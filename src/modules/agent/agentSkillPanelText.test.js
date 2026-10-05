@@ -38,7 +38,7 @@ test('全部值为非空字符串且不含 NBSP 等异形空格', () => {
     for (const [key, value] of Object.entries(table)) {
       assert.equal(typeof value, 'string', key);
       assert.ok(value.trim().length > 0, key);
-      assert.ok(!value.includes('\u00a0'), key);
+      assert.ok(!value.includes('\xa0'), key);
       assert.ok(!value.includes('\t'), key);
     }
 });

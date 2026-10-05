@@ -123,7 +123,7 @@ export async function savePersonReplacementAppearanceToAssetPackage({
     imageUrl: imageUrl2,
     totalAssetRef: {
       assetId: normalizeText(itemCreated?.['assetId']),
-      itemIndex: Math['max'](0x0, Math['trunc'](Number(itemCreated?.['itemIndex']) || 0x0)),
+      itemIndex: Math['max'](0, Math['trunc'](Number(itemCreated?.['itemIndex']) || 0)),
       itemKey: itemKey['itemKey'],
       imageUrl: imageUrl2,
       updatedAt: Date['now'](),

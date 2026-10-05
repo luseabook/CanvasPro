@@ -151,10 +151,10 @@ test('returns nothing for a lone trigger', () => {
 });
 
 test('advances by code point so astral characters stay inside a matched name', () => {
-  const candidate = nodeCandidate('a\u{20000}b');
-  const matches = matchPromptMentions('@a\u{20000}b', [candidate]);
+  const candidate = nodeCandidate('a𠀀b');
+  const matches = matchPromptMentions('@a𠀀b', [candidate]);
   assert.equal(matches.length, 1);
-  assert.equal(matches[0].name, 'a\u{20000}b');
+  assert.equal(matches[0].name, 'a𠀀b');
   assert.equal(matches[0].end, 5);
   assert.equal(matches[0].candidates.length, 1);
 });

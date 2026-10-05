@@ -24,9 +24,9 @@ export function toggleSourceVideoManualPlayback(
     const item = enabled3['_getBaseDuration'](),
       key = enabled3['_getClipRange'](item);
     if (key['active']) {
-      const index = enabled4['currentTime'] || 0x0;
+      const index = enabled4['currentTime'] || 0;
       (index < key['start'] || index > key['end']) && (enabled4['currentTime'] = key['start']);
-    } else enabled4['ended'] === !![] && (enabled4['currentTime'] = 0x0);
+    } else enabled4['ended'] === !![] && (enabled4['currentTime'] = 0);
     void enabled3['_playVideoWithRecovery']('manual', () => enabled3['_isManualControl'])['then'](
       (result) => {
         result

@@ -1,8 +1,8 @@
 import { getLocale } from '../i18n/index.js';
 const WORDS = {
   cnySecond: ['元 / 秒', 'CNY / second'],
-  cnyImage: ['元\x20/\x20张', 'CNY / image'],
-  cnyCall: ['元 / 次', 'CNY\x20/\x20request'],
+  cnyImage: ['元 / 张', 'CNY / image'],
+  cnyCall: ['元 / 次', 'CNY / request'],
   price: ['参考价', 'Reference price'],
   loading: ['参考价查询中', 'Loading reference price'],
   unavailable: ['参考价暂不可用', 'Reference price unavailable'],
@@ -13,19 +13,19 @@ const WORDS = {
   output: ['输出', 'Output'],
   cached_input: ['缓存读取', 'Cache read'],
   explicit_cached_input: ['显式缓存读取', 'Explicit cache read'],
-  cache_write: ['缓存写入', 'Cache\x20write'],
+  cache_write: ['缓存写入', 'Cache write'],
   cache_write_5m: ['缓存写入 · 5 分钟', 'Cache write · 5 min'],
-  cache_write_1h: ['缓存写入 · 1 小时', 'Cache\x20write\x20·\x201\x20hour'],
+  cache_write_1h: ['缓存写入 · 1 小时', 'Cache write · 1 hour'],
   output_thinking: ['思考输出', 'Thinking output'],
   text_input: ['文本输入', 'Text input'],
   cached_text_input: ['文本缓存读取', 'Cached text input'],
   image_input: ['图片输入', 'Image input'],
   cached_image_input: ['图片缓存读取', 'Cached image input'],
-  text_output: ['文本输出', 'Text\x20output'],
-  image_output: ['图片输出', 'Image\x20output'],
-  tokenUnit: ['美元 / 百万 tokens', 'USD\x20/\x20million\x20tokens'],
+  text_output: ['文本输出', 'Text output'],
+  image_output: ['图片输出', 'Image output'],
+  tokenUnit: ['美元 / 百万 tokens', 'USD / million tokens'],
   second: ['美元 / 秒', 'USD / second'],
-  image: ['美元\x20/\x20张', 'USD / image'],
+  image: ['美元 / 张', 'USD / image'],
   call: ['美元 / 次', 'USD / request'],
   inputImage: ['参考图输入', 'Reference image input'],
   storage: ['缓存存储', 'Cache storage'],
@@ -42,7 +42,7 @@ const WORDS = {
   unlimited: ['无上限', 'Unlimited'],
   listed: [
     '仅供参考，以账号实际账单为准。',
-    'For\x20reference\x20only;\x20your\x20account\x20invoice\x20is\x20authoritative.',
+    'For reference only; your account invoice is authoritative.',
   ],
   variable: [
     '费用受输出用量、参考素材和附加工具影响，不代表最终扣费。',
@@ -72,15 +72,15 @@ const WORDS = {
   ],
 };
 export function priceText(value) {
-  return WORDS[value]?.[getLocale() === 'en-US' ? 0x1 : 0x0] || value;
+  return WORDS[value]?.[getLocale() === 'en-US' ? 1 : 0] || value;
 }
 export function formatPrice(count, item = 'USD') {
-  const key = item === 'USD' ? '$' : item === 'CNY' ? '¥' : item + '\x20';
-  if (count === 0x0) return key + '0';
-  if (count > 0x0 && count < 0.000001) return '<' + key + '0.000001';
+  const key = item === 'USD' ? '$' : item === 'CNY' ? '¥' : item + ' ';
+  if (count === 0) return key + '0';
+  if (count > 0 && count < 0.000001) return '<' + key + '0.000001';
   return (
     '' +
     key +
-    Number(count)['toLocaleString']('en-US', { minimumFractionDigits: 0x2, maximumFractionDigits: 0x6 })
+    Number(count)['toLocaleString']('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })
   );
 }

@@ -114,9 +114,9 @@ test('几何 Worker：无三角面的 OBJ 回报解析错误', () => {
 
 test('几何 Worker：STL 二进制通道回传三角面计数', () => {
   const faces = 1;
-  const bytes = new Uint8Array(0x54 + faces * 0x32);
+  const bytes = new Uint8Array(84 + faces * 50);
   const view = new DataView(bytes.buffer);
-  view.setUint32(0x50, faces, true);
+  view.setUint32(80, faces, true);
   const posts = dispatch({
     type: 'parse',
     requestId: 'req-5',

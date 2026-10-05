@@ -15,7 +15,7 @@ export function nodeReferencePresentation(error, value = '节点') {
           ? 'image'
           : 'text',
     index = Array['isArray'](error['images'])
-      ? error['images'][Math['max'](0x0, Number(error['mainImageIndex']) || 0x0)] || error['images'][0x0]
+      ? error['images'][Math['max'](0, Number(error['mainImageIndex']) || 0)] || error['images'][0]
       : null,
     result =
       key === 'image'

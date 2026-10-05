@@ -17,7 +17,7 @@ function markLifecycle(value, url2) {
     sourceUrl: url2['sourceUrl'],
     size: url2['size'],
     activeCount: activeObjectUrls['size'],
-    createDurationMs: Number(url2['createDurationMs'] || 0x0),
+    createDurationMs: Number(url2['createDurationMs'] || 0),
   });
 }
 export function createTrackedMediaObjectUrl(
@@ -32,10 +32,10 @@ export function createTrackedMediaObjectUrl(
     kind: String(kind || 'media'),
     ownerId: String(ownerId || ''),
     sourceUrl: String(sourceUrl || ''),
-    size: Number(item?.['size'] || 0x0),
+    size: Number(item?.['size'] || 0),
     type: String(item?.['type'] || ''),
     createdAt: nowMs(),
-    createDurationMs: Math['max'](0x0, nowMs() - nowMs2),
+    createDurationMs: Math['max'](0, nowMs() - nowMs2),
   };
   return (activeObjectUrls['set'](url3, key), exposeSnapshotReader(), markLifecycle('created', key), url3);
 }
@@ -47,7 +47,7 @@ export function revokeTrackedMediaObjectUrl(index) {
     kind: 'unknown',
     ownerId: '',
     sourceUrl: '',
-    size: 0x0,
+    size: 0,
   };
   activeObjectUrls['delete'](url4);
   try {

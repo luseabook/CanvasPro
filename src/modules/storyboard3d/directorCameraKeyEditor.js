@@ -3,7 +3,7 @@ export function renderDirectorCameraKeyEditor(value) {
     '<label>' +
     index +
     '<input type="number" step="0.1" value="' +
-    Number(key)['toFixed'](0x3) +
+    Number(key)['toFixed'](3) +
     '" data-director-camera-key="' +
     item +
     '"></label>';
@@ -21,16 +21,16 @@ export function renderDirectorCameraKeyEditor(value) {
           '</div>',
       )
       ['join']('') +
-    '\x0a\x20\x20<div>' +
+    '\n  <div>' +
     run('focalLength', value['camera']['focalLength'], '焦距 mm') +
-    run('roll', ((value['camera']['roll'] || 0x0) * 0xb4) / Math['PI'], '倾斜°') +
+    run('roll', ((value['camera']['roll'] || 0) * 180) / Math['PI'], '倾斜°') +
     '<label>缓动<select data-director-camera-key-easing>' +
     ['linear', 'ease-in', 'ease-out', 'ease-in-out']
       ['map'](
         (target) =>
           '<option value="' +
           target +
-          '\x22\x20' +
+          '" ' +
           (value['easing'] === target ? 'selected' : '') +
           '>' +
           { linear: '匀速', 'ease-in': '缓入', 'ease-out': '缓出', 'ease-in-out': '缓入缓出' }[target] +

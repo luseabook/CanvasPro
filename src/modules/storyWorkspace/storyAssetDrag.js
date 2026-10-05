@@ -9,7 +9,7 @@ export const STORY_ASSET_DRAG_PREVIEW_POINTER_GAP = WORKSPACE_ASSET_DRAG_PREVIEW
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
-export function writeStoryAssetDragData(item, key, index = 0x0) {
+export function writeStoryAssetDragData(item, key, index = 0) {
   const text = normalizeText(key);
   if (!text || typeof item?.['setData'] !== 'function') return ![];
   try {
@@ -17,7 +17,7 @@ export function writeStoryAssetDragData(item, key, index = 0x0) {
       item['setData'](STORY_ASSET_DRAG_MIME, text),
       item['setData'](
         STORY_ASSET_DRAG_INDEX_MIME,
-        String(Math['max'](0x0, Math['trunc'](Number(index) || 0x0))),
+        String(Math['max'](0, Math['trunc'](Number(index) || 0))),
       ),
       (item['effectAllowed'] = 'copy'),
       !![]
@@ -35,11 +35,11 @@ export function readStoryAssetDragData(result) {
   }
 }
 export function readStoryAssetDragItemIndex(data) {
-  if (typeof data?.['getData'] !== 'function') return 0x0;
+  if (typeof data?.['getData'] !== 'function') return 0;
   try {
-    return Math['max'](0x0, Math['trunc'](Number(data['getData'](STORY_ASSET_DRAG_INDEX_MIME)) || 0x0));
+    return Math['max'](0, Math['trunc'](Number(data['getData'](STORY_ASSET_DRAG_INDEX_MIME)) || 0));
   } catch {
-    return 0x0;
+    return 0;
   }
 }
 export function hasStoryAssetDragData(options) {
@@ -65,7 +65,7 @@ export function getStoryPromptDropRange(dom, enabled, target, source) {
   const enabled2 = entry?.['startContainer'];
   if (
     !enabled2 ||
-    enabled2['nodeType'] !== 0x3 ||
+    enabled2['nodeType'] !== 3 ||
     !enabled['contains']?.(enabled2) ||
     enabled2['parentElement']?.['closest']?.('.ref-pill')
   )

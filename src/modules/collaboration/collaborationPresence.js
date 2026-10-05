@@ -40,8 +40,8 @@ export function createCollaborationPresence({
       const el2 = documentObject['querySelector']('.v2-canvas-stage');
       return (
         el2?.['getBoundingClientRect']() || {
-          left: 0x0,
-          top: 0x0,
+          left: 0,
+          top: 0,
           width: windowObject['innerWidth'],
           height: windowObject['innerHeight'],
         }
@@ -51,7 +51,7 @@ export function createCollaborationPresence({
     const item = windowObject['getComputedStyle'](documentObject['documentElement'])['getPropertyValue'](
         '--pointer-cursor-image',
       ),
-      enabled3 = item['match'](/url\(["']?([^"')]+)["']?\)/)?.[0x1];
+      enabled3 = item['match'](/url\(["']?([^"')]+)["']?\)/)?.[1];
     if (!enabled3 || value === enabled3) return;
     ((value = enabled3),
       void loadCursorMetrics(enabled3)
@@ -69,7 +69,7 @@ export function createCollaborationPresence({
       const index = getSession(),
         state = index?.['state'],
         bounds = handler();
-      el['hidden'] = !state || bounds['width'] <= 0x0 || bounds['height'] <= 0x0;
+      el['hidden'] = !state || bounds['width'] <= 0 || bounds['height'] <= 0;
       let viewport = run();
       if (state?.['locateView']) {
         const zoom = state['locateView'];
@@ -79,8 +79,8 @@ export function createCollaborationPresence({
           zoom: zoom['zoom'],
         });
         (store['updateViewport'](
-          viewport['x'] + bounds['left'] + bounds['width'] / 0x2 - box3['x'],
-          viewport['y'] + bounds['top'] + bounds['height'] / 0x2 - box3['y'],
+          viewport['x'] + bounds['left'] + bounds['width'] / 2 - box3['x'],
+          viewport['y'] + bounds['top'] + bounds['height'] / 2 - box3['y'],
           zoom['zoom'],
         ),
           (viewport = store['getStateRaw']()['viewport']));
@@ -90,8 +90,8 @@ export function createCollaborationPresence({
         const box5 = worldToScreen(box4['x'], box4['y'], viewport);
         ((state['locateActorId'] = ''),
           store['updateViewport'](
-            viewport['x'] + bounds['left'] + bounds['width'] / 0x2 - box5['x'],
-            viewport['y'] + bounds['top'] + bounds['height'] / 0x2 - box5['y'],
+            viewport['x'] + bounds['left'] + bounds['width'] / 2 - box5['x'],
+            viewport['y'] + bounds['top'] + bounds['height'] / 2 - box5['y'],
             viewport['zoom'],
           ),
           (viewport = store['getStateRaw']()['viewport']));
@@ -100,7 +100,7 @@ export function createCollaborationPresence({
         (enabled4) =>
           enabled4['actorId'] === state['followActorId'] &&
           enabled4['clientId'] !== state['clientId'] &&
-          (!enabled4['expiresAt'] || enabled4['expiresAt'] * 0x3e8 > Date['now']()),
+          (!enabled4['expiresAt'] || enabled4['expiresAt'] * 1000 > Date['now']()),
       );
       if (state?.['followActorId'] && !zoom2) index['follow']('');
       if (zoom2?.['view']) {
@@ -108,8 +108,8 @@ export function createCollaborationPresence({
             ...viewport,
             zoom: zoom2['view']['zoom'],
           }),
-          data = viewport['x'] + bounds['left'] + bounds['width'] / 0x2 - box6['x'],
-          options = viewport['y'] + bounds['top'] + bounds['height'] / 0x2 - box6['y'];
+          data = viewport['x'] + bounds['left'] + bounds['width'] / 2 - box6['x'],
+          options = viewport['y'] + bounds['top'] + bounds['height'] / 2 - box6['y'];
         if (
           Math['abs'](data - viewport['x']) > 0.1 ||
           Math['abs'](options - viewport['y']) > 0.1 ||
@@ -135,7 +135,7 @@ export function createCollaborationPresence({
                 el3['append'](current, entry, record),
                 el3['addEventListener']('click', () => getSession()?.['locate'](el3['dataset']['actorId'])),
                 el3['addEventListener']('keydown', (event) => {
-                  (event['key'] === 'Enter' || event['key'] === '\x20') &&
+                  (event['key'] === 'Enter' || event['key'] === ' ') &&
                     (event['preventDefault'](), getSession()?.['locate'](el3['dataset']['actorId']));
                 }));
             }
@@ -145,7 +145,7 @@ export function createCollaborationPresence({
         };
       for (const id2 of state?.['presence'] || []) {
         if (id2['clientId'] === state['clientId']) continue;
-        if (id2['expiresAt'] && id2['expiresAt'] * 0x3e8 < Date['now']()) continue;
+        if (id2['expiresAt'] && id2['expiresAt'] * 1000 < Date['now']()) continue;
         const collaborationMemberColor2 = collaborationMemberColor(
             state['members']?.['find']((payload) => payload['id'] === id2['actorId']) || {
               id: id2['actorId'],
@@ -154,7 +154,7 @@ export function createCollaborationPresence({
           list = Object['keys'](state['locks'] || {})['filter'](
             (handle) =>
               state['locks'][handle]['clientId'] === id2['clientId'] &&
-              state['locks'][handle]['expiresAt'] * 0x3e8 > Date['now'](),
+              state['locks'][handle]['expiresAt'] * 1000 > Date['now'](),
           );
         for (const config of new Set([...(id2['selected'] || []), ...list])) {
           const box7 = readNodeGeometryPreview(config, store['getStateRaw']()['nodes'][config]);
@@ -177,22 +177,22 @@ export function createCollaborationPresence({
           el5['style']['setProperty']('--member-color', collaborationMemberColor2),
           el5['style']['setProperty']('--member-direction', viewportEdge['angle'] + 'deg'),
           el5['classList']['toggle']('is-offscreen', viewportEdge['outside']),
-          el5['classList']['toggle']('is-right', box9['x'] > bounds['left'] + bounds['width'] / 0x2),
-          el5['classList']['toggle']('is-bottom', box9['y'] > bounds['top'] + bounds['height'] - 0x3c));
+          el5['classList']['toggle']('is-right', box9['x'] > bounds['left'] + bounds['width'] / 2),
+          el5['classList']['toggle']('is-bottom', box9['y'] > bounds['top'] + bounds['height'] - 60));
         const el6 = el5['querySelector']('.collaboration-cursor-name');
         if (el6['textContent'] !== id2['name']) el6['textContent'] = id2['name'];
         ((el5['dataset']['member'] = id2['name']),
           (el5['dataset']['actorId'] = id2['actorId']),
           el5['setAttribute']('role', 'button'),
-          (el5['tabIndex'] = viewportEdge['outside'] && offscreenMembers ? 0x0 : -0x1),
-          el5['setAttribute']('aria-label', '定位\x20' + id2['name']),
+          (el5['tabIndex'] = viewportEdge['outside'] && offscreenMembers ? 0 : -1),
+          el5['setAttribute']('aria-label', '定位 ' + id2['name']),
           (el5['hidden'] = viewportEdge['outside'] && !offscreenMembers));
       }
       const map5 = new Set(state?.['editingPending'] || []);
       for (const scope of map3['keys']()) if (!map5['has'](scope)) map3['delete'](scope);
       for (const input of map5) {
         if (!map3['has'](input)) map3['set'](input, Date['now']());
-        if (Date['now']() - map3['get'](input) < 0xc8) continue;
+        if (Date['now']() - map3['get'](input) < 200) continue;
         const box10 = readNodeGeometryPreview(input, store['getStateRaw']()['nodes'][input]);
         if (box10 !== store['getStateRaw']()['nodes'][input]) continue;
         if (!box10) continue;
@@ -226,7 +226,7 @@ export function createCollaborationPresence({
       if (map5['size'] || map2['active']())
         setTimeout2 = setTimeout(() => {
           if (!enabled2 && !enabled) enabled = windowObject['requestAnimationFrame'](key);
-        }, 0xc8);
+        }, 200);
     },
     redraw = () => {
       if (enabled2) return;
@@ -235,7 +235,7 @@ export function createCollaborationPresence({
       getSession()?.['setPresence']({
         ...(box ? screenToWorld(box['x'], box['y'], zoom3) : {}),
         view: {
-          ...screenToWorld(box12['left'] + box12['width'] / 0x2, box12['top'] + box12['height'] / 0x2, zoom3),
+          ...screenToWorld(box12['left'] + box12['width'] / 2, box12['top'] + box12['height'] / 2, zoom3),
           zoom: zoom3['zoom'],
         },
         selected: [...(store['getStateRaw']()['selectedNodeIds'] || [])],

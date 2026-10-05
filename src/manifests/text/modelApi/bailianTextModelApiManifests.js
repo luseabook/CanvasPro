@@ -22,10 +22,10 @@ export const BAILIAN_TEXT_OUTPUT_TOKENS_FIELD = Object['freeze']({
   placement: 'mode',
   variant: 'pillMenu',
   label: '输出上限',
-  defaultValue: 0x2000,
-  options: [0x1000, 0x2000, 0x4000, 0x8000]['map']((value2) => ({
+  defaultValue: 8192,
+  options: [4096, 8192, 16384, 32768]['map']((value2) => ({
     value: value2,
-    label: value2 / 0x400 + 'K',
+    label: value2 / 1024 + 'K',
   })),
 });
 export const bailianTextModelManifests = Object['freeze'](
@@ -42,8 +42,8 @@ export const bailianTextModelManifests = Object['freeze'](
       description: '百炼官方 · 文本、图片与视频画面理解',
       inputSlots: Object['freeze']({
         allowedKinds: Object['freeze'](['text', 'image', 'video']),
-        minByKind: Object['freeze']({ text: 0x0, image: 0x0 }),
-        maxByKind: Object['freeze']({ image: 0x8, video: 0x1, audio: 0x0 }),
+        minByKind: Object['freeze']({ text: 0, image: 0 }),
+        maxByKind: Object['freeze']({ image: 8, video: 1, audio: 0 }),
       }),
       uiSchema: Object['freeze']({
         fields: Object['freeze']([

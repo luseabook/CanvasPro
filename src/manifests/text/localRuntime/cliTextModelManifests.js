@@ -1,7 +1,7 @@
 const CLI_TEXT_INPUT_SLOTS = Object['freeze']({
     allowedKinds: Object['freeze'](['text', 'image']),
-    minByKind: Object['freeze']({ text: 0x0 }),
-    maxByKind: Object['freeze']({ image: 0x5, video: 0x0, audio: 0x0 }),
+    minByKind: Object['freeze']({ text: 0 }),
+    maxByKind: Object['freeze']({ image: 5, video: 0, audio: 0 }),
   }),
   CLI_TEXT_UI_SCHEMA = Object['freeze']({
     fields: Object['freeze']([
@@ -101,7 +101,7 @@ export const cliTextModelManifests = Object['freeze']([
     icon: 'OA',
     title: 'OpenAI CLI',
     subtitle: '使用本机 ChatGPT/Codex 账号额度生成文本',
-    order: 0xa,
+    order: 10,
   }),
 ]);
 export const cliTextExecutionManifests = Object['freeze']([

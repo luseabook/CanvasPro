@@ -11,24 +11,24 @@ function toolSchema(list) {
   if (enabled['type'] === 'array' && !enabled['items']) enabled['items'] = {};
   return enabled;
 }
-export function sanitizeMcpResult(list2, count = 0x0) {
-  if (count > 0x12) return '[depth limit]';
+export function sanitizeMcpResult(list2, count = 0) {
+  if (count > 18) return '[depth limit]';
   if (typeof list2 === 'string') {
     if (/^data:|^blob:/i['test'](list2)) return '[inline media omitted]';
-    return list2['length'] > 0x5dc0 ? list2['slice'](0x0, 0x5dc0) + '…[truncated]' : list2;
+    return list2['length'] > 24000 ? list2['slice'](0, 24000) + '…[truncated]' : list2;
   }
   if (Array['isArray'](list2)) {
-    if (list2['length'] > 0x7d0)
+    if (list2['length'] > 2000)
       throw new Error(
         'Result has too many entries; request a smaller selection. Do not resubmit a mutation.',
       );
-    return list2['map']((key) => sanitizeMcpResult(key, count + 0x1));
+    return list2['map']((key) => sanitizeMcpResult(key, count + 1));
   }
   if (list2 && typeof list2 === 'object')
     return Object['fromEntries'](
       Object['entries'](list2)
         ['filter'](([index, result]) => !SENSITIVE_KEY['test'](index) && typeof result !== 'function')
-        ['map'](([data, options]) => [data, sanitizeMcpResult(options, count + 0x1)]),
+        ['map'](([data, options]) => [data, sanitizeMcpResult(options, count + 1)]),
     );
   return list2;
 }
@@ -36,7 +36,7 @@ export function canExposeCanvasCommand(target, { allowGeneration: allowGeneratio
   const source = target['capabilitySchema'] || {};
   if (!Array['isArray'](source['writes']) || source['requiresSystemAccess']) return ![];
   if (!['safe', 'confirm']['includes'](target['riskLevel'])) return ![];
-  if (PRIVATE_NAMESPACES['has'](target['id']['split']('.')[0x0])) return ![];
+  if (PRIVATE_NAMESPACES['has'](target['id']['split']('.')[0])) return ![];
   if (source['writes']['some']((next) => !CANVAS_WRITES['has'](next))) return ![];
   if (
     source['writes']['includes']('generationTasks') &&
@@ -54,26 +54,26 @@ export function buildCanvasMcpTools(current, entry = {}) {
         description['description'] +
         ' Uses the connected canvas. ' +
         (description['capabilitySchema']['writes']['includes']('generationTasks')
-          ? 'Generation\x20may\x20consume\x20provider\x20credits;\x20follow\x20the\x20user\x27s\x20authorized\x20scope.\x20'
+          ? 'Generation may consume provider credits; follow the user\'s authorized scope. '
           : '') +
-        'Reuse\x20requestKey\x20when\x20retrying\x20an\x20uncertain\x20submission.',
+        'Reuse requestKey when retrying an uncertain submission.',
       inputSchema: {
         type: 'object',
         properties: {
           ...toolSchema(description['argsSchema']['properties']),
           requestKey: {
             type: 'string',
-            minLength: 0x8,
-            maxLength: 0x64,
+            minLength: 8,
+            maxLength: 100,
             description:
-              'Unique\x20operation\x20ID;\x20reuse\x20only\x20when\x20retrying\x20exactly\x20the\x20same\x20call.',
+              'Unique operation ID; reuse only when retrying exactly the same call.',
           },
         },
         required: [...description['argsSchema']['required'], 'requestKey'],
         additionalProperties: ![],
       },
       annotations: {
-        readOnlyHint: description['capabilitySchema']['writes']['length'] === 0x0,
+        readOnlyHint: description['capabilitySchema']['writes']['length'] === 0,
         destructiveHint: ![],
         openWorldHint: description['capabilitySchema']['writes']['includes']('generationTasks'),
       },
@@ -91,8 +91,8 @@ export function buildCanvasMcpTools(current, entry = {}) {
           query: { type: 'string' },
           kind: { type: 'string', enum: ['text', 'image', 'video', 'audio'] },
           modelId: { type: 'string' },
-          offset: { type: 'integer', minimum: 0x0 },
-          requestKey: { type: 'string', minLength: 0x8, maxLength: 0x64 },
+          offset: { type: 'integer', minimum: 0 },
+          requestKey: { type: 'string', minLength: 8, maxLength: 100 },
         },
         required: ['requestKey'],
         additionalProperties: ![],
@@ -120,11 +120,11 @@ export function describeCanvasMcpModels(list4, enabled2 = {}) {
               ['includes'](enabled3),
           )),
     ),
-    nextOffset = Number['isInteger'](enabled2['offset']) ? Math['max'](0x0, enabled2['offset']) : 0x0;
+    nextOffset = Number['isInteger'](enabled2['offset']) ? Math['max'](0, enabled2['offset']) : 0;
   return sanitizeMcpResult({
     total: total['length'],
-    nextOffset: nextOffset + 0x14 < total['length'] ? nextOffset + 0x14 : null,
-    models: total['slice'](nextOffset, nextOffset + 0x14)['map']((modelId) => ({
+    nextOffset: nextOffset + 20 < total['length'] ? nextOffset + 20 : null,
+    models: total['slice'](nextOffset, nextOffset + 20)['map']((modelId) => ({
       modelId: modelId['modelId'],
       name: modelId['displayName'] || modelId['name'] || modelId['label'],
       kind: modelId['kind'],

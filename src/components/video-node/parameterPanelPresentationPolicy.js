@@ -37,7 +37,7 @@ export function resolveVideoAdaptiveRatioSource({
   adaptivePolicy: adaptivePolicy = {},
 } = {}) {
   const list = Array['isArray'](inEdges) ? inEdges : [];
-  let edge = pickGenerationRatioSourceEdge(list, nodeData) || list[0x0] || null;
+  let edge = pickGenerationRatioSourceEdge(list, nodeData) || list[0] || null;
   const result = String(adaptivePolicy?.['preferSlot'] || '')['trim'](),
     data = adaptivePolicy?.['preferVideoKind'] === !![],
     fallbackSquare = adaptivePolicy?.['fallbackSquareWhenNoVideo'] === !![];
@@ -78,7 +78,7 @@ function getManifestConditionFieldValue(options2 = {}, handle = '') {
     return plainGenerationParams[enabled2];
   if (Object['prototype']['hasOwnProperty']['call'](options2 || {}, enabled2)) return options2[enabled2];
   const list2 = enabled2['split']('.')['filter'](Boolean);
-  if (list2['length'] <= 0x1) return undefined;
+  if (list2['length'] <= 1) return undefined;
   let enabled3 = options2;
   for (const state of list2) {
     if (!enabled3 || typeof enabled3 !== 'object') return undefined;
@@ -101,7 +101,7 @@ function manifestConditionMatches(el, config = {}) {
       : Object['prototype']['hasOwnProperty']['call'](el, 'value')
         ? [el['value']]
         : [];
-  if (list3['length'] === 0x0) return Boolean(manifestConditionFieldValue);
+  if (list3['length'] === 0) return Boolean(manifestConditionFieldValue);
   return list3['some'](
     (value2) =>
       manifestConditionFieldValue === value2 ||

@@ -1,14 +1,14 @@
 import { getArrowGeometry } from '../imageAnnotate/arrowGeometry.js';
 import { getWhiteboardShapeBounds } from '../imageAnnotate/whiteboardShapes.js';
 import { getPolylineBounds } from './whiteboardInteractionGeometry.js';
-export const WHITEBOARD_LAYER_HANDLE_RADIUS_SCREEN = 0xa;
-export const WHITEBOARD_LAYER_ROTATE_OFFSET_SCREEN = 0x18;
+export const WHITEBOARD_LAYER_HANDLE_RADIUS_SCREEN = 10;
+export const WHITEBOARD_LAYER_ROTATE_OFFSET_SCREEN = 24;
 export const WHITEBOARD_LAYER_MIN_SCALE = 0.05;
-export const WHITEBOARD_LAYER_MAX_SCALE = 0x28;
+export const WHITEBOARD_LAYER_MAX_SCALE = 40;
 const TRANSFORMABLE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape', 'arrow', 'number-label']),
   GENERIC_RESIZE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape', 'number-label']),
   GENERIC_ROTATE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape']),
-  finiteNumberOr = (value, item = 0x0) => {
+  finiteNumberOr = (value, item = 0) => {
     const key = Number(value);
     return Number['isFinite'](key) ? key : item;
   },
@@ -23,7 +23,7 @@ const TRANSFORMABLE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape', 'arrow'
       y: finiteNumberOr(box2?.['y']) + finiteNumberOr2 * source + finiteNumberOr3 * target,
     };
   },
-  boundsFromPoints = (next, current = 0x0) => {
+  boundsFromPoints = (next, current = 0) => {
     let x = Infinity,
       y = Infinity,
       width = -Infinity,
@@ -38,12 +38,12 @@ const TRANSFORMABLE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape', 'arrow'
         (height = Math['max'](height, record)));
     });
     if (!Number['isFinite'](x)) return null;
-    const payload = Math['max'](0x0, finiteNumberOr(current));
+    const payload = Math['max'](0, finiteNumberOr(current));
     return {
       x: x - payload,
       y: y - payload,
-      width: width - x + payload * 0x2,
-      height: height - y + payload * 0x2,
+      width: width - x + payload * 2,
+      height: height - y + payload * 2,
     };
   },
   getArrowPathPoints = (handle) => {
@@ -51,8 +51,8 @@ const TRANSFORMABLE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape', 'arrow'
     if (x2['type'] === 'elbow') return x2['points'];
     if (x2['type'] !== 'arc') return [x2['start'], x2['end']];
     const list = [],
-      state = 0x10;
-    for (let config = 0x0; config <= state; config += 0x1) {
+      state = 16;
+    for (let config = 0; config <= state; config += 1) {
       const scope = config / state,
         input = x2['anticlockwise']
           ? x2['startAngle'] - x2['sweep'] * scope
@@ -65,34 +65,34 @@ const TRANSFORMABLE_TYPES = new Set(['brush', 'eraser', 'rect', 'shape', 'arrow'
     return list;
   },
   getLayerBounds = (box4) => {
-    const output = Math['max'](0x0, finiteNumberOr(box4?.['sizeWorld'], 0x1) / 0x2);
+    const output = Math['max'](0, finiteNumberOr(box4?.['sizeWorld'], 1) / 2);
     if (box4?.['type'] === 'brush' || box4?.['type'] === 'eraser')
       return getPolylineBounds(box4['points'], output);
     if (box4?.['type'] === 'rect' || box4?.['type'] === 'shape') return getWhiteboardShapeBounds(box4);
     if (box4?.['type'] === 'arrow') return boundsFromPoints(getArrowPathPoints(box4), output);
     if (box4?.['type'] === 'number-label') {
-      const width2 = Math['max'](0x1, finiteNumberOr(box4['sizeWorld'], 0x12) / 0x2);
+      const width2 = Math['max'](1, finiteNumberOr(box4['sizeWorld'], 18) / 2);
       return {
         x: finiteNumberOr(box4['x']) - width2,
         y: finiteNumberOr(box4['y']) - width2,
-        width: width2 * 0x2,
-        height: width2 * 0x2,
+        width: width2 * 2,
+        height: width2 * 2,
       };
     }
     return null;
   };
 export const isWhiteboardLayerTransformable = (value2) => TRANSFORMABLE_TYPES['has'](value2?.['type']);
-export function getWhiteboardLayerGeometry(value3, { zoom: zoom = 0x1 } = {}) {
+export function getWhiteboardLayerGeometry(value3, { zoom: zoom = 1 } = {}) {
   if (!isWhiteboardLayerTransformable(value3)) return null;
   const x3 = getLayerBounds(value3);
   if (!x3) return null;
-  const value4 = Math['max'](0.001, finiteNumberOr(zoom, 0x1)),
+  const value4 = Math['max'](0.001, finiteNumberOr(zoom, 1)),
     x4 = {
-      x: x3['x'] + x3['width'] / 0x2,
-      y: x3['y'] + x3['height'] / 0x2,
+      x: x3['x'] + x3['width'] / 2,
+      y: x3['y'] + x3['height'] / 2,
     },
     rotation2 =
-      value3['type'] === 'rect' || value3['type'] === 'shape' ? finiteNumberOr(value3['rotation']) : 0x0,
+      value3['type'] === 'rect' || value3['type'] === 'shape' ? finiteNumberOr(value3['rotation']) : 0,
     list2 = [
       { id: 'nw', point: { x: x3['x'], y: x3['y'] } },
       { id: 'ne', point: { x: x3['x'] + x3['width'], y: x3['y'] } },
@@ -136,10 +136,10 @@ export function getWhiteboardLayerGeometry(value3, { zoom: zoom = 0x1 } = {}) {
     supportsRotation: supportsRotation,
   };
 }
-export function getWhiteboardLayerTransformHandleAtPoint(value5, box5, { zoom: zoom = 0x1 } = {}) {
+export function getWhiteboardLayerTransformHandleAtPoint(value5, box5, { zoom: zoom = 1 } = {}) {
   const args = getWhiteboardLayerGeometry(value5, { zoom: zoom });
   if (!args) return null;
-  const value6 = WHITEBOARD_LAYER_HANDLE_RADIUS_SCREEN / Math['max'](0.001, finiteNumberOr(zoom, 0x1)),
+  const value6 = WHITEBOARD_LAYER_HANDLE_RADIUS_SCREEN / Math['max'](0.001, finiteNumberOr(zoom, 1)),
     list3 = [...(args['rotationHandle'] ? [args['rotationHandle']] : []), ...args['scaleHandles']];
   return (
     list3['find'](
@@ -189,7 +189,7 @@ export function createWhiteboardLayerTransformSession({
 const transformPoint = (
     box7,
     x5,
-    { scale: scale = 0x1, rotation: rotation = 0x0, dx: dx = 0x0, dy: dy = 0x0 } = {},
+    { scale: scale = 1, rotation: rotation = 0, dx: dx = 0, dy: dy = 0 } = {},
   ) => {
     const value8 = {
         x: x5['x'] + (finiteNumberOr(box7?.['x']) - x5['x']) * scale,
@@ -209,10 +209,10 @@ const transformPoint = (
 export function applyWhiteboardLayerTransform(box10, center, box11) {
   if (!box10 || !center?.['base'] || box10['type'] !== center['base']['type']) return ![];
   const box12 = { x: finiteNumberOr(box11?.['x']), y: finiteNumberOr(box11?.['y']) };
-  let scale2 = 0x1,
-    rotation3 = 0x0,
-    dx2 = 0x0,
-    dy2 = 0x0;
+  let scale2 = 1,
+    rotation3 = 0,
+    dx2 = 0,
+    dy2 = 0;
   if (center['mode'] === 'move')
     ((dx2 = box12['x'] - center['start']['x']), (dy2 = box12['y'] - center['start']['y']));
   else {
@@ -235,7 +235,7 @@ export function applyWhiteboardLayerTransform(box10, center, box11) {
       center['mode'] === 'move'
         ? Math['hypot'](dx2, dy2) > 0.01
         : center['mode'] === 'scale'
-          ? Math['abs'](scale2 - 0x1) > 0.001
+          ? Math['abs'](scale2 - 1) > 0.001
           : Math['abs'](rotation3) > 0.001,
     args4 = {
       center: center['center'],
@@ -249,16 +249,16 @@ export function applyWhiteboardLayerTransform(box10, center, box11) {
     ((box10['points'] = value12['points']['map']((value13) =>
       transformPoint(value13, center['center'], args4),
     )),
-      (box10['sizeWorld'] = Math['max'](0x1, finiteNumberOr(value12['sizeWorld'], 0x1) * scale2)));
+      (box10['sizeWorld'] = Math['max'](1, finiteNumberOr(value12['sizeWorld'], 1) * scale2)));
   else {
     if (box10['type'] === 'rect' || box10['type'] === 'shape')
-      (applyPointPair(box10, value12, { ...args4, rotation: 0x0 }),
-        (box10['sizeWorld'] = Math['max'](0x1, finiteNumberOr(value12['sizeWorld'], 0x1) * scale2)),
+      (applyPointPair(box10, value12, { ...args4, rotation: 0 }),
+        (box10['sizeWorld'] = Math['max'](1, finiteNumberOr(value12['sizeWorld'], 1) * scale2)),
         (box10['rotation'] = finiteNumberOr(value12['rotation']) + rotation3));
     else {
       if (box10['type'] === 'arrow')
         (applyPointPair(box10, value12, args4),
-          (box10['sizeWorld'] = Math['max'](0x1, finiteNumberOr(value12['sizeWorld'], 0x1) * scale2)),
+          (box10['sizeWorld'] = Math['max'](1, finiteNumberOr(value12['sizeWorld'], 1) * scale2)),
           (box10['bend'] = finiteNumberOr(value12['bend']) * scale2),
           (box10['elbowOffset'] = finiteNumberOr(value12['elbowOffset']) * scale2));
       else {
@@ -266,7 +266,7 @@ export function applyWhiteboardLayerTransform(box10, center, box11) {
           const box13 = transformPoint(value12, center['center'], args4);
           ((box10['x'] = box13['x']),
             (box10['y'] = box13['y']),
-            (box10['sizeWorld'] = Math['max'](0x1, finiteNumberOr(value12['sizeWorld'], 0x12) * scale2)));
+            (box10['sizeWorld'] = Math['max'](1, finiteNumberOr(value12['sizeWorld'], 18) * scale2)));
         }
       }
     }

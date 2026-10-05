@@ -51,7 +51,7 @@ export function resolveVideoClipSelectionBodyCursor(index = 'grab') {
 }
 const SMART_CLIP_IMAGE_EXT_RE = /\.(?:png|jpe?g|webp|bmp|gif)(?:[?#]|$)/i,
   VIDEO_CLIP_SEEK_EPSILON_SEC = 0.035,
-  VIDEO_CLIP_PLAY_SEEK_TIMEOUT_MS = 0x384;
+  VIDEO_CLIP_PLAY_SEEK_TIMEOUT_MS = 900;
 export const SMART_CLIP_KEYFRAME_DEFAULT_OPTIONS = Object['freeze']({
   mode: 'stable',
   maxSegments: SMART_CLIP_DEFAULT_SEGMENTS,
@@ -66,7 +66,7 @@ function escapeClipHelperHtml(options) {
     if (target === '&') return '&amp;';
     if (target === '<') return '&lt;';
     if (target === '>') return '&gt;';
-    if (target === '\x22') return '&quot;';
+    if (target === '"') return '&quot;';
     return '&#39;';
   });
 }
@@ -97,7 +97,7 @@ function getWindowTimer(payload) {
   const handle = globalThis['window']?.[payload] || globalThis[payload];
   return typeof handle === 'function' ? handle['bind'](globalThis['window'] || globalThis) : null;
 }
-function waitForSmartClipVideoEvent(el, state, config = 0x2710) {
+function waitForSmartClipVideoEvent(el, state, config = 10000) {
   const run = getWindowTimer('setTimeout'),
     handler = getWindowTimer('clearTimeout');
   if (!el || typeof run !== 'function') return Promise['resolve'](![]);
@@ -146,12 +146,12 @@ async function captureSmartClipVideoFirstFrame(enabled, fileNamePrefix) {
     try {
       el3['load']?.();
     } catch {}
-    const waitForVideoFrame2 = await waitForVideoFrame(el3, { timeoutMs: 0x2710 });
+    const waitForVideoFrame2 = await waitForVideoFrame(el3, { timeoutMs: 10000 });
     if (!waitForVideoFrame2) throw new Error('video frame is not ready');
     return (
-      Number(el3['currentTime'] || 0x0) > 0.001 &&
-        ((el3['currentTime'] = 0x0),
-        await waitForSmartClipVideoEvent(el3, ['seeked', 'timeupdate'], 0x1388)),
+      Number(el3['currentTime'] || 0) > 0.001 &&
+        ((el3['currentTime'] = 0),
+        await waitForSmartClipVideoEvent(el3, ['seeked', 'timeupdate'], 5000)),
       await captureVideoFrameSnapshot(el3, { fileNamePrefix: fileNamePrefix })
     );
   } finally {
@@ -166,7 +166,7 @@ async function extractSmartClipVideoResultFirstFrame(value6, value7, value8) {
   if (!smartClipResultUrl) throw new Error('missing video segment url');
   const captureSmartClipVideoFirstFrame2 = await captureSmartClipVideoFirstFrame(
     smartClipResultUrl,
-    'smart_clip_keyframe_' + (value8 + 0x1),
+    'smart_clip_keyframe_' + (value8 + 1),
   );
   return saveVideoFrameSnapshot(captureSmartClipVideoFirstFrame2, saveOutputBlob);
 }
@@ -183,10 +183,10 @@ function getSmartClipStageText(value10) {
   return videoClipText('smartClip.stages.processing');
 }
 function buildSmartClipProgressPayload(options2 = {}) {
-  const progress = Math['max'](0x0, Math['min'](0x1, Number(options2['progress'] || 0x0))),
-    pct = Math['round'](progress * 0x64),
-    doneCount = Number(options2['doneCount'] || 0x0),
-    total = Number(options2['total'] || 0x0),
+  const progress = Math['max'](0, Math['min'](1, Number(options2['progress'] || 0))),
+    pct = Math['round'](progress * 100),
+    doneCount = Number(options2['doneCount'] || 0),
+    total = Number(options2['total'] || 0),
     stage = String(options2['stage'] || ''),
     stageText = getSmartClipStageText(stage);
   return {
@@ -197,7 +197,7 @@ function buildSmartClipProgressPayload(options2 = {}) {
     doneCount: doneCount,
     total: total,
     text:
-      total > 0x0
+      total > 0
         ? videoClipText('smartClip.progressWithTotal', {
             stage: stageText,
             done: doneCount,
@@ -210,9 +210,9 @@ function buildSmartClipProgressPayload(options2 = {}) {
 function pickPositiveNumber(...args) {
   for (const value11 of args) {
     const count = Number(value11);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 function normalizeVideoClipReverseControl(onChange) {
   if (!onChange || typeof onChange['onChange'] !== 'function') return null;
@@ -231,8 +231,8 @@ function pickSelectedVideoItem(value12) {
   const list = Array['isArray'](value12?.['videos']) ? value12['videos'] : [];
   if (!list['length']) return null;
   const value13 = Number(value12?.['mainVideoIndex']),
-    value14 = Number['isFinite'](value13) ? Math['max'](0x0, Math['trunc'](value13)) : 0x0;
-  return list[Math['min'](value14, list['length'] - 0x1)] || list[0x0] || null;
+    value14 = Number['isFinite'](value13) ? Math['max'](0, Math['trunc'](value13)) : 0;
+  return list[Math['min'](value14, list['length'] - 1)] || list[0] || null;
 }
 const DIRECT_VIDEO_SOURCE_RE = /^(?:https?:|blob:|data:)/i,
   BLOCKED_VIDEO_SOURCE_RE = /^(?:file|javascript):/i;
@@ -264,7 +264,7 @@ export function buildVideoCutNodeMeta(value19, value20, value21, value22) {
     count2 =
       Number['isFinite'](value23) && Number['isFinite'](value24) && value24 > value23
         ? value24 - value23
-        : 0x0,
+        : 0,
     box = pickSelectedVideoItem(value19),
     positiveNumber = pickPositiveNumber(
       box?.['videoDuration'],
@@ -285,7 +285,7 @@ export function buildVideoCutNodeMeta(value19, value20, value21, value22) {
         box?.['fps'],
         value19?.['videoFps'],
         value19?.['fps'],
-      ) || (positiveNumber2 > 0x0 && positiveNumber > 0x0 ? positiveNumber2 / positiveNumber : 0x0),
+      ) || (positiveNumber2 > 0 && positiveNumber > 0 ? positiveNumber2 / positiveNumber : 0),
     positiveNumber4 = pickPositiveNumber(
       box?.['videoWidth'],
       box?.['width'],
@@ -299,13 +299,13 @@ export function buildVideoCutNodeMeta(value19, value20, value21, value22) {
       value19?.['selectedVideoHeight'],
     ),
     value25 = {};
-  if (count2 > 0x0) value25['videoDuration'] = count2;
-  if (positiveNumber3 > 0x0) value25['videoFps'] = positiveNumber3;
-  count2 > 0x0 &&
-    positiveNumber3 > 0x0 &&
-    (value25['videoFrameCount'] = Math['max'](0x1, Math['round'](count2 * positiveNumber3)));
-  if (positiveNumber4 > 0x0) value25['videoWidth'] = Math['round'](positiveNumber4);
-  if (positiveNumber5 > 0x0) value25['videoHeight'] = Math['round'](positiveNumber5);
+  if (count2 > 0) value25['videoDuration'] = count2;
+  if (positiveNumber3 > 0) value25['videoFps'] = positiveNumber3;
+  count2 > 0 &&
+    positiveNumber3 > 0 &&
+    (value25['videoFrameCount'] = Math['max'](1, Math['round'](count2 * positiveNumber3)));
+  if (positiveNumber4 > 0) value25['videoWidth'] = Math['round'](positiveNumber4);
+  if (positiveNumber5 > 0) value25['videoHeight'] = Math['round'](positiveNumber5);
   return value25;
 }
 export function buildVideoCutNodePlaybackFields(localPath) {
@@ -397,12 +397,12 @@ export async function runSmartClipFromVideoNode({
     if (!box2) throw new Error(videoClipText('errors.sourceNodeMissing'));
     const outputMode2 = normalizeSmartClipOutputMode(value36['outputMode'] || outputMode['outputMode']),
       reason2 = outputMode2 === SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
-      autoMediaSizeByShortSide = getAutoMediaSizeByShortSide(box2['width'] || 0x200, box2['height'] || 0x120),
+      autoMediaSizeByShortSide = getAutoMediaSizeByShortSide(box2['width'] || 512, box2['height'] || 288),
       { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
       { startX: startX, startY: startY } = calcSpawnStartFromAnchor(box2, spacing, direction),
       nodeIds = [],
       value37 = { ...(appStore['getState']()['nodes'] || {}) };
-    for (let doneCount2 = 0x0; doneCount2 < progress2['length']; doneCount2++) {
+    for (let doneCount2 = 0; doneCount2 < progress2['length']; doneCount2++) {
       const value38 = progress2[doneCount2] || {},
         resultLocalPath3 = pickResultLocalPath(value38);
       if (!resultLocalPath3) continue;
@@ -412,12 +412,12 @@ export async function runSmartClipFromVideoNode({
         emitSmartClipProgress(onProgress, {
           stage: 'frame',
           stageText: videoClipText('smartClip.stages.frame'),
-          progress: progress2['length'] > 0x0 ? doneCount2 / progress2['length'] : 0x0,
-          pct: progress2['length'] > 0x0 ? Math['round']((doneCount2 / progress2['length']) * 0x64) : 0x0,
+          progress: progress2['length'] > 0 ? doneCount2 / progress2['length'] : 0,
+          pct: progress2['length'] > 0 ? Math['round']((doneCount2 / progress2['length']) * 100) : 0,
           doneCount: doneCount2,
           total: progress2['length'],
           text: videoClipText('smartClip.extractingFrame', {
-            current: doneCount2 + 0x1,
+            current: doneCount2 + 1,
             total: progress2['length'],
           }),
           outputMode: outputMode2,
@@ -432,7 +432,7 @@ export async function runSmartClipFromVideoNode({
         if (!localPath3) continue;
       }
       const videoFps = normalizeSmartClipFps(value38['fps'] || outputMode['fps']),
-        videoDuration = Number(value38['duration']) > 0x0 ? Number(value38['duration']) : 0x0,
+        videoDuration = Number(value38['duration']) > 0 ? Number(value38['duration']) : 0,
         naturalWidth = pickPositiveNumber(
           originalLocalPath['width'],
           originalLocalPath['imageWidth'],
@@ -441,7 +441,7 @@ export async function runSmartClipFromVideoNode({
           box2['selectedVideoWidth'],
           box2['originalWidth'],
           box2['width'],
-          0x200,
+          512,
         ),
         naturalHeight = pickPositiveNumber(
           originalLocalPath['height'],
@@ -451,7 +451,7 @@ export async function runSmartClipFromVideoNode({
           box2['selectedVideoHeight'],
           box2['originalHeight'],
           box2['height'],
-          0x120,
+          288,
         ),
         width = reason2 ? getAutoMediaSizeByShortSide(naturalWidth, naturalHeight) : autoMediaSizeByShortSide,
         x = avoidOverlap
@@ -475,7 +475,7 @@ export async function runSmartClipFromVideoNode({
               y: x['y'],
               width: width['width'],
               height: width['height'],
-              name: videoClipText('smartClip.keyframeNodeName', { index: doneCount2 + 0x1 }),
+              name: videoClipText('smartClip.keyframeNodeName', { index: doneCount2 + 1 }),
               src: localPathToUrl(localPath3),
               localPath: localPath3,
               originalLocalPath: originalLocalPath['originalLocalPath'] || localPath3,
@@ -496,12 +496,12 @@ export async function runSmartClipFromVideoNode({
               y: x['y'],
               width: width['width'],
               height: width['height'],
-              name: videoClipText('smartClip.segmentNodeName', { index: doneCount2 + 0x1 }),
+              name: videoClipText('smartClip.segmentNodeName', { index: doneCount2 + 1 }),
               ...args2,
               videoDuration: videoDuration || undefined,
               videoFps: videoFps,
               videoFrameCount:
-                videoDuration > 0x0 ? Math['max'](0x1, Math['round'](videoDuration * videoFps)) : undefined,
+                videoDuration > 0 ? Math['max'](1, Math['round'](videoDuration * videoFps)) : undefined,
               needsAutoResize: ![],
               fixedSize: !![],
             });
@@ -559,11 +559,11 @@ const VideoClipController = {
     confirmBtnEl: null,
     thumbEls: null,
     videoEl: null,
-    durationSec: 0x0,
-    startSec: 0x0,
-    endSec: 0x0,
+    durationSec: 0,
+    startSec: 0,
+    endSec: 0,
     _dragMode: null,
-    _dragOffsetPx: 0x0,
+    _dragOffsetPx: 0,
     _onKeyDown: null,
     _onDocClick: null,
     _onLoadedMeta: null,
@@ -575,15 +575,15 @@ const VideoClipController = {
     _onSmartClipMaxSegmentDragMove: null,
     _onSmartClipMaxSegmentDragUp: null,
     _suppressSmartClipMaxSegmentClick: ![],
-    _retryRaf: 0x0,
-    _retryCount: 0x0,
-    _thumbToken: 0x0,
-    _sourceToken: 0x0,
-    _reverseRequestToken: 0x0,
-    _clipSessionToken: 0x0,
-    _playheadRaf: 0x0,
+    _retryRaf: 0,
+    _retryCount: 0,
+    _thumbToken: 0,
+    _sourceToken: 0,
+    _reverseRequestToken: 0,
+    _clipSessionToken: 0,
+    _playheadRaf: 0,
     _rangeLoopSeekPending: ![],
-    _rangePlaybackSeq: 0x0,
+    _rangePlaybackSeq: 0,
     _pendingPlaybackStartSec: null,
     _hiddenEls: null,
     _sourceOptions: null,
@@ -601,10 +601,10 @@ const VideoClipController = {
         (this['nodeId'] = nodeId3),
         (this['anchorNodeId'] = nodeId3),
         (this['_rangeLoopSeekPending'] = ![]),
-        (this['_rangePlaybackSeq'] += 0x1),
+        (this['_rangePlaybackSeq'] += 1),
         (this['_pendingPlaybackStartSec'] = null),
         appStore['setVideoClipState']({ active: !![], nodeId: nodeId3 }),
-        (this['_retryCount'] = 0x0),
+        (this['_retryCount'] = 0),
         this['_mountWhenReady']());
     },
     initForSource(dimMode = {}) {
@@ -621,16 +621,16 @@ const VideoClipController = {
         (this['nodeId'] = String(dimMode['anchorId'] || dimMode['nodeId'] || 'video-source-clip')),
         (this['anchorNodeId'] = this['nodeId']),
         (this['wrapperEl'] = enabled9),
-        (this['durationSec'] = 0x0),
-        (this['startSec'] = Math['max'](0x0, Number(dimMode['initialStartSec']) || 0x0)),
+        (this['durationSec'] = 0),
+        (this['startSec'] = Math['max'](0, Number(dimMode['initialStartSec']) || 0)),
         (this['endSec'] = Math['max'](
           this['startSec'],
           Number(dimMode['initialEndSec']) || this['startSec'],
         )),
         (this['_rangeLoopSeekPending'] = ![]),
-        (this['_rangePlaybackSeq'] += 0x1),
+        (this['_rangePlaybackSeq'] += 1),
         (this['_pendingPlaybackStartSec'] = null),
-        (this['_retryCount'] = 0x0),
+        (this['_retryCount'] = 0),
         (this['_sourceOptions'] = {
           ...dimMode,
           sourceUrl: sourceUrl,
@@ -703,7 +703,7 @@ const VideoClipController = {
           const enabled10 = document['getElementById'](value46);
           if (!enabled10) {
             this['_retryCount']++;
-            if (this['_retryCount'] > 0xa) {
+            if (this['_retryCount'] > 10) {
               this['exit']({ silent: !![] });
               return;
             }
@@ -772,7 +772,7 @@ const VideoClipController = {
         const el12 = document['createElementNS'](value48, 'path');
         el12['setAttribute']('d', 'M18 6L6 18');
         const el13 = document['createElementNS'](value48, 'path');
-        (el13['setAttribute']('d', 'M6\x206l12\x2012'),
+        (el13['setAttribute']('d', 'M6 6l12 12'),
           el11['appendChild'](el12),
           el11['appendChild'](el13),
           el10['appendChild'](el11));
@@ -799,7 +799,7 @@ const VideoClipController = {
       this['_reverseControl'] &&
         ((el17 = document['createElement']('button')),
         (el17['type'] = 'button'),
-        (el17['className'] = 'v2-video-clipbtn\x20reverse'),
+        (el17['className'] = 'v2-video-clipbtn reverse'),
         (el17['innerHTML'] = renderMediaClipReverseIcon({ className: 'v2-video-clip-reverse-icon' })));
       const el18 = document['createElement']('div');
       el18['className'] = 'v2-video-cliprow';
@@ -825,7 +825,7 @@ const VideoClipController = {
         },
         {
           html:
-            '<span\x20class=\x22v2-video-cliphelperkbd\x22>Space</span><span>' +
+            '<span class="v2-video-cliphelperkbd">Space</span><span>' +
             clipHelperLabel('helper.rangePlayPause') +
             '</span>',
         },
@@ -838,25 +838,25 @@ const VideoClipController = {
         {
           html:
             '<span class="v2-video-cliphelperkbd">Shift</span> + <span class="v2-video-cliphelperkbd">←</span>/<span class="v2-video-cliphelperkbd">→</span> <span>' +
-            clipHelperLabel('helper.moveSelectionByLargeStep', { frames: 0xa }) +
+            clipHelperLabel('helper.moveSelectionByLargeStep', { frames: 10 }) +
             '</span>',
         },
         {
           html:
-            '<span\x20class=\x22v2-video-cliphelperkbd\x22>I</span>/<span\x20class=\x22v2-video-cliphelperkbd\x22>O</span>\x20<span>' +
+            '<span class="v2-video-cliphelperkbd">I</span>/<span class="v2-video-cliphelperkbd">O</span> <span>' +
             clipHelperLabel('helper.setInOut') +
             '</span>',
         },
         {
           html:
             '<span class="v2-video-cliphelperkbd">Ctrl</span> + <span class="v2-video-cliphelperkbd">←</span>/<span class="v2-video-cliphelperkbd">→</span> <span>' +
-            clipHelperLabel('helper.fineTuneInPoint', { frames: 0x1 }) +
+            clipHelperLabel('helper.fineTuneInPoint', { frames: 1 }) +
             '</span>',
         },
         {
           html:
             '<span class="v2-video-cliphelperkbd">Alt</span> + <span class="v2-video-cliphelperkbd">←</span>/<span class="v2-video-cliphelperkbd">→</span> <span>' +
-            clipHelperLabel('helper.fineTuneOutPoint', { frames: 0x1 }) +
+            clipHelperLabel('helper.fineTuneOutPoint', { frames: 1 }) +
             '</span>',
         },
         {
@@ -869,7 +869,7 @@ const VideoClipController = {
         },
         {
           html:
-            '<span\x20class=\x22v2-video-cliphelperkbd\x22>' +
+            '<span class="v2-video-cliphelperkbd">' +
             clipHelperLabel('helper.clickKey') +
             '</span><span>' +
             clipHelperLabel('helper.jumpPlayhead') +
@@ -877,24 +877,24 @@ const VideoClipController = {
         },
         {
           html:
-            '<span\x20class=\x22v2-video-cliphelperkbd\x22>' +
+            '<span class="v2-video-cliphelperkbd">' +
             clipHelperLabel('helper.doubleClickRangeKey') +
             '</span><span>' +
-            clipHelperLabel('helper.resetDefaultRange', { seconds: 0x3 }) +
+            clipHelperLabel('helper.resetDefaultRange', { seconds: 3 }) +
             '</span>',
         },
       ];
       this['_msgEls'] = list5['map']((value50, count3) => {
         const el21 = document['createElement']('div');
         el21['className'] = 'v2-video-cliphelper-msg';
-        if (count3 !== 0x0) el21['classList']['add']('hide-down');
+        if (count3 !== 0) el21['classList']['add']('hide-down');
         return ((el21['innerHTML'] = value50['html']), el20['appendChild'](el21), el21);
       });
-      let value51 = 0x0;
+      let value51 = 0;
       ((this['_msgInterval'] = setInterval(() => {
         if (!this['active'] || !this['_msgEls']) return;
         const el22 = this['_msgEls'][value51];
-        value51 = (value51 + 0x1) % this['_msgEls']['length'];
+        value51 = (value51 + 1) % this['_msgEls']['length'];
         const el23 = this['_msgEls'][value51];
         (el22['classList']['remove']('hide-down'),
           el22['classList']['add']('hide-up'),
@@ -904,8 +904,8 @@ const VideoClipController = {
             el22 &&
               el22['classList']['contains']('hide-up') &&
               (el22['classList']['remove']('hide-up'), el22['classList']['add']('hide-down'));
-          }, 0x12c));
-      }, 0xfa0)),
+          }, 300));
+      }, 4000)),
         (this['_smartClipMode'] = this['_smartClipMode'] || 'stable'),
         (this['_smartClipMaxSegments'] = normalizeSmartClipMaxSegments(this['_smartClipMaxSegments'])),
         (this['_smartClipFps'] = normalizeSmartClipFps(this['_smartClipFps'])),
@@ -917,11 +917,11 @@ const VideoClipController = {
       const el26 = document['createElement']('button');
       el26['className'] = 'v2-video-clip-smartbtn';
       const value52 =
-          '<svg\x20width=\x2214\x22\x20height=\x2214\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22><path\x20d=\x22M21\x2016V8a2\x202\x200\x200\x200-1-1.73l-7-4a2\x202\x200\x200\x200-2\x200l-7\x204A2\x202\x200\x200\x200\x203\x208v8a2\x202\x200\x200\x200\x201\x201.73l7\x204a2\x202\x200\x200\x200\x202\x200l7-4A2\x202\x200\x200\x200\x2021\x2016z\x22></path><polyline\x20points=\x223.27\x206.96\x2012\x2012.01\x2020.73\x206.96\x22></polyline><line\x20x1=\x2212\x22\x20y1=\x2222.08\x22\x20x2=\x2212\x22\x20y2=\x2212\x22></line></svg>',
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>',
         value53 =
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g style="animation:spin 1s linear infinite;transform-origin:50% 50%;transform-box:fill-box;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g></svg>',
         handler5 = () => escapeClipHelperHtml(videoClipText('smartPanel.smartClipButton'));
-      el26['innerHTML'] = value52 + '\x20' + handler5();
+      el26['innerHTML'] = value52 + ' ' + handler5();
       const el27 = document['createElement']('button');
       ((el27['type'] = 'button'),
         (el27['className'] = 'v2-video-clip-smartbtn v2-video-clip-framebtn'),
@@ -1038,7 +1038,7 @@ const VideoClipController = {
         el52['setAttribute']('aria-label', videoClipText('smartPanel.maxSegmentsAria')),
         el52['setAttribute']('aria-valuemin', String(SMART_CLIP_MIN_SEGMENTS)),
         el52['setAttribute']('aria-valuemax', String(SMART_CLIP_MAX_SEGMENTS)),
-        (el52['tabIndex'] = 0x0));
+        (el52['tabIndex'] = 0));
       const el53 = document['createElement']('span');
       ((el53['className'] = 'v2-video-clip-maxseg-suffix'),
         (el53['textContent'] = videoClipText('smartPanel.segmentUnit')),
@@ -1057,7 +1057,7 @@ const VideoClipController = {
         (el56['textContent'] = videoClipText('controls.cancel')));
       const el57 = document['createElement']('button');
       ((el57['type'] = 'button'),
-        (el57['className'] = 'v2-video-clip-panelbtn\x20primary'),
+        (el57['className'] = 'v2-video-clip-panelbtn primary'),
         (el57['textContent'] = videoClipText('controls.start')),
         el55['appendChild'](el56),
         el55['appendChild'](el57),
@@ -1154,7 +1154,7 @@ const VideoClipController = {
         const box3 = this['_smartClipMaxSegmentDrag'];
         if (!box3) return;
         const value60 = event7['clientX'] - box3['x'],
-          value61 = Math['trunc'](value60 / 0x6),
+          value61 = Math['trunc'](value60 / 6),
           smartClipMaxSegments3 = normalizeSmartClipMaxSegments(box3['base'] + value61);
         smartClipMaxSegments3 !== box3['last'] &&
           ((box3['moved'] = !![]), (box3['last'] = smartClipMaxSegments3), handler7(smartClipMaxSegments3));
@@ -1215,7 +1215,7 @@ const VideoClipController = {
           };
         }),
         (el52['onmousedown'] = (x2) => {
-          if (x2['button'] !== 0x0) return;
+          if (x2['button'] !== 0) return;
           (x2['preventDefault'](), x2['stopPropagation']());
           const doc = document,
             base = normalizeSmartClipMaxSegments(this['_smartClipMaxSegments']);
@@ -1242,16 +1242,16 @@ const VideoClipController = {
         }),
         (el52['onkeydown'] = (event13) => {
           event13['stopPropagation']();
-          if (event13['key'] === 'Enter' || event13['key'] === '\x20') {
+          if (event13['key'] === 'Enter' || event13['key'] === ' ') {
             (event13['preventDefault'](), handler8());
             return;
           }
           if (event13['key'] === 'ArrowRight' || event13['key'] === 'ArrowUp') {
-            (event13['preventDefault'](), handler7(Number(this['_smartClipMaxSegments']) + 0x1));
+            (event13['preventDefault'](), handler7(Number(this['_smartClipMaxSegments']) + 1));
             return;
           }
           (event13['key'] === 'ArrowLeft' || event13['key'] === 'ArrowDown') &&
-            (event13['preventDefault'](), handler7(Number(this['_smartClipMaxSegments']) - 0x1));
+            (event13['preventDefault'](), handler7(Number(this['_smartClipMaxSegments']) - 1));
         }),
         (el56['onclick'] = (event14) => {
           (event14['stopPropagation'](), run5());
@@ -1267,7 +1267,7 @@ const VideoClipController = {
         ((el26['dataset']['loading'] = 'true'),
           (el26['disabled'] = !![]),
           (el26['innerHTML'] =
-            value53 + '\x20' + escapeClipHelperHtml(videoClipText('smartClip.preparing'))),
+            value53 + ' ' + escapeClipHelperHtml(videoClipText('smartClip.preparing'))),
           window['showToast']?.(
             value65
               ? videoClipText('smartClip.startedKeyframes')
@@ -1281,7 +1281,7 @@ const VideoClipController = {
             shouldContinue: () => this['active'],
             onProgress: (response4) => {
               if (!el26?.['isConnected'] || !response4?.['text']) return;
-              el26['innerHTML'] = value53 + '\x20' + response4['text'];
+              el26['innerHTML'] = value53 + ' ' + response4['text'];
             },
           });
           if (!count4?.['ok']) {
@@ -1314,7 +1314,7 @@ const VideoClipController = {
               el26['isConnected'] &&
               ((el26['dataset']['loading'] = 'false'),
               (el26['disabled'] = ![]),
-              (el26['innerHTML'] = value52 + '\x20' + handler5())));
+              (el26['innerHTML'] = value52 + ' ' + handler5())));
         }
       };
       ((el57['onclick'] = async (event15) => {
@@ -1407,7 +1407,7 @@ const VideoClipController = {
       const sourceLocalPath = String(options5['sourceLocalPath'] || '')['trim'](),
         sourceUrl2 = localPathToUrl(sourceLocalPath) || String(options5['sourceUrl'] || '')['trim']();
       if (!sourceUrl2) throw new Error('倒放完成后未返回可用的视频源');
-      const durationSec = Number(this['durationSec']) || 0x0,
+      const durationSec = Number(this['durationSec']) || 0,
         value69 = { startSec: this['startSec'], endSec: this['endSec'] },
         mirrorMediaClipRange2 = mirrorMediaClipRange({
           startSec: this['startSec'],
@@ -1538,7 +1538,7 @@ const VideoClipController = {
           return;
         const value80 = event21['clientX'],
           box4 = this['selectionEl']['getBoundingClientRect'](),
-          value81 = 0x14,
+          value81 = 20,
           value82 = Math['abs'](value80 - box4['left']) < value81,
           value83 = Math['abs'](value80 - box4['right']) < value81;
         if (value82)
@@ -1555,11 +1555,11 @@ const VideoClipController = {
               (this['selectionEl']['style']['cursor'] = videoClipSelectionBodyCursor));
       };
       this['trackEl']?.['addEventListener']('pointermove', value79);
-      const value84 = 0x1e,
-        handler14 = (value85) => (Number(value85 || 0x1) / value84) * 0x1,
+      const value84 = 30,
+        handler14 = (value85) => (Number(value85 || 1) / value84) * 1,
         handler15 = () => {
           const count5 = this['durationSec'];
-          if (!Number['isFinite'](count5) || count5 <= 0x0) return 0.1;
+          if (!Number['isFinite'](count5) || count5 <= 0) return 0.1;
           return Math['min'](0.1, count5);
         },
         handler16 = (value86, value87, value88) =>
@@ -1567,16 +1567,16 @@ const VideoClipController = {
         handler17 = (value89) => {
           if (!this['trackEl'] || !this['active']) return;
           const count6 = this['durationSec'];
-          if (!Number['isFinite'](count6) || count6 <= 0x0) return;
+          if (!Number['isFinite'](count6) || count6 <= 0) return;
           const enabled15 = this['videoEl'] || this['_getVideoEl']();
           if (!enabled15) return;
           const box5 = this['trackEl']['getBoundingClientRect']();
           if (!box5['width']) return;
           const value90 = value89 - box5['left'],
-            value91 = handler16(value90 / box5['width'], 0x0, 0x1),
+            value91 = handler16(value90 / box5['width'], 0, 1),
             value92 = value91 * count6,
-            value93 = Math['max'](0x0, count6 - 0.001),
-            value94 = handler16(value92, 0x0, value93);
+            value93 = Math['max'](0, count6 - 0.001),
+            value94 = handler16(value92, 0, value93);
           (this['_pauseRangePlaybackForRangeEdit'](enabled15),
             (this['_pendingPlaybackStartSec'] = value94));
           try {
@@ -1588,7 +1588,7 @@ const VideoClipController = {
           const enabled16 = this['videoEl'] || this['_getVideoEl']();
           if (!enabled16) return;
           if (!enabled16['paused']) return;
-          const value96 = Number(enabled16['currentTime']) || 0x0;
+          const value96 = Number(enabled16['currentTime']) || 0;
           if (value96 >= this['startSec'] && value96 <= this['endSec']) return;
           try {
             enabled16['currentTime'] = this['startSec'];
@@ -1596,16 +1596,16 @@ const VideoClipController = {
         },
         handler19 = (count7, value98) => {
           const count8 = this['durationSec'];
-          if (!Number['isFinite'](count8) || count8 <= 0x0) return;
+          if (!Number['isFinite'](count8) || count8 <= 0) return;
           const value99 = this['_pauseRangePlaybackForRangeEdit'](),
-            value100 = handler14(value98) * (count7 >= 0x0 ? 0x1 : -0x1),
+            value100 = handler14(value98) * (count7 >= 0 ? 1 : -1),
             value101 = handler15(),
             value102 = Math['max'](value101, this['endSec'] - this['startSec']);
           let count9 = this['startSec'] + value100,
             value103 = this['endSec'] + value100;
-          count9 < 0x0 && ((count9 = 0x0), (value103 = value102));
+          count9 < 0 && ((count9 = 0), (value103 = value102));
           value103 > count8 &&
-            ((value103 = count8), (count9 = Math['max'](0x0, count8 - value102)));
+            ((value103 = count8), (count9 = Math['max'](0, count8 - value102)));
           ((this['startSec'] = count9), (this['endSec'] = value103));
           if (value99)
             try {
@@ -1616,12 +1616,12 @@ const VideoClipController = {
         },
         handler20 = (count10) => {
           const count11 = this['durationSec'];
-          if (!Number['isFinite'](count11) || count11 <= 0x0) return;
+          if (!Number['isFinite'](count11) || count11 <= 0) return;
           const value105 = this['_pauseRangePlaybackForRangeEdit'](),
-            value106 = handler14(0x1) * (count10 >= 0x0 ? 0x1 : -0x1),
+            value106 = handler14(1) * (count10 >= 0 ? 1 : -1),
             value107 = handler15(),
-            value108 = Math['max'](0x0, this['endSec'] - value107);
-          this['startSec'] = handler16(this['startSec'] + value106, 0x0, value108);
+            value108 = Math['max'](0, this['endSec'] - value107);
+          this['startSec'] = handler16(this['startSec'] + value106, 0, value108);
           if (value105)
             try {
               value105['currentTime'] = this['startSec'];
@@ -1630,9 +1630,9 @@ const VideoClipController = {
         },
         handler21 = (count12) => {
           const count13 = this['durationSec'];
-          if (!Number['isFinite'](count13) || count13 <= 0x0) return;
+          if (!Number['isFinite'](count13) || count13 <= 0) return;
           const value110 = this['_pauseRangePlaybackForRangeEdit'](),
-            value111 = handler14(0x1) * (count12 >= 0x0 ? 0x1 : -0x1),
+            value111 = handler14(1) * (count12 >= 0 ? 1 : -1),
             value112 = handler15(),
             value113 = Math['min'](count13, this['startSec'] + value112);
           this['endSec'] = handler16(this['endSec'] + value111, value113, count13);
@@ -1644,16 +1644,16 @@ const VideoClipController = {
         },
         handler22 = (value115) => {
           const count14 = this['durationSec'];
-          if (!Number['isFinite'](count14) || count14 <= 0x0) return;
+          if (!Number['isFinite'](count14) || count14 <= 0) return;
           const enabled17 = this['videoEl'] || this['_getVideoEl']();
           if (!enabled17) return;
           this['_pauseRangePlaybackForRangeEdit'](enabled17);
-          let value116 = Number(enabled17['currentTime']) || 0x0;
-          value116 = handler16(value116, 0x0, count14);
+          let value116 = Number(enabled17['currentTime']) || 0;
+          value116 = handler16(value116, 0, count14);
           const value117 = handler15();
           if (value115 === 'in') {
-            const value118 = Math['max'](0x0, this['endSec'] - value117);
-            this['startSec'] = handler16(value116, 0x0, value118);
+            const value118 = Math['max'](0, this['endSec'] - value117);
+            this['startSec'] = handler16(value116, 0, value118);
           } else {
             const value119 = Math['min'](count14, this['startSec'] + value117);
             this['endSec'] = handler16(value116, value119, count14);
@@ -1668,7 +1668,7 @@ const VideoClipController = {
           if (!box6['width']) return;
           const value122 = event22['clientX'],
             box7 = this['selectionEl']['getBoundingClientRect'](),
-            value123 = 0x14,
+            value123 = 20,
             value124 = Math['abs'](value122 - box7['left']) < value123,
             value125 = Math['abs'](value122 - box7['right']) < value123;
           if (value124 || (el67 && el67['dataset']['handle'] === 'left'))
@@ -1681,9 +1681,9 @@ const VideoClipController = {
           if (this['_dragMode'] === 'move') {
             const box8 = this['selectionEl']['getBoundingClientRect']();
             this['_dragOffsetPx'] = event22['clientX'] - box8['left'];
-          } else this['_dragOffsetPx'] = 0x0;
+          } else this['_dragOffsetPx'] = 0;
           (event22['preventDefault'](), event22['stopPropagation']());
-          const value126 = Number(event22['clientX'] || 0x0);
+          const value126 = Number(event22['clientX'] || 0);
           let enabled18 = ![];
           if (this['_dragMode'] === 'scrub') handler17(event22['clientX']);
           else {
@@ -1692,13 +1692,13 @@ const VideoClipController = {
           ((this['_onPointerMove'] = (event23) => {
             if (!this['active'] || !this['trackEl']) return;
             (event23['preventDefault'](), event23['stopPropagation']());
-            const value127 = Number(event23['clientX'] || 0x0);
+            const value127 = Number(event23['clientX'] || 0);
             if (this['_dragMode'] === 'scrub') {
               handler17(value127);
               return;
             }
             if (this['_dragMode'] === 'move') {
-              if (!enabled18 && Math['abs'](value127 - value126) <= 0x2) return;
+              if (!enabled18 && Math['abs'](value127 - value126) <= 2) return;
               enabled18 = !![];
             }
             this['_handleDragAtClientX'](value127);
@@ -1714,7 +1714,7 @@ const VideoClipController = {
               (window['removeEventListener']('pointermove', this['_onPointerMove'], !![]),
                 window['removeEventListener']('pointerup', this['_onPointerUp'], !![]),
                 (this['_dragMode'] = null),
-                (this['_dragOffsetPx'] = 0x0),
+                (this['_dragOffsetPx'] = 0),
                 this['leftHandleEl']?.['classList']['remove']('hover-active'),
                 this['rightHandleEl']?.['classList']['remove']('hover-active'),
                 (this['_onPointerMove'] = null),
@@ -1731,16 +1731,16 @@ const VideoClipController = {
           (event25) => {
             if (!this['active'] || this['_isSourceReverseEditLocked']()) return;
             (event25['preventDefault'](), event25['stopPropagation']());
-            const value130 = Number(event25['deltaX']) || 0x0,
-              value131 = Number(event25['deltaY']) || 0x0,
+            const value130 = Number(event25['deltaX']) || 0,
+              value131 = Number(event25['deltaY']) || 0,
               enabled19 = Math['abs'](value130) > Math['abs'](value131) ? value130 : value131;
             if (!enabled19) return;
-            const value132 = enabled19 > 0x0 ? 0x1 : -0x1;
+            const value132 = enabled19 > 0 ? 1 : -1;
             if (event25['ctrlKey'] || event25['metaKey']) handler20(value132);
             else {
               if (event25['altKey']) handler21(value132);
               else {
-                const value133 = event25['shiftKey'] ? 0xa : 0x1;
+                const value133 = event25['shiftKey'] ? 10 : 1;
                 handler19(value132, value133);
               }
             }
@@ -1751,14 +1751,14 @@ const VideoClipController = {
           if (!this['active'] || this['_isSourceReverseEditLocked']()) return;
           (event26['preventDefault'](), event26['stopPropagation']());
           const enabled20 = this['durationSec'];
-          if (!enabled20 || !Number['isFinite'](enabled20) || enabled20 <= 0x0) return;
+          if (!enabled20 || !Number['isFinite'](enabled20) || enabled20 <= 0) return;
           const box9 = this['selectionEl']['getBoundingClientRect'](),
             value134 = event26['clientX'],
-            value135 = 0x18;
+            value135 = 24;
           if (value134 - box9['left'] < value135 || box9['right'] - value134 < value135) return;
-          const value136 = Math['min'](0x3, enabled20),
-            value137 = (this['startSec'] + this['endSec']) / 0x2,
-            value138 = Math['max'](0x0, Math['min'](enabled20 - value136, value137 - value136 / 0x2)),
+          const value136 = Math['min'](3, enabled20),
+            value137 = (this['startSec'] + this['endSec']) / 2,
+            value138 = Math['max'](0, Math['min'](enabled20 - value136, value137 - value136 / 2)),
             value139 = this['_pauseRangePlaybackForRangeEdit']();
           ((this['startSec'] = value138), (this['endSec'] = value138 + value136));
           if (value139 && value139['paused']) value139['currentTime'] = this['startSec'];
@@ -1781,7 +1781,7 @@ const VideoClipController = {
             return;
           }
           if (this['_isSourceReverseEditLocked']()) return;
-          if (event27['key'] === '\x20' || event27['code'] === 'Space') {
+          if (event27['key'] === ' ' || event27['code'] === 'Space') {
             this['_handlePlaybackShortcutKey'](event27);
             return;
           }
@@ -1795,7 +1795,7 @@ const VideoClipController = {
           }
           if (event27['key'] === 'ArrowLeft' || event27['key'] === 'ArrowRight') {
             event27['preventDefault']();
-            const value141 = event27['key'] === 'ArrowRight' ? 0x1 : -0x1;
+            const value141 = event27['key'] === 'ArrowRight' ? 1 : -1;
             if (event27['ctrlKey'] || event27['metaKey']) {
               handler20(value141);
               return;
@@ -1804,7 +1804,7 @@ const VideoClipController = {
               handler21(value141);
               return;
             }
-            const value142 = event27['shiftKey'] ? 0xa : 0x1;
+            const value142 = event27['shiftKey'] ? 10 : 1;
             handler19(value141, value142);
           }
         }),
@@ -1844,15 +1844,15 @@ const VideoClipController = {
         delete el68['dataset']['desktopMediaKeepAlive'];
     },
     _readDurationSec(enabled21) {
-      if (!enabled21) return 0x0;
+      if (!enabled21) return 0;
       const count15 = Number(enabled21['duration']);
-      if (Number['isFinite'](count15) && count15 > 0x0) return count15;
+      if (Number['isFinite'](count15) && count15 > 0) return count15;
       const list8 = enabled21['seekable'];
       if (list8 && list8['length']) {
-        const count16 = Number(list8['end'](list8['length'] - 0x1));
-        if (Number['isFinite'](count16) && count16 > 0x0) return count16;
+        const count16 = Number(list8['end'](list8['length'] - 1));
+        if (Number['isFinite'](count16) && count16 > 0) return count16;
       }
-      return 0x0;
+      return 0;
     },
     _resolveKnownDurationSec(value146) {
       const selectedVideoItem2 = pickSelectedVideoItem(value146),
@@ -1862,7 +1862,7 @@ const VideoClipController = {
           value146?.['videoDuration'],
           value146?.['duration'],
         );
-      if (positiveNumber6 > 0x0) return positiveNumber6;
+      if (positiveNumber6 > 0) return positiveNumber6;
       const positiveNumber7 = pickPositiveNumber(
           selectedVideoItem2?.['videoFrameCount'],
           selectedVideoItem2?.['frameCount'],
@@ -1875,7 +1875,7 @@ const VideoClipController = {
           value146?.['videoFps'],
           value146?.['fps'],
         );
-      return positiveNumber7 > 0x0 && positiveNumber8 > 0x0 ? positiveNumber7 / positiveNumber8 : 0x0;
+      return positiveNumber7 > 0 && positiveNumber8 > 0 ? positiveNumber7 / positiveNumber8 : 0;
     },
     _resolveActiveVideoData() {
       if (!this['_sourceOptions']) return appStore['getState']()['nodes']?.[this['nodeId']] || null;
@@ -1918,18 +1918,18 @@ const VideoClipController = {
     },
     _applyDurationSec(value147) {
       const count17 = Number(value147);
-      if (!Number['isFinite'](count17) || count17 <= 0x0) return ![];
+      if (!Number['isFinite'](count17) || count17 <= 0) return ![];
       this['durationSec'] = count17;
       if (!(this['endSec'] > this['startSec'])) {
-        const value148 = Math['min'](0x3, count17),
-          value149 = Math['max'](0x0, (count17 - value148) / 0x2);
+        const value148 = Math['min'](3, count17),
+          value149 = Math['max'](0, (count17 - value148) / 2);
         return ((this['startSec'] = value149), (this['endSec'] = value149 + value148), !![]);
       }
-      ((this['startSec'] = Math['max'](0x0, Math['min'](this['startSec'], count17))),
-        (this['endSec'] = Math['max'](0x0, Math['min'](this['endSec'], count17))));
+      ((this['startSec'] = Math['max'](0, Math['min'](this['startSec'], count17))),
+        (this['endSec'] = Math['max'](0, Math['min'](this['endSec'], count17))));
       if (this['endSec'] <= this['startSec']) {
-        const value150 = Math['min'](0x3, count17);
-        ((this['startSec'] = 0x0), (this['endSec'] = value150));
+        const value150 = Math['min'](3, count17);
+        ((this['startSec'] = 0), (this['endSec'] = value150));
       }
       return !![];
     },
@@ -1988,7 +1988,7 @@ const VideoClipController = {
       const value165 = this['_readDurationSec'](this['videoEl']);
       if (this['_applyDurationSec'](value165)) this['_render']();
       else
-        !(this['durationSec'] > 0x0) &&
+        !(this['durationSec'] > 0) &&
           value157 &&
           void this['_applyVideoMetaDurationFallback'](value157, value158);
       (this['videoEl'] &&
@@ -2018,7 +2018,7 @@ const VideoClipController = {
     _renderPlayhead() {
       if (!this['playheadEl'] || !this['trackEl']) return;
       const count18 = this['durationSec'];
-      if (!Number['isFinite'](count18) || count18 <= 0x0) {
+      if (!Number['isFinite'](count18) || count18 <= 0) {
         this['playheadEl']['style']['display'] = 'none';
         return;
       }
@@ -2027,7 +2027,7 @@ const VideoClipController = {
         this['playheadEl']['style']['display'] = 'none';
         return;
       }
-      let value169 = Number(enabled23['currentTime']) || 0x0;
+      let value169 = Number(enabled23['currentTime']) || 0;
       const value170 = Number(this['_pendingPlaybackStartSec']);
       enabled23['paused'] &&
         enabled23['seeking'] &&
@@ -2043,19 +2043,19 @@ const VideoClipController = {
           value169 = this['startSec'];
         }
       } else !enabled23['seeking'] && (this['_rangeLoopSeekPending'] = ![]);
-      const value172 = Math['max'](0x0, Math['min'](0x1, value169 / count18));
+      const value172 = Math['max'](0, Math['min'](1, value169 / count18));
       ((this['playheadEl']['style']['display'] = 'block'),
-        (this['playheadEl']['style']['left'] = value172 * 0x64 + '%'));
+        (this['playheadEl']['style']['left'] = value172 * 100 + '%'));
     },
     _handlePlaybackShortcutKey(event29) {
       if (!this['active'] || this['_isSourceReverseEditLocked']()) return ![];
-      if (!(event29?.['key'] === '\x20' || event29?.['code'] === 'Space')) return ![];
+      if (!(event29?.['key'] === ' ' || event29?.['code'] === 'Space')) return ![];
       (event29['preventDefault']?.(), event29['stopPropagation']?.());
       if (!event29['repeat']) void this['_togglePlayRange']();
       return !![];
     },
     _pauseRangePlaybackForRangeEdit(enabled24 = this['videoEl'] || this['_getVideoEl']()) {
-      ((this['_rangePlaybackSeq'] += 0x1),
+      ((this['_rangePlaybackSeq'] += 1),
         (this['_rangeLoopSeekPending'] = ![]),
         (this['_pendingPlaybackStartSec'] = null));
       if (!enabled24) return null;
@@ -2072,9 +2072,9 @@ const VideoClipController = {
       await this['_ensureVideoPlaybackSource'](enabled25);
       if (!this['active'] || value174 !== this['_rangePlaybackSeq']) return ![];
       let count19 = Number(this['durationSec']);
-      if (!Number['isFinite'](count19) || count19 <= 0x0) {
+      if (!Number['isFinite'](count19) || count19 <= 0) {
         count19 = this['_readDurationSec'](enabled25);
-        if (!Number['isFinite'](count19) || count19 <= 0x0) return ![];
+        if (!Number['isFinite'](count19) || count19 <= 0) return ![];
         if (this['_applyDurationSec'](count19)) this['_render']();
       }
       try {
@@ -2086,10 +2086,10 @@ const VideoClipController = {
             !![]
           );
       } catch (value175) {}
-      const value176 = Math['max'](0x0, Math['min'](this['startSec'], count19)),
+      const value176 = Math['max'](0, Math['min'](this['startSec'], count19)),
         value177 = Math['max'](value176, Math['min'](this['endSec'], count19));
       if (!(value177 > value176)) return ![];
-      const value178 = Number(enabled25['currentTime']) || 0x0,
+      const value178 = Number(enabled25['currentTime']) || 0,
         value179 = this['_pendingPlaybackStartSec'],
         value180 = Number(value179),
         value181 =
@@ -2107,9 +2107,9 @@ const VideoClipController = {
         label: 'video-clip:' + (this['nodeId'] || 'unknown') + ':range',
         ensureSrc: () => this['_ensureVideoPlaybackSource'](enabled25),
         minBufferAhead: 0.5,
-        readyTimeoutMs: 0x1f4,
-        recoveryDebounceMs: 0x96,
-        recoveryCooldownMs: 0x1f4,
+        readyTimeoutMs: 500,
+        recoveryDebounceMs: 150,
+        recoveryCooldownMs: 500,
         shouldRecover: (el69) =>
           this['active'] === !![] &&
           this['videoEl'] === el69 &&
@@ -2134,11 +2134,11 @@ const VideoClipController = {
     },
     async _seekVideoForRangePlayback(enabled27, value183) {
       if (!enabled27) return ![];
-      const value184 = Math['max'](0x0, Number(value183) || 0x0),
-        value185 = Number(enabled27['currentTime'] || 0x0);
+      const value184 = Math['max'](0, Number(value183) || 0),
+        value185 = Number(enabled27['currentTime'] || 0);
       if (
         Math['abs'](value185 - value184) <= VIDEO_CLIP_SEEK_EPSILON_SEC &&
-        Number(enabled27['readyState'] || 0x0) >= 0x2 &&
+        Number(enabled27['readyState'] || 0) >= 2 &&
         !enabled27['seeking']
       )
         return !![];
@@ -2153,7 +2153,7 @@ const VideoClipController = {
       );
     },
     _waitForRangePlaybackSeek(el71) {
-      if (!el71 || (Number(el71['readyState'] || 0x0) >= 0x2 && !el71['seeking']))
+      if (!el71 || (Number(el71['readyState'] || 0) >= 2 && !el71['seeking']))
         return Promise['resolve'](!![]);
       return new Promise((handler23) => {
         let value187 = ![];
@@ -2168,7 +2168,7 @@ const VideoClipController = {
               handler23(!![]));
           },
           value189 = () => {
-            if (Number(el71['readyState'] || 0x0) >= 0x2 || !el71['seeking']) handler24();
+            if (Number(el71['readyState'] || 0) >= 2 || !el71['seeking']) handler24();
           },
           setTimeout2 = setTimeout(handler24, VIDEO_CLIP_PLAY_SEEK_TIMEOUT_MS);
         (list9['forEach']((value190) => el71['addEventListener']?.(value190, value189)),
@@ -2194,24 +2194,24 @@ const VideoClipController = {
         });
       if (!this['active'] || this['_thumbToken'] !== value192) return;
       (this['trackEl']?.['dataset'] && (this['trackEl']['dataset']['thumbnailState'] = renderVideoTimelineThumbnails2['source']),
-        renderVideoTimelineThumbnails2['errors']['length'] >= 0x2 &&
+        renderVideoTimelineThumbnails2['errors']['length'] >= 2 &&
           (renderVideoTimelineThumbnails2['source'] === 'poster' || renderVideoTimelineThumbnails2['source'] === 'empty') &&
           console['warn'](
-            '[VideoClipController]\x20timeline\x20thumbnail\x20extraction\x20fell\x20back:',
+            '[VideoClipController] timeline thumbnail extraction fell back:',
             renderVideoTimelineThumbnails2['errors']['map']((error4) => error4['message']),
           ));
     },
     _handleDragAtClientX(value194) {
       if (!this['trackEl'] || !this['active'] || this['_isSourceReverseEditLocked']()) return;
       const enabled28 = this['durationSec'];
-      if (!enabled28 || !Number['isFinite'](enabled28) || enabled28 <= 0x0) {
+      if (!enabled28 || !Number['isFinite'](enabled28) || enabled28 <= 0) {
         this['_render']();
         return;
       }
       const box11 = this['trackEl']['getBoundingClientRect']();
       if (!box11['width']) return;
       const value195 = value194 - box11['left'],
-        value196 = Math['max'](0x0, Math['min'](0x1, value195 / box11['width'])),
+        value196 = Math['max'](0, Math['min'](1, value195 / box11['width'])),
         value197 = value196 * enabled28,
         value198 = Math['min'](0.1, enabled28),
         value199 = Math['max'](value198, this['endSec'] - this['startSec']),
@@ -2223,7 +2223,7 @@ const VideoClipController = {
             ? this['_pauseRangePlaybackForRangeEdit']()
             : null;
       if (this['_dragMode'] === 'left') {
-        const value201 = Math['max'](0x0, Math['min'](value197, this['endSec'] - value198));
+        const value201 = Math['max'](0, Math['min'](value197, this['endSec'] - value198));
         this['startSec'] = value201;
         if (value200)
           try {
@@ -2239,7 +2239,7 @@ const VideoClipController = {
               value205 = value194 - box11['left'] - this['_dragOffsetPx'],
               value206 = value205 - value204,
               value207 = (value206 / box11['width']) * enabled28,
-              value208 = Math['max'](0x0, Math['min'](enabled28 - value199, this['startSec'] + value207));
+              value208 = Math['max'](0, Math['min'](enabled28 - value199, this['startSec'] + value207));
             ((this['startSec'] = value208), (this['endSec'] = value208 + value199));
             if (value200)
               try {
@@ -2247,8 +2247,8 @@ const VideoClipController = {
               } catch (value209) {}
           } else {
             if (this['_dragMode'] === 'set') {
-              const value210 = Math['min'](0x3, enabled28),
-                value211 = Math['max'](0x0, Math['min'](enabled28 - value210, value197 - value210 / 0x2));
+              const value210 = Math['min'](3, enabled28),
+                value211 = Math['max'](0, Math['min'](enabled28 - value210, value197 - value210 / 2));
               ((this['startSec'] = value211), (this['endSec'] = value211 + value210));
             }
           }
@@ -2267,20 +2267,20 @@ const VideoClipController = {
       )
         return;
       const sourceDurationSec = this['durationSec'],
-        value212 = Number['isFinite'](sourceDurationSec) && sourceDurationSec > 0x0,
-        startSec = value212 ? Math['max'](0x0, Math['min'](this['startSec'], sourceDurationSec)) : 0x0,
-        endSec = value212 ? Math['max'](0x0, Math['min'](this['endSec'], sourceDurationSec)) : 0x0,
-        durationSec2 = Math['max'](0x0, endSec - startSec);
+        value212 = Number['isFinite'](sourceDurationSec) && sourceDurationSec > 0,
+        startSec = value212 ? Math['max'](0, Math['min'](this['startSec'], sourceDurationSec)) : 0,
+        endSec = value212 ? Math['max'](0, Math['min'](this['endSec'], sourceDurationSec)) : 0,
+        durationSec2 = Math['max'](0, endSec - startSec);
       if (value212) {
-        const value213 = (startSec / sourceDurationSec) * 0x64,
-          value214 = (durationSec2 / sourceDurationSec) * 0x64;
+        const value213 = (startSec / sourceDurationSec) * 100,
+          value214 = (durationSec2 / sourceDurationSec) * 100;
         ((this['selectionEl']['style']['left'] = value213 + '%'),
           (this['selectionEl']['style']['width'] = value214 + '%'),
           (this['leftHandleEl']['style']['left'] = value213 + '%'),
           (this['rightHandleEl']['style']['left'] = value213 + value214 + '%'),
           this['labelEl'] &&
-            ((this['labelEl']['textContent'] = durationSec2['toFixed'](0x2) + 's'),
-            (this['labelEl']['style']['left'] = value213 + value214 / 0x2 + '%')));
+            ((this['labelEl']['textContent'] = durationSec2['toFixed'](2) + 's'),
+            (this['labelEl']['style']['left'] = value213 + value214 / 2 + '%')));
       } else
         ((this['selectionEl']['style']['left'] = '0%'),
           (this['selectionEl']['style']['width'] = '0%'),
@@ -2311,9 +2311,9 @@ const VideoClipController = {
     },
     setSourceRange(value216, value217, { seek: seek = !![] } = {}) {
       if (!this['active'] || !this['_sourceOptions']) return ![];
-      const count20 = Number(this['durationSec']) || 0x0;
-      if (count20 <= 0x0) return ![];
-      const value218 = Math['max'](0x0, Math['min'](count20, Number(value216) || 0x0)),
+      const count20 = Number(this['durationSec']) || 0;
+      if (count20 <= 0) return ![];
+      const value218 = Math['max'](0, Math['min'](count20, Number(value216) || 0)),
         value219 = Math['max'](value218, Math['min'](count20, Number(value217) || count20));
       ((this['startSec'] = value218), (this['endSec'] = value219));
       if (seek) {
@@ -2350,9 +2350,9 @@ const VideoClipController = {
         return;
       }
       const enabled30 = this['durationSec'];
-      if (!enabled30 || !Number['isFinite'](enabled30) || enabled30 <= 0x0) return;
-      const startSec2 = Math['max'](0x0, Math['min'](this['startSec'], enabled30)),
-        endSec2 = Math['max'](0x0, Math['min'](this['endSec'], enabled30));
+      if (!enabled30 || !Number['isFinite'](enabled30) || enabled30 <= 0) return;
+      const startSec2 = Math['max'](0, Math['min'](this['startSec'], enabled30)),
+        endSec2 = Math['max'](0, Math['min'](this['endSec'], enabled30));
       if (!(endSec2 > startSec2)) return;
       const src4 = value223
         ? this['_resolveActiveVideoSrc']()
@@ -2405,8 +2405,8 @@ const VideoClipController = {
           return;
         }
         const { width: width2, height: height } = getAutoMediaSizeByShortSide(
-            name['width'] || 0x200,
-            name['height'] || 0x120,
+            name['width'] || 512,
+            name['height'] || 288,
           ),
           x3 = calcSafeSpawnPosNearNode(
             appStore['getState']()['nodes'],
@@ -2470,13 +2470,13 @@ const VideoClipController = {
         this['_reverseRequestToken']++,
         this['_clipSessionToken']++,
         (this['_rangeLoopSeekPending'] = ![]),
-        (this['_rangePlaybackSeq'] += 0x1),
+        (this['_rangePlaybackSeq'] += 1),
         (this['_pendingPlaybackStartSec'] = null));
       !enabled31?.['embedded'] && appStore['setVideoClipState']({ active: ![], nodeId: null });
       if (this['_playheadRaf']) cancelAnimationFrame(this['_playheadRaf']);
-      this['_playheadRaf'] = 0x0;
+      this['_playheadRaf'] = 0;
       if (this['_retryRaf']) cancelAnimationFrame(this['_retryRaf']);
-      this['_retryRaf'] = 0x0;
+      this['_retryRaf'] = 0;
       if (this['videoEl']) {
         this['_setClipMediaKeepAlive'](this['videoEl'], ![]);
         if (this['_onLoadedMeta'])
@@ -2510,13 +2510,13 @@ const VideoClipController = {
         (this['_onPointerMove'] = null),
         (this['_onPointerUp'] = null),
         (this['_dragMode'] = null),
-        (this['_dragOffsetPx'] = 0x0));
+        (this['_dragOffsetPx'] = 0));
       this['_onDocClick'] &&
         (document['removeEventListener']('pointerdown', this['_onDocClick'], !![]),
         (this['_onDocClick'] = null));
-      ((this['durationSec'] = 0x0),
-        (this['startSec'] = 0x0),
-        (this['endSec'] = 0x0),
+      ((this['durationSec'] = 0),
+        (this['startSec'] = 0),
+        (this['endSec'] = 0),
         (this['nodeId'] = null),
         (this['anchorNodeId'] = null),
         (this['_sourceOptions'] = null),

@@ -1,15 +1,15 @@
-const MAX_SKILL_USAGE_ITEMS = 0x4,
-  MAX_SKILL_USAGE_TEXT_CHARS = 0x7d0,
-  MAX_SKILL_USAGE_DESCRIPTION_CHARS = 0x1f4,
-  MAX_SKILL_USAGE_RESOURCE_NAMES = 0xc;
+const MAX_SKILL_USAGE_ITEMS = 4,
+  MAX_SKILL_USAGE_TEXT_CHARS = 2000,
+  MAX_SKILL_USAGE_DESCRIPTION_CHARS = 500,
+  MAX_SKILL_USAGE_RESOURCE_NAMES = 12;
 function truncateText(value, item) {
   const list = String(value || '')['trim']();
-  return list['length'] <= item ? list : list['slice'](0x0, Math['max'](0x0, item - 0x3)) + '...';
+  return list['length'] <= item ? list : list['slice'](0, Math['max'](0, item - 3)) + '...';
 }
 function normalizeResourceNames(options = {}) {
   const list2 = Array['isArray'](options['resources']) ? options['resources'] : [],
     key = list2['map']((error) => String(error?.['name'] || '')['trim']())['filter'](Boolean);
-  return [...new Set(key)]['slice'](0x0, MAX_SKILL_USAGE_RESOURCE_NAMES);
+  return [...new Set(key)]['slice'](0, MAX_SKILL_USAGE_RESOURCE_NAMES);
 }
 function includesText(index, result) {
   const list3 = String(index || '')['toLocaleLowerCase'](),
@@ -42,34 +42,34 @@ export function normalizeAgentSkillUsageSnapshots(list4 = []) {
     ['map']((options3 = {}) => {
       const id = String(options3['id'] || '')
         ['trim']()
-        ['slice'](0x0, 0x40);
+        ['slice'](0, 64);
       if (!id) return null;
       const current = options3['match'] && typeof options3['match'] === 'object' ? options3['match'] : {};
       return {
         id: id,
-        title: truncateText(options3['title'] || id, 0x78),
+        title: truncateText(options3['title'] || id, 120),
         description: truncateText(options3['description'] || '', MAX_SKILL_USAGE_DESCRIPTION_CHARS),
         source: String(options3['source'] || '')
           ['trim']()
-          ['slice'](0x0, 0x28),
+          ['slice'](0, 40),
         match: {
           kind: String(current['kind'] || 'semantic')
             ['trim']()
-            ['slice'](0x0, 0x20),
-          matchedText: truncateText(current['matchedText'] || '', 0xa0),
+            ['slice'](0, 32),
+          matchedText: truncateText(current['matchedText'] || '', 160),
         },
         instructions: truncateText(options3['instructions'] || '', MAX_SKILL_USAGE_TEXT_CHARS),
         resourceNames: [
           ...new Set(
             (Array['isArray'](options3['resourceNames']) ? options3['resourceNames'] : [])
-              ['map']((entry) => truncateText(entry, 0xa0))
+              ['map']((entry) => truncateText(entry, 160))
               ['filter'](Boolean),
           ),
-        ]['slice'](0x0, MAX_SKILL_USAGE_RESOURCE_NAMES),
+        ]['slice'](0, MAX_SKILL_USAGE_RESOURCE_NAMES),
       };
     })
     ['filter'](Boolean)
-    ['slice'](0x0, MAX_SKILL_USAGE_ITEMS);
+    ['slice'](0, MAX_SKILL_USAGE_ITEMS);
 }
 export function buildSelectedAgentSkillUsage({
   context: context = {},
@@ -83,12 +83,12 @@ export function buildSelectedAgentSkillUsage({
       resourceNames: normalizeResourceNames(args),
     })),
   );
-  if (skillIds['length'] === 0x0) return null;
+  if (skillIds['length'] === 0) return null;
   return {
     type: 'skill.selected',
     channel: String(channel || '')
       ['trim']()
-      ['slice'](0x0, 0x50),
+      ['slice'](0, 80),
     skillIds: skillIds['map']((record) => record['id']),
     skillSnapshots: skillIds,
   };

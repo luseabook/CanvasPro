@@ -128,8 +128,8 @@ function createFakeDocument() {
     documentElement: documentElement,
     body: body,
     defaultView: {
-      innerWidth: 0x320,
-      innerHeight: 0x258,
+      innerWidth: 800,
+      innerHeight: 600,
       addEventListener(value3, value4) {
         handler(map4, value3, value4);
       },
@@ -198,7 +198,7 @@ function createFakeDocument() {
     const box = computeTooltipPosition(
       { left: 100, top: 100, right: 140, bottom: 124, width: 40, height: 24 },
       { width: 80, height: 30 },
-      { width: 0x190, height: 0x12c },
+      { width: 400, height: 300 },
       'top',
     );
     (assert.equal(box.placement, 'top'),
@@ -208,7 +208,7 @@ function createFakeDocument() {
     const box2 = computeTooltipPosition(
       { left: 0, top: 90, right: 20, bottom: 110, width: 20, height: 20 },
       { width: 120, height: 30 },
-      { width: 0x12c, height: 240 },
+      { width: 300, height: 240 },
       'top',
     );
     (assert.equal(box2.left, 8), assert.equal(box2.arrowLeft, 12));
@@ -217,7 +217,7 @@ function createFakeDocument() {
     const box3 = computeTooltipPosition(
       { left: 100, top: 6, right: 140, bottom: 26, width: 40, height: 20 },
       { width: 80, height: 30 },
-      { width: 0x12c, height: 240 },
+      { width: 300, height: 240 },
       'top',
     );
     (assert.equal(box3.placement, 'bottom'), assert.equal(box3.top, 38));
@@ -226,7 +226,7 @@ function createFakeDocument() {
     const box4 = computeTooltipPosition(
       { left: 40, top: 80, right: 64, bottom: 104, width: 24, height: 24 },
       { width: 90, height: 40 },
-      { width: 0x12c, height: 220 },
+      { width: 300, height: 220 },
       'right',
     );
     (assert.equal(box4.placement, 'right'),
@@ -234,9 +234,9 @@ function createFakeDocument() {
       assert.equal(box4.top, 72),
       assert.equal(box4.arrowTop, 20));
     const box5 = computeTooltipPosition(
-      { left: 0x104, top: 80, right: 0x11c, bottom: 104, width: 24, height: 24 },
+      { left: 260, top: 80, right: 284, bottom: 104, width: 24, height: 24 },
       { width: 90, height: 40 },
-      { width: 0x12c, height: 220 },
+      { width: 300, height: 220 },
       'right',
     );
     (assert.equal(box5.placement, 'left'), assert.equal(box5.left, 158));

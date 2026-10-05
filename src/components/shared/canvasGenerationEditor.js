@@ -57,11 +57,11 @@ export function openCanvasGenerationEditor({
   overlay['dataset'][overlayDataKey] = '';
   const el = document['createElement']('button');
   ((el['type'] = 'button'),
-    (el['className'] = 'v2-annotate-btn\x20icon-only\x20act-cancel'),
+    (el['className'] = 'v2-annotate-btn icon-only act-cancel'),
     el['setAttribute']('aria-label', t('imageAnnotate.toolbar.cancel')),
     (el['dataset']['tooltip'] = t('imageAnnotate.toolbar.cancel')),
     (el['innerHTML'] =
-      '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20width=\x2218\x22\x20height=\x2218\x22><path\x20d=\x22M18\x206L6\x2018M6\x206l12\x2012\x22/></svg>'));
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 6L6 18M6 6l12 12"/></svg>'));
   const panel = document['createElement']('div');
   ((panel['className'] = 'v2-annotate-toolbar v2-annotate-generation-toolbar'),
     (panel['innerHTML'] =
@@ -111,11 +111,11 @@ export function openCanvasGenerationEditor({
               width: node['width'] * result['viewport']['zoom'],
               height: node['height'] * result['viewport']['zoom'],
             },
-            center = top['x'] + top['width'] / 0x2;
+            center = top['x'] + top['width'] / 2;
           (update(top),
             positionCanvasEditorToolbar(panel, {
               center: center,
-              top: top['y'] + top['height'] + 0xe,
+              top: top['y'] + top['height'] + 14,
             }));
         },
         data = () => onClose();

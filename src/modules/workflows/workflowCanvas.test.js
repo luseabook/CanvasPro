@@ -49,12 +49,12 @@ function sampleCanvas() {
 (test('workflow: createWorkflowFromCanvas trims and limits metadata', () => {
   const error = createWorkflowFromCanvas(sampleCanvas(), {
     name: '  ' + 'n'.repeat(60) + '  ',
-    note: 'x'.repeat(0x190),
+    note: 'x'.repeat(400),
     tags: ['tag', ' tag ', 'LONG_TAG_VALUE', 'B', 'C', 'D', 'E'],
     cover: '/cover.png',
   });
   (assert.equal(error.name.length, 50),
-    assert.equal(error.note.length, 0x12c),
+    assert.equal(error.note.length, 300),
     assert.deepEqual(error.tags, ['tag', 'LONG_TAG_VAL', 'B', 'C', 'D']),
     assert.equal(error.cover, '/cover.png'),
     assert.equal(error.workflowData.nodes.length, 2),
@@ -113,7 +113,7 @@ function sampleCanvas() {
   test('workflow: filterWorkflows searches name tags and note', () => {
     const source = [
       { id: '1', name: 'Alpha', tags: ['draw'], note: '', updatedAt: 100 },
-      { id: '2', name: 'Mine', tags: ['Scene'], note: 'step by step', updatedAt: 0x12c },
+      { id: '2', name: 'Mine', tags: ['Scene'], note: 'step by step', updatedAt: 300 },
       { id: '3', name: 'Other', tags: [], note: 'nothing', updatedAt: 200 },
     ];
     (assert.deepEqual(
@@ -166,7 +166,7 @@ function sampleCanvas() {
   test('workflow: createWorkflowSnapshotCoverCandidate uses root group color theme', () => {
     const workflowSnapshotCoverCandidate2 = createWorkflowSnapshotCoverCandidate({
         nodes: [
-          { id: 'g', type: 'group', color: 'var(--red)', x: 0, y: 0, width: 0x168, height: 220 },
+          { id: 'g', type: 'group', color: 'var(--red)', x: 0, y: 0, width: 360, height: 220 },
           { id: 'text-1', type: 'source-text', parentId: 'g', x: 32, y: 48, width: 120, height: 72 },
         ],
         edges: [],
@@ -249,15 +249,15 @@ function sampleCanvas() {
     const calcWorkflowCenterOffset2 = calcWorkflowCenterOffset(
       [{ id: 'a', x: 0, y: 0, width: 100, height: 100 }],
       {
-        x: 0x12c,
-        y: 0x190,
+        x: 300,
+        y: 400,
       },
     );
-    assert.deepEqual(calcWorkflowCenterOffset2, { dx: 250, dy: 0x15e });
+    assert.deepEqual(calcWorkflowCenterOffset2, { dx: 250, dy: 350 });
   }),
   test('workflow: applyWorkflowToCanvas keeps relative layout', () => {
     const workflowFromCanvas = createWorkflowFromCanvas(sampleCanvas(), { name: 'Apply' }),
-      canvas = applyWorkflowToCanvas(workflowFromCanvas, { x: 0x1f4, y: 0x1f4 });
+      canvas = applyWorkflowToCanvas(workflowFromCanvas, { x: 500, y: 500 });
     (assert.equal(canvas.nodes.length, 2), assert.equal(canvas.edges.length, 1));
     const next = canvas.nodes[1].x - canvas.nodes[0].x,
       current = canvas.nodes[1].y - canvas.nodes[0].y;

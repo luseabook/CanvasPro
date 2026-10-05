@@ -3,10 +3,10 @@ function getResponseText(value) {
 }
 export function repairStoryEpisodeScriptMissingBodyTerminators(item) {
   const text = getResponseText(item);
-  if (!text) return { text: text, repairedCount: 0x0 };
-  let repairedCount = 0x0;
+  if (!text) return { text: text, repairedCount: 0 };
+  let repairedCount = 0;
   const key = (index, result, data) => {
-    return ((repairedCount += 0x1), '' + result + data + '\x22}');
+    return ((repairedCount += 1), '' + result + data + '"}');
   };
   let text2 = text['replace'](
     /("body"\s*:\s*")((?:\\.|[^"\\])*?)\}(?=\s*,\s*\{\s*"(?:ref|sceneRef|scene_ref|id)"\s*:)/gu,

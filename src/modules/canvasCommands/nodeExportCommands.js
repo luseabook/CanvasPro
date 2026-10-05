@@ -31,12 +31,12 @@ function normalizeDestinationArgs(args = {}) {
   };
 }
 function normalizeExportItems(args = {}, context = {}) {
-  const ids = normalizeNodeIds(args, context, { min: 0x1, allowSelection: !![] }),
+  const ids = normalizeNodeIds(args, context, { min: 1, allowSelection: !![] }),
     { items: items, skipped: skipped } = collectSelectedNodeExportItems({
       nodes: getState(context)['nodes'] || {},
       selectedNodeIds: ids,
     });
-  if (items['length'] <= 0x0)
+  if (items['length'] <= 0)
     throw createCanvasCommandError(
       'NO_EXPORTABLE_ITEMS',
       'Selected canvas nodes do not contain exportable text or media.',
@@ -75,7 +75,7 @@ export function registerNodeExportCommands(registry) {
           return {
             ok: ![],
             errorCode: 'NODE_EXPORT_UNAVAILABLE',
-            message: 'Node\x20export\x20is\x20unavailable\x20in\x20this\x20environment.',
+            message: 'Node export is unavailable in this environment.',
           };
         const selection = normalizeExportItems(args, context);
         return { args: { ...normalizeDestinationArgs(args), ...selection } };
@@ -93,7 +93,7 @@ export function registerNodeExportCommands(registry) {
       if (!api)
         throw createCanvasCommandError(
           'NODE_EXPORT_UNAVAILABLE',
-          'Node\x20export\x20is\x20unavailable\x20in\x20this\x20environment.',
+          'Node export is unavailable in this environment.',
         );
       const result = await api['exportSelected']({
         items: args['items'] || [],

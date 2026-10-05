@@ -13,7 +13,7 @@ const TASK_TERMINAL_STATUSES = new Set([
   TASK_SUCCESS_STATUSES = new Set(['success', 'succeeded', 'completed', 'complete', 'done']),
   TASK_FAILURE_STATUSES = new Set(['failed', 'fail', 'error']),
   TASK_CANCELLED_STATUSES = new Set(['cancelled', 'canceled']),
-  MAX_TASK_MEDIA_ITEMS = 0xc;
+  MAX_TASK_MEDIA_ITEMS = 12;
 function getNode(state = {}, value = '') {
   const item = String(value || '')['trim']();
   return item ? state['nodes']?.[item] || null : null;
@@ -99,7 +99,7 @@ function buildImageTaskMedia(imageUrl = {}, entry = '') {
       ? imageUrl['images']
           ['map']((record) => normalizeImageTaskMediaItem(record, name))
           ['filter'](Boolean)
-          ['slice'](0x0, MAX_TASK_MEDIA_ITEMS)
+          ['slice'](0, MAX_TASK_MEDIA_ITEMS)
       : [],
     imageTaskMediaItem = normalizeImageTaskMediaItem(
       {
@@ -114,9 +114,9 @@ function buildImageTaskMedia(imageUrl = {}, entry = '') {
       },
       name,
     ),
-    items = list3['length'] > 0x0 ? list3 : imageTaskMediaItem ? [imageTaskMediaItem] : [];
-  if (items['length'] === 0x0) return null;
-  const url2 = items[0x0];
+    items = list3['length'] > 0 ? list3 : imageTaskMediaItem ? [imageTaskMediaItem] : [];
+  if (items['length'] === 0) return null;
+  const url2 = items[0];
   return {
     kind: 'image',
     url: url2['url'],
@@ -223,7 +223,7 @@ export function createAgentTaskBindingRuntime({
 } = {}) {
   if (!sessionStore || typeof readCanvasState !== 'function')
     throw new TypeError(
-      '[agentTaskBindingRuntime]\x20sessionStore\x20and\x20readCanvasState\x20are\x20required',
+      '[agentTaskBindingRuntime] sessionStore and readCanvasState are required',
     );
   function run(output, value2 = {}) {
     return typeof formatText === 'function' ? formatText(output, value2) : output;
@@ -386,7 +386,7 @@ export function createAgentTaskBindingRuntime({
         map['has'](value19['id']),
       );
     if (
-      map['size'] === 0x0 ||
+      map['size'] === 0 ||
       bindings['length'] !== map['size'] ||
       bindings['some']((response7) => !isTerminalTaskStatus(response7['status']))
     )
@@ -421,7 +421,7 @@ export function createAgentTaskBindingRuntime({
     enabled3 = !![];
     if (typeof store?.['subscribeSelector'] === 'function')
       value21 = store['subscribeSelector'](
-        (value22) => Number(value22?.['_persistRev'] || 0x0),
+        (value22) => Number(value22?.['_persistRev'] || 0),
         () => sync(readCanvasState()),
       );
     else {

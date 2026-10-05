@@ -1,20 +1,20 @@
 import { generateText } from './aiTextApi.js';
 import { buildAgentModelRequestParams } from './agentModelRequestParams.js';
-const AUTHORING_HISTORY_LIMIT = 0xc,
-  AUTHORING_TEXT_LIMIT = 0xbb8,
-  AUTHORING_PROMPT_LIMIT = 0x4e20;
+const AUTHORING_HISTORY_LIMIT = 12,
+  AUTHORING_TEXT_LIMIT = 3000,
+  AUTHORING_PROMPT_LIMIT = 20000;
 export const AGENT_SKILL_AUTHORING_SYSTEM_PROMPT = [
   'You design declarative SKILL.md capability packages for SHUO Canvas.',
   'Return only the requested JSON object and never Markdown or prose outside JSON.',
   'A Skill contains an ASCII lowercase kebab-case id, a user-facing title, a concise description of when to use it, trigger phrases, and plain-text instructions.',
-  'Infer\x20safe\x20professional\x20defaults\x20whenever\x20the\x20user\x27s\x20purpose\x20is\x20clear.',
+  'Infer safe professional defaults whenever the user\'s purpose is clear.',
   "Use need_clarification only when the Skill's actual purpose cannot be inferred, and ask one concise question.",
-  'Do\x20not\x20request\x20confirmation\x20for\x20optional\x20wording,\x20tone,\x20format,\x20or\x20naming\x20details.',
+  'Do not request confirmation for optional wording, tone, format, or naming details.',
   'Skills are declarative guidance only. Never add scripts, executable code, filesystem paths, secrets, or claims that the Skill can bypass product policy.',
   'Choose an id that does not conflict with existingSkills.',
-  'For\x20update\x20operations,\x20preserve\x20targetSkill.id\x20exactly\x20and\x20revise\x20only\x20the\x20requested\x20title,\x20description,\x20triggers,\x20or\x20instructions.',
+  'For update operations, preserve targetSkill.id exactly and revise only the requested title, description, triggers, or instructions.',
   'For clone operations, keep the source meaning unless the user requests changes and choose a new non-conflicting id.',
-]['join']('\x0a');
+]['join']('\n');
 const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
   name: 'agent_skill_draft',
   strict: ![],
@@ -44,7 +44,7 @@ const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
 });
 function truncateText(value, item = AUTHORING_TEXT_LIMIT) {
   const list = String(value || '');
-  return list['length'] <= item ? list : list['slice'](0x0, Math['max'](0x0, item - 0x3)) + '...';
+  return list['length'] <= item ? list : list['slice'](0, Math['max'](0, item - 3)) + '...';
 }
 function normalizeLocale(key = '') {
   return String(key || '')
@@ -82,22 +82,22 @@ function buildPrompt({
       ['slice'](-AUTHORING_HISTORY_LIMIT),
     existingSkills: (Array['isArray'](existingSkills) ? existingSkills : [])
       ['map']((options = {}) => ({
-        id: truncateText(options['id'], 0x40),
-        title: truncateText(options['title'] || options['id'], 0x78),
+        id: truncateText(options['id'], 64),
+        title: truncateText(options['title'] || options['id'], 120),
       }))
       ['filter']((data) => data['id'])
-      ['slice'](0x0, 0x64),
+      ['slice'](0, 100),
     operation: ['create', 'update', 'clone']['includes'](String(operation)) ? String(operation) : 'create',
     targetSkill:
       targetSkill && typeof targetSkill === 'object'
         ? {
-            id: truncateText(targetSkill['id'], 0x40),
-            title: truncateText(targetSkill['title'] || targetSkill['id'], 0x78),
-            description: truncateText(targetSkill['description'], 0x258),
+            id: truncateText(targetSkill['id'], 64),
+            title: truncateText(targetSkill['title'] || targetSkill['id'], 120),
+            description: truncateText(targetSkill['description'], 600),
             triggers: (Array['isArray'](targetSkill['triggers']) ? targetSkill['triggers'] : [])
-              ['slice'](0x0, 0x18)
-              ['map']((target) => truncateText(target, 0xa0)),
-            instructions: truncateText(targetSkill['instructions'], 0x2ee0),
+              ['slice'](0, 24)
+              ['map']((target) => truncateText(target, 160)),
+            instructions: truncateText(targetSkill['instructions'], 12000),
           }
         : null,
     outputContract: {
@@ -108,7 +108,7 @@ function buildPrompt({
         id: 'lowercase-kebab-case',
         title: 'string',
         description: 'when this Skill should be used',
-        triggers: ['short\x20phrases'],
+        triggers: ['short phrases'],
         instructions: 'complete declarative instructions',
       },
     },
@@ -116,13 +116,13 @@ function buildPrompt({
       ? {
           retry: {
             previousAttemptRejected: !![],
-            reason: truncateText(retryReason || repairReason, 0xc8),
+            reason: truncateText(retryReason || repairReason, 200),
             instruction: 'Return the corrected JSON object only.',
           },
         }
       : {}),
   };
-  return JSON['stringify'](index)['slice'](0x0, AUTHORING_PROMPT_LIMIT);
+  return JSON['stringify'](index)['slice'](0, AUTHORING_PROMPT_LIMIT);
 }
 function getResultText(response) {
   return typeof response === 'string'
@@ -142,7 +142,7 @@ function parseResult(source) {
   try {
     return JSON['parse'](enabled);
   } catch {
-    throw new Error('Agent\x20Skill\x20author\x20returned\x20invalid\x20JSON.');
+    throw new Error('Agent Skill author returned invalid JSON.');
   }
 }
 export async function requestAgentSkillDraft({

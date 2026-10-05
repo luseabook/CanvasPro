@@ -31,7 +31,7 @@ export function normalizePersonReplacementVideoGenerationState(options = {}, key
     ...(requestId ? { requestId: requestId } : {}),
     ...args,
     ...(Number['isFinite'](queueIndex) ? { queueIndex: queueIndex } : {}),
-    ...(Number['isFinite'](queueLength) && queueLength >= 0x0 ? { queueLength: queueLength } : {}),
+    ...(Number['isFinite'](queueLength) && queueLength >= 0 ? { queueLength: queueLength } : {}),
   };
 }
 export function getRecoverablePersonReplacementVideoTask(options2 = {}) {

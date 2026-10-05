@@ -106,7 +106,7 @@ class FakeVideoElement {
     ((fakeVideoElement3.src = '/output/sample.mp4'),
       (fakeVideoElement3.readyState = 0),
       (fakeVideoElement3.networkState = 2));
-    const playVideoWithRecovery3 = playVideoWithRecovery(fakeVideoElement3, { readyTimeoutMs: 0x3e8 });
+    const playVideoWithRecovery3 = playVideoWithRecovery(fakeVideoElement3, { readyTimeoutMs: 1000 });
     (await Promise.resolve(),
       await Promise.resolve(),
       assert.equal(fakeVideoElement3.playCount, 1),
@@ -128,7 +128,7 @@ class FakeVideoElement {
       setTimeout(() => {
         ((fakeVideoElement4.readyState = 2), fakeVideoElement4.dispatchEventName('loadeddata'));
       }, 0));
-    const playVideoWithRecovery4 = await playVideoWithRecovery(fakeVideoElement4, { readyTimeoutMs: 0x3e8 });
+    const playVideoWithRecovery4 = await playVideoWithRecovery(fakeVideoElement4, { readyTimeoutMs: 1000 });
     (assert.equal(playVideoWithRecovery4, true),
       assert.equal(fakeVideoElement4.preload, 'auto'),
       assert.equal(fakeVideoElement4.loadCount, 0),

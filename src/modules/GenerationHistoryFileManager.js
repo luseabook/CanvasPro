@@ -57,18 +57,18 @@ const FILE_FILTERS = Object['freeze']([
   FILE_MANAGER_KEEP_OPEN_SELECTOR =
     '[data-sidebar-submenu-owner="' +
     FILE_MANAGER_SIDEBAR_KEY +
-    '\x22],\x20#file-manager-delete-confirm-overlay',
-  FILE_PANEL_RESIZE = Object['freeze']({ minWidth: 0x230, defaultWidth: 0x2f8, maxViewportGap: 0x18 }),
+    '"], #file-manager-delete-confirm-overlay',
+  FILE_PANEL_RESIZE = Object['freeze']({ minWidth: 560, defaultWidth: 760, maxViewportGap: 24 }),
   FILE_MASONRY = Object['freeze']({
-    gap: 0x10,
-    placementStep: 0x8,
-    fixedShortSide: 0x96,
-    defaultShortSide: 0x104,
-    maxLongSide: 0x230,
+    gap: 16,
+    placementStep: 8,
+    fixedShortSide: 150,
+    defaultShortSide: 260,
+    maxLongSide: 560,
   }),
-  FILE_HISTORY_PAGE_SIZE = 0x50,
-  FILE_OUTPUT_PAGE_SIZE = 0x50,
-  FILE_HISTORY_SCROLL_PREFETCH_PX = 0x168;
+  FILE_HISTORY_PAGE_SIZE = 80,
+  FILE_OUTPUT_PAGE_SIZE = 80,
+  FILE_HISTORY_SCROLL_PREFETCH_PX = 360;
 function fileManagerText(value, item = {}) {
   return t('generationHistoryFileManager.' + value, item);
 }
@@ -81,8 +81,8 @@ function normalizeProjectId(data) {
 }
 function resolveThumbSrc(state) {
   if (!resolveMediaSrc(state)) return '';
-  const options = Array['isArray'](state?.['items']) ? state['items'][0x0] : null,
-    target = Array['isArray'](state?.['nodes']) ? state['nodes'][0x0] : null;
+  const options = Array['isArray'](state?.['items']) ? state['items'][0] : null,
+    target = Array['isArray'](state?.['nodes']) ? state['nodes'][0] : null;
   return String(
     state?.['coverUrl'] ||
       options?.['thumbSrc'] ||
@@ -95,7 +95,7 @@ function resolveThumbSrc(state) {
   )['trim']();
 }
 function resolveMediaSrc(state2) {
-  const source = Array['isArray'](state2?.['nodes']) ? state2['nodes'][0x0] : null;
+  const source = Array['isArray'](state2?.['nodes']) ? state2['nodes'][0] : null;
   return String(
     source?.['imageUrl'] ||
       source?.['sourceUrl'] ||
@@ -128,7 +128,7 @@ function getRecordMediaKind(state3) {
     current === 'file'
   )
     return current;
-  const entry = Array['isArray'](state3?.['nodes']) ? state3['nodes'][0x0] : null,
+  const entry = Array['isArray'](state3?.['nodes']) ? state3['nodes'][0] : null,
     list = String(entry?.['type'] || '')
       ['trim']()
       ['toLowerCase']();
@@ -149,10 +149,10 @@ function isSupportedOutputMediaKind(payload) {
 function isFileManagerActionableRecord(state4) {
   const recordMediaKind = getRecordMediaKind(state4);
   if (!isSupportedOutputMediaKind(recordMediaKind)) return ![];
-  return Array['isArray'](state4?.['nodes']) && state4['nodes']['length'] > 0x0;
+  return Array['isArray'](state4?.['nodes']) && state4['nodes']['length'] > 0;
 }
 function resolveRecordLocalPath(state5) {
-  const handle = Array['isArray'](state5?.['nodes']) ? state5['nodes'][0x0] : null;
+  const handle = Array['isArray'](state5?.['nodes']) ? state5['nodes'][0] : null;
   return normalizeLocalPath(
     state5?.['localPath'] ||
       state5?.['outputItem']?.['localPath'] ||
@@ -214,16 +214,16 @@ function outputFileToRecord(box) {
     id =
       needsAutoResize === 'video' ? 'source-video' : needsAutoResize === 'audio' ? 'source-audio' : 'source-image',
     count =
-      Number(box?.['videoWidth'] || box?.['originalWidth'] || box?.['width'] || 0x0) || 0x0,
+      Number(box?.['videoWidth'] || box?.['originalWidth'] || box?.['width'] || 0) || 0,
     count2 =
-      Number(box?.['videoHeight'] || box?.['originalHeight'] || box?.['height'] || 0x0) ||
-      0x0,
+      Number(box?.['videoHeight'] || box?.['originalHeight'] || box?.['height'] || 0) ||
+      0,
     scope = {
       id: id + '-output-' + String(box?.['relPath'] || localPath)['replace'](/[^\w-]+/g, '_'),
       type: id,
       name: name,
-      x: 0x0,
-      y: 0x0,
+      x: 0,
+      y: 0,
       ...getNodeDefaultSize(id),
       src: src,
       localPath: localPath,
@@ -236,8 +236,8 @@ function outputFileToRecord(box) {
     ((scope['imageUrl'] = src),
       (scope['sourceUrl'] = src),
       (scope['thumbUrl'] = url2),
-      count > 0x0 && ((scope['originalWidth'] = count), (scope['imageWidth'] = count)),
-      count2 > 0x0 && ((scope['originalHeight'] = count2), (scope['imageHeight'] = count2)));
+      count > 0 && ((scope['originalWidth'] = count), (scope['imageWidth'] = count)),
+      count2 > 0 && ((scope['originalHeight'] = count2), (scope['imageHeight'] = count2)));
   else {
     if (needsAutoResize === 'video') {
       ((scope['videoUrl'] = src),
@@ -245,9 +245,9 @@ function outputFileToRecord(box) {
         (scope['thumbUrl'] = url2),
         (scope['posterLocalPath'] = thumbLocalPath),
         (scope['videoThumbSrc'] = src));
-      if (count > 0x0) scope['videoWidth'] = count;
-      if (count2 > 0x0) scope['videoHeight'] = count2;
-      if (Number(box?.['duration'] || 0x0) > 0x0) scope['duration'] = Number(box['duration']);
+      if (count > 0) scope['videoWidth'] = count;
+      if (count2 > 0) scope['videoHeight'] = count2;
+      if (Number(box?.['duration'] || 0) > 0) scope['duration'] = Number(box['duration']);
     } else needsAutoResize === 'audio' && (scope['audioUrl'] = src);
   }
   return {
@@ -258,7 +258,7 @@ function outputFileToRecord(box) {
       needsAutoResize === 'audio' ? '' : needsAutoResize === 'video' ? url2 : url2 || url || src,
     name: name,
     localPath: localPath,
-    updatedAt: Number(box?.['mtime'] || 0x0) || 0x0,
+    updatedAt: Number(box?.['mtime'] || 0) || 0,
     nodes: [scope],
   };
 }
@@ -269,7 +269,7 @@ function outputFileToDisplayRecord(outputItem) {
       mediaKind: 'folder',
       coverType: 'folder',
       name: String(outputItem?.['name'] || fileManagerText('fallback.folder')),
-      updatedAt: Number(outputItem?.['mtime'] || 0x0) || 0x0,
+      updatedAt: Number(outputItem?.['mtime'] || 0) || 0,
       outputItem: outputItem,
       nodes: [],
     };
@@ -280,14 +280,14 @@ function outputFileToDisplayRecord(outputItem) {
     mediaKind: 'file',
     coverType: 'file',
     name: String(outputItem?.['name'] || fileManagerText('fallback.file')),
-    updatedAt: Number(outputItem?.['mtime'] || 0x0) || 0x0,
+    updatedAt: Number(outputItem?.['mtime'] || 0) || 0,
     outputItem: outputItem,
     nodes: [],
   };
 }
 function resolveRecordSize(state6, input) {
-  const box2 = Array['isArray'](state6?.['nodes']) ? state6['nodes'][0x0] : null,
-    output = Array['isArray'](state6?.['items']) ? state6['items'][0x0] : null,
+  const box2 = Array['isArray'](state6?.['nodes']) ? state6['nodes'][0] : null,
+    output = Array['isArray'](state6?.['items']) ? state6['items'][0] : null,
     box3 = output?.['nodeData'] || {},
     width =
       Number(
@@ -296,8 +296,8 @@ function resolveRecordSize(state6, input) {
           box2?.['originalWidth'] ||
           box2?.['width'] ||
           box3['width'] ||
-          0x0,
-      ) || 0x0,
+          0,
+      ) || 0,
     height =
       Number(
         box2?.['videoHeight'] ||
@@ -305,22 +305,22 @@ function resolveRecordSize(state6, input) {
           box2?.['originalHeight'] ||
           box2?.['height'] ||
           box3['height'] ||
-          0x0,
-      ) || 0x0;
-  if (width > 0x0 && height > 0x0) return { width: width, height: height };
+          0,
+      ) || 0;
+  if (width > 0 && height > 0) return { width: width, height: height };
   if (input === GENERATION_HISTORY_MEDIA_KINDS['VIDEO'])
     return {
-      width: Math['round']((FILE_MASONRY['defaultShortSide'] * 0x10) / 0x9),
+      width: Math['round']((FILE_MASONRY['defaultShortSide'] * 16) / 9),
       height: FILE_MASONRY['defaultShortSide'],
     };
-  if (input === GENERATION_HISTORY_MEDIA_KINDS['AUDIO']) return { width: 0x140, height: 0x8c };
-  if (input === 'folder') return { width: 0x96, height: 0x76 };
-  if (input === 'file') return { width: 0x96, height: 0x84 };
+  if (input === GENERATION_HISTORY_MEDIA_KINDS['AUDIO']) return { width: 320, height: 140 };
+  if (input === 'folder') return { width: 150, height: 118 };
+  if (input === 'file') return { width: 150, height: 132 };
   return { width: FILE_MASONRY['defaultShortSide'], height: FILE_MASONRY['defaultShortSide'] };
 }
 function resolveRecordAspect(value2, value3) {
   const { width: width2, height: height2 } = resolveRecordSize(value2, value3);
-  return width2 + '\x20/\x20' + height2;
+  return width2 + ' / ' + height2;
 }
 class GenerationHistoryFileManager {
   constructor() {
@@ -341,23 +341,23 @@ class GenerationHistoryFileManager {
       (this['_outputBreadcrumbs'] = [{ name: 'output', dir: '' }]),
       (this['_outputLoading'] = ![]),
       (this['_outputLoaded'] = ![]),
-      (this['_outputNextOffset'] = 0x0),
+      (this['_outputNextOffset'] = 0),
       (this['_outputHasMore'] = !![]),
-      (this['_outputTotalItems'] = 0x0),
-      (this['_outputLoadToken'] = 0x0),
-      (this['_panelWidth'] = 0x0),
+      (this['_outputTotalItems'] = 0),
+      (this['_outputLoadToken'] = 0),
+      (this['_panelWidth'] = 0),
       (this['_resizeState'] = null),
       (this['_recordsLoaded'] = ![]),
       (this['_recordsDirty'] = ![]),
-      (this['_nextOffset'] = 0x0),
+      (this['_nextOffset'] = 0),
       (this['_hasMore'] = !![]),
-      (this['_totalRecords'] = 0x0),
-      (this['_loadToken'] = 0x0),
+      (this['_totalRecords'] = 0),
+      (this['_loadToken'] = 0),
       (this['_selectedRecordIds'] = new Set()),
       (this['_selectionDrag'] = null),
       (this['_suppressNextClick'] = ![]),
       (this['_unsubscribeLocale'] = null),
-      (this['_videoThumbnailQueue'] = createVideoThumbnailRequestQueue({ concurrency: 0x1 })),
+      (this['_videoThumbnailQueue'] = createVideoThumbnailRequestQueue({ concurrency: 1 })),
       (this['_videoThumbnailObserver'] = null),
       (this['_videoThumbnailTargets'] = new WeakMap()),
       (this['_videoThumbnailBackfills'] = new Map()),
@@ -383,13 +383,13 @@ class GenerationHistoryFileManager {
   }
   ['_getCanvasCenterWorld']() {
     const { viewport: viewport } = appStore['getState'](),
-      value5 = window['innerWidth'] / 0x2,
-      value6 = window['innerHeight'] / 0x2,
-      enabled = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0x0,
-      enabled2 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0x0;
+      value5 = window['innerWidth'] / 2,
+      value6 = window['innerHeight'] / 2,
+      enabled = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0,
+      enabled2 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0;
     if (!enabled || !enabled2) return screenToWorld(value5, value6, viewport);
-    let value7 = 0x0,
-      value8 = 0x0,
+    let value7 = 0,
+      value8 = 0,
       value9 = enabled,
       value10 = enabled2;
     const list2 = [],
@@ -398,7 +398,7 @@ class GenerationHistoryFileManager {
     if (value11) list2['push'](value11);
     if (value12) list2['push'](value12);
     if (this['panel']?.['classList']['contains']('show')) list2['push'](this['panel']);
-    const value13 = 0x8;
+    const value13 = 8;
     for (const el of list2) {
       if (!el?.['isConnected']) continue;
       const box4 = el['getBoundingClientRect'](),
@@ -425,8 +425,8 @@ class GenerationHistoryFileManager {
     }
     const count3 = value9 - value7,
       count4 = value10 - value8,
-      value18 = count3 > 0x28 ? value7 + count3 / 0x2 : value5,
-      value19 = count4 > 0x28 ? value8 + count4 / 0x2 : value6;
+      value18 = count3 > 40 ? value7 + count3 / 2 : value5,
+      value19 = count4 > 40 ? value8 + count4 / 2 : value6;
     return screenToWorld(value18, value19, viewport);
   }
   ['_hasRecord'](value20) {
@@ -465,13 +465,13 @@ class GenerationHistoryFileManager {
       });
     return (
       list4['sort']((error2, error3) => {
-        const value23 = error2?.['outputItem']?.['isDir'] ? 0x0 : 0x1,
-          value24 = error3?.['outputItem']?.['isDir'] ? 0x0 : 0x1;
+        const value23 = error2?.['outputItem']?.['isDir'] ? 0 : 1,
+          value24 = error3?.['outputItem']?.['isDir'] ? 0 : 1;
         if (value23 !== value24) return value23 - value24;
-        const value25 = Number(error2?.['updatedAt'] || 0x0),
-          value26 = Number(error3?.['updatedAt'] || 0x0),
+        const value25 = Number(error2?.['updatedAt'] || 0),
+          value26 = Number(error3?.['updatedAt'] || 0),
           count5 = this['_sortOrder'] === 'asc' ? value25 - value26 : value26 - value25;
-        if (count5 !== 0x0) return count5;
+        if (count5 !== 0) return count5;
         return String(error2?.['name'] || '')['localeCompare'](String(error3?.['name'] || ''), 'zh-CN');
       }),
       list4
@@ -494,7 +494,7 @@ class GenerationHistoryFileManager {
     );
   }
   ['_clearSelection']() {
-    if (this['_selectedRecordIds']['size'] === 0x0) return;
+    if (this['_selectedRecordIds']['size'] === 0) return;
     (this['_selectedRecordIds']['clear'](), this['_syncSelectionClasses']());
   }
   ['_selectRecord'](recordId, { shiftKey: shiftKey = ![] } = {}) {
@@ -523,7 +523,7 @@ class GenerationHistoryFileManager {
     });
   }
   ['_pruneSelectionToVisibleRecords']() {
-    if (this['_selectedRecordIds']['size'] === 0x0) return;
+    if (this['_selectedRecordIds']['size'] === 0) return;
     const map = new Set(
       this['_visibleRecords']()
         ['filter'](isFileManagerActionableRecord)
@@ -670,8 +670,8 @@ class GenerationHistoryFileManager {
   ['_bindMarqueeSelection']() {
     if (!this['contentEl']) return;
     this['contentEl']['addEventListener']('pointerdown', (event4) => {
-      if (event4['button'] !== 0x0 || !this['_isOpen']()) return;
-      if (event4['target']['closest']('[data-file-action],\x20.v2-file-history-resize-handle')) return;
+      if (event4['button'] !== 0 || !this['_isOpen']()) return;
+      if (event4['target']['closest']('[data-file-action], .v2-file-history-resize-handle')) return;
       const startX = event4['clientX'],
         startY = event4['clientY'],
         enabled5 = { startX: startX, startY: startY, active: ![], marqueeEl: null };
@@ -680,7 +680,7 @@ class GenerationHistoryFileManager {
           if (this['_selectionDrag'] !== enabled5) return;
           const value43 = event5['clientX'] - startX,
             value44 = event5['clientY'] - startY;
-          if (!enabled5['active'] && Math['hypot'](value43, value44) < 0x6) return;
+          if (!enabled5['active'] && Math['hypot'](value43, value44) < 6) return;
           !enabled5['active'] &&
             ((enabled5['active'] = !![]),
             (enabled5['marqueeEl'] = document['createElement']('div')),
@@ -745,7 +745,7 @@ class GenerationHistoryFileManager {
       if (!this['_selectedRecordIds']['has'](value47)) this['_setSelection']([value47]);
       const value49 = this['_getSelectedRecords'](),
         list5 = this['_buildContextMenuItems'](value49);
-      if (list5['length'] === 0x0) return;
+      if (list5['length'] === 0) return;
       showContextMenu(event6['clientX'], event6['clientY'], list5, {
         ensureItemIcons: !![],
         includeNodePicker: ![],
@@ -765,7 +765,7 @@ class GenerationHistoryFileManager {
       if (!isFileManagerActionableRecord(value51)) return;
       (event7['preventDefault'](), event7['stopPropagation']());
       const value52 =
-        this['_selectedRecordIds']['has'](value50) && this['_getSelectedRecords']()['length'] > 0x0
+        this['_selectedRecordIds']['has'](value50) && this['_getSelectedRecords']()['length'] > 0
           ? this['_getSelectedRecords']()
           : [value51];
       this['restoreRecordsToCanvas'](value52);
@@ -778,8 +778,8 @@ class GenerationHistoryFileManager {
   }
   ['_buildContextMenuItems'](value54) {
     const records = (Array['isArray'](value54) ? value54 : [])['filter'](isFileManagerActionableRecord),
-      value55 = records[0x0] || null,
-      value56 = records['length'] === 0x1 ? resolveRecordLocalPath(value55) : '',
+      value55 = records[0] || null,
+      value56 = records['length'] === 1 ? resolveRecordLocalPath(value55) : '',
       fileManagerMenuActions = getFileManagerMenuActions({
         records: records,
         canRevealInFolder: canShowItemInFolder(value56),
@@ -788,11 +788,11 @@ class GenerationHistoryFileManager {
       }),
       list7 = [];
     for (const value57 of fileManagerMenuActions) {
-      if (value57 === 'delete' && list7['length'] > 0x0) list7['push']('sep');
+      if (value57 === 'delete' && list7['length'] > 0) list7['push']('sep');
       if (value57 === 'add-to-canvas')
         list7['push']({
           label:
-            records['length'] > 0x1
+            records['length'] > 1
               ? fileManagerText('contextMenu.addManyToCanvas', { count: records['length'] })
               : fileManagerText('contextMenu.addToCanvas'),
           icon: 'add-to-canvas',
@@ -819,7 +819,7 @@ class GenerationHistoryFileManager {
             value57 === 'delete' &&
               list7['push']({
                 label:
-                  records['length'] > 0x1
+                  records['length'] > 1
                     ? fileManagerText('contextMenu.deleteMany', { count: records['length'] })
                     : fileManagerText('contextMenu.delete'),
                 icon: 'delete',
@@ -834,9 +834,9 @@ class GenerationHistoryFileManager {
   }
   ['_clampContentScroll']() {
     if (!this['contentEl']) return;
-    const count6 = Math['max'](0x0, this['contentEl']['scrollHeight'] - this['contentEl']['clientHeight']);
-    if (count6 <= 0x0) {
-      this['contentEl']['scrollTop'] = 0x0;
+    const count6 = Math['max'](0, this['contentEl']['scrollHeight'] - this['contentEl']['clientHeight']);
+    if (count6 <= 0) {
+      this['contentEl']['scrollTop'] = 0;
       return;
     }
     this['contentEl']['scrollTop'] > count6 && (this['contentEl']['scrollTop'] = count6);
@@ -871,7 +871,7 @@ class GenerationHistoryFileManager {
           this['_clampContentScroll']());
       };
     this['resizeHandleEl']['addEventListener']('pointerdown', (startX2) => {
-      if (startX2['button'] !== 0x0) return;
+      if (startX2['button'] !== 0) return;
       (startX2['preventDefault'](), startX2['stopPropagation']());
       const startWidth = this['panel']['getBoundingClientRect']();
       ((this['_resizeState'] = {
@@ -934,7 +934,7 @@ class GenerationHistoryFileManager {
         projectId: this['_getCurrentProjectId'](),
         canvasId: this['_getCurrentCanvasId'](),
         generationStartedAt:
-          Number(value64['startedAt'] || nodeData['generationStartTime'] || 0x0) || undefined,
+          Number(value64['startedAt'] || nodeData['generationStartTime'] || 0) || undefined,
         now: Number(value64['createdAt'] || Date['now']()) || Date['now'](),
       });
       void this['_saveRecords'](generationHistoryAssetsFromNode, { captureSource: 'event' });
@@ -944,24 +944,24 @@ class GenerationHistoryFileManager {
     ((this['records'] = []),
       (this['_recordsLoaded'] = ![]),
       (this['_recordsDirty'] = ![]),
-      (this['_nextOffset'] = 0x0),
+      (this['_nextOffset'] = 0),
       (this['_hasMore'] = !![]),
-      (this['_totalRecords'] = 0x0));
-    if (this['contentEl']) this['contentEl']['scrollTop'] = 0x0;
+      (this['_totalRecords'] = 0));
+    if (this['contentEl']) this['contentEl']['scrollTop'] = 0;
   }
   ['_resetOutputPageState']() {
     ((this['outputItems'] = []),
       (this['_outputLoaded'] = ![]),
-      (this['_outputNextOffset'] = 0x0),
+      (this['_outputNextOffset'] = 0),
       (this['_outputHasMore'] = !![]),
-      (this['_outputTotalItems'] = 0x0));
-    if (this['contentEl']) this['contentEl']['scrollTop'] = 0x0;
+      (this['_outputTotalItems'] = 0));
+    if (this['contentEl']) this['contentEl']['scrollTop'] = 0;
   }
   ['_normalizeOutputPageResponse'](nextOffset, value65) {
     const items = Array['isArray'](nextOffset?.['items']) ? nextOffset['items'] : [];
     return {
       items: items,
-      total: Number(nextOffset?.['total'] || 0x0) || items['length'],
+      total: Number(nextOffset?.['total'] || 0) || items['length'],
       nextOffset:
         nextOffset?.['nextOffset'] === null || nextOffset?.['nextOffset'] === undefined
           ? null
@@ -980,7 +980,7 @@ class GenerationHistoryFileManager {
     ((this['_activeSource'] = 'output'), (this['_outputLoading'] = !![]));
     const value67 = ++this['_outputLoadToken'];
     if (this['_isOpen']()) this['render']();
-    const offset = reset || value66 ? 0x0 : this['_outputNextOffset'];
+    const offset = reset || value66 ? 0 : this['_outputNextOffset'];
     try {
       const fetchOutputFilesFromServer2 = await fetchOutputFilesFromServer({
         dir: dir4,
@@ -990,7 +990,7 @@ class GenerationHistoryFileManager {
       });
       if (value67 !== this['_outputLoadToken']) return;
       const args2 = this['_normalizeOutputPageResponse'](fetchOutputFilesFromServer2, offset);
-      if (offset === 0x0) this['outputItems'] = args2['items'];
+      if (offset === 0) this['outputItems'] = args2['items'];
       else {
         const map3 = new Set(
           this['outputItems']['map']((value68) => getOutputRecordIdForItem(value68)),
@@ -1007,7 +1007,7 @@ class GenerationHistoryFileManager {
       ((this['_outputDir'] = String(fetchOutputFilesFromServer2?.['dir'] || '')['trim']()),
         (this['_outputParent'] = String(fetchOutputFilesFromServer2?.['parent'] || '')['trim']()),
         (this['_outputBreadcrumbs'] =
-          Array['isArray'](fetchOutputFilesFromServer2?.['breadcrumbs']) && fetchOutputFilesFromServer2['breadcrumbs']['length'] > 0x0
+          Array['isArray'](fetchOutputFilesFromServer2?.['breadcrumbs']) && fetchOutputFilesFromServer2['breadcrumbs']['length'] > 0
             ? fetchOutputFilesFromServer2['breadcrumbs']
             : [{ name: 'output', dir: '' }]),
         (this['_outputNextOffset'] =
@@ -1020,7 +1020,7 @@ class GenerationHistoryFileManager {
     } catch (value70) {
       if (value67 !== this['_outputLoadToken']) return;
       console['error']('[GenerationHistoryFileManager] 加载输出文件夹失败:', value70);
-      if (offset === 0x0) this['outputItems'] = [];
+      if (offset === 0) this['outputItems'] = [];
       this['_outputLoaded'] = !![];
     } finally {
       if (value67 === this['_outputLoadToken']) {
@@ -1033,7 +1033,7 @@ class GenerationHistoryFileManager {
     const value72 = {
       kind: 'generation-history',
       projectId: this['_getCurrentProjectId'](),
-      offset: Number(value71) || 0x0,
+      offset: Number(value71) || 0,
       limit: FILE_HISTORY_PAGE_SIZE,
     };
     this['_activeSource'] === 'current-canvas' && (value72['canvasId'] = this['_getCurrentCanvasId']());
@@ -1053,7 +1053,7 @@ class GenerationHistoryFileManager {
       : [];
     return {
       items: items3,
-      total: Number(items2?.['total'] || 0x0) || items3['length'],
+      total: Number(items2?.['total'] || 0) || items3['length'],
       nextOffset:
         items2?.['nextOffset'] === null || items2?.['nextOffset'] === undefined
           ? null
@@ -1069,13 +1069,13 @@ class GenerationHistoryFileManager {
     this['_loading'] = !![];
     if (this['_isOpen']()) this['render']();
     let value75 = ![];
-    const count7 = reset ? 0x0 : this['_nextOffset'];
+    const count7 = reset ? 0 : this['_nextOffset'];
     try {
       const fetchAssetsFromServer2 = await fetchAssetsFromServer(this['_buildAssetPageParams'](count7));
       if (value74 !== this['_loadToken']) return;
       const args3 = this['_normalizeAssetsPageResponse'](fetchAssetsFromServer2, count7),
         value76 =
-          count7 === 0x0
+          count7 === 0
             ? args3['items']
             : [
                 ...this['records'],
@@ -1095,7 +1095,7 @@ class GenerationHistoryFileManager {
         (this['_totalRecords'] = args3['total']),
         (this['_recordsLoaded'] = !![]),
         (this['_recordsDirty'] = ![]),
-        (value75 = backfillAfterLoad && count7 === 0x0));
+        (value75 = backfillAfterLoad && count7 === 0));
     } catch (value79) {
       if (value74 !== this['_loadToken']) return;
       console['error']('[GenerationHistoryFileManager] 加载生成媒体历史失败:', value79);
@@ -1137,8 +1137,8 @@ class GenerationHistoryFileManager {
           return ![];
         return !this['_hasRecord'](enabled6);
       });
-    if (list9['length'] === 0x0) return 0x0;
-    let count8 = 0x0;
+    if (list9['length'] === 0) return 0;
+    let count8 = 0;
     for (const value82 of list9) {
       const historyRecordIdentityKey3 = buildHistoryRecordIdentityKey(value82);
       this['_savingIds']['add'](value82['id']);
@@ -1149,7 +1149,7 @@ class GenerationHistoryFileManager {
             value82,
             ...this['records']['filter']((value83) => value83['id'] !== value82['id']),
           ])),
-          (count8 += 0x1));
+          (count8 += 1));
       } catch (value84) {
         console['error']('[GenerationHistoryFileManager] 保存生成媒体历史失败:', value84);
       } finally {
@@ -1157,7 +1157,7 @@ class GenerationHistoryFileManager {
         if (historyRecordIdentityKey3) this['_savingRecordKeys']['delete'](historyRecordIdentityKey3);
       }
     }
-    if (count8 > 0x0) {
+    if (count8 > 0) {
       if (this['_isOpen']()) this['render']();
       else this['_recordsDirty'] = !![];
     }
@@ -1180,7 +1180,7 @@ class GenerationHistoryFileManager {
           list11 = Array['isArray'](nodeData2['videos']) ? nodeData2['videos'] : [],
           videos =
             value86 === 'ai-video'
-              ? list11['length'] > 0x0
+              ? list11['length'] > 0
                 ? list11
                 : String(nodeData2['videoUrl'] || nodeData2['localPath'] || '')['trim']()
                   ? [nodeData2]
@@ -1191,7 +1191,7 @@ class GenerationHistoryFileManager {
             String(nodeData2['audioUrl'] || nodeData2['localPath'] || '')['trim']()
               ? [nodeData2]
               : [];
-        if (images['length'] === 0x0 && videos['length'] === 0x0 && audios['length'] === 0x0)
+        if (images['length'] === 0 && videos['length'] === 0 && audios['length'] === 0)
           continue;
         const generationStartedAt = resolveFileManagerBackfillStartedAt(nodeData2);
         list10['push'](
@@ -1257,7 +1257,7 @@ class GenerationHistoryFileManager {
     }
     const list12 = this['_visibleRecords']();
     this['_pruneSelectionToVisibleRecords']();
-    if (list12['length'] === 0x0) {
+    if (list12['length'] === 0) {
       const el10 = document['createElement']('div');
       ((el10['className'] = 'v2-file-history-empty'),
         (el10['textContent'] =
@@ -1360,42 +1360,42 @@ class GenerationHistoryFileManager {
     }
   }
   ['_getMasonryMetrics']() {
-    if (!this['contentEl']) return { contentWidth: 0x1 };
+    if (!this['contentEl']) return { contentWidth: 1 };
     const value88 = window['getComputedStyle'](this['contentEl']),
       value89 =
-        (Number['parseFloat'](value88['paddingLeft']) || 0x0) +
-        (Number['parseFloat'](value88['paddingRight']) || 0x0);
-    return { contentWidth: Math['max'](0x1, (this['contentEl']['clientWidth'] || 0x1) - value89) };
+        (Number['parseFloat'](value88['paddingLeft']) || 0) +
+        (Number['parseFloat'](value88['paddingRight']) || 0);
+    return { contentWidth: Math['max'](1, (this['contentEl']['clientWidth'] || 1) - value89) };
   }
   ['_getRecordDisplaySize'](value90, value91) {
     const recordMediaKind3 = getRecordMediaKind(value90),
       { width: width4, height: height4 } = resolveRecordSize(value90, recordMediaKind3),
-      value92 = Math['max'](0x1, width4),
-      value93 = Math['max'](0x1, height4),
+      value92 = Math['max'](1, width4),
+      value93 = Math['max'](1, height4),
       value94 = Math['min'](value92, value93),
       value95 = Math['max'](value92, value93),
       value96 = FILE_MASONRY['fixedShortSide'],
       value97 = Math['min'](
         value96 / value94,
         FILE_MASONRY['maxLongSide'] / value95,
-        value92 > value91 ? value91 / value92 : 0x1,
+        value92 > value91 ? value91 / value92 : 1,
       );
     return {
-      width: Math['max'](0x1, Math['round'](value92 * value97)),
-      height: Math['max'](0x1, Math['round'](value93 * value97)),
+      width: Math['max'](1, Math['round'](value92 * value97)),
+      height: Math['max'](1, Math['round'](value93 * value97)),
     };
   }
   ['_findMasonrySlot'](value98, box8, value99) {
     const value100 = FILE_MASONRY['gap'],
-      value101 = Math['max'](0x0, value99 - box8['width']),
+      value101 = Math['max'](0, value99 - box8['width']),
       list13 = [];
-    for (let value102 = 0x0; value102 <= value101; value102 += FILE_MASONRY['placementStep']) {
+    for (let value102 = 0; value102 <= value101; value102 += FILE_MASONRY['placementStep']) {
       list13['push'](value102);
     }
-    if (list13[list13['length'] - 0x1] !== value101) list13['push'](value101);
+    if (list13[list13['length'] - 1] !== value101) list13['push'](value101);
     let box9 = null;
     for (const x2 of list13) {
-      let y2 = 0x0;
+      let y2 = 0;
       for (const box10 of value98) {
         const value103 =
           x2 < box10['x'] + box10['width'] + value100 &&
@@ -1407,7 +1407,7 @@ class GenerationHistoryFileManager {
         (y2 === box9['y'] && x2 < box9['x'])) &&
         (box9 = { x: x2, y: y2 });
     }
-    return box9 || { x: 0x0, y: 0x0 };
+    return box9 || { x: 0, y: 0 };
   }
   ['_renderMasonry'](value104) {
     const { contentWidth: contentWidth } = this['_getMasonryMetrics'](),
@@ -1415,7 +1415,7 @@ class GenerationHistoryFileManager {
     ((el17['className'] = 'v2-file-history-masonry-canvas'),
       this['contentEl']['appendChild'](el17));
     const list14 = [];
-    let value105 = 0x0;
+    let value105 = 0;
     for (const value106 of value104) {
       const box11 = this['_getRecordDisplaySize'](value106, contentWidth),
         box12 = this['_findMasonrySlot'](list14, box11, contentWidth),
@@ -1477,7 +1477,7 @@ class GenerationHistoryFileManager {
     const value110 = String(state7?.['id'] || '') + ':' + videoUrl['mediaSrc'],
       value111 = this['_videoThumbnailBackfills']['get'](value110);
     if (value111) return value111;
-    const args5 = Array['isArray'](state7?.['nodes']) ? state7['nodes'][0x0] || {} : {},
+    const args5 = Array['isArray'](state7?.['nodes']) ? state7['nodes'][0] || {} : {},
       value112 = {
         ...args5,
         localPath: resolveRecordLocalPath(state7),
@@ -1512,7 +1512,7 @@ class GenerationHistoryFileManager {
   ['_rememberVideoThumbnail'](state8, value116) {
     const value117 = String(value116?.['id'] || '');
     if (value116?.['outputItem']) {
-      const value118 = Array['isArray'](state8?.['nodes']) ? state8['nodes'][0x0] || {} : {},
+      const value118 = Array['isArray'](state8?.['nodes']) ? state8['nodes'][0] || {} : {},
         thumbLocalPath2 = normalizeLocalPath(value118?.['thumbLocalPath']);
       if (!thumbLocalPath2) return;
       this['outputItems'] = (Array['isArray'](this['outputItems']) ? this['outputItems'] : [])['map'](
@@ -1530,7 +1530,7 @@ class GenerationHistoryFileManager {
   async ['_persistVideoThumbnail'](state9, value120) {
     try {
       if (value120?.['outputItem']) {
-        const value121 = Array['isArray'](state9?.['nodes']) ? state9['nodes'][0x0] || {} : {},
+        const value121 = Array['isArray'](state9?.['nodes']) ? state9['nodes'][0] || {} : {},
           localPath2 = resolveRecordLocalPath(value120),
           thumbLocalPath3 = normalizeLocalPath(value121?.['thumbLocalPath']);
         if (!localPath2 || !thumbLocalPath3) return;
@@ -1563,7 +1563,7 @@ class GenerationHistoryFileManager {
     if (list15['length'] !== map5['size']) return (this['render'](), ![]);
     const { contentWidth: contentWidth2 } = this['_getMasonryMetrics'](),
       list16 = [];
-    let value123 = 0x0;
+    let value123 = 0;
     for (const value124 of list15) {
       const value125 = String(value124?.['id'] || ''),
         el23 = map5['get'](value125);
@@ -1617,7 +1617,7 @@ class GenerationHistoryFileManager {
         this['_selectedRecordIds']['has'](String(value126?.['id'] || '')),
       ));
     const el28 = document['createElement']('div');
-    el28['className'] = 'v2-file-history-thumb\x20is-' + recordMediaKind4;
+    el28['className'] = 'v2-file-history-thumb is-' + recordMediaKind4;
     const recordAspect = resolveRecordAspect(value126, recordMediaKind4);
     if (recordAspect) el28['style']['aspectRatio'] = recordAspect;
     const value127 =
@@ -1672,9 +1672,9 @@ class GenerationHistoryFileManager {
         },
         value133 = () => {
           if (!el30 || !enabled12) return;
-          const count9 = Number(enabled12['duration'] || 0x0),
-            value134 = Number(enabled12['currentTime'] || 0x0),
-            value135 = count9 > 0x0 ? Math['min'](Math['max'](value134 / count9, 0x0), 0x1) : 0x0;
+          const count9 = Number(enabled12['duration'] || 0),
+            value134 = Number(enabled12['currentTime'] || 0),
+            value135 = count9 > 0 ? Math['min'](Math['max'](value134 / count9, 0), 1) : 0;
           el30['style']['transform'] = 'scaleX(' + value135 + ')';
         },
         handler2 = () => {
@@ -1685,7 +1685,7 @@ class GenerationHistoryFileManager {
             el31['removeEventListener']('loadedmetadata', value133),
             el31['pause']());
           try {
-            el31['currentTime'] = 0x0;
+            el31['currentTime'] = 0;
           } catch {}
           (el31['removeAttribute']('src'), el31['load']?.(), el31['remove']());
         },
@@ -1743,9 +1743,9 @@ class GenerationHistoryFileManager {
       const enabled13 = String(value132 || '')['trim']();
       if (!enabled13) return;
       let value141 = null,
-        value142 = 0x0;
+        value142 = 0;
       const run3 = () => {
-          value142 += 0x1;
+          value142 += 1;
           const el34 = value141;
           ((value141 = null), el29['classList']['remove']('is-preview-playing'));
           if (!el34) return;
@@ -1765,7 +1765,7 @@ class GenerationHistoryFileManager {
           const el35 = el29['querySelector']('.v2-file-history-thumb');
           if (!el35) return;
           const value144 = document['createElement']('audio'),
-            value145 = value142 + 0x1;
+            value145 = value142 + 1;
           ((value142 = value145),
             (value144['preload'] = 'auto'),
             (value144['className'] = 'v2-file-history-preview-audio'),
@@ -1890,9 +1890,9 @@ class GenerationHistoryFileManager {
   }
   ['_buildCanvasNodeFromRecord'](
     state10,
-    { center: center, occupiedNodes: occupiedNodes, index: index = 0x0 } = {},
+    { center: center, occupiedNodes: occupiedNodes, index: index = 0 } = {},
   ) {
-    const args7 = Array['isArray'](state10?.['nodes']) ? state10['nodes'][0x0] : null;
+    const args7 = Array['isArray'](state10?.['nodes']) ? state10['nodes'][0] : null;
     if (!args7) return null;
     const recordMediaKind5 = getRecordMediaKind(state10),
       value155 =
@@ -1904,17 +1904,17 @@ class GenerationHistoryFileManager {
       type = String(args7['type'] || value155)['trim']() || value155,
       box15 = normalizeFileManagerSourceNodeForCanvas({ ...args7, type: type }),
       value156 =
-        Number(box15['width'] ?? box15['w']) || (type === 'source-audio' ? 0x140 : 0x104),
+        Number(box15['width'] ?? box15['w']) || (type === 'source-audio' ? 320 : 260),
       value157 =
-        Number(box15['height'] ?? box15['h']) || (type === 'source-audio' ? 0x8c : 0x104),
+        Number(box15['height'] ?? box15['h']) || (type === 'source-audio' ? 140 : 260),
       box16 = center || this['_getCanvasCenterWorld'](),
       box17 = findAvailablePosition(
         occupiedNodes || appStore['getState']()['nodes'],
-        box16['x'] - value156 / 0x2 + index * 0x18,
-        box16['y'] - value157 / 0x2 + index * 0x18,
+        box16['x'] - value156 / 2 + index * 24,
+        box16['y'] - value157 / 2 + index * 24,
         value156,
         value157,
-        0x18,
+        24,
         'right',
       ),
       box18 = JSON['parse'](JSON['stringify'](box15));
@@ -1928,7 +1928,7 @@ class GenerationHistoryFileManager {
   }
   ['restoreRecordsToCanvas'](value158) {
     const list17 = (Array['isArray'](value158) ? value158 : [])['filter'](isFileManagerActionableRecord);
-    if (list17['length'] === 0x0) return;
+    if (list17['length'] === 0) return;
     const center2 = this['_getCanvasCenterWorld'](),
       occupiedNodes2 = { ...(appStore['getState']()['nodes'] || {}) },
       count10 = [];
@@ -1941,18 +1941,18 @@ class GenerationHistoryFileManager {
       if (!enabled16) return;
       ((occupiedNodes2[enabled16['id']] = enabled16), count10['push'](enabled16));
     });
-    if (count10['length'] === 0x0) return;
+    if (count10['length'] === 0) return;
     appStore['batch'](() => {
       (count10['forEach']((value160) => appStore['addNode'](value160)),
         appStore['setSelectedNodes'](count10['map']((value161) => value161['id'])));
     });
     const value162 =
-      count10['length'] > 0x1
+      count10['length'] > 1
         ? fileManagerText('toasts.addedMany', { count: count10['length'] })
         : this['_activeSource'] === 'output'
           ? fileManagerText('toasts.addedOutput')
           : fileManagerText('toasts.addedHistory', {
-              label: getMediaLabel(getRecordMediaKind(list17[0x0])),
+              label: getMediaLabel(getRecordMediaKind(list17[0])),
             });
     window['showToast']?.(value162, 'success');
   }
@@ -1998,7 +1998,7 @@ class GenerationHistoryFileManager {
         const el48 = document['createElement']('div');
         ((el48['className'] = 'confirm-msg'),
           (el48['textContent'] =
-            count11 > 0x1
+            count11 > 1
               ? fileManagerText('deleteConfirm.messageMany', { count: count11 })
               : fileManagerText('deleteConfirm.messageOne')));
         const el49 = document['createElement']('div');
@@ -2047,13 +2047,13 @@ class GenerationHistoryFileManager {
   }
   async ['_deleteRecords'](value170) {
     const list18 = (Array['isArray'](value170) ? value170 : [])['filter'](isFileManagerActionableRecord);
-    if (list18['length'] === 0x0) return;
+    if (list18['length'] === 0) return;
     const enabled17 = await this['_showDeleteRecordsConfirm'](list18['length']);
     if (!enabled17) return;
     try {
       if (this['_activeSource'] === 'output') {
         const localPaths = list18['map'](resolveRecordLocalPath)['filter'](Boolean);
-        if (localPaths['length'] === 0x0) return;
+        if (localPaths['length'] === 0) return;
         await deleteOutputFilesFromServer({ localPaths: localPaths });
         const map7 = new Set(localPaths['map']((value171) => normalizeLocalPath(value171)));
         this['outputItems'] = (Array['isArray'](this['outputItems']) ? this['outputItems'] : [])['filter'](
@@ -2068,14 +2068,14 @@ class GenerationHistoryFileManager {
           (value176) => !map8['has'](String(value176?.['id'] || '')),
         )),
           (this['_totalRecords'] = Math['max'](
-            0x0,
-            Number(this['_totalRecords'] || 0x0) - list19['length'],
+            0,
+            Number(this['_totalRecords'] || 0) - list19['length'],
           )));
       }
       this['_selectedRecordIds']['clear']();
       if (this['_isOpen']()) this['render']();
       window['showToast']?.(
-        list18['length'] > 0x1
+        list18['length'] > 1
           ? fileManagerText('toasts.deletedMany')
           : fileManagerText('toasts.deletedOne'),
         'success',

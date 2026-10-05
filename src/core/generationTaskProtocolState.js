@@ -6,7 +6,7 @@ import {
 function normalizeStatus(value, item = 'pending') {
   return String(value || item)['trim']() || item;
 }
-function normalizeNumber(key, index = 0x0) {
+function normalizeNumber(key, index = 0) {
   const result = Number(key);
   return Number['isFinite'](result) ? result : index;
 }
@@ -55,7 +55,7 @@ function buildTaskMetaPatch(options3 = {}) {
 export function buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
   useOpenapiQuery: useOpenapiQuery = ![],
 } = {}) {
@@ -72,7 +72,7 @@ export function buildAsyncTaskPatch({
   kind: kind = 'generation',
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
 } = {}) {
   return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'], {
@@ -89,7 +89,7 @@ export function buildDreaminaTaskPatch({
   status: status = 'pending',
   phase: phase = 'generating',
   label: label = '',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   lastCheckedAt: lastCheckedAt = Date['now'](),
   recovering: recovering = ![],
   raw: raw = {},
@@ -115,7 +115,7 @@ export function buildImageGenerationDreaminaTaskPatch({
   status: status = 'pending',
   phase: phase = 'generating',
   label: label = DEFAULT_IMAGE_DREAMINA_TASK_LABEL,
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   lastCheckedAt: lastCheckedAt = Date['now'](),
   recovering: recovering = ![],
   raw: raw = {},
@@ -137,7 +137,7 @@ export function buildImageGenerationAsyncTaskPatch({
   kind: kind = 'image',
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
 } = {}) {
   return buildAsyncTaskPatch({
@@ -152,7 +152,7 @@ export function buildImageGenerationAsyncTaskPatch({
 export function buildRunningHubOpenapiTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
   useOpenapiQuery: useOpenapiQuery = !![],
 } = {}) {
@@ -167,12 +167,12 @@ export function buildRunningHubOpenapiTaskPatch({
 export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } = {}) {
   return {
     generationQueueStatus: 'idle',
-    generationQueueIndex: -0x1,
-    generationQueueLength: 0x0,
+    generationQueueIndex: -1,
+    generationQueueLength: 0,
     ...buildRunningHubTaskPatch({
       taskId: '',
       status: 'idle',
-      startedAt: 0x0,
+      startedAt: 0,
       recovering: ![],
       useOpenapiQuery: ![],
     }),
@@ -181,8 +181,8 @@ export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } =
       status: 'idle',
       phase: 'idle',
       label: '',
-      startedAt: 0x0,
-      lastCheckedAt: 0x0,
+      startedAt: 0,
+      lastCheckedAt: 0,
       recovering: ![],
       raw: {},
     }),
@@ -191,7 +191,7 @@ export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } =
       kind: kind,
       taskId: '',
       status: 'idle',
-      startedAt: 0x0,
+      startedAt: 0,
       recovering: ![],
     }),
   };
@@ -199,9 +199,9 @@ export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } =
 export function buildGenerationProtocolResetPatch(options5 = {}) {
   return buildIdleGenerationProtocolPatch(options5);
 }
-export function buildGenerationProtocolStartPatch(options6 = {}, source = 0x0) {
+export function buildGenerationProtocolStartPatch(options6 = {}, source = 0) {
   const args2 = buildTaskMetaPatch(options6),
-    args3 = { generationQueueStatus: 'submitting', generationQueueIndex: -0x1, generationQueueLength: 0x0 };
+    args3 = { generationQueueStatus: 'submitting', generationQueueIndex: -1, generationQueueLength: 0 };
   if (isWorkflowProtocolSpec(options6))
     return {
       ...args2,
@@ -227,7 +227,7 @@ export function buildGenerationProtocolStartPatch(options6 = {}, source = 0x0) {
     };
   return { ...args2, ...args3 };
 }
-export function buildGenerationProtocolTaskIdPatch(options7 = {}, next = '', current = 0x0) {
+export function buildGenerationProtocolTaskIdPatch(options7 = {}, next = '', current = 0) {
   const enabled = String(next || '')['trim']();
   if (!enabled) return {};
   if (isWorkflowProtocolSpec(options7))
@@ -252,20 +252,20 @@ export function buildGenerationProtocolTerminalPatch(options8 = {}, entry = 'idl
   if (isWorkflowProtocolSpec(options8))
     return {
       generationQueueStatus: 'idle',
-      generationQueueIndex: -0x1,
-      generationQueueLength: 0x0,
+      generationQueueIndex: -1,
+      generationQueueLength: 0,
       rhTaskStatus: status2,
       rhTaskRecovering: ![],
     };
   if (isAsyncModelApiProtocolSpec(options8))
     return {
       generationQueueStatus: 'idle',
-      generationQueueIndex: -0x1,
-      generationQueueLength: 0x0,
+      generationQueueIndex: -1,
+      generationQueueLength: 0,
       asyncTaskStatus: status2,
       asyncTaskRecovering: ![],
     };
-  return { generationQueueStatus: 'idle', generationQueueIndex: -0x1, generationQueueLength: 0x0 };
+  return { generationQueueStatus: 'idle', generationQueueIndex: -1, generationQueueLength: 0 };
 }
 export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, payload = '') {
   const args4 = String(record?.['taskId'] || '')['trim'](),
@@ -300,7 +300,7 @@ export function buildGenerationProtocolTransitionPatch({
   type: type = '',
   spec: spec = {},
   context: context = {},
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   taskId: taskId = '',
   status: status = '',
   message: message = '',

@@ -260,14 +260,14 @@ import {
   createVideoExecutionManifest,
 } from './vendorVideoModelApiShared.js';
 import { AGNES_MODEL_API_PROFILE_IDS } from '../../../modules/agnesProviderProfiles.js';
-const AGNES_VIDEO_FRAME_RATE = 0x18,
-  AGNES_VIDEO_MIN_SECONDS = 0x2,
-  AGNES_VIDEO_MIN_FRAMES = AGNES_VIDEO_MIN_SECONDS * AGNES_VIDEO_FRAME_RATE + 0x1,
-  AGNES_VIDEO_MAX_FRAMES = 0x1b9,
-  AGNES_VIDEO_MAX_SECONDS = Number(((AGNES_VIDEO_MAX_FRAMES - 0x1) / AGNES_VIDEO_FRAME_RATE)['toFixed'](0x1)),
+const AGNES_VIDEO_FRAME_RATE = 24,
+  AGNES_VIDEO_MIN_SECONDS = 2,
+  AGNES_VIDEO_MIN_FRAMES = AGNES_VIDEO_MIN_SECONDS * AGNES_VIDEO_FRAME_RATE + 1,
+  AGNES_VIDEO_MAX_FRAMES = 441,
+  AGNES_VIDEO_MAX_SECONDS = Number(((AGNES_VIDEO_MAX_FRAMES - 1) / AGNES_VIDEO_FRAME_RATE)['toFixed'](1)),
   AGNES_VIDEO_DURATION_VALUES = Object['freeze']([
     ...Array['from'](
-      { length: Math['floor'](AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 0x1 },
+      { length: Math['floor'](AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 1 },
       (value, item) => AGNES_VIDEO_MIN_SECONDS + item,
     ),
     ...(Number['isInteger'](AGNES_VIDEO_MAX_SECONDS) ? [] : [AGNES_VIDEO_MAX_SECONDS]),
@@ -291,7 +291,7 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
   }),
   AGNES_VIDEO_DURATION_FIELD = createFooterDurationSliderOptionsField({
     values: AGNES_VIDEO_DURATION_VALUES,
-    defaultValue: 0x5,
+    defaultValue: 5,
     label: '视频时长',
   }),
   AGNES_VIDEO_NEGATIVE_PROMPT_FIELD = Object['freeze']({
@@ -319,14 +319,14 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
     description:
       '官方范围 1-60 fps；24 fps 较稳妥，30 fps 更顺滑。提高帧率会在相同时长下生成更多帧，成本和耗时会增加。',
     defaultValue: AGNES_VIDEO_FRAME_RATE,
-    min: 0x1,
-    max: 0x3c,
-    step: 0x1,
+    min: 1,
+    max: 60,
+    step: 1,
   }),
   AGNES_VIDEO_INPUT_SLOTS = createVideoInputSlots({
-    image: 0x2,
-    video: 0x0,
-    audio: 0x0,
+    image: 2,
+    video: 0,
+    audio: 0,
     fixedSlots: Object['freeze']([
       Object['freeze']({
         id: 'firstFrame',
@@ -371,8 +371,8 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
       defaultValue: AGNES_VIDEO_FRAME_RATE,
       transform: Object['freeze']({
         name: 'agnesVideoFrameRate',
-        min: 0x1,
-        max: 0x3c,
+        min: 1,
+        max: 60,
         fallback: AGNES_VIDEO_FRAME_RATE,
       }),
     }),
@@ -380,12 +380,12 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
       path: 'num_frames',
       from: 'param',
       field: Object['freeze'](['generationParams.duration', 'duration']),
-      defaultValue: 0x5,
+      defaultValue: 5,
       transform: Object['freeze']({
         name: 'agnesVideoNumFrames',
         frameRate: AGNES_VIDEO_FRAME_RATE,
-        frameRateMin: 0x1,
-        frameRateMax: 0x3c,
+        frameRateMin: 1,
+        frameRateMax: 60,
         min: AGNES_VIDEO_MIN_FRAMES,
         max: AGNES_VIDEO_MAX_FRAMES,
       }),
@@ -399,7 +399,7 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
         name: 'agnesVideoSeed',
         modeField: 'seed_mode',
         defaultMode: 'random',
-        min: 0x0,
+        min: 0,
         max: 0x7fffffff,
       }),
       omitWhenEmpty: !![],
@@ -441,17 +441,17 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
   AGNES_VIDEO_TASK_POLLING = Object['freeze']({
     mode: 'task-proxy',
     method: 'GET',
-    pollIntervalMs: 0x1e * 0x3e8,
-    maxWaitMs: 0x1e * 0x3c * 0x3e8,
+    pollIntervalMs: 30 * 1000,
+    maxWaitMs: 30 * 60 * 1000,
     continuePollingOnSuccessWithoutResult: !![],
     urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=agnes-video-v2.0',
     headersMode: 'bearer',
     transportErrorPolicy: Object['freeze']({
-      maxConsecutiveErrors: 0x3,
+      maxConsecutiveErrors: 3,
       retryableStatuses: Object['freeze']([
-        0x198, 0x1a9, 0x1ad, 0x1f4, 0x1f6, 0x1f7, 0x1f8, 0x208, 0x20a, 0x20c,
+        408, 425, 429, 500, 502, 503, 504, 520, 522, 524,
       ]),
-      terminalStatuses: Object['freeze']([0x190, 0x191, 0x193, 0x194, 0x195, 0x199, 0x19a, 0x19d, 0x1a6]),
+      terminalStatuses: Object['freeze']([400, 401, 403, 404, 405, 409, 410, 413, 422]),
       surfaceLastError: !![],
     }),
   }),
@@ -484,8 +484,8 @@ const AGNES_VIDEO_FRAME_RATE = 0x18,
     options: ['720P'],
   }),
   AGNES_VIDEO_25_DURATION_FIELD = createFooterDurationSliderOptionsField({
-    values: [0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc],
-    defaultValue: 0x5,
+    values: [4, 5, 6, 7, 8, 9, 10, 11, 12],
+    defaultValue: 5,
     label: '视频时长',
   });
 function createAgnesVideo25FixedSlot({
@@ -514,7 +514,7 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
       label: '首帧',
       description: '首尾帧模式使用的起始图片；首帧和尾帧至少放入一张',
       mode: 'keyframe',
-      displayOrder: 0xa,
+      displayOrder: 10,
     }),
     createAgnesVideo25FixedSlot({
       id: 'lastFrame',
@@ -522,7 +522,7 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
       label: '尾帧',
       description: '首尾帧模式使用的结束图片；可单独作为尾帧约束',
       mode: 'keyframe',
-      displayOrder: 0x14,
+      displayOrder: 20,
     }),
     createAgnesVideo25FixedSlot({
       id: 'referenceImage',
@@ -530,7 +530,7 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
       label: '参考图',
       description: flash ? '多模态参考模式最多支持 5 张图片' : '多模态参考模式使用的内容或风格图片',
       mode: 'reference',
-      displayOrder: 0x1e,
+      displayOrder: 30,
     }),
     createAgnesVideo25FixedSlot({
       id: 'referenceAudio',
@@ -538,27 +538,27 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
       label: '参考音频',
       description: '多模态参考模式使用的声音或节奏素材',
       mode: 'reference',
-      displayOrder: 0x32,
+      displayOrder: 50,
     }),
   ];
   return (
     !flash &&
       key['splice'](
-        0x3,
-        0x0,
+        3,
+        0,
         createAgnesVideo25FixedSlot({
           id: 'referenceVideo',
           kind: 'video',
           label: '参考视频',
           description: '多模态参考模式使用的动作、风格或时序素材',
           mode: 'reference',
-          displayOrder: 0x28,
+          displayOrder: 40,
         }),
       ),
     createVideoInputSlots({
-      image: flash ? 0x5 : 0x9,
-      video: flash ? 0x0 : 0x3,
-      audio: 0x3,
+      image: flash ? 5 : 9,
+      video: flash ? 0 : 3,
+      audio: 3,
       fixedSlots: Object['freeze'](key),
       cycleFixedInputWhenFull: !![],
       preserveHiddenInputsByKind: !![],
@@ -567,7 +567,7 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
         Object['freeze']({
           when: Object['freeze']({ field: 'mode', value: 'keyframe' }),
           allowedKinds: Object['freeze'](['text', 'image']),
-          maxByKind: Object['freeze']({ image: 0x2, video: 0x0, audio: 0x0 }),
+          maxByKind: Object['freeze']({ image: 2, video: 0, audio: 0 }),
         }),
       ]),
     })
@@ -584,7 +584,7 @@ const AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
     path: 'seconds',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'stringParam',
   }),
   Object['freeze']({
@@ -608,23 +608,23 @@ const AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
       name: 'agnesVideoSeed',
       modeField: 'seed_mode',
       defaultMode: 'random',
-      min: 0x0,
+      min: 0,
       max: 0x7fffffff,
     }),
     omitWhenEmpty: !![],
   }),
-  Object['freeze']({ path: 'n', from: 'constant', value: 0x1 }),
+  Object['freeze']({ path: 'n', from: 'constant', value: 1 }),
 ]);
 function createAgnesVideo25TaskPolling(index) {
   return Object['freeze']({
     ...AGNES_VIDEO_TASK_POLLING,
-    pollIntervalMs: 0x2 * 0x3e8,
+    pollIntervalMs: 2 * 1000,
     urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=' + index,
   });
 }
 function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
   const model = flash ? 'agnes-video-2.5-flash' : 'agnes-video-2.5',
-    displayName = flash ? 'Agnes\x20Video\x202.5\x20Flash' : 'Agnes\x20Video\x202.5';
+    displayName = flash ? 'Agnes Video 2.5 Flash' : 'Agnes Video 2.5';
   return Object['freeze']({
     modelId: 'agnes/' + model,
     executionId: 'agnes.model-api.video.' + model + '.v1',
@@ -654,9 +654,9 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
       strictInputCounts: !![],
       strictUiSchemaParams: !![],
       agnesVideo25: Object['freeze']({
-        maxReferenceImages: flash ? 0x5 : 0x9,
-        maxReferenceVideos: flash ? 0x0 : 0x3,
-        maxReferenceAudios: 0x3,
+        maxReferenceImages: flash ? 5 : 9,
+        maxReferenceVideos: flash ? 0 : 3,
+        maxReferenceAudios: 3,
       }),
     }),
     prompt: Object['freeze']({
@@ -669,8 +669,8 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
         Object['freeze']({
           when: Object['freeze']({ field: 'mode', value: 'reference' }),
           placeholder: flash
-            ? '使用\x20<Picture\x20N>\x20/\x20<Audio\x20N>\x20说明参考素材的用途。'
-            : '使用\x20<Picture\x20N>\x20/\x20<Audio\x20N>\x20/\x20<Video\x20N>\x20说明参考素材的用途。',
+            ? '使用 <Picture N> / <Audio N> 说明参考素材的用途。'
+            : '使用 <Picture N> / <Audio N> / <Video N> 说明参考素材的用途。',
         }),
       ]),
     }),
@@ -684,7 +684,7 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
       storyWorkspace: Object['freeze']({ defaultGenerationParams: Object['freeze']({ mode: 'reference' }) }),
       videoMenu: Object['freeze']({
         role: 'agnesModel',
-        order: flash ? 0x1e : 0x14,
+        order: flash ? 30 : 20,
         label: displayName,
         subtitle: flash ? '高速 · 720P' : '多模态 · 最高 2K',
       }),
@@ -702,7 +702,7 @@ export const AGNES_VIDEO_MODELS = Object['freeze']([
     model: 'agnes-video-v2.0',
     endpoint: '/v1/videos',
     endpointMode: 'video-generation',
-    description: 'Agnes\x20AI\x20text-to-video\x20and\x20image-to-video\x20model\x20API',
+    description: 'Agnes AI text-to-video and image-to-video model API',
     fields: Object['freeze']([
       AGNES_VIDEO_RESOLUTION_FIELD,
       AGNES_VIDEO_RATIO_FIELD,
@@ -726,9 +726,9 @@ export const AGNES_VIDEO_MODELS = Object['freeze']([
       providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
       videoMenu: Object['freeze']({
         role: 'agnesModel',
-        order: 0xa,
-        label: 'Agnes\x20Video\x20V2.0',
-        subtitle: 'Text/image\x20to\x20video',
+        order: 10,
+        label: 'Agnes Video V2.0',
+        subtitle: 'Text/image to video',
       }),
     }),
   }),

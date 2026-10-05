@@ -3,7 +3,7 @@ import { getResultText } from './storyTextRequest.js';
 const text = (value) => String(value || '')['trim']();
 function normalizeAssessment(verdict, clipRef) {
   if (verdict['issues'] != null && !Array['isArray'](verdict['issues']))
-    throw new Error('片段\x20' + clipRef + ' 的 issues 必须是数组。');
+    throw new Error('片段 ' + clipRef + ' 的 issues 必须是数组。');
   const issues = (verdict['issues'] || [])
     ['map']((item) => ({
       code: text(item?.['code']) || 'other',
@@ -17,7 +17,7 @@ function normalizeAssessment(verdict, clipRef) {
   )
     throw new Error('片段 ' + clipRef + ' 的审片结论无效，不能视为通过。');
   if (verdict['verdict'] === 'pass' && (verdict['issues'] || [])['length'])
-    throw new Error('片段\x20' + clipRef + ' 的审片结论与问题列表矛盾。');
+    throw new Error('片段 ' + clipRef + ' 的审片结论与问题列表矛盾。');
   return { clipRef: clipRef, verdict: verdict['verdict'], issues: issues };
 }
 function inspectResponse(
@@ -42,9 +42,9 @@ function inspectResponse(
     const text2 = text(next?.[source]);
     if (!refs['includes'](text2)) {
       if (repair) continue;
-      throw new Error(result + '结果包含当前批次之外的片段\x20' + (text2 || '（空引用）') + '。');
+      throw new Error(result + '结果包含当前批次之外的片段 ' + (text2 || '（空引用）') + '。');
     }
-    map['set'](text2, (map['get'](text2) || 0x0) + 0x1);
+    map['set'](text2, (map['get'](text2) || 0) + 1);
   }
   const accepted2 = {},
     errors2 = [];
@@ -53,7 +53,7 @@ function inspectResponse(
       errors2['push'](result + '结果遗漏片段 ' + sourceClipRef + '。');
       continue;
     }
-    if (map['get'](sourceClipRef) > 0x1) {
+    if (map['get'](sourceClipRef) > 1) {
       errors2['push'](result + '结果包含重复片段引用 ' + sourceClipRef + '。');
       continue;
     }
@@ -134,9 +134,9 @@ export async function requestStoryReviewOutput({
       'map'
     ]((scope) => scope['ref']),
     input = repair2 ? 'repairs' : 'assessments',
-    errors3 = draft['protocolProgress']?.[key2] || { accepted: {}, attempt: 0x0, errors: [] };
+    errors3 = draft['protocolProgress']?.[key2] || { accepted: {}, attempt: 0, errors: [] };
   ((draft['protocolProgress'] ||= {}), (draft['protocolProgress'][key2] = errors3));
-  for (let count = 0x0; count < 0x3; count += 0x1) {
+  for (let count = 0; count < 3; count += 1) {
     const requiredClipRefs = list['filter']((output) => !errors3['accepted'][output]);
     if (!requiredClipRefs['length']) break;
     if (errors3['errors']['length'])
@@ -148,7 +148,7 @@ export async function requestStoryReviewOutput({
           '返回格式，剩余 ' +
           requiredClipRefs['length'] +
           ' 个片段（本轮 ' +
-          (count + 0x1) +
+          (count + 1) +
           '/3）',
       });
     const value2 = {
@@ -179,7 +179,7 @@ export async function requestStoryReviewOutput({
         { ...payload2, prompt: JSON['stringify'](value2) },
         stepId + ':protocol-' + errors3['attempt'],
       );
-    errors3['attempt'] += 0x1;
+    errors3['attempt'] += 1;
     try {
       const inspectResponse4 = inspectResponse(value5, {
         episodeRef: failedClips['episodeRef'],
@@ -197,7 +197,7 @@ export async function requestStoryReviewOutput({
   const list2 = list['filter']((value6) => !errors3['accepted'][value6]);
   if (list2['length']) {
     const error3 = new Error(
-      '审片协议补全达到本轮上限，未解决片段\x20' +
+      '审片协议补全达到本轮上限，未解决片段 ' +
         list2['join']('、') +
         '：' +
         errors3['errors']['join']('；'),

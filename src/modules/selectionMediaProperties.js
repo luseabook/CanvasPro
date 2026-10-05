@@ -5,30 +5,30 @@ import { normalizeNodeType } from './nodeMeta.js';
 import { resolveNodeDisplayedMediaMetrics } from './nodeMediaMetrics.js';
 import { resolveSourceVideoMediaTaskSrc } from '../components/source-video/sourceVideoMediaState.js';
 import { scheduleSourceVideoIdleTask } from '../components/source-video/sourceVideoRuntime.js';
-const VIDEO_META_RETRY_DELAY_MS = 0x7530,
+const VIDEO_META_RETRY_DELAY_MS = 30000,
   IMAGE_NODE_TYPES = new Set(['source-image', 'ai-image']),
   VIDEO_NODE_TYPES = new Set(['source-video', 'ai-video']),
   AUDIO_NODE_TYPES = new Set(['source-audio', 'ai-audio']),
   TEXT_EDITOR_SELECTOR = '.prompt-textarea, .source-text-content';
 function toPositiveNumber(value) {
   const count = Number(value);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function pickPositiveNumber(...args) {
   for (const item of args) {
     const toPositiveNumber2 = toPositiveNumber(item);
-    if (toPositiveNumber2 > 0x0) return toPositiveNumber2;
+    if (toPositiveNumber2 > 0) return toPositiveNumber2;
   }
-  return 0x0;
+  return 0;
 }
 function normalizeMetaSourceIdentity(key) {
   return normalizeLocalPath(key) || String(key || '')['trim']();
 }
 function pickMainItem(list, index) {
-  if (!Array['isArray'](list) || list['length'] === 0x0) return null;
+  if (!Array['isArray'](list) || list['length'] === 0) return null;
   const result = Number(index),
-    data = Number['isFinite'](result) ? Math['max'](0x0, Math['trunc'](result)) : 0x0;
-  return list[data] || list[0x0] || null;
+    data = Number['isFinite'](result) ? Math['max'](0, Math['trunc'](result)) : 0;
+  return list[data] || list[0] || null;
 }
 function resolveNodeName(error, error2) {
   return String(error?.['name'] || error?.['fileName'] || error2?.['name'] || error2?.['fileName'] || '')[
@@ -61,9 +61,9 @@ function buildImageModel(args2) {
     name: resolveNodeName(options, mainItem),
     width: width,
     height: height,
-    duration: 0x0,
-    fps: 0x0,
-    frameCount: 0x0,
+    duration: 0,
+    fps: 0,
+    frameCount: 0,
     frameCountApproximate: ![],
     metaSource: '',
     needsVideoProbe: ![],
@@ -82,7 +82,7 @@ function buildVideoModel(args3) {
       box?.['originalWidth'],
       box?.['width'],
       nodeDisplayedMediaMetrics2?.['w'],
-      source ? target['videoWidth'] : 0x0,
+      source ? target['videoWidth'] : 0,
       target['naturalWidth'],
     ),
     height2 = pickPositiveNumber(
@@ -90,32 +90,32 @@ function buildVideoModel(args3) {
       box?.['originalHeight'],
       box?.['height'],
       nodeDisplayedMediaMetrics2?.['h'],
-      source ? target['videoHeight'] : 0x0,
+      source ? target['videoHeight'] : 0,
       target['naturalHeight'],
     ),
     duration = pickPositiveNumber(
       box?.['videoDuration'],
       box?.['duration'],
-      source ? target['videoDuration'] : 0x0,
+      source ? target['videoDuration'] : 0,
       target['duration'],
     ),
     fps = pickPositiveNumber(
       box?.['videoFps'],
       box?.['fps'],
-      source ? target['videoFps'] : 0x0,
+      source ? target['videoFps'] : 0,
       target['fps'],
       target['frameRate'],
     ),
     frameCount = pickPositiveNumber(
       box?.['videoFrameCount'],
       box?.['frameCount'],
-      source ? target['videoFrameCount'] : 0x0,
+      source ? target['videoFrameCount'] : 0,
       target['frameCount'],
     ),
     count2 =
-      frameCount <= 0x0 && duration > 0x0 && fps > 0x0
-        ? Math['max'](0x1, Math['round'](duration * fps))
-        : 0x0;
+      frameCount <= 0 && duration > 0 && fps > 0
+        ? Math['max'](1, Math['round'](duration * fps))
+        : 0;
   return {
     nodeId: String(target['id'] || ''),
     kind: 'video',
@@ -125,10 +125,10 @@ function buildVideoModel(args3) {
     duration: duration,
     fps: fps,
     frameCount: frameCount || count2,
-    frameCountApproximate: frameCount <= 0x0 && count2 > 0x0,
+    frameCountApproximate: frameCount <= 0 && count2 > 0,
     metaSource: metaSource,
     needsVideoProbe:
-      !!metaSource && (width2 <= 0x0 || height2 <= 0x0 || duration <= 0x0 || fps <= 0x0 || frameCount <= 0x0),
+      !!metaSource && (width2 <= 0 || height2 <= 0 || duration <= 0 || fps <= 0 || frameCount <= 0),
   };
 }
 function buildAudioModel(args4) {
@@ -144,11 +144,11 @@ function buildAudioModel(args4) {
     nodeId: String(next['id'] || ''),
     kind: 'audio',
     name: resolveNodeName(next, mainItem2),
-    width: 0x0,
-    height: 0x0,
+    width: 0,
+    height: 0,
     duration: duration2,
-    fps: 0x0,
-    frameCount: 0x0,
+    fps: 0,
+    frameCount: 0,
     frameCountApproximate: ![],
     metaSource: '',
     needsVideoProbe: ![],
@@ -159,11 +159,11 @@ function buildTextEditingModel(current, characterCount) {
     nodeId: String(current?.['id'] || ''),
     kind: 'text',
     name: resolveNodeName(current),
-    width: 0x0,
-    height: 0x0,
-    duration: 0x0,
-    fps: 0x0,
-    frameCount: 0x0,
+    width: 0,
+    height: 0,
+    duration: 0,
+    fps: 0,
+    frameCount: 0,
     frameCountApproximate: ![],
     characterCount: characterCount,
     metaSource: '',
@@ -179,8 +179,8 @@ export function buildSelectionMediaPropertiesModel(entry) {
 }
 export function selectSelectionMediaPropertiesModel(state = {}) {
   const list2 = Array['isArray'](state['selectedNodeIds']) ? state['selectedNodeIds'] : [];
-  if (list2['length'] !== 0x1) return null;
-  const record = state['nodes']?.[list2[0x0]];
+  if (list2['length'] !== 1) return null;
+  const record = state['nodes']?.[list2[0]];
   return buildSelectionMediaPropertiesModel(record);
 }
 function isSupportedTextEditor(enabled) {
@@ -210,9 +210,9 @@ export function selectSelectionPropertiesDisplayModel(state2 = {}, payload = glo
       buildTextEditingModel(handle, characterCount2['characterCount']);
   return { ...args5, characterCount: characterCount2['characterCount'] };
 }
-function formatDecimal(config, maximumFractionDigits = 0x2) {
+function formatDecimal(config, maximumFractionDigits = 2) {
   const toPositiveNumber3 = toPositiveNumber(config);
-  if (toPositiveNumber3 <= 0x0) return '';
+  if (toPositiveNumber3 <= 0) return '';
   return new Intl['NumberFormat'](undefined, { maximumFractionDigits: maximumFractionDigits })['format'](
     toPositiveNumber3,
   );
@@ -220,7 +220,7 @@ function formatDecimal(config, maximumFractionDigits = 0x2) {
 function formatDimension(scope, input) {
   const count3 = Math['round'](toPositiveNumber(scope)),
     count4 = Math['round'](toPositiveNumber(input));
-  if (count3 <= 0x0 || count4 <= 0x0) return '—';
+  if (count3 <= 0 || count4 <= 0) return '—';
   return count3 + ' × ' + count4;
 }
 function formatDuration(output) {
@@ -233,7 +233,7 @@ function formatFps(value3) {
 }
 function formatFrameCount(value4, value5) {
   const count5 = Math['round'](toPositiveNumber(value4));
-  if (count5 <= 0x0) return '—';
+  if (count5 <= 0) return '—';
   return t(
     value5 ? 'selectionMediaProperties.values.framesApproximate' : 'selectionMediaProperties.values.frames',
     { value: new Intl['NumberFormat']()['format'](count5) },
@@ -241,7 +241,7 @@ function formatFrameCount(value4, value5) {
 }
 function formatCharacterCount(value6) {
   const value7 = Number(value6),
-    value8 = Number['isFinite'](value7) ? Math['max'](0x0, Math['trunc'](value7)) : 0x0;
+    value8 = Number['isFinite'](value7) ? Math['max'](0, Math['trunc'](value7)) : 0;
   return new Intl['NumberFormat']()['format'](value8);
 }
 function setText(el4, value9, value10) {
@@ -249,7 +249,7 @@ function setText(el4, value9, value10) {
   if (el5 && el5['textContent'] !== value10) el5['textContent'] = value10;
 }
 function setRowVisible(el6, value11, value12) {
-  const el7 = el6?.['querySelector']?.('[data-selection-media-row="' + value11 + '\x22]');
+  const el7 = el6?.['querySelector']?.('[data-selection-media-row="' + value11 + '"]');
   if (el7) el7['hidden'] = value12 !== !![];
 }
 export function renderSelectionMediaProperties(el8, box2) {
@@ -302,11 +302,11 @@ function buildVideoMetaPatch(box3, videoMetaSrc) {
     toPositiveNumber6 = toPositiveNumber(box3?.['duration']),
     toPositiveNumber7 = toPositiveNumber(box3?.['width']),
     toPositiveNumber8 = toPositiveNumber(box3?.['height']);
-  if (toPositiveNumber4 > 0x0) value17['videoFps'] = toPositiveNumber4;
-  if (toPositiveNumber5 > 0x0) value17['videoFrameCount'] = Math['round'](toPositiveNumber5);
-  if (toPositiveNumber6 > 0x0) value17['videoDuration'] = toPositiveNumber6;
-  if (toPositiveNumber7 > 0x0) value17['videoWidth'] = Math['round'](toPositiveNumber7);
-  if (toPositiveNumber8 > 0x0) value17['videoHeight'] = Math['round'](toPositiveNumber8);
+  if (toPositiveNumber4 > 0) value17['videoFps'] = toPositiveNumber4;
+  if (toPositiveNumber5 > 0) value17['videoFrameCount'] = Math['round'](toPositiveNumber5);
+  if (toPositiveNumber6 > 0) value17['videoDuration'] = toPositiveNumber6;
+  if (toPositiveNumber7 > 0) value17['videoWidth'] = Math['round'](toPositiveNumber7);
+  if (toPositiveNumber8 > 0) value17['videoHeight'] = Math['round'](toPositiveNumber8);
   return value17;
 }
 export function initSelectionMediaProperties({
@@ -348,7 +348,7 @@ export function initSelectionMediaProperties({
       if (
         response?.['status'] === 'pending' ||
         (response?.['status'] === 'failed' &&
-          now() - Number(response['failedAt'] || 0x0) < VIDEO_META_RETRY_DELAY_MS)
+          now() - Number(response['failedAt'] || 0) < VIDEO_META_RETRY_DELAY_MS)
       )
         return;
       if (value18 === enabled5) return;

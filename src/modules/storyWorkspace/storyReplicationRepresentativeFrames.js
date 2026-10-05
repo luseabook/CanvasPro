@@ -37,7 +37,7 @@ export async function collectStoryReplicationRepresentativeFrames({
   for (const [key, timeSec2] of item['characters']['entries']()) {
     if (!isActive() || episode['replication']['sourceAnalysis'] !== item) return;
     if (timeSec2['frame']?.['localPath']) continue;
-    onProgress?.('正在提取人物代表画面 ' + (key + 0x1) + '/' + item['characters']['length']);
+    onProgress?.('正在提取人物代表画面 ' + (key + 1) + '/' + item['characters']['length']);
     try {
       const capture2 = await capture({
         videoRef: episode['sourceVideo']['videoRef'],

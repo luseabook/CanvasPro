@@ -13,7 +13,7 @@ export function addStoryLibraryAudioToProject(value, item) {
   if (!list['length']) return ![];
   return (
     (value['assetFilter'] = 'audio'),
-    (value['selectedAssetId'] = list[0x0]['id']),
+    (value['selectedAssetId'] = list[0]['id']),
     (value['assetSelectionMode'] = ![]),
     (value['selectedAssetIds'] = []),
     !![]
@@ -93,7 +93,7 @@ export function bindStoryAudioAssets(
       if (target === 'choose-project-voice') {
         ((state['audioTargetCharacterId'] = state['selectedAssetId']),
           (state['assetFilter'] = 'audio'),
-          (state['selectedAssetId'] = state['data']['audioAssets']?.[0x0]?.['id'] || ''),
+          (state['selectedAssetId'] = state['data']['audioAssets']?.[0]?.['id'] || ''),
           (state['assetSelectionMode'] = ![]),
           (state['selectedAssetIds'] = []),
           handler2());
@@ -131,7 +131,7 @@ export function bindStoryAudioAssets(
     async2 = async (event4) => {
       if (event4['target']['matches']('[data-story-audio-character]') && isCurrent(sourceProjectId)) {
         state['audioTargetCharacterId'] = event4['target']['value'];
-        const el7 = el2?.['querySelector']('[data-story-audio-action=\x22bind\x22]');
+        const el7 = el2?.['querySelector']('[data-story-audio-action="bind"]');
         if (el7)
           el7['disabled'] = !state['data']['assets']['some'](
             (next) => next['kind'] === 'character' && next['id'] === event4['target']['value'],
@@ -180,7 +180,7 @@ export function bindStoryAudioAssets(
             sourceAssetId = await saveAssetPackageItem({
               packageKey: 'story-audio:' + sourceProjectId['projectId'],
               packageName:
-                (sourceProjectId['data']['project']['title'] || category + '项目') + '\x20·\x20音频素材',
+                (sourceProjectId['data']['project']['title'] || category + '项目') + ' · 音频素材',
               category: category + '工作室',
               itemKey: globalThis['crypto']['randomUUID'](),
               itemName: itemName,
@@ -200,7 +200,7 @@ export function bindStoryAudioAssets(
             },
           ]);
           if (isCurrent(sourceProjectId) && state['assetFilter'] === 'audio')
-            state['selectedAssetId'] = addStoryAudioAssets2['at'](-0x1)?.['id'] || state['selectedAssetId'];
+            state['selectedAssetId'] = addStoryAudioAssets2['at'](-1)?.['id'] || state['selectedAssetId'];
           (syncEntry(sourceProjectId), persist({ immediate: !![] }));
         }
         finishTask(sourceProjectId, id, { status: 'succeeded', message: '项目音频已保存' });

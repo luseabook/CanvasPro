@@ -1,30 +1,30 @@
 import { publishDirectorMobilePose } from '../../../api/directorMobileClientApi.js';
-const token = location['hash']['slice'](0x1),
+const token = location['hash']['slice'](1),
   status = document['querySelector']('#status'),
   look = document['querySelector']('#look');
-let translation = [0x0, 0x0, 0x0],
-  rotation = [0x0, 0x0, 0x0],
+let translation = [0, 0, 0],
+  rotation = [0, 0, 0],
   origin = null,
   dirty = !![],
   sequence = Date['now'](),
   sending = ![];
-const radians = (value) => ((Number(value) || 0x0) * Math['PI']) / 0xb4,
+const radians = (value) => ((Number(value) || 0) * Math['PI']) / 180,
   wrapped = (item) => Math['atan2'](Math['sin'](item), Math['cos'](item));
 (document['querySelectorAll']('[data-move]')['forEach']((el) =>
   el['addEventListener']('click', () => {
     const [key, index] = el['dataset']['move']['split'](',')['map'](Number);
-    ((translation[key] = Math['max'](-0x64, Math['min'](0x64, translation[key] + index))), (dirty = !![]));
+    ((translation[key] = Math['max'](-100, Math['min'](100, translation[key] + index))), (dirty = !![]));
   }),
 ),
   document['querySelector']('#reset')['addEventListener']('click', () => {
-    ((origin = null), (translation = [0x0, 0x0, 0x0]), (rotation = [0x0, 0x0, 0x0]), (dirty = !![]));
+    ((origin = null), (translation = [0, 0, 0]), (rotation = [0, 0, 0]), (dirty = !![]));
   }));
 let gesture = null,
   gyroEnabled = ![];
 (look['addEventListener']('keydown', (event) => {
   if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']['includes'](event['key'])) return;
   (event['preventDefault'](),
-    (rotation[event['key'] === 'ArrowLeft' || event['key'] === 'ArrowRight' ? 0x1 : 0x0] += [
+    (rotation[event['key'] === 'ArrowLeft' || event['key'] === 'ArrowRight' ? 1 : 0] += [
       'ArrowLeft',
       'ArrowUp',
     ]['includes'](event['key'])
@@ -42,10 +42,10 @@ let gesture = null,
     ((rotation = [
       Math['max'](
         -1.5,
-        Math['min'](1.5, gesture['rotation'][0x0] - (event2['clientY'] - gesture['y']) * 0.005),
+        Math['min'](1.5, gesture['rotation'][0] - (event2['clientY'] - gesture['y']) * 0.005),
       ),
-      wrapped(gesture['rotation'][0x1] - (event2['clientX'] - gesture['x']) * 0.005),
-      gesture['rotation'][0x2],
+      wrapped(gesture['rotation'][1] - (event2['clientX'] - gesture['x']) * 0.005),
+      gesture['rotation'][2],
     ]),
       (dirty = !![]));
   }));
@@ -90,5 +90,5 @@ const timer = setInterval(async () => {
   } finally {
     sending = ![];
   }
-}, 0x50);
+}, 80);
 window['addEventListener']('pagehide', () => clearInterval(timer), { once: !![] });

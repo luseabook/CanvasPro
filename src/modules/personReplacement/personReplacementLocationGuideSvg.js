@@ -2,19 +2,19 @@ import { PERSON_REPLACEMENT_MARKER_COLORS } from './personReplacementPromptMode.
 const escapeXml = (value) =>
   String(value)
     ['replaceAll']('&', '&amp;')
-    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('"', '&quot;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;');
 export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, people: people = [] } = {}) {
-  const width = 0x4b0,
+  const width = 1200,
     height = Math['max'](
-      0x1,
-      Math['round']((width * (Number(frame['height']) || 0x9)) / (Number(frame['width']) || 0x10)),
+      1,
+      Math['round']((width * (Number(frame['height']) || 9)) / (Number(frame['width']) || 16)),
     ),
     item = [0.25, 0.5, 0.75]
       ['map'](
         (key) =>
-          '<path d="M' + width * key + ' 0V' + height + '\x20M0\x20' + height * key + 'H' + width + '"/>',
+          '<path d="M' + width * key + ' 0V' + height + ' M0 ' + height * key + 'H' + width + '"/>',
       )
       ['join'](''),
     index = people['map'](({ label: label, bbox: bbox, markerIndex: markerIndex }, result) => {
@@ -37,33 +37,33 @@ export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, peop
         Math['round'](bbox['width'] * width) +
         '" height="' +
         Math['round'](bbox['height'] * height) +
-        '\x22\x20rx=\x2210\x22\x20fill=\x22' +
+        '" rx="10" fill="' +
         target +
-        '\x22\x20fill-opacity=\x220.12\x22\x20stroke=\x22' +
+        '" fill-opacity="0.12" stroke="' +
         target +
         '" stroke-width="8"/><rect x="' +
         data +
         '" y="' +
         options +
-        '\x22\x20width=\x2272\x22\x20height=\x2272\x22\x20rx=\x228\x22\x20fill=\x22' +
+        '" width="72" height="72" rx="8" fill="' +
         target +
         '"/><text x="' +
-        (data + 0x24) +
+        (data + 36) +
         '" y="' +
-        (options + 0x37) +
+        (options + 55) +
         '" text-anchor="middle" fill="var(--canvas-black)" font-family="Arial, sans-serif" font-size="56" font-weight="800">' +
         escapeXml(label) +
         '</text></g>'
       );
     })['join'](''),
     source =
-      '<svg\x20xmlns=\x22http://www.w3.org/2000/svg\x22\x20width=\x22' +
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' +
       width +
-      '\x22\x20height=\x22' +
+      '" height="' +
       height +
       '" viewBox="0 0 ' +
       width +
-      '\x20' +
+      ' ' +
       height +
       '"><rect width="100%" height="100%" fill="var(--canvas-black)"/><g stroke="var(--canvas-white)" stroke-opacity="0.18" stroke-width="2">' +
       item +
@@ -80,7 +80,7 @@ export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, peop
 export function resolvePersonReplacementLocationGuidePreview(list) {
   if (typeof document === 'undefined' || typeof getComputedStyle !== 'function') return list;
   const computedStyle = getComputedStyle(document['documentElement']),
-    decodeURIComponent2 = decodeURIComponent(list['slice'](list['indexOf'](',') + 0x1))['replace'](
+    decodeURIComponent2 = decodeURIComponent(list['slice'](list['indexOf'](',') + 1))['replace'](
       /var\((--[a-z0-9-]+)\)/g,
       (next, current) => {
         const enabled = computedStyle['getPropertyValue'](current)['trim']();

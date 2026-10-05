@@ -157,8 +157,8 @@ export function bindVideoFrameInterpolationAction(index) {
             window.showToast?.(frameInterpolationText('apiKeyMissing'), 'error');
             return;
           }
-          const entry = sourceNodeId.width || 0x12c,
-            record = sourceNodeId.height || 0x12c,
+          const entry = sourceNodeId.width || 300,
+            record = sourceNodeId.height || 300,
             { width: width, height: height } = getAutoMediaSizeByShortSide(entry, record),
             { x: x, y: y } = calcSafeSpawnPosNearNode(store.getState().nodes, sourceNodeId, width, height);
           id = 'source-video-frame-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);

@@ -4,8 +4,8 @@ import { getCanvasMediaSchedulerStats, resetCanvasMediaSchedulerForTests } from 
 import { createWheelPanController } from './WheelPanController.js';
 
 const OWNER = 'wheel-pan';
-const END_DELAY_MS = 0xa0;
-const RESUME_DELAY_MS = 0x78;
+const END_DELAY_MS = 160;
+const RESUME_DELAY_MS = 120;
 
 function createHarness({ acquireResult = { x: 100, y: 200, zoom: 1 }, commitResult = { x: 70, y: 240, zoom: 1 } } = {}) {
   const calls = { acquire: [], update: [], commit: [] };

@@ -24,7 +24,7 @@ function getRunningHubConfiguredCapabilities(options = {}) {
 }
 function getRunningHubVerificationStatus(options2 = {}, item = {}) {
   const list2 = getRunningHubConfiguredCapabilities(options2);
-  if (list2['length'] === 0x0) return 'failed';
+  if (list2['length'] === 0) return 'failed';
   const list3 = list2['map']((key) => item?.[key]?.['status'] || 'unknown');
   if (list3['every']((index) => index === 'passed')) return PASSED_PROVIDER_CONNECTION_STATUS;
   return list3['some']((result) => result === 'passed') ? 'partial' : 'failed';
@@ -36,7 +36,7 @@ function getComfyUiConfiguredCapabilities(options3 = {}) {
 }
 function getComfyUiVerificationStatus(options4 = {}, data = {}) {
   const list5 = getComfyUiConfiguredCapabilities(options4);
-  if (list5['length'] === 0x0) return 'failed';
+  if (list5['length'] === 0) return 'failed';
   const list6 = list5['map']((target) => data?.[target]?.['status'] || 'unknown');
   if (list6['every']((source) => source === PASSED_PROVIDER_CONNECTION_STATUS))
     return PASSED_PROVIDER_CONNECTION_STATUS;
@@ -81,7 +81,7 @@ function buildRunningHubConnectionVerification(config, scope, input, verifiedAt)
     {
       status: getRunningHubVerificationStatus(scope, capabilities),
       verifiedAt: verifiedAt,
-      ...(Object['keys'](capabilities)['length'] > 0x0 ? { capabilities: capabilities } : {}),
+      ...(Object['keys'](capabilities)['length'] > 0 ? { capabilities: capabilities } : {}),
     }
   );
 }
@@ -97,7 +97,7 @@ function buildComfyUiConnectionVerification(value2, value3, value4, verifiedAt2)
     {
       status: getComfyUiVerificationStatus(value3, capabilities2),
       verifiedAt: verifiedAt2,
-      ...(Object['keys'](capabilities2)['length'] > 0x0 ? { capabilities: capabilities2 } : {}),
+      ...(Object['keys'](capabilities2)['length'] > 0 ? { capabilities: capabilities2 } : {}),
     }
   );
 }
@@ -140,7 +140,7 @@ export function formatProviderDiagnosticDetail(options6 = {}, value20 = {}) {
   const list10 = [],
     value21 = options6['suggestion'] || options6['summary'] || options6['error'] || options6['detail'] || '';
   if (value21) list10['push'](value21);
-  if (Array['isArray'](options6['steps']) && options6['steps']['length'] > 0x0)
+  if (Array['isArray'](options6['steps']) && options6['steps']['length'] > 0)
     options6['steps']['forEach']((response2) => {
       const value22 = response2['skipped']
           ? value20['skipped'] || '跳过'
@@ -156,7 +156,7 @@ export function formatProviderDiagnosticDetail(options6 = {}, value20 = {}) {
       );
     });
   else options6['detail'] && list10['push'](options6['detail']);
-  return list10['filter'](Boolean)['join']('\x0a');
+  return list10['filter'](Boolean)['join']('\n');
 }
 export function isProviderConnectionVerified(options7 = {}, value23 = '') {
   const response3 = options7?.['providers']?.[normalizeProviderId(value23)]?.['connectionVerification'];
@@ -184,7 +184,7 @@ export function reconcileProviderConnectionVerification(options8 = {}, args3 = {
     const args4 = options8?.['connectionVerification'];
     if (!args4) return value26;
     const capabilities3 = getPreservedRunningHubCapabilities(options8, value26);
-    if (Object['keys'](capabilities3)['length'] === 0x0)
+    if (Object['keys'](capabilities3)['length'] === 0)
       return (delete value26['connectionVerification'], value26);
     return (
       (value26['connectionVerification'] = {
@@ -199,7 +199,7 @@ export function reconcileProviderConnectionVerification(options8 = {}, args3 = {
     const args5 = options8?.['connectionVerification'];
     if (!args5) return value26;
     const capabilities4 = getPreservedComfyUiCapabilities(options8, value26);
-    if (Object['keys'](capabilities4)['length'] === 0x0)
+    if (Object['keys'](capabilities4)['length'] === 0)
       return (delete value26['connectionVerification'], value26);
     return (
       (value26['connectionVerification'] = {
@@ -260,7 +260,7 @@ export function mergePassedProviderApiConfig(
             verifiedAt: verifiedAt3,
           };
         }),
-          Object['keys'](value34)['length'] > 0x0 && (connectionVerification['capabilities'] = value34));
+          Object['keys'](value34)['length'] > 0 && (connectionVerification['capabilities'] = value34));
       }
       providers[providerId4] = { ...args8, connectionVerification: connectionVerification };
     }),

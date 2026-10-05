@@ -22,7 +22,7 @@ function mediaClipText(value, item = {}) {
   return t('mediaClip.' + value, item);
 }
 function timelineEditClipIndex(value2 = null) {
-  return Math['max'](0x0, Math['trunc'](toNumber(value2?.['clipIndex'], 0x0)));
+  return Math['max'](0, Math['trunc'](toNumber(value2?.['clipIndex'], 0)));
 }
 function timelineEditClips(value3 = null) {
   return Array['isArray'](value3?.['startClips']) ? value3['startClips'] : [];
@@ -35,7 +35,7 @@ function timelineEditBaseState(args = {}, key = 'video', index = null) {
     tracks: { ...(args['tracks'] || {}), [key]: index?.['startTrack'] },
   };
 }
-function findCommittedClipIndex(options = {}, result = 'video', data = null, target = -0x1) {
+function findCommittedClipIndex(options = {}, result = 'video', data = null, target = -1) {
   const timelineEditClipIndex2 = timelineEditClipIndex(data),
     timelineEditClips2 = timelineEditClips(data),
     text = normalizeText(timelineEditClips2[timelineEditClipIndex2]?.['id']);
@@ -48,15 +48,15 @@ function buildFirstVideoLeftTrimPreviewState(args2 = {}, next = {}, startSec = {
     timelineEditClipIndex3 = timelineEditClipIndex(next),
     current = list2[timelineEditClipIndex3] || {},
     entry = Math['max'](
-      0x0,
+      0,
       toNumber(startSec['endSec'], current['endSec']) - toNumber(startSec['startSec'], current['startSec']),
     ),
     record = Math['max'](
-      0x0,
+      0,
       toNumber(
         current['timelineEndSec'],
-        toNumber(current['timelineStartSec'], 0x0) +
-          Math['max'](0x0, toNumber(current['endSec'], 0x0) - toNumber(current['startSec'], 0x0)),
+        toNumber(current['timelineStartSec'], 0) +
+          Math['max'](0, toNumber(current['endSec'], 0) - toNumber(current['startSec'], 0)),
       ),
     ),
     payload = record - entry,
@@ -67,8 +67,8 @@ function buildFirstVideoLeftTrimPreviewState(args2 = {}, next = {}, startSec = {
             ...args3,
             startSec: startSec['startSec'],
             endSec: startSec['endSec'],
-            timelineStartSec: Math['round'](payload * 0x3e8) / 0x3e8,
-            timelineEndSec: Math['round'](handle * 0x3e8) / 0x3e8,
+            timelineStartSec: Math['round'](payload * 1000) / 1000,
+            timelineEndSec: Math['round'](handle * 1000) / 1000,
           }
         : { ...args3 },
     );
@@ -94,14 +94,14 @@ export function isMediaClipVideoLeftTrimDrag(value4 = null) {
   );
 }
 export function isMediaClipRollingVideoLeftTrimDrag(value5 = null) {
-  return isMediaClipVideoLeftTrimDrag(value5) && timelineEditClipIndex(value5) > 0x0;
+  return isMediaClipVideoLeftTrimDrag(value5) && timelineEditClipIndex(value5) > 0;
 }
 export function resolveMediaClipTimelineTrimPreview({
   mediaClip: mediaClip = {},
   kind: kind = 'video',
   drag: drag = null,
-  deltaSec: deltaSec = 0x0,
-  durationSec: durationSec = 0x0,
+  deltaSec: deltaSec = 0,
+  durationSec: durationSec = 0,
 } = {}) {
   const clipIndex = timelineEditClipIndex(drag),
     timelineEditClips3 = timelineEditClips(drag),
@@ -129,7 +129,7 @@ export function resolveMediaClipTimelineTrimPreview({
   const previewClips =
       (kind === 'audio' ? previewState['audioClips'] : previewState['clips']) || timelineEditClips3,
     previewClip = previewClips[clipIndex] || startSec2,
-    timelineStartSec = toNumber(previewClip['timelineStartSec'], 0x0),
+    timelineStartSec = toNumber(previewClip['timelineStartSec'], 0),
     timelineEndSec = Math['max'](timelineStartSec, toNumber(previewClip['timelineEndSec'], timelineStartSec)),
     pendingRange = {
       startSec: toNumber(previewClip['startSec'], startSec3['startSec']),
@@ -147,34 +147,34 @@ export function resolveMediaClipTimelineTrimPreview({
     displayDurationSec: getMediaClipTimelineDisplayDuration(durationSec),
     timelineStartSec: timelineStartSec,
     timelineEndSec: timelineEndSec,
-    clipDurationSec: Math['max'](0x0, timelineEndSec - timelineStartSec),
+    clipDurationSec: Math['max'](0, timelineEndSec - timelineStartSec),
     sourcePreviewSec: drag?.['side'] === 'left' ? pendingRange['startSec'] : pendingRange['endSec'],
   };
 }
 export function resolveMediaClipTimelineMovePreview({
   kind: kind = 'video',
   drag: drag = null,
-  deltaSec: deltaSec = 0x0,
-  durationSec: durationSec = 0x0,
+  deltaSec: deltaSec = 0,
+  durationSec: durationSec = 0,
   laneIndex: laneIndex = null,
 } = {}) {
   const clipIndex2 = timelineEditClipIndex(drag),
     clip = timelineEditClips(drag)[clipIndex2];
   if (!clip) return null;
   const displayDurationSec = getMediaClipTimelineDisplayDuration(durationSec),
-    toNumber2 = toNumber(clip['timelineStartSec'], 0x0),
+    toNumber2 = toNumber(clip['timelineStartSec'], 0),
     config = Math['max'](toNumber2, toNumber(clip['timelineEndSec'], toNumber2)),
     clipDurationSec = Math['max'](0.1, config - toNumber2),
     timelineStartSec2 =
       kind === 'video'
         ? Math['max'](
-            0x0,
-            Math['min'](Math['max'](0x0, displayDurationSec - clipDurationSec), toNumber2 + deltaSec),
+            0,
+            Math['min'](Math['max'](0, displayDurationSec - clipDurationSec), toNumber2 + deltaSec),
           )
-        : Math['max'](0x0, toNumber2 + deltaSec),
+        : Math['max'](0, toNumber2 + deltaSec),
     pendingDeltaSec = timelineStartSec2 - toNumber2,
     pendingLaneIndex =
-      kind === 'audio' ? normalizeMediaClipAudioLaneIndex(laneIndex ?? drag?.['startLaneIndex']) : 0x0;
+      kind === 'audio' ? normalizeMediaClipAudioLaneIndex(laneIndex ?? drag?.['startLaneIndex']) : 0;
   return {
     kind: kind,
     clipIndex: clipIndex2,
@@ -189,7 +189,7 @@ export function resolveMediaClipTimelineMovePreview({
       timelineStartSec2,
       Math['min'](
         timelineStartSec2 + clipDurationSec,
-        toNumber(drag?.['startPlayheadSec'], 0x0) + pendingDeltaSec,
+        toNumber(drag?.['startPlayheadSec'], 0) + pendingDeltaSec,
       ),
     ),
   };
@@ -242,7 +242,7 @@ export function commitMediaClipTimelineEditTransaction({
       }
     }
   }
-  const scope = mode === 'move' && kind === 'video' ? -0x1 : timelineEditClipIndex5;
+  const scope = mode === 'move' && kind === 'video' ? -1 : timelineEditClipIndex5;
   return {
     kind: kind,
     mode: mode,
@@ -254,8 +254,8 @@ export function previewMediaClipTimelineTrimDrag(
   mediaClip3,
   kind2,
   drag2,
-  deltaSec2 = 0x0,
-  durationSec2 = 0x0,
+  deltaSec2 = 0,
+  durationSec2 = 0,
   input = null,
 ) {
   const enabled = drag2?.['segmentEl'];
@@ -328,10 +328,10 @@ export function previewMediaClipTimelineTrimDrag(
     }),
     mediaClip3['_syncPreviewTime']('audio', startSec4['sourcePreviewSec']));
 }
-export function previewMediaClipTimelineMoveDrag(value6, kind3, drag3, deltaSec3 = 0x0, durationSec3 = 0x0) {
+export function previewMediaClipTimelineMoveDrag(value6, kind3, drag3, deltaSec3 = 0, durationSec3 = 0) {
   const el = drag3?.['segmentEl'];
   if (!el) return;
-  const laneIndex2 = kind3 === 'audio' ? value6['_audioLaneIndexFromDrag'](drag3) : 0x0,
+  const laneIndex2 = kind3 === 'audio' ? value6['_audioLaneIndexFromDrag'](drag3) : 0,
     startSec5 = resolveMediaClipTimelineMovePreview({
       kind: kind3,
       drag: drag3,
@@ -392,21 +392,21 @@ export function commitMediaClipTimelineEdit(mediaClip4, kind4, mode2, drag4, val
   if (!commitMediaClipTimelineEditTransaction2) return;
   mediaClip4['_mediaClip'] = commitMediaClipTimelineEditTransaction2['mediaClip'];
   const count = commitMediaClipTimelineEditTransaction2['activeClipIndex'];
-  if (count >= 0x0 && kind4 === 'video')
+  if (count >= 0 && kind4 === 'video')
     (mediaClip4['_setActiveClipIndex'](count), mediaClip4['_selectClipIndex'](count));
   else
-    count >= 0x0 &&
+    count >= 0 &&
       kind4 === 'audio' &&
       (mediaClip4['_setActiveAudioClipIndex'](count), mediaClip4['_selectAudioClipIndex'](count));
   if (mode2 === 'trim' && kind4 === 'video') {
-    const value9 = mediaClip4['_mediaClip']['clips']?.[count >= 0x0 ? count : timelineEditClipIndex(drag4)];
+    const value9 = mediaClip4['_mediaClip']['clips']?.[count >= 0 ? count : timelineEditClipIndex(drag4)];
     if (value9) {
       const value10 = mediaClip4['_videoTimelineDuration'](mediaClip4['_mediaClip']['tracks']?.['video']),
         displayDurationSec2 = getMediaClipTimelineDisplayDuration(
           toNumber(drag4?.['durationSec'], toNumber(drag4?.['previewDurationSec'], value10)),
         );
       ((mediaClip4['_playheadSec'] = Math['max'](
-        0x0,
+        0,
         Math['min'](displayDurationSec2, toNumber(drag4?.['startPlayheadSec'], mediaClip4['_playheadSec'])),
       )),
         mediaClip4['_syncTimelineAddSlotForRow'](drag4?.['rowEl'], {
@@ -428,7 +428,7 @@ export function commitMediaClipTimelineEdit(mediaClip4, kind4, mode2, drag4, val
           toNumber(drag4?.['durationSec'], toNumber(drag4?.['previewDurationSec'], value11)),
         );
       ((mediaClip4['_playheadSec'] = Math['max'](
-        0x0,
+        0,
         Math['min'](displayDurationSec3, toNumber(drag4?.['startPlayheadSec'], mediaClip4['_playheadSec'])),
       )),
         mediaClip4['_syncTimelineAddSlotForRow'](drag4?.['rowEl'], {
@@ -444,13 +444,13 @@ export function commitMediaClipTimelineEdit(mediaClip4, kind4, mode2, drag4, val
       if (mode2 === 'move' && kind4 === 'video') {
         const value12 = mediaClip4['_videoTimelineDuration'](mediaClip4['_mediaClip']['tracks']?.['video']);
         mediaClip4['_playheadSec'] = Math['max'](
-          0x0,
+          0,
           Math['min'](value12, toNumber(drag4?.['startPlayheadSec'], mediaClip4['_playheadSec'])),
         );
       } else {
         if (mode2 === 'move' && kind4 === 'audio') {
           const value13 = mediaClip4['_timelineDurationForKind']('audio');
-          ((mediaClip4['_playheadSec'] = Math['max'](0x0, Math['min'](value13, mediaClip4['_playheadSec']))),
+          ((mediaClip4['_playheadSec'] = Math['max'](0, Math['min'](value13, mediaClip4['_playheadSec']))),
             mediaClip4['_syncTimelineAddSlotForRow'](drag4?.['rowEl'], {
               displayDurationSec: drag4?.['previewDurationSec'],
               materialEndSec: mediaClip4['_timelineMaterialEndSec'](),
@@ -473,7 +473,7 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
   ((el2['type'] = 'button'),
     (el2['className'] = 'media-clip-trim media-clip-trim-' + side),
     (el2['dataset']['clipIndex'] = String(
-      Math['max'](0x0, Math['trunc'](toNumber(value14['clipIndex'], 0x0))),
+      Math['max'](0, Math['trunc'](toNumber(value14['clipIndex'], 0))),
     )),
     el2['setAttribute']('aria-label', mediaClipText(side === 'left' ? 'trim.left' : 'trim.right')));
   const el3 = document['createElement']('span');
@@ -503,7 +503,7 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
         el2['setPointerCapture']?.(startX['pointerId']);
       } catch {}
       const value16 = startMediaClip['_mediaClip']['tracks']?.[kind5],
-        clipIndex3 = Math['max'](0x0, Math['trunc'](toNumber(value14['clipIndex'], 0x0)));
+        clipIndex3 = Math['max'](0, Math['trunc'](toNumber(value14['clipIndex'], 0)));
       if (kind5 === 'video')
         (startMediaClip['_setActiveClipIndex'](clipIndex3), startMediaClip['_selectClipIndex'](clipIndex3));
       else
@@ -542,7 +542,7 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
         startClips: startClips,
         startMediaClip: startMediaClip['_mediaClip'],
         durationSec: durationSec4,
-        startScrollLeft: toNumber(scrollEl?.['scrollLeft'], 0x0),
+        startScrollLeft: toNumber(scrollEl?.['scrollLeft'], 0),
         latestClientX: startX['clientX'],
         segmentEl: segmentEl,
         rowEl: rowEl,
@@ -638,7 +638,7 @@ export function detachMediaClipTimelineEditDrag(value25) {
     value25['_setTimelineDrag'](null));
 }
 export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, startX2, value27 = {}) {
-  if (value27['compact'] === !![] || startX2['button'] !== 0x0) return;
+  if (value27['compact'] === !![] || startX2['button'] !== 0) return;
   (stopPointer(startX2),
     startPlayheadSec['_cancelTimelineSettle'](),
     startPlayheadSec['_stopTimelineDragAutoScroll'](),
@@ -653,7 +653,7 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
       kind6 === 'audio'
         ? startPlayheadSec['_audioTimelineClips'](args8)['map']((args9) => ({ ...args9 }))
         : startPlayheadSec['_videoTimelineClips'](args8)['map']((args10) => ({ ...args10 })),
-    clipIndex4 = Math['max'](0x0, Math['trunc'](toNumber(value27['clipIndex'], 0x0))),
+    clipIndex4 = Math['max'](0, Math['trunc'](toNumber(value27['clipIndex'], 0))),
     durationSec7 = startPlayheadSec['_resolveTimelineDragDuration'](
       kind6,
       args8,
@@ -690,13 +690,13 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
     startX: startX2['clientX'],
     startY: startX2['clientY'],
     startLaneIndex:
-      kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0x0,
+      kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0,
     startPlayheadSec: startPlayheadSec['_playheadSec'],
     startTrack: { ...args8 },
     startClips: startClips2,
     startMediaClip: startPlayheadSec['_mediaClip'],
     durationSec: durationSec7,
-    startScrollLeft: toNumber(scrollEl2?.['scrollLeft'], 0x0),
+    startScrollLeft: toNumber(scrollEl2?.['scrollLeft'], 0),
     latestClientX: startX2['clientX'],
     latestClientY: startX2['clientY'],
     segmentEl: startX2['currentTarget'],
@@ -704,9 +704,9 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
     laneEl: laneEl2,
     timelineEl: timelineEl,
     scrollEl: scrollEl2,
-    pendingDeltaSec: 0x0,
+    pendingDeltaSec: 0,
     pendingLaneIndex:
-      kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0x0,
+      kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0,
     hasMoved: ![],
   });
   const value28 = (value29) => handleMediaClipTimelineDrag(startPlayheadSec, value29, sessionId2),
@@ -814,7 +814,7 @@ export function applyMediaClipTimelineDragPreviewFromPointer(
   }
   startSec6['mode'] === 'trim' && value37['_hideTimelineHoverPlayhead'](el7);
   const box = el7?.['getBoundingClientRect'](),
-    trackWidthPx = Math['max'](0x1, toNumber(box?.['width'], readLayoutWidthPx(el7, 0x1))),
+    trackWidthPx = Math['max'](1, toNumber(box?.['width'], readLayoutWidthPx(el7, 1))),
     mediaClipTimelineDeltaSecFromPx = getMediaClipTimelineDeltaSecFromPx(
       value37['_timelineDragDeltaPx'](startSec6, value38),
       {
@@ -867,7 +867,7 @@ export function handleMediaClipTimelineSegmentDrag(args11, event2) {
   if (!enabled3) return;
   const el8 = args11['_timelineRowForDrag'](enabled3),
     box2 = el8?.['getBoundingClientRect'](),
-    trackWidthPx2 = Math['max'](0x1, toNumber(box2?.['width'], readLayoutWidthPx(el8, 0x1))),
+    trackWidthPx2 = Math['max'](1, toNumber(box2?.['width'], readLayoutWidthPx(el8, 1))),
     durationSec10 =
       enabled3['durationSec'] ??
       args11['_resolveTimelineDragDuration'](
@@ -881,13 +881,13 @@ export function handleMediaClipTimelineSegmentDrag(args11, event2) {
     value42 =
       enabled3['kind'] === 'audio' && enabled3['mode'] === 'move'
         ? toNumber(enabled3['latestClientY'], toNumber(event2?.['clientY'], enabled3['startY'])) -
-          toNumber(enabled3['startY'], 0x0)
-        : 0x0,
+          toNumber(enabled3['startY'], 0)
+        : 0,
     count2 =
       enabled3['kind'] === 'audio' && enabled3['mode'] === 'move'
         ? Math['max'](Math['abs'](value41), Math['abs'](value42))
         : Math['abs'](value41);
-  if (!enabled3['hasMoved'] && count2 <= 0x3) return;
+  if (!enabled3['hasMoved'] && count2 <= 3) return;
   ((enabled3['hasMoved'] = !![]),
     enabled3['laneEl']?.['classList']['add']('is-moving'),
     enabled3['timelineEl']?.['classList']['add']('is-moving-material'),

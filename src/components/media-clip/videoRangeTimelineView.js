@@ -1,6 +1,6 @@
 export function createVideoRangeTimelineView({
   documentRef: documentRef = globalThis['document'],
-  thumbnailCount: thumbnailCount = 0xa,
+  thumbnailCount: thumbnailCount = 10,
   labelText: labelText = '0.00s',
 } = {}) {
   if (!documentRef?.['createElement']) throw new Error('Video range timeline requires a document');
@@ -11,8 +11,8 @@ export function createVideoRangeTimelineView({
   const thumbsEl = documentRef['createElement']('div');
   thumbsEl['className'] = 'v2-video-clipthumbs';
   const thumbEls = [],
-    value = Math['max'](0x1, Math['trunc'](Number(thumbnailCount) || 0x0));
-  for (let item = 0x0; item < value; item += 0x1) {
+    value = Math['max'](1, Math['trunc'](Number(thumbnailCount) || 0));
+  for (let item = 0; item < value; item += 1) {
     const key = documentRef['createElement']('div');
     ((key['className'] = 'v2-video-clipthumb'), thumbsEl['appendChild'](key), thumbEls['push'](key));
   }

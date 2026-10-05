@@ -17,7 +17,7 @@ const PANEL_KIND_KEYS = Object['freeze'](['image', 'video', 'audio']),
   DEFAULT_AI_APP_NAME = '未命名 AI应用',
   SAVED_APPS_STORAGE_KEY = 'aiCanvas.runningHubAiApp.savedApps.v1',
   PANEL_DRAFT_STORAGE_KEY = 'aiCanvas.runningHubAiApp.panelDraft.v1',
-  CUSTOM_AI_APP_STORAGE_SAVE_DELAY_MS = 0xfa;
+  CUSTOM_AI_APP_STORAGE_SAVE_DELAY_MS = 250;
 function normalizeKind(value) {
   return PANEL_KIND_KEYS['includes'](value) ? value : 'image';
 }
@@ -53,7 +53,7 @@ function createSavedAppId() {
   const next =
     typeof globalThis['crypto']?.['randomUUID'] === 'function'
       ? globalThis['crypto']['randomUUID']()
-      : Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa);
+      : Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 10);
   return 'rh-ai-app-' + next;
 }
 function serializeSavedAppRecord(error = {}) {
@@ -173,7 +173,7 @@ function savePanelDraftToStorage(value7, value8, handler4) {
     const serializePanelDraftForStorage2 = serializePanelDraftForStorage(value8);
     value7?.['setItem']?.(PANEL_DRAFT_STORAGE_KEY, JSON['stringify'](serializePanelDraftForStorage2));
   } catch (value9) {
-    handler4('[RH\x20AI\x20App]\x20save\x20panel\x20draft\x20failed:', value9);
+    handler4('[RH AI App] save panel draft failed:', value9);
   }
 }
 function serializePanelDraftForStorage({
@@ -242,7 +242,7 @@ export function createRhAiAppConfigRepository({
   let enabled4 = ![],
     enabled5 = ![],
     enabled6 = ![],
-    enabled7 = 0x0;
+    enabled7 = 0;
   const run = createRhAiAppPersistence({
       externalBridge: externalBridge,
       storage: storage,
@@ -250,7 +250,7 @@ export function createRhAiAppConfigRepository({
     }),
     handler5 = () => {
       if (!enabled7) return;
-      (windowObject?.['clearTimeout']?.(enabled7), (enabled7 = 0x0));
+      (windowObject?.['clearTimeout']?.(enabled7), (enabled7 = 0));
     },
     value16 = {
       loadLocalSeed() {
@@ -259,7 +259,7 @@ export function createRhAiAppConfigRepository({
         return {
           panelDraft: panelDraft,
           savedApps: savedApps3,
-          hasData: Boolean(panelDraft) || savedApps3['length'] > 0x0,
+          hasData: Boolean(panelDraft) || savedApps3['length'] > 0,
         };
       },
       saveSavedApps(list4 = []) {

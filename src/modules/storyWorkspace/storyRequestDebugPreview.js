@@ -18,7 +18,7 @@ function parsePromptObject(key = '') {
 }
 function formatPromptForPreview(result = '') {
   const promptObject = parsePromptObject(result);
-  return promptObject ? JSON['stringify'](promptObject, null, 0x2) : String(result || '');
+  return promptObject ? JSON['stringify'](promptObject, null, 2) : String(result || '');
 }
 function getPromptSectionCharacters(enabled) {
   if (!enabled || typeof enabled !== 'object') return {};
@@ -56,11 +56,11 @@ export function buildStoryRequestDebugPreviewModel(
     content = String(maskDebugPayloadSecrets2?.['systemPrompt'] || ''),
     promptObject2 = parsePromptObject(source),
     task = String(promptObject2?.['task'] || ''),
-    batchIndex = Math['max'](0x0, Math['trunc'](Number(promptObject2?.['batch']?.['index']) || 0x0)),
-    batchTotal = Math['max'](0x0, Math['trunc'](Number(promptObject2?.['batch']?.['total']) || 0x0)),
+    batchIndex = Math['max'](0, Math['trunc'](Number(promptObject2?.['batch']?.['index']) || 0)),
+    batchTotal = Math['max'](0, Math['trunc'](Number(promptObject2?.['batch']?.['total']) || 0)),
     clipCount = Array['isArray'](promptObject2?.['batch']?.['clipPlans'])
       ? promptObject2['batch']['clipPlans']['length']
-      : 0x0;
+      : 0;
   return {
     title: title,
     subtitle: subtitle,
@@ -87,11 +87,11 @@ export function buildStoryRequestDebugPreviewModel(
         content: JSON['stringify'](
           Object['fromEntries'](
             Object['entries'](getPromptSectionCharacters(promptObject2))['sort'](
-              (next, current) => current[0x1] - next[0x1],
+              (next, current) => current[1] - next[1],
             ),
           ),
           null,
-          0x2,
+          2,
         ),
       },
     ],

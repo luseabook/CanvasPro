@@ -69,9 +69,9 @@ const AGENT_QUICK_ACTIONS = Object['freeze']([
   AGENT_CUSTOM_QUICK_ACTIONS_SEEDED_STORAGE_KEY = 'aiCanvas.agentCustomQuickActionsSeeded.v1',
   AGENT_CUSTOM_QUICK_ACTIONS_VERSION_STORAGE_KEY = 'aiCanvas.agentCustomQuickActionsVersion.v1',
   AGENT_CUSTOM_QUICK_ACTIONS_VERSION = 'canvas-defaults-v2',
-  AGENT_PANEL_WIDTH_LIMITS = Object['freeze']({ min: 0x230, max: 0x35c }),
-  AGENT_CUSTOM_QUICK_ACTION_LIMIT = 0x8,
-  AGENT_NOTICE_AUTO_HIDE_MS = 0xc80;
+  AGENT_PANEL_WIDTH_LIMITS = Object['freeze']({ min: 560, max: 860 }),
+  AGENT_CUSTOM_QUICK_ACTION_LIMIT = 8,
+  AGENT_NOTICE_AUTO_HIDE_MS = 3200;
 function createAgentPromptAttachmentButton({ title: title = '', className: className = '' } = {}) {
   const el = document['createElement']('div');
   el['innerHTML'] = createPromptAttachmentButtonHTML({
@@ -87,15 +87,15 @@ function createAgentPromptAttachmentButton({ title: title = '', className: class
         ['filter'](Boolean)
         ['forEach']((value) => el2['classList']['add'](value)),
       el2['setAttribute']('role', 'button'),
-      (el2['tabIndex'] = 0x0),
+      (el2['tabIndex'] = 0),
       el2
     );
   const el3 = createAgentElement(
     'div',
-    ['prompt-attachment-btn', className]['filter'](Boolean)['join']('\x20'),
+    ['prompt-attachment-btn', className]['filter'](Boolean)['join'](' '),
   );
   title && ((el3['title'] = title), el3['setAttribute']('aria-label', title));
-  (el3['setAttribute']('role', 'button'), (el3['tabIndex'] = 0x0));
+  (el3['setAttribute']('role', 'button'), (el3['tabIndex'] = 0));
   const el4 = createAgentElement('span', 'btn-icon');
   return (
     (el4['innerHTML'] =
@@ -111,13 +111,13 @@ function setEditorText(el5, item = '') {
 function getEditorText(el6) {
   return String(el6?.['innerText'] || el6?.['textContent'] || '')['trim']();
 }
-function truncateUiText(key, index = 0x28) {
+function truncateUiText(key, index = 40) {
   const list = String(key || '')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
   return list['length'] <= index
     ? list
-    : list['slice'](0x0, Math['max'](0x0, index - 0x3)) + '...';
+    : list['slice'](0, Math['max'](0, index - 3)) + '...';
 }
 function writeJsonArrayToStorage(result, data, options) {
   try {
@@ -133,7 +133,7 @@ function normalizeQuickAction(custom = {}, target = '', locale = getLocale()) {
     next = custom['labelKey'] ? agentPanelText(custom['labelKey'], locale) : custom['label'];
   return {
     id: id,
-    label: truncateUiText(next || prompt, 0x1c),
+    label: truncateUiText(next || prompt, 28),
     prompt: prompt,
     custom: custom['custom'] === !![],
   };
@@ -143,7 +143,7 @@ function normalizeQuickActionList(list2 = [], locale2 = getLocale()) {
     normalizeQuickAction(current, 'custom-' + entry, locale2),
   )
     ['filter'](Boolean)
-    ['slice'](0x0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
+    ['slice'](0, AGENT_CUSTOM_QUICK_ACTION_LIMIT);
 }
 function getDefaultQuickActions(locale3 = getLocale()) {
   return normalizeQuickActionList(AGENT_QUICK_ACTIONS, locale3);
@@ -167,7 +167,7 @@ function mergeSeedQuickActions(list3 = []) {
       if (!enabled || map['has'](enabled)) return;
       (map['add'](enabled), list4['push'](payload));
     }),
-    list4['slice'](0x0, AGENT_CUSTOM_QUICK_ACTION_LIMIT)
+    list4['slice'](0, AGENT_CUSTOM_QUICK_ACTION_LIMIT)
   );
 }
 function migrateQuickActionsToCurrentDefaults(list5 = []) {
@@ -187,7 +187,7 @@ function migrateQuickActionsToCurrentDefaults(list5 = []) {
       if (map3['has'](value2['id'])) return;
       (list7['push'](value2), map4['add'](value2['id']));
     }),
-    list7['slice'](0x0, AGENT_CUSTOM_QUICK_ACTION_LIMIT)
+    list7['slice'](0, AGENT_CUSTOM_QUICK_ACTION_LIMIT)
   );
 }
 function isKnownDefaultQuickActionContent(options3 = {}) {
@@ -276,11 +276,11 @@ function resolveFirstAgentThumbUrl(list11 = [], { imageLikeOnly: imageLikeOnly =
 }
 function getPrimaryVideoItem(options4 = {}) {
   const list12 = Array['isArray'](options4['videos']) ? options4['videos'] : [];
-  if (list12['length'] === 0x0) return null;
+  if (list12['length'] === 0) return null;
   const value21 = Number['isFinite'](Number(options4['mainVideoIndex']))
-    ? Math['max'](0x0, Math['trunc'](Number(options4['mainVideoIndex'])))
-    : 0x0;
-  return list12[value21] || list12[0x0] || null;
+    ? Math['max'](0, Math['trunc'](Number(options4['mainVideoIndex'])))
+    : 0;
+  return list12[value21] || list12[0] || null;
 }
 function resolveAgentInputRefThumbUrl(options5 = {}, inferAgentInputKind2 = inferAgentInputKind(options5?.['type'])) {
   const value22 = String(inferAgentInputKind2 || '')['trim']();
@@ -338,7 +338,7 @@ function normalizeAgentInputRefFromNode(box = {}, { source: source = 'canvas' } 
     kind = inferAgentInputKind(type),
     name = truncateUiText(
       box['name'] || box['label'] || box['title'] || id2,
-      0x3c,
+      60,
     ),
     count = Number(box['width']),
     count2 = Number(box['height']),
@@ -352,8 +352,8 @@ function normalizeAgentInputRefFromNode(box = {}, { source: source = 'canvas' } 
       source: source,
       thumbUrl: resolveAgentInputRefThumbUrl(box, kind),
     };
-  if (Number['isFinite'](count) && count > 0x0) box2['width'] = Math['round'](count);
-  if (Number['isFinite'](count2) && count2 > 0x0) box2['height'] = Math['round'](count2);
+  if (Number['isFinite'](count) && count > 0) box2['width'] = Math['round'](count);
+  if (Number['isFinite'](count2) && count2 > 0) box2['height'] = Math['round'](count2);
   return box2;
 }
 function isAgentMaterialRef(options6 = {}) {
@@ -376,7 +376,7 @@ function normalizePastedImageFile(type2 = null) {
   if (!type2 || !String(type2['type'] || '')['startsWith']('image/')) return null;
   if (String(type2['name'] || '')['trim']()) return type2;
   try {
-    const value29 = String(type2['type'] || '')['split']('/')[0x1] || 'png';
+    const value29 = String(type2['type'] || '')['split']('/')[1] || 'png';
     return new File([type2], 'agent-paste-image.' + value29, { type: type2['type'] });
   } catch {
     return type2;
@@ -388,7 +388,7 @@ function getStoreState(store2) {
 function clampAgentSidebarWidth(value30, value31 = globalThis['window']?.['innerWidth']) {
   const value32 = Number(value30),
     value33 = Number['isFinite'](Number(value31))
-      ? Math['max'](0x140, Number(value31) - 0x18)
+      ? Math['max'](320, Number(value31) - 24)
       : AGENT_PANEL_WIDTH_LIMITS['max'],
     value34 = Math['min'](AGENT_PANEL_WIDTH_LIMITS['max'], value33),
     value35 = Math['min'](AGENT_PANEL_WIDTH_LIMITS['min'], value34);
@@ -396,7 +396,7 @@ function clampAgentSidebarWidth(value30, value31 = globalThis['window']?.['inner
 }
 function readStoredSidebarWidth(value36 = globalThis['window']) {
   const count3 = Number(value36?.['localStorage']?.['getItem']?.(AGENT_PANEL_WIDTH_STORAGE_KEY));
-  return Number['isFinite'](count3) && count3 > 0x0 ? count3 : null;
+  return Number['isFinite'](count3) && count3 > 0 ? count3 : null;
 }
 function writeStoredSidebarWidth(value37, value38 = globalThis['window']) {
   try {
@@ -468,7 +468,7 @@ function formatActionSummary(options7 = {}) {
                         : value48,
     list15 = [],
     value50 = response['prompt'] || response['text'];
-  if (value50) list15['push']('“' + String(value50)['slice'](0x0, 0x24) + '”');
+  if (value50) list15['push']('“' + String(value50)['slice'](0, 36) + '”');
   return (
     Number['isFinite'](Number(response['gap'])) &&
       list15['push'](formatAgentPanelText('gapValue', { value: Number(response['gap']) })),
@@ -509,7 +509,7 @@ function createParamControl(field = {}, value56 = null, value57 = null) {
   const value58 = String(field['type'] || '')['toLowerCase']();
   let trigger,
     value59 = enabled5;
-  if (Array['isArray'](field['options']) && field['options']['length'] > 0x0) {
+  if (Array['isArray'](field['options']) && field['options']['length'] > 0) {
     ((trigger = createAgentButton('agent-param-input agent-param-select-trigger', '')),
       (trigger['value'] = field['value']),
       trigger['setAttribute']('aria-haspopup', 'menu'),
@@ -519,12 +519,12 @@ function createParamControl(field = {}, value56 = null, value57 = null) {
     ((value59 = enabled5 + '：' + value60),
       trigger['append'](
         createAgentElement('span', 'agent-param-select-value', value60),
-        createAgentElement('span', 'agent-caret\x20agent-param-select-caret'),
+        createAgentElement('span', 'agent-caret agent-param-select-caret'),
       ));
     const el11 = trigger['querySelector']('.agent-param-select-caret');
     (el11 &&
       (el11['innerHTML'] =
-        '<svg\x20width=\x2210\x22\x20height=\x2210\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><polyline\x20points=\x226\x209\x2012\x2015\x2018\x209\x22></polyline></svg>'),
+        '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
       trigger['addEventListener']('click', (event) => {
         (event['preventDefault']?.(),
           event['stopPropagation']?.(),
@@ -551,7 +551,7 @@ function createParamControl(field = {}, value56 = null, value57 = null) {
   return (
     (trigger['dataset']['agentParamId'] = enabled4),
     trigger['setAttribute']('aria-label', value59),
-    (!Array['isArray'](field['options']) || field['options']['length'] === 0x0) &&
+    (!Array['isArray'](field['options']) || field['options']['length'] === 0) &&
       trigger['addEventListener']('change', () => {
         value56?.(enabled4, readParamControlValue(trigger, field), field);
       }),
@@ -575,7 +575,7 @@ function renderEditableParams(
     onAdvancedExpandedChange: onAdvancedExpandedChange = null,
   } = {},
 ) {
-  if (!Array['isArray'](list16) || list16['length'] === 0x0) return;
+  if (!Array['isArray'](list16) || list16['length'] === 0) return;
   const list17 = list16['filter'](isAdvancedEditableParam),
     value64 = list16['filter']((value65) => !isAdvancedEditableParam(value65)),
     el13 = createAgentElement('div', 'agent-param-editor');
@@ -583,7 +583,7 @@ function renderEditableParams(
     createAgentElement('div', 'agent-plan-group-title', agentPanelText('editableParams')),
   );
   const run = (list18, value66 = 'agent-param-list') => {
-    if (list18['length'] === 0x0) return null;
+    if (list18['length'] === 0) return null;
     const el14 = createAgentElement('div', value66);
     return (
       list18['map']((value67) => createParamControl(value67, value62, value63))
@@ -594,7 +594,7 @@ function renderEditableParams(
     );
   };
   run(value64);
-  if (list17['length'] > 0x0) {
+  if (list17['length'] > 0) {
     const el15 = createAgentElement(
         'button',
         'agent-param-advanced-toggle advanced-settings-icon-button',
@@ -622,7 +622,7 @@ function renderEditableParams(
   el12['appendChild'](el13);
 }
 function renderActionGroup(el18, value69, list19 = []) {
-  if (!Array['isArray'](list19) || list19['length'] === 0x0) return;
+  if (!Array['isArray'](list19) || list19['length'] === 0) return;
   const el19 = createAgentElement('div', 'agent-plan-group');
   el19['appendChild'](createAgentElement('div', 'agent-plan-group-title', value69));
   const el20 = createAgentElement('div', 'agent-plan-list');
@@ -633,7 +633,7 @@ function renderActionGroup(el18, value69, list19 = []) {
     el18['appendChild'](el19));
 }
 function renderTraceSummary(el21, value71, list20 = []) {
-  if (!Array['isArray'](list20) || list20['length'] === 0x0) return;
+  if (!Array['isArray'](list20) || list20['length'] === 0) return;
   const el22 = createAgentElement('div', 'agent-plan-group');
   el22['appendChild'](createAgentElement('div', 'agent-plan-group-title', value71));
   const el23 = createAgentElement('div', 'agent-plan-list');
@@ -655,7 +655,7 @@ function renderPlanPreview(
   }
   const enabled8 = enabled7['confirmationSummary'] || null,
     list21 = Array['isArray'](enabled7['actions']) ? enabled7['actions'] : [];
-  if (!enabled8 && list21['length'] === 0x0) {
+  if (!enabled8 && list21['length'] === 0) {
     advancedExpanded2['hidden'] = !![];
     return;
   }
@@ -671,7 +671,7 @@ function renderPlanPreview(
       ([
         [
           agentPanelText('batchNodes'),
-          Number(enabled8['generation']['batchSize'] || 0x0) > 0x1
+          Number(enabled8['generation']['batchSize'] || 0) > 1
             ? '' + enabled8['generation']['batchSize']
             : '',
         ],
@@ -726,8 +726,8 @@ function renderRecovery(
   el27['replaceChildren']();
   const value79 = value76?.['recovery'] || null,
     list22 = Array['isArray'](value79?.['options']) ? value79['options'] : [];
-  el27['hidden'] = list22['length'] === 0x0;
-  if (list22['length'] === 0x0) return;
+  el27['hidden'] = list22['length'] === 0;
+  if (list22['length'] === 0) return;
   el27['appendChild'](
     createAgentElement('div', 'agent-recovery-title', agentPanelText('recoveryTitle')),
   );
@@ -771,7 +771,7 @@ function renderRecovery(
               : value81 === 'retryPlanner'
                 ? await value77['retryPlannerRun']?.()
                 : await value77['retryFailedPlan']?.();
-          handler(value82 || { ok: ![], status: 'failed', reply: 'Recovery\x20failed.' });
+          handler(value82 || { ok: ![], status: 'failed', reply: 'Recovery failed.' });
         } catch (reply2) {
           handler({ ok: ![], status: 'failed', reply: reply2?.['message'] || 'Agent recovery failed.' });
         } finally {
@@ -793,7 +793,7 @@ function formatHistoryTime(value83) {
 }
 function getLastMessageSummary(options10 = {}) {
   const list23 = Array['isArray'](options10['messages']) ? options10['messages'] : [],
-    value85 = list23[list23['length'] - 0x1] || null;
+    value85 = list23[list23['length'] - 1] || null;
   return String(value85?.['content'] || options10['lastPlanSummary'] || options10['title'] || '')['trim']();
 }
 function renderHistory(value86, value87, { onSelect: onSelect = null, onDelete: onDelete = null } = {}) {
@@ -861,7 +861,7 @@ function showAgentPopover(el36) {
 }
 function closeFloatingMenus(el37, enabled10 = null) {
   el37?.['querySelectorAll']?.(
-    '.agent-floating-menu.show,\x20.agent-model-menu.show,\x20.agent-history-popover',
+    '.agent-floating-menu.show, .agent-model-menu.show, .agent-history-popover',
   )?.['forEach']((value90) => {
     if (value90 !== enabled10) hideAgentPopover(value90);
   });
@@ -880,7 +880,7 @@ function isAgentMenuSurface(el38) {
 function hasOpenFloatingMenus(el39) {
   return Array['from'](
     el39?.['querySelectorAll']?.(
-      '.agent-floating-menu.show,\x20.agent-model-menu.show,\x20.agent-history-popover',
+      '.agent-floating-menu.show, .agent-model-menu.show, .agent-history-popover',
     ) || [],
   )['some'](isAgentPopoverOpen);
 }
@@ -910,11 +910,11 @@ export function initAgentPanel({
   (el40['setAttribute']('role', 'separator'),
     el40['setAttribute']('aria-orientation', 'vertical'),
     el40['setAttribute']('aria-label', agentPanelText('resizeAria')),
-    (el40['tabIndex'] = 0x0));
+    (el40['tabIndex'] = 0));
   const agentElement4 = createAgentElement('div', 'agent-sidebar-header'),
     agentElement5 = createAgentElement('div', 'agent-sidebar-title');
   agentElement5['append'](
-    createAgentElement('span', 'agent-sidebar-title-main', surface['title'] || 'Shuo\x20Canvas\x20Agent'),
+    createAgentElement('span', 'agent-sidebar-title-main', surface['title'] || 'Shuo Canvas Agent'),
     createAgentElement('span', 'agent-sidebar-title-badge', agentPanelText('betaBadge')),
   );
   const agentElement6 = createAgentElement('div', 'agent-header-actions'),
@@ -951,14 +951,14 @@ export function initAgentPanel({
       (showContextMenu2?.['close']?.(), (showContextMenu2 = null));
     },
     handler2 = (ownerElement, list25) => {
-      if (!Array['isArray'](list25) || list25['length'] === 0x0) return;
+      if (!Array['isArray'](list25) || list25['length'] === 0) return;
       (ownerElement['preventDefault']?.(),
         ownerElement['stopPropagation']?.(),
         closeFloatingMenus(ownerRoot),
         run2(),
         (showContextMenu2 = showContextMenu(
-          Number(ownerElement['clientX']) || 0x0,
-          Number(ownerElement['clientY']) || 0x0,
+          Number(ownerElement['clientX']) || 0,
+          Number(ownerElement['clientY']) || 0,
           list25,
           {
             className: 'v2-canvas-ctx-menu agent-context-menu',
@@ -969,7 +969,7 @@ export function initAgentPanel({
         )));
     },
     onOpenParamOptions2 = ({ trigger: trigger2, field: field2, onSelect: onSelect2 } = {}) => {
-      if (!trigger2 || !Array['isArray'](field2?.['options']) || field2['options']['length'] === 0x0)
+      if (!trigger2 || !Array['isArray'](field2?.['options']) || field2['options']['length'] === 0)
         return;
       if (trigger2['getAttribute']('aria-expanded') === 'true') {
         run2();
@@ -989,13 +989,13 @@ export function initAgentPanel({
           };
         })
         ['filter'](Boolean);
-      if (list26['length'] === 0x0) return;
+      if (list26['length'] === 0) return;
       const box3 = trigger2['getBoundingClientRect']?.() || {};
       trigger2['setAttribute']('aria-expanded', 'true');
       let showContextMenu3 = null;
       ((showContextMenu3 = showContextMenu(
-        Number(box3['left']) || 0x0,
-        (Number(box3['bottom']) || 0x0) + 0x4,
+        Number(box3['left']) || 0,
+        (Number(box3['bottom']) || 0) + 4,
         list26,
         {
           className: 'v2-canvas-ctx-menu v2-sb-dropdown agent-param-dropdown-menu',
@@ -1062,7 +1062,7 @@ export function initAgentPanel({
   );
   const el56 = createAgentElement('input', 'agent-custom-input');
   ((el56['type'] = 'text'),
-    (el56['maxLength'] = 0x1c),
+    (el56['maxLength'] = 28),
     (el56['placeholder'] = agentPanelText('customShortcutNamePlaceholder')),
     el55['appendChild'](el56));
   const el57 = createAgentElement('label', 'agent-custom-field');
@@ -1070,7 +1070,7 @@ export function initAgentPanel({
     createAgentElement('span', 'agent-custom-label', agentPanelText('customShortcutPromptLabel')),
   );
   const el58 = createAgentElement('textarea', 'agent-custom-textarea');
-  ((el58['rows'] = 0x4),
+  ((el58['rows'] = 4),
     (el58['placeholder'] = agentPanelText('customShortcutPromptPlaceholder')),
     el57['appendChild'](el58));
   const agentElement12 = createAgentElement('div', 'agent-custom-editor-actions'),
@@ -1137,7 +1137,7 @@ export function initAgentPanel({
       'img-model-pills aigen-text-model-selector agent-text-model-selector',
     );
   el77['dataset']['aigenTextModelSelector'] = '';
-  const agentElement16 = createAgentElement('div', 'agent-menu-wrap\x20agent-model-wrap\x20img-model-wrap'),
+  const agentElement16 = createAgentElement('div', 'agent-menu-wrap agent-model-wrap img-model-wrap'),
     el78 = createAgentButton('agent-pill-btn agent-model-btn img-model-btn-trigger', '', {
       title: agentPanelText('modelSelection'),
     }),
@@ -1148,23 +1148,23 @@ export function initAgentPanel({
       'agent-model-label img-model-label',
       resolveAgentModelLabel(activeModel['model']),
     ),
-    el80 = createAgentElement('span', 'agent-caret\x20node-menu-caret');
+    el80 = createAgentElement('span', 'agent-caret node-menu-caret');
   ((el80['innerHTML'] =
     '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'),
     el78['append'](el79, agentElement17, el80));
   const el81 = createAgentElement(
     'div',
-    'floating-menu\x20img-model-menu\x20node-model-menu\x20agent-model-menu',
+    'floating-menu img-model-menu node-model-menu agent-model-menu',
   );
   ((el81['innerHTML'] = buildAIGenTextModelMenuMarkup({ activeModel: activeModel['model'] })),
     agentElement16['append'](el78, el81));
-  const agentButton = createAgentButton('model-provider-profile-selector-toggle\x20is-hidden', ''),
+  const agentButton = createAgentButton('model-provider-profile-selector-toggle is-hidden', ''),
     el82 = createAgentElement('div', 'ui-schema-placement ui-schema-mode-slot');
   ((el82['dataset']['aigenTextUiSchemaModeSlot'] = ''),
     (el82['hidden'] = !![]),
     el77['append'](agentElement16, agentButton, el82));
   const el83 = createAgentElement('div', 'agent-menu-wrap'),
-    el84 = createAgentButton('agent-pill-btn\x20agent-mode-btn', '', {
+    el84 = createAgentButton('agent-pill-btn agent-mode-btn', '', {
       title: agentPanelText('agentMode'),
       icon: agentIconSvg('mode'),
     }),
@@ -1198,7 +1198,7 @@ export function initAgentPanel({
     slashTrigger: slashTrigger,
     onSelect: (value100) => {
       const value101 = String(value100?.['id'] || '')['trim']();
-      if (value101) setEditorText(slashTrigger, '$' + value101 + '\x20');
+      if (value101) setEditorText(slashTrigger, '$' + value101 + ' ');
       (setMenuOpen(onCatalogChange['menu'], ![], ownerRoot), slashTrigger['focus']());
     },
   });
@@ -1234,9 +1234,9 @@ export function initAgentPanel({
         const value105 = '$' + value104;
         setEditorText(
           slashTrigger,
-          editorText === value105 || editorText['startsWith'](value105 + '\x20')
-            ? '' + editorText + (editorText === value105 ? '\x20' : '')
-            : '' + value105 + (editorText ? '\x20' + editorText : '\x20'),
+          editorText === value105 || editorText['startsWith'](value105 + ' ')
+            ? '' + editorText + (editorText === value105 ? ' ' : '')
+            : '' + value105 + (editorText ? ' ' + editorText : ' '),
         );
       }
       (setMenuOpen(onCatalogChange['menu'], ![], ownerRoot), slashTrigger['focus']());
@@ -1348,9 +1348,9 @@ export function initAgentPanel({
         document?.['getSelection']?.() || windowObject?.['getSelection']?.() || globalThis['getSelection']?.(),
       enabled15 = String(value116?.['toString']?.() || '')['trim']();
     if (!enabled15 || value116?.['isCollapsed'] === !![]) return '';
-    const count4 = Number(value116?.['rangeCount']) || 0x0;
-    if (count4 > 0x0 && typeof value116['getRangeAt'] === 'function') {
-      for (let value117 = 0x0; value117 < count4; value117 += 0x1) {
+    const count4 = Number(value116?.['rangeCount']) || 0;
+    if (count4 > 0 && typeof value116['getRangeAt'] === 'function') {
+      for (let value117 = 0; value117 < count4; value117 += 1) {
         const value118 = value116['getRangeAt'](value117);
         if (
           value115['contains'](value118['commonAncestorContainer']) ||
@@ -1373,22 +1373,22 @@ export function initAgentPanel({
         (event3['preventDefault']?.(), event3['clipboardData']['setData']('text/plain', enabled16)));
   }
   function run10() {
-    const scrollWidth = Math['max'](0x0, Number(el47['scrollWidth']) || 0x0),
-      value119 = Number(el47['getBoundingClientRect']?.()['width']) || 0x0,
+    const scrollWidth = Math['max'](0, Number(el47['scrollWidth']) || 0),
+      value119 = Number(el47['getBoundingClientRect']?.()['width']) || 0,
       clientWidth = Math['max'](
-        0x0,
-        Number(el47['clientWidth']) || value119 || Number(el47['offsetWidth']) || 0x0,
+        0,
+        Number(el47['clientWidth']) || value119 || Number(el47['offsetWidth']) || 0,
       ),
-      maxScroll = Math['max'](0x0, scrollWidth - clientWidth),
-      scrollLeft = Math['min'](maxScroll, Math['max'](0x0, Number(el47['scrollLeft']) || 0x0));
+      maxScroll = Math['max'](0, scrollWidth - clientWidth),
+      scrollLeft = Math['min'](maxScroll, Math['max'](0, Number(el47['scrollLeft']) || 0));
     return { clientWidth: clientWidth, maxScroll: maxScroll, scrollLeft: scrollLeft, scrollWidth: scrollWidth };
   }
   function run4() {
     const { maxScroll: maxScroll2, scrollLeft: scrollLeft2 } = run10(),
-      value120 = maxScroll2 > 0x1;
+      value120 = maxScroll2 > 1;
     (el46['classList']['toggle']('has-overflow', value120),
-      el46['classList']['toggle']('has-left-fade', value120 && scrollLeft2 > 0x1),
-      el46['classList']['toggle']('has-right-fade', value120 && scrollLeft2 < maxScroll2 - 0x1));
+      el46['classList']['toggle']('has-left-fade', value120 && scrollLeft2 > 1),
+      el46['classList']['toggle']('has-right-fade', value120 && scrollLeft2 < maxScroll2 - 1));
   }
   function run11(value121) {
     const value122 = value121 === !![];
@@ -1396,17 +1396,17 @@ export function initAgentPanel({
   }
   function run12(event4) {
     const { maxScroll: maxScroll3, scrollLeft: scrollLeft3 } = run10();
-    if (maxScroll3 <= 0x1) return;
-    const value123 = Number(event4?.['deltaY']) || 0x0,
-      count5 = Number(event4?.['deltaX']) || 0x0,
+    if (maxScroll3 <= 1) return;
+    const value123 = Number(event4?.['deltaY']) || 0,
+      count5 = Number(event4?.['deltaX']) || 0,
       enabled17 =
-        Math['abs'](count5) > Math['abs'](value123) && count5 !== 0x0 ? count5 : value123;
+        Math['abs'](count5) > Math['abs'](value123) && count5 !== 0 ? count5 : value123;
     if (!enabled17) return;
-    const enabled18 = enabled17 < 0x0 && scrollLeft3 > 0x1,
-      enabled19 = enabled17 > 0x0 && scrollLeft3 < maxScroll3 - 0x1;
+    const enabled18 = enabled17 < 0 && scrollLeft3 > 1,
+      enabled19 = enabled17 > 0 && scrollLeft3 < maxScroll3 - 1;
     if (!enabled18 && !enabled19) return;
     (event4?.['preventDefault']?.(),
-      (el47['scrollLeft'] = Math['min'](maxScroll3, Math['max'](0x0, scrollLeft3 + enabled17))),
+      (el47['scrollLeft'] = Math['min'](maxScroll3, Math['max'](0, scrollLeft3 + enabled17))),
       run4());
   }
   function run6(value124) {
@@ -1461,8 +1461,8 @@ export function initAgentPanel({
       run13(el51, agentPanelText('customShortcutClose')),
       run14(el52, agentPanelText('customShortcutNew')));
     const value129 = el54['querySelectorAll']('.agent-custom-label');
-    if (value129[0x0]) value129[0x0]['textContent'] = agentPanelText('customShortcutNameLabel');
-    if (value129[0x1]) value129[0x1]['textContent'] = agentPanelText('customShortcutPromptLabel');
+    if (value129[0]) value129[0]['textContent'] = agentPanelText('customShortcutNameLabel');
+    if (value129[1]) value129[1]['textContent'] = agentPanelText('customShortcutPromptLabel');
     ((el56['placeholder'] = agentPanelText('customShortcutNamePlaceholder')),
       (el58['placeholder'] = agentPanelText('customShortcutPromptPlaceholder')),
       run14(el59, agentPanelText('customShortcutSave')),
@@ -1510,11 +1510,11 @@ export function initAgentPanel({
     }
     if (String(options11['kind'] || '') === 'audio') {
       const el97 =
-        createReferenceFallbackThumbElement('audio', 'ref-thumb-media\x20agent-input-ref-fallback') ||
+        createReferenceFallbackThumbElement('audio', 'ref-thumb-media agent-input-ref-fallback') ||
         createAgentElement('div', 'ref-thumb-media ref-thumb-fallback agent-input-ref-fallback');
       (el97['classList']?.['add']?.('agent-input-ref-audio-thumb'), (el97['textContent'] = ''));
       const el98 = createAgentElement('span', 'agent-audio-thumb-bars');
-      for (let count6 = 0x0; count6 < 0x9; count6 += 0x1) {
+      for (let count6 = 0; count6 < 9; count6 += 1) {
         el98['appendChild'](createAgentElement('span', 'agent-audio-thumb-bar'));
       }
       return (el97['appendChild'](el98), el97);
@@ -1523,7 +1523,7 @@ export function initAgentPanel({
       'div',
       'ref-thumb-media ref-thumb-fallback agent-input-ref-fallback',
       String(options11['kind'] || 'node')
-        ['slice'](0x0, 0x3)
+        ['slice'](0, 3)
         ['toUpperCase'](),
     );
     return (el99['setAttribute']('aria-hidden', 'true'), el99);
@@ -1532,7 +1532,7 @@ export function initAgentPanel({
     el71['replaceChildren']();
     const list28 = [...list27, ...args['getDocumentDisplayRefs']()];
     (list28['forEach']((error) => {
-      const el100 = createAgentElement('div', 'ref-thumb-wrap\x20agent-input-ref-thumb'),
+      const el100 = createAgentElement('div', 'ref-thumb-wrap agent-input-ref-thumb'),
         value131 = String(error['label'] || error['name'] || error['nodeId'] || '')['trim']();
       ((el100['title'] = value131),
         el100['setAttribute']('aria-label', value131),
@@ -1549,8 +1549,8 @@ export function initAgentPanel({
         el71['appendChild'](el100));
     }),
       el68['classList']['add']('active'),
-      el68['classList']['toggle']('has-input-refs', list28['length'] > 0x0),
-      (el70['hidden'] = list28['length'] > 0x0));
+      el68['classList']['toggle']('has-input-refs', list28['length'] > 0),
+      (el70['hidden'] = list28['length'] > 0));
   }
   function addInputRefs(list29 = []) {
     const map6 = new Map(list27['map']((value132) => [value132['nodeId'], value132]));
@@ -1559,7 +1559,7 @@ export function initAgentPanel({
         if (!enabled22['nodeId'] || map6['has'](enabled22['nodeId'])) return;
         map6['set'](enabled22['nodeId'], enabled22);
       }),
-      (list27 = Array['from'](map6['values']())['slice'](0x0, AGENT_CONVERSATION_INPUT_REF_LIMIT)),
+      (list27 = Array['from'](map6['values']())['slice'](0, AGENT_CONVERSATION_INPUT_REF_LIMIT)),
       onDocumentChange(),
       list27['length']
     );
@@ -1579,9 +1579,9 @@ export function initAgentPanel({
           id: String(args2['nodeId'] || args2['id'] || '')['trim'](),
           nodeId: String(args2['nodeId'] || args2['id'] || '')['trim'](),
         }))
-        ['slice'](0x0, AGENT_CONVERSATION_INPUT_REF_LIMIT);
-    if (list30['length'] === 0x0 && !clearWhenMissing) return ![];
-    return ((list27 = list30), onDocumentChange(), list30['length'] > 0x0);
+        ['slice'](0, AGENT_CONVERSATION_INPUT_REF_LIMIT);
+    if (list30['length'] === 0 && !clearWhenMissing) return ![];
+    return ((list27 = list30), onDocumentChange(), list30['length'] > 0);
   }
   function run19() {
     return document?.['getElementById']?.('v2-wrap') || null;
@@ -1667,7 +1667,7 @@ export function initAgentPanel({
       return;
     }
     (addInputRefs([ref3]),
-      onNotice(formatAgentPanelText('attachSelected', { count: 0x1 }), { sticky: !![] }));
+      onNotice(formatAgentPanelText('attachSelected', { count: 1 }), { sticky: !![] }));
   }
   function run27(event7) {
     if (!enabled21 || event7['key'] !== 'Escape') return;
@@ -1684,10 +1684,10 @@ export function initAgentPanel({
         normalizeAgentInputRefFromNode(storeState['nodes']?.[value137], { source: 'canvas-selection' }),
       )['filter'](Boolean),
       list33 = list32['filter'](isAgentMaterialRef);
-    if (list33['length'] === 0x0) return (onNotice(agentPanelText('attachSelectedEmpty')), 0x0);
+    if (list33['length'] === 0) return (onNotice(agentPanelText('attachSelectedEmpty')), 0);
     const value138 = list27['length'];
     addInputRefs(list33);
-    const count7 = Math['max'](0x0, list27['length'] - value138);
+    const count7 = Math['max'](0, list27['length'] - value138);
     return (
       onNotice(formatAgentPanelText('attachSelected', { count: count7 || list33['length'] })),
       slashTrigger['focus'](),
@@ -1695,16 +1695,16 @@ export function initAgentPanel({
     );
   }
   function run31({ toggle: toggle = !![] } = {}) {
-    if (enabled21) return (run28({ toggle: toggle }), 0x0);
+    if (enabled21) return (run28({ toggle: toggle }), 0);
     const count8 = run30();
-    if (count8 > 0x0) return count8;
-    return (run28({ toggle: ![] }), 0x0);
+    if (count8 > 0) return count8;
+    return (run28({ toggle: ![] }), 0);
   }
   let id3 = '';
   function run32() {
     const list34 = readCustomQuickActions(windowObject);
     el53['replaceChildren']();
-    if (list34['length'] === 0x0) {
+    if (list34['length'] === 0) {
       const agentElement19 = createAgentElement(
         'div',
         'agent-custom-empty',
@@ -1742,15 +1742,15 @@ export function initAgentPanel({
     ((el56['value'] = String(options12['label'] || '')['trim']()),
       (el58['value'] = value143),
       run32(),
-      !el56['value'] && value143 && (el56['value'] = truncateUiText(value143, 0x12)));
+      !el56['value'] && value143 && (el56['value'] = truncateUiText(value143, 18)));
   }
   function run35({ prefillFromInput: prefillFromInput = ![] } = {}) {
     run6(!![]);
     const customQuickActions2 = readCustomQuickActions(windowObject),
       prompt2 = prefillFromInput ? getEditorText(slashTrigger) : '';
     (prompt2
-      ? run34({ label: truncateUiText(prompt2, 0x12), prompt: prompt2 })
-      : run34(customQuickActions2[0x0] || {}),
+      ? run34({ label: truncateUiText(prompt2, 18), prompt: prompt2 })
+      : run34(customQuickActions2[0] || {}),
       el58['focus']?.());
   }
   function run36() {
@@ -1759,7 +1759,7 @@ export function initAgentPanel({
       (onNotice(agentPanelText('customShortcutEmpty')), el58['focus']?.());
       return;
     }
-    const label2 = truncateUiText(el56['value'] || prompt3, 0x1c),
+    const label2 = truncateUiText(el56['value'] || prompt3, 28),
       list35 = readCustomQuickActions(windowObject),
       custom2 = list35['find']((value144) => value144['id'] === id3),
       value145 = {
@@ -1770,7 +1770,7 @@ export function initAgentPanel({
       },
       count9 = list35['findIndex']((value146) => value146['id'] === value145['id']),
       value147 =
-        count9 >= 0x0
+        count9 >= 0
           ? list35['map']((value148) => (value148['id'] === value145['id'] ? value145 : value148))
           : [value145, ...list35['filter']((value149) => value149['prompt'] !== prompt3)],
       writeCustomQuickActions2 = writeCustomQuickActions(value147, windowObject);
@@ -1778,7 +1778,7 @@ export function initAgentPanel({
       (id3 = value145['id']),
       run3(),
       run32(),
-      run11(messagesEl['children']['length'] > 0x0),
+      run11(messagesEl['children']['length'] > 0),
       onNotice(agentPanelText('customShortcutSaved')),
       writeCustomQuickActions2
     );
@@ -1792,8 +1792,8 @@ export function initAgentPanel({
     );
     return (
       run3(),
-      run11(messagesEl['children']['length'] > 0x0),
-      id3 === enabled25 ? run34(writeCustomQuickActions3[0x0] || {}) : run32(),
+      run11(messagesEl['children']['length'] > 0),
+      id3 === enabled25 ? run34(writeCustomQuickActions3[0] || {}) : run32(),
       onNotice(agentPanelText('customShortcutDeleted')),
       writeCustomQuickActions3
     );
@@ -1818,7 +1818,7 @@ export function initAgentPanel({
     agentConversationPresentation?.['appendEntry'](options13);
   }
   function run40({ hasMessages: hasMessages } = {}) {
-    const value152 = hasMessages ?? messagesEl['children']['length'] > 0x0;
+    const value152 = hasMessages ?? messagesEl['children']['length'] > 0;
     ((el44['hidden'] = value152), run11(value152));
     if (value152) run6(![]);
   }
@@ -1860,7 +1860,7 @@ export function initAgentPanel({
   function run44() {
     const value155 = getHistory(),
       list36 = Array['isArray'](value155) ? value155 : [];
-    return (agentConversationPresentation?.['renderMessages'](list36), run40(), list36['length'] > 0x0);
+    return (agentConversationPresentation?.['renderMessages'](list36), run40(), list36['length'] > 0);
   }
   function setBusy(value156, { stoppable: stoppable = ![] } = {}) {
     enabled11 = value156 === !![];
@@ -1929,7 +1929,7 @@ export function initAgentPanel({
   function run48(event8) {
     (event8['preventDefault']?.(), event8['stopPropagation']?.());
     const value159 = Number(event8['clientX']),
-      enabled27 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0x0;
+      enabled27 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0;
     if (!Number['isFinite'](value159) || !enabled27) return;
     stateRoot['classList']?.['add']?.('agent-sidebar-resizing');
     const value160 = (event9) => {
@@ -2021,7 +2021,7 @@ export function initAgentPanel({
       });
     Array['isArray'](diagnostic?.['taskMessages']) &&
       diagnostic['taskMessages']['forEach']((value169) => run39(value169));
-    el44['hidden'] = messagesEl['children']['length'] > 0x0;
+    el44['hidden'] = messagesEl['children']['length'] > 0;
     const value170 = diagnostic?.['status'] === 'need_confirmation' ? diagnostic?.['plan'] || null : null;
     (renderPlanPreview(el61, value170, { onParamChange: onParamChange2, onOpenParamOptions: onOpenParamOptions2 }),
       run43(diagnostic),
@@ -2075,7 +2075,7 @@ export function initAgentPanel({
     try {
       const value174 = await runtime['handleUserMessage'](editorText2, {
         inputRefs: inputRefs2,
-        ...(documentFiles['files']['length'] > 0x0
+        ...(documentFiles['files']['length'] > 0
           ? { documentFiles: documentFiles['files'], displayInputRefs: inputRefs3 }
           : {}),
       });
@@ -2126,7 +2126,7 @@ export function initAgentPanel({
     }),
     el52['addEventListener']('click', () => {
       const prompt4 = getEditorText(slashTrigger);
-      (run34(prompt4 ? { label: truncateUiText(prompt4, 0x12), prompt: prompt4 } : {}),
+      (run34(prompt4 ? { label: truncateUiText(prompt4, 18), prompt: prompt4 } : {}),
         el58['focus']?.());
     }),
     el59['addEventListener']('click', run36),
@@ -2156,7 +2156,7 @@ export function initAgentPanel({
       (event17['stopPropagation']?.(), run31());
     }),
     el69['addEventListener']('keydown', (event18) => {
-      if (event18['key'] !== 'Enter' && event18['key'] !== '\x20') return;
+      if (event18['key'] !== 'Enter' && event18['key'] !== ' ') return;
       (event18['preventDefault']?.(), run31());
     }),
     el71['addEventListener']('click', (event19) => {
@@ -2211,14 +2211,14 @@ export function initAgentPanel({
       }
       (agentSkillPanel['close'](),
         run6(![]),
-        onCatalogChange['openSlash'](editorText3[0x1]),
+        onCatalogChange['openSlash'](editorText3[1]),
         setMenuOpen(onCatalogChange['menu'], !![], ownerRoot));
     }),
     slashTrigger['addEventListener']('keydown', (event23) => {
       if (isAgentPopoverOpen(onCatalogChange['menu']) && !event23['isComposing']) {
         if (event23['key'] === 'ArrowDown' || event23['key'] === 'ArrowUp') {
           (event23['preventDefault'](),
-            onCatalogChange['moveActive'](event23['key'] === 'ArrowUp' ? -0x1 : 0x1));
+            onCatalogChange['moveActive'](event23['key'] === 'ArrowUp' ? -1 : 1));
           return;
         }
         if ((event23['key'] === 'Enter' && !event23['shiftKey']) || event23['key'] === 'Tab') {
@@ -2289,7 +2289,7 @@ export function initAgentPanel({
         {
           label: agentPanelText(value185 ? 'copySelection' : 'copyMessage'),
           icon: 'copy',
-          kbd: 'Ctrl\x20C',
+          kbd: 'Ctrl C',
           shortcutActionId: 'copy',
           action: () => void onCopy(enabled31),
         },
@@ -2316,8 +2316,8 @@ export function initAgentPanel({
     el40['addEventListener']('keydown', (event30) => {
       if (event30['key'] !== 'ArrowLeft' && event30['key'] !== 'ArrowRight') return;
       event30['preventDefault']();
-      const value188 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0x0,
-        value189 = event30['key'] === 'ArrowLeft' ? 0x18 : -0x18;
+      const value188 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0,
+        value189 = event30['key'] === 'ArrowLeft' ? 24 : -24;
       run47(value188 + value189, { persist: !![] });
     }),
     el65['addEventListener']('click', async () => {

@@ -100,14 +100,14 @@ const PP_MEDIA_ERROR_CODES = {
     timeout: { type: ErrorType.TIMEOUT, message: '请求超时', retryable: true },
   },
   PP_HTTP_STATUS_MAP = {
-    0x190: { type: ErrorType.INVALID_PARAMS, message: '请求参数错误', retryable: false },
-    0x191: { type: ErrorType.AUTH_ERROR, message: '认证失败', retryable: false },
-    0x193: { type: ErrorType.FORBIDDEN, message: '没有访问权限', retryable: false },
-    0x194: { type: ErrorType.MODEL_UNAVAILABLE, message: '资源不存在', retryable: false },
-    0x1ad: { type: ErrorType.RATE_LIMIT, message: '请求过于频繁，请稍后重试', retryable: true },
-    0x1f4: { type: ErrorType.SERVER_ERROR, message: '服务器内部错误', retryable: true },
-    0x1f6: { type: ErrorType.SERVICE_UNAVAILABLE, message: '网关错误', retryable: true },
-    0x1f7: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务不可用', retryable: true },
+    400: { type: ErrorType.INVALID_PARAMS, message: '请求参数错误', retryable: false },
+    401: { type: ErrorType.AUTH_ERROR, message: '认证失败', retryable: false },
+    403: { type: ErrorType.FORBIDDEN, message: '没有访问权限', retryable: false },
+    404: { type: ErrorType.MODEL_UNAVAILABLE, message: '资源不存在', retryable: false },
+    429: { type: ErrorType.RATE_LIMIT, message: '请求过于频繁，请稍后重试', retryable: true },
+    500: { type: ErrorType.SERVER_ERROR, message: '服务器内部错误', retryable: true },
+    502: { type: ErrorType.SERVICE_UNAVAILABLE, message: '网关错误', retryable: true },
+    503: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务不可用', retryable: true },
   };
 function extractErrorCode(value, item) {
   const response = value?.error || value,
@@ -168,7 +168,7 @@ export function parseError(enabled, status) {
     return ApiError.authError('ppio', code, message);
   if (list.includes('CONTENT') || list.includes('PROMPT') || list.includes('不适宜'))
     return ApiError.contentFiltered('ppio', message);
-  if (status >= 0x190) return ApiError.fromHttpStatus(status, 'ppio', message);
+  if (status >= 400) return ApiError.fromHttpStatus(status, 'ppio', message);
   return null;
 }
 export function parseTaskError(error3) {

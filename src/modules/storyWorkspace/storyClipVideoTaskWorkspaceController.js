@@ -52,8 +52,8 @@ export function createStoryClipVideoTaskWorkspaceController({
   const run = () => getWorkspaceDestroyed() === !![],
     replaceClip = (item, key, enabled, index = state['data']) => {
       const response = index?.['episodes']?.['find']((result) => result['id'] === item),
-        count = response?.['clips']?.['findIndex']((data) => data['id'] === key) ?? -0x1;
-      if (!response || count < 0x0 || !enabled) return ![];
+        count = response?.['clips']?.['findIndex']((data) => data['id'] === key) ?? -1;
+      if (!response || count < 0 || !enabled) return ![];
       return (
         (response['clips'][count] = enabled),
         (response['status'] = deriveStoryEpisodeStatus(response['clips'])),
@@ -117,7 +117,7 @@ export function createStoryClipVideoTaskWorkspaceController({
             schedulePersistence({ immediate: !![] }));
           if (!isProjectTaskCurrent(record)) return;
           restoreProjectTaskState(scope);
-          if (state['view'] === 'project' && state['step'] === 0x3) {
+          if (state['view'] === 'project' && state['step'] === 3) {
             refreshEpisodeCard(payload);
             return;
           }
@@ -131,7 +131,7 @@ export function createStoryClipVideoTaskWorkspaceController({
         },
       });
     },
-    waitForRecoveryManifest = async (providerHint, value4 = 0x3a98) => {
+    waitForRecoveryManifest = async (providerHint, value4 = 15000) => {
       const value5 = Date['now']();
       while (!run()) {
         const modelExecution = resolveModelExecution(providerHint['modelId'], {
@@ -139,7 +139,7 @@ export function createStoryClipVideoTaskWorkspaceController({
         });
         if (modelExecution?.['modelManifest'] && modelExecution?.['executionManifest']) return !![];
         if (Date['now']() - value5 >= value4) return ![];
-        await new Promise((value6) => windowObject['setTimeout'](value6, 0xfa));
+        await new Promise((value6) => windowObject['setTimeout'](value6, 250));
       }
       return ![];
     },
@@ -171,7 +171,7 @@ export function createStoryClipVideoTaskWorkspaceController({
             schedulePersistence({ immediate: !![] }));
           if (isProjectTaskCurrent(projectToken)) {
             restoreProjectTaskState(projectToken['data']);
-            if (state['view'] === 'project' && state['step'] === 0x3) refreshEpisodeCard(episodeId2);
+            if (state['view'] === 'project' && state['step'] === 3) refreshEpisodeCard(episodeId2);
             else
               state['view'] === 'episode' &&
                 normalizeText(state['selectedEpisodeId']) === normalizeText(episodeId2) &&
@@ -238,7 +238,7 @@ export function createStoryClipVideoTaskWorkspaceController({
         activeControllers['get'](value7) === value15 && activeControllers['delete'](value7);
         if (isProjectTaskCurrent(projectToken)) {
           restoreProjectTaskState(projectToken['data']);
-          if (state['view'] === 'project' && state['step'] === 0x3) refreshEpisodeCard(episodeId2);
+          if (state['view'] === 'project' && state['step'] === 3) refreshEpisodeCard(episodeId2);
           else
             state['view'] === 'episode' &&
               normalizeText(state['selectedEpisodeId']) === normalizeText(episodeId2) &&

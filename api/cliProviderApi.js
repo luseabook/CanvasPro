@@ -107,8 +107,8 @@ export async function generateTextWithCliProvider(payload) {
     timeoutMs =
       payload?.['disableRequestTimeout'] === !![]
         ? null
-        : Number['isFinite'](count) && count > 0x0
-          ? Math['max'](0x7530, Math['trunc'](count) + 0x1388)
+        : Number['isFinite'](count) && count > 0
+          ? Math['max'](30000, Math['trunc'](count) + 5000)
           : undefined;
   if (typeof onText === 'function')
     return requestCliTextStream(args2, { onText: onText, signal: signal, timeoutMs: timeoutMs });
@@ -118,13 +118,13 @@ export async function generateTextWithCliProvider(payload) {
 export async function generateImageWithCliProvider(args3) {
   const count2 = Number(args3?.['timeoutMs']),
     timeoutMs2 =
-      Number['isFinite'](count2) && count2 > 0x0
-        ? Math['max'](0x7530, Math['min'](0xdbba0, Math['trunc'](count2 / 0x3e8) * 0x3e8))
-        : 0x927c0,
+      Number['isFinite'](count2) && count2 > 0
+        ? Math['max'](30000, Math['min'](900000, Math['trunc'](count2 / 1000) * 1000))
+        : 600000,
     post5 = await post(
       '/api/v2/cli-providers/generate-image',
       { ...args3, timeoutMs: timeoutMs2 },
-      timeoutMs2 + 0x1388,
+      timeoutMs2 + 5000,
     );
-  return unwrapCliProviderResult(post5, 'OpenAI\x20CLI\x20图像生成失败');
+  return unwrapCliProviderResult(post5, 'OpenAI CLI 图像生成失败');
 }

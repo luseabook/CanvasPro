@@ -7,11 +7,13 @@
 > 第 125k/125l 清零 `src/modules` 直属层；第 126/127 批实测孤岛 483/1238、未落地 771、首波过闸门 260。
 > 第 128–141 批落地首波 135 件 510 例（132 清零 `src/modules` 候选、136 清零 `src/core`、137–141 清 `src/components`，回归 7426/7383/43；130 发现 `core/math.js` 死循环）——见 `docs/b126-reachability.md`、`docs/b127-porting-backlog.md`（§11）。
 > 已落：第 119–125l 批 168 件，128–141 又落 135 件，全部未接线。原未落地 771，**现已清零**（第 142 批复算：镜像范围 1754 件仓库 0 缺失、闸门 MISSING_TOTAL=0）；余 **201 个未接线孤立模块**（§7.6；第 150–157 批接线 167 件）。
+> **⚠ 第 158 批：基线变更（2026-10-05）**——已安装应用已由 0.7.16 升到 **0.8.0**。0.8.0 镜像已重取（`shuo-deobf-080`，1952 件 / 0 失败）。相对 0.7.16：**+184 新增、0 删除、455 件有变**；仓库对 0.7.16 已 0 缺失，0.8.0 的 184 件一件没有，**156 批待裁决项作废**。见 `docs/b158-version-rebaseline.md`。**裁决：维持 0.4.12 基线，暂不切 0.8.0。**
+> **去混淆已完成（158b + 159 + 160）**：转义 24,925 处、十六进制还原 31,038 处，合计 **2,653 件次**（去重 1,443 件）。校验 1,189/1,189、1,085/1,085、6/6 全过，全量 **11193/11190/3**。源码零 `_0x`、零未解释转义；代码位十六进制剩 **619 处，全为刻意常量**（10 个受保护件已在 160 批经授权清完）。见 `docs/unescape-normalization.md`。
 
 ## 0. 现状速览
 
 - **项目**：`F:\CanvasPro` 是 AI CanvasPro 0.4.12 的源码，技术栈为原生 ESM 前端、Python `server.py`、可选 Electron。结构见 §10，细节见 `docs/tracking/project-map.md`。
-- **总目标**（用户原话要点）：对照已安装的 0.7.16（`D:\shuocancas\SHUO Canvas\resources\webapp`），把缺失功能的**可维护源码加进来，并实际接入工程**。
+- **总目标**（用户原话要点）：对照已安装的应用（`D:\shuocancas\SHUO Canvas\resources\webapp`；**2026-10-05 起实际版本为 0.8.0**，此前为 0.7.16），把缺失功能的**可维护源码加进来，并实际接入工程**。
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
 - **进度**：第1–123批已提交推送；124a–f 业务代码与末尾记账（8fafc80、ba8e9b4、3b8fc6e、3c3b3ae）均已推远端移植分支，远端 master 未更新；124g/124h 至 141 共 307 件新模块未提交（工作树 614 个未跟踪 src 文件）。R01–R26 **都没有完成**（§6）；不把模块落地或推送成功误写成功能已完成。
@@ -228,9 +230,7 @@ node tools/tracking/track.mjs --status
 
 ### 7.1 第 121 批（已完成）
 
-- 121a / 121b / 121c 三段都已交付：`api/story-generation/` 32 件已落 23 件（第 120 批 10、121a 8、121b 3、121c 2），全部未接线。细节见 `docs/api-story-generation-batch121.md`。
-- 其余 9 件依赖本仓没有的 `src/domain/storyGeneration/*` 或 `api/storyGenerationApi.js`，要等这些依赖就位（同 §7.3，单独成批、用户授权），不要硬上。
-- 下一批转 §7.2。api sweep 基线现为 791/791/0。
+- 121a–121c 已交付（`api/story-generation/` 32 件落 23 件，全部未接线），细节见 `docs/api-story-generation-batch121.md`；余 9 件待 `src/domain/storyGeneration/*` 就位（同 §7.3，单独成批、用户授权），不要硬上。
 
 ### 7.2 之后的纯新增队列
 
@@ -256,7 +256,7 @@ node tools/tracking/track.mjs --status
 | 节点管理面板装配 | `canvasMediaLocalService.js` 的 28 个消费方世代分叉 |
 | `directorMultiView` / `directorViewportRuntime` | 导出面受阻（第 91 批记录） |
 | `storyWorkspace` 的 `storyEpisodeCanvas`、`storyReplicationCardMotion`、`storyReplicationPortraitController`、`storyWorkspaceDeveloperDiagnostics` | 在用的 `core/generationResultRenderer.js`、`core/math.js`、`services/diagnosticsService.js` 缺对应导出（第 123 批闸门，见 `docs/src-storyworkspace-batch123.md` §1） |
-| 125h/125i/125j 批实测受阻件（41 件，后并入第 127 批统一口径） | 均为依赖件缺具名导出：`subscriptionAccess.js :: CUSTOM_PROVIDER_VIP_MODEL_ID` / `REPLACEMENT_STUDIO_VIP_MODEL_ID`、`canvasMediaLocalService.js :: resolveCanvasVideoDisplayUrl` 与 `resolveCanvasVideoPosterUrl`、`settings/panelSettings.js :: openSettingsPanelToField` 等；第 127 批已把全部受阻归因查清（105 个导出 / 40 个文件，全部镜像里有），见 §7.6 |
+| 125h/125i/125j 批实测受阻件（41 件，已并入第 127 批口径） | 均为依赖件缺具名导出，全部归因见 §7.6 |
 
 ### 7.4 接线欠账（总目标要求「实际接入」）
 
@@ -366,9 +366,9 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-04（157 批·脏件批）：27 件脏件全过机械工序，27 件全落地后 70 例失败 → 逐件归因＋补测，回滚 12 件（taskOrchestrationModule 与 AIGenAudioNode 各 12、SourceVideoNode 8、modelApiResolvers 7、projectLifecycle 6 等），**落地 15 件**。孤立 269→**201**（接通 80，含 renderer 12 个 renderer* 与 agent 15 件；另 12 件被 0.7.16 淘汰转孤立）。483 口径 403/1238。全量 11185/11182/3 零回归。
+- 2026-10-05（160 批·清受保护件残留）：经授权清完 159 批隔离的 6 个受保护件（`uiSchemaRenderer.js` 214 转义 + 26 十六进制、`rendererVirtualization.js` 77、`nodeFooterControls.js` 3 + 61、`configApi.js` 13、`storeRuntimeEffectsService.js` 9、`aigenText/uiModule.js` 3），共 **406 处**，只改字面量值、不动标识符与导出面。校验 6/6 PASS、全量回归零回归；`freeImageHostApi.js` 未写入（MD5 不变）。终态全仓代码位十六进制剩 **619 处**、全为刻意常量。裁决 **维持 0.4.12 基线**。见 `docs/unescape-normalization.md`。
 
-- 2026-10-04（156 批·manifests 层侦察）：11 件纯新增候选全过机械工序，闭包对 modelRegistry + vendorVideoModelApiManifests 已在批内闭合、裸导入全通过。但 10/11 属规格变更型——接通 0.7.16 模型 manifest 后 api 域 67 例断言 0.4.12 旧规格失败（baseline 1000/1000 全绿）。最终只落 `api/errors/ErrorParser.js`（+3 解析器、0 失败），孤立 272→**269**（累计 99）；全量 11185/11182/3 零回归。余 10 件待裁决是否采纳 0.7.16 模型规格。
+- 2026-10-05（159 批·去混淆收尾之二）：补 158b 漏掉的两块。① 单半字节十六进制（`0x0`–`0xf`）原被当"位模式"豁免，剩 24,300 处；代码自身即反证（同一数组里十进制与十六进制混排、`[0xf, 30]` 并列），改为**一律还原**。② 改写器 `scan()` 判闭合用绝对层级，**嵌套模板**内层 `${…}` 永不归零、吃到文件尾，其后转义与十六进制全失扫（13 件命中、2 件漏改；只漏改不改错），改相对计数 + 8 例回归测试。落 **1,085 件**（转义 83 + 十六进制 24,169），校验 1,085/1,085 PASS、全量 **11193/11190/3**。受保护件与 `vendor/` 排除。终态非受保护件可还原十六进制 **0 处**。见 `docs/unescape-normalization.md`。
 
 ## 12. 变更记录机制（全自动）
 

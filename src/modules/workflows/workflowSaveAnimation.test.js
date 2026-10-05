@@ -66,9 +66,9 @@ class FakeElement {
 function createHarness({ reducedMotion: reducedMotion = false, includeTarget: includeTarget = true } = {}) {
   const body = new FakeElement('body'),
     target = new FakeElement('btnWorkflows');
-  target.rect = { left: 20, top: 0x104, width: 40, height: 40 };
+  target.rect = { left: 20, top: 260, width: 40, height: 40 };
   const source = new FakeElement('workflow-cover', 'v2-workflow-form-cover');
-  ((source.rect = { left: 0x12c, top: 120, width: 240, height: 135 }),
+  ((source.rect = { left: 300, top: 120, width: 240, height: 135 }),
     source.appendChild(new FakeElement('cover-img', '')));
   const documentRef = {
       body: body,
@@ -112,13 +112,13 @@ function createHarness({ reducedMotion: reducedMotion = false, includeTarget: in
     assert.equal(playWorkflowSaveFly2.fly.style.height, '135px'),
     assert.equal(playWorkflowSaveFly2.fly.children[0].id, ''),
     assert.equal(playWorkflowSaveFly2.fly.animateCalls.length, 1),
-    assert.equal(playWorkflowSaveFly2.fly.animateCalls[0].options.duration, 0x208),
+    assert.equal(playWorkflowSaveFly2.fly.animateCalls[0].options.duration, 520),
     assert.equal(playWorkflowSaveFly2.fly.animateCalls[0].options.easing, 'cubic-bezier(0.2, 0, 0, 1)'),
     playWorkflowSaveFly2.animation.finish(),
     assert.equal(playWorkflowSaveFly2.fly.removed, true),
     assert.equal(body2.children.length, 0),
     assert.equal(target2.animateCalls.length, 1),
-    assert.equal(target2.animateCalls[0].options.duration, 0x104));
+    assert.equal(target2.animateCalls[0].options.duration, 260));
 }),
   test('workflowSaveAnimation: reduced motion 时跳过动画', () => {
     const {

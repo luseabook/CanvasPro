@@ -49,7 +49,7 @@ export function createCollaborationInvitation({
     ));
   let options = '',
     target = '',
-    source = 0x0;
+    source = 0;
   function invalidate() {
     (source++, (el4['value'] = ''), (el5['textContent'] = '获取邀请'));
   }

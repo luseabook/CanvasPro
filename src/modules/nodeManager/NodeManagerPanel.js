@@ -15,8 +15,8 @@ import { NODE_MANAGER_PLACEMENT_EVENT, normalizeNodeManagerPlacement } from './n
 import { createNodeManagerDragController } from './nodeManagerDragController.js';
 import { createNodeManagerListSnapshot } from './nodeManagerListSnapshot.js';
 const SIDEBAR_KEY = 'node-manager',
-  GROUP_DISCLOSURE_MOTION_MS = 0x96,
-  VIDEO_PLAY_RETRY_MS = 0x640,
+  GROUP_DISCLOSURE_MOTION_MS = 150,
+  VIDEO_PLAY_RETRY_MS = 1600,
   ICON_SELECTORS = Object['freeze']({
     audio: '.nam-item[data-type="audio"] svg',
     chevron: '#localeSelectTrigger .settings-preset-chevron',
@@ -24,10 +24,10 @@ const SIDEBAR_KEY = 'node-manager',
     filter: '.settings-nav-item[data-pane="canvas-align"] svg',
     image: '.nam-item[data-type="image"] svg',
     more: '.v2-material-more svg, .act-more-tools svg',
-    node: '#btnNodeManager\x20svg',
+    node: '#btnNodeManager svg',
     search: '.settings-shortcuts-search-icon',
-    text: '.nam-item[data-type=\x22text\x22]\x20svg',
-    video: '.nam-item[data-type=\x22video\x22]\x20svg',
+    text: '.nam-item[data-type="text"] svg',
+    video: '.nam-item[data-type="video"] svg',
     videoPlay: '.video-play-btn svg',
   });
 function createSharedIcon(value) {
@@ -84,35 +84,35 @@ function getProjectName() {
   const record = window['CanvasTabManager']?.['getCanvasProjectContext']?.(),
     payload = document['getElementById']('projectNameText')?.['textContent'];
   return String(record?.['projectName'] || payload || t('projectDropdown.unnamedCanvas'))
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
 }
 function normalizeWheelDelta(event, handle) {
   const state =
-    event['deltaMode'] === 0x1 ? 0x10 : event['deltaMode'] === 0x2 ? Math['max'](0x1, handle) : 0x1;
-  return (Number(event['deltaY']) || Number(event['deltaX']) || 0x0) * state;
+    event['deltaMode'] === 1 ? 16 : event['deltaMode'] === 2 ? Math['max'](1, handle) : 1;
+  return (Number(event['deltaY']) || Number(event['deltaX']) || 0) * state;
 }
 export function installScrollableWheelBoundary(el5, { getAxis: getAxis = () => 'vertical' } = {}) {
   const config = (event2) => {
     if (getAxis() === 'horizontal') {
-      const scope = Math['max'](0x0, Number(el5['clientWidth']) || 0x0),
-        count = Math['max'](0x0, (Number(el5['scrollWidth']) || 0x0) - scope);
-      if (count <= 0x0) return;
+      const scope = Math['max'](0, Number(el5['clientWidth']) || 0),
+        count = Math['max'](0, (Number(el5['scrollWidth']) || 0) - scope);
+      if (count <= 0) return;
       if (!scrollElementHorizontallyWithWheel(event2, el5, { stopPropagation: !![] })) {
-        const enabled = Number(event2['deltaY']) || Number(event2['deltaX']) || 0x0;
+        const enabled = Number(event2['deltaY']) || Number(event2['deltaX']) || 0;
         if (!enabled) return;
         (event2['preventDefault'](), event2['stopPropagation']());
       }
       return;
     }
-    const input = Math['max'](0x0, Number(el5['clientHeight']) || 0x0),
-      count2 = Math['max'](0x0, (Number(el5['scrollHeight']) || 0x0) - input);
-    if (count2 <= 0x0) return;
+    const input = Math['max'](0, Number(el5['clientHeight']) || 0),
+      count2 = Math['max'](0, (Number(el5['scrollHeight']) || 0) - input);
+    if (count2 <= 0) return;
     const wheelDelta = normalizeWheelDelta(event2, input);
     if (!wheelDelta) return;
     ((el5['scrollTop'] = Math['min'](
       count2,
-      Math['max'](0x0, (Number(el5['scrollTop']) || 0x0) + wheelDelta),
+      Math['max'](0, (Number(el5['scrollTop']) || 0) + wheelDelta),
     )),
       event2['preventDefault'](),
       event2['stopPropagation']());
@@ -123,10 +123,10 @@ export function installScrollableWheelBoundary(el5, { getAxis: getAxis = () => '
   );
 }
 function normalizeRect(box) {
-  const left = Number(box?.['left']) || 0x0,
-    top = Number(box?.['top']) || 0x0,
-    width = Math['max'](0x0, Number(box?.['width']) || 0x0),
-    height = Math['max'](0x0, Number(box?.['height']) || 0x0);
+  const left = Number(box?.['left']) || 0,
+    top = Number(box?.['top']) || 0,
+    width = Math['max'](0, Number(box?.['width']) || 0),
+    height = Math['max'](0, Number(box?.['height']) || 0);
   return {
     left: left,
     top: top,
@@ -140,28 +140,28 @@ export function resolveNodeManagerViewportInsets({
   placement: placement,
   panelRect: panelRect,
   canvasRect: canvasRect,
-  gap: gap = 0xc,
+  gap: gap = 12,
 } = {}) {
   const box2 = normalizeRect(panelRect),
     box3 = normalizeRect(canvasRect),
-    output = Math['max'](0x0, Number(gap) || 0x0),
-    box4 = { top: 0x0, right: 0x0, bottom: 0x0, left: 0x0 };
-  if (!(box3['width'] > 0x0 && box3['height'] > 0x0)) return box4;
+    output = Math['max'](0, Number(gap) || 0),
+    box4 = { top: 0, right: 0, bottom: 0, left: 0 };
+  if (!(box3['width'] > 0 && box3['height'] > 0)) return box4;
   const enabled2 = box2['right'] > box3['left'] && box2['left'] < box3['right'],
     enabled3 = box2['bottom'] > box3['top'] && box2['top'] < box3['bottom'];
   if (!enabled2 || !enabled3) return box4;
   const nodeManagerPlacement = normalizeNodeManagerPlacement(placement);
   if (nodeManagerPlacement === 'left')
-    box4['left'] = Math['min'](box3['width'] - 0x1, Math['max'](0x0, box2['right'] - box3['left'] + output));
+    box4['left'] = Math['min'](box3['width'] - 1, Math['max'](0, box2['right'] - box3['left'] + output));
   else
     nodeManagerPlacement === 'right'
       ? (box4['right'] = Math['min'](
-          box3['width'] - 0x1,
-          Math['max'](0x0, box3['right'] - box2['left'] + output),
+          box3['width'] - 1,
+          Math['max'](0, box3['right'] - box2['left'] + output),
         ))
       : (box4['bottom'] = Math['min'](
-          box3['height'] - 0x1,
-          Math['max'](0x0, box3['bottom'] - box2['top'] + output),
+          box3['height'] - 1,
+          Math['max'](0, box3['bottom'] - box2['top'] + output),
         ));
   return box4;
 }
@@ -217,11 +217,11 @@ export function createNodeManagerPanel({
         showToast?.(error?.['message'] || t('nodeManager.toasts.duplicateFailed'), 'error');
       },
       onDuplicated: (value11) => {
-        appViewport?.['focusNode']?.(value11, 0x60, 0xf0, run2());
+        appViewport?.['focusNode']?.(value11, 96, 240, run2());
       },
     });
   (list['push'](() => nodeManagerDragController['destroy']()),
-    (placement2 = createElement('section', 'node-manager-panel\x20canvas-toolbar-panel-surface', {
+    (placement2 = createElement('section', 'node-manager-panel canvas-toolbar-panel-surface', {
       id: 'nodeManagerPanel',
       role: 'complementary',
       'aria-hidden': 'true',
@@ -233,7 +233,7 @@ export function createNodeManagerPanel({
     el10 = createElement('button', 'node-manager-project-name', { type: 'button' }),
     el11 = createElement('span', 'node-manager-project-name-text', { 'data-tooltip-overflow': 'true' });
   (el10['append'](el11), el9['appendChild'](el10));
-  const el12 = createElement('button', 'node-manager-icon-button\x20node-manager-header-collapse', {
+  const el12 = createElement('button', 'node-manager-icon-button node-manager-header-collapse', {
     type: 'button',
   });
   (run(el12, 'collapse', 'node-manager-collapse-icon'), el8['append'](el9, el12));
@@ -297,9 +297,9 @@ export function createNodeManagerPanel({
   }
   function run6() {
     const list2 = count3['groupIds'] || [],
-      value14 = list2['length'] > 0x0 && list2['every']((value15) => collapsedGroupIds['has'](value15)),
+      value14 = list2['length'] > 0 && list2['every']((value15) => collapsedGroupIds['has'](value15)),
       t2 = t(value14 ? 'nodeManager.expandAll' : 'nodeManager.collapseAll');
-    ((el14['hidden'] = list2['length'] === 0x0),
+    ((el14['hidden'] = list2['length'] === 0),
       el14['classList']['toggle']('is-expand-action', value14),
       el14['setAttribute']('aria-label', t2),
       (el14['title'] = t2));
@@ -326,7 +326,7 @@ export function createNodeManagerPanel({
       el12['setAttribute']('aria-label', t('nodeManager.collapsePanel')),
       (el12['title'] = t('nodeManager.collapsePanel')),
       (el23['textContent'] = t('nodeManager.collapsePanel')),
-      (el24['textContent'] = t('nodeManager.total', { count: count3['totalNodeCount'] || 0x0 })),
+      (el24['textContent'] = t('nodeManager.total', { count: count3['totalNodeCount'] || 0 })),
       run5(),
       run6());
   }
@@ -354,7 +354,7 @@ export function createNodeManagerPanel({
     run(value19, value21, 'node-manager-thumb-fallback-icon');
   }
   function run11(value22, src) {
-    const el28 = createElement('span', 'node-manager-thumb\x20is-' + value22['category']);
+    const el28 = createElement('span', 'node-manager-thumb is-' + value22['category']);
     if (value22['kind'] === 'group')
       return (
         el28['classList']['add']('node-manager-folder-icon'),
@@ -398,13 +398,13 @@ export function createNodeManagerPanel({
         if (run12(value25)) return;
         performance['now']() - value26 < VIDEO_PLAY_RETRY_MS && requestAnimationFrame(value27);
       };
-    window['setTimeout'](value27, 0x118);
+    window['setTimeout'](value27, 280);
   }
   function run14(value28) {
     const response = executeCanvasCommand?.('node.select', { ids: [value28['id']] });
     if (response?.['ok'] === ![]) return;
     if (value28['category'] === 'video') run12(value28['id']);
-    appViewport?.['focusNode']?.(value28['id'], 0x60, 0x140, run2());
+    appViewport?.['focusNode']?.(value28['id'], 96, 320, run2());
     if (value28['category'] === 'video') run13(value28['id']);
   }
   function run15(value29, value30) {
@@ -414,7 +414,7 @@ export function createNodeManagerPanel({
       el32['setAttribute']('aria-busy', String(value30)),
       el32['querySelector']('.node-manager-row-spinner')?.['remove']());
     if (value30) {
-      const element5 = createElement('span', 'project-package-loading-spinner\x20node-manager-row-spinner', {
+      const element5 = createElement('span', 'project-package-loading-spinner node-manager-row-spinner', {
         'aria-hidden': 'true',
       });
       el32['appendChild'](element5);
@@ -452,7 +452,7 @@ export function createNodeManagerPanel({
     const value32 = () => {
       if (value31 || value10) return;
       const name = String(input2['value'] || '')
-          ['replace'](/\s+/g, '\x20')
+          ['replace'](/\s+/g, ' ')
           ['trim'](),
         enabled5 = input2['isConnected'];
       cancel();
@@ -553,7 +553,7 @@ export function createNodeManagerPanel({
         'data-node-id': name2['id'],
       });
     (row2['classList']['toggle']('is-busy', value37),
-      row2['style']['setProperty']('--node-manager-indent', Math['max'](0x0, name2['depth']) * 0x10 + 'px'));
+      row2['style']['setProperty']('--node-manager-indent', Math['max'](0, name2['depth']) * 16 + 'px'));
     name2['kind'] === 'group' && row2['setAttribute']('aria-expanded', String(!name2['collapsed']));
     if (name2['kind'] === 'group') {
       const el35 = createElement('button', 'node-manager-group-chevron', {
@@ -581,7 +581,7 @@ export function createNodeManagerPanel({
             el35['classList']['toggle']('is-open', value38));
           const value39 = map6['get'](name2['id']);
           if (value39) window['clearTimeout'](value39);
-          const value40 = window['matchMedia']?.('(prefers-reduced-motion:\x20reduce)')?.['matches'];
+          const value40 = window['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'];
           if (value40) {
             run22();
             return;
@@ -605,7 +605,7 @@ export function createNodeManagerPanel({
     ((el36['textContent'] = value41), trigger['appendChild'](el36));
     if (name2['kind'] === 'group') {
       const el37 = createElement('span', 'node-manager-group-count');
-      ((el37['textContent'] = t('nodeManager.groupCount', { count: name2['childCount'] || 0x0 })),
+      ((el37['textContent'] = t('nodeManager.groupCount', { count: name2['childCount'] || 0 })),
         trigger['appendChild'](el37));
     } else nodeManagerDragController['bindNodeRow']({ trigger: trigger, row: row2, nodeId: name2['id'] });
     (trigger['addEventListener']('click', () => run14(name2)), row2['appendChild'](trigger));
@@ -621,12 +621,12 @@ export function createNodeManagerPanel({
       el38['addEventListener']('click', (event6) => {
         (event6['preventDefault'](), event6['stopPropagation']());
         const box5 = el38['getBoundingClientRect']();
-        run21(name2, box5['right'], box5['bottom'] + 0x4, el38);
+        run21(name2, box5['right'], box5['bottom'] + 4, el38);
       }),
       row2['appendChild'](el38),
       value37 &&
         row2['appendChild'](
-          createElement('span', 'project-package-loading-spinner\x20node-manager-row-spinner', {
+          createElement('span', 'project-package-loading-spinner node-manager-row-spinner', {
             'aria-hidden': 'true',
           }),
         ),
@@ -655,7 +655,7 @@ export function createNodeManagerPanel({
     const list3 = [],
       map8 = new Set(count3['items']['map']((value44) => value44['id']));
     if (value9 && !map8['has'](value9['id'])) run16();
-    if (count3['items']['length'] === 0x0) {
+    if (count3['items']['length'] === 0) {
       const el39 = createElement('div', 'node-manager-empty', { role: 'status' });
       ((el39['textContent'] = t('nodeManager.empty')), list3['push'](el39));
     } else
@@ -724,7 +724,7 @@ export function createNodeManagerPanel({
     let showContextMenu3 = null;
     ((showContextMenu3 = showContextMenu(
       box6['left'],
-      box6['bottom'] + 0x4,
+      box6['bottom'] + 4,
       NODE_MANAGER_FILTERS['map']((checked) => ({
         label: t('nodeManager.filters.' + checked),
         checked: checked === filter,
@@ -783,14 +783,14 @@ export function createNodeManagerPanel({
         return;
       }
       const enabled9 = String(el42['value'] || '')
-        ['replace'](/\s+/g, '\x20')
+        ['replace'](/\s+/g, ' ')
         ['trim']();
       if (!enabled9 || enabled9 === projectName2) {
         handler2();
         return;
       }
       ((enabled8 = !![]), (el42['disabled'] = !![]), el8['setAttribute']('aria-busy', 'true'));
-      const el43 = createElement('span', 'project-package-loading-spinner\x20node-manager-project-spinner', {
+      const el43 = createElement('span', 'project-package-loading-spinner node-manager-project-spinner', {
         'aria-hidden': 'true',
       });
       el9['appendChild'](el43);
@@ -846,7 +846,7 @@ export function createNodeManagerPanel({
     isOpen: isOpen,
     closeOnOutsidePointerDown: ![],
     ignorePointerDown: (event9) =>
-      !!event9?.['target']?.['closest']?.('[data-sidebar-submenu-owner="' + SIDEBAR_KEY + '\x22]'),
+      !!event9?.['target']?.['closest']?.('[data-sidebar-submenu-owner="' + SIDEBAR_KEY + '"]'),
   }),
     button['removeAttribute']('aria-haspopup'),
     el10['addEventListener']('click', run25),
@@ -856,7 +856,7 @@ export function createNodeManagerPanel({
     el20['addEventListener']('click', () => run23(el20)),
     el14['addEventListener']('click', () => {
       const list4 = count3['groupIds'] || [],
-        value53 = list4['length'] > 0x0 && list4['every']((value54) => collapsedGroupIds['has'](value54));
+        value53 = list4['length'] > 0 && list4['every']((value54) => collapsedGroupIds['has'](value54));
       if (value53) collapsedGroupIds['clear']();
       else list4['forEach']((value55) => collapsedGroupIds['add'](value55));
       run22();
@@ -882,7 +882,7 @@ export function createNodeManagerPanel({
       (map6['forEach']((value56) => window['clearTimeout'](value56)), map6['clear']());
     }));
   const value57 = graphStore['subscribeSelector']?.(
-      (value58) => Number(value58['_nodesRev'] || 0x0),
+      (value58) => Number(value58['_nodesRev'] || 0),
       () => {
         if (!isOpen()) return;
         run18();

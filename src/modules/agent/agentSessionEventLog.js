@@ -41,16 +41,16 @@ const SESSION_EVENT_TYPES = new Set([
     'undone',
   ]),
   MAX_MESSAGE_CONTENT_CHARS = AGENT_MESSAGE_CONTENT_LIMIT,
-  MAX_PROJECTED_RUN_EVENTS = 0x78,
-  MAX_PROJECTED_OPERATIONS = 0x78,
-  MAX_PROJECTED_TASK_BINDINGS = 0x18;
+  MAX_PROJECTED_RUN_EVENTS = 120,
+  MAX_PROJECTED_OPERATIONS = 120,
+  MAX_PROJECTED_TASK_BINDINGS = 24;
 function normalizeTimestamp(value, item = Date['now']()) {
   const count = Number(value);
-  return Number['isFinite'](count) && count > 0x0 ? count : item;
+  return Number['isFinite'](count) && count > 0 ? count : item;
 }
-function normalizeSequence(key, index = 0x1) {
+function normalizeSequence(key, index = 1) {
   const count2 = Math['trunc'](Number(key));
-  return Number['isFinite'](count2) && count2 > 0x0 ? count2 : index;
+  return Number['isFinite'](count2) && count2 > 0 ? count2 : index;
 }
 function cloneJson(result, data = null) {
   try {
@@ -67,22 +67,22 @@ function normalizeMessageSnapshot(error = {}, options = Date['now']()) {
     ),
     status2 = String(error['status'] || '')
       ['trim']()
-      ['slice'](0x0, 0x78);
+      ['slice'](0, 120);
   if (!content && !status2) return null;
   const target = {
       role:
         String(error['role'] || 'assistant')
           ['trim']()
-          ['slice'](0x0, 0x20) || 'assistant',
+          ['slice'](0, 32) || 'assistant',
       content: content,
       status: status2,
       ts: normalizeTimestamp(error['ts'], options),
     },
     list = String(error['messageType'] || error['type'] || 'text')['trim']();
-  if (list && list !== 'text') target['messageType'] = list['slice'](0x0, 0x28);
+  if (list && list !== 'text') target['messageType'] = list['slice'](0, 40);
   target['role'] === 'user' &&
     Array['isArray'](error['inputRefs']) &&
-    (target['inputRefs'] = cloneJson(error['inputRefs']['slice'](0x0, 0xc), []));
+    (target['inputRefs'] = cloneJson(error['inputRefs']['slice'](0, 12), []));
   target['role'] === 'assistant' &&
     error['diagnostic'] &&
     (target['diagnostic'] = cloneJson(error['diagnostic'], null));
@@ -119,7 +119,7 @@ function normalizePayload(options2 = {}, source = Date['now']()) {
 }
 export function normalizeAgentSessionEvent(
   response = {},
-  { fallbackTs: fallbackTs = Date['now'](), fallbackSeq: fallbackSeq = 0x1 } = {},
+  { fallbackTs: fallbackTs = Date['now'](), fallbackSeq: fallbackSeq = 1 } = {},
 ) {
   if (!response || typeof response !== 'object' || Array['isArray'](response)) return null;
   const id2 = String(response['id'] || '')['trim'](),
@@ -142,14 +142,14 @@ export function normalizeAgentSessionEvent(
     itemType: itemType,
     status: String(response['status'] || '')
       ['trim']()
-      ['slice'](0x0, 0x50),
+      ['slice'](0, 80),
     ts: ts,
     payload: payload,
   };
 }
 export function createAgentMessageSessionEvent({
   id: id = '',
-  seq: seq = 0x0,
+  seq: seq = 0,
   conversationId: conversationId = '',
   projectId: projectId = '',
   turnId: turnId = '',
@@ -198,7 +198,7 @@ function getRunSessionEventShape(response2 = {}) {
 }
 export function createAgentRunSessionEvent({
   id: id = '',
-  seq: seq = 0x0,
+  seq: seq = 0,
   conversationId: conversationId = '',
   projectId: projectId = '',
   itemId: itemId = '',
@@ -206,7 +206,7 @@ export function createAgentRunSessionEvent({
 } = {}) {
   const type4 = getRunSessionEventShape(runEvent),
     current = String(runEvent['commandId'] || '')['trim'](),
-    entry = Math['max'](0x0, Math['trunc'](Number(runEvent['step'] || 0x0))),
+    entry = Math['max'](0, Math['trunc'](Number(runEvent['step'] || 0))),
     record =
       type4['itemType'] === 'approval'
         ? String(runEvent['runId'] || '')['trim']() + ':approval:' + entry + ':' + (current || 'plan')
@@ -233,7 +233,7 @@ function getItemLifecycleType(handle = '') {
 }
 export function createAgentOperationSessionEvent({
   id: id = '',
-  seq: seq = 0x0,
+  seq: seq = 0,
   conversationId: conversationId = '',
   projectId: projectId = '',
   operation: operation = {},
@@ -254,7 +254,7 @@ export function createAgentOperationSessionEvent({
 }
 export function createAgentTaskSessionEvent({
   id: id = '',
-  seq: seq = 0x0,
+  seq: seq = 0,
   conversationId: conversationId = '',
   projectId: projectId = '',
   taskBinding: taskBinding = {},
@@ -275,10 +275,10 @@ export function createAgentTaskSessionEvent({
 }
 function sortSessionEvents(args = []) {
   return [...args]['sort']((config, scope) => {
-    const count3 = Number(config['seq'] || 0x0) - Number(scope['seq'] || 0x0);
-    if (count3 !== 0x0) return count3;
-    const count4 = Number(config['ts'] || 0x0) - Number(scope['ts'] || 0x0);
-    if (count4 !== 0x0) return count4;
+    const count3 = Number(config['seq'] || 0) - Number(scope['seq'] || 0);
+    if (count3 !== 0) return count3;
+    const count4 = Number(config['ts'] || 0) - Number(scope['ts'] || 0);
+    if (count4 !== 0) return count4;
     return String(config['id'] || '')['localeCompare'](String(scope['id'] || ''));
   });
 }
@@ -286,7 +286,7 @@ export function projectAgentSessionEvents(list2 = []) {
   const events = sortSessionEvents(
       (Array['isArray'](list2) ? list2 : [])
         ['map']((input, fallbackSeq2) =>
-          normalizeAgentSessionEvent(input, { fallbackSeq: fallbackSeq2 + 0x1 }),
+          normalizeAgentSessionEvent(input, { fallbackSeq: fallbackSeq2 + 1 }),
         )
         ['filter'](Boolean),
     ),
@@ -304,7 +304,7 @@ export function projectAgentSessionEvents(list2 = []) {
         status: '',
         startedAt: startedAt2['ts'],
         updatedAt: startedAt2['ts'],
-        completedAt: 0x0,
+        completedAt: 0,
         itemIds: [],
       };
       response3['updatedAt'] = startedAt2['ts'];
@@ -324,7 +324,7 @@ export function projectAgentSessionEvents(list2 = []) {
         status: '',
         startedAt: startedAt2['ts'],
         updatedAt: startedAt2['ts'],
-        completedAt: 0x0,
+        completedAt: 0,
       };
       ((response4['turnId'] = id3 || response4['turnId']),
         (response4['type'] = startedAt2['itemType']),
@@ -411,15 +411,15 @@ export function createAgentSessionEventsFromLegacyState({
   taskBindings: taskBindings = [],
 } = {}) {
   const list3 = [];
-  let value16 = 0x0;
+  let value16 = 0;
   const run = (handler, message4, value17, value18) => {
     const seq2 = ++value16,
       value19 = handler({
-        id: conversationId + ':migrated:' + value17 + ':' + (value18 + 0x1),
+        id: conversationId + ':migrated:' + value17 + ':' + (value18 + 1),
         seq: seq2,
         conversationId: conversationId,
         projectId: projectId,
-        ...(value17 === 'message' ? { itemId: conversationId + ':message:' + (value18 + 0x1) } : {}),
+        ...(value17 === 'message' ? { itemId: conversationId + ':message:' + (value18 + 1) } : {}),
         ...(value17 === 'message' ? { message: message4 } : {}),
         ...(value17 === 'run' ? { runEvent: message4 } : {}),
         ...(value17 === 'operation' ? { operation: message4 } : {}),

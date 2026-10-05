@@ -35,7 +35,7 @@ export function parseRunningHubResourceReference(value, item, key) {
       sourceType === 'runninghub-workflow'
         ? /^\/(?:workflow|post|openapi\/v2\/run\/workflow)\/(\d{1,30})\/?$/
         : /^\/(?:ai-detail|openapi\/v2\/run\/ai-app)\/(\d{1,30})\/?$/;
-    resourceId = result['match'](data)?.[0x1];
+    resourceId = result['match'](data)?.[1];
     if (!resourceId)
       throw new Error(
         item === 'runninghub-workflow'
@@ -66,9 +66,9 @@ export async function fetchRunningHubDefinition({
   const post2 = await post(
     '/api/v2/runninghubwf/definition',
     { ...workflowId, apiKey: apiKey },
-    { provider: 'runninghubwf', signal: signal, timeout: 0x88b8 },
+    { provider: 'runninghubwf', signal: signal, timeout: 35000 },
   );
-  if (Number(post2?.['code']) !== 0x0 || !post2?.['data']) throw new Error('RunningHub 未返回有效配置');
+  if (Number(post2?.['code']) !== 0 || !post2?.['data']) throw new Error('RunningHub 未返回有效配置');
   const enabled = post2['data'];
   if (workflowId['sourceType'] === 'runninghub-workflow') {
     const workflow =

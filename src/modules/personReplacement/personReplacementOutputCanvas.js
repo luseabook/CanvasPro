@@ -17,10 +17,10 @@ import {
   resolvePersonReplacementVideoSourceRef,
 } from './personReplacementProject.js';
 import { resolveGenerationResultSelection } from '../../core/generationResultRenderer.js';
-const NODE_GAP = 0x48,
-  SECTION_GAP = 0xb4,
-  STAGE_GAP = 0x140,
-  ASSET_COLUMNS = 0x5,
+const NODE_GAP = 72,
+  SECTION_GAP = 180,
+  STAGE_GAP = 320,
+  ASSET_COLUMNS = 5,
   STAGE_GROUP_COLORS = Object['freeze']({
     assets: 'var(--indigo)',
     image: 'var(--green)',
@@ -29,17 +29,17 @@ const NODE_GAP = 0x48,
     composite: 'var(--cyan)',
   });
 export const PERSON_REPLACEMENT_CANVAS_SCOPES = Object['freeze']({ CLIPS: 'clips', PROJECT: 'project' });
-export const PERSON_REPLACEMENT_CANVAS_LAYOUT_VERSION = 0x9;
+export const PERSON_REPLACEMENT_CANVAS_LAYOUT_VERSION = 9;
 export const PERSON_REPLACEMENT_CANVAS_NODE_SIZES = Object['freeze']({
-  'comment-note': Object['freeze']({ width: 0x578, height: 0x120 }),
-  group: Object['freeze']({ width: 0x200, height: 0x170 }),
-  'source-text': Object['freeze']({ width: 0x2d0, height: 0x1e0 }),
-  'source-image': Object['freeze']({ width: 0x120, height: 0x120 }),
-  'ai-image': Object['freeze']({ width: 0x120, height: 0x120 }),
-  'source-video': Object['freeze']({ width: 0x200, height: 0x120 }),
-  'ai-video': Object['freeze']({ width: 0x200, height: 0x120 }),
-  'source-audio': Object['freeze']({ width: 0x1a4, height: 0xb4 }),
-  'ai-audio': Object['freeze']({ width: 0x1a4, height: 0xb4 }),
+  'comment-note': Object['freeze']({ width: 1400, height: 288 }),
+  group: Object['freeze']({ width: 512, height: 368 }),
+  'source-text': Object['freeze']({ width: 720, height: 480 }),
+  'source-image': Object['freeze']({ width: 288, height: 288 }),
+  'ai-image': Object['freeze']({ width: 288, height: 288 }),
+  'source-video': Object['freeze']({ width: 512, height: 288 }),
+  'ai-video': Object['freeze']({ width: 512, height: 288 }),
+  'source-audio': Object['freeze']({ width: 420, height: 180 }),
+  'ai-audio': Object['freeze']({ width: 420, height: 180 }),
 });
 function asObject(value) {
   return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
@@ -65,24 +65,24 @@ export const personReplacementCanvasMaterializationBindingPolicy = Object['freez
       ) ||
       list['find']((data) => data?.['personReplacementBinding']?.['kind'] === 'stage-group') ||
       list['find']((options) => options?.['personReplacementBinding']?.['kind'] === 'project-overview') ||
-      list[0x0] ||
+      list[0] ||
       null
     );
   },
 });
 function normalizePromptDisplayText(target) {
   return String(target || '')
-    ['replace'](/<br\b[^>]*\/?>/gi, '\x0a')
-    ['replace'](/<\/(?:div|p|section|article|blockquote|li)>/gi, '\x0a')
-    ['replace'](/<li\b[^>]*>/gi, '-\x20')
+    ['replace'](/<br\b[^>]*\/?>/gi, '\n')
+    ['replace'](/<\/(?:div|p|section|article|blockquote|li)>/gi, '\n')
+    ['replace'](/<li\b[^>]*>/gi, '- ')
     ['replace'](/<[^>]+>/g, '')
-    ['replace'](/&nbsp;|&#160;/gi, '\x20')
+    ['replace'](/&nbsp;|&#160;/gi, ' ')
     ['replace'](/&lt;/gi, '<')
     ['replace'](/&gt;/gi, '>')
-    ['replace'](/&quot;/gi, '\x22')
-    ['replace'](/&#39;|&apos;/gi, '\x27')
+    ['replace'](/&quot;/gi, '"')
+    ['replace'](/&#39;|&apos;/gi, '\'')
     ['replace'](/&amp;/gi, '&')
-    ['replace'](/\n{3,}/g, '\x0a\x0a')
+    ['replace'](/\n{3,}/g, '\n\n')
     ['trim']();
 }
 function normalizeList(list2) {
@@ -94,22 +94,22 @@ function normalizeScope(next) {
     : PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'];
 }
 function normalizeWorkspaceStep(options2 = {}) {
-  const current = Math['trunc'](Number(options2['workspace']?.['step']) || Number(options2['step']) || 0x1);
-  return Math['max'](0x1, Math['min'](0x5, current));
+  const current = Math['trunc'](Number(options2['workspace']?.['step']) || Number(options2['step']) || 1);
+  return Math['max'](1, Math['min'](5, current));
 }
 function getWorkspaceStepName(entry) {
   return ['', '素材设定', '图像替换', '视频替换', '声音克隆', '合成视频'][
-    Math['max'](0x1, Math['min'](0x5, Math['trunc'](Number(entry) || 0x1)))
+    Math['max'](1, Math['min'](5, Math['trunc'](Number(entry) || 1)))
   ];
 }
 function formatSequence(record) {
-  return String(record + 0x1)['padStart'](0x2, '0');
+  return String(record + 1)['padStart'](2, '0');
 }
 function createPlanEntry(
   key2,
   data2,
   box,
-  { width: width = 0x0, height: height = 0x0, parentKey: parentKey = '', inputKeys: inputKeys = [] } = {},
+  { width: width = 0, height: height = 0, parentKey: parentKey = '', inputKeys: inputKeys = [] } = {},
 ) {
   const type2 = normalizeText(data2?.['type']),
     box2 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES[type2],
@@ -122,7 +122,7 @@ function createPlanEntry(
     data: data2,
     width: width2,
     height: height2,
-    position: { x: Number(box?.['x']) || 0x0, y: Number(box?.['y']) || 0x0 },
+    position: { x: Number(box?.['x']) || 0, y: Number(box?.['y']) || 0 },
     ...(normalizeText(parentKey) ? { parentKey: normalizeText(parentKey) } : {}),
     ...(normalizeList(inputKeys)['length']
       ? { inputKeys: normalizeList(inputKeys)['map'](normalizeText)['filter'](Boolean) }
@@ -145,16 +145,16 @@ const PERSON_REPLACEMENT_LOCATION_GUIDE_SUBDIR = 'person-replacement-guides';
 function buildInlineSvgSignature(output) {
   const list3 = normalizeText(output);
   let value2 = 0x811c9dc5;
-  for (let value3 = 0x0; value3 < list3['length']; value3 += 0x1) {
+  for (let value3 = 0; value3 < list3['length']; value3 += 1) {
     ((value2 ^= list3['charCodeAt'](value3)), (value2 = Math['imul'](value2, 0x1000193)));
   }
-  return 'svg-' + (value2 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'svg-' + (value2 >>> 0)['toString'](16)['padStart'](8, '0');
 }
 function buildInlineSvgBlob(value4) {
   const list4 = normalizeText(value4),
     count = list4['indexOf'](','),
-    value5 = count >= 0x0 ? list4['slice'](0x0, count) : '',
-    enabled = count >= 0x0 ? list4['slice'](count + 0x1) : '';
+    value5 = count >= 0 ? list4['slice'](0, count) : '',
+    enabled = count >= 0 ? list4['slice'](count + 1) : '';
   if (!/^data:image\/svg\+xml(?:;|$)/i['test'](value5) || !enabled)
     throw new Error('人物定位图不是有效的 SVG 数据');
   const run = globalThis['Blob'];
@@ -164,7 +164,7 @@ function buildInlineSvgBlob(value4) {
     if (typeof run2 !== 'function') throw new Error('当前环境无法解码人物定位图');
     const list5 = run2(enabled),
       uint8Array = new Uint8Array(list5['length']);
-    for (let value6 = 0x0; value6 < list5['length']; value6 += 0x1) {
+    for (let value6 = 0; value6 < list5['length']; value6 += 1) {
       uint8Array[value6] = list5['charCodeAt'](value6);
     }
     return new run([uint8Array], { type: 'image/svg+xml' });
@@ -233,7 +233,7 @@ async function materializePersonReplacementLocationGuides({
     }
     if (asObject2['kind'] !== 'person-location-guide') continue;
     const text4 = normalizeText(
-      entry2?.['data']?.['imageUrl'] || entry2?.['data']?.['images']?.[0x0]?.['imageUrl'],
+      entry2?.['data']?.['imageUrl'] || entry2?.['data']?.['images']?.[0]?.['imageUrl'],
     );
     if (!/^data:image\/svg\+xml(?:;|,)/i['test'](text4)) continue;
     const inlineSvgSignature = buildInlineSvgSignature(text4);
@@ -247,15 +247,15 @@ async function materializePersonReplacementLocationGuides({
       (await adapter['nodeExists'](text5, canvasId))
     ) {
       const value9 = await adapter['getNode'](text5, canvasId);
-      ((value8 = value9?.['images']?.[0x0] || value9 || {}),
+      ((value8 = value9?.['images']?.[0] || value9 || {}),
         normalizeText(value9?.['personReplacementBinding']?.['locationGuideSignature']) ===
           inlineSvgSignature &&
           (localPath2 = normalizeLocalPath(
             value9?.['originalLocalPath'] ||
               value9?.['localPath'] ||
               value9?.['displayLocalPath'] ||
-              value9?.['images']?.[0x0]?.['originalLocalPath'] ||
-              value9?.['images']?.[0x0]?.['localPath'] ||
+              value9?.['images']?.[0]?.['originalLocalPath'] ||
+              value9?.['images']?.[0]?.['localPath'] ||
               '',
           )));
     }
@@ -276,7 +276,7 @@ function buildPersonReplacementVideoCanvasNodeData({
   project: project = {},
   videoRef: videoRef = '',
   results: results = [],
-  activeIndex: activeIndex = 0x0,
+  activeIndex: activeIndex = 0,
   name: name = '',
   type: type = 'ai-video',
   prompt: prompt = '',
@@ -331,7 +331,7 @@ function buildPersonReplacementImageCanvasNodeData({
   project: project = {},
   imageRef: imageRef = '',
   results: results = [],
-  activeIndex: activeIndex = 0x0,
+  activeIndex: activeIndex = 0,
   name: name = '',
   type: type = 'ai-image',
   prompt: prompt = '',
@@ -351,7 +351,7 @@ function buildPersonReplacementImageCanvasNodeData({
           images: [
             { localPath: localPath4['localPath'], imageUrl: localPath4['url'], sourceUrl: localPath4['url'] },
           ],
-        })['items'][0x0]
+        })['items'][0]
       : imageUrl
         ? { imageUrl: imageUrl, sourceUrl: imageUrl, localPath: '' }
         : null,
@@ -396,10 +396,10 @@ function buildPersonReplacementImageCanvasNodeData({
 }
 function resolveShotImageCanvasGeometry(options3 = {}) {
   const width3 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-image'],
-    imageWidth = Math['max'](0x0, Number(options3?.['frame']?.['width']) || 0x0),
-    imageHeight = Math['max'](0x0, Number(options3?.['frame']?.['height']) || 0x0);
-  if (!(imageWidth > 0x0 && imageHeight > 0x0))
-    return { width: width3['width'], height: width3['height'], imageWidth: 0x0, imageHeight: 0x0 };
+    imageWidth = Math['max'](0, Number(options3?.['frame']?.['width']) || 0),
+    imageHeight = Math['max'](0, Number(options3?.['frame']?.['height']) || 0);
+  if (!(imageWidth > 0 && imageHeight > 0))
+    return { width: width3['width'], height: width3['height'], imageWidth: 0, imageHeight: 0 };
   return {
     ...getAutoMediaSizeByShortSide(imageWidth, imageHeight),
     imageWidth: imageWidth,
@@ -407,13 +407,13 @@ function resolveShotImageCanvasGeometry(options3 = {}) {
   };
 }
 function applyImageCanvasGeometry(args2, box3, { source: source = ![] } = {}) {
-  const imageWidth2 = Math['max'](0x0, Number(box3?.['imageWidth']) || 0x0),
-    imageHeight2 = Math['max'](0x0, Number(box3?.['imageHeight']) || 0x0);
+  const imageWidth2 = Math['max'](0, Number(box3?.['imageWidth']) || 0),
+    imageHeight2 = Math['max'](0, Number(box3?.['imageHeight']) || 0);
   return {
     ...args2,
-    width: Math['max'](0x1, Number(box3?.['width']) || 0x1),
-    height: Math['max'](0x1, Number(box3?.['height']) || 0x1),
-    ...(imageWidth2 > 0x0 && imageHeight2 > 0x0
+    width: Math['max'](1, Number(box3?.['width']) || 1),
+    height: Math['max'](1, Number(box3?.['height']) || 1),
+    ...(imageWidth2 > 0 && imageHeight2 > 0
       ? { imageWidth: imageWidth2, imageHeight: imageHeight2 }
       : {}),
     ...(source ? { needsAutoResize: ![] } : {}),
@@ -421,10 +421,10 @@ function applyImageCanvasGeometry(args2, box3, { source: source = ![] } = {}) {
 }
 function resolveShotVideoCanvasGeometry(options4 = {}) {
   const width4 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-video'],
-    videoWidth = Math['max'](0x0, Number(options4?.['frame']?.['width']) || 0x0),
-    videoHeight = Math['max'](0x0, Number(options4?.['frame']?.['height']) || 0x0);
-  if (!(videoWidth > 0x0 && videoHeight > 0x0))
-    return { width: width4['width'], height: width4['height'], videoWidth: 0x0, videoHeight: 0x0 };
+    videoWidth = Math['max'](0, Number(options4?.['frame']?.['width']) || 0),
+    videoHeight = Math['max'](0, Number(options4?.['frame']?.['height']) || 0);
+  if (!(videoWidth > 0 && videoHeight > 0))
+    return { width: width4['width'], height: width4['height'], videoWidth: 0, videoHeight: 0 };
   return {
     ...getAutoMediaSizeByShortSide(videoWidth, videoHeight),
     videoWidth: videoWidth,
@@ -432,11 +432,11 @@ function resolveShotVideoCanvasGeometry(options4 = {}) {
   };
 }
 function applyVideoCanvasGeometry(args3, box4) {
-  const naturalWidth = Math['max'](0x0, Number(box4?.['videoWidth']) || 0x0),
-    naturalHeight = Math['max'](0x0, Number(box4?.['videoHeight']) || 0x0),
-    width5 = Math['max'](0x1, Number(box4?.['width']) || 0x1),
-    height3 = Math['max'](0x1, Number(box4?.['height']) || 0x1),
-    value11 = naturalWidth > 0x0 && naturalHeight > 0x0;
+  const naturalWidth = Math['max'](0, Number(box4?.['videoWidth']) || 0),
+    naturalHeight = Math['max'](0, Number(box4?.['videoHeight']) || 0),
+    width5 = Math['max'](1, Number(box4?.['width']) || 1),
+    height3 = Math['max'](1, Number(box4?.['height']) || 1),
+    value11 = naturalWidth > 0 && naturalHeight > 0;
   return {
     ...args3,
     width: width5,
@@ -462,18 +462,18 @@ function applyVideoCanvasGeometry(args3, box4) {
 function resolveAppearanceImageCanvasGeometry(box5 = {}) {
   const width6 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-image'],
     imageWidth3 = Math['max'](
-      0x0,
+      0,
       Number(box5?.['imageWidth'] || box5?.['naturalWidth'] || box5?.['originalWidth'] || box5?.['width']) ||
-        0x0,
+        0,
     ),
     imageHeight3 = Math['max'](
-      0x0,
+      0,
       Number(
         box5?.['imageHeight'] || box5?.['naturalHeight'] || box5?.['originalHeight'] || box5?.['height'],
-      ) || 0x0,
+      ) || 0,
     );
-  if (!(imageWidth3 > 0x0 && imageHeight3 > 0x0))
-    return { width: width6['width'], height: width6['height'], imageWidth: 0x0, imageHeight: 0x0 };
+  if (!(imageWidth3 > 0 && imageHeight3 > 0))
+    return { width: width6['width'], height: width6['height'], imageWidth: 0, imageHeight: 0 };
   return {
     ...getAutoMediaSizeByShortSide(imageWidth3, imageHeight3),
     imageWidth: imageWidth3,
@@ -487,8 +487,8 @@ async function resolveProjectAppearanceImageSizes(args5 = {}) {
         normalizeList(args6?.['appearances'])['map'](async (response2) => {
           const appearanceImageCanvasGeometry = resolveAppearanceImageCanvasGeometry(response2);
           if (
-            appearanceImageCanvasGeometry['imageWidth'] > 0x0 &&
-            appearanceImageCanvasGeometry['imageHeight'] > 0x0
+            appearanceImageCanvasGeometry['imageWidth'] > 0 &&
+            appearanceImageCanvasGeometry['imageHeight'] > 0
           )
             return response2;
           const text6 = normalizeText(
@@ -514,7 +514,7 @@ async function resolveProjectShotImageSizes(args7 = {}) {
   const shots = await Promise['all'](
     normalizeList(args7['shots'])['map'](async (args8) => {
       const shotImageCanvasGeometry = resolveShotImageCanvasGeometry(args8);
-      if (shotImageCanvasGeometry['imageWidth'] > 0x0 && shotImageCanvasGeometry['imageHeight'] > 0x0)
+      if (shotImageCanvasGeometry['imageWidth'] > 0 && shotImageCanvasGeometry['imageHeight'] > 0)
         return args8;
       const list6 = [
         ...new Set(
@@ -586,7 +586,7 @@ function buildPersonReplacementAudioCanvasNodeData({
     name: normalizeText(name) || '替换音频',
     prompt: normalizeText(prompt),
     audios: audios,
-    mainAudioIndex: 0x0,
+    mainAudioIndex: 0,
     audioUrl: audioUrl2['url'],
     localPath: audioUrl2['localPath'],
     ...(normalizeText(model) ? { model: normalizeText(model), audioWorkflowKey: normalizeText(model) } : {}),
@@ -605,7 +605,7 @@ function buildStageAnnotationNodeData({
     type: 'comment-note',
     name: normalizeText(title),
     content: normalizeText(content),
-    style: { fontSize: 0x28, textColor: 'white', backgroundColor: 'transparent' },
+    style: { fontSize: 40, textColor: 'white', backgroundColor: 'transparent' },
     personReplacementBinding: buildBinding(project, {
       kind: isProjectAnchor ? 'project-overview' : 'stage-annotation',
       stage: normalizeText(stage),
@@ -617,11 +617,11 @@ function getCharacterAppearanceRecords(options5 = {}) {
   const list7 = [];
   return (
     normalizeList(options5['characters'])['forEach']((prompt2, value13) => {
-      const characterId = normalizeText(prompt2?.['id']) || 'character-' + (value13 + 0x1),
+      const characterId = normalizeText(prompt2?.['id']) || 'character-' + (value13 + 1),
         list8 = normalizeList(prompt2?.['appearances']),
         list9 = normalizeList(prompt2?.['imageRefs'])['map']((imageUrl2, name3) => ({
-          id: 'image-' + (name3 + 0x1),
-          name: name3 === 0x0 ? '基础形象' : '形象 ' + (name3 + 0x1),
+          id: 'image-' + (name3 + 1),
+          name: name3 === 0 ? '基础形象' : '形象 ' + (name3 + 1),
           imageUrl: imageUrl2,
           prompt: prompt2?.['description'],
         })),
@@ -631,29 +631,29 @@ function getCharacterAppearanceRecords(options5 = {}) {
             ? list9
             : [{ id: 'base', name: '基础形象', imageUrl: '', prompt: prompt2?.['description'] }];
       list10['forEach']((box6, value14) => {
-        const appearanceId = normalizeText(box6?.['id']) || 'appearance-' + (value14 + 0x1);
+        const appearanceId = normalizeText(box6?.['id']) || 'appearance-' + (value14 + 1);
         list7['push']({
           key: 'asset:' + characterId + ':' + appearanceId,
           characterId: characterId,
           appearanceId: appearanceId,
-          characterName: normalizeText(prompt2?.['name']) || '目标人物' + (value13 + 0x1),
+          characterName: normalizeText(prompt2?.['name']) || '目标人物' + (value13 + 1),
           appearanceName: normalizeText(box6?.['name']),
           imageRef: normalizeText(box6?.['imageUrl'] || box6?.['imageRef'] || box6?.['url']),
           prompt: normalizeText(box6?.['prompt'] || prompt2?.['description']),
           imageWidth: Math['max'](
-            0x0,
+            0,
             Number(
               box6?.['imageWidth'] || box6?.['naturalWidth'] || box6?.['originalWidth'] || box6?.['width'],
-            ) || 0x0,
+            ) || 0,
           ),
           imageHeight: Math['max'](
-            0x0,
+            0,
             Number(
               box6?.['imageHeight'] ||
                 box6?.['naturalHeight'] ||
                 box6?.['originalHeight'] ||
                 box6?.['height'],
-            ) || 0x0,
+            ) || 0,
           ),
         });
       });
@@ -664,7 +664,7 @@ function getCharacterAppearanceRecords(options5 = {}) {
 function appendAssetStage(list11, project3, y, list12) {
   const box7 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note'],
     list13 = [];
-  for (let value15 = 0x0; value15 < list12['length']; value15 += ASSET_COLUMNS) {
+  for (let value15 = 0; value15 < list12['length']; value15 += ASSET_COLUMNS) {
     const list14 = list12['slice'](value15, value15 + ASSET_COLUMNS),
       items3 = list14['map']((appearance) => ({
         appearance: appearance,
@@ -674,8 +674,8 @@ function appendAssetStage(list11, project3, y, list12) {
       items: items3,
       width: items3['reduce'](
         (value16, value17, count2) =>
-          value16 + value17['geometry']['width'] + (count2 > 0x0 ? NODE_GAP : 0x0),
-        0x0,
+          value16 + value17['geometry']['width'] + (count2 > 0 ? NODE_GAP : 0),
+        0,
       ),
       height: Math['max'](...items3['map']((value18) => value18['geometry']['height'])),
     });
@@ -690,14 +690,14 @@ function appendAssetStage(list11, project3, y, list12) {
         content: '人物素材及形象参考图。',
         isProjectAnchor: !![],
       }),
-      { x: 0x0, y: y },
+      { x: 0, y: y },
     ),
   );
   const y2 = y + box7['height'] + NODE_GAP;
-  let value19 = 0x0;
+  let value19 = 0;
   return (
     list13['forEach']((box8) => {
-      let x = 0x0;
+      let x = 0;
       (box8['items']['forEach'](({ appearance: appearance2, geometry: geometry }) => {
         (list11['push'](
           createPlanEntry(
@@ -708,7 +708,7 @@ function appendAssetStage(list11, project3, y, list12) {
                 imageRef: appearance2['imageRef'],
                 name: [appearance2['characterName'], appearance2['appearanceName']]
                   ['filter'](Boolean)
-                  ['join']('\x20·\x20'),
+                  ['join'](' · '),
                 prompt: appearance2['prompt'],
                 model: project3['settings']?.['characterImageModelId'],
                 provider: project3['settings']?.['characterImageProvider'],
@@ -759,7 +759,7 @@ function buildShotPromptPackage(project4, shot) {
       ...prompt3['promptAssetRefs']['map']((ref, value20) => ({
         ref: ref['url'],
         role: 'prompt-reference',
-        slot: promptPackage['referenceImages']['length'] + value20 + 0x1,
+        slot: promptPackage['referenceImages']['length'] + value20 + 1,
       })),
     ],
   };
@@ -786,20 +786,20 @@ function appendImageReplacementStage(list16, project5, y3, value24) {
         title: '阶段 2 · 图像替换',
         content: '关键帧、人物素材和提示词共同连到替换结果图。',
       }),
-      { x: 0x0, y: y3 },
+      { x: 0, y: y3 },
     ),
   );
   let y4 = y3 + box9['height'] + NODE_GAP;
   return (
     normalizeList(project5['shots'])['forEach']((imageRef3, value25) => {
-      const shotId = normalizeText(imageRef3?.['id']) || 'shot-' + (value25 + 0x1),
+      const shotId = normalizeText(imageRef3?.['id']) || 'shot-' + (value25 + 1),
         formatSequence2 = formatSequence(value25),
         annotatedSource = buildShotPromptPackage(project5, imageRef3),
         inputKeys2 = [];
-      let x2 = 0x0;
+      let x2 = 0;
       const width8 = resolveShotImageCanvasGeometry(imageRef3),
         imageRef4 = normalizeText(
-          annotatedSource['referenceImages'][0x0]?.['ref'] || imageRef3?.['keyframeRef'],
+          annotatedSource['referenceImages'][0]?.['ref'] || imageRef3?.['keyframeRef'],
         );
       if (imageRef4) {
         const value26 = 'shot:' + shotId + ':keyframe';
@@ -877,7 +877,7 @@ function appendImageReplacementStage(list16, project5, y3, value24) {
           value29,
           {
             type: 'source-text',
-            name: '镜头片段' + formatSequence2 + '\x20·\x20图像替换提示词',
+            name: '镜头片段' + formatSequence2 + ' · 图像替换提示词',
             content: content2,
             personReplacementBinding: buildBinding(project5, {
               shotId: shotId,
@@ -935,16 +935,16 @@ function appendVideoReplacementStage(list17, project6, y5) {
         title: '阶段 3 · 视频替换',
         content: '原视频片段与替换结果图共同连到替换视频。',
       }),
-      { x: 0x0, y: y5 },
+      { x: 0, y: y5 },
     ),
   );
   let y6 = y5 + box11['height'] + NODE_GAP;
   return (
     normalizeList(project6['shots'])['forEach']((videoRef2, value30) => {
-      const shotId2 = normalizeText(videoRef2?.['id']) || 'shot-' + (value30 + 0x1),
+      const shotId2 = normalizeText(videoRef2?.['id']) || 'shot-' + (value30 + 1),
         formatSequence3 = formatSequence(value30),
         inputKeys3 = [];
-      let x3 = 0x0;
+      let x3 = 0;
       const width9 = resolveShotVideoCanvasGeometry(videoRef2),
         videoRef3 =
           resolvePersonReplacementVideoSourceRef(videoRef2) || normalizeText(videoRef2?.['sourceVideoRef']);
@@ -1017,7 +1017,7 @@ function getVoiceSegments(options6 = {}) {
         list18['push']({
           ...asObject(value35),
           sourceId: normalizeText(value33) || 'source',
-          segmentId: normalizeText(value35?.['id']) || 'segment-' + (value36 + 0x1),
+          segmentId: normalizeText(value35?.['id']) || 'segment-' + (value36 + 1),
         });
       });
     }),
@@ -1037,19 +1037,19 @@ function appendVoiceReplacementStage(list19, project7, y7) {
         content:
           '使用源音频时，源音频连到替换音频；使用参考音频时，原音频与参考音频共同连到替换音频。总合成音频独立展示。',
       }),
-      { x: 0x0, y: y7 },
+      { x: 0, y: y7 },
     ),
   );
   const y8 = y7 + box12['height'] + NODE_GAP;
   let y9 = y8,
     value37 = y7 + box12['height'],
-    value38 = 0x0;
+    value38 = 0;
   getVoiceSegments(project7)['forEach']((audioRef2, value39) => {
     const sourceId = normalizeText(audioRef2['sourceId']),
       segmentId = normalizeText(audioRef2['segmentId']),
       formatSequence4 = formatSequence(value39),
       inputKeys4 = [];
-    let x4 = 0x0;
+    let x4 = 0;
     const audioRef3 = normalizeText(audioRef2['sourceAudioLocalPath'] || audioRef2['sourceAudioUrl']);
     if (audioRef3) {
       const value40 = 'voice:' + sourceId + ':' + segmentId + ':source-audio';
@@ -1124,7 +1124,7 @@ function appendVoiceReplacementStage(list19, project7, y7) {
   });
   const audioRef5 = normalizeText(project7['audio']?.['replacementAudioRef']);
   if (audioRef5) {
-    const x5 = value38 ? value38 + NODE_GAP : 0x0;
+    const x5 = value38 ? value38 + NODE_GAP : 0;
     (list19['push'](
       createPlanEntry(
         'voice:timeline',
@@ -1153,20 +1153,20 @@ function appendCompositeStage(list20, project8, y10) {
       buildStageAnnotationNodeData({
         project: project8,
         stage: 'composite',
-        title: '阶段\x205\x20·\x20最终合成对比',
+        title: '阶段 5 · 最终合成对比',
         content: '原视频与最终替换视频用于效果对比。',
       }),
-      { x: 0x0, y: y10 },
+      { x: 0, y: y10 },
     ),
   );
   const y11 = y10 + box14['height'] + NODE_GAP;
-  let x6 = 0x0;
+  let x6 = 0;
   const list21 = normalizeList(project8['sources']),
     count3 = list21['findIndex']((value43) => normalizeText(value43?.['videoRef']));
-  if (count3 >= 0x0) {
+  if (count3 >= 0) {
     const value44 = list21[count3],
       videoRef4 = normalizeText(value44['videoRef']),
-      sourceId2 = normalizeText(value44?.['id']) || 'source-' + (count3 + 0x1);
+      sourceId2 = normalizeText(value44?.['id']) || 'source-' + (count3 + 1);
     (list20['push'](
       createPlanEntry(
         'project:source:' + sourceId2 + ':comparison-video',
@@ -1184,7 +1184,7 @@ function appendCompositeStage(list20, project8, y10) {
         { x: x6 * (box15['width'] + NODE_GAP), y: y11 },
       ),
     ),
-      (x6 += 0x1));
+      (x6 += 1));
   }
   const videoRef5 = normalizeText(
     project8['output']?.['finalVideoRef'] || project8['output']?.['visualMasterRef'],
@@ -1221,12 +1221,12 @@ export function buildPersonReplacementOutputCanvasNodeData({
 }
 function buildReplacementClipPlan(project9, canvasScope3) {
   const list22 = [];
-  let x7 = 0x0;
+  let x7 = 0;
   return (
     normalizeList(project9['shots'])['forEach']((activeIndex4, value45) => {
       const videoRef6 = normalizeText(activeIndex4?.['resultVideoRef']);
       if (!videoRef6) return;
-      const shotId3 = normalizeText(activeIndex4?.['id']) || 'shot-' + (value45 + 0x1),
+      const shotId3 = normalizeText(activeIndex4?.['id']) || 'shot-' + (value45 + 1),
         width10 = resolveShotVideoCanvasGeometry(activeIndex4);
       (list22['push'](
         createPlanEntry(
@@ -1242,7 +1242,7 @@ function buildReplacementClipPlan(project9, canvasScope3) {
             }),
             width10,
           ),
-          { x: x7, y: 0x0 },
+          { x: x7, y: 0 },
           { width: width10['width'], height: width10['height'] },
         ),
       ),
@@ -1253,7 +1253,7 @@ function buildReplacementClipPlan(project9, canvasScope3) {
 }
 function getPlanBounds(value46) {
   const list23 = normalizeList(value46);
-  if (!list23['length']) return { left: 0x0, top: 0x0, right: 0x0, bottom: 0x0, width: 0x0, height: 0x0 };
+  if (!list23['length']) return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
   const left = Math['min'](...list23['map']((value47) => value47['position']['x'])),
     top = Math['min'](...list23['map']((value48) => value48['position']['y'])),
     right = Math['max'](...list23['map']((box16) => box16['position']['x'] + box16['width'])),
@@ -1322,7 +1322,7 @@ function buildProjectCanvasPlan(project11) {
   const value53 = [],
     characterAppearanceRecords = getCharacterAppearanceRecords(project11),
     workspaceStep = normalizeWorkspaceStep(project11);
-  let appendHorizontalStage2 = 0x0;
+  let appendHorizontalStage2 = 0;
   const run3 = ({ stage: stage3, name: name5, buildStage: buildStage }) => {
     const entries2 = [];
     buildStage(entries2);
@@ -1339,39 +1339,39 @@ function buildProjectCanvasPlan(project11) {
       stage: 'assets',
       name: '阶段 1 · 素材设定',
       buildStage: (value54) => {
-        appendAssetStage(value54, project11, 0x0, characterAppearanceRecords);
+        appendAssetStage(value54, project11, 0, characterAppearanceRecords);
       },
     }),
-    workspaceStep >= 0x2 &&
+    workspaceStep >= 2 &&
       run3({
         stage: 'image',
         name: '阶段 2 · 图像替换',
         buildStage: (value55) => {
-          appendImageReplacementStage(value55, project11, 0x0, characterAppearanceRecords);
+          appendImageReplacementStage(value55, project11, 0, characterAppearanceRecords);
         },
       }),
-    workspaceStep >= 0x3 &&
+    workspaceStep >= 3 &&
       run3({
         stage: 'video',
-        name: '阶段\x203\x20·\x20视频替换',
+        name: '阶段 3 · 视频替换',
         buildStage: (value56) => {
-          appendVideoReplacementStage(value56, project11, 0x0);
+          appendVideoReplacementStage(value56, project11, 0);
         },
       }),
-    workspaceStep >= 0x4 &&
+    workspaceStep >= 4 &&
       run3({
         stage: 'voice',
-        name: '阶段\x204\x20·\x20声音克隆',
+        name: '阶段 4 · 声音克隆',
         buildStage: (value57) => {
-          appendVoiceReplacementStage(value57, project11, 0x0);
+          appendVoiceReplacementStage(value57, project11, 0);
         },
       }),
-    workspaceStep >= 0x5 &&
+    workspaceStep >= 5 &&
       run3({
         stage: 'composite',
         name: '阶段 5 · 合成视频',
         buildStage: (value58) => {
-          appendCompositeStage(value58, project11, 0x0);
+          appendCompositeStage(value58, project11, 0);
         },
       }),
     value53
@@ -1393,13 +1393,13 @@ function clonePlanEntryForScope(args10, canvasScope4, map) {
   return value60;
 }
 function normalizePlanOrigin(list28) {
-  const value61 = Math['min'](...list28['map']((value62) => Number(value62['position']?.['x']) || 0x0)),
-    value63 = Math['min'](...list28['map']((value64) => Number(value64['position']?.['y']) || 0x0));
+  const value61 = Math['min'](...list28['map']((value62) => Number(value62['position']?.['x']) || 0)),
+    value63 = Math['min'](...list28['map']((value64) => Number(value64['position']?.['y']) || 0));
   return list28['map']((args12) => ({
     ...args12,
     position: {
-      x: (Number(args12['position']?.['x']) || 0x0) - value61,
-      y: (Number(args12['position']?.['y']) || 0x0) - value63,
+      x: (Number(args12['position']?.['x']) || 0) - value61,
+      y: (Number(args12['position']?.['y']) || 0) - value63,
     },
   }));
 }
@@ -1407,18 +1407,18 @@ function reflowCurrentVideoPlan(list29, project12) {
   const args13 = list29['find']((event2) => event2['key'] === 'stage:video:annotation'),
     map2 = new Map(list29['map']((event3) => [event3['key'], event3]));
   let y12 = PERSON_REPLACEMENT_CANVAS_NODE_SIZES['comment-note']['height'] + NODE_GAP;
-  const entries3 = args13 ? [{ ...args13, position: { x: 0x0, y: 0x0 }, parentKey: '' }] : [];
+  const entries3 = args13 ? [{ ...args13, position: { x: 0, y: 0 }, parentKey: '' }] : [];
   return (
     normalizeList(project12['shots'])['forEach']((value65, value66) => {
-      const text11 = normalizeText(value65?.['id']) || 'shot-' + (value66 + 0x1),
+      const text11 = normalizeText(value65?.['id']) || 'shot-' + (value66 + 1),
         box19 = map2['get']('shot:' + text11 + ':original-video'),
         box20 = map2['get']('shot:' + text11 + ':replacement-image'),
         box21 = map2['get']('shot:' + text11 + ':replacement-video');
-      let x10 = 0x0,
+      let x10 = 0,
         value67 = Math['max'](
-          Number(box20?.['height']) || 0x0,
-          Number(box19?.['height']) || 0x0,
-          Number(box21?.['height']) || 0x0,
+          Number(box20?.['height']) || 0,
+          Number(box19?.['height']) || 0,
+          Number(box21?.['height']) || 0,
           PERSON_REPLACEMENT_CANVAS_NODE_SIZES['ai-video']['height'],
         );
       (box20 &&
@@ -1446,21 +1446,21 @@ function buildCurrentInterfacePlan(value68) {
   const workspaceStep2 = normalizeWorkspaceStep(value68),
     list30 = buildProjectCanvasPlan(value68),
     value69 = (event4) => {
-      if (workspaceStep2 === 0x1)
+      if (workspaceStep2 === 1)
         return event4['key']['startsWith']('stage:assets:') || event4['key']['startsWith']('asset:');
-      if (workspaceStep2 === 0x2)
+      if (workspaceStep2 === 2)
         return (
           event4['key']['startsWith']('stage:assets:') ||
           event4['key']['startsWith']('asset:') ||
           event4['key']['startsWith']('stage:image:') ||
           /^shot:[^:]+:(?:keyframe|location-guide|prompt|replacement-image)$/['test'](event4['key'])
         );
-      if (workspaceStep2 === 0x3)
+      if (workspaceStep2 === 3)
         return (
           event4['key']['startsWith']('stage:video:') ||
           /^shot:[^:]+:(?:replacement-image|original-video|replacement-video)$/['test'](event4['key'])
         );
-      if (workspaceStep2 === 0x4)
+      if (workspaceStep2 === 4)
         return event4['key']['startsWith']('stage:voice:') || event4['key']['startsWith']('voice:');
       return ![];
     },
@@ -1469,7 +1469,7 @@ function buildCurrentInterfacePlan(value68) {
     value71 = list31['map']((value72) =>
       clonePlanEntryForScope(value72, PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'], value70),
     );
-  return workspaceStep2 === 0x3 ? reflowCurrentVideoPlan(value71, value68) : normalizePlanOrigin(value71);
+  return workspaceStep2 === 3 ? reflowCurrentVideoPlan(value71, value68) : normalizePlanOrigin(value71);
 }
 export function buildPersonReplacementCanvasPlan({
   project: project = {},
@@ -1477,7 +1477,7 @@ export function buildPersonReplacementCanvasPlan({
 } = {}) {
   const scope2 = normalizeScope(scope);
   if (scope2 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'])
-    return normalizeWorkspaceStep(project) < 0x5
+    return normalizeWorkspaceStep(project) < 5
       ? buildCurrentInterfacePlan(project)
       : buildReplacementClipPlan(project, scope2);
   return buildProjectCanvasPlan(project);
@@ -1487,10 +1487,10 @@ function buildPlanLayout(list32 = []) {
     normalizeList(list32)['map']((box22) => [
       box22['key'],
       {
-        x: Number(box22['position']?.['x']) || 0x0,
-        y: Number(box22['position']?.['y']) || 0x0,
-        width: Number(box22['width']) || 0x0,
-        height: Number(box22['height']) || 0x0,
+        x: Number(box22['position']?.['x']) || 0,
+        y: Number(box22['position']?.['y']) || 0,
+        width: Number(box22['width']) || 0,
+        height: Number(box22['height']) || 0,
       },
     ]),
   );
@@ -1566,11 +1566,11 @@ export async function syncPersonReplacementCanvas({
     throw new Error('人物替换画布适配器不完整');
   const scope3 = normalizeScope(scope),
     workspaceStep3 = normalizeWorkspaceStep(project),
-    value78 = scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] || workspaceStep3 <= 0x2,
+    value78 = scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] || workspaceStep3 <= 2,
     value79 =
       scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'] ||
-      workspaceStep3 === 0x2 ||
-      workspaceStep3 === 0x3,
+      workspaceStep3 === 2 ||
+      workspaceStep3 === 3,
     [characters2, shots2] = await Promise['all']([
       value78 ? resolveProjectAppearanceImageSizes(project) : project,
       value79 ? resolveProjectShotImageSizes(project) : project,
@@ -1587,7 +1587,7 @@ export async function syncPersonReplacementCanvas({
     throw new Error('人物替换画布适配器缺少节点连线能力');
   const text13 = normalizeText(project['title']) || '人物替换项目',
     canvasName =
-      scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] && workspaceStep3 < 0x5
+      scope3 === PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] && workspaceStep3 < 5
         ? text13 + ' · ' + getWorkspaceStepName(workspaceStep3)
         : text13,
     previousBinding2 = asObject(project['output']?.['canvasBinding']),
@@ -1595,9 +1595,9 @@ export async function syncPersonReplacementCanvas({
     text15 = normalizeText(previousBinding2['scope']) === scope3,
     value82 =
       scope3 !== PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'] ||
-      Math['trunc'](Number(previousBinding2['workspaceStep']) || 0x0) === workspaceStep3,
+      Math['trunc'](Number(previousBinding2['workspaceStep']) || 0) === workspaceStep3,
     value83 =
-      Math['trunc'](Number(previousBinding2['layoutVersion']) || 0x0) ===
+      Math['trunc'](Number(previousBinding2['layoutVersion']) || 0) ===
       PERSON_REPLACEMENT_CANVAS_LAYOUT_VERSION,
     canReuseCanvas2 = Boolean(
       text14 && text15 && value82 && value83 && (await adapter4['canvasExists'](text14)),
@@ -1622,9 +1622,9 @@ export async function syncPersonReplacementCanvas({
       : ![],
     nodes2 = {},
     nodes3 = [];
-  let createdCount = 0x0,
-    updatedCount = 0x0,
-    deletedCount = 0x0;
+  let createdCount = 0,
+    updatedCount = 0,
+    deletedCount = 0;
   const sequenceKey = 'person-replacement:' + (normalizeText(project['id']) || canvasId2),
     mutationSnapshot2 = await adapter4['createMutationSnapshot']?.({ canvasId: canvasId2 });
   try {
@@ -1675,8 +1675,8 @@ export async function syncPersonReplacementCanvas({
               sequenceKey: sequenceKey,
               parentNodeId: normalizeText(nodes2[key3['parentKey']]),
             });
-      if (value88) updatedCount += 0x1;
-      else createdCount += 0x1;
+      if (value88) updatedCount += 1;
+      else createdCount += 1;
       const nodeId = normalizeText(node?.['id'] || (value88 ? text17 : ''));
       if (!nodeId) throw new Error('同步人物替换画布节点失败：' + (key3['data']['name'] || key3['key']));
       ((nodes2[key3['key']] = nodeId), nodes3['push']({ ...key3, nodeId: nodeId, node: node }));
@@ -1709,7 +1709,7 @@ export async function syncPersonReplacementCanvas({
       typeof adapter4['focusNodes'] === 'function' &&
         (await adapter4['focusNodes'](
           nodes3['map']((value91) => value91['nodeId']),
-          { padding: 0x50, durationMs: 0x0, maxZoom: 0.2 },
+          { padding: 80, durationMs: 0, maxZoom: 0.2 },
         )));
   } catch (value92) {
     await rollbackCanvasMutation({

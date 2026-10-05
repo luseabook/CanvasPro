@@ -3,12 +3,12 @@ import { buildApiUrl } from './apiUrl.js';
 import { localPathToUrl, normalizeLocalPath } from '../src/utils/localMediaPath.js';
 import { ensureImageDerivativesToServer, stageAssetUploadToServer } from './projectsV2Api.js';
 import { detectCollaborationMediaContentType } from './collaborationMediaContentType.js';
-export const COLLABORATION_PROTOCOL = 0x5;
+export const COLLABORATION_PROTOCOL = 5;
 export const COLLABORATION_DOCUMENT_SCHEMA = '1';
-export const COLLABORATION_IDENTITY_PROTOCOL = 0x2;
+export const COLLABORATION_IDENTITY_PROTOCOL = 2;
 export const COLLABORATION_IDENTITY_VERSION = '0.7.13';
-export const COLLABORATION_CHUNK_BYTES = 0x100 * 0x400;
-export const COLLABORATION_MAX_ASSET_BYTES = 0x100 * 0x400 * 0x400;
+export const COLLABORATION_CHUNK_BYTES = 256 * 1024;
+export const COLLABORATION_MAX_ASSET_BYTES = 256 * 1024 * 1024;
 const MEDIA_EXTENSIONS = {
   'image/jpeg': 'jpg',
   'image/png': 'png',
@@ -45,7 +45,7 @@ export async function fetchCollaborationConfig() {
     url: '/api/v2/collaboration/config',
     provider: 'local',
     method: 'GET',
-    timeout: 0x3a98,
+    timeout: 15000,
   });
 }
 export function encodeCollaborationInvite(url, invite) {
@@ -57,10 +57,10 @@ export function encodeCollaborationInvite(url, invite) {
 }
 export function decodeCollaborationInvite(key) {
   const list = String(key || '')['trim']();
-  if (!list['startsWith']('AICLAN2.') || list['length'] > 0x1000)
+  if (!list['startsWith']('AICLAN2.') || list['length'] > 4096)
     throw new Error('请粘贴房主生成的完整邀请连接信息');
   try {
-    const enabled = JSON['parse'](atob(list['slice'](0x8)['replace'](/-/g, '+')['replace'](/_/g, '/')));
+    const enabled = JSON['parse'](atob(list['slice'](8)['replace'](/-/g, '+')['replace'](/_/g, '/')));
     if (
       !enabled['endpoint']?.['url'] ||
       !enabled['endpoint']['fingerprint'] ||
@@ -81,7 +81,7 @@ async function localControl(timeout, signal) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON['stringify'](timeout),
     signal: signal,
-    timeout: timeout['payload']?.['action'] === 'presence' ? 0x1388 : 0xafc8,
+    timeout: timeout['payload']?.['action'] === 'presence' ? 5000 : 45000,
   });
 }
 export function createCollaborationApi({
@@ -102,7 +102,7 @@ export function createCollaborationApi({
   let connectionId = null,
     enabled2 = null,
     promise = null,
-    result = 0x0;
+    result = 0;
   async function run(data, options) {
     const response = await controlRequest(data, options);
     if (!response || response['success'] === ![]) {
@@ -119,7 +119,7 @@ export function createCollaborationApi({
       handler = () => signal2['abort']();
     if (el?.['aborted']) handler();
     el?.['addEventListener']('abort', handler, { once: !![] });
-    const setTimeout2 = setTimeout(handler, 0x7530);
+    const setTimeout2 = setTimeout(handler, 30000);
     try {
       let status;
       try {
@@ -143,7 +143,7 @@ export function createCollaborationApi({
           { code: 'AUTH_UNAVAILABLE' },
         );
       }
-      if ([0x194, 0x195]['includes'](status['status']))
+      if ([404, 405]['includes'](status['status']))
         throw Object['assign'](new Error('协作授权接口尚未接通，请联系管理员完成服务部署。'), {
           code: 'AUTH_NOT_DEPLOYED',
           status: status['status'],
@@ -235,7 +235,7 @@ export function createCollaborationApi({
       return ensureImageDerivativesToServer({ localPath: localPath });
     },
     async uploadMedia(type, scope, input, output) {
-      const enabled4 = MEDIA_EXTENSIONS[type['type']['split'](';')[0x0]];
+      const enabled4 = MEDIA_EXTENSIONS[type['type']['split'](';')[0]];
       if (!enabled4) throw Object['assign'](new Error('不支持的协作素材格式'), { code: 'ASSET_TYPE' });
       const server = await stageAssetUploadToServer(
         new File([type], 'collaboration.' + enabled4, { type: type['type'] }),
@@ -300,11 +300,11 @@ export function createCollaborationApi({
             : code['phase'] === 'verifying'
               ? '房主正在校验素材完整性'
               : '正在传送素材给房主 · ' +
-                Math['round']((code['offset'] / Math['max'](0x1, code['size'])) * 0x64) +
+                Math['round']((code['offset'] / Math['max'](1, code['size'])) * 100) +
                 '%',
         );
         if (code['done']) return code['result'];
-        await new Promise((value5) => setTimeout(value5, 0xfa));
+        await new Promise((value5) => setTimeout(value5, 250));
       }
       throw new DOMException('Aborted', 'AbortError');
     },
@@ -317,7 +317,7 @@ export function createCollaborationApi({
       return sources;
     },
     async disconnect() {
-      result += 0x1;
+      result += 1;
       if (promise) await promise['catch'](() => {});
       if (enabled2) return enabled2;
       const connectionId5 = connectionId;
@@ -351,13 +351,13 @@ export function createCollaborationApi({
         const snapshotId = roomId['snapshot'];
         if (
           !Number['isInteger'](snapshotId['pages']) ||
-          snapshotId['pages'] < 0x1 ||
-          snapshotId['pages'] > 0x400
+          snapshotId['pages'] < 1 ||
+          snapshotId['pages'] > 1024
         )
           throw new Error('画布快照信息无效');
         const list2 = [];
-        let value8 = 0x0;
-        for (let page = 0x0; page < snapshotId['pages']; page++) {
+        let value8 = 0;
+        for (let page = 0; page < snapshotId['pages']; page++) {
           const response4 = await run(
             {
               action: 'relay',
@@ -375,7 +375,7 @@ export function createCollaborationApi({
           if (
             response4['page'] !== page ||
             typeof response4['text'] !== 'string' ||
-            (value8 += response4['text']['length']) > 0x40 * 0x400 * 0x400
+            (value8 += response4['text']['length']) > 64 * 1024 * 1024
           )
             throw new Error('画布快照分片无效');
           list2['push'](response4['text']);
@@ -406,20 +406,20 @@ export async function readCollaborationMedia(value10, el2) {
     handler3 = () => signal3['abort']();
   if (el2?.['aborted']) handler3();
   el2?.['addEventListener']('abort', handler3, { once: !![] });
-  const setTimeout3 = setTimeout(handler3, 0x7530);
+  const setTimeout3 = setTimeout(handler3, 30000);
   try {
     const response5 = await fetch(value11, { signal: signal3['signal'] });
     if (!response5['ok']) throw new Error('无法读取待共享素材');
-    const value12 = Number(response5['headers']['get']('Content-Length') || 0x0);
+    const value12 = Number(response5['headers']['get']('Content-Length') || 0);
     if (value12 > COLLABORATION_MAX_ASSET_BYTES)
-      throw Object['assign'](new Error('协作素材单文件不能超过\x20256\x20MiB'), { code: 'ASSET_LIMIT' });
+      throw Object['assign'](new Error('协作素材单文件不能超过 256 MiB'), { code: 'ASSET_LIMIT' });
     const list3 = await response5['blob']();
     if (list3['size'] > COLLABORATION_MAX_ASSET_BYTES)
-      throw Object['assign'](new Error('协作素材单文件不能超过\x20256\x20MiB'), { code: 'ASSET_LIMIT' });
+      throw Object['assign'](new Error('协作素材单文件不能超过 256 MiB'), { code: 'ASSET_LIMIT' });
     const detectCollaborationMediaContentType2 = await detectCollaborationMediaContentType(list3);
     if (el2?.['aborted']) throw new DOMException('Aborted', 'AbortError');
     return detectCollaborationMediaContentType2 && detectCollaborationMediaContentType2 !== list3['type']
-      ? list3['slice'](0x0, list3['size'], detectCollaborationMediaContentType2)
+      ? list3['slice'](0, list3['size'], detectCollaborationMediaContentType2)
       : list3;
   } catch (cause2) {
     if (el2?.['aborted'] || ['ASSET_LIMIT', 'ASSET_TYPE']['includes'](cause2['code'])) throw cause2;

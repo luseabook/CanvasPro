@@ -1,6 +1,6 @@
 import { getMediaClipTimelineDisplayDuration } from '../../components/media-clip/mediaClipTimelineModel.js';
-export const PERSON_REPLACEMENT_CUT_DEFAULT_FPS = 0x18;
-export const PERSON_REPLACEMENT_CUT_BASE_VIEWPORT_WIDTH_PX = 0x3c0;
+export const PERSON_REPLACEMENT_CUT_DEFAULT_FPS = 24;
+export const PERSON_REPLACEMENT_CUT_BASE_VIEWPORT_WIDTH_PX = 960;
 export const PERSON_REPLACEMENT_CUT_MIN_SEC = 0.001;
 export const PERSON_REPLACEMENT_CUT_EPSILON_SEC = 0.001;
 function normalizeText(value, item = '') {
@@ -17,7 +17,7 @@ function getPersonReplacementSourceShotBounds(list = []) {
     (Array['isArray'](list) ? list : [])['forEach']((source) => {
       const text = normalizeText(source?.['sourceId']);
       if (!text) return;
-      const startSec = Math['max'](0x0, Number(source?.['startTimeSec']) || 0x0),
+      const startSec = Math['max'](0, Number(source?.['startTimeSec']) || 0),
         endSec = Math['max'](startSec, Number(source?.['endTimeSec']) || startSec),
         next = map['get'](text);
       map['set'](
@@ -33,17 +33,17 @@ function getPersonReplacementSourceShotBounds(list = []) {
     map
   );
 }
-function findPersonReplacementShotCutOrigin(list2 = [], current = 0x0, entry = 0x0) {
+function findPersonReplacementShotCutOrigin(list2 = [], current = 0, entry = 0) {
   let record = null,
-    payload = -0x1,
+    payload = -1,
     handle = Number['POSITIVE_INFINITY'];
-  const state = current + (entry - current) / 0x2;
+  const state = current + (entry - current) / 2;
   return (
     (Array['isArray'](list2) ? list2 : [])['forEach']((config) => {
-      const scope = Math['max'](0x0, Number(config?.['startTimeSec']) || 0x0),
+      const scope = Math['max'](0, Number(config?.['startTimeSec']) || 0),
         input = Math['max'](scope, Number(config?.['endTimeSec']) || scope),
-        output = Math['max'](0x0, Math['min'](entry, input) - Math['max'](current, scope)),
-        value2 = scope + (input - scope) / 0x2,
+        output = Math['max'](0, Math['min'](entry, input) - Math['max'](current, scope)),
+        value2 = scope + (input - scope) / 2,
         value3 = Math['abs'](state - value2);
       (output > payload || (output === payload && value3 < handle)) &&
         ((record = config), (payload = output), (handle = value3));
@@ -54,11 +54,11 @@ function findPersonReplacementShotCutOrigin(list2 = [], current = 0x0, entry = 0
 function getPersonReplacementShotCutKeyframePatch(options2 = {}) {
   const keyframeRef = normalizeText(options2?.['keyframeRef']);
   if (!keyframeRef) return null;
-  const value4 = Math['max'](0x0, Number(options2?.['startSec']) || 0x0),
+  const value4 = Math['max'](0, Number(options2?.['startSec']) || 0),
     value5 = Math['max'](value4, Number(options2?.['endSec']) || value4),
     value6 = Number(options2?.['keyframeTimeSec']),
-    width = Math['max'](0x0, Number(options2?.['frame']?.['width']) || 0x0),
-    height = Math['max'](0x0, Number(options2?.['frame']?.['height']) || 0x0);
+    width = Math['max'](0, Number(options2?.['frame']?.['width']) || 0),
+    height = Math['max'](0, Number(options2?.['frame']?.['height']) || 0);
   return {
     keyframeRef: keyframeRef,
     keyframeTimeSec: Number['isFinite'](value6) ? clamp(value6, value4, value5, value4) : value4,
@@ -91,8 +91,8 @@ export function buildPersonReplacementDetectedShotCutRanges({
           Number(value9?.['endTimeSec']) - Number(value10?.['endTimeSec']),
       );
   if (!sourceId || !list3['length']) throw new Error('智能检测缺少可映射的原始片段');
-  const value11 = Math['max'](0x0, Number(list3[0x0]?.['startTimeSec']) || 0x0),
-    value12 = Math['max'](value11, Number(list3[list3['length'] - 0x1]?.['endTimeSec']) || value11),
+  const value11 = Math['max'](0, Number(list3[0]?.['startTimeSec']) || 0),
+    value12 = Math['max'](value11, Number(list3[list3['length'] - 1]?.['endTimeSec']) || value11),
     list4 = (Array['isArray'](shotBundles) ? shotBundles : [])
       ['filter']((value13) => value13 && typeof value13 === 'object')
       ['sort'](
@@ -102,9 +102,9 @@ export function buildPersonReplacementDetectedShotCutRanges({
       ),
     list5 = [];
   list4['forEach']((bundle, count) => {
-    const value16 = count === 0x0 ? value11 : Math['max'](value11, Number(bundle?.['start']) || value11),
+    const value16 = count === 0 ? value11 : Math['max'](value11, Number(bundle?.['start']) || value11),
       startSec2 = Math['min'](value12, value16),
-      value17 = list5[list5['length'] - 0x1],
+      value17 = list5[list5['length'] - 1],
       value18 = value17 && value12 - startSec2 < PERSON_REPLACEMENT_CUT_MIN_SEC,
       value19 = value17 && startSec2 - value17['startSec'] < PERSON_REPLACEMENT_CUT_MIN_SEC;
     if (value18 || value19) return;
@@ -113,17 +113,17 @@ export function buildPersonReplacementDetectedShotCutRanges({
   if (!list5['length'] || !(value12 > value11)) throw new Error('智能检测未返回可用切口');
   const map2 = new Set();
   return list5['map']((value20, count2) => {
-    const startSec3 = count2 === 0x0 ? value11 : value20['startSec'],
-      endSec2 = count2 + 0x1 < list5['length'] ? list5[count2 + 0x1]['startSec'] : value12;
+    const startSec3 = count2 === 0 ? value11 : value20['startSec'],
+      endSec2 = count2 + 1 < list5['length'] ? list5[count2 + 1]['startSec'] : value12;
     if (endSec2 - startSec3 < PERSON_REPLACEMENT_CUT_MIN_SEC) throw new Error('智能检测返回了无效切口');
     const personReplacementShotCutOrigin = findPersonReplacementShotCutOrigin(list3, startSec3, endSec2),
       originShotId = normalizeText(personReplacementShotCutOrigin?.['id']);
     if (!originShotId) throw new Error('智能检测结果无法映射到原始片段');
-    const value21 = originShotId + ':detected:' + Math['round'](startSec3 * 0x3e8),
+    const value21 = originShotId + ':detected:' + Math['round'](startSec3 * 1000),
       shotId = map2['has'](originShotId) ? value21 : originShotId;
     map2['add'](shotId);
     const outputFps = Math['max'](
-        0x1,
+        1,
         Number(value20['bundle']?.['fps']) ||
           Number(fps) ||
           Number(personReplacementShotCutOrigin?.['outputFps']) ||
@@ -172,18 +172,18 @@ export function normalizePersonReplacementShotCutRanges(
         normalizeText(value25['sourceId'] || enabled['sourceId']) !== normalizeText(enabled['sourceId']) ||
         !Number['isFinite'](startSec4) ||
         !Number['isFinite'](endSec3) ||
-        startSec4 < 0x0 ||
+        startSec4 < 0 ||
         endSec3 - startSec4 < PERSON_REPLACEMENT_CUT_MIN_SEC
       )
-        throw new Error('片段\x20' + (shotId2 || '未知') + ' 的切口范围无效');
+        throw new Error('片段 ' + (shotId2 || '未知') + ' 的切口范围无效');
       map5['add'](shotId2);
       const keyframeRef3 = normalizeText(value25?.['keyframeRef']),
         value27 = Number(value25?.['keyframeTimeSec']),
         keyframeTimeSec2 = Number['isFinite'](value27)
           ? Math['max'](startSec4, Math['min'](endSec3, value27))
           : startSec4,
-        width2 = Math['max'](0x0, Number(value25?.['frame']?.['width']) || 0x0),
-        height2 = Math['max'](0x0, Number(value25?.['frame']?.['height']) || 0x0);
+        width2 = Math['max'](0, Number(value25?.['frame']?.['width']) || 0),
+        height2 = Math['max'](0, Number(value25?.['frame']?.['height']) || 0);
       return {
         shotId: shotId2,
         sourceId: normalizeText(enabled['sourceId']),
@@ -203,8 +203,8 @@ export function normalizePersonReplacementShotCutRanges(
     });
   return (
     list9['forEach']((value28, value29) => {
-      const enabled2 = list9[value29 - 0x1],
-        enabled3 = list9[value29 + 0x1],
+      const enabled2 = list9[value29 - 1],
+        enabled3 = list9[value29 + 1],
         enabled4 = map3['get'](value28['originShotId'] || value28['shotId']),
         value30 = map4['get'](value28['sourceId']);
       if (!enabled4) throw new Error('片段 ' + (value28['shotId'] || '未知') + ' 缺少原始片段');
@@ -214,12 +214,12 @@ export function normalizePersonReplacementShotCutRanges(
         value32 = allowTimelineReplacement ? Number(value30?.['endSec']) : Number(enabled4['endTimeSec']);
       if (
         (!enabled2 || enabled2['sourceId'] !== value28['sourceId']) &&
-        Math['abs'](value28['startSec'] - (value31 || 0x0)) > PERSON_REPLACEMENT_CUT_EPSILON_SEC
+        Math['abs'](value28['startSec'] - (value31 || 0)) > PERSON_REPLACEMENT_CUT_EPSILON_SEC
       )
         throw new Error('每段源视频的起点不能通过内部切口编辑器修改');
       if (
         (!enabled3 || enabled3['sourceId'] !== value28['sourceId']) &&
-        Math['abs'](value28['endSec'] - (value32 || 0x0)) > PERSON_REPLACEMENT_CUT_EPSILON_SEC
+        Math['abs'](value28['endSec'] - (value32 || 0)) > PERSON_REPLACEMENT_CUT_EPSILON_SEC
       )
         throw new Error('每段源视频的终点不能通过内部切口编辑器修改');
       if (
@@ -240,28 +240,28 @@ export function normalizePersonReplacementShotCutRanges(
 }
 export function getPersonReplacementShotDurationSec(value35) {
   const count3 = Number(value35?.['durationSec']);
-  if (Number['isFinite'](count3) && count3 > 0x0) return count3;
+  if (Number['isFinite'](count3) && count3 > 0) return count3;
   const count4 = Number(value35?.['endTimeSec']) - Number(value35?.['startTimeSec']);
-  return Number['isFinite'](count4) && count4 > 0x0 ? count4 : 0.1;
+  return Number['isFinite'](count4) && count4 > 0 ? count4 : 0.1;
 }
 export function getPersonReplacementShotCutFrameSec(value36, value37) {
   const value38 = Math['max'](
-    0x1,
+    1,
     Number(value36?.['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
     Number(value37?.['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
   );
-  return Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, 0x1 / value38);
+  return Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, 1 / value38);
 }
 function getPersonReplacementShotCutSplitFrameSec(options3 = {}) {
-  const value39 = Math['max'](0x1, Number(options3?.['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS);
-  return Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, 0x1 / value39);
+  const value39 = Math['max'](1, Number(options3?.['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS);
+  return Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, 1 / value39);
 }
-export function canSplitPersonReplacementShotCutRange(options4 = {}, value40 = 0x0) {
+export function canSplitPersonReplacementShotCutRange(options4 = {}, value40 = 0) {
   const value41 = Math['max'](
       PERSON_REPLACEMENT_CUT_MIN_SEC,
       Number(options4?.['durationSec']) ||
         Number(options4?.['endSec']) - Number(options4?.['startSec']) ||
-        0x0,
+        0,
     ),
     personReplacementShotCutSplitFrameSec = getPersonReplacementShotCutSplitFrameSec(options4),
     value42 = Number(value40);
@@ -276,13 +276,13 @@ function getPersonReplacementShotCutMergeSelection(list10 = [], value43 = []) {
     list12 = [
       ...new Set((Array['isArray'](value43) ? value43 : [])['map'](normalizeText)['filter'](Boolean)),
     ];
-  if (list12['length'] !== 0x2) return null;
+  if (list12['length'] !== 2) return null;
   const leftIndex = list12['map']((value44) =>
     list11['findIndex']((value45) => normalizeText(value45?.['shotId']) === value44),
   )['sort']((value46, value47) => value46 - value47);
-  if (leftIndex[0x0] < 0x0 || leftIndex[0x1] !== leftIndex[0x0] + 0x1) return null;
-  const left = list11[leftIndex[0x0]],
-    right = list11[leftIndex[0x1]];
+  if (leftIndex[0] < 0 || leftIndex[1] !== leftIndex[0] + 1) return null;
+  const left = list11[leftIndex[0]],
+    right = list11[leftIndex[1]];
   if (
     !normalizeText(left?.['sourceId']) ||
     normalizeText(left?.['sourceId']) !== normalizeText(right?.['sourceId']) ||
@@ -290,7 +290,7 @@ function getPersonReplacementShotCutMergeSelection(list10 = [], value43 = []) {
     Math['abs'](Number(left?.['endSec']) - Number(right?.['startSec'])) > PERSON_REPLACEMENT_CUT_EPSILON_SEC
   )
     return null;
-  return { left: left, right: right, leftIndex: leftIndex[0x0] };
+  return { left: left, right: right, leftIndex: leftIndex[0] };
 }
 export function canMergePersonReplacementShotCutRanges(list13 = [], value48 = []) {
   return Boolean(getPersonReplacementShotCutMergeSelection(list13, value48));
@@ -304,25 +304,25 @@ export function mergePersonReplacementShotCutRanges(
     personReplacementShotCutMergeSelection = getPersonReplacementShotCutMergeSelection(list15, value49);
   if (!personReplacementShotCutMergeSelection) return list14;
   const { left: left2, right: right2, leftIndex: leftIndex2 } = personReplacementShotCutMergeSelection,
-    startSec5 = Math['max'](0x0, Number(left2['startSec']) || 0x0),
+    startSec5 = Math['max'](0, Number(left2['startSec']) || 0),
     endSec4 = Math['max'](startSec5, Number(right2['endSec']) || startSec5);
   if (endSec4 - startSec5 < PERSON_REPLACEMENT_CUT_MIN_SEC) return list14;
   const originShotId3 = normalizeText(left2['originShotId']) || normalizeText(left2['shotId']),
     shotId3 =
-      originShotId3 + ':merge:' + Math['round'](startSec5 * 0x3e8) + '-' + Math['round'](endSec4 * 0x3e8);
+      originShotId3 + ':merge:' + Math['round'](startSec5 * 1000) + '-' + Math['round'](endSec4 * 1000);
   if (
     !originShotId3 ||
     list15['some'](
       (value50, value51) =>
         value51 !== leftIndex2 &&
-        value51 !== leftIndex2 + 0x1 &&
+        value51 !== leftIndex2 + 1 &&
         normalizeText(value50?.['shotId']) === shotId3,
     )
   )
     return list14;
   const text3 = normalizeText(preferredShotId),
     value52 = [left2, right2]
-      ['sort']((value53) => (normalizeText(value53?.['shotId']) === text3 ? -0x1 : 0x1))
+      ['sort']((value53) => (normalizeText(value53?.['shotId']) === text3 ? -1 : 1))
       ['find']((value54) => getPersonReplacementShotCutKeyframePatch(value54)),
     value55 = value52 ? getPersonReplacementShotCutKeyframePatch(value52) : null,
     value56 = {
@@ -333,7 +333,7 @@ export function mergePersonReplacementShotCutRanges(
       endSec: endSec4,
       durationSec: endSec4 - startSec5,
       outputFps: Math['max'](
-        0x1,
+        1,
         Number(left2['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
         Number(right2['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
       ),
@@ -341,14 +341,14 @@ export function mergePersonReplacementShotCutRanges(
     };
   return list15['flatMap']((value57, value58) => {
     if (value58 === leftIndex2) return [value56];
-    if (value58 === leftIndex2 + 0x1) return [];
+    if (value58 === leftIndex2 + 1) return [];
     return [value57];
   })['map']((args2, index2) => ({ ...args2, index: index2 }));
 }
 export function createPersonReplacementShotCutDraft(options5 = {}) {
   const list16 = Array['isArray'](options5['shots']) ? options5['shots'] : [],
     list17 = list16['map']((args3, index3) => {
-      const startSec6 = Math['max'](0x0, Number(args3['startTimeSec']) || 0x0),
+      const startSec6 = Math['max'](0, Number(args3['startTimeSec']) || 0),
         endSec5 = Math['max'](startSec6, Number(args3['endTimeSec']) || startSec6),
         value59 =
           args3?.['keyframeManuallySelected'] === !![]
@@ -365,13 +365,13 @@ export function createPersonReplacementShotCutDraft(options5 = {}) {
         startSec: startSec6,
         endSec: endSec5,
         durationSec: Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, endSec5 - startSec6),
-        outputFps: Math['max'](0x1, Number(args3['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
+        outputFps: Math['max'](1, Number(args3['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
         ...(args3['isReversed'] === !![] ? { isReversed: !![] } : {}),
         ...(value59 || {}),
       };
     });
-  for (let value60 = 0x1; value60 < list17['length']; value60 += 0x1) {
-    const enabled5 = list17[value60 - 0x1],
+  for (let value60 = 1; value60 < list17['length']; value60 += 1) {
+    const enabled5 = list17[value60 - 1],
       value61 = list17[value60];
     if (!enabled5['sourceId'] || enabled5['sourceId'] !== value61['sourceId']) continue;
     const personReplacementShotCutFrameSec = getPersonReplacementShotCutFrameSec(enabled5, value61),
@@ -454,13 +454,13 @@ export function hasPersonReplacementShotCutUpdateChanges(list20 = [], value69 = 
 export function movePersonReplacementShotCutBoundary(list23 = [], value72, value73) {
   const list24 = (Array['isArray'](list23) ? list23 : [])['map']((args4) => ({ ...args4 })),
     count5 = Math['trunc'](Number(value72));
-  if (!(count5 > 0x0 && count5 < list24['length'])) return list24;
-  const enabled7 = list24[count5 - 0x1],
+  if (!(count5 > 0 && count5 < list24['length'])) return list24;
+  const enabled7 = list24[count5 - 1],
     value74 = list24[count5];
   if (!enabled7?.['sourceId'] || enabled7['sourceId'] !== value74?.['sourceId']) return list24;
   const personReplacementShotCutFrameSec2 = getPersonReplacementShotCutFrameSec(enabled7, value74),
     value75 = Math['max'](
-      0x1,
+      1,
       Number(enabled7['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
       Number(value74['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
     ),
@@ -480,46 +480,46 @@ export function movePersonReplacementShotCutBoundary(list23 = [], value72, value
 export function countEditablePersonReplacementShotCuts(list25 = []) {
   return list25['reduce'](
     (value78, value79, count6) =>
-      count6 > 0x0 && list25[count6 - 0x1]?.['sourceId'] === value79['sourceId'] ? value78 + 0x1 : value78,
-    0x0,
+      count6 > 0 && list25[count6 - 1]?.['sourceId'] === value79['sourceId'] ? value78 + 1 : value78,
+    0,
   );
 }
 export function getPersonReplacementShotCutTotalDuration(list26 = []) {
   return (Array['isArray'](list26) ? list26 : [])['reduce'](
     (value80, value81) =>
-      value80 + Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(value81?.['durationSec']) || 0x0),
-    0x0,
+      value80 + Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(value81?.['durationSec']) || 0),
+    0,
   );
 }
 export function getPersonReplacementShotCutDisplayDuration(list27 = []) {
   return getMediaClipTimelineDisplayDuration(getPersonReplacementShotCutTotalDuration(list27));
 }
-export function getPersonReplacementShotCutPositionAtTimelineSec(list28 = [], value82 = 0x0) {
+export function getPersonReplacementShotCutPositionAtTimelineSec(list28 = [], value82 = 0) {
   const list29 = Array['isArray'](list28) ? list28 : [],
     totalDurationSec = getPersonReplacementShotCutTotalDuration(list29),
-    timelineSec = clamp(value82, 0x0, totalDurationSec, 0x0);
-  let value83 = 0x0;
-  for (let shotIndex = 0x0; shotIndex < list29['length']; shotIndex += 0x1) {
+    timelineSec = clamp(value82, 0, totalDurationSec, 0);
+  let value83 = 0;
+  for (let shotIndex = 0; shotIndex < list29['length']; shotIndex += 1) {
     const sourceTimeSec = list29[shotIndex],
-      count7 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(sourceTimeSec?.['durationSec']) || 0x0),
-      value84 = shotIndex === list29['length'] - 0x1;
+      count7 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(sourceTimeSec?.['durationSec']) || 0),
+      value84 = shotIndex === list29['length'] - 1;
     if (timelineSec < value83 + count7 || value84) {
-      const clamp5 = clamp(timelineSec - value83, 0x0, count7, 0x0),
-        value85 = Number(sourceTimeSec?.['startSec']) || 0x0,
+      const clamp5 = clamp(timelineSec - value83, 0, count7, 0),
+        value85 = Number(sourceTimeSec?.['startSec']) || 0,
         value86 = Math['max'](value85, Number(sourceTimeSec?.['endSec']) || value85),
         personReplacementShotCutSplitFrameSec2 = getPersonReplacementShotCutSplitFrameSec(sourceTimeSec),
         value87 = Math['max'](
-          0x0,
+          0,
           value86 - value85 - Math['min'](personReplacementShotCutSplitFrameSec2, value86 - value85),
         ),
-        value88 = count7 > 0x0 ? clamp(clamp5 / count7, 0x0, 0x1, 0x0) : 0x0;
+        value88 = count7 > 0 ? clamp(clamp5 / count7, 0, 1, 0) : 0;
       return {
         shotId: normalizeText(sourceTimeSec?.['shotId']),
         sourceId: normalizeText(sourceTimeSec?.['sourceId']),
         shotIndex: shotIndex,
         sourceTimeSec:
           sourceTimeSec?.['isReversed'] === !![]
-            ? clamp(value85 + value87 * (0x1 - value88), value85, value86, value85)
+            ? clamp(value85 + value87 * (1 - value88), value85, value86, value85)
             : clamp(value85 + clamp5, value85, value86, value85),
         timelineSec: timelineSec,
         totalDurationSec: totalDurationSec,
@@ -530,20 +530,20 @@ export function getPersonReplacementShotCutPositionAtTimelineSec(list28 = [], va
   return {
     shotId: '',
     sourceId: '',
-    shotIndex: -0x1,
-    sourceTimeSec: 0x0,
-    timelineSec: 0x0,
+    shotIndex: -1,
+    sourceTimeSec: 0,
+    timelineSec: 0,
     totalDurationSec: totalDurationSec,
   };
 }
-export function splitPersonReplacementShotCutAtTimelineSec(list30 = [], value89 = 0x0) {
+export function splitPersonReplacementShotCutAtTimelineSec(list30 = [], value89 = 0) {
   const list31 = Array['isArray'](list30) ? list30 : [],
     personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(list31),
-    clamp6 = clamp(value89, 0x0, personReplacementShotCutTotalDuration, 0x0);
-  let value90 = 0x0;
-  for (let value91 = 0x0; value91 < list31['length']; value91 += 0x1) {
+    clamp6 = clamp(value89, 0, personReplacementShotCutTotalDuration, 0);
+  let value90 = 0;
+  for (let value91 = 0; value91 < list31['length']; value91 += 1) {
     const args5 = list31[value91],
-      value92 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(args5?.['durationSec']) || 0x0),
+      value92 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(args5?.['durationSec']) || 0),
       value93 = clamp6 - value90;
     if (!canSplitPersonReplacementShotCutRange(args5, value93)) {
       value90 += value92;
@@ -551,12 +551,12 @@ export function splitPersonReplacementShotCutAtTimelineSec(list30 = [], value89 
     }
     const endSec6 = clamp(
         Number(args5['startSec']) + value93,
-        Number(args5['startSec']) || 0x0,
-        Number(args5['endSec']) || Number(args5['startSec']) || 0x0,
-        Number(args5['startSec']) || 0x0,
+        Number(args5['startSec']) || 0,
+        Number(args5['endSec']) || Number(args5['startSec']) || 0,
+        Number(args5['startSec']) || 0,
       ),
       originShotId4 = normalizeText(args5['originShotId']) || normalizeText(args5['shotId']),
-      shotId5 = originShotId4 + ':split:' + Math['round'](endSec6 * 0x3e8);
+      shotId5 = originShotId4 + ':split:' + Math['round'](endSec6 * 1000);
     if (list31['some']((value94) => normalizeText(value94?.['shotId']) === shotId5)) return list31;
     const personReplacementShotCutKeyframePatch = getPersonReplacementShotCutKeyframePatch(args5),
       args6 = personReplacementShotCutKeyframePatch
@@ -589,25 +589,25 @@ export function splitPersonReplacementShotCutAtTimelineSec(list30 = [], value89 
 }
 export function getPersonReplacementShotCutTimelineSec(list32 = [], value99, value100) {
   const text6 = normalizeText(value99);
-  let value101 = 0x0;
+  let value101 = 0;
   for (const value102 of Array['isArray'](list32) ? list32 : []) {
-    const value103 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(value102?.['durationSec']) || 0x0);
+    const value103 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(value102?.['durationSec']) || 0);
     if (normalizeText(value102?.['shotId']) === text6) {
       if (value102?.['isReversed'] === !![]) {
-        const value104 = Number(value102?.['startSec']) || 0x0,
+        const value104 = Number(value102?.['startSec']) || 0,
           value105 = Math['max'](value104, Number(value102?.['endSec']) || value104),
           personReplacementShotCutSplitFrameSec3 = getPersonReplacementShotCutSplitFrameSec(value102),
           count8 = Math['max'](
-            0x0,
+            0,
             value105 - value104 - Math['min'](personReplacementShotCutSplitFrameSec3, value105 - value104),
           );
-        if (!(count8 > 0x0)) return value101;
-        const clamp7 = clamp(Number(value100) - value104, 0x0, count8, 0x0);
-        return value101 + (0x1 - clamp7 / count8) * value103;
+        if (!(count8 > 0)) return value101;
+        const clamp7 = clamp(Number(value100) - value104, 0, count8, 0);
+        return value101 + (1 - clamp7 / count8) * value103;
       }
-      return value101 + clamp(Number(value100) - Number(value102?.['startSec']), 0x0, value103, 0x0);
+      return value101 + clamp(Number(value100) - Number(value102?.['startSec']), 0, value103, 0);
     }
     value101 += value103;
   }
-  return 0x0;
+  return 0;
 }

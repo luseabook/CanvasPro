@@ -9,57 +9,57 @@ import {
   ErrorType,
 } from './index.js';
 (test('errors: parseError 通用解析-余额不足', () => {
-  const error = parseError('unknown', { message: '余额不足' }, 0x190);
+  const error = parseError('unknown', { message: '余额不足' }, 400);
   (assert.ok(error instanceof ApiError),
     assert.equal(error.type, ErrorType.INSUFFICIENT_BALANCE),
     assert.equal(error.retryable, false));
 }),
   test('errors: parseError 通用解析-鉴权失败', () => {
-    const error2 = parseError('unknown', { message: 'bad' }, 0x191);
+    const error2 = parseError('unknown', { message: 'bad' }, 401);
     (assert.ok(error2 instanceof ApiError),
       assert.equal(error2.type, ErrorType.AUTH_ERROR),
       assert.equal(error2.retryable, false));
   }),
   test('errors: parseError 通用解析-限流', () => {
-    const error3 = parseError('unknown', { message: 'rate limit' }, 0x1ad);
+    const error3 = parseError('unknown', { message: 'rate limit' }, 429);
     (assert.ok(error3 instanceof ApiError),
       assert.equal(error3.type, ErrorType.RATE_LIMIT),
       assert.equal(error3.retryable, true));
   }),
   test('errors: parseError 通用解析-内容过滤', () => {
-    const error4 = parseError('unknown', { message: 'safety filtered' }, 0x190);
+    const error4 = parseError('unknown', { message: 'safety filtered' }, 400);
     (assert.ok(error4 instanceof ApiError),
       assert.equal(error4.type, ErrorType.CONTENT_FILTERED),
       assert.equal(error4.retryable, false));
   }),
   test('errors: parseError 通用解析-HTTP 500', () => {
-    const error5 = parseError('unknown', { message: 'server error' }, 0x1f4);
+    const error5 = parseError('unknown', { message: 'server error' }, 500);
     (assert.ok(error5 instanceof ApiError),
       assert.equal(error5.type, ErrorType.SERVER_ERROR),
       assert.equal(error5.retryable, true));
   }),
   test('errors: parseError 通用解析不会把对象错误显示为 [object Object]', () => {
-    const error6 = parseError('agnes', { error: { message: 'invalid api key', code: 0x191 } }, 0x191);
+    const error6 = parseError('agnes', { error: { message: 'invalid api key', code: 401 } }, 401);
     (assert.ok(error6 instanceof ApiError),
       assert.equal(error6.type, ErrorType.AUTH_ERROR),
       assert.match(error6.getUserMessage(), /invalid api key/),
       assert.doesNotMatch(error6.getUserMessage(), /\[object Object\]/));
   }),
   test('errors: parseError Agnes 映射官方 HTTP 错误码', () => {
-    const error7 = parseError('agnes', { message: 'Invalid request. Check request parameters' }, 0x190);
+    const error7 = parseError('agnes', { message: 'Invalid request. Check request parameters' }, 400);
     (assert.ok(error7 instanceof ApiError),
       assert.equal(error7.type, ErrorType.INVALID_PARAMS),
       assert.equal(error7.retryable, false));
-    const error8 = parseError('agnes', { error: { message: 'Unauthorized. Check your API key' } }, 0x191);
+    const error8 = parseError('agnes', { error: { message: 'Unauthorized. Check your API key' } }, 401);
     (assert.ok(error8 instanceof ApiError),
       assert.equal(error8.type, ErrorType.AUTH_ERROR),
       assert.match(error8.getUserMessage(), /\[Agnes AI\]/),
       assert.match(error8.getUserMessage(), /Unauthorized/));
-    const error9 = parseError('agnes', { message: 'Task not found' }, 0x194);
+    const error9 = parseError('agnes', { message: 'Task not found' }, 404);
     (assert.ok(error9 instanceof ApiError),
       assert.equal(error9.type, ErrorType.INVALID_PARAMS),
       assert.equal(error9.retryable, false));
-    const error10 = parseError('agnes', { message: 'Service busy. Retry later' }, 0x1f7);
+    const error10 = parseError('agnes', { message: 'Service busy. Retry later' }, 503);
     (assert.ok(error10 instanceof ApiError),
       assert.equal(error10.type, ErrorType.SERVICE_UNAVAILABLE),
       assert.equal(error10.retryable, true));
@@ -111,7 +111,7 @@ import {
   test('errors: parseTaskError apimart 提取任务失败中的 error.message', () => {
     const error15 = parseTaskError('apimart', {
       status: 'failed',
-      error: { code: 0x190, message: 'Seedance request rejected', type: 'invalid_request' },
+      error: { code: 400, message: 'Seedance request rejected', type: 'invalid_request' },
     });
     (assert.ok(error15 instanceof ApiError),
       assert.equal(error15.type, ErrorType.TASK_FAILED),
@@ -133,24 +133,24 @@ import {
   }),
   test('errors: parseBatchErrors 会标记 batchIndex', () => {
     const list = parseBatchErrors('grsai', [
-      { success: false, error: '余额不足', status: 0x190 },
+      { success: false, error: '余额不足', status: 400 },
       { success: true },
-      { success: false, error: { message: 'rate limit' }, status: 0x1ad },
+      { success: false, error: { message: 'rate limit' }, status: 429 },
     ]);
     (assert.equal(list.length, 2), assert.equal(list[0].batchIndex, 0), assert.equal(list[1].batchIndex, 2));
   }),
   test('errors: runninghub(模型API) 使用模型专用错误码映射', () => {
-    const error17 = parseError('runninghub', { code: 0x5f0 }, 200);
+    const error17 = parseError('runninghub', { code: 1520 }, 200);
     (assert.ok(error17 instanceof ApiError),
       assert.equal(error17.type, ErrorType.RATE_LIMIT),
-      assert.equal(error17.code, 0x5f0),
+      assert.equal(error17.code, 1520),
       assert.equal(error17.retryable, true));
   }),
   test('errors: runninghubwf(工作流) 保持原错误码映射', () => {
-    const error18 = parseError('runninghubwf', { code: 0x32a }, 200);
+    const error18 = parseError('runninghubwf', { code: 810 }, 200);
     (assert.ok(error18 instanceof ApiError),
       assert.equal(error18.type, ErrorType.INVALID_PARAMS),
-      assert.equal(error18.code, 0x32a));
+      assert.equal(error18.code, 810));
   }),
   test('errors: runninghubwf 失败信息追加 failedReason 节点详情', () => {
     const error19 = parseTaskError('runninghubwf', {
@@ -218,13 +218,13 @@ import {
     });
     (assert.ok(taskError2 instanceof ApiError),
       assert.equal(taskError2.type, ErrorType.CONTENT_FILTERED),
-      assert.equal(taskError2.code, 0x5dd));
+      assert.equal(taskError2.code, 1501));
   }),
   test('errors: runninghub(模型API) parseTaskError 支持 results[0].errorCode=1501', () => {
     const taskError3 = parseTaskError('runninghub', { status: 'FAILED', results: [{ errorCode: '1501' }] });
     (assert.ok(taskError3 instanceof ApiError),
       assert.equal(taskError3.type, ErrorType.CONTENT_FILTERED),
-      assert.equal(taskError3.code, 0x5dd));
+      assert.equal(taskError3.code, 1501));
   }),
   test('errors: runninghub(模型API) parseTaskError 对 submitted/pending 不应误判失败', () => {
     const taskError4 = parseTaskError('runninghub', { status: 'submitted' }),

@@ -181,7 +181,7 @@ test('only the four preset manager node types are accepted', () => {
     assert.equal(isPromptPresetNodeTypeSupported(nodeType), true, nodeType);
     assert.equal(isPromptPresetNodeTypeSupported(`  ${nodeType}  `), true, nodeType);
   }
-  for (const nodeType of ['', ' ', 'text', 'ai-', null, undefined, 0x2a, {}, []]) {
+  for (const nodeType of ['', ' ', 'text', 'ai-', null, undefined, 42, {}, []]) {
     assert.equal(isPromptPresetNodeTypeSupported(nodeType), false, String(nodeType));
   }
 });
@@ -207,7 +207,7 @@ test('quick capture settings normalize to a supported node type or to empty', ()
     assert.equal(getDefaultQuickCapturePresetNodeType(), nodeType);
   }
 
-  for (const value of ['', '  ', 'text', 'ai-', null, undefined, 0x2a, {}]) {
+  for (const value of ['', '  ', 'text', 'ai-', null, undefined, 42, {}]) {
     __setPromptPresetSettingsForTest({ defaultQuickCaptureNodeType: value });
     assert.equal(getDefaultQuickCapturePresetNodeType(), '', String(value));
   }

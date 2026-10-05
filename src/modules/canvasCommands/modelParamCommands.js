@@ -53,7 +53,7 @@ function normalizeModelArgs(preserveParams = {}) {
 function validateModelPatchArgs(message, next = {}, current = {}) {
   const nodeId = String(next['nodeId'] || '')['trim']();
   if (!nodeId)
-    return { ok: ![], errorCode: 'MISSING_NODE_ID', message: message + '\x20requires\x20nodeId.' };
+    return { ok: ![], errorCode: 'MISSING_NODE_ID', message: message + ' requires nodeId.' };
   const node = getNode(current, nodeId);
   if (!node)
     return { ok: ![], errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId };
@@ -82,9 +82,9 @@ function validateModelPatchArgs(message, next = {}, current = {}) {
       message:
         'Model ' +
         modelId['modelId'] +
-        '\x20is\x20' +
+        ' is ' +
         (modelId['kind'] || '(unknown)') +
-        ',\x20not\x20' +
+        ', not ' +
         enabled +
         '.',
     };
@@ -160,10 +160,10 @@ export function registerModelParamCommands(entry) {
       execute: executeModelPatch,
     });
   }
-  (run('node.setModel', 'Set\x20a\x20manifest-backed\x20model\x20on\x20a\x20generation\x20node.'),
+  (run('node.setModel', 'Set a manifest-backed model on a generation node.'),
     run(
       'node.changeModel',
-      'Change\x20a\x20generation\x20node\x20to\x20another\x20manifest-backed\x20model.',
+      'Change a generation node to another manifest-backed model.',
     ),
     entry['register']({
       id: 'node.setParams',
@@ -185,7 +185,7 @@ export function registerModelParamCommands(entry) {
       validate(options3 = {}, payload = {}) {
         const nodeId2 = String(options3['nodeId'] || '')['trim']();
         if (!nodeId2)
-          return { ok: ![], errorCode: 'MISSING_NODE_ID', message: 'node.setParams\x20requires\x20nodeId.' };
+          return { ok: ![], errorCode: 'MISSING_NODE_ID', message: 'node.setParams requires nodeId.' };
         const node2 = getNode(payload, nodeId2);
         if (!node2)
           return { ok: ![], errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId2 };
@@ -204,7 +204,7 @@ export function registerModelParamCommands(entry) {
             message: 'Model manifest not found: ' + modelId2,
           };
         const map = getDeclaredParamIds(modelManifest);
-        if (map['size'] === 0x0)
+        if (map['size'] === 0)
           return {
             ok: ![],
             errorCode: 'MODEL_PARAMS_UNSUPPORTED',
@@ -212,18 +212,18 @@ export function registerModelParamCommands(entry) {
           };
         const args2 = normalizeParamsArgs(options3),
           changedParamIds = Object['keys'](args2);
-        if (changedParamIds['length'] === 0x0)
+        if (changedParamIds['length'] === 0)
           return {
             ok: ![],
             errorCode: 'MISSING_PARAMS',
             message: 'node.setParams requires params or field/value.',
           };
         const unknown = changedParamIds['filter']((handle) => !map['has'](handle));
-        if (unknown['length'] > 0x0)
+        if (unknown['length'] > 0)
           return {
             ok: ![],
             errorCode: 'UNSUPPORTED_MODEL_PARAM',
-            message: 'Unsupported model param(s): ' + unknown['join'](',\x20'),
+            message: 'Unsupported model param(s): ' + unknown['join'](', '),
             details: { modelId: modelId2, unknown: unknown },
           };
         const args3 = getPlainObject(node2['generationParams']),

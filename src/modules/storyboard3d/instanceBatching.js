@@ -1,21 +1,21 @@
 import * as threeRuntime from '../panoramaSceneNode/threeRuntime.js';
-export const STORYBOARD_3D_INSTANCE_BATCH_MIN_COUNT = 0x3;
-function finite(value, item = 0x0) {
+export const STORYBOARD_3D_INSTANCE_BATCH_MIN_COUNT = 3;
+function finite(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function vector3(index, result) {
   const data = Array['isArray'](index) ? index : [];
   return new threeRuntime['Vector3'](
-    finite(data[0x0], result[0x0]),
-    finite(data[0x1], result[0x1]),
-    finite(data[0x2], result[0x2]),
+    finite(data[0], result[0]),
+    finite(data[1], result[1]),
+    finite(data[2], result[2]),
   );
 }
 export function createStoryboard3DInstanceMatrix(box, options = null) {
-  const vector32 = vector3(box?.['position'], [0x0, 0x0, 0x0]),
-    box2 = vector3(box?.['rotation'], [0x0, 0x0, 0x0]),
-    box3 = vector3(box?.['scale'], [0x1, 0x1, 0x1]);
+  const vector32 = vector3(box?.['position'], [0, 0, 0]),
+    box2 = vector3(box?.['rotation'], [0, 0, 0]),
+    box3 = vector3(box?.['scale'], [1, 1, 1]);
   box3['set'](Math['max'](0.001, box3['x']), Math['max'](0.001, box3['y']), Math['max'](0.001, box3['z']));
   const target = new threeRuntime['Matrix4']()['compose'](
     vector32,
@@ -36,8 +36,8 @@ export function findStoryboard3DInstancingTemplate(enabled) {
     if (enabled2?.['isSkinnedMesh'] || enabled2?.['morphTargetInfluences']?.['length']) source = !![];
     if (enabled2?.['isMesh'] && !enabled2['isInstancedMesh']) list['push'](enabled2);
   });
-  if (source || list['length'] !== 0x1) return null;
-  const geometry = list[0x0];
+  if (source || list['length'] !== 1) return null;
+  const geometry = list[0];
   if (!geometry['geometry'] || !geometry['material']) return null;
   return {
     geometry: geometry['geometry'],
@@ -53,10 +53,10 @@ export function createStoryboard3DInstanceBatch({
   receiveShadow: receiveShadow = !![],
 } = {}) {
   if (!template?.['geometry'] || !template?.['material'])
-    throw new TypeError('An\x20instancing\x20template\x20is\x20required');
+    throw new TypeError('An instancing template is required');
   const list2 = Array['isArray'](objects) ? objects['filter']((next) => next?.['id']) : [];
-  if (list2['length'] === 0x0)
-    throw new Error('At\x20least\x20one\x20storyboard\x20object\x20is\x20required');
+  if (list2['length'] === 0)
+    throw new Error('At least one storyboard object is required');
   const list3 = Array['isArray'](template['material']) ? template['material'] : [template['material']],
     ownedMaterials = [],
     current = list3['map']((enabled3) => {
@@ -66,7 +66,7 @@ export function createStoryboard3DInstanceBatch({
     }),
     mesh = new threeRuntime['InstancedMesh'](
       template['geometry'],
-      Array['isArray'](template['material']) ? current : current[0x0],
+      Array['isArray'](template['material']) ? current : current[0],
       list2['length'],
     );
   return (
@@ -102,8 +102,8 @@ export function updateStoryboard3DInstanceTransform(
   scope,
   { recomputeBounds: recomputeBounds = !![] } = {},
 ) {
-  const count = enabled5?.['objectIds']?.['indexOf']?.(config) ?? -0x1;
-  if (count < 0x0 || !enabled5?.['mesh']?.['setMatrixAt']) return ![];
+  const count = enabled5?.['objectIds']?.['indexOf']?.(config) ?? -1;
+  if (count < 0 || !enabled5?.['mesh']?.['setMatrixAt']) return ![];
   (enabled5['mesh']['setMatrixAt'](count, createStoryboard3DInstanceMatrix(scope, enabled5['sourceMatrix'])),
     (enabled5['mesh']['instanceMatrix']['needsUpdate'] = !![]));
   if (recomputeBounds) refreshStoryboard3DInstanceBatchBounds(enabled5);

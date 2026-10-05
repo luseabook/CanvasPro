@@ -28,7 +28,7 @@ export function createAgentSkillPanel({
   windowObject: windowObject = globalThis['window'],
 } = {}) {
   hydrateDisabledAgentSkillIds({ registry: registry, windowObject: windowObject });
-  const element = createAgentElement('section', 'agent-custom-panel\x20agent-skill-panel');
+  const element = createAgentElement('section', 'agent-custom-panel agent-skill-panel');
   ((element['hidden'] = !![]), element['setAttribute']('aria-hidden', 'true'));
   const agentElement = createAgentElement('div', 'agent-custom-panel-header'),
     agentElement2 = createAgentElement('div', 'agent-custom-panel-copy'),
@@ -42,11 +42,11 @@ export function createAgentSkillPanel({
     el4 = createAgentButton('agent-custom-close-btn agent-skill-close-btn', '×');
   agentElement['append'](agentElement2, agentElement3);
   const el5 = createAgentElement('div', 'agent-skill-root-actions'),
-    el6 = createAgentButton('agent-secondary-btn\x20agent-skill-create-btn', text('skillCreate'), {
+    el6 = createAgentButton('agent-secondary-btn agent-skill-create-btn', text('skillCreate'), {
       icon: agentIconSvg('plus'),
     }),
     el7 = createAgentButton(
-      'agent-secondary-btn\x20agent-skill-operation-btn\x20agent-skill-import-btn',
+      'agent-secondary-btn agent-skill-operation-btn agent-skill-import-btn',
       text('skillImport'),
       { icon: agentIconSvg('upload') },
     ),
@@ -64,7 +64,7 @@ export function createAgentSkillPanel({
   (list['push']([agentSkillEditor['saveButton'], 'save']),
     element['append'](agentElement, el9, agentSkillEditor['element']));
   let enabled = '',
-    key = 0x0,
+    key = 0,
     index = '',
     result = '',
     enabled2 = ![];
@@ -79,7 +79,7 @@ export function createAgentSkillPanel({
       list2 = getInstalledSkills(registry);
     index && !list2['some']((options) => options['id'] === index) && ((index = ''), (result = ''));
     el9['replaceChildren']();
-    list2['length'] === 0x0 &&
+    list2['length'] === 0 &&
       el9['appendChild'](
         createAgentElement('div', 'agent-custom-empty agent-skill-empty', text('skillEmpty')),
       );
@@ -134,7 +134,7 @@ export function createAgentSkillPanel({
           el12['append'](el17, el16));
         if (name['editable']) {
           const el18 = createAgentButton(
-            'agent-icon-btn\x20agent-skill-action-btn\x20agent-skill-edit-btn',
+            'agent-icon-btn agent-skill-action-btn agent-skill-edit-btn',
             '',
             { title: text('skillEdit'), icon: agentIconSvg('edit') },
           );
@@ -148,7 +148,7 @@ export function createAgentSkillPanel({
       }
       (el11['append'](agentElement4, el12), el9['appendChild'](el11));
     }
-    (Number(count['diagnostics']?.['length'] || 0x0) > 0x0 &&
+    (Number(count['diagnostics']?.['length'] || 0) > 0 &&
       el9['appendChild'](
         createAgentElement(
           'div',
@@ -207,7 +207,7 @@ export function createAgentSkillPanel({
         (render(),
           count2?.['available'] === ![]
             ? onNotice?.(text('skillRefreshFailed'))
-            : onNotice?.(formatText('skillRefreshDone', { count: count2?.['loaded'] || 0x0 })));
+            : onNotice?.(formatText('skillRefreshDone', { count: count2?.['loaded'] || 0 })));
       },
       () => onNotice?.(text('skillRefreshFailed')),
     );
@@ -221,13 +221,13 @@ export function createAgentSkillPanel({
         if (name2?.['success'] === !![]) {
           render();
           const state =
-            name2['scriptsSkipped'] || Number(name2['skippedResources'] || 0x0) > 0x0
+            name2['scriptsSkipped'] || Number(name2['skippedResources'] || 0) > 0
               ? 'skillImportRestricted'
               : 'skillImportDone';
           onNotice?.(formatText(state, { name: name2['skillId'] || 'Skill' }));
           !element['hidden'] &&
             name2['skillId'] &&
-            el9['querySelector']('[data-agent-skill-insert="' + name2['skillId'] + '\x22]')?.['focus']?.();
+            el9['querySelector']('[data-agent-skill-insert="' + name2['skillId'] + '"]')?.['focus']?.();
           return;
         }
         if (name2?.['errorCode'] === 'SKILL_REFRESH_AFTER_INSTALL_FAILED')
@@ -250,7 +250,7 @@ export function createAgentSkillPanel({
       render(),
       !element['hidden'] &&
         index &&
-        el9['querySelector']('[data-agent-skill-delete-confirm="' + index + '\x22]')?.['focus']?.());
+        el9['querySelector']('[data-agent-skill-delete-confirm="' + index + '"]')?.['focus']?.());
   }
   function run4(scope) {
     if (enabled || index !== scope) return;
@@ -259,7 +259,7 @@ export function createAgentSkillPanel({
       render(),
       !element['hidden'] &&
         scope &&
-        el9['querySelector']('[data-agent-skill-delete=\x22' + scope + '\x22]')?.['focus']?.());
+        el9['querySelector']('[data-agent-skill-delete="' + scope + '"]')?.['focus']?.());
   }
   function confirmDelete(id) {
     if (enabled || index !== id) return Promise['resolve'](null);
@@ -292,7 +292,7 @@ export function createAgentSkillPanel({
       (el9['hidden'] = ![]),
       focusId &&
         !element['hidden'] &&
-        el9['querySelector']('[data-agent-skill-edit="' + focusId + '\x22]')?.['focus']?.());
+        el9['querySelector']('[data-agent-skill-edit="' + focusId + '"]')?.['focus']?.());
   }
   function run6(value2 = null) {
     if (enabled) return;
@@ -392,7 +392,7 @@ export function createAgentSkillPanel({
       const el27 = event['target']?.['closest']?.('[data-agent-skill-insert]');
       if (!el27 || el27['disabled']) return;
       if (typeof onUse === 'function') onUse(el27['dataset']['agentSkillInsert']);
-      else onInsert?.('$' + el27['dataset']['agentSkillInsert'] + '\x20');
+      else onInsert?.('$' + el27['dataset']['agentSkillInsert'] + ' ');
       close();
     }),
     el9['addEventListener']('wheel', agentScrollableWheelHandler, { passive: ![] }),
@@ -420,7 +420,7 @@ export function createAgentSkillPanel({
       refreshText: refreshText,
       destroy() {
         ((enabled2 = !![]),
-          (key += 0x1),
+          (key += 1),
           el9['removeEventListener']('wheel', agentScrollableWheelHandler),
           agentSkillEditor['element']['removeEventListener']('wheel', agentScrollableWheelHandler2, !![]),
           run2(''));

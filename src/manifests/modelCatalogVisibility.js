@@ -4,7 +4,7 @@ export function isModelProviderPubliclyListed(value) {
   const list = String(value || '')
     ['trim']()
     ['toLowerCase']();
-  return list['length'] > 0x0 && !HIDDEN_MODEL_PROVIDER_ID_SET['has'](list);
+  return list['length'] > 0 && !HIDDEN_MODEL_PROVIDER_ID_SET['has'](list);
 }
 export function isModelManifestPubliclyListed(item) {
   return Boolean(item && isModelProviderPubliclyListed(item['provider']));

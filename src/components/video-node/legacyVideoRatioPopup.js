@@ -17,7 +17,7 @@ export function restoreLegacyVideoRatioPopupAfterSync({ footer: footer, fallback
   const scheduleFrame =
     typeof requestAnimationFrame === 'function'
       ? requestAnimationFrame
-      : (callback) => setTimeout(callback, 0x0);
+      : (callback) => setTimeout(callback, 0);
   scheduleFrame(applyPopup);
 }
 export function syncLegacyVideoRatioFooter({

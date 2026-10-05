@@ -1,6 +1,6 @@
-const DEFAULT_VIEWPORT_WIDTH = 0x400,
-  DEFAULT_VIEWPORT_HEIGHT = 0x300,
-  DEFAULT_DURATION_MS = 0x370,
+const DEFAULT_VIEWPORT_WIDTH = 1024,
+  DEFAULT_VIEWPORT_HEIGHT = 768,
+  DEFAULT_DURATION_MS = 880,
   DEFAULT_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 function isReducedMotionPreferred(value) {
   try {
@@ -23,14 +23,14 @@ function resolveRevealPoint({
   sourceElement: sourceElement2,
 }) {
   const { width: width2, height: height } = getViewportSize(documentObject2, windowObject2),
-    item = { x: width2 / 0x2, y: height / 0x2 },
+    item = { x: width2 / 2, y: height / 2 },
     x = Number(event2?.['clientX']),
     y = Number(event2?.['clientY']);
-  if (Number['isFinite'](x) && Number['isFinite'](y) && (x !== 0x0 || y !== 0x0)) return { x: x, y: y };
+  if (Number['isFinite'](x) && Number['isFinite'](y) && (x !== 0 || y !== 0)) return { x: x, y: y };
   const el2 = sourceElement2 || event2?.['currentTarget'] || event2?.['target'];
   if (typeof el2?.['getBoundingClientRect'] !== 'function') return item;
   const x2 = el2['getBoundingClientRect']();
-  return { x: x2['left'] + x2['width'] / 0x2, y: x2['top'] + x2['height'] / 0x2 };
+  return { x: x2['left'] + x2['width'] / 2, y: x2['top'] + x2['height'] / 2 };
 }
 function getRevealRadius(key, index, result, data) {
   const { width: width3, height: height2 } = getViewportSize(key, index);
@@ -44,18 +44,18 @@ function getRevealRadius(key, index, result, data) {
   );
 }
 function formatPercentage(options, { roundUp: roundUp = ![] } = {}) {
-  const target = options * 0x2710,
-    source = (roundUp ? Math['ceil'](target) : Math['round'](target)) / 0x2710;
-  return String(Object['is'](source, -0x0) ? 0x0 : source);
+  const target = options * 10000,
+    source = (roundUp ? Math['ceil'](target) : Math['round'](target)) / 10000;
+  return String(Object['is'](source, -0) ? 0 : source);
 }
 function getRelativeRevealGeometry(next, current, entry, record) {
   const { width: width4, height: height3 } = getViewportSize(next, current),
     payload = Math['hypot'](width4, height3) / Math['SQRT2'],
     revealRadius = getRevealRadius(next, current, entry, record);
   return {
-    x: formatPercentage((entry / width4) * 0x64),
-    y: formatPercentage((record / height3) * 0x64),
-    radius: formatPercentage((revealRadius / payload) * 0x64, { roundUp: !![] }),
+    x: formatPercentage((entry / width4) * 100),
+    y: formatPercentage((record / height3) * 100),
+    radius: formatPercentage((revealRadius / payload) * 100, { roundUp: !![] }),
   };
 }
 export function runCircularRevealTransition({
@@ -102,8 +102,8 @@ export function runCircularRevealTransition({
         scope = el3['animate'](
           {
             clipPath: [
-              'circle(0px at ' + box['x'] + '%\x20' + box['y'] + '%)',
-              'circle(' + box['radius'] + '%\x20at\x20' + box['x'] + '%\x20' + box['y'] + '%)',
+              'circle(0px at ' + box['x'] + '% ' + box['y'] + '%)',
+              'circle(' + box['radius'] + '% at ' + box['x'] + '% ' + box['y'] + '%)',
             ],
           },
           { duration: duration, easing: easing, pseudoElement: '::view-transition-new(root)' },

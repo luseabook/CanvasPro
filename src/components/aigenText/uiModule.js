@@ -302,7 +302,7 @@ export function createAIGenTextNodeUiModule(value) {
             const config = await api.buildGenerateTextRequest(enabled5),
               outputText = formatFinalApiDebugRequest(config),
               scope = store.getState(),
-              x = this._data.x + (this._data.width || 0x17c) + 50,
+              x = this._data.x + (this._data.width || 380) + 50,
               y = this._data.y;
             let enabled6 = Object.values(scope.nodes).find((item2) => item2.type === 'debug');
             if (!enabled6) {
@@ -312,8 +312,8 @@ export function createAIGenTextNodeUiModule(value) {
                 type: 'debug',
                 x: x,
                 y: y,
-                width: 0x15e,
-                height: 0x104,
+                width: 350,
+                height: 260,
                 name: t('aigenText.debug.nodeName'),
                 outputText: outputText,
               });

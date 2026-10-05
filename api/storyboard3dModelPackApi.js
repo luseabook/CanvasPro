@@ -6,17 +6,17 @@ function normalizeText(value) {
 }
 function normalizeInstallProgress(item) {
   const error = item && typeof item === 'object' ? item : {},
-    downloadedBytes = Math['max'](0x0, Number(error['downloadedBytes']) || 0x0),
-    totalBytes = Math['max'](0x0, Number(error['totalBytes']) || 0x0),
-    key = totalBytes > 0x0 ? (downloadedBytes / totalBytes) * 0x64 : 0x0;
+    downloadedBytes = Math['max'](0, Number(error['downloadedBytes']) || 0),
+    totalBytes = Math['max'](0, Number(error['totalBytes']) || 0),
+    key = totalBytes > 0 ? (downloadedBytes / totalBytes) * 100 : 0;
   return {
     state: normalizeText(error['state']),
     downloadedBytes: downloadedBytes,
     totalBytes: totalBytes,
-    percent: Math['min'](0x64, Math['max'](0x0, Number(error['percent']) || key)),
+    percent: Math['min'](100, Math['max'](0, Number(error['percent']) || key)),
     currentSource: normalizeText(error['currentSource']),
-    completedSources: Math['max'](0x0, Math['floor'](Number(error['completedSources']) || 0x0)),
-    totalSources: Math['max'](0x0, Math['floor'](Number(error['totalSources']) || 0x0)),
+    completedSources: Math['max'](0, Math['floor'](Number(error['completedSources']) || 0)),
+    totalSources: Math['max'](0, Math['floor'](Number(error['totalSources']) || 0)),
     message: normalizeText(error['message']),
   };
 }
@@ -28,8 +28,8 @@ function normalizeStatus(index) {
     packId: normalizeText(success['packId']),
     version: normalizeText(success['version']),
     requiredVersion: normalizeText(success['requiredVersion']),
-    downloadBytes: Math['max'](0x0, Number(success['downloadBytes']) || 0x0),
-    assetCount: Math['max'](0x0, Math['floor'](Number(success['assetCount']) || 0x0)),
+    downloadBytes: Math['max'](0, Number(success['downloadBytes']) || 0),
+    assetCount: Math['max'](0, Math['floor'](Number(success['assetCount']) || 0)),
     assets: Array['isArray'](success['assets']) ? success['assets']['map']((args) => ({ ...args })) : [],
     installProgress: normalizeInstallProgress(success['installProgress']),
   };
@@ -43,20 +43,20 @@ function unwrap(response, result) {
   return normalizeStatus(response2);
 }
 export async function getStoryboard3DModelPackStatus() {
-  return unwrap(await get(MODEL_PACK_API + '/status', 0x7530), '无法读取\x203D\x20模型包状态。');
+  return unwrap(await get(MODEL_PACK_API + '/status', 30000), '无法读取 3D 模型包状态。');
 }
 export async function installStoryboard3DModelPack() {
-  return unwrap(await post(MODEL_PACK_API + '/install', {}, 0xf * 0x3c * 0x3e8), '3D 模型包安装失败。');
+  return unwrap(await post(MODEL_PACK_API + '/install', {}, 15 * 60 * 1000), '3D 模型包安装失败。');
 }
 export async function fetchStoryboard3DModelPackAssetFile(response3, { signal: signal } = {}) {
   const text = normalizeText(response3?.['url'] || response3?.['source']?.['url']);
   if (!text['startsWith'](MODEL_PACK_ASSET_PREFIX)) throw new Error('模型包资产地址无效。');
-  const response4 = await fetchWithTimeoutWithSignal(buildApiUrl(text), { method: 'GET' }, 0x1d4c0, signal);
+  const response4 = await fetchWithTimeoutWithSignal(buildApiUrl(text), { method: 'GET' }, 120000, signal);
   if (!response4['ok']) throw new Error('模型包资产下载失败：HTTP ' + response4['status']);
   const data = await response4['blob'](),
-    list = text['split']('?')[0x0],
+    list = text['split']('?')[0],
     value2 =
-      decodeURIComponent(list['slice'](list['lastIndexOf']('/') + 0x1)) ||
+      decodeURIComponent(list['slice'](list['lastIndexOf']('/') + 1)) ||
       'asset.' + (normalizeText(response3?.['format']) || 'obj'),
     type = response4['headers']?.['get']?.('content-type') || data['type'] || 'application/octet-stream';
   if (typeof File === 'function') return new File([data], value2, { type: type });

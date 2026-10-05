@@ -13,7 +13,7 @@ export function deferNodeEditCompletion(enabled, handler, handler2 = () => !![],
       handler(result && enabled['allowed']() && handler2());
     },
     options = () => handler3(![]),
-    setTimeout2 = setTimeout(options, 0x2710);
+    setTimeout2 = setTimeout(options, 10000);
   for (const target of index) el?.['addEventListener']?.(target, options, !![]);
   return (void enabled['wait']['then'](handler3, options), !![]);
 }

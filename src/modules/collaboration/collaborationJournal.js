@@ -11,7 +11,7 @@ export function createCollaborationJournal({
     if (!indexedDB) return Promise['resolve'](null);
     if (!promise)
       promise = new Promise((handler, handler2) => {
-        const item = indexedDB['open']('aicanvas-collaboration-recovery', 0x1);
+        const item = indexedDB['open']('aicanvas-collaboration-recovery', 1);
         ((item['onupgradeneeded'] = () => item['result']['createObjectStore']('pending')),
           (item['onsuccess'] = () => {
             const key = item['result'];
@@ -40,7 +40,7 @@ export function createCollaborationJournal({
     available: !!indexedDB,
     read: () => run2('readonly', (map) => map['get'](value)),
     write(args) {
-      const structuredClone2 = structuredClone({ ...args, schema: 0x1 });
+      const structuredClone2 = structuredClone({ ...args, schema: 1 });
       return run2('readwrite', (target) => target['put'](structuredClone2, value));
     },
     clear: () => run2('readwrite', (map2) => map2['delete'](value)),

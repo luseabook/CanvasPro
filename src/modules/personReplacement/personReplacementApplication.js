@@ -120,7 +120,7 @@ function nowIso() {
 }
 function createId(index) {
   const result = globalThis['crypto']?.['randomUUID']?.();
-  return index + '-' + (result || Date['now']() + '-' + Math['round'](Math['random']() * 0x186a0));
+  return index + '-' + (result || Date['now']() + '-' + Math['round'](Math['random']() * 100000));
 }
 function resolveMediaRef(response) {
   if (typeof response === 'string') return normalizeText(response);
@@ -145,7 +145,7 @@ function resolveDurationSec(options) {
       options?.['duration'] ??
       options?.['metadata']?.['duration'],
   );
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function resolveVideoThumbnailRef(target) {
   return normalizeText(
@@ -194,7 +194,7 @@ function createInitialProject() {
       sources: [],
       characters: [],
       shots: [],
-      workspace: { view: 'home', step: 0x1 },
+      workspace: { view: 'home', step: 1 },
       createdAt: createdAt,
       updatedAt: createdAt,
     }),
@@ -253,8 +253,8 @@ export function createReplacementStudioApplication({
       ((initialProject = record['project']),
         record['source'] === 'workspace' &&
           record['reason'] === 'step-change' &&
-          record['previousProject']?.['workspace']?.['step'] !== 0x3 &&
-          record['project']['workspace']?.['step'] === 0x3 &&
+          record['previousProject']?.['workspace']?.['step'] !== 3 &&
+          record['project']['workspace']?.['step'] === 3 &&
           void prepareVideoReplacementShots());
     });
   let args = normalizePersonReplacementProjectLibrary(),
@@ -265,7 +265,7 @@ export function createReplacementStudioApplication({
     persistenceState = {
       status: typeof saveWorkspace === 'function' ? 'saved' : 'idle',
       error: '',
-      retryAttempt: 0x0,
+      retryAttempt: 0,
     },
     abortController = null,
     personReplacementImageTaskRuntime = null,
@@ -298,7 +298,7 @@ export function createReplacementStudioApplication({
         navigation: {
           source: 'replacement-studio',
           projectId: projectId,
-          step: step ? 0x3 : handle ? 0x1 : 0x2,
+          step: step ? 3 : handle ? 1 : 2,
         },
         body: step ? '人物替换视频生成完成。' : handle ? '人物形象生成完成。' : '人物替换首帧生成完成。',
         mediaKind: step ? 'video' : 'image',
@@ -311,24 +311,24 @@ export function createReplacementStudioApplication({
     state = ({
       kind: kind = 'image',
       projectId: projectId = initialProject['id'],
-      totalCount: totalCount = 0x0,
-      successCount: successCount = 0x0,
+      totalCount: totalCount = 0,
+      successCount: successCount = 0,
     } = {}) => {
-      const enabled2 = Math['max'](0x0, Math['trunc'](Number(totalCount) || 0x0));
+      const enabled2 = Math['max'](0, Math['trunc'](Number(totalCount) || 0));
       if (!enabled2) return ![];
-      const config = Math['max'](0x0, Math['min'](enabled2, Math['trunc'](Number(successCount) || 0x0))),
+      const config = Math['max'](0, Math['min'](enabled2, Math['trunc'](Number(successCount) || 0))),
         body = enabled2 - config,
         scope = kind === 'asset' ? '人物形象' : kind === 'video' ? '替换视频' : '替换首帧';
       return (
         handler3({
           body:
-            body > 0x0
+            body > 0
               ? '批量' + scope + '生成已结束：成功 ' + config + ' 个，失败 ' + body + ' 个。'
-              : enabled2 + '\x20个' + scope + '已全部生成完成。',
+              : enabled2 + ' 个' + scope + '已全部生成完成。',
           navigation: {
             source: 'replacement-studio',
             projectId: projectId,
-            step: kind === 'video' ? 0x3 : kind === 'asset' ? 0x1 : 0x2,
+            step: kind === 'video' ? 3 : kind === 'asset' ? 1 : 2,
           },
         }),
         !![]
@@ -423,7 +423,7 @@ export function createReplacementStudioApplication({
         (persistenceState = {
           status: status,
           error: normalizeText(error),
-          retryAttempt: Math['max'](0x0, Math['trunc'](Number(retryAttempt) || 0x0)),
+          retryAttempt: Math['max'](0, Math['trunc'](Number(retryAttempt) || 0)),
         }),
         workspace?.['setPersistenceState']?.(cloneJson(persistenceState)),
         persistenceState
@@ -431,7 +431,7 @@ export function createReplacementStudioApplication({
     },
     workspacePersistenceCoordinator = createWorkspacePersistenceCoordinator({
       ready: ![],
-      debounceMs: 0x15e,
+      debounceMs: 350,
       save: saveWorkspace,
       getSnapshot: () => {
         return (rememberProject(), cloneJson(args));
@@ -608,7 +608,7 @@ export function createReplacementStudioApplication({
         void handler11({ expectedProjectId: initialProject['id'] }),
         void personReplacementImageTaskRuntime?.['resumeRecoverable']?.(),
         void videoTaskRuntime?.['resumeRecoverable']?.());
-      if (initialProject['workspace']['step'] === 0x3) void prepareVideoReplacementShots();
+      if (initialProject['workspace']['step'] === 3) void prepareVideoReplacementShots();
       return cloneJson(initialProject);
     },
     showProjectHome = () => {
@@ -683,8 +683,8 @@ export function createReplacementStudioApplication({
         value40 =
           Boolean(enabled7['videoRef']) &&
           initialProject['audio']['originalAudioRef'] === enabled7['videoRef'],
-        selectedSourceId = value39 ? title[0x0]?.['id'] || '' : initialProject['audio']['selectedSourceId'],
-        value41 = title['find']((value42) => value42['id'] === selectedSourceId) || title[0x0] || null,
+        selectedSourceId = value39 ? title[0]?.['id'] || '' : initialProject['audio']['selectedSourceId'],
+        value41 = title['find']((value42) => value42['id'] === selectedSourceId) || title[0] || null,
         value43 =
           Boolean(initialProject['output']['originalMasterRef']) &&
           initialProject['audio']['originalAudioRef'] === initialProject['output']['originalMasterRef'],
@@ -694,7 +694,7 @@ export function createReplacementStudioApplication({
           ...initialProject,
           title: title['length'] ? initialProject['title'] : '未命名人物替换项目',
           status: title['length'] ? initialProject['status'] : 'draft',
-          source: title[0x0] || {},
+          source: title[0] || {},
           sources: title,
           shots: shots,
           sourceCharacters: buildPersonReplacementSourceCharacters(shots, initialProject['sourceCharacters']),
@@ -742,10 +742,10 @@ export function createReplacementStudioApplication({
     const order2 = [...initialProject['sources']],
       list4 = list3['map']((error5, value47) => ({
         id: createId('source'),
-        fileName: normalizeText(error5['name']) || '视频 ' + (order2['length'] + value47 + 0x1),
+        fileName: normalizeText(error5['name']) || '视频 ' + (order2['length'] + value47 + 1),
         videoRef: '',
         processingStatus: 'uploading',
-        processingProgress: 0x0,
+        processingProgress: 0,
         order: order2['length'] + value47,
       }));
     (list4['forEach']((value48, value49) => {
@@ -755,14 +755,14 @@ export function createReplacementStudioApplication({
         ...initialProject,
         title:
           initialProject['title'] === '未命名人物替换项目'
-            ? createProjectTitle(list3[0x0]?.['name'])
+            ? createProjectTitle(list3[0]?.['name'])
             : initialProject['title'],
         sources: [...order2, ...list4],
-        source: order2[0x0] || list4[0x0],
-        workspace: { ...initialProject['workspace'], view: 'home', step: 0x1 },
+        source: order2[0] || list4[0],
+        workspace: { ...initialProject['workspace'], view: 'home', step: 1 },
       }));
     const sources2 = [];
-    for (let value50 = 0x0; value50 < list3['length']; value50 += 0x1) {
+    for (let value50 = 0; value50 < list3['length']; value50 += 1) {
       const value51 = list3[value50],
         selectedSourceId2 = list4[value50];
       try {
@@ -788,7 +788,7 @@ export function createReplacementStudioApplication({
                   thumbnailRef: thumbnailRef,
                   durationSec: durationSec || args6['durationSec'],
                   processingStatus: 'ready-to-start',
-                  processingProgress: 0x0,
+                  processingProgress: 0,
                 }
               : args6,
           ),
@@ -814,8 +814,8 @@ export function createReplacementStudioApplication({
       }
     }
     const ok = initialProject['sources']['filter']((value55) => value55['videoRef'])['length'];
-    if (ok) showToast('已加入 ' + ok + '\x20个视频。', 'success');
-    return { ok: ok > 0x0, project: snapshot(), sources: sources2 };
+    if (ok) showToast('已加入 ' + ok + ' 个视频。', 'success');
+    return { ok: ok > 0, project: snapshot(), sources: sources2 };
   }
   async function run2(id) {
     const { personDetection: personDetection, ...args8 } = id;
@@ -830,17 +830,17 @@ export function createReplacementStudioApplication({
           typeof personDetection === 'object' &&
           Array['isArray'](personDetection['people'])
             ? personDetection
-            : await detectPeople(id['keyframeRef'], { maxPeople: 0x20 }),
+            : await detectPeople(id['keyframeRef'], { maxPeople: 32 }),
         list5 = [...frame['people']]['sort']((value56, value57) => {
-          const value58 = Number(value56?.['bbox']?.['x']) || 0x0,
-            value59 = Number(value57?.['bbox']?.['x']) || 0x0,
-            value60 = Number(value56?.['bbox']?.['y']) || 0x0,
-            value61 = Number(value57?.['bbox']?.['y']) || 0x0;
+          const value58 = Number(value56?.['bbox']?.['x']) || 0,
+            value59 = Number(value57?.['bbox']?.['x']) || 0,
+            value60 = Number(value56?.['bbox']?.['y']) || 0,
+            value61 = Number(value57?.['bbox']?.['y']) || 0;
           return value58 - value59 || value60 - value61;
         }),
         people = list5['map']((bbox, value62) => ({
-          id: id['id'] + '-person-' + (value62 + 0x1),
-          sourceCharacterId: id['sourceId'] + '-' + id['id'] + '-person-' + (value62 + 0x1),
+          id: id['id'] + '-person-' + (value62 + 1),
+          sourceCharacterId: id['sourceId'] + '-' + id['id'] + '-person-' + (value62 + 1),
           targetCharacterId: '',
           targetAppearanceId: '',
           label: formatPersonReplacementPersonLabel(value62),
@@ -852,13 +852,13 @@ export function createReplacementStudioApplication({
           detectionMethod: 'automatic',
           bbox: bbox['bbox'],
           detectionConfidence: bbox['confidence'],
-          identityConfidence: 0x0,
-          identityMatchSimilarity: 0x0,
+          identityConfidence: 0,
+          identityMatchSimilarity: 0,
           identityReviewStatus: 'confirmed',
           identityReviewRequired: ![],
           identityMethod: 'fallback',
           ambiguousIdentityIds: [],
-          orientationConfidence: Number(bbox['orientationConfidence']) || 0x0,
+          orientationConfidence: Number(bbox['orientationConfidence']) || 0,
           orientation: bbox['orientation'] || 'unknown',
           orientationModelId: bbox['orientationModelId'] || '',
           occlusion: 'none',
@@ -868,7 +868,7 @@ export function createReplacementStudioApplication({
         frame: frame['frame'],
         people: people,
         analysisStatus: 'succeeded',
-        reviewRequired: people['length'] === 0x0,
+        reviewRequired: people['length'] === 0,
       };
     } catch (error7) {
       return (
@@ -894,7 +894,7 @@ export function createReplacementStudioApplication({
         analysis: {
           status: status3['length'] ? 'failed' : 'succeeded',
           modelId: '',
-          stats: { identityCount: 0x0, reviewCount: 0x0 },
+          stats: { identityCount: 0, reviewCount: 0 },
           error: status3['length'] ? '人物身份分析服务尚未初始化' : '',
         },
       };
@@ -909,7 +909,7 @@ export function createReplacementStudioApplication({
           status3['map']((shotId2, value66) => ({
             shotId: shotId2['id'],
             sourceId: shotId2['sourceId'],
-            sourceOrder: sourceOrder['get'](shotId2['sourceId']) ?? 0x0,
+            sourceOrder: sourceOrder['get'](shotId2['sourceId']) ?? 0,
             shotIndex: shotId2['index'] ?? value66,
             shotTimeSec: shotId2['keyframeTimeSec'] ?? shotId2['startTimeSec'],
             imageRef: shotId2['keyframeRef'],
@@ -923,7 +923,7 @@ export function createReplacementStudioApplication({
             autoThreshold: initialProject['settings']['identityAutoThreshold'],
             reviewThreshold: initialProject['settings']['identityReviewThreshold'],
             ambiguityMargin: initialProject['settings']['identityAmbiguityMargin'],
-            maxShotGap: 0x2,
+            maxShotGap: 2,
           },
         ),
         map5 = new Map(
@@ -983,7 +983,7 @@ export function createReplacementStudioApplication({
         analysis: {
           status: 'succeeded',
           modelId: modelId['modelId'],
-          stats: { ...(modelId['stats'] || {}), reviewCount: 0x0 },
+          stats: { ...(modelId['stats'] || {}), reviewCount: 0 },
           error: '',
         },
       };
@@ -1012,9 +1012,9 @@ export function createReplacementStudioApplication({
             stats: {
               identityCount: shots4['reduce'](
                 (value69, value70) => value69 + value70['people']['length'],
-                0x0,
+                0,
               ),
-              reviewCount: 0x0,
+              reviewCount: 0,
             },
             error: error10,
           },
@@ -1038,12 +1038,12 @@ export function createReplacementStudioApplication({
           value75 = Number['isFinite'](value73)
             ? value73
             : Number['isFinite'](value74)
-              ? value74 / 0x64
-              : 0x0,
-          value76 = processingStatus?.['phase'] === 'keyframes' ? 0x2d : 0x5,
-          processingProgress = Math['min'](0x58, Math['round'](value76 + value75 * 0x28)),
+              ? value74 / 100
+              : 0,
+          value76 = processingStatus?.['phase'] === 'keyframes' ? 45 : 5,
+          processingProgress = Math['min'](88, Math['round'](value76 + value75 * 40)),
           progress = Math['round'](
-            ((value72 + processingProgress / 0x64) / initialProject['sources']['length']) * 0x5a,
+            ((value72 + processingProgress / 100) / initialProject['sources']['length']) * 90,
           );
         setProject(
           {
@@ -1072,7 +1072,7 @@ export function createReplacementStudioApplication({
     return runSmartClip2['shotBundles']['map']((startTimeSec, index2) => {
       const videoRef2 = normalizeText(startTimeSec['clipRef']);
       return {
-        id: source2['id'] + '-' + (startTimeSec['id'] || 'shot-' + (index2 + 0x1)),
+        id: source2['id'] + '-' + (startTimeSec['id'] || 'shot-' + (index2 + 1)),
         sourceId: source2['id'],
         index: index2,
         startTimeSec: startTimeSec['start'],
@@ -1084,9 +1084,9 @@ export function createReplacementStudioApplication({
         keyframeIndex: startTimeSec['keyframeIndex'],
         keyframeTimeSec: startTimeSec['keyframeTimeSec'],
         personDetection: startTimeSec['personDetection'],
-        outputFps: startTimeSec['fps'] || 0x18,
+        outputFps: startTimeSec['fps'] || 24,
         materializationStatus: videoRef2 ? 'succeeded' : 'pending',
-        materializationProgress: videoRef2 ? 0x64 : 0x0,
+        materializationProgress: videoRef2 ? 100 : 0,
         people: [],
         analysisStatus: startTimeSec['keyframeRef'] ? 'running' : 'failed',
         reviewRequired: !![],
@@ -1111,15 +1111,15 @@ export function createReplacementStudioApplication({
       workspace: {
         ...initialProject['workspace'],
         view: 'project',
-        step: 0x1,
-        sourceAnalysis: { status: mode === 'skip' ? 'extracting-keyframes' : 'cutting', progress: 0x3 },
+        step: 1,
+        sourceAnalysis: { status: mode === 'skip' ? 'extracting-keyframes' : 'cutting', progress: 3 },
       },
       sources: initialProject['sources']['map']((args11) =>
         args11['videoRef']
           ? {
               ...args11,
               processingStatus: mode === 'skip' ? 'extracting-keyframes' : 'cutting',
-              processingProgress: 0x3,
+              processingProgress: 3,
               error: '',
             }
           : args11,
@@ -1133,7 +1133,7 @@ export function createReplacementStudioApplication({
       ));
     try {
       const selectedShotId = [];
-      for (let value79 = 0x0; value79 < list6['length']; value79 += 0x1) {
+      for (let value79 = 0; value79 < list6['length']; value79 += 1) {
         if (value78['aborted']) return { ok: ![], reason: 'cancelled' };
         const value80 = list6[value79],
           value81 = await run4(value80, mode, value78, value79);
@@ -1147,7 +1147,7 @@ export function createReplacementStudioApplication({
             shots: [...selectedShotId],
             sources: initialProject['sources']['map']((args12) =>
               args12['id'] === value80['id']
-                ? { ...args12, processingStatus: 'ready', processingProgress: 0x64, error: '' }
+                ? { ...args12, processingStatus: 'ready', processingProgress: 100, error: '' }
                 : args12,
             ),
             sourceCharacters: buildPersonReplacementSourceCharacters(
@@ -1156,10 +1156,10 @@ export function createReplacementStudioApplication({
             ),
             workspace: {
               ...initialProject['workspace'],
-              selectedShotId: selectedShotId[0x0]?.['id'] || '',
+              selectedShotId: selectedShotId[0]?.['id'] || '',
               sourceAnalysis: {
                 status: 'detecting',
-                progress: Math['round'](((value79 + 0x1) / list6['length']) * 0x64),
+                progress: Math['round'](((value79 + 1) / list6['length']) * 100),
               },
             },
           },
@@ -1172,7 +1172,7 @@ export function createReplacementStudioApplication({
           shots: selectedShotId,
           workspace: {
             ...initialProject['workspace'],
-            sourceAnalysis: { status: 'identifying', progress: 0x5e },
+            sourceAnalysis: { status: 'identifying', progress: 94 },
             identityAnalysis: { status: 'running', modelId: '', stats: {}, error: '' },
           },
         },
@@ -1187,9 +1187,9 @@ export function createReplacementStudioApplication({
           sourceCharacters: sourceCharacters2['sourceCharacters'],
           workspace: {
             ...initialProject['workspace'],
-            step: 0x1,
-            selectedShotId: shots5[0x0]?.['id'] || '',
-            sourceAnalysis: { status: 'identifying', progress: 0x60 },
+            step: 1,
+            selectedShotId: shots5[0]?.['id'] || '',
+            sourceAnalysis: { status: 'identifying', progress: 96 },
             identityAnalysis: sourceCharacters2['analysis'],
           },
         },
@@ -1210,13 +1210,13 @@ export function createReplacementStudioApplication({
             status: 'character_mapping',
             workspace: {
               ...initialProject['workspace'],
-              sourceAnalysis: { status: 'ready', progress: 0x64 },
+              sourceAnalysis: { status: 'ready', progress: 100 },
               identityAnalysis: sourceCharacters2['analysis'],
             },
           },
           { renderWorkspace: ![] },
         ));
-      const value84 = Number(sourceCharacters2['analysis']?.['stats']?.['identityCount']) || 0x0,
+      const value84 = Number(sourceCharacters2['analysis']?.['stats']?.['identityCount']) || 0,
         error13 = getPersonReplacementDetectionFeedback(shots5, value84);
       return (showToast(error13['message'], error13['level']), { ok: !![], project: snapshot() });
     } catch (error14) {
@@ -1225,10 +1225,10 @@ export function createReplacementStudioApplication({
       (setProject(
         {
           ...initialProject,
-          workspace: { ...initialProject['workspace'], sourceAnalysis: { status: 'failed', progress: 0x64 } },
+          workspace: { ...initialProject['workspace'], sourceAnalysis: { status: 'failed', progress: 100 } },
           sources: initialProject['sources']['map']((args13) =>
             args13['videoRef'] && args13['processingStatus'] !== 'ready'
-              ? { ...args13, processingStatus: 'failed', processingProgress: 0x64, error: error15 }
+              ? { ...args13, processingStatus: 'failed', processingProgress: 100, error: error15 }
               : args13,
           ),
         },
@@ -1288,11 +1288,11 @@ export function createReplacementStudioApplication({
         width: width,
         height: height,
       } = normalizePersonReplacementBoundingBox(bbox2 && typeof bbox2 === 'object' ? bbox2 : {});
-    if (!args14 || width <= 0x0 || height <= 0x0) return null;
+    if (!args14 || width <= 0 || height <= 0) return null;
     const id2 = createId(text10 + '-manual-person'),
       sourceCharacterId2 = createId('source-character-manual'),
       promptMarkerIndex =
-        Math['max'](-0x1, ...args14['people']['map']((value89) => value89['promptMarkerIndex'])) + 0x1,
+        Math['max'](-1, ...args14['people']['map']((value89) => value89['promptMarkerIndex'])) + 1,
       value90 = {
         id: id2,
         sourceCharacterId: sourceCharacterId2,
@@ -1303,15 +1303,15 @@ export function createReplacementStudioApplication({
         detectionClass: 'character',
         detectionMethod: 'manual',
         bbox: { x: x, y: y, width: width, height: height },
-        detectionConfidence: 0x0,
-        identityConfidence: 0x1,
-        identityMatchSimilarity: 0x1,
+        detectionConfidence: 0,
+        identityConfidence: 1,
+        identityMatchSimilarity: 1,
         identityReviewStatus: 'confirmed',
         identityReviewRequired: ![],
         identityMethod: 'manual',
         ambiguousIdentityIds: [],
         orientation: 'front',
-        orientationConfidence: 0x1,
+        orientationConfidence: 1,
         orientationModelId: '',
         occlusion: 'none',
         notes: '用户手动画框的可替换主体',
@@ -1354,7 +1354,7 @@ export function createReplacementStudioApplication({
         box = normalizePersonReplacementBoundingBox(
           value93?.['bbox'] && typeof value93['bbox'] === 'object' ? value93['bbox'] : {},
         );
-      (box['width'] > 0x0 && box['height'] > 0x0 && (value94['bbox'] = box),
+      (box['width'] > 0 && box['height'] > 0 && (value94['bbox'] = box),
         Object['hasOwn'](value93 || {}, 'replacementScope') &&
           (value94['replacementScope'] = normalizePersonReplacementScope(value93['replacementScope'])),
         Object['keys'](value94)['length'] && map8['set'](text12, value94));
@@ -1447,7 +1447,7 @@ export function createReplacementStudioApplication({
       );
     return (
       showToast(
-        list8['length'] > 0x1 ? '已删除 ' + list8['length'] + ' 个人物框。' : '已删除该人物框。',
+        list8['length'] > 1 ? '已删除 ' + list8['length'] + ' 个人物框。' : '已删除该人物框。',
         'success',
       ),
       { project: project3 }
@@ -1459,7 +1459,7 @@ export function createReplacementStudioApplication({
     selectedShotId: selectedShotId2 = '',
     renderWorkspace: renderWorkspace = !![],
     notify: notify = !![],
-    revision: revision = 0x0,
+    revision: revision = 0,
   } = {}) {
     const value105 = coordinator['acceptRevision'](revision),
       value106 = 'shot-cut-timeline:' + value105,
@@ -1507,7 +1507,7 @@ export function createReplacementStudioApplication({
       }),
       changedShotCount = new Set(list10['map']((value115) => value115['shotId']));
     if (!list10['length'])
-      return (showToast('镜头切口没有变化。', 'info'), { project: snapshot(), changedShotCount: 0x0 });
+      return (showToast('镜头切口没有变化。', 'info'), { project: snapshot(), changedShotCount: 0 });
     const map15 = new Map();
     (initialProject['shots']['forEach']((value116) =>
       value116['people']['forEach']((value117) => {
@@ -1527,12 +1527,12 @@ export function createReplacementStudioApplication({
     try {
       const shots10 = [];
       let value118 = ![];
-      for (let index3 = 0x0; index3 < list9['length']; index3 += 0x1) {
+      for (let index3 = 0; index3 < list9['length']; index3 += 1) {
         const range = list9[index3],
           currentShot = map13['get'](range['shotId']) || map13['get'](range['originShotId']),
           isNewShot = !map13['has'](range['shotId']),
           value119 = map14['has'](normalizeText(range['originShotId'] || range['shotId']));
-        if (!currentShot) throw new Error('片段 ' + (range['shotId'] || index3 + 0x1) + ' 缺少原始片段');
+        if (!currentShot) throw new Error('片段 ' + (range['shotId'] || index3 + 1) + ' 缺少原始片段');
         if (!changedShotCount['has'](range['shotId'])) {
           shots10['push']({ ...currentShot, index: index3 });
           continue;
@@ -1542,10 +1542,10 @@ export function createReplacementStudioApplication({
           ),
           sourceVideoRef = normalizeText(currentShot['sourceVideoRef'] || value120?.['videoRef']);
         if (!sourceVideoRef)
-          throw new Error('片段 ' + (currentShot['title'] || index3 + 0x1) + ' 缺少原始视频');
-        const outputFps = [0x10, 0x18, 0x1e]['includes'](Math['round'](Number(currentShot['outputFps'])))
+          throw new Error('片段 ' + (currentShot['title'] || index3 + 1) + ' 缺少原始视频');
+        const outputFps = [16, 24, 30]['includes'](Math['round'](Number(currentShot['outputFps'])))
             ? Math['round'](Number(currentShot['outputFps']))
-            : 0x18,
+            : 24,
           {
             videoRef: videoRef3,
             reverseChanged: reverseChanged,
@@ -1593,7 +1593,7 @@ export function createReplacementStudioApplication({
             id: range['shotId'],
             title:
               isNewShot && currentShot['title']
-                ? currentShot['title'] + ' · ' + (index3 + 0x1)
+                ? currentShot['title'] + ' · ' + (index3 + 1)
                 : currentShot['title'],
             index: index3,
             startTimeSec: range['startSec'],
@@ -1605,7 +1605,7 @@ export function createReplacementStudioApplication({
             isReversed: range['isReversed'] === !![],
             materializedIsReversed: range['isReversed'] === !![],
             keyframeRef: keyframeRef,
-            keyframeIndex: !enabled10 && value123 ? currentShot['keyframeIndex'] : 0x0,
+            keyframeIndex: !enabled10 && value123 ? currentShot['keyframeIndex'] : 0,
             keyframeTimeSec: keyframeTimeSec
               ? range['keyframeTimeSec']
               : value123
@@ -1621,12 +1621,12 @@ export function createReplacementStudioApplication({
             frame: keyframeTimeSec && range['frame'] ? { ...range['frame'] } : currentShot['frame'],
             outputFps: outputFps,
             materializationStatus: 'succeeded',
-            materializationProgress: 0x64,
-            replacementImage: { results: [], activeIndex: 0x0 },
+            materializationProgress: 100,
+            replacementImage: { results: [], activeIndex: 0 },
             replacementImageRef: '',
             ...(value119
               ? {
-                  replacementVideo: { results: [], activeIndex: 0x0 },
+                  replacementVideo: { results: [], activeIndex: 0 },
                   resultVideoRef: '',
                   generationStatus: 'pending',
                 }
@@ -1674,9 +1674,9 @@ export function createReplacementStudioApplication({
                   normalizeText(initialProject['workspace']['selectedShotId']),
               )
             ? initialProject['workspace']['selectedShotId']
-            : shots11[0x0]?.['id'] || '';
+            : shots11[0]?.['id'] || '';
       if (enabled || !coordinator['isCurrent'](value105) || normalizeText(initialProject['id']) !== text16)
-        return { project: snapshot(), changedShotCount: 0x0, stale: !![] };
+        return { project: snapshot(), changedShotCount: 0, stale: !![] };
       const value126 = {
           ...initialProject,
           shots: shots11,
@@ -1692,7 +1692,7 @@ export function createReplacementStudioApplication({
             imageGenerationsByShotId: {},
             videoGeneration: { status: 'idle', shotId: '', error: '' },
             videoGenerationsByShotId: {},
-            videoPreparation: { status: 'idle', progress: 0x0, error: '' },
+            videoPreparation: { status: 'idle', progress: 0, error: '' },
           },
         },
         project4 = setProject(
@@ -1704,7 +1704,7 @@ export function createReplacementStudioApplication({
           { renderWorkspace: renderWorkspace },
         );
       return (
-        notify && showToast('已更新 ' + changedShotCount['size'] + '\x20个片段的切口。', 'success'),
+        notify && showToast('已更新 ' + changedShotCount['size'] + ' 个片段的切口。', 'success'),
         { project: project4, changedShotCount: changedShotCount['size'] }
       );
     } finally {
@@ -1825,7 +1825,7 @@ export function createReplacementStudioApplication({
           ...initialProject['workspace'],
           selectedCharacterId:
             initialProject['workspace']['selectedCharacterId'] === text21
-              ? characters[0x0]?.['id'] || ''
+              ? characters[0]?.['id'] || ''
               : initialProject['workspace']['selectedCharacterId'],
           selectedAssetIds: initialProject['workspace']['selectedAssetIds']['filter'](
             (value131) => value131 !== text21,
@@ -1856,7 +1856,7 @@ export function createReplacementStudioApplication({
           ...initialProject['workspace'],
           selectedSceneId:
             initialProject['workspace']['selectedSceneId'] === text22
-              ? scenes[0x0]?.['id'] || ''
+              ? scenes[0]?.['id'] || ''
               : initialProject['workspace']['selectedSceneId'],
           selectedAssetIds: initialProject['workspace']['selectedAssetIds']['filter'](
             (value135) => value135 !== text22,
@@ -1878,7 +1878,7 @@ export function createReplacementStudioApplication({
           ...initialProject['workspace'],
           selectedAudioAssetId:
             initialProject['workspace']['selectedAudioAssetId'] === text23
-              ? audioAssets[0x0]?.['id'] || ''
+              ? audioAssets[0]?.['id'] || ''
               : initialProject['workspace']['selectedAudioAssetId'],
         },
       });
@@ -1901,10 +1901,10 @@ export function createReplacementStudioApplication({
       list14 = Array['isArray'](initialProject[value139]) ? initialProject[value139] : [],
       map16 = new Set(list14['map']((value140) => value140['id'])),
       args28 = list13['map'](({ file: file2, imageRef: imageRef2 }, value141) => {
-        const value142 = list14['length'] + value141 + 0x1;
+        const value142 = list14['length'] + value141 + 1;
         let value143 = value142;
         const value144 = name2 ? 'target-scene' : 'target';
-        while (map16['has'](value144 + '-' + value143)) value143 += 0x1;
+        while (map16['has'](value144 + '-' + value143)) value143 += 1;
         const id3 = value144 + '-' + value143,
           id4 = id3 + '-appearance-1';
         map16['add'](id3);
@@ -1930,7 +1930,7 @@ export function createReplacementStudioApplication({
         if (!name2) value146['voiceReference'] = null;
         return value146;
       }),
-      selectedSceneId = args28['at'](-0x1);
+      selectedSceneId = args28['at'](-1);
     return {
       project: setProject({
         ...initialProject,
@@ -1969,7 +1969,7 @@ export function createReplacementStudioApplication({
         itemName = createUploadedAssetName(error19['name'], '未命名音频'),
         saveAssetPackageItem2 = await saveAssetPackageItem({
           packageKey: 'person-replacement-audio:' + sourceProjectId,
-          packageName: (normalizeText(initialProject['title']) || '未命名人物替换项目') + '\x20·\x20音频素材',
+          packageName: (normalizeText(initialProject['title']) || '未命名人物替换项目') + ' · 音频素材',
           category: '替换工作室',
           itemKey: itemKey,
           itemName: itemName,
@@ -1983,18 +1983,18 @@ export function createReplacementStudioApplication({
         });
       if (normalizeText(initialProject['id']) !== sourceProjectId) return null;
       const assetId2 = normalizeText(saveAssetPackageItem2?.['assetId']),
-        itemIndex = Math['max'](0x0, Math['trunc'](Number(saveAssetPackageItem2?.['itemIndex']) || 0x0));
+        itemIndex = Math['max'](0, Math['trunc'](Number(saveAssetPackageItem2?.['itemIndex']) || 0));
       assetId2 &&
         (assetRefs2['push']({ assetId: assetId2, itemIndex: itemIndex }),
         sourceAssets2['push']({
           assetId: assetId2,
           itemIndex: itemIndex,
           type: 'audio',
-          assetName: (normalizeText(initialProject['title']) || '未命名人物替换项目') + '\x20·\x20音频素材',
+          assetName: (normalizeText(initialProject['title']) || '未命名人物替换项目') + ' · 音频素材',
           name: itemName,
           savedName: itemName,
           url: audioUrl,
-          durationSec: Math['max'](0x0, Number(value147?.['durationSec']) || 0x0),
+          durationSec: Math['max'](0, Number(value147?.['durationSec']) || 0),
           waveformLocalPath: normalizeText(value147?.['waveformLocalPath']),
           waveformUrl: normalizeText(value147?.['waveformUrl']),
         }));
@@ -2016,7 +2016,7 @@ export function createReplacementStudioApplication({
       });
     return (
       showToast(
-        list18['length'] > 0x1 ? '已上传 ' + list18['length'] + ' 个音频素材。' : '音频素材已上传。',
+        list18['length'] > 1 ? '已上传 ' + list18['length'] + ' 个音频素材。' : '音频素材已上传。',
         'success',
       ),
       { ...args29, project: project11 }
@@ -2038,8 +2038,8 @@ export function createReplacementStudioApplication({
             normalizeText(value149?.['assetId'] || value149?.['sourceAssetId']) +
             ':' +
             Math['max'](
-              0x0,
-              Math['trunc'](Number(value149?.['itemIndex'] ?? value149?.['sourceItemIndex']) || 0x0),
+              0,
+              Math['trunc'](Number(value149?.['itemIndex'] ?? value149?.['sourceItemIndex']) || 0),
             ),
         ),
       ),
@@ -2048,7 +2048,7 @@ export function createReplacementStudioApplication({
           (value151) => [
             normalizeText(value151['sourceAssetId']) +
               ':' +
-              Math['max'](0x0, Math['trunc'](Number(value151['sourceItemIndex']) || 0x0)),
+              Math['max'](0, Math['trunc'](Number(value151['sourceItemIndex']) || 0)),
             value151,
           ],
         ),
@@ -2060,8 +2060,8 @@ export function createReplacementStudioApplication({
     list20['forEach']((error20) => {
       const sourceAssetId = normalizeText(error20?.['assetId'] || error20?.['sourceAssetId']),
         sourceItemIndex = Math['max'](
-          0x0,
-          Math['trunc'](Number(error20?.['itemIndex'] ?? error20?.['sourceItemIndex']) || 0x0),
+          0,
+          Math['trunc'](Number(error20?.['itemIndex'] ?? error20?.['sourceItemIndex']) || 0),
         ),
         value153 = sourceAssetId + ':' + sourceItemIndex;
       if (!map17['has'](value153)) return;
@@ -2077,9 +2077,9 @@ export function createReplacementStudioApplication({
             : normalizeText(error20?.['url'] || error20?.['sourceUrl'] || error20?.['imageUrl']),
         value155 = kind3 === 'audio' ? 'audio' : 'image';
       if (text25 !== value155 || !sourceUrl) return;
-      let value156 = list19['length'] + addedCount['length'] + 0x1;
+      let value156 = list19['length'] + addedCount['length'] + 1;
       const value157 = kind3 === 'scene' ? 'target-scene' : kind3 === 'audio' ? 'project-audio' : 'target';
-      while (map19['has'](value157 + '-' + value156)) value156 += 0x1;
+      while (map19['has'](value157 + '-' + value156)) value156 += 1;
       const id5 = value157 + '-' + value156,
         name3 = createUploadedAssetName(error20['name'] || error20['assetName'], ''),
         name4 =
@@ -2102,7 +2102,7 @@ export function createReplacementStudioApplication({
           audioUrl: sourceUrl,
           waveformLocalPath: normalizeText(error20['waveformLocalPath']),
           waveformUrl: normalizeText(error20['waveformUrl']),
-          durationSec: Math['max'](0x0, Number(error20['durationSec']) || 0x0),
+          durationSec: Math['max'](0, Number(error20['durationSec']) || 0),
           occurrences: '当前项目',
           description: '',
           isLibraryAsset: ![],
@@ -2113,7 +2113,7 @@ export function createReplacementStudioApplication({
           id: id5,
           kind: kind3,
           role: role2,
-          name: name3 || '目标' + role2 + '\x20' + value156,
+          name: name3 || '目标' + role2 + ' ' + value156,
           sourceOrigin: 'library',
           sourceAssetId: sourceAssetId,
           sourceItemIndex: sourceItemIndex,
@@ -2143,7 +2143,7 @@ export function createReplacementStudioApplication({
               : '请选择总素材中的图片后再加入' + role2 + '。',
             'warn',
           ),
-        { project: snapshot(), addedCount: 0x0, existingCount: 0x0 }
+        { project: snapshot(), addedCount: 0, existingCount: 0 }
       );
     setProject(
       {
@@ -2152,10 +2152,10 @@ export function createReplacementStudioApplication({
         workspace: {
           ...initialProject['workspace'],
           ...(kind3 === 'scene'
-            ? { selectedSceneId: selectedSceneId2['at'](-0x1) }
+            ? { selectedSceneId: selectedSceneId2['at'](-1) }
             : kind3 === 'audio'
-              ? { selectedAudioAssetId: selectedSceneId2['at'](-0x1), characterAssetTab: 'audio' }
-              : { selectedCharacterId: selectedSceneId2['at'](-0x1) }),
+              ? { selectedAudioAssetId: selectedSceneId2['at'](-1), characterAssetTab: 'audio' }
+              : { selectedCharacterId: selectedSceneId2['at'](-1) }),
           assetSelectionMode: ![],
           selectedAssetIds: [],
         },
@@ -2163,7 +2163,7 @@ export function createReplacementStudioApplication({
       { sync: ![] },
     );
     if (notify && addedCount['length'])
-      showToast('已将 ' + addedCount['length'] + '\x20项总素材加入' + role2 + '。', 'success');
+      showToast('已将 ' + addedCount['length'] + ' 项总素材加入' + role2 + '。', 'success');
     else
       notify &&
         showToast(
@@ -2320,7 +2320,7 @@ export function createReplacementStudioApplication({
     if (!keyframeRef2) throw new Error('关键帧保存结果缺少可用地址');
     return {
       keyframeRef: keyframeRef2,
-      keyframeTimeSec: Number(frame2['keyframeTimeSec']) || 0x0,
+      keyframeTimeSec: Number(frame2['keyframeTimeSec']) || 0,
       frame: frame2['frame'] && typeof frame2['frame'] === 'object' ? { ...frame2['frame'] } : {},
     };
   }
@@ -2385,7 +2385,7 @@ export function createReplacementStudioApplication({
     const value177 = initialProject['id'] + ':' + characterId2['id'];
     if (map['has'](value177)) return null;
     map['add'](value177);
-    const value178 = characterId2['appearances']['length'] + 0x1,
+    const value178 = characterId2['appearances']['length'] + 1,
       id7 = characterId2['id'] + '-appearance-' + value178 + '-' + Date['now'](),
       error25 = {
         id: id7,
@@ -2408,7 +2408,7 @@ export function createReplacementStudioApplication({
         ...initialProject['workspace'],
         assetAppearanceIndexes: {
           ...initialProject['workspace']['assetAppearanceIndexes'],
-          [characterId2['id']]: value178 - 0x1,
+          [characterId2['id']]: value178 - 1,
         },
         generatingAppearanceKeys: [
           ...initialProject['workspace']['generatingAppearanceKeys'],
@@ -2649,7 +2649,7 @@ export function createReplacementStudioApplication({
       });
       if (typeof subscribeLibraryAssets2 === 'function') handler2 = subscribeLibraryAssets2;
     } catch (value192) {
-      console['warn']('[replacementStudio]\x20failed\x20to\x20subscribe\x20asset\x20library', value192);
+      console['warn']('[replacementStudio] failed to subscribe asset library', value192);
     }
   const value193 = initialProject,
     value194 = workspaceView;

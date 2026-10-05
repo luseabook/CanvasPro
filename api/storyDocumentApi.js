@@ -26,25 +26,25 @@ export async function extractStoryDocument(file, { signal } = {}) {
 
 export const STORY_DOCUMENT_EXTRACT_PATH = '/api/v2/story-workspace/document/extract';
 
-export const STORY_DOCUMENT_MAX_FILE_BYTES = 0x14 * 0x400 * 0x400;
+export const STORY_DOCUMENT_MAX_FILE_BYTES = 20 * 1024 * 1024;
 
 export const STORY_DOCUMENT_SUPPORTED_EXTENSIONS = Object['freeze'](['txt', 'docx', 'pdf']);
 
 function getFileExtension(value) {
   const item = String(value || '')['trim'](),
     count = item['lastIndexOf']('.');
-  return count >= 0x0 ? item['slice'](count + 0x1)['toLowerCase']() : '';
+  return count >= 0 ? item['slice'](count + 1)['toLowerCase']() : '';
 }
 
 export function validateStoryDocumentFile(enabled) {
   if (!enabled) return { ok: ![], error: '请选择剧本文件。' };
   const fileExtension = getFileExtension(enabled['name']);
   if (fileExtension === 'doc')
-    return { ok: ![], error: '暂不支持旧版\x20DOC\x20文件，请先另存为\x20DOCX、PDF\x20或\x20TXT。' };
+    return { ok: ![], error: '暂不支持旧版 DOC 文件，请先另存为 DOCX、PDF 或 TXT。' };
   if (!STORY_DOCUMENT_SUPPORTED_EXTENSIONS['includes'](fileExtension))
     return { ok: ![], error: '仅支持 TXT、DOCX 和文本型 PDF 文件。' };
-  const count2 = Number(enabled['size'] || 0x0);
-  if (count2 <= 0x0) return { ok: ![], error: '剧本文件为空。' };
+  const count2 = Number(enabled['size'] || 0);
+  if (count2 <= 0) return { ok: ![], error: '剧本文件为空。' };
   if (count2 > STORY_DOCUMENT_MAX_FILE_BYTES) return { ok: ![], error: '剧本文件不能超过 20 MB。' };
   return { ok: !![], extension: fileExtension };
 }
@@ -88,7 +88,7 @@ export async function extractStoryDocumentText(response2, data = {}) {
     responseType: 'json',
     retries: 0,
     signal: data['signal'],
-    timeout: Number(data['timeout']) || 0x15f90,
+    timeout: Number(data['timeout']) || 90000,
   });
   return normalizeStoryDocumentResult(post2, response3['extension'], []);
 }

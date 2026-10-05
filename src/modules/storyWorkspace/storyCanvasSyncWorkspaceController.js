@@ -31,13 +31,13 @@ export function createStoryCanvasSyncWorkspaceController({
   resolveClipGenerationSettings: resolveClipGenerationSettings,
 } = {}) {
   if (!state || typeof state !== 'object') throw new TypeError('Story canvas sync requires workspace state.');
-  (requireFunctions('Story\x20canvas\x20sync\x20project\x20tasks', {
+  (requireFunctions('Story canvas sync project tasks', {
     createToken: projectTasks['createToken'],
     isCurrent: projectTasks['isCurrent'],
     isLive: projectTasks['isLive'],
     syncEntry: projectTasks['syncEntry'],
   }),
-    requireFunctions('Story\x20canvas\x20sync\x20persistence', { schedule: persistence['schedule'] }),
+    requireFunctions('Story canvas sync persistence', { schedule: persistence['schedule'] }),
     requireFunctions('Story canvas sync presentation', {
       closeMenu: presentation['closeMenu'],
       handleMediaNodeChanges: presentation['handleMediaNodeChanges'],
@@ -46,7 +46,7 @@ export function createStoryCanvasSyncWorkspaceController({
       requestWorkspaceMode: presentation['requestWorkspaceMode'],
       showToast: presentation['showToast'],
     }),
-    requireFunctions('Story\x20canvas\x20sync\x20projection', {
+    requireFunctions('Story canvas sync projection', {
       getProjectCanvasEpisodes: getProjectCanvasEpisodes,
       getSelectedEpisode: getSelectedEpisode,
       resolveClipGenerationSettings: resolveClipGenerationSettings,
@@ -132,7 +132,7 @@ export function createStoryCanvasSyncWorkspaceController({
       );
     } catch (error) {
       return (
-        globalThis['console']?.['warn']?.('[storyWorkspace]\x20片段帧同步到项目画布失败', error),
+        globalThis['console']?.['warn']?.('[storyWorkspace] 片段帧同步到项目画布失败', error),
         projectTasks['isCurrent'](project) &&
           presentation['showToast'](error?.['message'] || '片段帧同步到项目画布失败。', 'warning'),
         ![]
@@ -220,7 +220,7 @@ export function createStoryCanvasSyncWorkspaceController({
   async function addProject() {
     const project3 = projectTasks['createToken'](),
       episodes = getProjectCanvasEpisodes(project3['data']['episodes'], state['selectedEpisodeId']),
-      episodeId2 = episodes[0x0];
+      episodeId2 = episodes[0];
     if (!episodeId2) return ![];
     const output = map['get'](project3['projectId']);
     if (output?.['promise']) return output['promise'];
@@ -257,11 +257,11 @@ export function createStoryCanvasSyncWorkspaceController({
             presentation['showToast'](
               state3['reused']
                 ? '项目画布已同步：更新 ' +
-                    (state3['updatedCount'] || 0x0) +
-                    '\x20项，新增\x20' +
-                    (state3['createdCount'] || 0x0) +
+                    (state3['updatedCount'] || 0) +
+                    ' 项，新增 ' +
+                    (state3['createdCount'] || 0) +
                     ' 项。'
-                : '已创建项目画布，加入 ' + (state3['createdCount'] || 0x0) + ' 项内容。',
+                : '已创建项目画布，加入 ' + (state3['createdCount'] || 0) + ' 项内容。',
               'success',
             )),
           !![]

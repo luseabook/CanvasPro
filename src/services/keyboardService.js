@@ -22,7 +22,7 @@ import {
 } from './canvasPanShortcutState.js';
 let _listeners = [],
   _settingsShortcutRoot = null;
-const ALIGN_HOLD_TRIGGER_MS = 0xdc;
+const ALIGN_HOLD_TRIGGER_MS = 220;
 let _alignHoldTimer = null,
   _alignHoldActive = ![],
   _alignHoldKey = '';
@@ -50,23 +50,23 @@ const MODIFIER_ALIAS_MAP = Object['freeze']({
 function normalizeShortcutKeyPart(value) {
   const list = String(value ?? '')['trim']();
   if (!list) return '';
-  if (list === '\x20') return 'Space';
+  if (list === ' ') return 'Space';
   const item = list['toUpperCase']();
   if (MODIFIER_ALIAS_MAP[item]) return MODIFIER_ALIAS_MAP[item];
   if (NAMED_KEY_ALIAS_MAP[item]) return NAMED_KEY_ALIAS_MAP[item];
-  if (list['length'] === 0x1) return list['toUpperCase']();
-  return list[0x0]['toUpperCase']() + list['slice'](0x1)['toLowerCase']();
+  if (list['length'] === 1) return list['toUpperCase']();
+  return list[0]['toUpperCase']() + list['slice'](1)['toLowerCase']();
 }
 function getPanShortcutParts() {
   const key = getShortcuts?.() || {},
     list2 = key?.['pan-canvas']?.['keys'],
-    list3 = Array['isArray'](list2) && list2['length'] > 0x0 ? list2 : ['Space'];
+    list3 = Array['isArray'](list2) && list2['length'] > 0 ? list2 : ['Space'];
   return new Set(list3['map']((index) => normalizeShortcutKeyPart(index))['filter'](Boolean));
 }
 function shouldReleasePanShortcut(event) {
   if (!isCanvasPanShortcutHeld()) return ![];
   const result =
-      event?.['key'] === '\x20' || event?.['code'] === 'Space' ? 'Space' : event?.['key'],
+      event?.['key'] === ' ' || event?.['code'] === 'Space' ? 'Space' : event?.['key'],
     shortcutKeyPart = normalizeShortcutKeyPart(result);
   if (!shortcutKeyPart) return ![];
   return getPanShortcutParts()['has'](shortcutKeyPart);
@@ -162,7 +162,7 @@ function isDevModeToggleShortcut(event5) {
     return ![];
   return (
     event5?.['code'] === 'Backslash' ||
-    event5?.['key'] === '\x5c' ||
+    event5?.['key'] === '\\' ||
     event5?.['key'] === '|' ||
     event5?.['key'] === '、'
   );
@@ -175,8 +175,8 @@ function hasExpandedMediaClipNode(payload) {
 }
 function buildShortcutContext(mattingActive, { audioClipModeActive: audioClipModeActive = ![] } = {}) {
   const list4 = Array['isArray'](mattingActive?.['selectedNodeIds']) ? mattingActive['selectedNodeIds'] : [],
-    selectedNodeType = list4['length'] === 0x1 ? mattingActive?.['nodes']?.[list4[0x0]]?.['type'] || '' : '',
-    config = list4['length'] === 0x1 ? mattingActive?.['nodes']?.[list4[0x0]] || null : null,
+    selectedNodeType = list4['length'] === 1 ? mattingActive?.['nodes']?.[list4[0]]?.['type'] || '' : '',
+    config = list4['length'] === 1 ? mattingActive?.['nodes']?.[list4[0]] || null : null,
     scope =
       selectedNodeType === 'panorama-360'
         ? config?.['panorama360Node'] || null
@@ -258,7 +258,7 @@ function handleKeyDown(event6) {
   const audioClipModeActive2 = isAudioClipModeActive();
   if (audioClipModeActive2) return;
   if (
-    (event6['key'] === '\x20' || event6['code'] === 'Space') &&
+    (event6['key'] === ' ' || event6['code'] === 'Space') &&
     !event6['ctrlKey'] &&
     !event6['metaKey'] &&
     !event6['altKey'] &&
@@ -387,7 +387,7 @@ export function addShortcutListener(handler) {
     window['addEventListener']('shortcut-action', value9),
     () => {
       const value11 = _listeners['indexOf'](handler);
-      (value11 > -0x1 && _listeners['splice'](value11, 0x1),
+      (value11 > -1 && _listeners['splice'](value11, 1),
         window['removeEventListener']('shortcut-action', value9));
     }
   );

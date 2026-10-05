@@ -39,35 +39,35 @@ export function createStoryClipResultSelectionController({
     typeof schedulePersistence !== 'function'
   )
     throw new TypeError(
-      'Story\x20clip\x20result\x20selection\x20requires\x20navigation,\x20persistence,\x20and\x20presentation\x20adapters.',
+      'Story clip result selection requires navigation, persistence, and presentation adapters.',
     );
-  const item = { accumulator: 0x0, lockedUntil: 0x0 };
+  const item = { accumulator: 0, lockedUntil: 0 };
   function switchSelectedClip(key) {
     const index = getSelectedEpisode(state),
       list = Array['isArray'](index?.['clips']) ? index['clips'] : [];
-    if (list['length'] < 0x2) return ![];
+    if (list['length'] < 2) return ![];
     const result = storyClipProduction['getAdjacentClipId'](list, state['selectedClipId'], key),
       enabled = list['find']((data) => data['id'] === result);
     if (!enabled || enabled['id'] === state['selectedClipId']) return ![];
-    const options = Number(key) < 0x0 ? 'previous' : 'next';
+    const options = Number(key) < 0 ? 'previous' : 'next';
     (resetAdjustmentUi({ close: !![] }),
       (state['selectedClipId'] = enabled['id']),
       applyVideoSettings(enabled));
     if (!refreshSelectedClip(options)) render();
     return (schedulePersistence(), !![]);
   }
-  function selectVideoResult(target, source, { delta: delta = 0x0 } = {}) {
+  function selectVideoResult(target, source, { delta: delta = 0 } = {}) {
     const next = getSelectedEpisode(state),
       list2 = Array['isArray'](next?.['clips']) ? next['clips'] : [],
       enabled2 = list2['find']((current) => normalizeText(current?.['id']) === normalizeText(target));
     if (!enabled2) return ![];
     const entry = storyClipProduction['renderEpisode'](state, next, enabled2),
       list3 = entry['videoResults'];
-    if (list3['length'] < 0x2) return ![];
+    if (list3['length'] < 2) return ![];
     const record = entry['activeVideoResultIndex'],
       payload = Math['trunc'](Number(source)),
       activeIndex = Number['isFinite'](payload)
-        ? Math['max'](0x0, Math['min'](list3['length'] - 0x1, payload))
+        ? Math['max'](0, Math['min'](list3['length'] - 1, payload))
         : entry['getAdjacentVideoResultIndex'](delta),
       enabled3 = state['selectedClipId'] !== enabled2['id'];
     if (!enabled3 && activeIndex === record) return (hideHistory(), ![]);
@@ -78,10 +78,10 @@ export function createStoryClipResultSelectionController({
       (state['selectedClipId'] = enabled2['id']));
     if (enabled3) {
       (resetAdjustmentUi({ close: !![] }), applyVideoSettings(enabled2));
-      const input = count >= 0x0 && count < handle ? 'previous' : 'next';
+      const input = count >= 0 && count < handle ? 'previous' : 'next';
       if (!refreshSelectedClip(input)) render();
     } else {
-      const output = Number(delta) < 0x0 || (!delta && activeIndex < record) ? 'previous' : 'next';
+      const output = Number(delta) < 0 || (!delta && activeIndex < record) ? 'previous' : 'next';
       if (!refreshSelectedVideoResult(output)) render();
     }
     return (hideHistory(), schedulePersistence(), !![]);
@@ -120,14 +120,14 @@ export function createStoryClipResultSelectionController({
     const value6 = viewport['querySelector']('.story-page.is-current'),
       anchor = findStoryClipCardShell(value6, clipId['id']),
       value7 = Math['min'](
-        Math['max'](0x0, Math['trunc'](Number(value3) || 0x0)),
-        resultCount['results']['length'] - 0x1,
+        Math['max'](0, Math['trunc'](Number(value3) || 0)),
+        resultCount['results']['length'] - 1,
       );
     return (
       refreshHistory({
         anchor: anchor,
         focusSelector:
-          '[data-story-action="select-video-result"][data-story-video-result-index="' + value7 + '\x22]',
+          '[data-story-action="select-video-result"][data-story-video-result-index="' + value7 + '"]',
         fallbackFocus: anchor?.['querySelector']?.('.story-clip-card'),
       }),
       schedulePersistence(),
@@ -146,12 +146,12 @@ export function createStoryClipResultSelectionController({
     );
   }
   function handleNavigationWheel(event) {
-    const enabled5 = event['target']['closest']?.('[data-story-clip-navigation=\x22true\x22]');
+    const enabled5 = event['target']['closest']?.('[data-story-clip-navigation="true"]');
     if (!enabled5 || state['view'] !== 'episode') return ![];
     event['preventDefault']();
     const consumeWorkspaceWheelDirection2 = consumeWorkspaceWheelDirection(event, item, {
-      threshold: 0x18,
-      lockDuration: 0xdc,
+      threshold: 24,
+      lockDuration: 220,
     });
     if (consumeWorkspaceWheelDirection2) switchSelectedClip(consumeWorkspaceWheelDirection2);
     return !![];

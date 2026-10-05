@@ -8,17 +8,17 @@ import {
 } from './rendererVirtualization.js';
 (test('rendererVirtualization: viewport padding 命中进入阈值', () => {
   const isNodeInsideViewportPadding2 = isNodeInsideViewportPadding(
-      { id: 'n1', x: 0x384, y: 0, width: 200, height: 120 },
+      { id: 'n1', x: 900, y: 0, width: 200, height: 120 },
       { x: 0, y: 0, zoom: 1 },
-      0x3e8,
-      0x320,
+      1000,
+      800,
       120,
     ),
     isNodeInsideViewportPadding3 = isNodeInsideViewportPadding(
-      { id: 'n2', x: 0x514, y: 0, width: 200, height: 120 },
+      { id: 'n2', x: 1300, y: 0, width: 200, height: 120 },
       { x: 0, y: 0, zoom: 1 },
-      0x3e8,
-      0x320,
+      1000,
+      800,
       80,
     );
   (assert.equal(isNodeInsideViewportPadding2, true), assert.equal(isNodeInsideViewportPadding3, false));
@@ -50,16 +50,16 @@ import {
   test('rendererVirtualization: 双阈值滞回会分离 mount 与 park 候选', () => {
     const virtualizationCandidateSets = buildVirtualizationCandidateSets({
       nodes: {
-        near: { id: 'near', x: 0x4b0, y: 0, width: 200, height: 120 },
-        far: { id: 'far', x: 0x7d0, y: 0, width: 200, height: 120 },
-        pinned: { id: 'pinned', x: 0xfa0, y: 0, width: 200, height: 120 },
+        near: { id: 'near', x: 1200, y: 0, width: 200, height: 120 },
+        far: { id: 'far', x: 2000, y: 0, width: 200, height: 120 },
+        pinned: { id: 'pinned', x: 4000, y: 0, width: 200, height: 120 },
       },
       viewport: { x: 0, y: 0, zoom: 1 },
-      containerWidth: 0x3e8,
-      containerHeight: 0x320,
+      containerWidth: 1000,
+      containerHeight: 800,
       pinnedNodeIds: new Set(['pinned']),
-      mountPadding: 0x258,
-      parkPadding: 0x384,
+      mountPadding: 600,
+      parkPadding: 900,
     });
     (assert.equal(virtualizationCandidateSets.mountCandidateIds.has('near'), true),
       assert.equal(virtualizationCandidateSets.parkCandidateIds.has('near'), false),
@@ -91,14 +91,14 @@ import {
   test('rendererVirtualization: dense low zoom uses tighter parking buffers', () => {
     (assert.deepEqual(
       resolveRendererVirtualizationPadding({ viewport: { x: 0, y: 0, zoom: 0.28 }, nodeCount: 156 }),
-      { mountPadding: 0x140, parkPadding: 0x208 },
+      { mountPadding: 320, parkPadding: 520 },
     ),
       assert.deepEqual(
         resolveRendererVirtualizationPadding({ viewport: { x: 0, y: 0, zoom: 0.4 }, nodeCount: 100 }),
-        { mountPadding: 0x1a4, parkPadding: 0x28a },
+        { mountPadding: 420, parkPadding: 650 },
       ),
       assert.deepEqual(
         resolveRendererVirtualizationPadding({ viewport: { x: 0, y: 0, zoom: 0.4 }, nodeCount: 20 }),
-        { mountPadding: 0x258, parkPadding: 0x384 },
+        { mountPadding: 600, parkPadding: 900 },
       ));
   }));

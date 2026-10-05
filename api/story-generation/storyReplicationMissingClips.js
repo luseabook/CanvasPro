@@ -28,7 +28,7 @@ export async function completeReplicationMissingClips(partialResponse, value, ha
     );
   ((item['requirements'] = [
     ...(item['requirements'] || []),
-    '上次只返回了\x20' +
+    '上次只返回了 ' +
       [...map2['keys']()]['join']('、') +
       '。本次只补齐 ' +
       [...map3]['join']('、') +

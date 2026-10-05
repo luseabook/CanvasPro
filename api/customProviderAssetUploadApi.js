@@ -1,6 +1,6 @@
 import { post } from './requester.js';
 import { isConfiguredObjectStorageEnabled, uploadToConfiguredObjectStorage } from './objectStorageApi.js';
-const CUSTOM_PROVIDER_ASSET_MAX_BYTES = 0x64 * 0x400 * 0x400;
+const CUSTOM_PROVIDER_ASSET_MAX_BYTES = 100 * 1024 * 1024;
 function normalizeUploadProvider(value) {
   return String(value || '')
     ['trim']()
@@ -18,7 +18,7 @@ function normalizeCustomProviderAssetExtensions(list) {
           ['replace'](/^\./, ''),
       )['filter']((key) => /^[a-z0-9]{1,10}$/['test'](key)),
     ),
-  ]['slice'](0x0, 0x10);
+  ]['slice'](0, 16);
 }
 function resolveCustomProviderAssetOptions(options = {}) {
   const apiUrl = String(options['apiUrl'] || '')['trim']();
@@ -37,24 +37,24 @@ function resolveCustomProviderAssetOptions(options = {}) {
         ([index, list2]) =>
           ['model', 'purpose']['includes'](index) &&
           typeof list2 === 'string' &&
-          list2['length'] > 0x0 &&
-          list2['length'] <= 0xc0,
+          list2['length'] > 0 &&
+          list2['length'] <= 192,
       ),
     ),
     allowedExtensions: normalizeCustomProviderAssetExtensions(options['allowedExtensions']),
     maxBytes:
-      Number['isFinite'](count) && count > 0x0
+      Number['isFinite'](count) && count > 0
         ? Math['min'](CUSTOM_PROVIDER_ASSET_MAX_BYTES, Math['trunc'](count))
-        : 0x0,
+        : 0,
     filename: String(options['filename'] || '')['trim'](),
-    timeout: Number(options['uploadTimeout'] || options['timeout'] || 0xea60),
+    timeout: Number(options['uploadTimeout'] || options['timeout'] || 60000),
   };
 }
 function getBlobFileExtension(error, result = 'bin') {
   const data = String(error?.['name'] || '')['trim'](),
     target = data['match'](/\.([A-Za-z0-9]{1,10})$/);
   if (target) {
-    const source = target[0x1]['toLowerCase']();
+    const source = target[1]['toLowerCase']();
     return source === 'jpeg' ? 'jpg' : source;
   }
   const next = String(error?.['type'] || '')
@@ -78,14 +78,14 @@ function getFilenameExtension(entry) {
     ['trim']()
     ['match'](/\.([A-Za-z0-9]{1,10})$/);
   if (!enabled) return '';
-  const record = enabled[0x1]['toLowerCase']();
+  const record = enabled[1]['toLowerCase']();
   return record === 'jpeg' ? 'jpg' : record;
 }
 function resolveCustomProviderAssetResponseValue(payload, handle) {
   const state = String(handle || '')['match'](/[^.\[\]]+|\[(\d+)\]/g) || [];
   let enabled2 = payload;
   for (const list3 of state) {
-    const config = list3['startsWith']('[') ? list3['slice'](0x1, -0x1) : list3;
+    const config = list3['startsWith']('[') ? list3['slice'](1, -1) : list3;
     if (
       !enabled2 ||
       typeof enabled2 !== 'object' ||
@@ -117,17 +117,17 @@ export async function uploadToCustomProviderAsset(enabled3, enabled4, value3 = {
   const customProviderAssetOptions = resolveCustomProviderAssetOptions(value3);
   if (
     customProviderAssetOptions['maxBytes'] &&
-    Number(enabled3['size'] || 0x0) > customProviderAssetOptions['maxBytes']
+    Number(enabled3['size'] || 0) > customProviderAssetOptions['maxBytes']
   )
     throw new Error(
       '中转站素材上传失败：文件超过 ' +
-        Math['ceil'](customProviderAssetOptions['maxBytes'] / (0x400 * 0x400)) +
+        Math['ceil'](customProviderAssetOptions['maxBytes'] / (1024 * 1024)) +
         'MB 限制',
     );
   const filenameExtension = getFilenameExtension(customProviderAssetOptions['filename']),
     blobFileExtension = getBlobFileExtension(enabled3, filenameExtension || 'bin');
   if (
-    customProviderAssetOptions['allowedExtensions']['length'] > 0x0 &&
+    customProviderAssetOptions['allowedExtensions']['length'] > 0 &&
     !customProviderAssetOptions['allowedExtensions']['includes'](blobFileExtension)
   )
     throw new Error('中转站素材上传失败：不支持 .' + blobFileExtension + ' 格式');
@@ -146,9 +146,9 @@ export async function uploadToCustomProviderAsset(enabled3, enabled4, value3 = {
       provider: 'custom-provider-asset',
       timeout:
         Number['isFinite'](customProviderAssetOptions['timeout']) &&
-        customProviderAssetOptions['timeout'] > 0x0
-          ? Math['min'](0x5 * 0x3c * 0x3e8, Math['trunc'](customProviderAssetOptions['timeout']))
-          : 0xea60,
+        customProviderAssetOptions['timeout'] > 0
+          ? Math['min'](5 * 60 * 1000, Math['trunc'](customProviderAssetOptions['timeout']))
+          : 60000,
     }),
     customProviderAssetResponseValue = resolveCustomProviderAssetResponseValue(
       post2,

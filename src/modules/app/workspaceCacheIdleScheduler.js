@@ -1,9 +1,9 @@
-const DEFAULT_RETRY_DELAY_MS = 0xfa,
-  DEFAULT_MIN_IDLE_BUDGET_MS = 0xc,
-  DEFAULT_IDLE_TIMEOUT_MS = 0x5dc;
-function normalizeDelay(value, item = 0x0) {
+const DEFAULT_RETRY_DELAY_MS = 250,
+  DEFAULT_MIN_IDLE_BUDGET_MS = 12,
+  DEFAULT_IDLE_TIMEOUT_MS = 1500;
+function normalizeDelay(value, item = 0) {
   const count = Number(value);
-  return Number['isFinite'](count) && count >= 0x0 ? count : item;
+  return Number['isFinite'](count) && count >= 0 ? count : item;
 }
 function hasIdleBudget(enabled, key) {
   if (!enabled || typeof enabled !== 'object') return !![];
@@ -43,7 +43,7 @@ export function createWorkspaceCacheIdleScheduler({
   const delay = normalizeDelay(retryDelayMs, DEFAULT_RETRY_DELAY_MS),
     delay2 = normalizeDelay(minIdleBudgetMs, DEFAULT_MIN_IDLE_BUDGET_MS),
     timeout = normalizeDelay(idleTimeoutMs, DEFAULT_IDLE_TIMEOUT_MS);
-  let options = 0x0,
+  let options = 0,
     timer = null,
     requestIdleCallbackFn2 = null,
     enabled2 = ![];
@@ -91,7 +91,7 @@ export function createWorkspaceCacheIdleScheduler({
       if (typeof setTimeoutFn === 'function') {
         ((timer = setTimeoutFn(() => {
           ((timer = null), run4(entry));
-        }, 0x0)),
+        }, 0)),
           timer?.['unref']?.());
         return;
       }
@@ -109,10 +109,10 @@ export function createWorkspaceCacheIdleScheduler({
       timer?.['unref']?.());
   };
   const cancel = () => {
-      ((options += 0x1), (enabled2 = ![]), handler2());
+      ((options += 1), (enabled2 = ![]), handler2());
     },
-    schedule = ({ delayMs: delayMs = 0x0 } = {}) => {
-      ((options += 0x1), (enabled2 = !![]), handler2());
+    schedule = ({ delayMs: delayMs = 0 } = {}) => {
+      ((options += 1), (enabled2 = !![]), handler2());
       const state = options;
       return (run3(state, delayMs), state);
     };

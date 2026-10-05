@@ -9,17 +9,17 @@ import {
 } from '../services/mediaTaskService.js';
 import { screenToWorld } from './math.js';
 import { isViewportPanPreviewActive } from './viewportPanPreview.js';
-const DEFAULT_DEBOUNCE_MS = 0xa0,
+const DEFAULT_DEBOUNCE_MS = 160,
   LOW_ZOOM_VIDEO_WARMUP_THRESHOLD = 0.45,
-  DEFAULT_PROXY_MIGRATION_BATCH_SIZE = 0x4,
-  MAX_PROXY_MIGRATION_BATCH_SIZE = 0x8,
-  MAX_PENDING_PROXY_MIGRATION_UPDATE_COUNT = 0x78 + MAX_PROXY_MIGRATION_BATCH_SIZE,
+  DEFAULT_PROXY_MIGRATION_BATCH_SIZE = 4,
+  MAX_PROXY_MIGRATION_BATCH_SIZE = 8,
+  MAX_PENDING_PROXY_MIGRATION_UPDATE_COUNT = 120 + MAX_PROXY_MIGRATION_BATCH_SIZE,
   PROXY_MIGRATION_TERMINAL_STATUSES = new Set(['complete', 'failed', 'cancelled']);
 function normalizeViewport(box) {
   return {
-    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0x0,
-    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0x0,
-    zoom: Number['isFinite'](Number(box?.['zoom'])) && Number(box['zoom']) > 0x0 ? Number(box['zoom']) : 0x1,
+    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0,
+    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0,
+    zoom: Number['isFinite'](Number(box?.['zoom'])) && Number(box['zoom']) > 0 ? Number(box['zoom']) : 1,
   };
 }
 function readStoreSnapshot(store) {
@@ -27,13 +27,13 @@ function readStoreSnapshot(store) {
 }
 function getContainerSize(el) {
   return {
-    width: Math['max'](0x1, Number(el?.['clientWidth']) || 0x640),
-    height: Math['max'](0x1, Number(el?.['clientHeight']) || 0x384),
+    width: Math['max'](1, Number(el?.['clientWidth']) || 1600),
+    height: Math['max'](1, Number(el?.['clientHeight']) || 900),
   };
 }
 function normalizeProxyMigrationBatchSize(value) {
   const count = Math['trunc'](Number(value));
-  if (!Number['isFinite'](count) || count < 0x1) return DEFAULT_PROXY_MIGRATION_BATCH_SIZE;
+  if (!Number['isFinite'](count) || count < 1) return DEFAULT_PROXY_MIGRATION_BATCH_SIZE;
   return Math['min'](MAX_PROXY_MIGRATION_BATCH_SIZE, count);
 }
 function sortProxyMigrationNodeIdsByPriority({
@@ -45,12 +45,12 @@ function sortProxyMigrationNodeIdsByPriority({
 }) {
   const selected = new Set(selectedNodeIds || []),
     { width: width, height: height } = getContainerSize(containerEl),
-    box2 = screenToWorld(width / 0x2, height / 0x2, normalizeViewport(viewport));
+    box2 = screenToWorld(width / 2, height / 2, normalizeViewport(viewport));
   return (nodeIds || [])
     ['map']((nodeId, index) => {
       const box3 = nodes?.[nodeId] || {},
-        item = Number(box3['x'] || 0x0) + Number(box3['width'] || 0x0) / 0x2,
-        key = Number(box3['y'] || 0x0) + Number(box3['height'] || 0x0) / 0x2,
+        item = Number(box3['x'] || 0) + Number(box3['width'] || 0) / 2,
+        key = Number(box3['y'] || 0) + Number(box3['height'] || 0) / 2,
         distanceSq = item - box2['x'],
         result = key - box2['y'];
       return {
@@ -61,7 +61,7 @@ function sortProxyMigrationNodeIdsByPriority({
       };
     })
     ['sort']((data, options) => {
-      if (data['selected'] !== options['selected']) return data['selected'] ? -0x1 : 0x1;
+      if (data['selected'] !== options['selected']) return data['selected'] ? -1 : 1;
       return data['distanceSq'] - options['distanceSq'] || data['index'] - options['index'];
     })
     ['map']((target) => target['nodeId']);
@@ -84,14 +84,14 @@ export function collectVisibleLegacySourceVideoNodeIds({
         ['trim']()
         ['toLowerCase']() === 'source-video' && !!buildProxyPromotionPatch(enabled);
     if (!enabled?.['id'] || (!isLegacySourceVideo(enabled) && !enabled2)) continue;
-    if (!isNodeInsideViewportPadding(enabled, box4, width2, height2, 0x0)) continue;
+    if (!isNodeInsideViewportPadding(enabled, box4, width2, height2, 0)) continue;
     list['push'](String(enabled['id']));
   }
   return list;
 }
 function buildCanvasViewportVideoWarmupScopeSignature(state = {}) {
   const box5 = normalizeViewport(state['viewport']),
-    next = Number['isFinite'](Number(state['_nodeGeometryRev'])) ? Number(state['_nodeGeometryRev']) : 0x0,
+    next = Number['isFinite'](Number(state['_nodeGeometryRev'])) ? Number(state['_nodeGeometryRev']) : 0,
     current = Array['isArray'](state['selectedNodeIds'])
       ? state['selectedNodeIds']['map']((entry) => String(entry || ''))
       : [];
@@ -100,7 +100,7 @@ function buildCanvasViewportVideoWarmupScopeSignature(state = {}) {
 export function buildCanvasViewportVideoWarmupSignature(options2 = {}) {
   const record = Number['isFinite'](Number(options2['_sourceVideoRev']))
     ? Number(options2['_sourceVideoRev'])
-    : 0x0;
+    : 0;
   return buildCanvasViewportVideoWarmupScopeSignature(options2) + ':' + record;
 }
 export function createCanvasViewportVideoWarmupController({
@@ -121,8 +121,8 @@ export function createCanvasViewportVideoWarmupController({
   clearTimer: clearTimer = clearTimeout,
 } = {}) {
   if (!store2 || typeof syncWarmup !== 'function' || typeof clearWarmup !== 'function') return () => {};
-  const payload = Math['max'](0x78, Math['min'](0xc8, Number(debounceMs) || DEFAULT_DEBOUNCE_MS)),
-    handle = Math['max'](0x78, Math['min'](0xc8, Number(proxyMigrationBatchIntervalMs) || payload));
+  const payload = Math['max'](120, Math['min'](200, Number(debounceMs) || DEFAULT_DEBOUNCE_MS)),
+    handle = Math['max'](120, Math['min'](200, Number(proxyMigrationBatchIntervalMs) || payload));
   let timer = null,
     timer2 = null,
     queuedCount = [],
@@ -308,13 +308,13 @@ export function createCanvasViewportVideoWarmupController({
         });
       } catch {}
       const proxyMigrationBatchSize2 = normalizeProxyMigrationBatchSize(proxyMigrationBatchSize),
-        count2 = Math['max'](0x0, proxyMigrationBatchSize2 - map['size']);
-      if (count2 === 0x0) return;
-      const value27 = queuedCount['splice'](0x0, count2);
+        count2 = Math['max'](0, proxyMigrationBatchSize2 - map['size']);
+      if (count2 === 0) return;
+      const value27 = queuedCount['splice'](0, count2);
       for (const value28 of value27) {
         handler11(value28, value26, viewport5);
       }
-      if (queuedCount['length'] === 0x0) {
+      if (queuedCount['length'] === 0) {
         ((enabled3 = ''), (enabled4 = null));
         return;
       }
@@ -395,7 +395,7 @@ export function createCanvasViewportVideoWarmupController({
           nodeIds2['push'](value35);
         }
         const list2 = Object['keys'](value34);
-        if (list2['length'] > 0x0) {
+        if (list2['length'] > 0) {
           if (typeof store2['updateNodesData'] === 'function') store2['updateNodesData'](value34);
           else
             for (const value36 of list2) {

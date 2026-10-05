@@ -1,6 +1,6 @@
 import { post } from './apiBase.js';
 const STORYBOARD_VIDEO_FRAME_MAX_COUNT = 100,
-  STORYBOARD_VIDEO_FRAME_TIMEOUT_MS = 0x493e0;
+  STORYBOARD_VIDEO_FRAME_TIMEOUT_MS = 300000;
 function normalizeFrameCount(value) {
   const count = Number(value);
   if (!Number.isFinite(count) || count <= 0) return STORYBOARD_VIDEO_FRAME_MAX_COUNT;

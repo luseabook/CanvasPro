@@ -79,7 +79,7 @@ function installFetchSequence(result, { getData: getData = {}, postOk: postOk = 
           posts.push(JSON.parse(String(dom.body || '{}'))),
           {
             ok: postOk,
-            status: postOk ? 200 : 0x1f4,
+            status: postOk ? 200 : 500,
             headers: { get: () => 'application/json' },
             json: async () => ({ success: postOk }),
             text: async () => JSON.stringify({ success: postOk }),

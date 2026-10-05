@@ -32,22 +32,22 @@ const RH_HAILUO_H3_AUDIO_DRIVEN_ACCELERATION_FIELD_ID = 'rhHailuoH3AudioDrivenAc
     Object['freeze']({ value: 'ultra', label: '超清' }),
   ]),
   RH_HAILUO_H3_AUDIO_DRIVEN_DESCRIPTION =
-    '玩法\x201：音频+提示词生成视频；玩法\x202：音频+图像生成对口型视频；玩法\x203：音频+视频生成指定人物说话视频；玩法\x204：音频+图像+视频，生成音频驱动图像对口型并根据视频人物姿势。',
+    '玩法 1：音频+提示词生成视频；玩法 2：音频+图像生成对口型视频；玩法 3：音频+视频生成指定人物说话视频；玩法 4：音频+图像+视频，生成音频驱动图像对口型并根据视频人物姿势。',
   RH_HAILUO_H3_AUDIO_DRIVEN_HELP_TOOLTIP = [
     '海螺H3音频驱动用法',
     '[[red:玩法 1]]：音频 + 提示词，生成视频。',
-    '[[red:玩法\x202]]：音频\x20+\x20图像，生成图像对口型视频。',
+    '[[red:玩法 2]]：音频 + 图像，生成图像对口型视频。',
     '[[red:玩法 3]]：音频 + 视频，生成指定人物说话视频。',
     '[[red:玩法 4]]：音频 + 图像 + 视频，驱动图像对口型并跟随视频人物姿势。',
     '生成时长：根据音频时长决定。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   RH_HAILUO_H3_AUDIO_DRIVEN_FIXED_INPUT_SLOTS = Object['freeze']([
     Object['freeze']({
       id: 'audio',
       kind: 'audio',
       label: '音频参考',
-      description: '必填，只允许\x201\x20个音频参考',
-      displayOrder: 0xa,
+      description: '必填，只允许 1 个音频参考',
+      displayOrder: 10,
       required: !![],
     }),
   ]);
@@ -65,9 +65,9 @@ export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoMode
   fixedAssetSlots: ['audio'],
   inputSlots: {
     allowedKinds: ['text', 'image', 'video', 'audio'],
-    minByKind: { audio: 0x1 },
-    maxByKind: { image: 0x4, video: 0x1, audio: 0x1 },
-    displayAspectRatioSource: Object['freeze']({ kind: 'video', fallbackIndex: 0x0 }),
+    minByKind: { audio: 1 },
+    maxByKind: { image: 4, video: 1, audio: 1 },
+    displayAspectRatioSource: Object['freeze']({ kind: 'video', fallbackIndex: 0 }),
     fixedSlots: RH_HAILUO_H3_AUDIO_DRIVEN_FIXED_INPUT_SLOTS,
   },
   uiFields: [
@@ -120,7 +120,7 @@ export const rhVideoHailuoH3AudioDrivenExecutionManifest = createRunningHubVideo
     }),
     payloadResolver: 'runninghubHailuoH3AudioDriven',
     collectMediaInputs: !![],
-    taskCreate: Object['freeze']({ retainSeconds: 0x3c }),
+    taskCreate: Object['freeze']({ retainSeconds: 60 }),
   }),
   mapping: {
     promptNode: Object['freeze']({ nodeId: '59', fieldName: 'value' }),
@@ -134,21 +134,21 @@ export const rhVideoHailuoH3AudioDrivenExecutionManifest = createRunningHubVideo
       valueMap: Object['freeze']({ none: '0', turbo: '1' }),
     }),
     qualityLongEdges: Object['freeze']({
-      draft: 0x260,
-      economy: 0x3c0,
-      standard: 0x560,
-      high: 0x680,
-      ultra: 0x780,
+      draft: 608,
+      economy: 960,
+      standard: 1376,
+      high: 1664,
+      ultra: 1920,
     }),
     defaultQuality: 'economy',
     defaultAspectRatio: '自适应',
-    dimensionMultiple: 0x20,
+    dimensionMultiple: 32,
     imageLoaderNodes: Object['freeze'](
       ['60', '72', '128', '129']['map']((nodeId) => Object['freeze']({ nodeId: nodeId, fieldName: 'image' })),
     ),
     videoLoaderNodes: Object['freeze']([Object['freeze']({ nodeId: '68', fieldName: 'video' })]),
     audioLoaderNodes: Object['freeze']([Object['freeze']({ nodeId: '336', fieldName: 'audio' })]),
-    referenceLimits: Object['freeze']({ image: 0x4, video: 0x1, audio: 0x1 }),
+    referenceLimits: Object['freeze']({ image: 4, video: 1, audio: 1 }),
     referenceNode: Object['freeze']({
       nodeId: '121',
       imageFieldPrefix: 'ref_images.ref_image_',

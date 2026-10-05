@@ -1,7 +1,7 @@
-const DEFAULT_MAX_CHARS = 0x1770,
-  DEFAULT_MAX_STRING_CHARS = 0x320,
-  DEFAULT_MAX_ARRAY_ITEMS = 0xc,
-  DEFAULT_MAX_DEPTH = 0x5,
+const DEFAULT_MAX_CHARS = 6000,
+  DEFAULT_MAX_STRING_CHARS = 800,
+  DEFAULT_MAX_ARRAY_ITEMS = 12,
+  DEFAULT_MAX_DEPTH = 5,
   SENSITIVE_OR_BULKY_KEYS = new Set([
     'authorization',
     'apikey',
@@ -22,12 +22,12 @@ const DEFAULT_MAX_CHARS = 0x1770,
 function truncateText(value, item = DEFAULT_MAX_STRING_CHARS) {
   const list = String(value || '');
   if (list['length'] <= item) return list;
-  return list['slice'](0x0, Math['max'](0x0, item - 0x3)) + '...';
+  return list['slice'](0, Math['max'](0, item - 3)) + '...';
 }
 function sanitizeValue(
   list2,
   {
-    depth: depth = 0x0,
+    depth: depth = 0,
     maxDepth: maxDepth = DEFAULT_MAX_DEPTH,
     maxArrayItems: maxArrayItems = DEFAULT_MAX_ARRAY_ITEMS,
     maxStringChars: maxStringChars = DEFAULT_MAX_STRING_CHARS,
@@ -37,9 +37,9 @@ function sanitizeValue(
   if (typeof list2 === 'string') return truncateText(list2, maxStringChars);
   if (depth >= maxDepth) return '[truncated]';
   if (Array['isArray'](list2))
-    return list2['slice'](0x0, maxArrayItems)['map']((key) =>
+    return list2['slice'](0, maxArrayItems)['map']((key) =>
       sanitizeValue(key, {
-        depth: depth + 0x1,
+        depth: depth + 1,
         maxDepth: maxDepth,
         maxArrayItems: maxArrayItems,
         maxStringChars: maxStringChars,
@@ -50,7 +50,7 @@ function sanitizeValue(
   for (const [result, data] of Object['entries'](list2)) {
     if (SENSITIVE_OR_BULKY_KEYS['has'](String(result || '')['toLowerCase']())) continue;
     index[result] = sanitizeValue(data, {
-      depth: depth + 0x1,
+      depth: depth + 1,
       maxDepth: maxDepth,
       maxArrayItems: maxArrayItems,
       maxStringChars: maxStringChars,
@@ -66,7 +66,7 @@ function trimToBudget(ok, options = DEFAULT_MAX_CHARS) {
     status: String(ok?.['status'] || ''),
     commandId: String(ok?.['commandId'] || ''),
     errorCode: String(ok?.['errorCode'] || ''),
-    message: truncateText(ok?.['message'] || '', Math['max'](0xa0, options - 0x140)),
+    message: truncateText(ok?.['message'] || '', Math['max'](160, options - 320)),
     truncated: !![],
   };
   list3 = JSON['stringify'](ok2);
@@ -83,7 +83,7 @@ export function sanitizeAgentToolResult(target, source = {}) {
 }
 function getActionResponse(options2 = {}) {
   const next = Array['isArray'](options2['results']) ? options2['results'] : [];
-  return next['at'](-0x1) || {};
+  return next['at'](-1) || {};
 }
 function normalizeStringArray(list4) {
   return Array['isArray'](list4)
@@ -106,13 +106,13 @@ export function deriveAgentCapabilityDiscovery({ action: action = {}, execution:
   return { commandIds: [], modelIds: [] };
 }
 export function buildAgentToolResult({
-  step: step = 0x0,
+  step: step = 0,
   action: action = {},
   execution: execution = {},
 } = {}) {
   const result2 = getActionResponse(execution);
   return sanitizeAgentToolResult({
-    step: Number(step) || 0x0,
+    step: Number(step) || 0,
     commandId: String(action['type'] || result2['commandId'] || ''),
     ok: execution['ok'] === !![],
     status: String(execution['status'] || (execution['ok'] === !![] ? 'success' : 'failed')),
@@ -162,8 +162,8 @@ export function fingerprintAgentAction(args3 = {}) {
     args: args3['args'] && typeof args3['args'] === 'object' ? args3['args'] : {},
   });
   let output = 0x811c9dc5;
-  for (let value2 = 0x0; value2 < list6['length']; value2 += 0x1) {
+  for (let value2 = 0; value2 < list6['length']; value2 += 1) {
     ((output ^= list6['charCodeAt'](value2)), (output = Math['imul'](output, 0x1000193)));
   }
-  return 'agent-action-' + (output >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'agent-action-' + (output >>> 0)['toString'](16)['padStart'](8, '0');
 }

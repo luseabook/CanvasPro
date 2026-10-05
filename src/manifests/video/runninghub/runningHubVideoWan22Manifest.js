@@ -22,10 +22,10 @@ const RH_WAN22_ASPECT_RATIO_OPTIONS = Object['freeze']([
   Object['freeze']({ value: '1:2', label: '1:2' }),
 ]);
 export const RH_VIDEO_WAN22_HELP_TOOLTIP = [
-  'Wan2.2\x20视频模型用法',
+  'Wan2.2 视频模型用法',
   '不接图时为文生视频；接入首帧时为图生视频；同时接入首帧和尾帧时为首尾帧视频。',
   '分辨率用于选择清晰度，比例用于选择横屏、竖屏或方形画面。',
-]['join']('\x0a');
+]['join']('\n');
 export const rhVideoWan22ModelManifest = createRunningHubVideoModelManifest({
   modelId: RH_VIDEO_WAN22_MODEL_ID,
   executionId: RH_VIDEO_WAN22_EXECUTION_ID,
@@ -35,15 +35,15 @@ export const rhVideoWan22ModelManifest = createRunningHubVideoModelManifest({
   fixedAssetSlots: ['firstFrame', 'lastFrame'],
   inputSlots: {
     allowedKinds: ['text', 'image'],
-    minByKind: { image: 0x0 },
-    maxByKind: { image: 0x2 },
+    minByKind: { image: 0 },
+    maxByKind: { image: 2 },
     displayAspectRatioSource: Object['freeze']({
       slots: Object['freeze'](['firstFrame', 'lastFrame']),
-      fallbackIndex: 0x0,
+      fallbackIndex: 0,
     }),
     fixedSlots: Object['freeze']([
-      Object['freeze']({ id: 'firstFrame', kind: 'image', label: '首帧', required: ![], displayOrder: 0x0 }),
-      Object['freeze']({ id: 'lastFrame', kind: 'image', label: '尾帧', required: ![], displayOrder: 0x1 }),
+      Object['freeze']({ id: 'firstFrame', kind: 'image', label: '首帧', required: ![], displayOrder: 0 }),
+      Object['freeze']({ id: 'lastFrame', kind: 'image', label: '尾帧', required: ![], displayOrder: 1 }),
     ]),
   },
   uiFields: [
@@ -53,12 +53,12 @@ export const rhVideoWan22ModelManifest = createRunningHubVideoModelManifest({
       placement: 'videoParams',
       displayRole: 'resolution',
       label: '分辨率',
-      defaultValue: 0x340,
+      defaultValue: 832,
       options: Object['freeze']([
-        Object['freeze']({ value: 0x340, label: '832' }),
-        Object['freeze']({ value: 0x400, label: '1024' }),
-        Object['freeze']({ value: 0x500, label: '1280' }),
-        Object['freeze']({ value: 0x5a0, label: '1440' }),
+        Object['freeze']({ value: 832, label: '832' }),
+        Object['freeze']({ value: 1024, label: '1024' }),
+        Object['freeze']({ value: 1280, label: '1280' }),
+        Object['freeze']({ value: 1440, label: '1440' }),
       ]),
     }),
     Object['freeze']({
@@ -75,17 +75,17 @@ export const rhVideoWan22ModelManifest = createRunningHubVideoModelManifest({
       type: 'stepper',
       placement: 'videoParams',
       label: '帧数',
-      defaultValue: 0x51,
-      min: 0x1,
+      defaultValue: 81,
+      min: 1,
       max: 0xf423f,
-      step: 0x1,
+      step: 1,
     }),
     RH_INSTANCE_FIELD,
   ],
 });
 export const rhVideoWan22ExecutionManifest = createRunningHubVideoExecutionManifest({
   id: RH_VIDEO_WAN22_EXECUTION_ID,
-  label: 'Wan2.2\x20视频模型',
+  label: 'Wan2.2 视频模型',
   workflowId: '2073678184750604289',
   submitMode: 'openapi-v2-ai-app',
   queryMode: 'openapi-v2-query',
@@ -103,7 +103,7 @@ export const rhVideoWan22ExecutionManifest = createRunningHubVideoExecutionManif
     framesNode: Object['freeze']({
       nodeId: '162',
       fieldName: 'value',
-      defaultValue: 0x51,
+      defaultValue: 81,
       description: '帧数',
     }),
     promptNode: Object['freeze']({ nodeId: '159', fieldName: 'value', description: '提示词' }),

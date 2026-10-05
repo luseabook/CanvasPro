@@ -6,11 +6,11 @@ import { attachChromeShellStartupDiagnostics } from './chromeShellStartupDiagnos
 import { prepareWindowsChromeShellTaskbarIdentity } from './windowsTaskbarIdentity.js';
 const TRUE_RE = /^(1|true|yes|on)$/i,
   FALSE_RE = /^(0|false|no|off)$/i,
-  DEFAULT_EARLY_EXIT_GRACE_MS = 0x1388,
+  DEFAULT_EARLY_EXIT_GRACE_MS = 5000,
   CHROME_SHELL_SPAWN_ERROR_CODE = 'CHROME_SHELL_SPAWN_ERROR',
-  WINDOWS_ACTIVATION_TIMEOUT_MS = 0x1770,
-  TRACKED_CLOSE_GRACE_MS = 0x5dc,
-  TRACKED_CLOSE_FORCE_MS = 0x9c4,
+  WINDOWS_ACTIVATION_TIMEOUT_MS = 6000,
+  TRACKED_CLOSE_GRACE_MS = 1500,
+  TRACKED_CLOSE_FORCE_MS = 2500,
   BACKGROUND_RESPONSIVENESS_ARGS = Object['freeze']([
     '--disable-background-timer-throttling',
     '--disable-renderer-backgrounding',
@@ -96,7 +96,7 @@ function candidatePathsForPlatform(env = process['env'], platform = process['pla
   if (platform === 'darwin')
     return [
       '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-      '/Applications/Microsoft\x20Edge.app/Contents/MacOS/Microsoft\x20Edge',
+      '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
     ];
   return [
     '/usr/bin/google-chrome',
@@ -120,7 +120,7 @@ export function resolveChromeShellBrowserExecutable({
       if (preferred === 'auto') return !![];
       const base = path['basename'](String(candidate || ''))['toLowerCase']();
       return preferred === 'chrome'
-        ? ['chrome.exe', 'chrome', 'google\x20chrome', 'google-chrome', 'google-chrome-stable']['includes'](
+        ? ['chrome.exe', 'chrome', 'google chrome', 'google-chrome', 'google-chrome-stable']['includes'](
             base,
           )
         : ['msedge.exe', 'msedge', 'microsoft edge', 'microsoft-edge', 'microsoft-edge-stable']['includes'](
@@ -180,8 +180,8 @@ export function prepareChromeShellTaskbarIdentity({
 function resolveRemoteDebuggingPort(env = process['env']) {
   const raw = String(env['AIC_CHROME_SHELL_REMOTE_DEBUGGING_PORT'] || '')['trim']();
   if (!/^\d+$/['test'](raw)) return '';
-  const port = Number['parseInt'](raw, 0xa);
-  return port > 0x0 && port <= 0xffff ? String(port) : '';
+  const port = Number['parseInt'](raw, 10);
+  return port > 0 && port <= 0xffff ? String(port) : '';
 }
 function shouldActivateChromeShellWindow({
   env: env = process['env'],
@@ -239,24 +239,24 @@ export function writeChromeShellPreferences({
       ...(existing['profile'] && typeof existing['profile'] === 'object' ? existing['profile'] : {}),
       password_manager_enabled: ![],
     },
-    devtools: disableDevTools ? { ...devtools, availability: 0x2 } : devtoolsWithoutAvailability,
+    devtools: disableDevTools ? { ...devtools, availability: 2 } : devtoolsWithoutAvailability,
   };
   return (
-    writeFile(preferencesPath, JSON['stringify'](preferences, null, 0x2) + '\x0a', 'utf8'),
+    writeFile(preferencesPath, JSON['stringify'](preferences, null, 2) + '\n', 'utf8'),
     { preferencesPath: preferencesPath, preferences: preferences }
   );
 }
 function readPositiveInteger(value) {
   const parsed = Number(value);
-  return Number['isFinite'](parsed) && parsed > 0x0 ? Math['round'](parsed) : 0x0;
+  return Number['isFinite'](parsed) && parsed > 0 ? Math['round'](parsed) : 0;
 }
 function readFiniteInteger(value) {
   const parsed = Number(value);
   return Number['isFinite'](parsed) ? Math['round'](parsed) : null;
 }
-function readNonNegativeInteger(value, fallback = 0x0) {
+function readNonNegativeInteger(value, fallback = 0) {
   const parsed = Number(value);
-  if (!Number['isFinite'](parsed) || parsed < 0x0) return fallback;
+  if (!Number['isFinite'](parsed) || parsed < 0) return fallback;
   return Math['round'](parsed);
 }
 function resolveEarlyExitGraceMs(env = process['env']) {
@@ -265,7 +265,7 @@ function resolveEarlyExitGraceMs(env = process['env']) {
   return readNonNegativeInteger(raw, DEFAULT_EARLY_EXIT_GRACE_MS);
 }
 function isCleanEarlyChromeShellExit({ code: code, signal: signal, runtimeMs: runtimeMs, graceMs: graceMs }) {
-  return code === 0x0 && !signal && graceMs > 0x0 && runtimeMs >= 0x0 && runtimeMs < graceMs;
+  return code === 0 && !signal && graceMs > 0 && runtimeMs >= 0 && runtimeMs < graceMs;
 }
 export function normalizeChromeShellSpawnError(error) {
   if (error?.['code'] === CHROME_SHELL_SPAWN_ERROR_CODE) return error;
@@ -289,9 +289,9 @@ export function normalizeChromeShellSpawnError(error) {
 function buildWindowsActivationScript(pid) {
   const targetPid = readPositiveInteger(pid);
   if (!targetPid) return '';
-  return ('\x0a$targetPid\x20=\x20' +
+  return ('\n$targetPid = ' +
     targetPid +
-    '\x0a$deadline\x20=\x20[DateTime]::UtcNow.AddMilliseconds(' +
+    '\n$deadline = [DateTime]::UtcNow.AddMilliseconds(' +
     WINDOWS_ACTIVATION_TIMEOUT_MS +
     ')\n$typeDefinition = @\'\nusing System;\nusing System.Text;\nusing System.Runtime.InteropServices;\npublic static class AicChromeShellWindowActivator {\n  public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);\n  [DllImport("user32.dll")] public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);\n  [DllImport("user32.dll")] public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);\n  [DllImport("user32.dll")] public static extern int GetWindowTextLength(IntPtr hWnd);\n  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);\n  [DllImport("user32.dll")] public static extern bool GetWindowRect(IntPtr hWnd, out RECT rect);\n  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);\n  [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hWnd);\n  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);\n  public struct RECT { public int Left; public int Top; public int Right; public int Bottom; }\n}\n\'@\nAdd-Type -TypeDefinition $typeDefinition -ErrorAction SilentlyContinue\nwhile ([DateTime]::UtcNow -lt $deadline) {\n  $script:shown = $false\n  [AicChromeShellWindowActivator]::EnumWindows({\n    param($hWnd, $lParam)\n    $windowProcessId = [uint32]0\n    [void][AicChromeShellWindowActivator]::GetWindowThreadProcessId($hWnd, [ref]$windowProcessId)\n    if ([int]$windowProcessId -ne $targetPid) { return $true }\n    $len = [AicChromeShellWindowActivator]::GetWindowTextLength($hWnd)\n    $text = New-Object System.Text.StringBuilder ([Math]::Max(256, $len + 1))\n    [void][AicChromeShellWindowActivator]::GetWindowText($hWnd, $text, $text.Capacity)\n    $title = $text.ToString()\n    $rect = New-Object AicChromeShellWindowActivator+RECT\n    [void][AicChromeShellWindowActivator]::GetWindowRect($hWnd, [ref]$rect)\n    $width = $rect.Right - $rect.Left\n    $height = $rect.Bottom - $rect.Top\n    $looksLikeAppWindow = $title -like \'*updream canvas*\' -or $title -like \'*AI CanvasPro*\' -or ($width -gt 300 -and $height -gt 300 -and $title -notmatch \'IME\')\n    if (-not $looksLikeAppWindow) { return $true }\n    [void][AicChromeShellWindowActivator]::ShowWindow($hWnd, 9)\n    [void][AicChromeShellWindowActivator]::SetForegroundWindow($hWnd)\n    $script:shown = $true\n    return $false\n  }, [IntPtr]::Zero) | Out-Null\n  if ($script:shown) { exit 0 }\n  Start-Sleep -Milliseconds 200\n}\nexit 0\n')[
     'trim'
@@ -301,12 +301,12 @@ function buildMacActivationScript(pid) {
   const targetPid = readPositiveInteger(pid);
   if (!targetPid) return '';
   return [
-    'ObjC.import(\x22AppKit\x22);',
-    'const\x20app\x20=\x20$.NSRunningApplication.runningApplicationWithProcessIdentifier(' + targetPid + ');',
-    'if\x20(app)\x20{',
+    'ObjC.import("AppKit");',
+    'const app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(' + targetPid + ');',
+    'if (app) {',
     '  app.activateWithOptions($.NSApplicationActivateAllWindows | $.NSApplicationActivateIgnoringOtherApps);',
     '}',
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 export function activateChromeShellWindowSoon({
   child: child,
@@ -344,7 +344,7 @@ export function activateChromeShellWindowSoon({
 function buildWindowsChromeShellFocusScript() {
   return ('\n$focusMode = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_FOCUS_MODE")\n$windowAction = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_WINDOW_ACTION")\n$targetPidText = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_TARGET_PID")\n$expectedBrowserPath = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_EXPECTED_BROWSER_PATH")\n$expectedProfileDir = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_EXPECTED_PROFILE_DIR")\n$expectedAppBaseUrl = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_EXPECTED_APP_BASE_URL")\n$timeoutText = [Environment]::GetEnvironmentVariable("AIC_CHROME_SHELL_FOCUS_TIMEOUT_MS")\n$targetPid = 0\n$timeoutMs = ' +
     WINDOWS_ACTIVATION_TIMEOUT_MS +
-    '\x0a[void][int]::TryParse($targetPidText,\x20[ref]$targetPid)\x0a[void][int]::TryParse($timeoutText,\x20[ref]$timeoutMs)\x0a$typeDefinition\x20=\x20@\x27\x0ausing\x20System;\x0ausing\x20System.Text;\x0ausing\x20System.Runtime.InteropServices;\x0apublic\x20static\x20class\x20AicChromeShellFocus\x20{\x0a\x20\x20public\x20delegate\x20bool\x20EnumWindowsProc(IntPtr\x20hWnd,\x20IntPtr\x20lParam);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20bool\x20EnumWindows(EnumWindowsProc\x20lpEnumFunc,\x20IntPtr\x20lParam);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20bool\x20IsWindowVisible(IntPtr\x20hWnd);\x0a\x20\x20[DllImport(\x22user32.dll\x22,\x20CharSet\x20=\x20CharSet.Unicode)]\x20public\x20static\x20extern\x20int\x20GetWindowText(IntPtr\x20hWnd,\x20StringBuilder\x20text,\x20int\x20count);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20int\x20GetWindowTextLength(IntPtr\x20hWnd);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20uint\x20GetWindowThreadProcessId(IntPtr\x20hWnd,\x20out\x20uint\x20processId);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20bool\x20ShowWindow(IntPtr\x20hWnd,\x20int\x20nCmdShow);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20bool\x20SetForegroundWindow(IntPtr\x20hWnd);\x0a\x20\x20[DllImport(\x22user32.dll\x22)]\x20public\x20static\x20extern\x20bool\x20IsWindow(IntPtr\x20hWnd);\x0a\x20\x20[DllImport(\x22user32.dll\x22,\x20SetLastError\x20=\x20true)]\x20public\x20static\x20extern\x20bool\x20PostMessage(IntPtr\x20hWnd,\x20uint\x20message,\x20IntPtr\x20wParam,\x20IntPtr\x20lParam);\x0a\x20\x20[DllImport(\x22kernel32.dll\x22,\x20SetLastError\x20=\x20true)]\x20public\x20static\x20extern\x20IntPtr\x20OpenProcess(uint\x20access,\x20bool\x20inheritHandle,\x20uint\x20processId);\x0a\x20\x20[DllImport(\x22kernel32.dll\x22,\x20CharSet\x20=\x20CharSet.Unicode,\x20SetLastError\x20=\x20true)]\x20public\x20static\x20extern\x20bool\x20QueryFullProcessImageName(IntPtr\x20process,\x20uint\x20flags,\x20StringBuilder\x20path,\x20ref\x20uint\x20size);\x0a\x20\x20[DllImport(\x22kernel32.dll\x22)]\x20public\x20static\x20extern\x20bool\x20CloseHandle(IntPtr\x20handle);\x0a\x20\x20[DllImport(\x22shell32.dll\x22,\x20CharSet\x20=\x20CharSet.Unicode,\x20SetLastError\x20=\x20true)]\x20public\x20static\x20extern\x20IntPtr\x20CommandLineToArgvW(string\x20commandLine,\x20out\x20int\x20argumentCount);\x0a\x20\x20[DllImport(\x22kernel32.dll\x22,\x20SetLastError\x20=\x20true)]\x20public\x20static\x20extern\x20IntPtr\x20LocalFree(IntPtr\x20memory);\x0a\x20\x20public\x20static\x20string\x20GetProcessPath(uint\x20processId)\x20{\x0a\x20\x20\x20\x20IntPtr\x20process\x20=\x20OpenProcess(0x1000,\x20false,\x20processId);\x0a\x20\x20\x20\x20if\x20(process\x20==\x20IntPtr.Zero)\x20return\x20\x22\x22;\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20StringBuilder\x20path\x20=\x20new\x20StringBuilder(32768);\x0a\x20\x20\x20\x20\x20\x20uint\x20size\x20=\x20(uint)path.Capacity;\x0a\x20\x20\x20\x20\x20\x20return\x20QueryFullProcessImageName(process,\x200,\x20path,\x20ref\x20size)\x20?\x20path.ToString()\x20:\x20\x22\x22;\x0a\x20\x20\x20\x20}\x20finally\x20{\x0a\x20\x20\x20\x20\x20\x20CloseHandle(process);\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20public\x20static\x20string[]\x20SplitCommandLine(string\x20commandLine)\x20{\x0a\x20\x20\x20\x20if\x20(String.IsNullOrWhiteSpace(commandLine))\x20return\x20new\x20string[0];\x0a\x20\x20\x20\x20int\x20argumentCount\x20=\x200;\x0a\x20\x20\x20\x20IntPtr\x20argumentList\x20=\x20CommandLineToArgvW(commandLine,\x20out\x20argumentCount);\x0a\x20\x20\x20\x20if\x20(argumentList\x20==\x20IntPtr.Zero\x20||\x20argumentCount\x20<=\x200)\x20return\x20new\x20string[0];\x0a\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20string[]\x20arguments\x20=\x20new\x20string[argumentCount];\x0a\x20\x20\x20\x20\x20\x20for\x20(int\x20index\x20=\x200;\x20index\x20<\x20argumentCount;\x20index++)\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20IntPtr\x20argument\x20=\x20Marshal.ReadIntPtr(argumentList,\x20index\x20*\x20IntPtr.Size);\x0a\x20\x20\x20\x20\x20\x20\x20\x20arguments[index]\x20=\x20Marshal.PtrToStringUni(argument)\x20??\x20\x22\x22;\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20return\x20arguments;\x0a\x20\x20\x20\x20}\x20finally\x20{\x0a\x20\x20\x20\x20\x20\x20LocalFree(argumentList);\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a}\x0a\x27@\x0atry\x20{\x20Add-Type\x20-TypeDefinition\x20$typeDefinition\x20-ErrorAction\x20Stop\x20}\x20catch\x20{\x20exit\x202\x20}\x0a$expectedFullPath\x20=\x20\x22\x22\x0a$expectedFullProfileDir\x20=\x20\x22\x22\x0a$expectedAppUri\x20=\x20$null\x0aif\x20(-not\x20[String]::IsNullOrWhiteSpace($expectedBrowserPath))\x20{\x0a\x20\x20try\x20{\x20$expectedFullPath\x20=\x20[IO.Path]::GetFullPath($expectedBrowserPath)\x20}\x20catch\x20{\x20exit\x202\x20}\x0a}\x0aif\x20(-not\x20[String]::IsNullOrWhiteSpace($expectedProfileDir))\x20{\x0a\x20\x20try\x20{\x20$expectedFullProfileDir\x20=\x20[IO.Path]::GetFullPath($expectedProfileDir)\x20}\x20catch\x20{\x20exit\x202\x20}\x0a}\x0aif\x20(-not\x20[String]::IsNullOrWhiteSpace($expectedAppBaseUrl))\x20{\x0a\x20\x20try\x20{\x0a\x20\x20\x20\x20$expectedAppUri\x20=\x20[Uri]$expectedAppBaseUrl\x0a\x20\x20}\x20catch\x20{\x20exit\x202\x20}\x0a}\x0aif\x20($focusMode\x20-eq\x20\x22detached\x22\x20-and\x20(\x0a\x20\x20[String]::IsNullOrWhiteSpace($expectedFullPath)\x20-or\x0a\x20\x20[String]::IsNullOrWhiteSpace($expectedFullProfileDir)\x20-or\x0a\x20\x20$null\x20-eq\x20$expectedAppUri\x0a))\x20{\x20exit\x202\x20}\x0afunction\x20Test-AicChromeShellLaunchIdentity([uint32]$processId)\x20{\x0a\x20\x20try\x20{\x0a\x20\x20\x20\x20$record\x20=\x20Get-CimInstance\x20Win32_Process\x20-Filter\x20(\x22ProcessId\x20=\x20\x22\x20+\x20$processId)\x20-ErrorAction\x20Stop\x0a\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20return\x20$false\x0a\x20\x20}\x0a\x20\x20if\x20($null\x20-eq\x20$record)\x20{\x20return\x20$false\x20}\x0a\x20\x20$hasExpectedProfile\x20=\x20$false\x0a\x20\x20$hasExpectedApp\x20=\x20$false\x0a\x20\x20foreach\x20($argument\x20in\x20[AicChromeShellFocus]::SplitCommandLine([string]$record.CommandLine))\x20{\x0a\x20\x20\x20\x20if\x20($argument.StartsWith(\x22--user-data-dir=\x22,\x20[StringComparison]::OrdinalIgnoreCase))\x20{\x0a\x20\x20\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20$candidateProfile\x20=\x20[IO.Path]::GetFullPath($argument.Substring(16))\x0a\x20\x20\x20\x20\x20\x20\x20\x20$hasExpectedProfile\x20=\x20[String]::Equals(\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20$candidateProfile,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20$expectedFullProfileDir,\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20[StringComparison]::OrdinalIgnoreCase\x0a\x20\x20\x20\x20\x20\x20\x20\x20)\x0a\x20\x20\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20$hasExpectedProfile\x20=\x20$false\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20if\x20($argument.StartsWith(\x22--app=\x22,\x20[StringComparison]::OrdinalIgnoreCase))\x20{\x0a\x20\x20\x20\x20\x20\x20try\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20$candidateAppUri\x20=\x20[Uri]$argument.Substring(6)\x0a\x20\x20\x20\x20\x20\x20\x20\x20$hasExpectedApp\x20=\x20(\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20[String]::Equals($candidateAppUri.Scheme,\x20$expectedAppUri.Scheme,\x20[StringComparison]::OrdinalIgnoreCase)\x20-and\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20[String]::Equals($candidateAppUri.Host,\x20$expectedAppUri.Host,\x20[StringComparison]::OrdinalIgnoreCase)\x20-and\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20$candidateAppUri.Port\x20-eq\x20$expectedAppUri.Port\x20-and\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20[String]::Equals($candidateAppUri.AbsolutePath,\x20$expectedAppUri.AbsolutePath,\x20[StringComparison]::Ordinal)\x20-and\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20$candidateAppUri.Query\x20-match\x20\x27(?:^|[?&])aicRuntime=chrome-shell(?:&|$)\x27\x0a\x20\x20\x20\x20\x20\x20\x20\x20)\x0a\x20\x20\x20\x20\x20\x20}\x20catch\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20$hasExpectedApp\x20=\x20$false\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20}\x0a\x20\x20return\x20$hasExpectedProfile\x20-and\x20$hasExpectedApp\x0a}\x0a$deadline\x20=\x20[DateTime]::UtcNow.AddMilliseconds($timeoutMs)\x0a$script:targetWindow\x20=\x20[IntPtr]::Zero\x0awhile\x20([DateTime]::UtcNow\x20-lt\x20$deadline)\x20{\x0a\x20\x20if\x20($windowAction\x20-eq\x20\x22close\x22\x20-and\x20$script:targetWindow\x20-ne\x20[IntPtr]::Zero)\x20{\x0a\x20\x20\x20\x20if\x20(-not\x20[AicChromeShellFocus]::IsWindow($script:targetWindow))\x20{\x20exit\x200\x20}\x0a\x20\x20\x20\x20Start-Sleep\x20-Milliseconds\x20100\x0a\x20\x20\x20\x20continue\x0a\x20\x20}\x0a\x20\x20$script:succeeded\x20=\x20$false\x0a\x20\x20[AicChromeShellFocus]::EnumWindows({\x0a\x20\x20\x20\x20param($hWnd,\x20$lParam)\x0a\x20\x20\x20\x20if\x20(-not\x20[AicChromeShellFocus]::IsWindowVisible($hWnd))\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20$windowProcessId\x20=\x20[uint32]0\x0a\x20\x20\x20\x20[void][AicChromeShellFocus]::GetWindowThreadProcessId($hWnd,\x20[ref]$windowProcessId)\x0a\x20\x20\x20\x20if\x20($focusMode\x20-eq\x20\x22tracked\x22\x20-and\x20[int]$windowProcessId\x20-ne\x20$targetPid)\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20$len\x20=\x20[AicChromeShellFocus]::GetWindowTextLength($hWnd)\x0a\x20\x20\x20\x20$text\x20=\x20New-Object\x20System.Text.StringBuilder\x20([Math]::Max(256,\x20$len\x20+\x201))\x0a\x20\x20\x20\x20[void][AicChromeShellFocus]::GetWindowText($hWnd,\x20$text,\x20$text.Capacity)\x0a\x20\x20\x20\x20$title\x20=\x20$text.ToString()\x0a\x20\x20\x20\x20if\x20($focusMode\x20-eq\x20\x22detached\x22\x20-and\x20$title\x20-notlike\x20\x22*updream\x20canvas*\x22\x20-and\x20$title\x20-notlike\x20\x22*AI\x20CanvasPro*\x22\x20-and\x20$title\x20-notlike\x20\x22*AI\x20Canvas*\x22)\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20if\x20(-not\x20[String]::IsNullOrWhiteSpace($expectedFullPath))\x20{\x0a\x20\x20\x20\x20\x20\x20$processPath\x20=\x20[AicChromeShellFocus]::GetProcessPath($windowProcessId)\x0a\x20\x20\x20\x20\x20\x20if\x20([String]::IsNullOrWhiteSpace($processPath))\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20\x20\x20try\x20{\x20$processPath\x20=\x20[IO.Path]::GetFullPath($processPath)\x20}\x20catch\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20\x20\x20if\x20(-not\x20[String]::Equals($processPath,\x20$expectedFullPath,\x20[StringComparison]::OrdinalIgnoreCase))\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20if\x20($focusMode\x20-eq\x20\x22detached\x22\x20-and\x20-not\x20(Test-AicChromeShellLaunchIdentity\x20$windowProcessId))\x20{\x20return\x20$true\x20}\x0a\x20\x20\x20\x20if\x20($windowAction\x20-eq\x20\x22close\x22)\x20{\x0a\x20\x20\x20\x20\x20\x20if\x20([AicChromeShellFocus]::PostMessage($hWnd,\x200x0010,\x20[IntPtr]::Zero,\x20[IntPtr]::Zero))\x20{\x0a\x20\x20\x20\x20\x20\x20\x20\x20$script:targetWindow\x20=\x20$hWnd\x0a\x20\x20\x20\x20\x20\x20\x20\x20return\x20$false\x0a\x20\x20\x20\x20\x20\x20}\x0a\x20\x20\x20\x20\x20\x20return\x20$true\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20if\x20([AicChromeShellFocus]::IsIconic($hWnd))\x20{\x0a\x20\x20\x20\x20\x20\x20[void][AicChromeShellFocus]::ShowWindow($hWnd,\x209)\x0a\x20\x20\x20\x20}\x0a\x20\x20\x20\x20[void][AicChromeShellFocus]::SetForegroundWindow($hWnd)\x0a\x20\x20\x20\x20$script:succeeded\x20=\x20$true\x0a\x20\x20\x20\x20return\x20$false\x0a\x20\x20},\x20[IntPtr]::Zero)\x20|\x20Out-Null\x0a\x20\x20if\x20($script:succeeded)\x20{\x20exit\x200\x20}\x0a\x20\x20Start-Sleep\x20-Milliseconds\x20150\x0a}\x0aexit\x201\x0a')[
+    '\n[void][int]::TryParse($targetPidText, [ref]$targetPid)\n[void][int]::TryParse($timeoutText, [ref]$timeoutMs)\n$typeDefinition = @\'\nusing System;\nusing System.Text;\nusing System.Runtime.InteropServices;\npublic static class AicChromeShellFocus {\n  public delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);\n  [DllImport("user32.dll")] public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);\n  [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hWnd);\n  [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);\n  [DllImport("user32.dll")] public static extern int GetWindowTextLength(IntPtr hWnd);\n  [DllImport("user32.dll")] public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);\n  [DllImport("user32.dll")] public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);\n  [DllImport("user32.dll")] public static extern bool SetForegroundWindow(IntPtr hWnd);\n  [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr hWnd);\n  [DllImport("user32.dll", SetLastError = true)] public static extern bool PostMessage(IntPtr hWnd, uint message, IntPtr wParam, IntPtr lParam);\n  [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr OpenProcess(uint access, bool inheritHandle, uint processId);\n  [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] public static extern bool QueryFullProcessImageName(IntPtr process, uint flags, StringBuilder path, ref uint size);\n  [DllImport("kernel32.dll")] public static extern bool CloseHandle(IntPtr handle);\n  [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)] public static extern IntPtr CommandLineToArgvW(string commandLine, out int argumentCount);\n  [DllImport("kernel32.dll", SetLastError = true)] public static extern IntPtr LocalFree(IntPtr memory);\n  public static string GetProcessPath(uint processId) {\n    IntPtr process = OpenProcess(0x1000, false, processId);\n    if (process == IntPtr.Zero) return "";\n    try {\n      StringBuilder path = new StringBuilder(32768);\n      uint size = (uint)path.Capacity;\n      return QueryFullProcessImageName(process, 0, path, ref size) ? path.ToString() : "";\n    } finally {\n      CloseHandle(process);\n    }\n  }\n  public static string[] SplitCommandLine(string commandLine) {\n    if (String.IsNullOrWhiteSpace(commandLine)) return new string[0];\n    int argumentCount = 0;\n    IntPtr argumentList = CommandLineToArgvW(commandLine, out argumentCount);\n    if (argumentList == IntPtr.Zero || argumentCount <= 0) return new string[0];\n    try {\n      string[] arguments = new string[argumentCount];\n      for (int index = 0; index < argumentCount; index++) {\n        IntPtr argument = Marshal.ReadIntPtr(argumentList, index * IntPtr.Size);\n        arguments[index] = Marshal.PtrToStringUni(argument) ?? "";\n      }\n      return arguments;\n    } finally {\n      LocalFree(argumentList);\n    }\n  }\n}\n\'@\ntry { Add-Type -TypeDefinition $typeDefinition -ErrorAction Stop } catch { exit 2 }\n$expectedFullPath = ""\n$expectedFullProfileDir = ""\n$expectedAppUri = $null\nif (-not [String]::IsNullOrWhiteSpace($expectedBrowserPath)) {\n  try { $expectedFullPath = [IO.Path]::GetFullPath($expectedBrowserPath) } catch { exit 2 }\n}\nif (-not [String]::IsNullOrWhiteSpace($expectedProfileDir)) {\n  try { $expectedFullProfileDir = [IO.Path]::GetFullPath($expectedProfileDir) } catch { exit 2 }\n}\nif (-not [String]::IsNullOrWhiteSpace($expectedAppBaseUrl)) {\n  try {\n    $expectedAppUri = [Uri]$expectedAppBaseUrl\n  } catch { exit 2 }\n}\nif ($focusMode -eq "detached" -and (\n  [String]::IsNullOrWhiteSpace($expectedFullPath) -or\n  [String]::IsNullOrWhiteSpace($expectedFullProfileDir) -or\n  $null -eq $expectedAppUri\n)) { exit 2 }\nfunction Test-AicChromeShellLaunchIdentity([uint32]$processId) {\n  try {\n    $record = Get-CimInstance Win32_Process -Filter ("ProcessId = " + $processId) -ErrorAction Stop\n  } catch {\n    return $false\n  }\n  if ($null -eq $record) { return $false }\n  $hasExpectedProfile = $false\n  $hasExpectedApp = $false\n  foreach ($argument in [AicChromeShellFocus]::SplitCommandLine([string]$record.CommandLine)) {\n    if ($argument.StartsWith("--user-data-dir=", [StringComparison]::OrdinalIgnoreCase)) {\n      try {\n        $candidateProfile = [IO.Path]::GetFullPath($argument.Substring(16))\n        $hasExpectedProfile = [String]::Equals(\n          $candidateProfile,\n          $expectedFullProfileDir,\n          [StringComparison]::OrdinalIgnoreCase\n        )\n      } catch {\n        $hasExpectedProfile = $false\n      }\n    }\n    if ($argument.StartsWith("--app=", [StringComparison]::OrdinalIgnoreCase)) {\n      try {\n        $candidateAppUri = [Uri]$argument.Substring(6)\n        $hasExpectedApp = (\n          [String]::Equals($candidateAppUri.Scheme, $expectedAppUri.Scheme, [StringComparison]::OrdinalIgnoreCase) -and\n          [String]::Equals($candidateAppUri.Host, $expectedAppUri.Host, [StringComparison]::OrdinalIgnoreCase) -and\n          $candidateAppUri.Port -eq $expectedAppUri.Port -and\n          [String]::Equals($candidateAppUri.AbsolutePath, $expectedAppUri.AbsolutePath, [StringComparison]::Ordinal) -and\n          $candidateAppUri.Query -match \'(?:^|[?&])aicRuntime=chrome-shell(?:&|$)\'\n        )\n      } catch {\n        $hasExpectedApp = $false\n      }\n    }\n  }\n  return $hasExpectedProfile -and $hasExpectedApp\n}\n$deadline = [DateTime]::UtcNow.AddMilliseconds($timeoutMs)\n$script:targetWindow = [IntPtr]::Zero\nwhile ([DateTime]::UtcNow -lt $deadline) {\n  if ($windowAction -eq "close" -and $script:targetWindow -ne [IntPtr]::Zero) {\n    if (-not [AicChromeShellFocus]::IsWindow($script:targetWindow)) { exit 0 }\n    Start-Sleep -Milliseconds 100\n    continue\n  }\n  $script:succeeded = $false\n  [AicChromeShellFocus]::EnumWindows({\n    param($hWnd, $lParam)\n    if (-not [AicChromeShellFocus]::IsWindowVisible($hWnd)) { return $true }\n    $windowProcessId = [uint32]0\n    [void][AicChromeShellFocus]::GetWindowThreadProcessId($hWnd, [ref]$windowProcessId)\n    if ($focusMode -eq "tracked" -and [int]$windowProcessId -ne $targetPid) { return $true }\n    $len = [AicChromeShellFocus]::GetWindowTextLength($hWnd)\n    $text = New-Object System.Text.StringBuilder ([Math]::Max(256, $len + 1))\n    [void][AicChromeShellFocus]::GetWindowText($hWnd, $text, $text.Capacity)\n    $title = $text.ToString()\n    if ($focusMode -eq "detached" -and $title -notlike "*updream canvas*" -and $title -notlike "*AI CanvasPro*" -and $title -notlike "*AI Canvas*") { return $true }\n    if (-not [String]::IsNullOrWhiteSpace($expectedFullPath)) {\n      $processPath = [AicChromeShellFocus]::GetProcessPath($windowProcessId)\n      if ([String]::IsNullOrWhiteSpace($processPath)) { return $true }\n      try { $processPath = [IO.Path]::GetFullPath($processPath) } catch { return $true }\n      if (-not [String]::Equals($processPath, $expectedFullPath, [StringComparison]::OrdinalIgnoreCase)) { return $true }\n    }\n    if ($focusMode -eq "detached" -and -not (Test-AicChromeShellLaunchIdentity $windowProcessId)) { return $true }\n    if ($windowAction -eq "close") {\n      if ([AicChromeShellFocus]::PostMessage($hWnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)) {\n        $script:targetWindow = $hWnd\n        return $false\n      }\n      return $true\n    }\n    if ([AicChromeShellFocus]::IsIconic($hWnd)) {\n      [void][AicChromeShellFocus]::ShowWindow($hWnd, 9)\n    }\n    [void][AicChromeShellFocus]::SetForegroundWindow($hWnd)\n    $script:succeeded = $true\n    return $false\n  }, [IntPtr]::Zero) | Out-Null\n  if ($script:succeeded) { exit 0 }\n  Start-Sleep -Milliseconds 150\n}\nexit 1\n')[
     'trim'
   ]();
 }
@@ -361,7 +361,7 @@ function resolveChromeShellFocusTarget(launch) {
       return null;
     return {
       mode: 'detached',
-      targetPid: 0x0,
+      targetPid: 0,
       expectedBrowserPath: browserPath,
       expectedProfileDir: profileDir,
       expectedAppIdentity: appIdentity,
@@ -395,8 +395,8 @@ export async function controlChromeShellLaunchWindow({
   const target = resolveChromeShellFocusTarget(launch);
   if (!target) return ![];
   const resolvedTimeoutMs = Math['max'](
-    0x64,
-    Math['min'](0x2710, readNonNegativeInteger(timeoutMs, WINDOWS_ACTIVATION_TIMEOUT_MS)),
+    100,
+    Math['min'](10000, readNonNegativeInteger(timeoutMs, WINDOWS_ACTIVATION_TIMEOUT_MS)),
   );
   let helper;
   try {
@@ -440,13 +440,13 @@ export async function controlChromeShellLaunchWindow({
       resolve(succeeded === !![]);
     };
     (helper['once']('error', () => finish(![])),
-      helper['once']('exit', (exitCode) => finish(exitCode === 0x0)),
+      helper['once']('exit', (exitCode) => finish(exitCode === 0)),
       (timer = setTimeoutFn(() => {
         try {
           helper['kill']?.();
         } catch {}
         finish(![]);
-      }, resolvedTimeoutMs + 0x3e8)));
+      }, resolvedTimeoutMs + 1000)));
   });
 }
 export function focusChromeShellLaunchWindow(options = {}) {
@@ -473,7 +473,7 @@ function waitForChromeShellProcessExit({
       (child?.['off']?.('exit', onExit), resolve(exited === !![]));
     };
     ((onExit = () => finish(!![])), child?.['once']?.('exit', onExit));
-    const timeoutTimer = setTimeoutFn(() => finish(hasExited()), Math['max'](0x0, Number(timeoutMs) || 0x0));
+    const timeoutTimer = setTimeoutFn(() => finish(hasExited()), Math['max'](0, Number(timeoutMs) || 0));
     if (settled) clearTimeoutFn(timeoutTimer);
     else timer = timeoutTimer;
   });
@@ -509,7 +509,7 @@ function runWindowsTaskkill({
       return;
     }
     (helper['once']('error', () => finish(![])),
-      helper['once']('exit', (exitCode) => finish(exitCode === 0x0)));
+      helper['once']('exit', (exitCode) => finish(exitCode === 0)));
     const timeoutTimer = setTimeoutFn(
       () => {
         try {
@@ -517,7 +517,7 @@ function runWindowsTaskkill({
         } catch {}
         finish(![]);
       },
-      Math['max'](0x64, Number(timeoutMs) || 0x0),
+      Math['max'](100, Number(timeoutMs) || 0),
     );
     if (settled) clearTimeoutFn(timeoutTimer);
     else timer = timeoutTimer;
@@ -624,10 +624,10 @@ function normalizeChromeWindowPlacement(placement = {}) {
     bottom = readFiniteInteger(placement['bottom']),
     width =
       readPositiveInteger(placement['width']) ||
-      (left !== null && right !== null ? Math['max'](0x0, right - left) : 0x0),
+      (left !== null && right !== null ? Math['max'](0, right - left) : 0),
     height =
       readPositiveInteger(placement['height']) ||
-      (top !== null && bottom !== null ? Math['max'](0x0, bottom - top) : 0x0),
+      (top !== null && bottom !== null ? Math['max'](0, bottom - top) : 0),
     { fullscreen: fullscreen, maximized: maximized } = normalizeWindowMode(placement);
   if (!fullscreen && !maximized && (!width || !height)) return null;
   return {
@@ -652,14 +652,14 @@ function collectChromeAppWindowPlacements(node, placements = []) {
 }
 function pickChromeAppWindowPlacement(preferences = {}) {
   const placements = collectChromeAppWindowPlacements(preferences?.['browser']?.['app_window_placement']);
-  if (placements['length'] <= 0x0) return null;
+  if (placements['length'] <= 0) return null;
   return [...placements]['sort']((a, b) => {
     const score = (placement) =>
-      (placement['fullscreen'] ? 0x3b9aca00 : 0x0) +
-      (placement['maximized'] ? 0x5f5e100 : 0x0) +
+      (placement['fullscreen'] ? 1000000000 : 0) +
+      (placement['maximized'] ? 100000000 : 0) +
       placement['width'] * placement['height'];
     return score(b) - score(a);
-  })[0x0];
+  })[0];
 }
 function readLegacyElectronWindowState(profileDir, readFile = readFileSync) {
   const statePath = path['join'](path['dirname'](String(profileDir || '')), 'window-state.json'),
@@ -689,25 +689,25 @@ function normalizeDisplayWorkArea(display) {
 }
 function hasReasonableDisplayIntersection(windowState, workArea) {
   const overlapWidth = Math['max'](
-      0x0,
+      0,
       Math['min'](windowState['x'] + windowState['width'], workArea['x'] + workArea['width']) -
         Math['max'](windowState['x'], workArea['x']),
     ),
     overlapHeight = Math['max'](
-      0x0,
+      0,
       Math['min'](windowState['y'] + windowState['height'], workArea['y'] + workArea['height']) -
         Math['max'](windowState['y'], workArea['y']),
     ),
-    minWidth = Math['min'](0xf0, Math['max'](0x1, windowState['width'] * 0.2)),
-    minHeight = Math['min'](0x78, Math['max'](0x1, windowState['height'] * 0.2));
+    minWidth = Math['min'](240, Math['max'](1, windowState['width'] * 0.2)),
+    minHeight = Math['min'](120, Math['max'](1, windowState['height'] * 0.2));
   return overlapWidth >= minWidth && overlapHeight >= minHeight;
 }
 function distanceFromWindowCenterToWorkArea(windowState, workArea) {
-  const centerX = windowState['x'] + windowState['width'] / 0x2,
-    centerY = windowState['y'] + windowState['height'] / 0x2,
+  const centerX = windowState['x'] + windowState['width'] / 2,
+    centerY = windowState['y'] + windowState['height'] / 2,
     clampedX = Math['min'](Math['max'](centerX, workArea['x']), workArea['x'] + workArea['width']),
     clampedY = Math['min'](Math['max'](centerY, workArea['y']), workArea['y'] + workArea['height']);
-  return (centerX - clampedX) ** 0x2 + (centerY - clampedY) ** 0x2;
+  return (centerX - clampedX) ** 2 + (centerY - clampedY) ** 2;
 }
 function constrainWindowStateToDisplayWorkAreas(windowState, displayWorkAreas) {
   if (
@@ -722,20 +722,20 @@ function constrainWindowStateToDisplayWorkAreas(windowState, displayWorkAreas) {
   const workAreas = displayWorkAreas['map']((display) => normalizeDisplayWorkArea(display))['filter'](
     Boolean,
   );
-  if (workAreas['length'] <= 0x0) return { ...windowState, x: null, y: null };
+  if (workAreas['length'] <= 0) return { ...windowState, x: null, y: null };
   if (workAreas['some']((workArea) => hasReasonableDisplayIntersection(windowState, workArea)))
     return windowState;
   const nearest = [...workAreas]['sort'](
       (a, b) =>
         distanceFromWindowCenterToWorkArea(windowState, a) -
         distanceFromWindowCenterToWorkArea(windowState, b),
-    )[0x0],
+    )[0],
     width = Math['min'](windowState['width'], nearest['width']),
     height = Math['min'](windowState['height'], nearest['height']);
   return {
     ...windowState,
-    x: nearest['x'] + Math['round']((nearest['width'] - width) / 0x2),
-    y: nearest['y'] + Math['round']((nearest['height'] - height) / 0x2),
+    x: nearest['x'] + Math['round']((nearest['width'] - width) / 2),
+    y: nearest['y'] + Math['round']((nearest['height'] - height) / 2),
     width: width,
     height: height,
   };
@@ -827,7 +827,7 @@ export async function launchChromeShell({
           ...windowsTaskbarIdentity,
         });
   let child,
-    spawnedAt = 0x0;
+    spawnedAt = 0;
   try {
     ((spawnedAt = now()),
       (child = spawnProcess(browserPath, args, {
@@ -907,7 +907,7 @@ export async function launchChromeShellWithLifecycle({
       now: now,
       displayWorkAreas: displayWorkAreas,
       onExit: ({ code: code, signal: signal, spawnedAt: spawnedAt }) => {
-        const runtimeMs = Math['max'](0x0, now() - spawnedAt),
+        const runtimeMs = Math['max'](0, now() - spawnedAt),
           context = { code: code, signal: signal, runtimeMs: runtimeMs };
         if (isCleanEarlyChromeShellExit({ ...context, graceMs: earlyExitGraceMs })) {
           if (launch) launch['detached'] = !![];
@@ -944,7 +944,7 @@ export async function launchChromeShellWithLifecycle({
           type: 'chrome_shell.spawn_error',
           level: 'error',
           source: 'main',
-          message: 'Chrome\x20shell\x20process\x20failed',
+          message: 'Chrome shell process failed',
           error: normalized,
         }),
           onLaunchError?.(normalized));

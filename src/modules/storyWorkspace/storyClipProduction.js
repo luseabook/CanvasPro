@@ -54,15 +54,15 @@ function normalizeText(item) {
 }
 function formatPromptHistorySavedAt(key) {
   const index = new Date(Number(key));
-  if (!Number['isFinite'](index['getTime']()) || Number(key) <= 0x0) return '时间未记录';
-  const run = (result) => String(result)['padStart'](0x2, '0');
+  if (!Number['isFinite'](index['getTime']()) || Number(key) <= 0) return '时间未记录';
+  const run = (result) => String(result)['padStart'](2, '0');
   return (
     index['getFullYear']() +
     '-' +
-    run(index['getMonth']() + 0x1) +
+    run(index['getMonth']() + 1) +
     '-' +
     run(index['getDate']()) +
-    '\x20' +
+    ' ' +
     run(index['getHours']()) +
     ':' +
     run(index['getMinutes']())
@@ -71,16 +71,16 @@ function formatPromptHistorySavedAt(key) {
 function getPromptHistoryPreview(data) {
   return normalizeText(
     String(data || '')
-      ['replace'](/<br\s*\/?\s*>/gi, '\x20')
-      ['replace'](/<[^>]+>/g, '\x20')
-      ['replace'](/&nbsp;/gi, '\x20')
+      ['replace'](/<br\s*\/?\s*>/gi, ' ')
+      ['replace'](/<[^>]+>/g, ' ')
+      ['replace'](/&nbsp;/gi, ' ')
       ['replace'](/&lt;/gi, '<')
       ['replace'](/&gt;/gi, '>')
-      ['replace'](/&quot;/gi, '\x22')
-      ['replace'](/&#39;|&apos;/gi, '\x27')
+      ['replace'](/&quot;/gi, '"')
+      ['replace'](/&#39;|&apos;/gi, '\'')
       ['replace'](/&amp;/gi, '&')
-      ['replace'](/\s+/g, '\x20'),
-  )['slice'](0x0, 0x60);
+      ['replace'](/\s+/g, ' '),
+  )['slice'](0, 96);
 }
 function getVideoResults(options = {}) {
   return Array['isArray'](options?.['video']?.['results'])
@@ -88,15 +88,15 @@ function getVideoResults(options = {}) {
     : [];
 }
 function getActiveVideoResultIndex(options2 = {}, list = getVideoResults(options2)) {
-  if (!list['length']) return 0x0;
-  const source = Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0x0);
-  return Math['max'](0x0, Math['min'](list['length'] - 0x1, source));
+  if (!list['length']) return 0;
+  const source = Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0);
+  return Math['max'](0, Math['min'](list['length'] - 1, source));
 }
 function removeVideoResult(clip = {}, next) {
   const results = getVideoResults(clip),
     count = Number(next),
     activeIndex = getActiveVideoResultIndex(clip, results);
-  if (results['length'] < 0x2 || !Number['isInteger'](count) || count < 0x0 || count >= results['length'])
+  if (results['length'] < 2 || !Number['isInteger'](count) || count < 0 || count >= results['length'])
     return {
       changed: ![],
       clip: clip,
@@ -109,9 +109,9 @@ function removeVideoResult(clip = {}, next) {
     results2 = results['filter']((entry, record) => record !== count),
     activeIndex2 =
       count < activeIndex
-        ? activeIndex - 0x1
+        ? activeIndex - 1
         : count === activeIndex
-          ? Math['min'](count, results2['length'] - 0x1)
+          ? Math['min'](count, results2['length'] - 1)
           : activeIndex,
     activeResultChanged = results2[activeIndex2] !== current;
   return {
@@ -163,7 +163,7 @@ function renderVideoThumbnail(state, { className: className = '', label: label =
       escapeHtml(className) +
       '" src="' +
       escapeHtml(videoResultPosterUrl) +
-      '\x22\x20alt=\x22' +
+      '" alt="' +
       escapeHtml(label) +
       '" loading="lazy" draggable="false">'
     );
@@ -172,19 +172,19 @@ function renderVideoThumbnail(state, { className: className = '', label: label =
     return (
       '<video class="' +
       escapeHtml(className) +
-      '\x22\x20src=\x22' +
+      '" src="' +
       escapeHtml(videoResultUrl) +
-      '\x22\x20aria-label=\x22' +
+      '" aria-label="' +
       escapeHtml(label) +
       '" muted playsinline preload="metadata"></video>'
     );
   return '';
 }
-function getAdjacentVideoResultIndex(options4 = {}, config = 0x1) {
+function getAdjacentVideoResultIndex(options4 = {}, config = 1) {
   const list2 = getVideoResults(options4);
-  if (list2['length'] < 0x2) return getActiveVideoResultIndex(options4, list2);
+  if (list2['length'] < 2) return getActiveVideoResultIndex(options4, list2);
   const activeVideoResultIndex2 = getActiveVideoResultIndex(options4, list2),
-    scope = Number(config) < 0x0 ? -0x1 : 0x1;
+    scope = Number(config) < 0 ? -1 : 1;
   return (activeVideoResultIndex2 + scope + list2['length']) % list2['length'];
 }
 function renderVideoHistoryMenu(title = {}) {
@@ -199,18 +199,18 @@ function renderVideoHistoryMenu(title = {}) {
     renderMedia: (value2, value3) =>
       renderVideoThumbnail(value2, {
         className: 'story-media-history-thumbnail story-clip-video-history-thumbnail',
-        label: (title?.['title'] || '片段') + ' · 版本 ' + (value3 + 0x1),
+        label: (title?.['title'] || '片段') + ' · 版本 ' + (value3 + 1),
       }),
     getItemAttributes: (value4, value5) =>
       'data-story-action="select-video-result" data-story-clip-id="' +
       escapeHtml(title?.['id']) +
       '" data-story-video-result-index="' +
       value5 +
-      '\x22',
+      '"',
     renderItemAction: (value6, value7) =>
       renderWorkspaceCardDeleteControl({
         className: 'story-media-history-delete',
-        ariaLabel: '删除版本\x20' + (value7 + 0x1),
+        ariaLabel: '删除版本 ' + (value7 + 1),
         actionAttributes: {
           'data-story-action': 'delete-video-result',
           'data-story-clip-id': title?.['id'],
@@ -234,18 +234,18 @@ function renderTimelineVideoThumbnail(options5 = {}) {
 }
 function getSelectedEpisode(value9) {
   const list3 = Array['isArray'](value9?.['data']?.['episodes']) ? value9['data']['episodes'] : [];
-  return list3['find']((value10) => value10['id'] === value9?.['selectedEpisodeId']) || list3[0x0] || null;
+  return list3['find']((value10) => value10['id'] === value9?.['selectedEpisodeId']) || list3[0] || null;
 }
 function getSelectedClip(value11, value12) {
   const list4 = Array['isArray'](value12?.['clips']) ? value12['clips'] : [];
-  return list4['find']((value13) => value13['id'] === value11?.['selectedClipId']) || list4[0x0] || null;
+  return list4['find']((value13) => value13['id'] === value11?.['selectedClipId']) || list4[0] || null;
 }
-function getAdjacentClipId(list5 = [], value14 = '', value15 = 0x1) {
+function getAdjacentClipId(list5 = [], value14 = '', value15 = 1) {
   const list6 = (Array['isArray'](list5) ? list5 : [])['filter']((value16) => normalizeText(value16?.['id']));
   if (!list6['length']) return '';
   const count2 = list6['findIndex']((value17) => value17['id'] === value14),
-    value18 = count2 >= 0x0 ? count2 : 0x0,
-    value19 = Number(value15) < 0x0 ? -0x1 : 0x1,
+    value18 = count2 >= 0 ? count2 : 0,
+    value19 = Number(value15) < 0 ? -1 : 1,
     value20 = (value18 + value19 + list6['length']) % list6['length'];
   return list6[value20]['id'];
 }
@@ -260,7 +260,7 @@ function selectBatchTargets(list7 = [], value21 = []) {
 async function runBatch(list8 = [], handler = null, { onProgress: onProgress = null } = {}) {
   if (typeof handler !== 'function') return [];
   const total2 = Array['isArray'](list8) ? list8 : [];
-  let completed2 = 0x0;
+  let completed2 = 0;
   return Promise['all'](
     total2['map'](async (target2, index2) => {
       let result2;
@@ -270,7 +270,7 @@ async function runBatch(list8 = [], handler = null, { onProgress: onProgress = n
         result2 = { ok: ![], error: error };
       }
       return (
-        (completed2 += 0x1),
+        (completed2 += 1),
         onProgress?.({
           completed: completed2,
           total: total2['length'],
@@ -310,7 +310,7 @@ function setClipGenerationRunning(args2, value27, value28 = !![]) {
   }
   return (
     (args2['generatingClipIds'] = [...map3]),
-    (args2['generatingClipId'] = args2['generatingClipIds'][0x0] || ''),
+    (args2['generatingClipId'] = args2['generatingClipIds'][0] || ''),
     [...args2['generatingClipIds']]
   );
 }
@@ -331,7 +331,7 @@ function getGenerationState(options7 = {}, value29 = null) {
     isBatchGenerating: isBatchGenerating,
     batchLabel: normalizeText(batchCancelRequested?.['label']),
     batchCancelRequested: batchCancelRequested?.['cancelRequested'] === !![],
-    busy: isBatchGenerating || generatingClipIds2['length'] > 0x0,
+    busy: isBatchGenerating || generatingClipIds2['length'] > 0,
   };
 }
 function setEpisodeBatchRunning(enabled2, value31, value32 = !![], value33 = '', value34 = {}) {
@@ -397,7 +397,7 @@ function getClipInputSurface(providerHint, episode2, inputs) {
         kind: normalizeText(error2?.['type'] || error2?.['kind']),
         url: normalizeText(error2?.['url']),
         thumbUrl: normalizeText(error2?.['thumbUrl'] || error2?.['url']),
-        name: normalizeText(error2?.['name'] || error2?.['label']) || '素材 ' + (value40 + 0x1),
+        name: normalizeText(error2?.['name'] || error2?.['label']) || '素材 ' + (value40 + 1),
         refSlot: normalizeText(error2?.['refSlot'] || error2?.['slotId']),
       }))
       ['filter'](
@@ -459,7 +459,7 @@ function getUsedReferenceCounts(
     voiceAssetIds: voiceAssetIds = null,
   } = {},
 ) {
-  const value47 = { imageCount: 0x0, audioCount: 0x0, videoCount: 0x0 },
+  const value47 = { imageCount: 0, audioCount: 0, videoCount: 0 },
     map6 = new Set(),
     handler2 = (response6, value48 = '') => {
       const text5 = normalizeText(response6?.['type'] || response6?.['kind'] || value48),
@@ -467,7 +467,7 @@ function getUsedReferenceCounts(
       if (!Object['hasOwn'](value47, text5 + 'Count') || !text6) return;
       const value49 = text5 + ':' + text6;
       if (map6['has'](value49)) return;
-      (map6['add'](value49), (value47[text5 + 'Count'] += 0x1));
+      (map6['add'](value49), (value47[text5 + 'Count'] += 1));
     },
     value50 = value46?.['inputs'] && typeof value46['inputs'] === 'object' ? value46['inputs'] : {};
   return (
@@ -504,9 +504,9 @@ function renderReferenceSummary(
     value55 =
       '参考素材，图片 ' +
       usedReferenceCounts['imageCount'] +
-      '，音频\x20' +
+      '，音频 ' +
       usedReferenceCounts['audioCount'] +
-      '，视频\x20' +
+      '，视频 ' +
       usedReferenceCounts['videoCount'];
   return (
     '<div class="story-clip-reference-summary" data-story-clip-reference-summary role="status" aria-live="polite" aria-label="' +
@@ -515,7 +515,7 @@ function renderReferenceSummary(
     usedReferenceCounts['imageCount'] +
     '</strong></span>\n    <span>音频：<strong data-story-reference-count="audio">' +
     usedReferenceCounts['audioCount'] +
-    '</strong></span>\x0a\x20\x20\x20\x20<span>视频：<strong\x20data-story-reference-count=\x22video\x22>' +
+    '</strong></span>\n    <span>视频：<strong data-story-reference-count="video">' +
     usedReferenceCounts['videoCount'] +
     '</strong></span>\n  </div>'
   );
@@ -530,9 +530,9 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
     generationState = getGenerationState(enabled3, value56),
     { generatingClipIds: generatingClipIds3 } = generationState,
     enabled4 = value57 || getSelectedClip(enabled3, value56),
-    value59 = enabled3?.['clipSelectionMode'] ? list12[0x0] : enabled4,
-    value60 = enabled3?.['clipSelectionMode'] && count3 > 0x1,
-    value61 = !enabled3?.['clipSelectionMode'] || count3 === 0x1,
+    value59 = enabled3?.['clipSelectionMode'] ? list12[0] : enabled4,
+    value60 = enabled3?.['clipSelectionMode'] && count3 > 1,
+    value61 = !enabled3?.['clipSelectionMode'] || count3 === 1,
     value62 =
       value61 &&
       Boolean(
@@ -541,19 +541,19 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
           getRecoverableStoryClipVideoTask(value59)),
       ),
     value63 = enabled3?.['clipSelectionMode']
-      ? count3 === 0x0 ||
+      ? count3 === 0 ||
         generationState['isBatchGenerating'] ||
-        (value60 ? generatingClipIds3['length'] > 0x0 : value62)
+        (value60 ? generatingClipIds3['length'] > 0 : value62)
       : !enabled4 || generationState['isBatchGenerating'] || value62,
     text7 = normalizeText(value59?.['generation']?.['status'])['toLowerCase']() === 'queued',
-    value64 = '批量生成视频' + (count3 ? '\x20(' + count3 + ')' : ''),
+    value64 = '批量生成视频' + (count3 ? ' (' + count3 + ')' : ''),
     value65 = generationState['isBatchGenerating']
       ? value64
       : value62
         ? text7
           ? '排队中'
           : '生成中'
-        : enabled3?.['clipSelectionMode'] && count3 > 0x1
+        : enabled3?.['clipSelectionMode'] && count3 > 1
           ? value64
           : '生成本片段',
     value66 = Boolean(generationState['isBatchGenerating'] || value62),
@@ -561,7 +561,7 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
       renderRequestDebugButton('data-story-action="debug-clip-video"') +
       '<button type="button" class="story-workbench-action-button story-main-action-button" data-story-action="generate-clip-video" aria-busy="' +
       value66 +
-      '\x22\x20' +
+      '" ' +
       (value63 ? 'disabled' : '') +
       '>' +
       (value66 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
@@ -575,13 +575,13 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
         '</button>'
       : '',
     value68 =
-      '<div\x20class=\x22story-clip-selection-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-story-action=\x22select-all-clips\x22\x20aria-pressed=\x22' +
-      (count3 > 0x0 && count3 === list11['length']) +
-      '\x22\x20' +
+      '<div class="story-clip-selection-actions">\n        <button type="button" class="story-secondary-button" data-story-action="select-all-clips" aria-pressed="' +
+      (count3 > 0 && count3 === list11['length']) +
+      '" ' +
       (!list11['length'] ? 'disabled' : '') +
       '>' +
-      (count3 > 0x0 && count3 === list11['length'] ? '取消全选' : '全选') +
-      '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      (count3 > 0 && count3 === list11['length'] ? '取消全选' : '全选') +
+      '</button>\n        ' +
       value67 +
       '\n        ' +
       renderRequestDebugButton2 +
@@ -604,9 +604,9 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
   return (
     '<div class="story-clip-adjustment-bar" data-story-clip-adjustment-bar>\n    <div class="story-clip-adjustment-selectors">\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="mode">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-haspopup="listbox" aria-expanded="' +
     (value69?.['clipAdjustmentPromptModeOpen'] === !![]) +
-    '\x22\x20' +
+    '" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
-    '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20data-story-clip-adjustment-mode-label>' +
+    '>\n        <strong data-story-clip-adjustment-mode-label>' +
     escapeHtml(getStoryPromptModeLabel(storyPromptMode2)) +
     '</strong>\n      </button>\n      <div class="story-clip-adjustment-mode-menu" role="listbox" aria-label="提示词模式" ' +
     (value69?.['clipAdjustmentPromptModeOpen'] === !![] ? '' : 'hidden') +
@@ -619,13 +619,13 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
         escapeHtml(el['value']) +
         '" role="option" aria-selected="' +
         (el['value'] === storyPromptMode2) +
-        '\x22>' +
+        '">' +
         escapeHtml(el['label']) +
         '</button>',
     )['join']('') +
     '\n      </div>\n    </div>\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="language">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-label="语言转换" aria-haspopup="listbox" aria-expanded="' +
     (value69?.['clipAdjustmentLanguageOpen'] === !![]) +
-    '\x22\x20' +
+    '" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n        <strong data-story-clip-adjustment-mode-label>' +
     escapeHtml(
@@ -633,7 +633,7 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
         'label'
       ] || '语言转换',
     ) +
-    '</strong>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-clip-adjustment-mode-menu\x22\x20role=\x22listbox\x22\x20aria-label=\x22语言转换\x22\x20' +
+    '</strong>\n      </button>\n      <div class="story-clip-adjustment-mode-menu" role="listbox" aria-label="语言转换" ' +
     (value69?.['clipAdjustmentLanguageOpen'] ? '' : 'hidden') +
     '>\n        ' +
     [{ value: '', label: '保持当前语言' }, ...STORY_PROMPT_LANGUAGES]
@@ -645,7 +645,7 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
           el3['value'] +
           '" role="option" aria-selected="' +
           (el3['value'] === (value69?.['clipAdjustmentLanguage'] || '')) +
-          '\x22>' +
+          '">' +
           el3['label'] +
           '</button>',
       )
@@ -656,12 +656,12 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n      <button type="button" class="story-workbench-action-button" data-story-action="generate-clip-adjustment" ' +
     (isStoryClipAdjustmentGenerating2 || !canGenerateStoryClipAdjustment2 ? 'disabled' : '') +
-    '\x20aria-busy=\x22' +
+    ' aria-busy="' +
     isStoryClipAdjustmentGenerating2 +
-    '\x22>' +
+    '">' +
     (isStoryClipAdjustmentGenerating2 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
     (isStoryClipAdjustmentGenerating2 ? '生成中' : '生成') +
-    '</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
+    '</button>\n    </div>\n  </div>'
   );
 }
 function shouldCloseAdjustmentOnOutsideClick(value72, el4) {
@@ -686,7 +686,7 @@ function renderPromptHistoryControl(value74, value75) {
     ' 个已确认版本</span></header>\n      <div class="story-clip-prompt-history-list">\n        ' +
     list13['map']((value77) => {
       const value78 =
-          value77['durationSec'] > 0x0 ? value77['durationSec']['toFixed'](0x1) + 's' : '时长未记录',
+          value77['durationSec'] > 0 ? value77['durationSec']['toFixed'](1) + 's' : '时长未记录',
         promptHistoryPreview = getPromptHistoryPreview(value77['promptHtml']) || '空提示词';
       return (
         '<button type="button" class="story-clip-prompt-history-item" data-story-action="restore-clip-prompt-history" data-story-clip-prompt-history-id="' +
@@ -695,7 +695,7 @@ function renderPromptHistoryControl(value74, value75) {
         escapeHtml(getStoryPromptModeLabel(value77['promptMode'])) +
         ' 历史提示词">\n            <span class="story-clip-prompt-history-item-meta"><strong>' +
         escapeHtml(getStoryPromptModeLabel(value77['promptMode'])) +
-        '\x20·\x20' +
+        ' · ' +
         value78 +
         '</strong><small>' +
         escapeHtml(formatPromptHistorySavedAt(value77['savedAt'])) +
@@ -704,7 +704,7 @@ function renderPromptHistoryControl(value74, value75) {
         '</span>\n            <span class="story-clip-prompt-history-item-action">恢复</span>\n          </button>'
       );
     })['join']('') +
-    '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</div>'
+    '\n      </div>\n    </section>\n  </div>'
   );
 }
 function renderAdjustmentControl(value79, value80, value81 = null) {
@@ -713,17 +713,17 @@ function renderAdjustmentControl(value79, value80, value81 = null) {
     value82 =
       '<div class="story-clip-adjustment-header">\n    ' +
       renderPromptHistoryControl(value79, value80) +
-      '\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-clip-adjustment-trigger\x22\x20data-story-action=\x22toggle-clip-adjustment\x22\x20aria-expanded=\x22' +
+      '\n    <button type="button" class="story-clip-adjustment-trigger" data-story-action="toggle-clip-adjustment" aria-expanded="' +
       (value79?.['clipAdjustmentOpen'] === !![]) +
-      '\x22\x20' +
+      '" ' +
       (isStoryClipAdjustmentGenerating3 ? 'disabled' : '') +
-      '><span\x20aria-hidden=\x22true\x22>✦</span>AI\x20调整</button>\x0a\x20\x20</div>';
+      '><span aria-hidden="true">✦</span>AI 调整</button>\n  </div>';
   return (
     '<div class="story-clip-adjustment-control">\n    ' +
     value82 +
     '\n    ' +
     renderAdjustmentBar(value79, value80, value81) +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 function renderPromptComparison(value83) {
@@ -739,9 +739,9 @@ function renderPromptComparison(value83) {
     storyPromptMode4 = normalizeStoryPromptMode(enabled5['targetPromptMode'] || storyPromptMode3, {
       allowDeveloperModes: !![],
     }),
-    handler3 = (count4) => (count4 > 0x0 ? count4['toFixed'](0x1) + 's' : '--');
+    handler3 = (count4) => (count4 > 0 ? count4['toFixed'](1) + 's' : '--');
   return (
-    '<div\x20class=\x22story-clip-prompt-comparison\x22\x20data-story-clip-prompt-comparison>\x0a\x20\x20\x20\x20<header>\x0a\x20\x20\x20\x20\x20\x20<span>AI\x20调整完成</span>\x0a\x20\x20\x20\x20\x20\x20<strong>选择这个片段要使用的提示词版本</strong>\x0a\x20\x20\x20\x20</header>\x0a\x20\x20\x20\x20<div\x20class=\x22story-clip-prompt-comparison-grid\x22>\x0a\x20\x20\x20\x20\x20\x20<article>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-clip-prompt-version-title\x22><strong>原版本\x20·\x20' +
+    '<div class="story-clip-prompt-comparison" data-story-clip-prompt-comparison>\n    <header>\n      <span>AI 调整完成</span>\n      <strong>选择这个片段要使用的提示词版本</strong>\n    </header>\n    <div class="story-clip-prompt-comparison-grid">\n      <article>\n        <div class="story-clip-prompt-version-title"><strong>原版本 · ' +
     escapeHtml(getStoryPromptModeLabel(storyPromptMode3)) +
     '</strong><span>总时长 ' +
     handler3(durationSeconds) +
@@ -824,7 +824,7 @@ function renderPromptSurface(modelId2, episode3, value84) {
     );
   } catch (error3) {
     return (
-      '<div\x20class=\x22story-inline-error\x22>' +
+      '<div class="story-inline-error">' +
       escapeHtml(error3?.['message'] || '当前模型输入槽不可用') +
       '</div>'
     );
@@ -843,7 +843,7 @@ function renderVideoResultSwitchButton(value86, value87) {
     value89 +
     '" data-story-clip-id="' +
     escapeHtml(value87?.['id']) +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     value90 +
     '"><svg class="story-appearance-arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="' +
     value92 +
@@ -868,7 +868,7 @@ function renderVideoPlaybackControls(value93, value94) {
       beforeVolume:
         '<button type="button" class="video-snap-btn story-video-snap-btn" data-story-action="capture-video-frame" data-story-clip-id="' +
         escapeHtml2 +
-        '\x22\x20data-story-video-result-index=\x22' +
+        '" data-story-video-result-index="' +
         value94 +
         '" aria-label="获取当前帧" title="获取当前帧">\n        ' +
         renderStoryKeyframeIcon() +
@@ -878,7 +878,7 @@ function renderVideoPlaybackControls(value93, value94) {
         value94 +
         '" aria-label="裁剪视频" title="裁剪视频">\n        ' +
         VIDEO_CLIP_ICON_SVG +
-        '\x0a\x20\x20\x20\x20\x20\x20</button>',
+        '\n      </button>',
     },
   });
 }
@@ -893,10 +893,10 @@ function renderVideoPreview(value95, { isGenerating: isGenerating = ![] } = {}) 
     return (
       '<div class="story-video-empty story-video-loading" role="status" aria-live="polite" aria-busy="true">\n      ' +
       renderGenerationSpinner() +
-      '\x0a\x20\x20\x20\x20\x20\x20<strong>视频生成中</strong>\x0a\x20\x20\x20\x20\x20\x20<p>正在等待生成结果，完成后会自动显示。</p>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-script-loading-bar\x22\x20aria-hidden=\x22true\x22><div\x20class=\x22storyboard-script-loading-bar-fill\x22></div></div>\x0a\x20\x20\x20\x20</div>'
+      '\n      <strong>视频生成中</strong>\n      <p>正在等待生成结果，完成后会自动显示。</p>\n      <div class="storyboard-script-loading-bar" aria-hidden="true"><div class="storyboard-script-loading-bar-fill"></div></div>\n    </div>'
     );
   if (videoResultUrl2) {
-    const value98 = list14['length'] > 0x1;
+    const value98 = list14['length'] > 1;
     return (
       '<div class="story-video-result" data-story-video-result-index="' +
       activeVideoResultIndex3 +
@@ -908,8 +908,8 @@ function renderVideoPreview(value95, { isGenerating: isGenerating = ![] } = {}) 
       (value98 ? renderVideoResultSwitchButton('next', value95) : '') +
       '\n        ' +
       renderVideoPlaybackControls(value95, activeVideoResultIndex3) +
-      '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-video-result-meta\x22><strong>视频结果</strong><span>' +
-      (activeVideoResultIndex3 + 0x1) +
+      '\n      </div>\n      <div class="story-video-result-meta"><strong>视频结果</strong><span>' +
+      (activeVideoResultIndex3 + 1) +
       '/' +
       list14['length'] +
       '</span></div>\n    </div>'
@@ -950,13 +950,13 @@ function renderTimeline(
         ['filter'](Boolean),
     );
   return (
-    '<div\x20class=\x22story-clip-timeline\x20' +
+    '<div class="story-clip-timeline ' +
     (selectionMode ? 'is-selection-mode' : '') +
     '">\n    <div class="story-clip-timeline-header">\n      <span>' +
     escapeHtml(value101?.['duration'] || '--:--') +
     '</span>\n      <small>' +
     (selectionMode ? '点击片段选择需要生成的视频' : '点击片段切换提示词和视频结果') +
-    '</small>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<div\x20class=\x22story-clip-strip\x22\x20data-story-marquee-surface=\x22clips\x22>\x0a\x20\x20\x20\x20\x20\x20' +
+    '</small>\n    </div>\n    <div class="story-clip-strip" data-story-marquee-surface="clips">\n      ' +
     list15['map']((value105, value106) => {
       const text9 = normalizeText(value105['id']),
         value107 = adjustingClipIds['includes'](text9),
@@ -969,27 +969,27 @@ function renderTimeline(
         value108 = map7['has'](text9),
         hidden = !enabled6 && normalizeText(pendingDeleteClipId) === text9,
         value109 =
-          '<div\x20class=\x22story-clip-card-shell' +
+          '<div class="story-clip-card-shell' +
           (enabled6 ? ' is-generating' : '') +
           (hidden ? ' is-delete-confirming' : '') +
-          '\x22\x20data-story-video-history=\x22' +
-          (list16['length'] > 0x1) +
+          '" data-story-video-history="' +
+          (list16['length'] > 1) +
           '" data-story-clip-id="' +
           escapeHtml(value105['id']) +
-          '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-clip-card\x20' +
+          '">\n          <button type="button" class="story-clip-card ' +
           (value105['id'] === value102 ? 'is-selected' : '') +
-          '\x20' +
+          ' ' +
           (selectionMode ? 'is-selection-mode' : '') +
-          '\x20' +
+          ' ' +
           (value108 ? 'is-checked' : '') +
-          (renderTimelineVideoThumbnail2 ? '\x20has-video-thumbnail' : '') +
+          (renderTimelineVideoThumbnail2 ? ' has-video-thumbnail' : '') +
           '" data-story-clip-id="' +
           escapeHtml(value105['id']) +
-          '\x22\x20data-story-marquee-item\x20data-story-marquee-id=\x22' +
+          '" data-story-marquee-item data-story-marquee-id="' +
           escapeHtml(value105['id']) +
           '" aria-pressed="' +
           (selectionMode ? String(value108) : 'false') +
-          '\x22\x20aria-busy=\x22' +
+          '" aria-busy="' +
           enabled6 +
           '">\n            ' +
           (renderTimelineVideoThumbnail2
@@ -998,10 +998,10 @@ function renderTimeline(
               '</span>'
             : '') +
           '\n            <span class="story-clip-card-copy"><strong>片段' +
-          escapeHtml(String(value105['number'] || value106 + 0x1)['padStart'](0x2, '0')) +
-          '</strong><small\x20data-story-clip-duration=\x22' +
+          escapeHtml(String(value105['number'] || value106 + 1)['padStart'](2, '0')) +
+          '</strong><small data-story-clip-duration="' +
           escapeHtml(value105['id']) +
-          '\x22>' +
+          '">' +
           escapeHtml(formatStoryClipVideoGenerationDuration(value105, modelId, generationParams)) +
           '</small></span>\n          </button>\n          ' +
           (value107 && !enabled6
@@ -1009,7 +1009,7 @@ function renderTimeline(
             : '') +
           '\n          ' +
           (enabled6
-            ? '<span\x20class=\x22story-clip-card-loading\x20generation-loading-surface\x22\x20role=\x22status\x22\x20aria-busy=\x22true\x22\x20aria-label=\x22片段\x20' +
+            ? '<span class="story-clip-card-loading generation-loading-surface" role="status" aria-busy="true" aria-label="片段 ' +
               escapeHtml(value105['number']) +
               ' 视频生成中">' +
               renderGenerationSpinner() +
@@ -1035,8 +1035,8 @@ function renderTimeline(
                 escapeHtml(value105['id']) +
                 '">删除</button>\n          </div>') +
           '\n        </div>';
-      if (value106 >= list15['length'] - 0x1) return value109;
-      const value110 = list15[value106 + 0x1];
+      if (value106 >= list15['length'] - 1) return value109;
+      const value110 = list15[value106 + 1];
       return (
         value109 +
         '<button type="button" class="story-clip-insert-button" data-story-insert-after-clip-id="' +
@@ -1200,10 +1200,10 @@ function createRuntime({
       clip4 = state2['clipSelectionMode']
         ? selectBatchTargets(episode7?.['clips'], state2['selectedClipGenerationIds'])
         : [displayedClip2];
-    if (!episode7 || !clip4[0x0]) throw new Error('请先选择片段');
+    if (!episode7 || !clip4[0]) throw new Error('请先选择片段');
     const value124 = run3({
       episode: episode7,
-      clip: clip4[0x0],
+      clip: clip4[0],
       displayedClip: displayedClip2,
       projectToken: projectAdapter['createToken'](),
     });
@@ -1334,16 +1334,16 @@ function createRuntime({
       batch2 = projectAdapter['createBatch']?.('clip-videos', {
         episodeId: episode9['id'],
         total: targets['length'],
-        completed: 0x0,
+        completed: 0,
         targetClipIds: [...map11],
         pendingClipIds: [...map11],
-        label: '批量生成\x200/' + targets['length'],
+        label: '批量生成 0/' + targets['length'],
       }) || {
         id: 'clip-videos:' + normalizeText(projectToken4?.['projectId']) + ':' + Date['now'](),
         type: 'clip-videos',
         episodeId: episode9['id'],
         total: targets['length'],
-        completed: 0x0,
+        completed: 0,
       },
       batchRun2 = {
         batch: batch2,
@@ -1354,13 +1354,13 @@ function createRuntime({
       },
       value128 = handler7(projectToken4, episode9);
     (map10['set'](value128, batchRun2),
-      setEpisodeBatchRunning(state2, episode9['id'], !![], '批量生成\x200/' + targets['length'], {
+      setEpisodeBatchRunning(state2, episode9['id'], !![], '批量生成 0/' + targets['length'], {
         batchId: batch2['id'],
         cancelRequested: ![],
       }));
-    let succeeded = 0x0,
-      failed = 0x0,
-      cancelled = 0x0,
+    let succeeded = 0,
+      failed = 0,
+      cancelled = 0,
       firstFailure = null,
       suppressToast = ![];
     handler8();
@@ -1389,11 +1389,11 @@ function createRuntime({
               cancelRequested: batchRun2['cancelRequested'],
               label: label2,
             });
-            if (result4?.['ok']) succeeded += 0x1;
+            if (result4?.['ok']) succeeded += 1;
             else
               result4?.['cancelled'] || result4?.['reason'] === 'batch-cancelled'
-                ? (cancelled += 0x1)
-                : ((failed += 0x1),
+                ? (cancelled += 1)
+                : ((failed += 1),
                   (firstFailure ||= result4),
                   !suppressToast &&
                     result4?.['error'] &&
@@ -1426,7 +1426,7 @@ function createRuntime({
         type: 'batch-complete',
         projectToken: projectToken4,
         episodeId: episode9['id'],
-        clipId: targets[0x0]?.['id'] || '',
+        clipId: targets[0]?.['id'] || '',
         succeeded: succeeded,
         failed: failed,
         cancelled: cancelled,
@@ -1434,7 +1434,7 @@ function createRuntime({
         firstFailure: firstFailure,
         suppressToast: suppressToast,
       }),
-      succeeded > 0x0
+      succeeded > 0
     );
   }
   async function cancelBatch() {
@@ -1493,7 +1493,7 @@ function createRuntime({
       targets2 = state2['clipSelectionMode']
         ? selectBatchTargets(episode10?.['clips'], state2['selectedClipGenerationIds'])
         : [];
-    if (state2['clipSelectionMode'] && targets2['length'] > 0x1) {
+    if (state2['clipSelectionMode'] && targets2['length'] > 1) {
       if (generationState2['busy']) return ![];
       return run5({
         episode: episode10,
@@ -1501,7 +1501,7 @@ function createRuntime({
         projectToken: projectAdapter['createToken'](),
       });
     }
-    const clip7 = state2['clipSelectionMode'] ? targets2[0x0] : displayedClip4;
+    const clip7 = state2['clipSelectionMode'] ? targets2[0] : displayedClip4;
     if (!clip7) return (projectionAdapter['present']?.({ type: 'selection-missing' }), ![]);
     const projectToken6 = projectAdapter['createToken'](),
       response7 = await run4({

@@ -100,7 +100,7 @@ const subscriptionGateManifest = {
       key: 'replacementStudio',
       modelId: 'feature/replacement_studio',
       workflowId: '',
-      displayName: '\u66ff\u6362\u5de5\u4f5c\u5ba4',
+      displayName: '替换工作室',
       aliases: ['replacement_studio', 'replacement_studio.pro'],
       providers: ['aicanvas'],
       allowAnyActiveSubscription: true,
@@ -354,10 +354,10 @@ function _toExpirySeconds(value5) {
   if (value5 == null || value5 === '') return null;
   const count = Number(value5);
   if (Number.isFinite(count) && count > 0)
-    return count > 0x174876e800 ? Math.floor(count / 0x3e8) : Math.floor(count);
+    return count > 100000000000 ? Math.floor(count / 1000) : Math.floor(count);
   const count2 = Date.parse(String(value5));
   if (!Number.isFinite(count2) || count2 <= 0) return null;
-  return Math.floor(count2 / 0x3e8);
+  return Math.floor(count2 / 1000);
 }
 export function extractSubscriptionExpiresAt(value6) {
   const value7 = value6 && typeof value6 === 'object' ? value6 : {},

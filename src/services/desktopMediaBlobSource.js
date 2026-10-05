@@ -1,4 +1,4 @@
-const DESKTOP_PREVIEW_URL_CACHE_TTL_MS = 30 * 60 * 0x3e8,
+const DESKTOP_PREVIEW_URL_CACHE_TTL_MS = 30 * 60 * 1000,
   desktopPreviewUrlCache = new Map(),
   LOCAL_MEDIA_PATH_PREFIX_RE = /^(?:\/)?(?:output\/|data\/assets\/|data\/uploads\/)/i,
   LOCAL_PREVIEW_SCHEME_RE = /^aic-local-preview:/i,

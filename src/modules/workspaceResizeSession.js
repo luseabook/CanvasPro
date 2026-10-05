@@ -11,12 +11,12 @@ export function beginWorkspaceResizeSession({
   signal: signal = null,
 } = {}) {
   if (!event || !splitter || !layout || typeof onRatio !== 'function' || signal?.['aborted']) return ![];
-  if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0x0))
+  if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0))
     return ![];
   const box = layout['getBoundingClientRect']?.(),
     value = orientation === 'vertical',
     count = value ? Number(box?.['height']) : Number(box?.['width']);
-  if (!(count > 0x0)) return ![];
+  if (!(count > 0)) return ![];
   (event['preventDefault']?.(), event['stopPropagation']?.());
   const pointerId = event['pointerId'];
   try {
@@ -32,7 +32,7 @@ export function beginWorkspaceResizeSession({
       if (!run(event3)) return;
       const key = value ? event3?.['clientY'] : event3?.['clientX'],
         index = value ? box['top'] : box['left'];
-      onRatio(((Number(key) - Number(index || 0x0)) / count) * 0x64, event3);
+      onRatio(((Number(key) - Number(index || 0)) / count) * 100, event3);
     },
     handler = (result) => {
       if (!run(result)) return;

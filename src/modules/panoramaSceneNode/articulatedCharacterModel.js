@@ -4,7 +4,7 @@ export function createCharacterClayMaterial(color) {
   return new threeRuntime['MeshStandardMaterial']({
     color: color?.['isColor'] ? color['clone']() : new threeRuntime['Color'](color),
     roughness: 0.72,
-    metalness: 0x0,
+    metalness: 0,
     vertexColors: !![],
   });
 }
@@ -21,9 +21,9 @@ export function buildArticulatedCharacterShell(value) {
     list3 = [],
     key = value['matrixWorld']['clone']()['invert'](),
     handler = (index) => value['getObjectByName'](index)?.['getWorldPosition'](new threeRuntime['Vector3']()),
-    handler2 = (el, result, enabled2, args, data = new threeRuntime['Quaternion'](), options = 0x1) => {
+    handler2 = (el, result, enabled2, args, data = new threeRuntime['Quaternion'](), options = 1) => {
       const count = list2['findIndex']((error) => error['name'] === result);
-      if (count < 0x0 || !enabled2) {
+      if (count < 0 || !enabled2) {
         el['dispose']();
         return;
       }
@@ -32,19 +32,19 @@ export function buildArticulatedCharacterShell(value) {
       ),
         el['applyMatrix4'](key));
       const target = el['getAttribute']('position')['count'],
-        uint16Array = new Uint16Array(target * 0x4),
-        float32Array = new Float32Array(target * 0x4),
-        float32Array2 = new Float32Array(target * 0x3)['fill'](options);
-      for (let source = 0x0; source < target; source += 0x1) {
-        ((uint16Array[source * 0x4] = count), (float32Array[source * 0x4] = 0x1));
+        uint16Array = new Uint16Array(target * 4),
+        float32Array = new Float32Array(target * 4),
+        float32Array2 = new Float32Array(target * 3)['fill'](options);
+      for (let source = 0; source < target; source += 1) {
+        ((uint16Array[source * 4] = count), (float32Array[source * 4] = 1));
       }
-      (el['setAttribute']('skinIndex', new threeRuntime['Uint16BufferAttribute'](uint16Array, 0x4)),
-        el['setAttribute']('skinWeight', new threeRuntime['Float32BufferAttribute'](float32Array, 0x4)),
-        el['setAttribute']('color', new threeRuntime['Float32BufferAttribute'](float32Array2, 0x3)),
+      (el['setAttribute']('skinIndex', new threeRuntime['Uint16BufferAttribute'](uint16Array, 4)),
+        el['setAttribute']('skinWeight', new threeRuntime['Float32BufferAttribute'](float32Array, 4)),
+        el['setAttribute']('color', new threeRuntime['Float32BufferAttribute'](float32Array2, 3)),
         list3['push'](el));
     },
-    handler3 = (next, current, entry, record = 0x1) =>
-      handler2(new threeRuntime['SphereGeometry'](0x1, 0x10, 0xc), next, current, entry, undefined, record),
+    handler3 = (next, current, entry, record = 1) =>
+      handler2(new threeRuntime['SphereGeometry'](1, 16, 12), next, current, entry, undefined, record),
     handler4 = (payload, handle, state, config = state * 0.8) => {
       const enabled3 = handler(payload),
         enabled4 = handler(handle);
@@ -52,12 +52,12 @@ export function buildArticulatedCharacterShell(value) {
       const list4 = enabled4['clone']()['sub'](enabled3),
         scope = list4['length']();
       (handler2(
-        new threeRuntime['CylinderGeometry'](config, state, Math['max'](0.005, scope - state * 1.35), 0xc),
+        new threeRuntime['CylinderGeometry'](config, state, Math['max'](0.005, scope - state * 1.35), 12),
         payload,
         enabled3['clone']()['lerp'](enabled4, 0.5),
-        [0x1, 0x1, 0x1],
+        [1, 1, 1],
         new threeRuntime['Quaternion']()['setFromUnitVectors'](
-          new threeRuntime['Vector3'](0x0, 0x1, 0x0),
+          new threeRuntime['Vector3'](0, 1, 0),
           list4['normalize'](),
         ),
       ),
@@ -70,7 +70,7 @@ export function buildArticulatedCharacterShell(value) {
       handler4('calf_' + input, 'foot_' + input, 0.066, 0.043),
       handler3(
         'foot_' + input,
-        handler('foot_' + input)?.['add'](new threeRuntime['Vector3'](0x0, -0.015, 0.045)),
+        handler('foot_' + input)?.['add'](new threeRuntime['Vector3'](0, -0.015, 0.045)),
         [0.055, 0.04, 0.11],
       ),
       handler3('hand_' + input, handler('hand_' + input), [0.034, 0.06, 0.026]));
@@ -89,12 +89,12 @@ export function buildArticulatedCharacterShell(value) {
   output &&
     (handler3(
       'Head',
-      output['clone']()['add'](new threeRuntime['Vector3'](0x0, 0.065, 0x0)),
+      output['clone']()['add'](new threeRuntime['Vector3'](0, 0.065, 0)),
       [0.093, 0.127, 0.097],
     ),
     handler3(
       'Head',
-      output['clone']()['add'](new threeRuntime['Vector3'](0x0, 0.048, 0.094)),
+      output['clone']()['add'](new threeRuntime['Vector3'](0, 0.048, 0.094)),
       [0.019, 0.028, 0.018],
       0.65,
     ));
@@ -105,7 +105,7 @@ export function buildArticulatedCharacterShell(value) {
   }
   const geometries = mergeGeometries(list3);
   list3['forEach']((value3) => value3['dispose']());
-  const characterClayMaterial = createCharacterClayMaterial(new threeRuntime['Color'](0x1, 0x1, 0x1)),
+  const characterClayMaterial = createCharacterClayMaterial(new threeRuntime['Color'](1, 1, 1)),
     error3 = new threeRuntime['SkinnedMesh'](geometries, characterClayMaterial);
   return (
     (error3['name'] = 'ArticulatedDirectorMannequin'),

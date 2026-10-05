@@ -350,7 +350,7 @@ export function buildSharedPromptPanel(sourceNodeId, index = {}) {
         const generateTextRequest = await buildGenerateTextRequest(enabled5),
           outputText = formatFinalApiDebugRequest(generateTextRequest),
           value8 = appStore.getState(),
-          x = sourceNodeId._data.x + (sourceNodeId._data.width || 0x17c) + 50,
+          x = sourceNodeId._data.x + (sourceNodeId._data.width || 380) + 50,
           y = sourceNodeId._data.y;
         let enabled6 = Object.values(value8.nodes).find((item6) => item6.type === 'debug');
         (!enabled6
@@ -359,8 +359,8 @@ export function buildSharedPromptPanel(sourceNodeId, index = {}) {
               type: 'debug',
               x: x,
               y: y,
-              width: 0x17c,
-              height: 0x12c,
+              width: 380,
+              height: 300,
               name: sharedPromptPanelText('debugNodeName'),
               outputText: outputText,
             })

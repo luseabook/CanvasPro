@@ -2,7 +2,7 @@ import * as threeRuntime from '../panoramaSceneNode/threeRuntime.js';
 import { clientToViewportNdc, intersectRayWithAxisPlane } from '../../core/math.js';
 export class DirectorMultiView {
   constructor(value) {
-    ((this['timeline'] = value), (this['scale'] = 0xc), (this['offset'] = [0x0, 0x1, 0x0]));
+    ((this['timeline'] = value), (this['scale'] = 12), (this['offset'] = [0, 1, 0]));
   }
   ['identity']() {
     const { project: project, scene: scene } = this['timeline']['_context']();
@@ -35,7 +35,7 @@ export class DirectorMultiView {
       (this['renderer']['toneMappingExposure'] = enabled['bridge']['renderer']['toneMappingExposure']),
       (this['cameras'] = [
         new threeRuntime['PerspectiveCamera'](),
-        ...Array['from']({ length: 0x3 }, () => new threeRuntime['OrthographicCamera']()),
+        ...Array['from']({ length: 3 }, () => new threeRuntime['OrthographicCamera']()),
       ]),
       (this['abort'] = new this['timeline']['window']['AbortController']()));
     const signal = this['abort']['signal'];
@@ -55,8 +55,8 @@ export class DirectorMultiView {
           (event2['preventDefault'](),
             event2['stopPropagation'](),
             (this['scale'] = Math['max'](
-              0x1,
-              Math['min'](0x3e8, this['scale'] * (event2['deltaY'] > 0x0 ? 1.1 : 0.9)),
+              1,
+              Math['min'](1000, this['scale'] * (event2['deltaY'] > 0 ? 1.1 : 0.9)),
             )));
         },
         { signal: signal, passive: ![] },
@@ -72,52 +72,52 @@ export class DirectorMultiView {
         },
         { capture: !![], signal: signal },
       ));
-    let count = 0x0;
+    let count = 0;
     const index = (result) => {
       if (!this['layer']?.['isConnected'] || enabled['disposed'] || this['owner'] !== this['identity']()) {
         this['destroy']();
         return;
       }
-      (result - count > 0x21 && (this['paint'](), (count = result)),
+      (result - count > 33 && (this['paint'](), (count = result)),
         (this['frame'] = this['timeline']['window']['requestAnimationFrame'](index)));
     };
     (this['canvas']['focus'](), (this['frame'] = this['timeline']['window']['requestAnimationFrame'](index)));
   }
   ['paint']() {
-    const data = Math['max'](0x2, this['canvas']['clientWidth']),
-      options = Math['max'](0x2, this['canvas']['clientHeight']),
-      aspect = Math['floor'](data / 0x2),
-      target = Math['floor'](options / 0x2);
+    const data = Math['max'](2, this['canvas']['clientWidth']),
+      options = Math['max'](2, this['canvas']['clientHeight']),
+      aspect = Math['floor'](data / 2),
+      target = Math['floor'](options / 2);
     if (this['canvas']['width'] !== data || this['canvas']['height'] !== options)
       this['renderer']['setSize'](data, options, ![]);
     const near = this['runtime']['bridge']['camera'],
       source = new threeRuntime['Vector3'](...this['offset']),
-      next = this['cameras'][0x0];
+      next = this['cameras'][0];
     (next['position']['copy'](near['position']),
       next['quaternion']['copy'](near['quaternion']),
       Object['assign'](next, {
         aspect: aspect / target,
         near: near['near'],
         far: near['far'],
-        fov: near['fov'] || 0x23,
+        fov: near['fov'] || 35,
       }),
       next['updateProjectionMatrix'](),
       [
-        [0x0, 0x1, 0x0],
-        [0x0, 0x0, 0x1],
-        [0x1, 0x0, 0x0],
+        [0, 1, 0],
+        [0, 0, 1],
+        [1, 0, 0],
       ]['forEach']((args, count2) => {
-        const current = this['cameras'][count2 + 0x1];
-        (current['position']['copy'](source)['addScaledVector'](new threeRuntime['Vector3'](...args), 0x3e8),
-          current['up']['set'](0x0, count2 === 0x0 ? 0x0 : 0x1, count2 === 0x0 ? -0x1 : 0x0),
+        const current = this['cameras'][count2 + 1];
+        (current['position']['copy'](source)['addScaledVector'](new threeRuntime['Vector3'](...args), 1000),
+          current['up']['set'](0, count2 === 0 ? 0 : 1, count2 === 0 ? -1 : 0),
           current['lookAt'](source),
           Object['assign'](current, {
-            left: (-this['scale'] * aspect) / target / 0x2,
-            right: (this['scale'] * aspect) / target / 0x2,
-            top: this['scale'] / 0x2,
-            bottom: -this['scale'] / 0x2,
+            left: (-this['scale'] * aspect) / target / 2,
+            right: (this['scale'] * aspect) / target / 2,
+            top: this['scale'] / 2,
+            bottom: -this['scale'] / 2,
             near: 0.01,
-            far: 0xbb8,
+            far: 3000,
           }),
           current['updateProjectionMatrix'](),
           current['updateMatrixWorld']());
@@ -125,8 +125,8 @@ export class DirectorMultiView {
       this['runtime']['bridge']['_withCleanCaptureFrame'](() => {
         (this['renderer']['setScissorTest'](!![]),
           this['cameras']['forEach']((entry, count3) => {
-            const record = (count3 % 0x2) * aspect,
-              payload = count3 < 0x2 ? target : 0x0;
+            const record = (count3 % 2) * aspect,
+              payload = count3 < 2 ? target : 0;
             (this['renderer']['setViewport'](record, payload, aspect, target),
               this['renderer']['setScissor'](record, payload, aspect, target),
               this['renderer']['render'](this['runtime']['bridge']['scene'], entry));
@@ -137,10 +137,10 @@ export class DirectorMultiView {
   ['ray'](event4, handle) {
     const left = this['canvas']['getBoundingClientRect'](),
       state = {
-        left: left['left'] + ((handle % 0x2) * left['width']) / 0x2,
-        top: left['top'] + (Math['floor'](handle / 0x2) * left['height']) / 0x2,
-        width: left['width'] / 0x2,
-        height: left['height'] / 0x2,
+        left: left['left'] + ((handle % 2) * left['width']) / 2,
+        top: left['top'] + (Math['floor'](handle / 2) * left['height']) / 2,
+        width: left['width'] / 2,
+        height: left['height'] / 2,
       },
       viewportNdc = clientToViewportNdc(event4['clientX'], event4['clientY'], state);
     if (!viewportNdc) return null;
@@ -148,24 +148,24 @@ export class DirectorMultiView {
     return (config['setFromCamera'](viewportNdc, this['cameras'][handle]), config['ray']);
   }
   ['down'](event5) {
-    if (event5['target'] !== this['canvas'] || ![0x0, 0x2]['includes'](event5['button'])) return;
+    if (event5['target'] !== this['canvas'] || ![0, 2]['includes'](event5['button'])) return;
     (event5['preventDefault'](), event5['stopImmediatePropagation'](), this['canvas']['focus']());
     const box = this['canvas']['getBoundingClientRect'](),
       count4 =
-        (event5['clientX'] >= box['left'] + box['width'] / 0x2 ? 0x1 : 0x0) +
-        (event5['clientY'] >= box['top'] + box['height'] / 0x2 ? 0x2 : 0x0),
+        (event5['clientX'] >= box['left'] + box['width'] / 2 ? 1 : 0) +
+        (event5['clientY'] >= box['top'] + box['height'] / 2 ? 2 : 0),
       { project: project2, scene: scene2, editorState: editorState } = this['timeline']['_context'](),
       enabled2 = scene2['objects']['find'](
-        (scope) => scope['id'] === editorState['selectedObjectIds']['at'](-0x1),
+        (scope) => scope['id'] === editorState['selectedObjectIds']['at'](-1),
       ),
-      enabled3 = event5['button'] === 0x2;
+      enabled3 = event5['button'] === 2;
     if (!enabled3 && (!enabled2 || enabled2['locked'] || enabled2['type'] === 'group')) {
       this['timeline']['setMessage']?.('请先在对象列表选择一个已解锁物体。');
       return;
     }
     const args2 =
         !enabled3 && (this['timeline']['getPreviewTransform'](enabled2['id']) || enabled2['transform']),
-      input = count4 === 0x2 ? 0x2 : count4 === 0x3 ? 0x0 : 0x1,
+      input = count4 === 2 ? 2 : count4 === 3 ? 0 : 1,
       list = enabled3 ? [...this['offset']] : [...args2['position']],
       output = this['ray'](event5, count4),
       enabled4 =
@@ -201,7 +201,7 @@ export class DirectorMultiView {
               );
           if (!enabled5) return;
           position = list['map'](
-            (value4, value5) => value4 + (enabled5[value5] - enabled4[value5]) * (enabled3 ? -0x1 : 0x1),
+            (value4, value5) => value4 + (enabled5[value5] - enabled4[value5]) * (enabled3 ? -1 : 1),
           );
           if (enabled3) this['offset'] = position;
           else

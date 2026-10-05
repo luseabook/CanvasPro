@@ -8,7 +8,7 @@ import { buildRunningHubCustomAppExtensions } from './rhAiAppImport.js';
 export function createRunningHubWorkflowComponentDrafts(value) {
   const providerProfileId = JSON['parse'](value);
   if (!/^\d{1,30}$/['test'](String(providerProfileId['workflowId'] || '')))
-    throw new Error('缺少有效的\x20RunningHub\x20工作流\x20ID，请先获取工作流');
+    throw new Error('缺少有效的 RunningHub 工作流 ID，请先获取工作流');
   if (!['runninghub', 'runninghub-international']['includes'](providerProfileId['providerProfileId']))
     throw new Error('工作流缺少来源站点，请重新获取');
   const args = createComfyUiWorkflowComponentDrafts(JSON['stringify'](providerProfileId['workflow']));
@@ -46,8 +46,8 @@ export function buildRunningHubWorkflowManifestBundle({
     promptHelpTooltip: promptHelpTooltip,
     appKey: appKey,
   }))
-    item = Math['imul'](item ^ key['charCodeAt'](0x0), 0x1000193);
-  const index = kind + '-' + parsed['workflowId'] + '-' + (item >>> 0x0)['toString'](0x24),
+    item = Math['imul'](item ^ key['charCodeAt'](0), 0x1000193);
+  const index = kind + '-' + parsed['workflowId'] + '-' + (item >>> 0)['toString'](36),
     modelExtensions = buildRunningHubCustomAppExtensions(kind, '', displayName, appKey, description);
   ((modelExtensions['rhAiApp'] = {
     ...modelExtensions['rhAiApp'],

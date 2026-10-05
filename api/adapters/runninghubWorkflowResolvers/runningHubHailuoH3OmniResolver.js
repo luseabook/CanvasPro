@@ -24,14 +24,14 @@ function parseAspectRatio(target, source = HAILUO_H3_DEFAULT_RATIO) {
     [current, entry] = next['split'](':'),
     widthRatio = Number(current),
     heightRatio = Number(entry);
-  if (widthRatio > 0x0 && heightRatio > 0x0) return { widthRatio: widthRatio, heightRatio: heightRatio };
+  if (widthRatio > 0 && heightRatio > 0) return { widthRatio: widthRatio, heightRatio: heightRatio };
   if (next !== source) return parseAspectRatio(source, HAILUO_H3_DEFAULT_RATIO);
-  return { widthRatio: 0x10, heightRatio: 0x9 };
+  return { widthRatio: 16, heightRatio: 9 };
 }
 function roundToMultiple(record, payload) {
   const count = Number(payload),
-    handle = Number['isFinite'](count) && count > 0x0 ? count : 0x20;
-  return Math['max'](handle, Math['round'](Number(record || 0x0) / handle) * handle);
+    handle = Number['isFinite'](count) && count > 0 ? count : 32;
+  return Math['max'](handle, Math['round'](Number(record || 0) / handle) * handle);
 }
 function resolveAspectRatio(state, config) {
   const payloadParam = getPayloadParam(
@@ -52,23 +52,23 @@ export function resolveRunningHubHailuoH3OmniDimensions(options2 = {}, scope = {
       getPayloadParam(options2, 'rhHailuoH3Quality', scope['defaultQuality'] || HAILUO_H3_DEFAULT_QUALITY),
     )['trim'](),
     plainObject2 = getPlainObject(scope['qualityLongEdges']),
-    output = Number(plainObject2[scope['defaultQuality'] || HAILUO_H3_DEFAULT_QUALITY]) || 0x3c0,
+    output = Number(plainObject2[scope['defaultQuality'] || HAILUO_H3_DEFAULT_QUALITY]) || 960,
     width = Number(plainObject2[input]) || output,
     { widthRatio: widthRatio2, heightRatio: heightRatio2 } = parseAspectRatio(
       resolveAspectRatio(options2, scope),
       scope['defaultAspectRatio'] || HAILUO_H3_DEFAULT_RATIO,
     ),
-    value2 = Number(scope['dimensionMultiple']) || 0x20;
+    value2 = Number(scope['dimensionMultiple']) || 32;
   if (widthRatio2 === heightRatio2) return { width: width, height: width };
   if (widthRatio2 > heightRatio2)
     return { width: width, height: roundToMultiple((width * heightRatio2) / widthRatio2, value2) };
   return { width: roundToMultiple((width * widthRatio2) / heightRatio2, value2), height: width };
 }
 function resolveSeconds(value3, value4) {
-  const value5 = Number(getPayloadParam(value3, 'duration', value4['secondsNode']?.['defaultValue'] ?? 0x5)),
-    value6 = Number(value4['secondsNode']?.['defaultValue']) || 0x5,
-    value7 = Number(value4['secondsNode']?.['min']) || 0x3,
-    value8 = Number(value4['secondsNode']?.['max']) || 0xf,
+  const value5 = Number(getPayloadParam(value3, 'duration', value4['secondsNode']?.['defaultValue'] ?? 5)),
+    value6 = Number(value4['secondsNode']?.['defaultValue']) || 5,
+    value7 = Number(value4['secondsNode']?.['min']) || 3,
+    value8 = Number(value4['secondsNode']?.['max']) || 15,
     value9 = Number['isFinite'](value5) ? value5 : value6;
   return Math['round'](Math['max'](value7, Math['min'](value8, value9)));
 }
@@ -81,8 +81,8 @@ function getFrameSources(options3 = {}) {
     ](),
     enabled = Boolean(firstFrame || lastFrame);
   return {
-    firstFrame: firstFrame || (!enabled ? runningHubReferenceMediaUrls[0x0] || '' : ''),
-    lastFrame: lastFrame || (!enabled ? runningHubReferenceMediaUrls[0x1] || '' : ''),
+    firstFrame: firstFrame || (!enabled ? runningHubReferenceMediaUrls[0] || '' : ''),
+    lastFrame: lastFrame || (!enabled ? runningHubReferenceMediaUrls[1] || '' : ''),
   };
 }
 function resolveReferenceModeValue(value10, value11) {
@@ -103,8 +103,8 @@ async function appendFrameInputs({
 }) {
   const { firstFrame: firstFrame2, lastFrame: lastFrame2 } = getFrameSources(payload2),
     list = [
-      { slot: 'firstFrame', url: firstFrame2, loaderNode: mapping['imageLoaderNodes']?.[0x0] },
-      { slot: 'lastFrame', url: lastFrame2, loaderNode: mapping['imageLoaderNodes']?.[0x1] },
+      { slot: 'firstFrame', url: firstFrame2, loaderNode: mapping['imageLoaderNodes']?.[0] },
+      { slot: 'lastFrame', url: lastFrame2, loaderNode: mapping['imageLoaderNodes']?.[1] },
     ]['filter']((response) => response['url']);
   list['forEach']((enabled2) => {
     if (!enabled2['loaderNode']?.['nodeId'] || !enabled2['loaderNode']?.['fieldName'])
@@ -141,7 +141,7 @@ async function appendFrameInputs({
         },
         null,
       );
-  return list['length'] > 0x0
+  return list['length'] > 0
     ? (mapping['modeNode']?.['frameValue'] ?? '1')
     : (mapping['modeNode']?.['textValue'] ?? '0');
 }
@@ -161,7 +161,7 @@ async function appendReferenceInputs({
       ctx: ctx2,
       helpers: helpers2,
       nodeInfoList: nodeInfoList2,
-      requiredTotal: 0x1,
+      requiredTotal: 1,
       requiredTotalMessage: '海螺H3 全能参考模式至少需要一张图片、一个视频或一段音频',
       specs: [
         {
@@ -170,8 +170,8 @@ async function appendReferenceInputs({
           loaderNodes: mapping2['imageLoaderNodes'],
           referenceNodeId: referenceNodeId['nodeId'],
           referenceFieldPrefixes: [referenceNodeId['imageFieldPrefix']],
-          slotCount: 0x9,
-          maxCount: 0x9,
+          slotCount: 9,
+          maxCount: 9,
           maxCountMessage: '海螺H3 全能参考模式最多支持 9 张图片',
           mappingMissingMessage: '海螺H3 工作流图片加载节点映射不完整',
           uploadFailedMessage: '全能参考图片上传失败',
@@ -185,10 +185,10 @@ async function appendReferenceInputs({
             referenceNodeId['videoFieldPrefix'],
             referenceNodeId['videoAudioFieldPrefix'],
           ],
-          slotCount: 0x3,
-          maxCount: 0x3,
+          slotCount: 3,
+          maxCount: 3,
           maxCountMessage: '海螺H3 全能参考模式最多支持 3 个视频',
-          mappingMissingMessage: '海螺H3\x20工作流视频加载节点映射不完整',
+          mappingMissingMessage: '海螺H3 工作流视频加载节点映射不完整',
           uploadFailedMessage: '全能参考视频上传失败',
         },
         {
@@ -197,8 +197,8 @@ async function appendReferenceInputs({
           loaderNodes: mapping2['audioLoaderNodes'],
           referenceNodeId: referenceNodeId['nodeId'],
           referenceFieldPrefixes: [referenceNodeId['audioFieldPrefix']],
-          slotCount: 0x3,
-          maxCount: 0x3,
+          slotCount: 3,
+          maxCount: 3,
           maxCountMessage: '海螺H3 全能参考模式最多支持 3 个音频',
           mappingMissingMessage: '海螺H3 工作流音频加载节点映射不完整',
           uploadFailedMessage: '全能参考音频上传失败',

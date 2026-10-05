@@ -165,7 +165,7 @@ function pickPreferredAddressUrl(value10) {
 function normalizeDouyinDurationSeconds(value11) {
   const count3 = Number(value11);
   if (!Number.isFinite(count3) || count3 <= 0) return 0;
-  return count3 >= 0x3e8 ? count3 / 0x3e8 : count3;
+  return count3 >= 1000 ? count3 / 1000 : count3;
 }
 function getDouyinVideoTitle(value12, value13 = '抖音视频') {
   return sanitizeTitle(

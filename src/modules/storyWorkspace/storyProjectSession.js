@@ -74,7 +74,7 @@ function resetStoryProjectCopyClipRuntime(args = {}) {
       ...(data ? { status: status ? 'succeeded' : 'idle' } : {}),
       taskId: '',
       remoteTaskId: '',
-      startedAt: 0x0,
+      startedAt: 0,
     };
   }
   if (args2['result'] && typeof args2['result'] === 'object') {
@@ -96,9 +96,9 @@ export function duplicateStoryProjectEntry(
   const source = options2 && typeof options2 === 'object' && !Array['isArray'](options2) ? options2 : null,
     enabled = source?.['data'];
   if (!enabled?.['project']) return null;
-  const id = normalizeText(projectId) || 'story-' + Math['max'](0x1, Number(now) || Date['now']()) + '-copy',
+  const id = normalizeText(projectId) || 'story-' + Math['max'](1, Number(now) || Date['now']()) + '-copy',
     args3 = JSON['parse'](JSON['stringify'](source)),
-    title = (normalizeText(enabled['project']['title'] || source['title']) || '未命名故事') + '\x20副本',
+    title = (normalizeText(enabled['project']['title'] || source['title']) || '未命名故事') + ' 副本',
     data2 = args3['data'];
   return (
     (data2['project'] = {
@@ -129,7 +129,7 @@ export function duplicateStoryProjectEntry(
       title: title,
       createdAt: Number(now) || Date['now'](),
       updatedAt: Number(now) || Date['now'](),
-      archivedAt: 0x0,
+      archivedAt: 0,
       projectTitleEdited: !![],
       data: data2,
     }
@@ -181,14 +181,14 @@ export function createStoryProjectUiState(view = {}) {
       ? { ...cloneStoryProjectUiValue(view['characterVoiceEditor'], {}), isGenerating: ![] }
       : null,
     assetBreakdownVisibleCount: Math['max'](
-      0x0,
-      Math['trunc'](Number(view['assetBreakdownVisibleCount']) || 0x0),
+      0,
+      Math['trunc'](Number(view['assetBreakdownVisibleCount']) || 0),
     ),
   };
 }
 export function applyStoryLibraryAdditionUiState(
   enabled4 = {},
-  { targetAssetId: targetAssetId = '', selectedAppearanceIndex: selectedAppearanceIndex = 0x0 } = {},
+  { targetAssetId: targetAssetId = '', selectedAppearanceIndex: selectedAppearanceIndex = 0 } = {},
 ) {
   if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4)) return enabled4;
   const text5 = normalizeText(targetAssetId);
@@ -196,7 +196,7 @@ export function applyStoryLibraryAdditionUiState(
     text5 &&
       (enabled4['assetAppearanceIndexes'] = {
         ...(enabled4['assetAppearanceIndexes'] || {}),
-        [text5]: Math['max'](0x0, Math['trunc'](Number(selectedAppearanceIndex) || 0x0)),
+        [text5]: Math['max'](0, Math['trunc'](Number(selectedAppearanceIndex) || 0)),
       }),
     (enabled4['assetSelectionMode'] = ![]),
     (enabled4['selectedAssetIds'] = []),
@@ -210,12 +210,12 @@ export function applyStoryProjectUiState(enabled5 = {}, payload = {}, handle = e
     list4 = Array['isArray'](handle?.['assets']) ? handle['assets'] : [],
     storyWorkspaceStep = normalizeStoryWorkspaceStep(state['step']);
   ((enabled5['step'] =
-    (storyWorkspaceStep === 0x0 || handle?.['project']?.['outlineStatus'] !== 'stale') &&
+    (storyWorkspaceStep === 0 || handle?.['project']?.['outlineStatus'] !== 'stale') &&
     canEnterStoryWorkspaceStep(handle, storyWorkspaceStep)
       ? storyWorkspaceStep
       : handle?.['project']?.['collaboration']?.['stage'] === 'writing'
-        ? 0x0
-        : 0x1),
+        ? 0
+        : 1),
     (enabled5['assetFilter'] = Object['hasOwn'](STORY_ASSET_TAB_LABELS, state['assetFilter'])
       ? state['assetFilter']
       : 'character'),
@@ -239,29 +239,29 @@ export function applyStoryProjectUiState(enabled5 = {}, payload = {}, handle = e
     list4['some']((config) => normalizeText(config?.['id']) === text6)
       ? text6
       : normalizeText(
-          list4['find']((scope) => scope?.['kind'] === enabled5['assetFilter'])?.['id'] || list4[0x0]?.['id'],
+          list4['find']((scope) => scope?.['kind'] === enabled5['assetFilter'])?.['id'] || list4[0]?.['id'],
         );
   const text7 = normalizeText(state['selectedEpisodeId']),
-    input = list3['find']((output) => normalizeText(output?.['id']) === text7) || list3[0x0] || null;
+    input = list3['find']((output) => normalizeText(output?.['id']) === text7) || list3[0] || null;
   enabled5['selectedEpisodeId'] = normalizeText(input?.['id']);
   const text8 = normalizeText(state['selectedClipId']),
     list5 = Array['isArray'](input?.['clips']) ? input['clips'] : [];
   ((enabled5['selectedClipId'] = normalizeText(
-    list5['find']((value2) => normalizeText(value2?.['id']) === text8)?.['id'] || list5[0x0]?.['id'],
+    list5['find']((value2) => normalizeText(value2?.['id']) === text8)?.['id'] || list5[0]?.['id'],
   )),
     (enabled5['characterVoiceEditor'] = normalizeStoryProjectVoiceEditor(
       state['characterVoiceEditor'],
       handle,
     )),
     (enabled5['view'] =
-      state['view'] === 'episode' && canEnterStoryWorkspaceStep(handle, 0x3) && Boolean(input)
+      state['view'] === 'episode' && canEnterStoryWorkspaceStep(handle, 3) && Boolean(input)
         ? 'episode'
         : 'project'));
-  if (enabled5['view'] === 'episode') enabled5['step'] = 0x3;
+  if (enabled5['view'] === 'episode') enabled5['step'] = 3;
   return (
     (enabled5['assetBreakdownVisibleCount'] = Math['max'](
-      0x0,
-      Math['trunc'](Number(state['assetBreakdownVisibleCount']) || 0x0),
+      0,
+      Math['trunc'](Number(state['assetBreakdownVisibleCount']) || 0),
     )),
     enabled5
   );

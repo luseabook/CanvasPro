@@ -12,8 +12,8 @@ function readWindowBounds(value) {
     if (
       box &&
       ['left', 'top', 'width', 'height']['every']((item) => Number['isFinite'](box[item])) &&
-      box['width'] > 0x0 &&
-      box['height'] > 0x0
+      box['width'] > 0 &&
+      box['height'] > 0
     )
       return box;
   } catch {}
@@ -57,7 +57,7 @@ export function openDebugRequestWindow({
     el['setAttribute']('role', 'dialog'),
     el['setAttribute']('aria-label', title),
     (el['innerHTML'] =
-      '<header\x20class=\x22request-debug-header\x22><strong></strong><button\x20type=\x22button\x22\x20aria-label=\x22关闭调试窗口\x22>×</button></header><p\x20class=\x22request-debug-subtitle\x22></p><nav\x20class=\x22request-debug-tabs\x22></nav><pre\x20class=\x22request-debug-code\x20custom-scrollbar\x22\x20tabindex=\x220\x22></pre><footer><span\x20role=\x22status\x22></span><button\x20type=\x22button\x22>复制当前内容</button></footer>'),
+      '<header class="request-debug-header"><strong></strong><button type="button" aria-label="关闭调试窗口">×</button></header><p class="request-debug-subtitle"></p><nav class="request-debug-tabs"></nav><pre class="request-debug-code custom-scrollbar" tabindex="0"></pre><footer><span role="status"></span><button type="button">复制当前内容</button></footer>'),
     (el['querySelector']('strong')['textContent'] = title),
     (el['querySelector']('.request-debug-subtitle')['textContent'] = subtitle));
   const options = el['querySelector']('pre'),
@@ -86,14 +86,14 @@ export function openDebugRequestWindow({
           width: parseFloat(state['width']),
           height: parseFloat(state['height']),
         };
-      if (!(config['width'] > 0x0 && config['height'] > 0x0)) return;
+      if (!(config['width'] > 0 && config['height'] > 0)) return;
       rememberedBounds['set'](windowObject, config);
       try {
         windowObject['localStorage']?.['setItem'](BOUNDS_STORAGE_KEY, JSON['stringify'](config));
       } catch {}
     },
     handler3 = () => {
-      (windowObject['clearTimeout'](current), (current = windowObject['setTimeout'](handler2, 0x96)));
+      (windowObject['clearTimeout'](current), (current = windowObject['setTimeout'](handler2, 150)));
     },
     handler4 = () => {
       if (enabled) return;
@@ -107,9 +107,9 @@ export function openDebugRequestWindow({
     handler6 = (scope, input) => {
       const box4 = el['getBoundingClientRect']();
       ((el['style']['left'] =
-        Math['max'](0x0, Math['min'](scope, windowObject['innerWidth'] - box4['width'])) + 'px'),
+        Math['max'](0, Math['min'](scope, windowObject['innerWidth'] - box4['width'])) + 'px'),
         (el['style']['top'] =
-          Math['max'](0x0, Math['min'](input, windowObject['innerHeight'] - box4['height'])) + 'px'),
+          Math['max'](0, Math['min'](input, windowObject['innerHeight'] - box4['height'])) + 'px'),
         (el['style']['right'] = 'auto'));
     };
   (handler(el['querySelector']('header button'), 'click', handler4),
@@ -139,7 +139,7 @@ export function openDebugRequestWindow({
       { passive: !![] },
     ),
     handler(el['querySelector']('header'), 'pointerdown', (value5) => {
-      if (value5['button'] !== 0x0 || value5['target']['closest']('button')) return;
+      if (value5['button'] !== 0 || value5['target']['closest']('button')) return;
       value5['preventDefault']();
       const box5 = el['getBoundingClientRect']();
       box2 = { x: value5['clientX'] - box5['left'], y: value5['clientY'] - box5['top'] };
@@ -175,7 +175,7 @@ export function openDebugRequestWindow({
     if (enabled) return;
     (el['removeAttribute']('aria-busy'),
       (el3['disabled'] = ![]),
-      (el2['textContent'] = '只读预览\x20·\x20未提交生成'));
+      (el2['textContent'] = '只读预览 · 未提交生成'));
     const list2 = args['tabs'] || [
       {
         label: '请求参数',

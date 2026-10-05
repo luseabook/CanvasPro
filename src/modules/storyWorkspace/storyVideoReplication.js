@@ -11,8 +11,8 @@ import { parseUploadedStoryEpisodeScenes } from './storyScriptImport.js';
 import { localPathToUrl, pickResultLocalPath } from '../../utils/localMediaPath.js';
 import { validateStoryReplicationVideoSize } from './storyReplicationVideoLimits.js';
 export { STORY_REPLICATION_MAX_VIDEO_BYTES } from './storyReplicationVideoLimits.js';
-export const STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_SOURCE_CHARACTERS = 0x7d00;
-export const STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_OUTPUT_TOKENS = 0x4000;
+export const STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_SOURCE_CHARACTERS = 32000;
+export const STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_OUTPUT_TOKENS = 16384;
 export const STORY_REPLICATION_VIDEO_ACCEPT =
   '.mp4,.mov,.avi,video/mp4,video/quicktime,video/x-msvideo,video/avi,video/msvideo,video/vnd.avi';
 export function isStoryVideoReplicationHomeAvailable({ workspaceSurface: workspaceSurface = 'story' } = {}) {
@@ -28,7 +28,7 @@ export const STORY_REPLICATION_LOCALES = Object['freeze']([
   Object['freeze']({ value: 'source', label: '保留原语言', shortLabel: '原语言' }),
   Object['freeze']({ value: 'zh-CN', label: '中国 · 中文', shortLabel: '中文' }),
   Object['freeze']({ value: 'ja-JP', label: '日本 · 日语', shortLabel: '日语' }),
-  Object['freeze']({ value: 'ko-KR', label: '韩国\x20·\x20韩语', shortLabel: '韩语' }),
+  Object['freeze']({ value: 'ko-KR', label: '韩国 · 韩语', shortLabel: '韩语' }),
   Object['freeze']({ value: 'en-US', label: '美国 · 英语', shortLabel: '英语' }),
 ]);
 const SUPPORTED_VIDEO_EXTENSIONS = new Set(['mp4', 'mov', 'avi']);
@@ -41,7 +41,7 @@ export function resolveStoryVideoReplicationClipVoiceAssetIds(options2 = {}, ind
 }
 function normalizePositiveNumber(result) {
   const count = Number(result);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function stripVideoExtension(data) {
   return normalizeText(data)
@@ -56,30 +56,30 @@ function normalizeLocale(target) {
   const text = normalizeText(target);
   return STORY_REPLICATION_LOCALES['some']((el) => el['value'] === text)
     ? text
-    : STORY_REPLICATION_LOCALES[0x0]['value'];
+    : STORY_REPLICATION_LOCALES[0]['value'];
 }
-function createStableEpisodeId(error2 = {}, source = 0x0, next = 'story') {
+function createStableEpisodeId(error2 = {}, source = 0, next = 'story') {
   const list = [
     next,
     normalizeText(error2['name']),
-    Number(error2['size']) || 0x0,
-    Number(error2['lastModified']) || 0x0,
+    Number(error2['size']) || 0,
+    Number(error2['lastModified']) || 0,
     source,
   ]['join']('|');
   let current = 0x811c9dc5;
-  for (let entry = 0x0; entry < list['length']; entry += 0x1) {
+  for (let entry = 0; entry < list['length']; entry += 1) {
     ((current ^= list['charCodeAt'](entry)), (current = Math['imul'](current, 0x1000193)));
   }
-  return 'replication-episode-' + (current >>> 0x0)['toString'](0x24);
+  return 'replication-episode-' + (current >>> 0)['toString'](36);
 }
-function normalizeAnalysisSegment(options3 = {}, record = 0x0, count2 = 0x0) {
-  const startSec = Math['max'](0x0, Number(options3['startSec']) || 0x0),
+function normalizeAnalysisSegment(options3 = {}, record = 0, count2 = 0) {
+  const startSec = Math['max'](0, Number(options3['startSec']) || 0),
     payload = Number(options3['endSec']),
-    handle = Math['max'](0x1, Number(options3['durationSec']) || 0x0),
+    handle = Math['max'](1, Number(options3['durationSec']) || 0),
     state = Number['isFinite'](payload) && payload > startSec ? payload : startSec + handle,
-    endSec = count2 > 0x0 ? Math['min'](Math['max'](startSec + 0.1, state), count2) : state;
+    endSec = count2 > 0 ? Math['min'](Math['max'](startSec + 0.1, state), count2) : state;
   return {
-    title: normalizeText(options3['title']) || '片段 ' + String(record + 0x1)['padStart'](0x2, '0'),
+    title: normalizeText(options3['title']) || '片段 ' + String(record + 1)['padStart'](2, '0'),
     startSec: startSec,
     endSec: endSec,
     durationSec: Math['max'](0.1, endSec - startSec),
@@ -94,7 +94,7 @@ function normalizeAnalysisSegment(options3 = {}, record = 0x0, count2 = 0x0) {
 export function getStoryReplicationLocale(config) {
   const locale = normalizeLocale(config);
   return (
-    STORY_REPLICATION_LOCALES['find']((el2) => el2['value'] === locale) || STORY_REPLICATION_LOCALES[0x0]
+    STORY_REPLICATION_LOCALES['find']((el2) => el2['value'] === locale) || STORY_REPLICATION_LOCALES[0]
   );
 }
 export function resolveStoryReplicationUploadedVideo(response = {}) {
@@ -141,14 +141,14 @@ function buildStoryVideoReplicationEpisodeAssetEvidence(options4 = {}) {
       if (!list3['length']) return '';
       const text8 = normalizeText(value3?.['title']);
       return [
-        '片段\x20' + (value4 + 0x1) + (text8 ? '「' + text8 + '」' : '') + '：',
-        ...list3['map']((value5) => '-\x20' + value5),
-      ]['join']('\x0a');
+        '片段 ' + (value4 + 1) + (text8 ? '「' + text8 + '」' : '') + '：',
+        ...list3['map']((value5) => '- ' + value5),
+      ]['join']('\n');
     })
     ['filter'](Boolean);
   list2['push'](...args);
   if (!list2['length']) return '';
-  return ['【视频解析视觉证据（仅用于角色、场景与道具识别，不是新增剧情）】', ...list2]['join']('\x0a');
+  return ['【视频解析视觉证据（仅用于角色、场景与道具识别，不是新增剧情）】', ...list2]['join']('\n');
 }
 export function buildStoryVideoReplicationAssetExtractionProject(options5 = {}) {
   const args2 = options5?.['project'] || {};
@@ -160,7 +160,7 @@ export function buildStoryVideoReplicationAssetExtractionProject(options5 = {}) 
       : replicationFrameSources['filter']((value6) => normalizeText(value6?.['script']?.['fullText']))['map'](
           (id, value7) => ({
             id: id['id'],
-            title: '第\x20' + (id['number'] || value7 + 0x1) + ' 集：' + (id['title'] || '未命名分集'),
+            title: '第 ' + (id['number'] || value7 + 1) + ' 集：' + (id['title'] || '未命名分集'),
             content: id['script']['fullText'],
           }),
         ),
@@ -173,7 +173,7 @@ export function buildStoryVideoReplicationAssetExtractionProject(options5 = {}) 
         storyVideoReplicationEpisodeAssetEvidence = buildStoryVideoReplicationEpisodeAssetEvidence(value9);
       return {
         ...args3,
-        content: [text9, storyVideoReplicationEpisodeAssetEvidence]['filter'](Boolean)['join']('\x0a\x0a'),
+        content: [text9, storyVideoReplicationEpisodeAssetEvidence]['filter'](Boolean)['join']('\n\n'),
       };
     });
   return {
@@ -183,7 +183,7 @@ export function buildStoryVideoReplicationAssetExtractionProject(options5 = {}) 
       (value11) => value11['replication']?.['sourceAnalysis'],
     )['map']((episodeId) => ({
       episodeId: episodeId['id'],
-      durationSec: Number(episodeId['sourceVideo']?.['durationSec']) || 0x0,
+      durationSec: Number(episodeId['sourceVideo']?.['durationSec']) || 0,
       revision: episodeId['replication']['sourceAnalysis']['revision'],
       events: episodeId['replication']['sourceAnalysis']['events']['map'](
         ({ id: id2, startSec: startSec2, endSec: endSec2, visual: visual }) => ({
@@ -211,24 +211,24 @@ export function shouldUseStoryVideoReplicationUnifiedAssetLocalization(
       : [],
     value12 = list6['reduce'](
       (value13, value14) => value13 + String(value14?.['content'] || '')['length'],
-      0x0,
+      0,
     ),
     count3 =
       value12 ||
       (Array['isArray'](options6['episodes']) ? options6['episodes'] : [])['reduce'](
         (value15, value16) => value15 + String(value16?.['script']?.['fullText'] || '')['length'],
-        0x0,
+        0,
       ),
-    value17 = Math['max'](0x1, Math['trunc'](Number(maxSourceCharacters) || 0x0));
-  return count3 > 0x0 && count3 <= value17;
+    value17 = Math['max'](1, Math['trunc'](Number(maxSourceCharacters) || 0));
+  return count3 > 0 && count3 <= value17;
 }
 export function validateStoryReplicationVideoFile(error3 = {}, value18 = '') {
   const text10 = normalizeText(error3['name']),
     videoExtension = getVideoExtension(error3),
-    enabled = Math['max'](0x0, Number(error3['size']) || 0x0);
+    enabled = Math['max'](0, Number(error3['size']) || 0);
   if (!text10) return { ok: ![], error: '视频文件缺少文件名。' };
   if (!SUPPORTED_VIDEO_EXTENSIONS['has'](videoExtension))
-    return { ok: ![], error: '“' + text10 + '”格式不支持，仅支持\x20MP4、MOV、AVI。' };
+    return { ok: ![], error: '“' + text10 + '”格式不支持，仅支持 MP4、MOV、AVI。' };
   const response2 = validateStoryReplicationVideoSize(error3, value18);
   if (!response2['ok']) return response2;
   if (!enabled) return { ok: ![], error: '“' + text10 + '”是空文件。' };
@@ -271,9 +271,9 @@ export function createStoryVideoReplicationProjectData({
     if (!response3['ok']) throw new Error(response3['error']);
   }
   const targetAudience = getStoryReplicationLocale(targetLocale),
-    stripVideoExtension2 = stripVideoExtension(list9[0x0]?.['name']) || '未命名复刻视频',
+    stripVideoExtension2 = stripVideoExtension(list9[0]?.['name']) || '未命名复刻视频',
     title =
-      list9['length'] > 0x1
+      list9['length'] > 1
         ? stripVideoExtension2 + ' 等 ' + list9['length'] + ' 条视频'
         : stripVideoExtension2,
     episodeCount = list9['map']((error5, number) => {
@@ -281,8 +281,8 @@ export function createStoryVideoReplicationProjectData({
       return {
         id: id3,
         planningRef: id3,
-        number: number + 0x1,
-        title: stripVideoExtension(error5['name']) || '第\x20' + (number + 0x1) + '\x20集',
+        number: number + 1,
+        title: stripVideoExtension(error5['name']) || '第 ' + (number + 1) + ' 集',
         synopsis: '',
         hook: '',
         sourceChapterIds: [id3],
@@ -291,24 +291,24 @@ export function createStoryVideoReplicationProjectData({
         scriptStatus: 'pending',
         script: null,
         clips: [],
-        clipCount: 0x0,
-        characterCount: 0x0,
-        sceneCount: 0x0,
-        propCount: 0x0,
-        durationSec: 0x0,
+        clipCount: 0,
+        characterCount: 0,
+        sceneCount: 0,
+        propCount: 0,
+        durationSec: 0,
         duration: '--:--',
         coverUrl: '',
         status: '解析中',
         sourceVideo: {
           fileName: normalizeText(error5['name']),
-          size: Math['max'](0x0, Number(error5['size']) || 0x0),
+          size: Math['max'](0, Number(error5['size']) || 0),
           mimeType: normalizeText(error5['type']),
           videoRef: '',
           posterUrl: '',
           posterLocalPath: '',
-          durationSec: 0x0,
+          durationSec: 0,
         },
-        replication: { status: 'queued', progress: 0x0, error: '', analysis: null },
+        replication: { status: 'queued', progress: 0, error: '', analysis: null },
       };
     });
   return normalizeStoryWorkspaceAssetData({
@@ -329,7 +329,7 @@ export function createStoryVideoReplicationProjectData({
         sceneMaxSeconds:
           resolveStoryVideoClipDurationConstraints(resolveStoryPromptModeDefaultVideoModelId(promptMode))?.[
             'maxSeconds'
-          ] || 0xf,
+          ] || 15,
         promptMode: promptMode,
       },
       sourceDocument: null,
@@ -348,10 +348,10 @@ export function createStoryVideoReplicationProjectData({
         modelId: normalizeText(modelId),
         provider: normalizeText(provider),
         providerProfileId: normalizeText(providerProfileId),
-        assetLocalizationCompletedAt: 0x0,
+        assetLocalizationCompletedAt: 0,
         status: 'analyzing',
-        completedCount: 0x0,
-        failedCount: 0x0,
+        completedCount: 0,
+        failedCount: 0,
         totalCount: episodeCount['length'],
       },
       backgroundTasks: [],
@@ -364,7 +364,7 @@ export function createStoryVideoReplicationProjectData({
 export function isStoryVideoReplicationAssetLocalizationComplete(options7 = {}) {
   return (
     options7?.['project']?.['sourceMode'] === 'video-replication' &&
-    Number(options7['project']?.['replication']?.['assetLocalizationCompletedAt']) > 0x0 &&
+    Number(options7['project']?.['replication']?.['assetLocalizationCompletedAt']) > 0 &&
     Array['isArray'](options7['assets']) &&
     options7['assets']['some']((value23) => value23?.['kind'] === 'scene')
   );
@@ -379,7 +379,7 @@ export function markStoryVideoReplicationAssetLocalizationComplete(
     !enabled2['assets']['some']((value24) => value24?.['kind'] === 'scene')
   )
     return ![];
-  const assetLocalizationCompletedAt = Math['max'](0x0, Math['trunc'](Number(completedAt) || 0x0));
+  const assetLocalizationCompletedAt = Math['max'](0, Math['trunc'](Number(completedAt) || 0));
   if (!assetLocalizationCompletedAt) return ![];
   return (
     (enabled2['project']['replication'] = {
@@ -393,14 +393,14 @@ export function invalidateStoryVideoReplicationAssetLocalization(options8 = {}) 
   if (options8?.['project']?.['sourceMode'] !== 'video-replication') return ![];
   const args4 = options8['project']['replication'];
   if (!args4 || !args4['assetLocalizationCompletedAt']) return ![];
-  return ((options8['project']['replication'] = { ...args4, assetLocalizationCompletedAt: 0x0 }), !![]);
+  return ((options8['project']['replication'] = { ...args4, assetLocalizationCompletedAt: 0 }), !![]);
 }
 export function applyStoryVideoReplicationUpload(
   response4 = {},
   {
     file: file = null,
     videoRef: videoRef = '',
-    durationSec: durationSec = 0x0,
+    durationSec: durationSec = 0,
     posterUrl: posterUrl = '',
     posterLocalPath: posterLocalPath = '',
   } = {},
@@ -411,7 +411,7 @@ export function applyStoryVideoReplicationUpload(
     ...(file
       ? {
           fileName: normalizeText(file['name']) || response4['sourceVideo']?.['fileName'],
-          size: Math['max'](0x0, Number(file['size']) || 0x0),
+          size: Math['max'](0, Number(file['size']) || 0),
           mimeType: normalizeText(file['type']),
         }
       : {}),
@@ -425,14 +425,14 @@ export function applyStoryVideoReplicationUpload(
   const value25 = Math['round'](durationSec2);
   return (
     (response4['duration'] = value25
-      ? String(Math['floor'](value25 / 0x3c))['padStart'](0x2, '0') +
+      ? String(Math['floor'](value25 / 60))['padStart'](2, '0') +
         ':' +
-        String(value25 % 0x3c)['padStart'](0x2, '0')
+        String(value25 % 60)['padStart'](2, '0')
       : '--:--'),
     (response4['replication'] = {
       ...(response4['replication'] || {}),
       status: 'analyzing',
-      progress: 0x2d,
+      progress: 45,
       error: '',
     }),
     (response4['status'] = '解析中'),
@@ -453,7 +453,7 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
       (episodeRef['synopsis'] = sourceAnalysis2['synopsis']),
       (episodeRef['scriptStatus'] = 'completed'),
       (episodeRef['script'] = {
-        schemaVersion: 0x1,
+        schemaVersion: 1,
         source: 'video-replication',
         episodeRef: episodeRef['id'],
         fullText: fullText,
@@ -468,7 +468,7 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
         ...episodeRef['replication'],
         sourceAnalysis: sourceAnalysis2,
         status: 'ready',
-        progress: 0x64,
+        progress: 100,
         error: '',
         message: '',
         analysis: null,
@@ -483,20 +483,20 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
     list10 = Array['isArray'](sourceAnalysis['segments']) ? sourceAnalysis['segments'] : [],
     segmentCount = list10['map']((value26, value27) => normalizeAnalysisSegment(value26, value27, endSec3))[
       'filter'
-    ]((value28) => value28['durationSec'] > 0x0 && (value28['script'] || value28['prompt']));
+    ]((value28) => value28['durationSec'] > 0 && (value28['script'] || value28['prompt']));
   !segmentCount['length'] &&
     segmentCount['push'](
       normalizeAnalysisSegment(
         {
           title: normalizeText(sourceAnalysis['title']) || episodeRef['title'],
-          startSec: 0x0,
-          endSec: endSec3 || 0xf,
+          startSec: 0,
+          endSec: endSec3 || 15,
           script: normalizeText(sourceAnalysis['fullScript'] || sourceAnalysis['synopsis']),
           prompt: normalizeText(sourceAnalysis['seedancePrompt']),
           camera: normalizeText(sourceAnalysis['camera']),
           sound: normalizeText(sourceAnalysis['sound']),
         },
-        0x0,
+        0,
         endSec3,
       ),
     );
@@ -504,7 +504,7 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
     normalizeText(sourceAnalysis['fullScript']) ||
     segmentCount['map']((value29) => value29['script'])
       ['filter'](Boolean)
-      ['join']('\x0a\x0a') ||
+      ['join']('\n\n') ||
     normalizeText(sourceAnalysis['synopsis'] || sourceAnalysis['seedancePrompt']);
   if (!fullText2) throw new Error('视频理解模型未返回可用的本地化剧本。');
   const fallbackHeading =
@@ -516,10 +516,10 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
     });
   return (
     (episodeRef['title'] = fallbackHeading),
-    (episodeRef['synopsis'] = normalizeText(sourceAnalysis['synopsis']) || fullText2['slice'](0x0, 0xb4)),
+    (episodeRef['synopsis'] = normalizeText(sourceAnalysis['synopsis']) || fullText2['slice'](0, 180)),
     (episodeRef['scriptStatus'] = 'completed'),
     (episodeRef['script'] = {
-      schemaVersion: 0x1,
+      schemaVersion: 1,
       source: 'video-replication',
       episodeRef: episodeRef['id'],
       scenes: scenes['length']
@@ -537,12 +537,12 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
       generatedAt: Date['now'](),
     }),
     (episodeRef['clips'] = []),
-    (episodeRef['clipCount'] = 0x0),
+    (episodeRef['clipCount'] = 0),
     (episodeRef['status'] = '待拆分'),
     (episodeRef['replication'] = {
       ...(episodeRef['replication'] || {}),
       status: 'ready',
-      progress: 0x64,
+      progress: 100,
       error: '',
       analysis: {
         title: fallbackHeading,
@@ -557,7 +557,7 @@ export function applyStoryVideoReplicationAnalysis(episodeRef = {}, sourceAnalys
       scriptSourceRevision:
         sourceAnalysis['sourceAnalysis']?.['revision'] ||
         episodeRef['replication']?.['sourceAnalysis']?.['revision'] ||
-        0x0,
+        0,
     }),
     episodeRef
   );
@@ -569,7 +569,7 @@ export function failStoryVideoReplicationEpisode(response5 = {}, value30 = '') {
     (response5['replication'] = {
       ...(response5['replication'] || {}),
       status: 'failed',
-      progress: 0x0,
+      progress: 0,
       error: error6,
     }),
     response5
@@ -579,11 +579,11 @@ export function settleInterruptedStoryVideoReplication(
   options9 = {},
   { message: message = '上次视频解析已中断，请点击重试；已完成结果不会重新生成。' } = {},
 ) {
-  if (options9?.['project']?.['sourceMode'] !== 'video-replication') return 0x0;
-  let value31 = 0x0;
+  if (options9?.['project']?.['sourceMode'] !== 'video-replication') return 0;
+  let value31 = 0;
   for (const value32 of options9['episodes'] || []) {
     if (!['queued', 'uploading', 'analyzing']['includes'](value32?.['replication']?.['status'])) continue;
-    (failStoryVideoReplicationEpisode(value32, message), (value31 += 0x1));
+    (failStoryVideoReplicationEpisode(value32, message), (value31 += 1));
   }
   if (value31) syncStoryVideoReplicationProject(options9);
   return value31;
@@ -606,7 +606,7 @@ export function reorderStoryVideoReplicationEpisodes(list11 = [], value33 = []) 
       (map3['add'](text12), list13['push'](value36));
     }),
     list13['map']((value37, value38) => {
-      return ((value37['number'] = value38 + 0x1), value37);
+      return ((value37['number'] = value38 + 1), value37);
     })
   );
 }
@@ -619,7 +619,7 @@ export function syncStoryVideoReplicationProject(options10 = {}) {
     ),
     fullText3 = completedCount['map']((value42) => normalizeText(value42?.['script']?.['fullText']))
       ['filter'](Boolean)
-      ['join']('\x0a\x0a'),
+      ['join']('\n\n'),
     value43 = options10['project'] || (options10['project'] = {});
   ((value43['replication'] = {
     ...(value43['replication'] || {}),
@@ -638,7 +638,7 @@ export function syncStoryVideoReplicationProject(options10 = {}) {
   }),
     (value43['chapters'] = completedCount['map']((id4) => ({
       id: id4['id'],
-      title: '第\x20' + id4['number'] + '\x20集：' + id4['title'],
+      title: '第 ' + id4['number'] + ' 集：' + id4['title'],
       content: id4['script']['fullText'],
     }))),
     (value43['plotScript'] = fullText3),
@@ -646,7 +646,7 @@ export function syncStoryVideoReplicationProject(options10 = {}) {
     (value43['originalCreative'] = fullText3),
     (value43['summary'] = completedCount['map']((value44) => value44['synopsis'])
       ['filter'](Boolean)
-      ['join']('\x0a')));
+      ['join']('\n')));
   const episodeIds = totalCount['map']((value45) => value45['id']),
     value46 = value43['compiledScript'],
     confirmedAt = Boolean(
@@ -658,7 +658,7 @@ export function syncStoryVideoReplicationProject(options10 = {}) {
     (value43['compiledScript'] =
       completedCount['length'] === totalCount['length'] && totalCount['length']
         ? {
-            revision: 0x1,
+            revision: 1,
             episodeIds: episodeIds,
             fullText: fullText3,
             confirmedAt: confirmedAt ? value46['confirmedAt'] : Date['now'](),
@@ -672,9 +672,9 @@ export function getStoryVideoReplicationSummary(options11 = {}) {
   const status2 = options11['project']?.['replication'] || {};
   return {
     status: status2['status'] || 'pending',
-    total: Math['max'](0x0, Number(status2['totalCount']) || 0x0),
-    completed: Math['max'](0x0, Number(status2['completedCount']) || 0x0),
-    failed: Math['max'](0x0, Number(status2['failedCount']) || 0x0),
+    total: Math['max'](0, Number(status2['totalCount']) || 0),
+    completed: Math['max'](0, Number(status2['completedCount']) || 0),
+    failed: Math['max'](0, Number(status2['failedCount']) || 0),
     active: (options11['episodes'] || [])['filter']((value47) =>
       ['queued', 'uploading', 'analyzing']['includes'](value47?.['replication']?.['status']),
     )['length'],
@@ -690,12 +690,12 @@ export function getStoryVideoReplicationFooterState(
       if (!enabled4) return ![];
       const videoReplicationDialogueSummary = getVideoReplicationDialogueSummary(enabled4);
       return (
-        videoReplicationDialogueSummary['total'] === 0x0 || videoReplicationDialogueSummary['pending'] > 0x0
+        videoReplicationDialogueSummary['total'] === 0 || videoReplicationDialogueSummary['pending'] > 0
       );
     }),
-    actionLabel = storyVideoReplicationSummary['active'] > 0x0,
+    actionLabel = storyVideoReplicationSummary['active'] > 0,
     busy = actionLabel || localizing,
-    action = storyVideoReplicationSummary['completed'] > 0x0,
+    action = storyVideoReplicationSummary['completed'] > 0,
     enabled5 = (options12['episodes'] || [])['some'](
       (value50) => value50['replication']?.['status'] === 'pending',
     );
@@ -732,13 +732,13 @@ export function getStoryVideoReplicationFooterState(
           ? '原片画面已分析，人声文案待核对'
           : '视频解析完成'
         : storyVideoReplicationSummary['failed']
-          ? '已完成\x20' +
+          ? '已完成 ' +
             storyVideoReplicationSummary['completed'] +
             '/' +
             storyVideoReplicationSummary['total'] +
             ' 条，' +
             storyVideoReplicationSummary['failed'] +
-            '\x20条解析失败'
+            ' 条解析失败'
           : '等待视频解析',
     hint: actionLabel
       ? '已完成 ' +

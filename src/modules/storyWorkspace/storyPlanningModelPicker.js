@@ -5,8 +5,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 export function renderStoryPlanningTextModelPicker(
   modelId = {},
@@ -17,7 +17,7 @@ export function renderStoryPlanningTextModelPicker(
   return (
     '<div class="story-planning-model-picker ' +
     escapeHtml(className) +
-    '\x22>\x0a\x20\x20\x20\x20' +
+    '">\n    ' +
     renderAIGenTextModelSelectorMarkup({
       modelId: modelId['models']?.['text'],
       provider: modelId['textProvider'],
@@ -26,6 +26,6 @@ export function renderStoryPlanningTextModelPicker(
       getDisplayModelName: getDisplayModelName,
       className: 'story-planning-text-model-selector',
     }) +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }

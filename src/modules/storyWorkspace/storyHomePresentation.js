@@ -48,8 +48,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item) {
   return String(item ?? '')['trim']();
@@ -59,7 +59,7 @@ export function getStoryHomeModeDescription(key, index = '') {
   return (
     {
       upload: '导入已有剧本，按原稿进入制作',
-      generate: '输入故事想法，AI\x20帮你生成剧本',
+      generate: '输入故事想法，AI 帮你生成剧本',
       collaborate: '与 AI 讨论方向，自定设定，逐段打磨剧本',
     }[key] || ''
   );
@@ -102,11 +102,11 @@ function renderHomeTabs(options) {
         target +
         '" role="tab" aria-selected="' +
         next +
-        '\x22\x20aria-disabled=\x22' +
+        '" aria-disabled="' +
         enabled +
         '" tabindex="' +
         (next ? '0' : '-1') +
-        '\x22\x20' +
+        '" ' +
         (enabled ? 'disabled' : '') +
         '><span class="story-home-tab-content">' +
         renderStoryHomeTabIcon(target) +
@@ -115,7 +115,7 @@ function renderHomeTabs(options) {
         '</span></span></button>'
       );
     })['join']('') +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 export function renderStoryHomeComposerBody(current) {
@@ -133,7 +133,7 @@ export function renderStoryHomeComposerBody(current) {
       STORY_IDEA_MAX_CHARACTERS +
       '" placeholder="写下一段故事、人物设定或一个灵感，和 AI 一起把它展开……">' +
       escapeHtml(current['idea'] || '') +
-      '</textarea>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-input-meta\x22><p>先讨论方向，再由你决定如何写成正文。</p><span\x20data-story-idea-count>' +
+      '</textarea>\n      <div class="story-home-input-meta"><p>先讨论方向，再由你决定如何写成正文。</p><span data-story-idea-count>' +
       (current['idea'] || '')['length'] +
       ' / ' +
       STORY_IDEA_MAX_CHARACTERS +
@@ -147,32 +147,32 @@ export function renderStoryHomeComposerBody(current) {
         ? current['replicationSourcePreviewUrls']
         : [],
       record =
-        '<div\x20class=\x22story-replication-upload-list\x20workspace-video-import-grid\x22\x20data-story-replication-upload-list\x20' +
+        '<div class="story-replication-upload-list workspace-video-import-grid" data-story-replication-upload-list ' +
         (list2['length'] ? '' : 'hidden') +
         '>\n          ' +
         list2['map']((error, payload) => {
-          const handle = error['name'] || '视频 ' + (payload + 0x1),
+          const handle = error['name'] || '视频 ' + (payload + 1),
             text2 = normalizeText(entry[payload]);
           return (
             '<article class="story-replication-upload-item workspace-video-import-item" data-replication-source-key="' +
             escapeHtml(text2 || handle + ':' + error['size'] + ':' + error['lastModified']) +
             '">\n              <button type="button" class="story-replication-upload-thumbnail workspace-video-import-thumbnail" data-story-action="choose-replication-videos" aria-label="' +
             escapeHtml(handle) +
-            '，点击继续上传参考视频\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+            '，点击继续上传参考视频">\n                ' +
             (text2
-              ? '<video\x20src=\x22' +
+              ? '<video src="' +
                 escapeHtml(text2) +
-                '\x22\x20preload=\x22metadata\x22\x20muted\x20playsinline\x20aria-label=\x22' +
+                '" preload="metadata" muted playsinline aria-label="' +
                 escapeHtml(handle) +
                 ' 视频缩略图" draggable="false"></video>'
-              : '<span\x20class=\x22workspace-video-import-placeholder\x22>' +
+              : '<span class="workspace-video-import-placeholder">' +
                 renderStoryReplicationVideoIcon() +
                 '</span>') +
             '\n              </button>\n              <button type="button" class="story-replication-upload-remove workspace-video-import-remove" data-story-action="remove-replication-video" data-story-replication-file-index="' +
             payload +
             '" aria-label="移除 ' +
             escapeHtml(handle) +
-            '\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22workspace-video-import-copy\x22><strong>' +
+            '">×</button>\n              <div class="workspace-video-import-copy"><strong>' +
             escapeHtml(handle) +
             '</strong></div>\n            </article>'
           );
@@ -195,11 +195,11 @@ export function renderStoryHomeComposerBody(current) {
         ? '描述你希望如何改写这份剧本，例如：改成海外爆款短剧风格，强化冲突与集尾钩子。'
         : '输入你想创作的剧本内容，或上传参考剧本进行改编……';
     return (
-      '<div\x20class=\x22story-home-composer-panel\x20story-home-input-wrap\x20story-home-story-input\x20story-home-creation-input\x20' +
+      '<div class="story-home-composer-panel story-home-input-wrap story-home-story-input story-home-creation-input ' +
       (hasStoryHomeReferenceScript2 ? 'has-reference-script' : '') +
       '" data-story-rewrite-drop>\n      <div class="story-home-reference-source">\n        <button type="button" class="story-home-reference-upload" data-story-action="choose-rewrite-script" aria-label="' +
       (hasStoryHomeReferenceScript2 ? '替换参考剧本（改写模式）' : '上传参考剧本') +
-      '\x22\x20' +
+      '" ' +
       (current['isParsingDocument'] ? 'disabled' : '') +
       ' aria-busy="' +
       Boolean(current['isParsingDocument']) +
@@ -209,7 +209,7 @@ export function renderStoryHomeComposerBody(current) {
         : '<span class="story-home-reference-document-icon"></span><span class="story-home-reference-add-icon"></span><span class="story-home-reference-extension">' +
           escapeHtml(getStoryDocumentExtension(text3)) +
           '</span>') +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '</span>\n          ' +
       (current['isParsingDocument'] ? '<span class="story-home-reference-status">解析中</span>' : '') +
       '\n        </button>\n        ' +
       (hasStoryHomeReferenceScript2
@@ -217,15 +217,15 @@ export function renderStoryHomeComposerBody(current) {
           escapeHtml(text3) +
           '</span>\n          <button type="button" class="story-home-reference-remove" data-story-action="remove-rewrite-script" aria-label="移除参考剧本">×</button>'
         : '') +
-      '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-creation-copy\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label\x20for=\x22storyIdeaInput\x22>' +
+      '\n      </div>\n      <div class="story-home-creation-copy">\n        <label for="storyIdeaInput">' +
       (hasStoryHomeReferenceScript2 ? '填写改写要求' : '输入故事设定') +
-      '</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<textarea\x20id=\x22storyIdeaInput\x22\x20data-story-idea-input\x20maxlength=\x22' +
+      '</label>\n        <textarea id="storyIdeaInput" data-story-idea-input maxlength="' +
       STORY_IDEA_MAX_CHARACTERS +
-      '\x22\x20placeholder=\x22' +
+      '" placeholder="' +
       state +
-      '\x22>' +
+      '">' +
       escapeHtml(current['idea']) +
-      '</textarea>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-input-meta\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20data-story-script-mode-hint>' +
+      '</textarea>\n        <div class="story-home-input-meta">\n          <p data-story-script-mode-hint>' +
       (hasStoryHomeReferenceScript2
         ? STORY_HOME_REWRITE_SOURCE_HINT
         : escapeHtml(getStoryScriptModeHint(current['scriptMode']))) +
@@ -243,13 +243,13 @@ export function renderStoryHomeComposerBody(current) {
       STORY_SCRIPT_MAX_CHARACTERS +
       '" placeholder="在这里粘贴完整剧本……">' +
       escapeHtml(current['scriptText']) +
-      '</textarea>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-input-meta\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p>支持最多\x20' +
+      '</textarea>\n      <div class="story-home-input-meta">\n        <p>支持最多 ' +
       STORY_SCRIPT_MAX_CHARACTERS +
       ' 字，' +
       (isNovelIntent ? '将改编为分集剧本，拆分场景后生成正文。' : '将按原稿导入，不扩写、不重新分集。') +
       '</p>\n        <span data-story-paste-count>' +
       current['scriptText']['length'] +
-      '\x20/\x20' +
+      ' / ' +
       STORY_SCRIPT_MAX_CHARACTERS +
       '</span>\n      </div>\n      <div class="story-upload-actions">\n        <button type="button" class="story-secondary-button button-press-feedback" data-story-action="choose-script"><span>上传剧本</span></button>\n        <button type="button" class="story-secondary-button button-press-feedback is-active" data-story-action="paste-script" aria-pressed="true"><span>粘贴文本</span></button>\n      </div>\n    </div>'
     );
@@ -268,19 +268,19 @@ export function renderStoryHomeComposerBody(current) {
         ? '小说已就绪，将改编为分集剧本并拆分场景。'
         : '剧本已就绪，将按原稿结构导入并直接提取素材。'
       : '支持 TXT、DOCX、文本型 PDF，文本内容不超过 ' + STORY_SCRIPT_MAX_CHARACTERS + ' 字。') +
-    '</p>\x0a\x20\x20\x20\x20<div\x20class=\x22story-upload-actions\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback' +
+    '</p>\n    <div class="story-upload-actions">\n      <button type="button" class="story-secondary-button button-press-feedback' +
     (isNovelIntent ? '' : ' is-active') +
-    '\x22\x20data-story-action=\x22choose-script\x22\x20' +
+    '" data-story-action="choose-script" ' +
     (current['isParsingDocument'] ? 'disabled' : '') +
     ' aria-busy="' +
     Boolean(current['isParsingDocument']) +
-    '\x22>' +
+    '">' +
     (current['isParsingDocument'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
     '<span>' +
     (current['isParsingDocument'] ? '解析中' : '上传剧本') +
-    '</span></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback' +
+    '</span></button>\n      <button type="button" class="story-secondary-button button-press-feedback' +
     (isNovelIntent ? ' is-active' : '') +
-    '\x22\x20data-story-action=\x22choose-novel\x22\x20aria-pressed=\x22false\x22><span>上传小说</span></button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback\x22\x20data-story-action=\x22paste-script\x22\x20aria-pressed=\x22false\x22><span>粘贴文本</span></button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
+    '" data-story-action="choose-novel" aria-pressed="false"><span>上传小说</span></button>\n      <button type="button" class="story-secondary-button button-press-feedback" data-story-action="paste-script" aria-pressed="false"><span>粘贴文本</span></button>\n    </div>\n  </div>'
   );
 }
 export function renderStoryScriptModeControl(config = 'plot', { hidden: hidden = ![] } = {}) {
@@ -290,17 +290,17 @@ export function renderStoryScriptModeControl(config = 'plot', { hidden: hidden =
   return (
     '<button type="button" class="story-home-param-trigger story-script-mode-toggle ' +
     (storyScriptMode === 'narration' ? 'is-narration' : '') +
-    '\x22\x20data-story-script-mode-control\x20data-story-script-mode=\x22' +
+    '" data-story-script-mode-control data-story-script-mode="' +
     storyScriptMode +
-    '\x22\x20aria-pressed=\x22' +
+    '" aria-pressed="' +
     (storyScriptMode === 'narration') +
-    '\x22\x20aria-label=\x22当前' +
+    '" aria-label="当前' +
     scope +
     '，点击切换为' +
     input +
-    '\x22\x20' +
+    '" ' +
     (hidden ? 'hidden' : '') +
-    '>\x0a\x20\x20\x20\x20<span\x20class=\x22story-home-param-icon\x20story-script-mode-icon\x22\x20aria-hidden=\x22true\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22><path\x20d=\x22M7\x207h10l-2.5-2.5M17\x2017H7l2.5\x202.5\x22/><path\x20d=\x22M17\x207l-2.5\x202.5M7\x2017l2.5-2.5\x22/></svg></span>\x0a\x20\x20\x20\x20<span\x20data-story-script-mode-label>' +
+    '>\n    <span class="story-home-param-icon story-script-mode-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10l-2.5-2.5M17 17H7l2.5 2.5"/><path d="M17 7l-2.5 2.5M7 17l2.5-2.5"/></svg></span>\n    <span data-story-script-mode-label>' +
     scope +
     '</span>\n  </button>'
   );
@@ -331,20 +331,20 @@ function renderStoryAspectRatioPicker(
     escapeHtml(storyAspectRatio) +
     '</span>\n      ' +
     renderStoryHomeParamChevron() +
-    '\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<div\x20class=\x22story-home-param-popover\x20story-ratio-popover\x22\x20role=\x22listbox\x22\x20aria-label=\x22画面比例\x22>\x0a\x20\x20\x20\x20\x20\x20<strong>画面比例</strong>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-ratio-options\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n    </button>\n    <div class="story-home-param-popover story-ratio-popover" role="listbox" aria-label="画面比例">\n      <strong>画面比例</strong>\n      <div class="story-ratio-options">\n        ' +
     STORY_ASPECT_RATIO_OPTIONS['map'](
       (el) =>
         '<button type="button" class="story-ratio-option ' +
         (el['value'] === storyAspectRatio ? 'is-selected' : '') +
-        '\x22\x20data-story-aspect-ratio-option=\x22' +
+        '" data-story-aspect-ratio-option="' +
         escapeHtml(el['value']) +
-        '\x22\x20role=\x22option\x22\x20aria-selected=\x22' +
+        '" role="option" aria-selected="' +
         (el['value'] === storyAspectRatio) +
-        '\x22>' +
+        '">' +
         escapeHtml(el['selectedLabel'] || el['label']) +
         '</button>',
     )['join']('') +
-    '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
+    '\n      </div>\n    </div>\n  </div>'
   );
 }
 function renderStoryPlanningPicker({
@@ -363,9 +363,9 @@ function renderStoryPlanningPicker({
   return (
     '<div class="story-home-param-picker story-ratio-picker story-planning-picker" data-story-planning-picker="' +
     escapeHtml(field) +
-    '\x22\x20' +
+    '" ' +
     (hidden ? 'hidden' : '') +
-    '>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-home-param-trigger\x20story-menu-trigger\x22\x20data-story-home-param-trigger=\x22' +
+    '>\n    <button type="button" class="story-home-param-trigger story-menu-trigger" data-story-home-param-trigger="' +
     escapeHtml(field) +
     '" aria-haspopup="listbox" aria-expanded="false">\n      <span class="story-home-param-icon" aria-hidden="true">' +
     escapeHtml(icon) +
@@ -375,38 +375,38 @@ function renderStoryPlanningPicker({
     escapeHtml(formatOption(value5)) +
     '</span>\n      ' +
     renderStoryHomeParamChevron() +
-    '\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<div\x20class=\x22story-home-param-popover\x20story-ratio-popover\x20story-planning-popover\x22\x20role=\x22listbox\x22\x20aria-label=\x22' +
+    '\n    </button>\n    <div class="story-home-param-popover story-ratio-popover story-planning-popover" role="listbox" aria-label="' +
     escapeHtml(label) +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20<strong>' +
+    '">\n      <strong>' +
     escapeHtml(label) +
     '</strong>\n      <div class="story-ratio-options story-planning-options' +
     (singleColumn ? ' story-planning-options--single-column' : '') +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '">\n        ' +
     options2['map']((value6) => {
       const value7 = map['has'](value6);
       return (
-        '<button\x20type=\x22button\x22\x20class=\x22story-ratio-option\x20' +
+        '<button type="button" class="story-ratio-option ' +
         (value6 === value5 ? 'is-selected' : '') +
-        '\x20' +
+        ' ' +
         (value7 ? 'is-disabled' : '') +
         '" data-story-planning-field="' +
         escapeHtml(field) +
-        '\x22\x20data-story-planning-option=\x22' +
+        '" data-story-planning-option="' +
         value6 +
         '" role="option" aria-selected="' +
         (value6 === value5) +
-        '\x22\x20aria-disabled=\x22' +
+        '" aria-disabled="' +
         value7 +
-        '\x22\x20' +
+        '" ' +
         (value7 ? 'disabled' : '') +
         '>' +
         escapeHtml(formatOption(value6)) +
         '</button>'
       );
     })['join']('') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n        ' +
     (customOption?.['visible']
-      ? '<label\x20class=\x22story-ratio-option\x20story-episode-count-custom-editor\x20' +
+      ? '<label class="story-ratio-option story-episode-count-custom-editor ' +
         (customOption['selected'] ? 'is-selected' : '') +
         '" data-story-custom-episode-count role="option" aria-selected="' +
         customOption['selected'] +
@@ -416,7 +416,7 @@ function renderStoryPlanningPicker({
         STORY_EPISODE_COUNT_MAX +
         '" step="1" inputmode="numeric" autocomplete="off" data-story-custom-episode-count-input aria-label="输入自定义分集数，1 到 ' +
         STORY_EPISODE_COUNT_MAX +
-        '\x20集\x22\x20placeholder=\x22输入集数\x22\x20value=\x22' +
+        ' 集" placeholder="输入集数" value="' +
         (customOption['selected'] ? escapeHtml(value5) : '') +
         '">\n          <span>集</span>\n        </label>'
       : '') +
@@ -444,10 +444,10 @@ function renderStoryStylePicker(value8, { placement: placement = 'overlay', comp
       ? '<img data-story-style-thumbnail src="' +
         escapeHtml(storyStyleSelection['thumbnail']) +
         '" alt="" draggable="false">'
-      : '<span\x20class=\x22story-home-param-icon\x20story-style-custom-icon\x22\x20aria-hidden=\x22true\x22>✦</span>') +
+      : '<span class="story-home-param-icon story-style-custom-icon" aria-hidden="true">✦</span>') +
     '\n      <span class="story-home-param-kind-label">风格</span>\n      <span class="story-style-trigger-label">' +
     escapeHtml(storyStyleSelection['label']) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20' +
+    '</span>\n      ' +
     renderStoryHomeParamChevron() +
     '\n    </button>\n    <section class="story-home-param-popover story-style-popover" role="dialog" aria-label="风格库">\n      <div class="story-style-library" data-story-style-library>\n        <div class="story-style-header">\n          <div>\n            <strong>风格库</strong>\n            <small>为后续角色、场景、道具和分集画面统一视觉方向</small>\n          </div>\n          <label class="story-style-search">\n            <span aria-hidden="true">⌕</span>\n            <input type="search" data-story-style-search-input placeholder="搜索风格" autocomplete="off">\n          </label>\n        </div>\n        <div class="story-style-tabs" role="group" aria-label="风格分类">\n          ' +
     STORY_STYLE_CATEGORIES['map'](
@@ -458,7 +458,7 @@ function renderStoryStylePicker(value8, { placement: placement = 'overlay', comp
         value11['id'] +
         '" role="button" aria-pressed="' +
         (value11['id'] === 'all') +
-        '\x22>' +
+        '">' +
         value11['label'] +
         '</button>',
     )['join']('') +
@@ -487,9 +487,9 @@ function renderStoryStylePicker(value8, { placement: placement = 'overlay', comp
     escapeHtml(list3) +
     '</textarea>\n        <div class="story-style-custom-footer">\n          <span data-story-style-custom-count>' +
     list3['length'] +
-    '\x20/\x20' +
+    ' / ' +
     STORY_CUSTOM_STYLE_MAX_CHARACTERS +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-style-custom-confirm\x22\x20data-story-style-custom-confirm\x20aria-label=\x22确认自定义风格\x22>✓</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</div>'
+    '</span>\n          <button type="button" class="story-style-custom-confirm" data-story-style-custom-confirm aria-label="确认自定义风格">✓</button>\n        </div>\n      </div>\n    </section>\n  </div>'
   );
 }
 function renderStoryHomeEmptyIcon() {
@@ -509,7 +509,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
     modelId =
       allowDeveloperModes['homeTab'] === 'replication' &&
       !list4['includes'](allowDeveloperModes['models']['text'])
-        ? list4[0x0] || allowDeveloperModes['models']['text']
+        ? list4[0] || allowDeveloperModes['models']['text']
         : allowDeveloperModes['models']['text'],
     value18 = getStoryReplicationLocale(
       allowDeveloperModes['hasCreatedProject'] &&
@@ -518,7 +518,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
         : allowDeveloperModes['replicationTargetLocale'],
     );
   return (
-    '<div\x20class=\x22story-home-model-bar\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22story-home-model-controls\x22>\x0a\x20\x20\x20\x20\x20\x20' +
+    '<div class="story-home-model-bar">\n    <div class="story-home-model-controls">\n      ' +
     renderAIGenTextModelSelectorMarkup({
       modelId: modelId,
       provider: allowDeveloperModes['textProvider'],
@@ -528,7 +528,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
       className: 'story-home-text-model-selector',
       allowedModelIds: allowDeveloperModes['homeTab'] === 'replication' ? list4 : undefined,
     }) +
-    '\x0a\x20\x20\x20\x20\x20\x20' +
+    '\n      ' +
     (allowDeveloperModes['homeTab'] === 'replication'
       ? renderStoryPlanningPicker({
           field: 'replicationAsrProvider',
@@ -541,7 +541,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
             RECORDING_ASR_MODELS['find']((value21) => value21['id'] === value20)?.['label'] || value20,
         })
       : renderStoryStylePicker(allowDeveloperModes)) +
-    '\x0a\x20\x20\x20\x20\x20\x20' +
+    '\n      ' +
     renderStoryPlanningPicker({
       field: 'promptMode',
       label: '单片段提示词模式',
@@ -590,23 +590,23 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
     (['replication', 'collaborate']['includes'](allowDeveloperModes['homeTab'])
       ? ''
       : renderRequestDebugButton('data-story-action="debug-story-home"')) +
-    '<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20story-home-generate\x20story-main-action-button\x22\x20' +
+    '<button type="button" class="story-primary-button story-home-generate story-main-action-button" ' +
     (allowDeveloperModes['homeTab'] === 'collaborate'
       ? 'data-collaboration-start'
       : 'data-story-action="generate-story"') +
-    '\x20' +
+    ' ' +
     (value16 && !allowDeveloperModes['isGeneratingStory'] ? '' : 'disabled') +
     ' aria-busy="' +
     Boolean(allowDeveloperModes['isGeneratingStory']) +
-    '\x22>' +
+    '">' +
     (allowDeveloperModes['isGeneratingStory'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
-    '<span\x20data-story-generate-label>' +
+    '<span data-story-generate-label>' +
     escapeHtml(getStoryHomeGenerateButtonLabel(allowDeveloperModes)) +
     '</span>' +
     (allowDeveloperModes['isGeneratingStory']
       ? ''
-      : '<span\x20class=\x22story-generate-arrow\x22\x20aria-hidden=\x22true\x22>→</span>') +
-    '</button>\x0a\x20\x20</div>'
+      : '<span class="story-generate-arrow" aria-hidden="true">→</span>') +
+    '</button>\n  </div>'
   );
 }
 export function renderStoryHomeProjectResults(query) {
@@ -634,7 +634,7 @@ export function renderStoryHomeProjectResults(query) {
         '\n        ' +
         (list5['length']
           ? ''
-          : '<div\x20class=\x22story-project-filter-empty\x22><strong>' +
+          : '<div class="story-project-filter-empty"><strong>' +
             (showArchived ? '没有匹配的归档项目' : '没有匹配的' + value24) +
             '</strong><span>可以尝试其他搜索词，或清空搜索条件。</span></div>') +
         '\n        ' +
@@ -648,7 +648,7 @@ export function renderStoryHomeProjectResults(query) {
         '\n      </div>'
     : '<div class="story-project-empty">\n        <div class="story-project-empty-icon" aria-hidden="true">' +
         renderStoryHomeEmptyIcon() +
-        '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<strong>还没有' +
+        '</div>\n        <strong>还没有' +
         value24 +
         '</strong>\n        <span>创建项目后，它会保存在当前用户项目数据中。</span>\n        <button type="button" class="story-primary-button story-project-empty-action" data-story-action="new-story">创建第一个项目</button>\n      </div>';
 }
@@ -659,12 +659,12 @@ export function renderStoryHome(args) {
       homeTab: resolveStoryVideoReplicationHomeTab(args, args['homeTab']),
     },
     value27 = args['showArchivedProjects'] === !![],
-    value28 = args['projects']['filter']((value29) => Number(value29?.['archivedAt'] || 0x0) > 0x0)['length'];
+    value28 = args['projects']['filter']((value29) => Number(value29?.['archivedAt'] || 0) > 0)['length'];
   return (
     '<div class="story-home-page' +
     (value26['homeTab'] === 'replication' ? ' story-home-page--replication' : '') +
-    '\x22>\x0a\x20\x20\x20\x20<section\x20class=\x22story-home-hero\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-eyebrow\x22>SHUO\x20Canvas\x20·\x20' +
-    (args['workspaceSurface'] === 'replication' ? 'Replication\x20Studio' : 'Story Studio') +
+    '">\n    <section class="story-home-hero">\n      <span class="story-eyebrow">SHUO Canvas · ' +
+    (args['workspaceSurface'] === 'replication' ? 'Replication Studio' : 'Story Studio') +
     '</span>\n      <h1>' +
     (args['workspaceSurface'] === 'replication' ? '复刻工作室' : '从一个想法到完整的AI视频') +
     '</h1>\n      ' +
@@ -679,7 +679,7 @@ export function renderStoryHome(args) {
     (args['isGeneratingStory'] ? 'true' : 'false') +
     '">\n        ' +
     renderHomeTabs(value26) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-composer-body\x22>' +
+    '\n        <div class="story-home-composer-body">' +
     renderStoryHomeComposerBody(value26) +
     '</div>\n        ' +
     renderStoryHomeModelBar(value26) +
@@ -689,21 +689,21 @@ export function renderStoryHome(args) {
     escapeHtml(args['generationStatus'] || '正在创建剧情') +
     '</div>\n          <div class="storyboard-script-loading-bar"><div class="storyboard-script-loading-bar-fill"></div></div>\n        </div>\n      </div>\n    </section>\n    <section class="story-projects-section">\n      <div class="story-section-heading">\n        <div>\n          <h2>' +
     (value27 ? '已归档项目' : args['workspaceSurface'] === 'replication' ? '我的复刻项目' : '我的剧本项目') +
-    '</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-project-list-controls\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-project-import-button\x22\x20data-story-action=\x22import-project\x22>导入项目</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20class=\x22story-project-search\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20aria-hidden=\x22true\x22>⌕</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22search\x22\x20data-story-project-search\x20value=\x22' +
+    '</h2>\n        </div>\n        <div class="story-project-list-controls">\n          <button type="button" class="story-project-import-button" data-story-action="import-project">导入项目</button>\n          <label class="story-project-search">\n            <span aria-hidden="true">⌕</span>\n            <input type="search" data-story-project-search value="' +
     escapeHtml(args['projectSearchQuery'] || '') +
     '" placeholder="搜索项目名称" autocomplete="off" aria-label="搜索' +
     (args['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目') +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '">\n          </label>\n          ' +
     renderStoryProjectSortControl(args['projectSortOrder']) +
     '\n          <button type="button" class="story-project-archive-toggle ' +
     (value27 ? 'is-active' : '') +
     '" data-story-action="toggle-archived-projects" aria-pressed="' +
     value27 +
-    '\x22>' +
-    (value27 ? '返回项目' : '已归档\x20' + value28) +
-    '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20' +
+    '">' +
+    (value27 ? '返回项目' : '已归档 ' + value28) +
+    '</button>\n        </div>\n      </div>\n      ' +
     renderStoryHomeProjectResults(args) +
-    '\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</div>'
+    '\n    </section>\n  </div>'
   );
 }
 export function renderStoryProjectSortControl(value30 = 'updated-desc') {
@@ -731,10 +731,10 @@ export function renderStoryProjectCard(
 ) {
   const value32 = Array['isArray'](value31?.['data']?.['episodes'])
       ? value31['data']['episodes']['length']
-      : 0x0,
+      : 0,
     itemCount2 =
       itemCount !== null && itemCount !== undefined && Number['isFinite'](Number(itemCount))
-        ? Math['max'](0x0, Math['trunc'](Number(itemCount)))
+        ? Math['max'](0, Math['trunc'](Number(itemCount)))
         : value32,
     taskSummary = getStoryBackgroundTaskSummary(value31?.['data']);
   return renderWorkspaceProjectCard(value31, {
@@ -761,5 +761,5 @@ function resolveStoryProjectCoverImageUrls(value33, value34 = null) {
   )
     ['map'](normalizeText)
     ['filter']((value38, value39, list6) => value38 && list6['indexOf'](value38) === value39)
-    ['slice'](0x0, 0x3);
+    ['slice'](0, 3);
 }

@@ -58,7 +58,7 @@ function isBlockedIpv6(address = '') {
   if (!normalized || normalized === '::' || normalized === '::1') return true;
   if (normalized.startsWith('::')) return true;
   const prefix = Number.parseInt(normalized.split(':')[0] || '0', 16);
-  return (prefix & 0xe000) !== 0x2000 || normalized.startsWith('2001:db8:');
+  return (prefix & 57344) !== 8192 || normalized.startsWith('2001:db8:');
 }
 
 export function isPublicAgentInformationAddress(address = '') {

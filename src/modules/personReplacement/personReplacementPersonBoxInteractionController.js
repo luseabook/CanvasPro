@@ -8,7 +8,7 @@ import {
   normalizePersonReplacementManualBoxEdit,
   normalizePersonReplacementManualSelection,
 } from './personReplacementManualBox.js';
-const MANUAL_SELECTION_DRAG_THRESHOLD_PX = 0x4,
+const MANUAL_SELECTION_DRAG_THRESHOLD_PX = 4,
   DETECTION_BOX_SELECTOR = '[data-person-replacement-person-drop]',
   EDITABLE_DETECTION_BOX_SELECTOR = '.person-replacement-detection-box[data-person-id]',
   KEYBOARD_SELECTED_CLASS = 'is-keyboard-selected',
@@ -59,11 +59,11 @@ export function createPersonReplacementPersonBoxInteractionController({
   }
   function run3(event, el2) {
     const box = el2?.['getBoundingClientRect']?.(),
-      record = Math['max'](0x1, Number(box?.['width']) || Number(el2?.['clientWidth']) || 0x1),
-      payload = Math['max'](0x1, Number(box?.['height']) || Number(el2?.['clientHeight']) || 0x1);
+      record = Math['max'](1, Number(box?.['width']) || Number(el2?.['clientWidth']) || 1),
+      payload = Math['max'](1, Number(box?.['height']) || Number(el2?.['clientHeight']) || 1);
     return {
-      x: clamp((Number(event?.['clientX']) - Number(box?.['left'] || 0x0)) / record, 0x0, 0x1, 0x0),
-      y: clamp((Number(event?.['clientY']) - Number(box?.['top'] || 0x0)) / payload, 0x0, 0x1, 0x0),
+      x: clamp((Number(event?.['clientX']) - Number(box?.['left'] || 0)) / record, 0, 1, 0),
+      y: clamp((Number(event?.['clientY']) - Number(box?.['top'] || 0)) / payload, 0, 1, 0),
     };
   }
   function clearKeyboardSelection() {
@@ -142,7 +142,7 @@ export function createPersonReplacementPersonBoxInteractionController({
       )),
       clearKeyboardSelection(),
       run5(),
-      map['size'] > 0x0
+      map['size'] > 0
     );
   }
   function run6() {
@@ -159,7 +159,7 @@ export function createPersonReplacementPersonBoxInteractionController({
     );
   }
   function focusBatchSelectionStage() {
-    const el9 = run()?.['querySelector']?.('[data-story-marquee-surface=\x22people\x22]');
+    const el9 = run()?.['querySelector']?.('[data-story-marquee-surface="people"]');
     try {
       el9?.['focus']?.({ preventScroll: !![] });
     } catch {
@@ -221,7 +221,7 @@ export function createPersonReplacementPersonBoxInteractionController({
     return !![];
   }
   function beginBoxEdit(event2, element, { batch: batch = ![] } = {}) {
-    if (value3 || Number(event2?.['button']) > 0x0 || !element) return ![];
+    if (value3 || Number(event2?.['button']) > 0 || !element) return ![];
     const value16 = handler(),
       shotId3 = normalizeText(element['dataset']?.['shotId'] || value16['workspace']?.['selectedShotId']),
       personId2 = normalizeText(element['dataset']?.['personId']),
@@ -291,8 +291,8 @@ export function createPersonReplacementPersonBoxInteractionController({
         mode: mode,
         isBatchMove: isBatchMove,
         start: start,
-        startClientX: Number['isFinite'](Number(event2?.['clientX'])) ? Number(event2['clientX']) : 0x0,
-        startClientY: Number['isFinite'](Number(event2?.['clientY'])) ? Number(event2['clientY']) : 0x0,
+        startClientX: Number['isFinite'](Number(event2?.['clientX'])) ? Number(event2['clientX']) : 0,
+        startClientY: Number['isFinite'](Number(event2?.['clientY'])) ? Number(event2['clientY']) : 0,
         hasDragged: ![],
         items: items,
         cleanup: () => {
@@ -312,10 +312,10 @@ export function createPersonReplacementPersonBoxInteractionController({
     if (!enabled7?.['preview']) return;
     const box3 = normalizePersonReplacementManualSelection(enabled7['start'], value27);
     if (!box3) return;
-    (enabled7['preview']['style']?.['setProperty']?.('--selection-x', box3['x'] * 0x64 + '%'),
-      enabled7['preview']['style']?.['setProperty']?.('--selection-y', box3['y'] * 0x64 + '%'),
-      enabled7['preview']['style']?.['setProperty']?.('--selection-width', box3['width'] * 0x64 + '%'),
-      enabled7['preview']['style']?.['setProperty']?.('--selection-height', box3['height'] * 0x64 + '%'));
+    (enabled7['preview']['style']?.['setProperty']?.('--selection-x', box3['x'] * 100 + '%'),
+      enabled7['preview']['style']?.['setProperty']?.('--selection-y', box3['y'] * 100 + '%'),
+      enabled7['preview']['style']?.['setProperty']?.('--selection-width', box3['width'] * 100 + '%'),
+      enabled7['preview']['style']?.['setProperty']?.('--selection-height', box3['height'] * 100 + '%'));
   }
   function run9(event3, { cancelled: cancelled = ![] } = {}) {
     const shotId4 = value2;
@@ -326,7 +326,7 @@ export function createPersonReplacementPersonBoxInteractionController({
             Number(event3['clientX']) - shotId4['startClientX'],
             Number(event3['clientY']) - shotId4['startClientY'],
           )
-        : 0x0,
+        : 0,
       enabled8 = shotId4['hasDragged'] || value28 >= MANUAL_SELECTION_DRAG_THRESHOLD_PX;
     if (!cancelled && !enabled8) return (requestRender(), !![]);
     const value29 = run3(event3, shotId4['stage']),
@@ -442,7 +442,7 @@ export function createPersonReplacementPersonBoxInteractionController({
       value44 = new Set(list4['map']((value45) => value45['shotId']));
     if (
       list4['length'] &&
-      value44['size'] === 0x1 &&
+      value44['size'] === 1 &&
       deletionEnabled &&
       !isEditableTarget &&
       !event7?.['repeat'] &&

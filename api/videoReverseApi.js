@@ -6,9 +6,9 @@ export async function reverseVideo(nodeId = {}) {
   if (canUseElectronMediaTask())
     return await enqueueElectronMediaTask(
       { kind: 'videoReverse', src: src, nodeId: nodeId?.nodeId || '' },
-      { wait: true, timeout: 0x927c0 },
+      { wait: true, timeout: 600000 },
     );
-  const response = await post('/api/v2/video/reverse', { src: src }, 0x927c0);
+  const response = await post('/api/v2/video/reverse', { src: src }, 600000);
   if (!response?.success) throw new Error(response?.error || '视频倒放请求失败');
   const error = response.data || {};
   if (!error.success) throw new Error(error.error || error.message || '视频倒放失败');

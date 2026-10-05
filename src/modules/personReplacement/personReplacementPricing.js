@@ -13,8 +13,8 @@ export function bindPersonReplacementPricing(value, handler) {
           : project['characters']?.['find']((result) => result['id'] === item['selectedCharacterId']),
       workspaceAssetAppearances = getWorkspaceAssetAppearances(key),
       data =
-        workspaceAssetAppearances[item['assetAppearanceIndexes']?.[key?.['id']] || 0x0] ||
-        workspaceAssetAppearances[0x0],
+        workspaceAssetAppearances[item['assetAppearanceIndexes']?.[key?.['id']] || 0] ||
+        workspaceAssetAppearances[0],
       shot = project['shots']?.['find']((options) => options['id'] === item['selectedShotId']),
       target = prompt ? 'characterImage' : 'replacementImage';
     return {
@@ -32,7 +32,7 @@ export function bindPersonReplacementPricing(value, handler) {
   };
   return bindWorkspacePrices(value, [
     {
-      selector: '.story-asset-generation-actions\x20[data-story-action=\x22generate-asset\x22]',
+      selector: '.story-asset-generation-actions [data-story-action="generate-asset"]',
       getData: () => run(!![]),
     },
     {
@@ -40,7 +40,7 @@ export function bindPersonReplacementPricing(value, handler) {
       getData: () => run(![]),
     },
     {
-      selector: '[data-person-replacement-action=\x22generate-replacement-video\x22]',
+      selector: '[data-person-replacement-action="generate-replacement-video"]',
       getData: () => {
         const modelId = handler()['settings'],
           generationParams = resolvePersonReplacementVideoParameterPolicy({

@@ -57,7 +57,7 @@ function cloneJson(item) {
 function createRequestId() {
   const key = globalThis['crypto']?.['randomUUID']?.();
   return (
-    'replacement-video-request-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 0x186a0))
+    'replacement-video-request-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 100000))
   );
 }
 function normalizeStableRevisionValue(list) {
@@ -101,10 +101,10 @@ export function createPersonReplacementVideoGenerationRevision({
     imageMode: normalizeText(imageInput?.['mode']),
     imageRef: normalizeText(imageInput?.['imageRef']),
     referenceKind: normalizeText(imageInput?.['referenceKind']),
-    outputFps: Number(shot?.['outputFps']) || 0x0,
+    outputFps: Number(shot?.['outputFps']) || 0,
     subjectCount:
       imageInput?.['mode'] === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE
-        ? 0x1
+        ? 1
         : (Array['isArray'](shot?.['people']) ? shot['people'] : [])['filter']((source) =>
             normalizeText(source?.['targetCharacterId']),
           )['length'],
@@ -129,7 +129,7 @@ async function cancelPersonReplacementVideoTask({
   providerProfileId: providerProfileId = '',
 } = {}) {
   const apiKey = await resolveRunningHubWorkflowAccess(providerProfileId);
-  if (!apiKey['apiKey']) throw new Error('未配置\x20RunningHub\x20API\x20Key，无法取消远端任务');
+  if (!apiKey['apiKey']) throw new Error('未配置 RunningHub API Key，无法取消远端任务');
   return cancelRunningHubVideoTask({
     apiKey: apiKey['apiKey'],
     taskId: taskId,
@@ -153,7 +153,7 @@ export function createPersonReplacementVideoTaskRuntime({
   createId: createId = createRequestId,
 } = {}) {
   if (typeof getProject !== 'function' || typeof setProject !== 'function')
-    throw new Error('Person\x20replacement\x20video\x20task\x20runtime\x20requires\x20project\x20access');
+    throw new Error('Person replacement video task runtime requires project access');
   let entry = ![],
     record = null,
     payload = '';
@@ -368,7 +368,7 @@ export function createPersonReplacementVideoTaskRuntime({
         list3 = Array['isArray'](notify?.['shotIds'])
           ? notify['shotIds']['map'](normalizeText)['filter'](Boolean)
           : [],
-        value6 = list2['at'](-0x1);
+        value6 = list2['at'](-1);
       if (value6 && value6['projectId'] === projectId5) {
         if (!list3['length']) value6['prepareAll'] = !![];
         (list3['forEach']((value7) => value6['shotIds']['add'](value7)),
@@ -754,7 +754,7 @@ export function createPersonReplacementVideoTaskRuntime({
         (value39['abortController']?.['abort']?.(), !normalizeText(value39['taskId']) && handler5(value39));
       }),
         map['clear'](),
-        list2['splice'](0x0)['forEach']((promise3) => {
+        list2['splice'](0)['forEach']((promise3) => {
           promise3['resolve'](handler6());
         }),
         (entry = !![]));

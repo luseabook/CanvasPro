@@ -20,7 +20,7 @@ function buildImagePrompt(item, key, index) {
     if (result === undefined) throw new Error('OpenAI CLI 图片参数缺少 ' + field);
     return omitValues['includes'](result) ? [] : [template['replace']('{value}', String(result))];
   });
-  return [item, ...args2]['filter'](Boolean)['join']('\x0a\x0a');
+  return [item, ...args2]['filter'](Boolean)['join']('\n\n');
 }
 function resolveCliProvider(options = {}) {
   const enabled = String(options?.['extensions']?.['cliProvider'] || '')
@@ -35,7 +35,7 @@ function resolveReferenceInputUrls(options2 = {}) {
     modelManifest2 = getModelManifest(options2['model'])?.['inputSlots']?.['maxByKind']?.['image'];
   if (list3['length'] > modelManifest2)
     throw new Error(
-      'OpenAI\x20CLI\x20最多支持\x20' +
+      'OpenAI CLI 最多支持 ' +
         modelManifest2 +
         ' 张参考图，当前共 ' +
         list3['length'] +
@@ -56,7 +56,7 @@ export function buildOpenAiCliImageSubmitRequest(options3 = {}, target = '', sou
         imageParameters,
         source,
       ),
-      ...(inputUrls['length'] > 0x0 ? { inputUrls: inputUrls } : {}),
+      ...(inputUrls['length'] > 0 ? { inputUrls: inputUrls } : {}),
     },
   };
 }
@@ -65,12 +65,12 @@ async function materializeEditingImage(enabled2) {
   const response = await fetch(enabled2);
   if (!response['ok']) throw new Error('OpenAI CLI 编辑参考图读取失败');
   const next = await response['blob']();
-  if (next['type'] !== 'image/png' || next['size'] > 0x14 * 0x400 * 0x400)
+  if (next['type'] !== 'image/png' || next['size'] > 20 * 1024 * 1024)
     throw new Error('OpenAI CLI 临时编辑参考图仅支持不超过 20 MB 的 PNG');
   const list4 = new Uint8Array(await next['arrayBuffer']()),
     list5 = [];
-  for (let current = 0x0; current < list4['length']; current += 0x8000) {
-    list5['push'](String['fromCharCode'](...list4['subarray'](current, current + 0x8000)));
+  for (let current = 0; current < list4['length']; current += 32768) {
+    list5['push'](String['fromCharCode'](...list4['subarray'](current, current + 32768)));
   }
   return 'data:image/png;base64,' + btoa(list5['join'](''));
 }
@@ -85,12 +85,12 @@ export async function runOpenAiCliImageGeneration(timeoutMs = {}, entry = {}) {
   const count = imageParameters2['batchSize'],
     list6 = [];
   let payload;
-  for (let handle = 0x0; handle < count; handle += 0x1) {
+  for (let handle = 0; handle < count; handle += 1) {
     try {
       const generateImageWithCliProvider2 = await generateImageWithCliProvider(record);
       list6['push'](...normalizeImageResults(generateImageWithCliProvider2));
     } catch (error) {
-      if (count === 0x1) throw error;
+      if (count === 1) throw error;
       ((payload ??= error), list6['push']({ error: error['message'], status: 'failed', retryable: ![] }));
     }
   }
@@ -106,7 +106,7 @@ function normalizeImageResults(state) {
         response3?.['localPath'] || response3?.['imageUrl'] || response3?.['url'],
       ),
       url = localPathToUrl(localPath);
-    if (!localPath || !url) throw new Error('OpenAI\x20CLI\x20返回了不安全的本地图片路径');
+    if (!localPath || !url) throw new Error('OpenAI CLI 返回了不安全的本地图片路径');
     return {
       sourceId: null,
       thumbId: null,

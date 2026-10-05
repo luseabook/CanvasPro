@@ -4,7 +4,7 @@ export const normalizeReplicationContentType = (value) =>
 export const REPLICATION_CONTENT_ROUTING_RULE =
   '在本次完整视频观察中同时识别 contentType：story=以人物事件为主的剧情，narrated_story=剧情伴随解说/旁白，advertisement=以产品/品牌展示或销售传播为主的广告（也可包含故事），unknown=证据不足。contentTypeReason 简述画面依据；有人讲话、画面有商品或字幕，不足以单独认定广告。类型用于选择提示词模板，不改变原片内容，不改 ASR 文字，不重新判定每句人声类型，也不增加单独分类或审核请求。';
 const narrative =
-    '剧情模板：重点还原人物动作、表情、镜头与人物关系。textElements\x20的\x20physical/graphic\x20只记录当前画面实际物体文字或独立叙事图文；对白/旁白的转录字幕归\x20speech_subtitle\x20证据条目，不进入画面生成指令，也不塞入\x20visual/camera。人声仍完整输出一次。人物站位只用于建立场戏和同场跨段衔接，空镜/静物不套站位。',
+    '剧情模板：重点还原人物动作、表情、镜头与人物关系。textElements 的 physical/graphic 只记录当前画面实际物体文字或独立叙事图文；对白/旁白的转录字幕归 speech_subtitle 证据条目，不进入画面生成指令，也不塞入 visual/camera。人声仍完整输出一次。人物站位只用于建立场戏和同场跨段衔接，空镜/静物不套站位。',
   rules = {
     story: narrative + '人物对白放在对应镜头，不根据剧情类型删掉实际存在的画外音。',
     narrated_story:

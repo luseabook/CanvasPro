@@ -13,8 +13,8 @@ function toIdSet(value) {
 }
 function getContainerSize(box) {
   return {
-    width: Number['isFinite'](box?.['width']) ? box['width'] : 0x0,
-    height: Number['isFinite'](box?.['height']) ? box['height'] : 0x0,
+    width: Number['isFinite'](box?.['width']) ? box['width'] : 0,
+    height: Number['isFinite'](box?.['height']) ? box['height'] : 0,
   };
 }
 function createSpatialNodeMapView(item, map) {
@@ -65,7 +65,7 @@ function createNodeMap(list, options = null) {
 }
 function getSpatialNodeOrder(entry, record) {
   const payload = entry?.['nodesById']?.['get']?.(record)?.['order'];
-  return Number['isFinite'](payload) ? payload : 0x0;
+  return Number['isFinite'](payload) ? payload : 0;
 }
 function collectViewportRangeIds({
   nodeById: nodeById,
@@ -94,50 +94,50 @@ function collectViewportRangeIds({
   );
 }
 function smoothstep(config, scope, input) {
-  if (input <= config) return 0x0;
-  if (input >= scope) return 0x1;
+  if (input <= config) return 0;
+  if (input >= scope) return 1;
   const output = (input - config) / (scope - config);
-  return output * output * (0x3 - 0x2 * output);
+  return output * output * (3 - 2 * output);
 }
 function calculateScenePressure(value2, value3) {
-  const smoothstep2 = smoothstep(0x18, 0x78, value2),
-    smoothstep3 = smoothstep(0x50, 0x140, value3);
+  const smoothstep2 = smoothstep(24, 120, value2),
+    smoothstep3 = smoothstep(80, 320, value3);
   return Math['max'](smoothstep2, smoothstep3);
 }
 function calculateProjectedDetail(value4, map4, box2) {
-  if (value4['size'] === 0x0) return 0x0;
-  const value5 = Number['isFinite'](box2?.['zoom']) && box2['zoom'] > 0x0 ? box2['zoom'] : 0x1;
-  let value6 = 0x0,
-    count = 0x0;
+  if (value4['size'] === 0) return 0;
+  const value5 = Number['isFinite'](box2?.['zoom']) && box2['zoom'] > 0 ? box2['zoom'] : 1;
+  let value6 = 0,
+    count = 0;
   for (const value7 of value4) {
     const box3 = map4['get'](value7);
     if (!box3) continue;
-    const value8 = Math['max'](0x1, Number(box3['width']) || 0xa0) * value5,
-      value9 = Math['max'](0x1, Number(box3['height']) || 0x78) * value5;
-    ((value6 += value8 * value9), (count += 0x1));
+    const value8 = Math['max'](1, Number(box3['width']) || 160) * value5,
+      value9 = Math['max'](1, Number(box3['height']) || 120) * value5;
+    ((value6 += value8 * value9), (count += 1));
   }
-  if (count === 0x0) return 0x0;
+  if (count === 0) return 0;
   const value10 = value6 / count,
-    value11 = Math['round'](value10 * 0x3b9aca00) / 0x3b9aca00;
-  return smoothstep(0x4b0, 0x1c20, value11);
+    value11 = Math['round'](value10 * 1000000000) / 1000000000;
+  return smoothstep(1200, 7200, value11);
 }
 function interpolate(value12, value13, value14) {
   return value12 + (value13 - value12) * value14;
 }
 function calculateDynamicPadding(value15, value16) {
-  const mount = interpolate(0x1a4, 0x60, value15),
-    value17 = 0x2d0 * value15 * (0x1 - value16) ** 0x2,
+  const mount = interpolate(420, 96, value15),
+    value17 = 720 * value15 * (1 - value16) ** 2,
     preview = Math['max'](
       mount,
-      interpolate(0x2d0, 0xf0, value15) +
-        interpolate(0xf0, 0x0, value16) -
-        0x90 * value15 * value16 +
+      interpolate(720, 240, value15) +
+        interpolate(240, 0, value16) -
+        144 * value15 * value16 +
         value17,
     );
   return {
     mount: mount,
     preview: preview,
-    park: Math['max'](interpolate(0x384, 0x168, value15), preview + 0x78),
+    park: Math['max'](interpolate(900, 360, value15), preview + 120),
   };
 }
 function collectLiveIds(map5, ...args) {
@@ -153,27 +153,27 @@ function buildSurfaceSignature(args2, args3, args4) {
   return ['full', ...args2, 'proxy', ...args3, 'generation-busy', ...args4]['join']('\x1f');
 }
 function getNodeDistanceSquared(box4, box5, value21, value22) {
-  const value23 = Number['isFinite'](box5?.['zoom']) && box5['zoom'] > 0x0 ? box5['zoom'] : 0x1,
-    value24 = Number['isFinite'](box5?.['x']) ? box5['x'] : 0x0,
-    value25 = Number['isFinite'](box5?.['y']) ? box5['y'] : 0x0,
+  const value23 = Number['isFinite'](box5?.['zoom']) && box5['zoom'] > 0 ? box5['zoom'] : 1,
+    value24 = Number['isFinite'](box5?.['x']) ? box5['x'] : 0,
+    value25 = Number['isFinite'](box5?.['y']) ? box5['y'] : 0,
     value26 =
-      ((Number['isFinite'](box4?.['x']) ? box4['x'] : 0x0) +
-        (Number['isFinite'](box4?.['width']) ? box4['width'] : 0x0) / 0x2) *
+      ((Number['isFinite'](box4?.['x']) ? box4['x'] : 0) +
+        (Number['isFinite'](box4?.['width']) ? box4['width'] : 0) / 2) *
         value23 +
       value24,
     value27 =
-      ((Number['isFinite'](box4?.['y']) ? box4['y'] : 0x0) +
-        (Number['isFinite'](box4?.['height']) ? box4['height'] : 0x0) / 0x2) *
+      ((Number['isFinite'](box4?.['y']) ? box4['y'] : 0) +
+        (Number['isFinite'](box4?.['height']) ? box4['height'] : 0) / 2) *
         value23 +
       value25,
-    value28 = value26 - value21 / 0x2,
-    value29 = value27 - value22 / 0x2;
+    value28 = value26 - value21 / 2,
+    value29 = value27 - value22 / 2;
   return value28 * value28 + value29 * value29;
 }
 export function buildRendererScenePlan({
   nodes: nodes = [],
   spatialIndex: spatialIndex = null,
-  viewport: viewport = { x: 0x0, y: 0x0, zoom: 0x1 },
+  viewport: viewport = { x: 0, y: 0, zoom: 1 },
   containerRect: containerRect,
   mountCandidateIds: mountCandidateIds,
   previewCandidateIds: previewCandidateIds,
@@ -205,17 +205,17 @@ export function buildRendererScenePlan({
       viewport: viewport,
       width: width2,
       height: height2,
-      padding: 0x0,
+      padding: 0,
     }),
     fullSurfaceIds = new Set(),
     proxySurfaceIds = new Set(),
     pressure = calculateScenePressure(exactVisibleIds['size'], nodeById2['size']),
     projectedDetail = calculateProjectedDetail(exactVisibleIds, nodeById2, viewport),
     padding2 = calculateDynamicPadding(pressure, projectedDetail),
-    smoothstep4 = smoothstep(0x78, 0x140, nodeById2['size']),
+    smoothstep4 = smoothstep(120, 320, nodeById2['size']),
     calculateDenseLowZoomRasterStrength2 = calculateDenseLowZoomRasterStrength(smoothstep4, viewport),
     fullSurfaceBudget = Math['round'](
-      (0x30 - 0x10 * pressure) * projectedDetail * (0x1 - calculateDenseLowZoomRasterStrength2),
+      (48 - 16 * pressure) * projectedDetail * (1 - calculateDenseLowZoomRasterStrength2),
     ),
     map7 = collectLiveIds(nodeById2, mountedNodeIds),
     liveIds = collectLiveIds(nodeById2, selectedNodeIds, activeNodeIds, keepAliveNodeIds),
@@ -224,7 +224,7 @@ export function buildRendererScenePlan({
     shouldShowGenerationBusyUi(nodeById2['get'](value31)) && list2['push'](value31);
   }
   spatialIndex &&
-    list2['length'] > 0x1 &&
+    list2['length'] > 1 &&
     list2['sort'](
       (value32, value33) =>
         getSpatialNodeOrder(spatialIndex, value32) - getSpatialNodeOrder(spatialIndex, value33),
@@ -232,7 +232,7 @@ export function buildRendererScenePlan({
   const exactVisibleGenerationBusyIds = new Set(list2),
     map8 = collectLiveIds(nodeById2, mountCandidateIds);
   for (const value34 of liveIds) fullSurfaceIds['add'](value34);
-  if (deferInitialPlanning === !![] && includeParkIds === ![] && fullSurfaceBudget === 0x0) {
+  if (deferInitialPlanning === !![] && includeParkIds === ![] && fullSurfaceBudget === 0) {
     const liveIds2 = collectLiveIds(nodeById2, previewCandidateIds, mountCandidateIds, exactVisibleIds);
     for (const value35 of liveIds2) {
       if (!fullSurfaceIds['has'](value35)) proxySurfaceIds['add'](value35);
@@ -267,26 +267,26 @@ export function buildRendererScenePlan({
       height: height2,
       padding: padding2['mount'],
     }),
-    count2 = Math['max'](0x0, fullSurfaceBudget - fullSurfaceIds['size']);
-  if (count2 > 0x0) {
+    count2 = Math['max'](0, fullSurfaceBudget - fullSurfaceIds['size']);
+  if (count2 > 0) {
     const list3 = [...args5]
       ['filter']((value38) => !fullSurfaceIds['has'](value38))
       ['sort']((value39, value40) => {
         const count3 = Number(!exactVisibleIds['has'](value39)) - Number(!exactVisibleIds['has'](value40));
-        if (count3 !== 0x0) return count3;
+        if (count3 !== 0) return count3;
         const count4 =
           Number(!exactVisibleGenerationBusyIds['has'](value39)) -
           Number(!exactVisibleGenerationBusyIds['has'](value40));
-        if (count4 !== 0x0) return count4;
+        if (count4 !== 0) return count4;
         const count5 = Number(!map8['has'](value39)) - Number(!map8['has'](value40));
-        if (count5 !== 0x0) return count5;
+        if (count5 !== 0) return count5;
         const count6 = Number(!map7['has'](value39)) - Number(!map7['has'](value40));
-        if (count6 !== 0x0) return count6;
+        if (count6 !== 0) return count6;
         const count7 = handler(value39) - handler(value40);
-        if (count7 !== 0x0) return count7;
+        if (count7 !== 0) return count7;
         return getSpatialNodeOrder(spatialIndex, value39) - getSpatialNodeOrder(spatialIndex, value40);
       });
-    for (const value41 of list3['slice'](0x0, count2)) {
+    for (const value41 of list3['slice'](0, count2)) {
       fullSurfaceIds['add'](value41);
     }
   }
@@ -303,9 +303,9 @@ export function buildRendererScenePlan({
         }),
       ]['sort']((value43, value44) => {
         const count8 = Number(!map9['has'](value43)) - Number(!map9['has'](value44));
-        if (count8 !== 0x0) return count8;
+        if (count8 !== 0) return count8;
         const count9 = handler(value43) - handler(value44);
-        if (count9 !== 0x0) return count9;
+        if (count9 !== 0) return count9;
         return getSpatialNodeOrder(spatialIndex, value43) - getSpatialNodeOrder(spatialIndex, value44);
       }),
     );
@@ -332,7 +332,7 @@ export function buildRendererScenePlan({
         ['filter']((value48) => !map11['has'](value48))
         ['sort']((value49, value50) => {
           const count10 = Number(!map10['has'](value49)) - Number(!map10['has'](value50));
-          if (count10 !== 0x0) return count10;
+          if (count10 !== 0) return count10;
           return getSpatialNodeOrder(spatialIndex, value49) - getSpatialNodeOrder(spatialIndex, value50);
         }),
     );

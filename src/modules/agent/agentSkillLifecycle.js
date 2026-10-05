@@ -39,17 +39,17 @@ export function detectAgentSkillLifecycleIntent(data = '', options = []) {
   const installedSkills2 = installedSkills(options)['reduce']((target, source) => {
     const text4 = normalizeText(source['id']),
       text5 = normalizeText(source['title']);
-    return target['replaceAll']('$' + text4, '\x20')
-      ['replaceAll']('/' + text4, '\x20')
-      ['replaceAll'](text4, '\x20')
-      ['replaceAll'](text5, '\x20');
+    return target['replaceAll']('$' + text4, ' ')
+      ['replaceAll']('/' + text4, ' ')
+      ['replaceAll'](text4, ' ')
+      ['replaceAll'](text5, ' ');
   }, text3['toLowerCase']());
-  return OPERATION_PATTERNS['find'](([, next]) => next['test'](installedSkills2))?.[0x0] || '';
+  return OPERATION_PATTERNS['find'](([, next]) => next['test'](installedSkills2))?.[0] || '';
 }
 export function resolveAgentSkillLifecycleTarget(current = '', entry = []) {
   const skills = installedSkills(entry),
     list3 = normalizeText(current)['toLowerCase'](),
-    requestedId = list3['match'](/[$/]([a-z0-9][a-z0-9-]{0,63})/iu)?.[0x1]?.['toLowerCase']() || '';
+    requestedId = list3['match'](/[$/]([a-z0-9][a-z0-9-]{0,63})/iu)?.[1]?.['toLowerCase']() || '';
   if (requestedId) {
     const skill = skills['find']((record) => normalizeText(record['id'])['toLowerCase']() === requestedId);
     return skill ? { status: 'resolved', skill: skill } : { status: 'not_found', requestedId: requestedId };
@@ -59,8 +59,8 @@ export function resolveAgentSkillLifecycleTarget(current = '', entry = []) {
       text7 = normalizeText(payload['title'])['toLowerCase']();
     return Boolean((text6 && list3['includes'](text6)) || (text7 && list3['includes'](text7)));
   });
-  if (skill2['length'] === 0x1) return { status: 'resolved', skill: skill2[0x0] };
-  if (skill2['length'] > 0x1) return { status: 'ambiguous', skills: skill2 };
+  if (skill2['length'] === 1) return { status: 'resolved', skill: skill2[0] };
+  if (skill2['length'] > 1) return { status: 'ambiguous', skills: skill2 };
   const list4 = (list3['match'](/[\u3400-\u9fff]{2,}/g) || [])
       ['map']((handle) =>
         handle['replace'](
@@ -68,13 +68,13 @@ export function resolveAgentSkillLifecycleTarget(current = '', entry = []) {
           '',
         ),
       )
-      ['filter']((list5) => list5['length'] >= 0x2),
+      ['filter']((list5) => list5['length'] >= 2),
     skill3 = skills['filter']((state) => {
-      const list6 = normalizeText(state['title']) + '\x20' + normalizeText(state['description']);
+      const list6 = normalizeText(state['title']) + ' ' + normalizeText(state['description']);
       return list4['some']((config) => list6['includes'](config));
     });
-  if (skill3['length'] === 0x1) return { status: 'resolved', skill: skill3[0x0] };
-  if (skill3['length'] > 0x1) return { status: 'ambiguous', skills: skill3 };
+  if (skill3['length'] === 1) return { status: 'resolved', skill: skill3[0] };
+  if (skill3['length'] > 1) return { status: 'ambiguous', skills: skill3 };
   return { status: 'missing', skills: skills };
 }
 export function isAgentSkillLifecycleConfirmMessage(scope = '') {

@@ -1,8 +1,8 @@
 import { getMediaElementCurrentSource } from '../services/desktopMediaBlobSource.js';
-export function resolveNodeVideoElement(el, value = 0x0) {
+export function resolveNodeVideoElement(el, value = 0) {
   if (!el) return null;
   const item = Array['from'](el['querySelectorAll']('video')),
-    key = Math['max'](0x0, Math['trunc'](Number(value) || 0x0));
+    key = Math['max'](0, Math['trunc'](Number(value) || 0));
   let enabled = null,
     enabled2 = null,
     enabled3 = null;
@@ -18,11 +18,11 @@ export function resolveNodeVideoElement(el, value = 0x0) {
     const data = window['getComputedStyle'](el2);
     if (data['display'] === 'none' || data['visibility'] === 'hidden') continue;
     const count = Number(data['opacity']);
-    if (Number['isFinite'](count) && count <= 0x0) continue;
+    if (Number['isFinite'](count) && count <= 0) continue;
     const box = el2['getBoundingClientRect']();
     if (!box['width'] || !box['height']) continue;
     if (!enabled) enabled = el2;
     if (mediaElementCurrentSource) return el2;
   }
-  return enabled2 || enabled3 || enabled || item[0x0] || null;
+  return enabled2 || enabled3 || enabled || item[0] || null;
 }

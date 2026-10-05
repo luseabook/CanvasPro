@@ -15,7 +15,7 @@ export function createPersonReplacementCompletionNavigation({
       if (!openProject(enabled)) return ![];
     }
     const args = getProject(),
-      step = Math['max'](0x1, Math['min'](0x5, Math['trunc'](Number(options['step']) || 0x1)));
+      step = Math['max'](1, Math['min'](5, Math['trunc'](Number(options['step']) || 1)));
     return (setProject({ ...args, workspace: { ...args['workspace'], step: step } }), showProject(), !![]);
   };
 }

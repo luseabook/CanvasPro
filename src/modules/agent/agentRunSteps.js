@@ -32,7 +32,7 @@ function commandLabel(key = '') {
 }
 function upsertStep(list, key2, args = {}) {
   const count = list['findIndex']((event) => event['key'] === key2);
-  if (count < 0x0) {
+  if (count < 0) {
     list['push']({ key: key2, ...args });
     return;
   }
@@ -45,18 +45,18 @@ export function buildAgentRunSteps({ runEvents: runEvents = [], currentRun: curr
     )['trim']();
   if (!enabled) return [];
   const data = list2['filter']((options) => String(options?.['runId'] || '') === enabled)['sort'](
-      (target, source) => Number(target['ts'] || 0x0) - Number(source['ts'] || 0x0),
+      (target, source) => Number(target['ts'] || 0) - Number(source['ts'] || 0),
     ),
     list3 = [];
   let next = '',
     enabled2 = '';
   for (const ts of data) {
     if (ts['type'] === 'approval.requested')
-      ((next = enabled + ':approval:' + (ts['step'] || 0x0)),
+      ((next = enabled + ':approval:' + (ts['step'] || 0)),
         upsertStep(list3, next, {
           label: '等待确认',
           status: 'waiting',
-          step: Number(ts['step'] || 0x0),
+          step: Number(ts['step'] || 0),
           ts: ts['ts'],
         }));
     else {
@@ -67,20 +67,20 @@ export function buildAgentRunSteps({ runEvents: runEvents = [], currentRun: curr
           upsertStep(list3, next, { label: '已取消执行', status: 'cancelled', ts: ts['ts'] });
         else {
           if (ts['type'] === 'tool.completed')
-            upsertStep(list3, enabled + ':tool:' + (ts['step'] || 0x0) + ':' + ts['commandId'], {
+            upsertStep(list3, enabled + ':tool:' + (ts['step'] || 0) + ':' + ts['commandId'], {
               label: commandLabel(ts['commandId']),
               status: ts['ok'] === ![] ? 'failed' : 'success',
               commandId: ts['commandId'],
-              step: Number(ts['step'] || 0x0),
+              step: Number(ts['step'] || 0),
               ts: ts['ts'],
             });
           else {
             if (ts['type'] === 'task.waiting')
-              ((enabled2 = enabled + ':task-wait:' + (ts['step'] || 0x0)),
+              ((enabled2 = enabled + ':task-wait:' + (ts['step'] || 0)),
                 upsertStep(list3, enabled2, {
                   label: '等待生成任务完成',
                   status: 'running',
-                  step: Number(ts['step'] || 0x0),
+                  step: Number(ts['step'] || 0),
                   ts: ts['ts'],
                 }));
             else
@@ -111,7 +111,7 @@ export function buildAgentRunSteps({ runEvents: runEvents = [], currentRun: curr
       upsertStep(list3, enabled + ':current', {
         label: label,
         status: status,
-        step: Number(currentRun['step'] || 0x0),
+        step: Number(currentRun['step'] || 0),
         ts: Date['now'](),
       });
   } else
@@ -127,10 +127,10 @@ export function buildAgentRunSteps({ runEvents: runEvents = [], currentRun: curr
                 ? '任务已取消'
                 : '任务失败',
         status: status,
-        step: Number(currentRun['step'] || 0x0),
+        step: Number(currentRun['step'] || 0),
         ts: Date['now'](),
       });
-  return list3['slice'](-0x8);
+  return list3['slice'](-8);
 }
 export const agentRunStepInternals = Object['freeze']({
   normalizeStatus: normalizeStatus,

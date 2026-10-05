@@ -801,13 +801,13 @@ const AGNES_IMAGE_SIZE_BY_RATIO = Object.freeze({
     '9:16': '576x1024',
   }),
   AGNES_VIDEO_DIMENSIONS_BY_RATIO = Object.freeze({
-    '1:1': Object.freeze({ width: 0x400, height: 0x400 }),
-    '4:3': Object.freeze({ width: 0x400, height: 0x300 }),
-    '3:4': Object.freeze({ width: 0x300, height: 0x400 }),
-    '3:2': Object.freeze({ width: 0x480, height: 0x300 }),
-    '2:3': Object.freeze({ width: 0x300, height: 0x480 }),
-    '16:9': Object.freeze({ width: 0x480, height: 0x288 }),
-    '9:16': Object.freeze({ width: 0x288, height: 0x480 }),
+    '1:1': Object.freeze({ width: 1024, height: 1024 }),
+    '4:3': Object.freeze({ width: 1024, height: 768 }),
+    '3:4': Object.freeze({ width: 768, height: 1024 }),
+    '3:2': Object.freeze({ width: 1152, height: 768 }),
+    '2:3': Object.freeze({ width: 768, height: 1152 }),
+    '16:9': Object.freeze({ width: 1152, height: 648 }),
+    '9:16': Object.freeze({ width: 648, height: 1152 }),
   });
 function normalizeAgnesRatioLabel(value139, value140 = '4:3') {
   const value141 = String(value139 || '').trim();
@@ -866,7 +866,7 @@ function normalizeAgnesVideoNumFrames(value153, { spec: spec } = {}) {
     value154 = Number.isFinite(count6) && count6 > 0 ? count6 : 5,
     value155 = Number.isFinite(Number(spec?.frameRate)) ? Number(spec.frameRate) : 24,
     value156 = Number.isFinite(Number(spec?.min)) ? Math.trunc(Number(spec.min)) : 49,
-    value157 = Number.isFinite(Number(spec?.max)) ? Math.trunc(Number(spec.max)) : 0x1b9,
+    value157 = Number.isFinite(Number(spec?.max)) ? Math.trunc(Number(spec.max)) : 441,
     value158 = Math.max(1, value156),
     value159 = Math.max(value158, value157),
     value160 = Math.max(value158, Math.round(value154 * value155) + 1),
@@ -1615,7 +1615,7 @@ function pickDefaultConcreteVideoAspectRatio(value270) {
 
 function mergeUiSchemaDefaultsIntoPayload(args11 = {}, value273 = null) {
   const value274 = Array['isArray'](value273?.['uiSchema']?.['fields']) ? value273['uiSchema']['fields'] : [];
-  if (value274['length'] === 0x0) return args11;
+  if (value274['length'] === 0) return args11;
   const value275 =
     args11?.['generationParams'] &&
     typeof args11['generationParams'] === 'object' &&
@@ -1698,7 +1698,7 @@ function isSupportedModelApiProvider(value290, value291 = new Set()) {
 function collectRawImageInputUrls(options11 = {}, value293 = null) {
   const list32 = getOrderedInputSlotEntries(options11?.['inputUrlsBySlot'], value293),
     list33 =
-      list32['length'] > 0x0
+      list32['length'] > 0
         ? list32['map']((value294) => value294['url'])
         : Array['isArray'](options11?.['inputUrls'])
           ? options11['inputUrls']
@@ -1713,7 +1713,7 @@ function collectResolverOwnedImageInputUrls(options12 = {}, value296 = null) {
     manifestMaxInputCount6 = getManifestMaxInputCount(value296, 'image');
   return manifestMaxInputCount6 === null
     ? rawImageInputUrls
-    : rawImageInputUrls['slice'](0x0, Math['max'](0x0, manifestMaxInputCount6));
+    : rawImageInputUrls['slice'](0, Math['max'](0, manifestMaxInputCount6));
 }
 
 function resolveInputRouteExecutionManifest(args13, value297, value298) {
@@ -1724,7 +1724,7 @@ function resolveInputRouteExecutionManifest(args13, value297, value298) {
     !args14 ||
     typeof args14 !== 'object' ||
     Array['isArray'](args14) ||
-    collectRawImageInputUrls(value297, value298)['length'] === 0x0
+    collectRawImageInputUrls(value297, value298)['length'] === 0
   )
     return args13;
   return {
@@ -1747,7 +1747,7 @@ async function resolveMultipartInputImages(value301, value302, value303) {
     throw new Error('Model API multipart image input loader is not available');
   const list34 = collectRawImageInputUrls(value301, value302),
     manifestMaxInputCount7 = getManifestMaxInputCount(value302, 'image'),
-    value304 = manifestMaxInputCount7 === null ? list34 : list34['slice'](0x0, manifestMaxInputCount7),
+    value304 = manifestMaxInputCount7 === null ? list34 : list34['slice'](0, manifestMaxInputCount7),
     list35 = [];
   for (const value305 of value304) {
     const value306 = await value303['loadInputImageBlob'](value305);
@@ -1770,10 +1770,10 @@ function multipartFileName(value307, value308) {
           : value309 === 'image/gif'
             ? 'gif'
             : 'png';
-  return 'image-' + (value308 + 0x1) + '.' + value310;
+  return 'image-' + (value308 + 1) + '.' + value310;
 }
 
-function appendMultipartValue(value311, value312, list36, value313 = 0x0) {
+function appendMultipartValue(value311, value312, list36, value313 = 0) {
   if (list36 === undefined || list36 === null || list36 === '') return;
   if (typeof Blob !== 'undefined' && list36 instanceof Blob) {
     value311['append'](value312, list36, multipartFileName(list36, value313));
@@ -1805,13 +1805,13 @@ function resolveCustomProviderAssetUploadApiUrl(value318, value319) {
     enabled22 = String(value319 || '')['trim']();
   if (!enabled21 || !enabled22['startsWith']('/'))
     throw new Error(
-      'Custom\x20provider\x20asset\x20upload\x20manifest\x20is\x20missing\x20a\x20relative\x20endpoint',
+      'Custom provider asset upload manifest is missing a relative endpoint',
     );
   let uRL, uRL2;
   try {
     ((uRL = new URL(enabled21)), (uRL2 = new URL(enabled22, uRL['origin'])));
   } catch {
-    throw new Error('Custom\x20provider\x20asset\x20upload\x20manifest\x20has\x20an\x20invalid\x20endpoint');
+    throw new Error('Custom provider asset upload manifest has an invalid endpoint');
   }
   if (uRL2['origin'] !== uRL['origin'] || uRL2['search'] || uRL2['hash'])
     throw new Error('Custom provider asset upload endpoint must remain on the provider origin');
@@ -1853,7 +1853,7 @@ function assertNoUnsupportedApimartAssetUrls(value322, value323, value324 = {}, 
   throw new Error(
     'APIMart ' +
       value326 +
-      '输入不支持\x20asset://\x20私有素材\x20URL；请连接原始素材，或使用可公网访问的\x20' +
+      '输入不支持 asset:// 私有素材 URL；请连接原始素材，或使用可公网访问的 ' +
       value326 +
       ' URL 后重试',
   );
@@ -1876,16 +1876,16 @@ function validateStrictVideoInputCounts(value327, value328, value329) {
         manifestMaxInputCount8 === null &&
         Array['isArray'](enabled23) &&
         !enabled23['map']((value335) => String(value335 || '')['trim']())['includes'](value332)
-          ? 0x0
+          ? 0
           : manifestMaxInputCount8;
     if (value334 !== null && value333['length'] > value334)
       throw new Error(
         (value328['displayName'] || '当前模型') +
           '最多支持 ' +
           value334 +
-          '\x20个' +
+          ' 个' +
           value331[value332] +
-          '，当前传入\x20' +
+          '，当前传入 ' +
           value333['length'] +
           ' 个，请删减后重试',
       );
@@ -1954,13 +1954,13 @@ function validateStrictModelUiSchemaParams(value346, value347, value348) {
       ),
       strictUiSchemaFieldLabel = resolveStrictUiSchemaFieldLabel(value351);
     if (
-      list37['length'] > 0x0 &&
+      list37['length'] > 0 &&
       !list37['some']((value353) => isSameStrictUiSchemaOption(value353, el2['value']))
     )
       throw new Error(
-        '便宜渠道\x20' +
+        '便宜渠道 ' +
           value350 +
-          '\x20的' +
+          ' 的' +
           strictUiSchemaFieldLabel +
           '不支持“' +
           el2['value'] +
@@ -1977,30 +1977,30 @@ function validateStrictModelUiSchemaParams(value346, value347, value348) {
         el2['value'] !== ![] &&
         !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value355)
       )
-        throw new Error('便宜渠道\x20' + value350 + '\x20的' + strictUiSchemaFieldLabel + '只能开启或关闭');
+        throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '只能开启或关闭');
       continue;
     }
-    if (!['slider', 'stepper']['includes'](value354) || list37['length'] > 0x0) continue;
+    if (!['slider', 'stepper']['includes'](value354) || list37['length'] > 0) continue;
     const value356 = Number(el2['value']),
       value357 = Number(value351?.['min']),
       value358 = Number(value351?.['max']),
       count9 = Number(value351?.['step']);
     if (!Number['isFinite'](value356))
-      throw new Error('便宜渠道 ' + value350 + '\x20的' + strictUiSchemaFieldLabel + '必须是数字');
+      throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '必须是数字');
     if (Number['isFinite'](value357) && value356 < value357)
-      throw new Error('便宜渠道 ' + value350 + '\x20的' + strictUiSchemaFieldLabel + '不能小于 ' + value357);
+      throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '不能小于 ' + value357);
     if (Number['isFinite'](value358) && value356 > value358)
       throw new Error(
-        '便宜渠道\x20' + value350 + '\x20的' + strictUiSchemaFieldLabel + '不能大于\x20' + value358,
+        '便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '不能大于 ' + value358,
       );
     if (
       Number['isFinite'](count9) &&
-      count9 > 0x0 &&
+      count9 > 0 &&
       Number['isFinite'](value357) &&
       Math['abs']((value356 - value357) / count9 - Math['round']((value356 - value357) / count9)) > 1e-9
     )
       throw new Error(
-        '便宜渠道 ' + value350 + '\x20的' + strictUiSchemaFieldLabel + '必须按 ' + count9 + ' 递增',
+        '便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '必须按 ' + count9 + ' 递增',
       );
   }
 }
@@ -2022,7 +2022,7 @@ function validateStrictImageInputCounts(value359, value360, value361) {
   if (list38['length'] <= manifestMaxInputCount9) return;
   throw new Error(
     (value360['displayName'] || '当前模型') +
-      '最多支持\x20' +
+      '最多支持 ' +
       manifestMaxInputCount9 +
       ' 张参考图，当前传入 ' +
       list38['length'] +
@@ -2051,7 +2051,7 @@ function throwVolcengineFilesApiInputError(value364) {
   throw new Error(
     'Volcengine Seedance ' +
       volcengineContentGenerationMediaLabel2 +
-      '\x20input\x20cannot\x20use\x20Files\x20API\x20file_id\x20directly;\x20use\x20a\x20public\x20URL\x20or\x20asset://\x20asset\x20ID',
+      ' input cannot use Files API file_id directly; use a public URL or asset:// asset ID',
   );
 }
 
@@ -2071,7 +2071,7 @@ function resolveVolcengineContentGenerationMediaUrls(value368, value369) {
     }
     isVolcengineFileId(value370) && throwVolcengineFilesApiInputError(value369);
     throw new Error(
-      'Volcengine\x20Seedance\x20' +
+      'Volcengine Seedance ' +
         volcengineContentGenerationMediaLabel3 +
         ' input needs a public URL or asset:// asset ID; local files require an upload channel that returns a model-usable URL',
     );
@@ -2085,7 +2085,7 @@ function normalizeCustomProviderOpenAiImageSize(value371, { context: context20 }
       value371 || value372?.['generationParams']?.['imageSize'] || value372?.['imageSize'] || '1024x1024',
     )['trim'](),
     value374 = value373['match'](/^(\d{2,5})\s*[xX×]\s*(\d{2,5})$/);
-  if (value374) return Number(value374[0x1]) + 'x' + Number(value374[0x2]);
+  if (value374) return Number(value374[1]) + 'x' + Number(value374[2]);
   const enabled25 = String(
     value372?.['generationParams']?.['aspectRatio'] ||
       value372?.['resolvedRatioLabel'] ||
@@ -2096,8 +2096,8 @@ function normalizeCustomProviderOpenAiImageSize(value371, { context: context20 }
   const ratioLabel3 = parseRatioLabel(enabled25);
   if (!ratioLabel3) return '1024x1024';
   const count10 = ratioLabel3['w'] / ratioLabel3['h'];
-  if (Math['abs'](count10 - 0x1) < 0.05) return '1024x1024';
-  return count10 > 0x1 ? '1536x1024' : '1024x1536';
+  if (Math['abs'](count10 - 1) < 0.05) return '1024x1024';
+  return count10 > 1 ? '1536x1024' : '1024x1536';
 }
 
 function normalizeCustomProviderDocumentedValueMap(value375, { spec: spec5 } = {}) {
@@ -2148,7 +2148,7 @@ function normalizeStringParam(value387) {
   return String(value387);
 }
 
-const AGNES_IMAGE_SIZE_SCALE_BY_QUALITY = Object['freeze']({ '1K': 0x1, '2K': 0x2, '3K': 0x3, '4K': 0x4 });
+const AGNES_IMAGE_SIZE_SCALE_BY_QUALITY = Object['freeze']({ '1K': 1, '2K': 2, '3K': 3, '4K': 4 });
 
 function normalizeAgnesImageQuality(value388, value389 = '1K') {
   const value390 = String(value388 || '')
@@ -2163,10 +2163,10 @@ function normalizeAgnesVideoFrameRate(value391, { spec: spec7 } = {}) {
   const value392 = Number(value391),
     value393 = Number['isFinite'](Number(spec7?.['fallback']))
       ? Math['trunc'](Number(spec7['fallback']))
-      : 0x18,
+      : 24,
     value394 = Number['isFinite'](value392) ? Math['trunc'](value392) : value393,
-    value395 = Number['isFinite'](Number(spec7?.['min'])) ? Math['trunc'](Number(spec7['min'])) : 0x1,
-    value396 = Number['isFinite'](Number(spec7?.['max'])) ? Math['trunc'](Number(spec7['max'])) : 0x3c;
+    value395 = Number['isFinite'](Number(spec7?.['min'])) ? Math['trunc'](Number(spec7['min'])) : 1,
+    value396 = Number['isFinite'](Number(spec7?.['max'])) ? Math['trunc'](Number(spec7['max'])) : 60;
   return Math['min'](Math['max'](value394, value395), value396);
 }
 
@@ -2200,9 +2200,9 @@ function resolveAgnesVideoFrameRate(options14 = {}, value397 = {}) {
 
 function normalizeRunningHubSeedance25Duration(value400) {
   const value401 = Math['trunc'](Number(value400));
-  if (value401 === -0x1) return '-1';
-  const value402 = Number['isFinite'](value401) ? value401 : -0x1;
-  return value402 === -0x1 ? '-1' : String(Math['min'](0x1e, Math['max'](0x4, value402)));
+  if (value401 === -1) return '-1';
+  const value402 = Number['isFinite'](value401) ? value401 : -1;
+  return value402 === -1 ? '-1' : String(Math['min'](30, Math['max'](4, value402)));
 }
 
 const CUSTOM_PROVIDER_TASK_SUCCESS_STATUS_ALIASES = Object['freeze']([
@@ -2242,7 +2242,7 @@ const SAFE_MANIFEST_ERROR_RULE_TYPES = new Set([
 export function resolveManifestErrorRules(options15 = {}) {
   const value403 = options15?.['extensions']?.['errorRules'];
   if (!Array['isArray'](value403)) return [];
-  return value403['slice'](0x0, 0xc)['flatMap']((enabled28) => {
+  return value403['slice'](0, 12)['flatMap']((enabled28) => {
     if (!enabled28 || typeof enabled28 !== 'object' || Array['isArray'](enabled28)) return [];
     const value404 = String(enabled28['phase'] || 'any')
         ['trim']()
@@ -2254,40 +2254,40 @@ export function resolveManifestErrorRules(options15 = {}) {
         ...new Set(
           (Array['isArray'](enabled28['httpStatuses']) ? enabled28['httpStatuses'] : [])
             ['map']((value406) => Number(value406))
-            ['filter']((count11) => Number['isInteger'](count11) && count11 >= 0x190 && count11 <= 0x257),
+            ['filter']((count11) => Number['isInteger'](count11) && count11 >= 400 && count11 <= 599),
         ),
-      ]['slice'](0x0, 0xc),
+      ]['slice'](0, 12),
       list41 = [
         ...new Set(
           (Array['isArray'](enabled28['messageIncludesAny']) ? enabled28['messageIncludesAny'] : [])
             ['map']((value407) =>
               String(value407 || '')
-                ['replace'](/\s+/g, '\x20')
+                ['replace'](/\s+/g, ' ')
                 ['trim'](),
             )
-            ['filter']((value408) => value408 && value408['length'] <= 0xf0),
+            ['filter']((value408) => value408 && value408['length'] <= 240),
         ),
-      ]['slice'](0x0, 0x6);
+      ]['slice'](0, 6);
     if (
       !['any', 'submit', 'poll']['includes'](value404) ||
       !SAFE_MANIFEST_ERROR_RULE_TYPES['has'](value405) ||
       typeof enabled28['retryable'] !== 'boolean' ||
-      (args16['length'] === 0x0 && list41['length'] === 0x0)
+      (args16['length'] === 0 && list41['length'] === 0)
     )
       return [];
     const args17 = String(enabled28['userMessage'] || '')
-        ['replace'](/\s+/g, '\x20')
+        ['replace'](/\s+/g, ' ')
         ['trim']()
-        ['slice'](0x0, 0x1f4),
+        ['slice'](0, 500),
       args18 = String(enabled28['hint'] || '')
-        ['replace'](/\s+/g, '\x20')
+        ['replace'](/\s+/g, ' ')
         ['trim']()
-        ['slice'](0x0, 0x1f4);
+        ['slice'](0, 500);
     return [
       {
         phase: value404,
-        ...(args16['length'] > 0x0 ? { httpStatuses: args16 } : {}),
-        ...(list41['length'] > 0x0 ? { messageIncludesAny: list41 } : {}),
+        ...(args16['length'] > 0 ? { httpStatuses: args16 } : {}),
+        ...(list41['length'] > 0 ? { messageIncludesAny: list41 } : {}),
         type: value405,
         retryable: enabled28['retryable'],
         ...(args17 ? { userMessage: args17 } : {}),
@@ -2322,7 +2322,7 @@ function getAudioRefUrl(options16 = {}) {
 function orderAudioRefsByManifestSlots(list43 = [], value416 = null) {
   const list44 = (Array['isArray'](list43) ? list43 : [])['filter']((value417) => getAudioRefUrl(value417)),
     fixedInputSlotOrderByKind = getFixedInputSlotOrderByKind(value416, 'audio');
-  if (fixedInputSlotOrderByKind['length'] === 0x0 || list44['length'] <= 0x1) return list44;
+  if (fixedInputSlotOrderByKind['length'] === 0 || list44['length'] <= 1) return list44;
   const enabled29 = new Set(),
     value418 = [];
   return (
@@ -2331,7 +2331,7 @@ function orderAudioRefsByManifestSlots(list43 = [], value416 = null) {
         (value420, value421) =>
           !enabled29['has'](value421) && String(value420?.['refSlot'] || '')['trim']() === value419,
       );
-      if (count12 < 0x0) return;
+      if (count12 < 0) return;
       (enabled29['add'](count12), value418['push'](list44[count12]));
     }),
     list44['forEach']((value422, value423) => {
@@ -2346,7 +2346,7 @@ function mergeAudioRefsIntoPayload(args19 = {}, value424 = null) {
     args20 = orderAudioRefsByManifestSlots(value425, value424)
       ['map']((value426) => getAudioRefUrl(value426))
       ['filter'](Boolean);
-  if (args20['length'] === 0x0) return args19;
+  if (args20['length'] === 0) return args19;
   const args21 = normalizeInputList(args19['audioUrls']),
     enabled30 = new Set(args20);
   return {
@@ -2356,7 +2356,7 @@ function mergeAudioRefsIntoPayload(args19 = {}, value424 = null) {
 }
 
 function createModelApiRequestId() {
-  const value428 = Math['random']()['toString'](0x10)['slice'](0x2, 0xa);
+  const value428 = Math['random']()['toString'](16)['slice'](2, 10);
   return Date['now']() + '-' + value428;
 }
 
@@ -2413,7 +2413,7 @@ export async function buildAudioRequestFromManifest(value437, value438, value439
       },
     ),
     value442 =
-      Object['keys'](inputImagesBySlot)['length'] > 0x0
+      Object['keys'](inputImagesBySlot)['length'] > 0
         ? Object['values'](inputImagesBySlot)
         : await resolveInputImages(provider11, uiSchemaDefaultsIntoPayload, apiKey4, value439, {
             modelManifest: modelManifest5,
@@ -2496,8 +2496,8 @@ export async function buildAudioRequestFromManifest(value437, value438, value439
 }
 
 function normalizeTextMaxOutputTokens(value445) {
-  const count13 = Math['trunc'](Number(value445) || 0x0);
-  return count13 > 0x0 ? count13 : 0x0;
+  const count13 = Math['trunc'](Number(value445) || 0);
+  return count13 > 0 ? count13 : 0;
 }
 
 function resolveGeminiNativeVideoApiUrl(value446, value447, value448, value449) {
@@ -2521,7 +2521,7 @@ function buildGeminiNativeThinkingConfig(value452, value453) {
   if (value455?.['disabledUnsupported'] === !![])
     throw new Error('当前 Gemini 模型不支持关闭思考，请改用支持无思考模式的模型');
   const count14 = Number(value455?.['disabledBudget']);
-  if (!Number['isFinite'](count14) || count14 < 0x0) return {};
+  if (!Number['isFinite'](count14) || count14 < 0) return {};
   return {
     thinkingConfig: {
       thinkingBudget: Math['trunc'](count14),

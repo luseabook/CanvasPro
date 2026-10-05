@@ -1,6 +1,6 @@
 function normalizeProgressNumber(value) {
   const item = Number(value);
-  return Number['isFinite'](item) ? Math['max'](0x0, Math['trunc'](item)) : 0x0;
+  return Number['isFinite'](item) ? Math['max'](0, Math['trunc'](item)) : 0;
 }
 function normalizeProgressText(key) {
   return String(key || '')['trim']();

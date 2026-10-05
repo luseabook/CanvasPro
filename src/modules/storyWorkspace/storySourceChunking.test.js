@@ -8,7 +8,7 @@ import {
 } from './storySourceChunking.js';
 
 // Use an explicit window so the tests do not depend on the model tables.
-const SMALL_WINDOW = 0x2000; // 8192 tokens
+const SMALL_WINDOW = 8192; // 8192 tokens
 
 function budgetChars(contextTokens = SMALL_WINDOW, extra = {}) {
   return planStorySourceChunks({

@@ -7,7 +7,7 @@ function normalizeText(value) {
 }
 export function setPersonReplacementImageResultAsReference(
   project = {},
-  { shotId: shotId = '', resultIndex: resultIndex = 0x0 } = {},
+  { shotId: shotId = '', resultIndex: resultIndex = 0 } = {},
 ) {
   const selectedShotId = normalizeText(shotId),
     shots = Array['isArray'](project?.['shots']) ? project['shots'] : [],
@@ -17,9 +17,9 @@ export function setPersonReplacementImageResultAsReference(
     activeIndex = Math['trunc'](Number(resultIndex)),
     replacementImageRef = resolvePersonReplacementImageResultRef(results[activeIndex]);
   if (
-    count < 0x0 ||
+    count < 0 ||
     !Number['isInteger'](activeIndex) ||
-    activeIndex < 0x0 ||
+    activeIndex < 0 ||
     activeIndex >= results['length'] ||
     !replacementImageRef
   )

@@ -4,7 +4,7 @@ function getInputArray(value, item) {
 }
 function getKindMax(key, index) {
   const count = Number(key?.['maxByKind']?.[index]);
-  return Number['isFinite'](count) && count >= 0x0 ? count : Infinity;
+  return Number['isFinite'](count) && count >= 0 ? count : Infinity;
 }
 function filterKindMaterials({
   allowedKinds: allowedKinds,
@@ -14,7 +14,7 @@ function filterKindMaterials({
   refs: refs,
   entries: entries,
 }) {
-  const urls2 = allowedKinds['has'](kind) ? urls['slice'](0x0, getKindMax(policy, kind)) : [],
+  const urls2 = allowedKinds['has'](kind) ? urls['slice'](0, getKindMax(policy, kind)) : [],
     map = new Set(urls2);
   return {
     urls: urls2,

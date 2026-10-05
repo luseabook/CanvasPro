@@ -97,7 +97,7 @@ test('runtime versions are sanitized and bounded', () => {
   assert.equal(normalizeAsrRuntimeVersion('  '), 'unknown');
   assert.equal(normalizeAsrRuntimeVersion('1.2.3'), '1.2.3');
   assert.equal(normalizeAsrRuntimeVersion('1.2.3-beta+build/7'), '1.2.3-beta_build_7');
-  assert.equal(normalizeAsrRuntimeVersion('x'.repeat(200)).length, 0x50);
+  assert.equal(normalizeAsrRuntimeVersion('x'.repeat(200)).length, 80);
 });
 
 test('install dirs are namespaced per sanitized version', () => {

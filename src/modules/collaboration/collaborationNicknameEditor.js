@@ -20,7 +20,7 @@ export function createCollaborationNicknameEditor({
     el = element('form', 'collaboration-nickname-editor');
   el['hidden'] = !![];
   const el2 = element('input', 'collaboration-input');
-  ((el2['maxLength'] = 0x20),
+  ((el2['maxLength'] = 32),
     (el2['required'] = !![]),
     el2['setAttribute']('aria-label', '新的协作昵称'),
     (el2['autocomplete'] = 'off'));
@@ -47,7 +47,7 @@ export function createCollaborationNicknameEditor({
     }),
     el2['addEventListener']('input', () => el2['setCustomValidity']('')),
     el['addEventListener']('keydown', (event) => {
-      if (event['isComposing'] || event['keyCode'] === 0xe5) {
+      if (event['isComposing'] || event['keyCode'] === 229) {
         if (event['key'] === 'Enter') event['preventDefault']();
         return;
       }

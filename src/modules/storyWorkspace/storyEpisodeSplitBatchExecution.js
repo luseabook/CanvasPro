@@ -21,8 +21,8 @@ export async function runStoryEpisodeSplitBatchQueue({
   const total = Array['isArray'](targets) ? [...targets] : [],
     map = new Set(total),
     failures = [];
-  let completed = 0x0;
-  for (let index = 0x0; index < total['length']; index += 0x1) {
+  let completed = 0;
+  for (let index = 0; index < total['length']; index += 1) {
     if (!isLive())
       return {
         status: 'interrupted',
@@ -48,7 +48,7 @@ export async function runStoryEpisodeSplitBatchQueue({
             failures: failures,
             pendingTargets: [...map],
           };
-        completed += 0x1;
+        completed += 1;
       } catch (error) {
         failures['push']({ target: target, error: error });
       }
@@ -63,7 +63,7 @@ export async function runStoryEpisodeSplitBatchQueue({
       }));
     if (isCancellationRequested(batchId)) break;
   }
-  const cancelled = Math['max'](0x0, map['size']);
+  const cancelled = Math['max'](0, map['size']);
   return {
     status: isCancellationRequested(batchId) ? 'cancelled' : 'completed',
     completed: completed,
@@ -95,7 +95,7 @@ export function cancelStoryEpisodeSplitBatch({
   if (!cancelledEpisodeIds['length'])
     return (showToast('当前集正在拆分，暂无可取消的排队分集。', 'info'), ![]);
   if (!requestCancellation(text)) return ![];
-  const label = '已取消后续\x20' + cancelledEpisodeIds['length'] + ' 集排队，正在完成当前集';
+  const label = '已取消后续 ' + cancelledEpisodeIds['length'] + ' 集排队，正在完成当前集';
   return (
     updateBatch(text, {
       cancelRequested: !![],
@@ -124,7 +124,7 @@ export function finalizeStoryEpisodeSplitBatch({
   notifyFailure: notifyFailure = () => {},
   notifySuccess: notifySuccess = () => {},
 } = {}) {
-  const source = Number(batch?.['total']) || 0x0;
+  const source = Number(batch?.['total']) || 0;
   if (result2?.['status'] === 'cancelled')
     return (
       syncBatch({
@@ -132,15 +132,15 @@ export function finalizeStoryEpisodeSplitBatch({
         cancelRequested: !![],
         pendingEpisodeIds: [],
         cancelledEpisodeIds: result2['pendingTargets'],
-        label: '已停止批量拆分\x20·\x20完成\x20' + result2['completed'] + '/' + source,
+        label: '已停止批量拆分 · 完成 ' + result2['completed'] + '/' + source,
       }),
       persist(),
-      showToast('已停止后续 ' + result2['cancelled'] + '\x20集拆分。', 'info'),
+      showToast('已停止后续 ' + result2['cancelled'] + ' 集拆分。', 'info'),
       !![]
     );
   persist();
   if (result2?.['failures']?.['length']) {
-    const details = result2['failures'][0x0],
+    const details = result2['failures'][0],
       errorMessage = resolveErrorMessage(details['error']);
     return (
       notifyFailure(
@@ -157,7 +157,7 @@ export function finalizeStoryEpisodeSplitBatch({
             result2['completed'] +
             ' 集，失败 ' +
             result2['failures']['length'] +
-            '\x20集。',
+            ' 集。',
           tone: 'error',
           details: details['error'],
         },
@@ -169,7 +169,7 @@ export function finalizeStoryEpisodeSplitBatch({
     notifySuccess(
       selectionMode
         ? '已完成 ' + result2['completed'] + ' 个选中分集的片段拆分。'
-        : '已完成全部\x20' + result2['completed'] + ' 集片段拆分。',
+        : '已完成全部 ' + result2['completed'] + ' 集片段拆分。',
       {
         notificationMessage: selectionMode
           ? '选中的 ' + result2['completed'] + ' 集分镜脚本生成完成。'

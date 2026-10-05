@@ -1,11 +1,11 @@
 import { renderDirectorCurveEditor } from './directorCurveEditor.js';
 export function renderDirectorCameraPathPanel(enabled, value) {
   const list = enabled['points'](),
-    enabled2 = list['find']((item) => item['id'] === enabled['selectedId']) || list[0x0],
+    enabled2 = list['find']((item) => item['id'] === enabled['selectedId']) || list[0],
     handler = (key, index, result = ![]) =>
-      '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22timeline-camera-path-' +
+      '<button type="button" data-storyboard-3d-action="timeline-camera-path-' +
       key +
-      '\x22\x20' +
+      '" ' +
       (result ? 'disabled' : '') +
       '>' +
       index +
@@ -16,12 +16,12 @@ export function renderDirectorCameraPathPanel(enabled, value) {
       '<input type="number" data-camera-path-field="' +
       data +
       '" value="' +
-      Number(options)['toFixed'](0x3) +
+      Number(options)['toFixed'](3) +
       '" step="0.1" ' +
       source +
       '></label>';
   return (
-    '<fieldset\x20data-camera-path-panel><legend>运动轨迹</legend><div\x20class=\x22storyboard-3d-director-fields\x22>\x0a\x20\x20\x20\x20<label>轨迹对象<select\x20data-camera-path-object><option\x20value=\x22camera\x22\x20' +
+    '<fieldset data-camera-path-panel><legend>运动轨迹</legend><div class="storyboard-3d-director-fields">\n    <label>轨迹对象<select data-camera-path-object><option value="camera" ' +
     (!enabled['objectId'] ? 'selected' : '') +
     '>摄像机</option>' +
     enabled['context']()
@@ -30,39 +30,39 @@ export function renderDirectorCameraPathPanel(enabled, value) {
         (error, current) =>
           '<option value="' +
           current +
-          '\x22\x20' +
+          '" ' +
           (enabled['objectId'] === error['id'] ? 'selected' : '') +
           '>' +
           String(error['name'])['replaceAll']('&', '&amp;')['replaceAll']('<', '&lt;') +
           '</option>',
       )
       ['join']('') +
-    '</select></label>\x0a\x20\x20\x20\x20' +
+    '</select></label>\n    ' +
     handler('edit', enabled['active'] ? '结束轨道编辑' : '编辑画面轨道') +
     (enabled['active'] ? handler('focus', '查看整条轨道', !list['length']) : '') +
     '\n    ' +
     (enabled['active']
       ? handler('draw', enabled['drawing'] ? '停止点选' : '在画面点选路线') +
-        '\x0a\x20\x20\x20\x20<label>绘制<select\x20data-camera-path-draw-mode><option\x20value=\x22points\x22\x20' +
+        '\n    <label>绘制<select data-camera-path-draw-mode><option value="points" ' +
         (enabled['drawMode'] === 'points' ? 'selected' : '') +
         '>逐点</option><option value="freehand" ' +
         (enabled['drawMode'] === 'freehand' ? 'selected' : '') +
         '>手绘</option></select></label><label>手绘时长<input type="number" min="0.1" max="3600" step="0.1" value="' +
         enabled['drawDuration'] +
         '" data-camera-path-draw-duration></label>\n    ' +
-        handler('smooth', '平滑曲线', list['length'] < 0x2) +
-        handler('linear', '直线路径', list['length'] < 0x2) +
-        '\x0a\x20\x20\x20\x20<label>编辑平面<select\x20data-camera-path-plane>' +
+        handler('smooth', '平滑曲线', list['length'] < 2) +
+        handler('linear', '直线路径', list['length'] < 2) +
+        '\n    <label>编辑平面<select data-camera-path-plane>' +
         [
-          [0x1, 'XZ 地面'],
-          [0x2, 'XY 高度'],
-          [0x0, 'YZ\x20高度'],
+          [1, 'XZ 地面'],
+          [2, 'XY 高度'],
+          [0, 'YZ 高度'],
         ]
           ['map'](
             ([entry, record]) =>
-              '<option\x20value=\x22' +
+              '<option value="' +
               entry +
-              '\x22\x20' +
+              '" ' +
               (enabled['plane'] === entry ? 'selected' : '') +
               '>' +
               record +
@@ -70,9 +70,9 @@ export function renderDirectorCameraPathPanel(enabled, value) {
           )
           ['join']('') +
         '</select></label>\n    ' +
-        handler2('planeOffset', enabled['planeOffset'], '平面位置\x20/\x20米')
+        handler2('planeOffset', enabled['planeOffset'], '平面位置 / 米')
       : '') +
-    '\x0a\x20\x20\x20\x20<span>' +
+    '\n    <span>' +
     list['length'] +
     ' 个控制点</span>\n  </div>' +
     (enabled['active']
@@ -83,21 +83,21 @@ export function renderDirectorCameraPathPanel(enabled, value) {
         'Esc 取消拖动或结束编辑。</p>\n  <div class="storyboard-3d-director-fields"><label>控制点<select data-camera-path-selection>' +
         list['map'](
           (payload, handle) =>
-            '<option\x20value=\x22' +
+            '<option value="' +
             handle +
-            '\x22\x20' +
+            '" ' +
             (payload['id'] === enabled2?.['id'] ? 'selected' : '') +
             '>' +
-            (handle + 0x1) +
+            (handle + 1) +
             ' · ' +
-            payload['time']['toFixed'](0x2) +
+            payload['time']['toFixed'](2) +
             ' 秒</option>',
         )['join']('') +
         '</select></label>' +
         handler(
           'delete',
           '删除控制点',
-          !enabled2 || (!enabled['objectId'] && value['cameraKeyframes']['length'] <= 0x1),
+          !enabled2 || (!enabled['objectId'] && value['cameraKeyframes']['length'] <= 1),
         ) +
         '</div>\n  ' +
         (enabled2
@@ -109,9 +109,9 @@ export function renderDirectorCameraPathPanel(enabled, value) {
                 handler2('focalLength', enabled2['camera']['focalLength'], '焦距 / mm', 'min="1" max="500"') +
                 handler2(
                   'roll',
-                  ((enabled2['camera']['roll'] || 0x0) * 0xb4) / Math['PI'],
+                  ((enabled2['camera']['roll'] || 0) * 180) / Math['PI'],
                   '倾斜 / 度',
-                  'min=\x22-180\x22\x20max=\x22180\x22',
+                  'min="-180" max="180"',
                 )) +
             '\n  <label>缓动<select data-camera-path-easing>' +
             [
@@ -124,7 +124,7 @@ export function renderDirectorCameraPathPanel(enabled, value) {
                 ([state, config]) =>
                   '<option value="' +
                   state +
-                  '\x22\x20' +
+                  '" ' +
                   (enabled2['easing'] === state ? 'selected' : '') +
                   '>' +
                   config +

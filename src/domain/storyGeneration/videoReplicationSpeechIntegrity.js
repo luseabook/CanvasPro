@@ -6,7 +6,7 @@ const channels = ['voiceover', 'dialogue'],
   canonical = (value) => String(value || '')['replace'](/[\p{P}\p{Z}\s]/gu, '');
 export const REPLICATION_SPEECH_INTEGRITY_GUIDANCE =
   REPLICATION_SPEECH_OUTPUT_RULE +
-  '对照\x20speechOrder\x20与\x20speechRefs\x20逐句检查遗漏、重复、类型和先后。人物说话不能塞进画外音，也不能把对白前后的旁白合成一条。每个\x20shot\x20只记录一个实际镜头；camera\x20不得串写切镜或用连续调整构图掩盖切镜。';
+  '对照 speechOrder 与 speechRefs 逐句检查遗漏、重复、类型和先后。人物说话不能塞进画外音，也不能把对白前后的旁白合成一条。每个 shot 只记录一个实际镜头；camera 不得串写切镜或用连续调整构图掩盖切镜。';
 export function replicationSpeechParts(item, key) {
   return String(item || '')
     ['split'](/\n/u)
@@ -14,12 +14,12 @@ export function replicationSpeechParts(item, key) {
     ['filter'](Boolean)
     ['map']((result) => {
       const data = result['match'](/^[^：:]*[：:]([\s\S]*)$/u);
-      return { kind: key, text: (data?.[0x1] || result)['replace'](/^“|”$/gu, '')['trim']() };
+      return { kind: key, text: (data?.[1] || result)['replace'](/^“|”$/gu, '')['trim']() };
     });
 }
-const occurrences = (options, target) => (target ? options['split'](target)['length'] - 0x1 : 0x0);
-export function getReplicationSourceSpeechReviewReasons(source, { durationSec: durationSec = 0x0 } = {}) {
-  const args = getReplicationVisualGaps(source?.['events'], 0x0, durationSec)['map'](
+const occurrences = (options, target) => (target ? options['split'](target)['length'] - 1 : 0);
+export function getReplicationSourceSpeechReviewReasons(source, { durationSec: durationSec = 0 } = {}) {
+  const args = getReplicationVisualGaps(source?.['events'], 0, durationSec)['map'](
     (next) =>
       '原片 ' +
       next['startSec'] +
@@ -45,7 +45,7 @@ export function getReplicationSourceSpeechReviewReasons(source, { durationSec: d
           (enabled['voiceover'] || [])['length'] &&
           /打电话|通话|开口|问道|说道|问话|回答/u['test'](
             [enabled['visual'], ...(enabled['shots'] || [])['map']((current) => current['visual'])]['join'](
-              '\x20',
+              ' ',
             ),
           ) &&
           list['push'](
@@ -97,17 +97,17 @@ export function inspectReplicationSpeechIntegrity(
         value7 = new Set();
       for (const value8 of list6) {
         const canonical2 = canonical(value8['text']);
-        if (canonical2['length'] < 0x4 || value7['has'](canonical2)) continue;
+        if (canonical2['length'] < 4 || value7['has'](canonical2)) continue;
         value7['add'](canonical2);
         const value9 = list6['filter']((response) => canonical(response['text']) === canonical2)['length'];
         if (!enabled3 || !list4) continue;
-        const value10 = Math['max'](0x1, occurrences(enabled3, canonical2));
+        const value10 = Math['max'](1, occurrences(enabled3, canonical2));
         if (value9 > value10)
           handler(
             'replication_speech_duplicate',
             '同一句' +
               (value3 === 'voiceover' ? '画外音' : '对白') +
-              '在\x20' +
+              '在 ' +
               value9 +
               ' 个镜头重复转写，原片本段仅支持 ' +
               value10 +
@@ -117,7 +117,7 @@ export function inspectReplicationSpeechIntegrity(
       }
       if (compareSource && list7['length'] && list7['some']((value11) => value11['uncertain'])) {
         const value12 = list6['map']((value13) => canonical(value13['text']))['join']('');
-        let value14 = 0x0;
+        let value14 = 0;
         for (const value15 of list7) {
           const value16 = String(value15['text'] || '')
             ['split'](/\[听不清\]|【听不清】|\[无法听清\]/gu)
@@ -125,7 +125,7 @@ export function inspectReplicationSpeechIntegrity(
             ['filter'](Boolean);
           for (const list8 of value16) {
             const count = value12['indexOf'](list8, value14);
-            if (count < 0x0)
+            if (count < 0)
               handler(
                 'replication_speech_mismatch',
                 '原片已识别的' +
@@ -163,7 +163,7 @@ export function inspectReplicationSpeechIntegrity(
         !enabled2['some']((value28) => value28['code'] === 'replication_speech_mismatch') &&
         handler(
           'replication_speech_order',
-          '对白与画外音穿插顺序和原片\x20speechOrder\x20不符，不能按通道重新排序。',
+          '对白与画外音穿插顺序和原片 speechOrder 不符，不能按通道重新排序。',
         );
     }
     return enabled2;

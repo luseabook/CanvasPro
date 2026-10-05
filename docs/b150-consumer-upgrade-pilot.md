@@ -304,6 +304,10 @@ manifests 聚合件（modelRegistry gain 5、vendorTextModelApiManifests gain 4 
 `ComfyUiErrorParser`/`VolcengineErrorParser`/`VolcengineSpeechErrorParser`，0 回归），
 孤立 272→**269**，全量 **11185/11182/3**。余 10 件原地待命，是否采纳 0.7.16 模型规格需产品侧裁决。
 
+> **【2026-10-05 作废】** 用户告知已安装应用已升级到 **0.8.0**。本节「是否采纳 0.7.16 模型规格」
+> 的问题**随之作废**（0.7.16 已是过时标尺，不应采纳其规格）。正确问法变成「是否采纳 0.8.0 规格」。
+> 差异实测与后续口径见 `docs/b158-version-rebaseline.md`。余 10 件**冻结现状**，不再按本节口径推进。
+
 ## 13. 第 157 批：脏件批（27 取 15）
 
 "脏件"= 镜像消费方的相对导入集**不是**仓库导入集的超集（升级会丢导入）。27 件全部通过机械工序

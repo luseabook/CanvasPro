@@ -7,7 +7,7 @@ import { t } from '../i18n/index.js';
 const text = (value) => t('projectDropdown.' + value),
   normalizeName = (item) =>
     String(item || '')
-      ['replace'](/\s+/g, '\x20')
+      ['replace'](/\s+/g, ' ')
       ['trim'](),
   lookupName = (key) => normalizeName(stripCanvasProjectFileExtension(key))['toLowerCase']();
 export function buildCanvasProjectContext(isTemporary = {}, index = {}) {
@@ -22,7 +22,7 @@ export function buildCanvasProjectContext(isTemporary = {}, index = {}) {
     )['trim'](),
     recentId: String(isTemporary['recentId'] || index['recentId'] || '')['trim'](),
     displayPath: String(isTemporary['displayPath'] || index['displayPath'] || '')['trim'](),
-    lastModified: Number(isTemporary['lastModified'] || index['lastModified'] || 0x0) || 0x0,
+    lastModified: Number(isTemporary['lastModified'] || index['lastModified'] || 0) || 0,
     isTemporary: isTemporary['isTemporary'] === !![],
     workspaceProjectScoped: !![],
   };
@@ -83,7 +83,7 @@ export function createCanvasProjectOperations({
       ),
       error =
         hydratedData?.['canvases']?.['find']((next) => next?.['id'] === hydratedData['activeCanvasId']) ||
-        hydratedData?.['canvases']?.[0x0];
+        hydratedData?.['canvases']?.[0];
     if (!error) throw new Error(text('loadFailed'));
     const name = buildUniqueCanvasName(
         enabled2['projectName'] || stripCanvasProjectFileExtension(enabled2['filename']) || error['name'],
@@ -175,7 +175,7 @@ export function createCanvasProjectOperations({
             projectName: projectName3,
             recentId: '',
             displayPath: '',
-            lastModified: 0x0,
+            lastModified: 0,
             isTemporary: ![],
           }),
           output['renameCanvas']?.(value3, projectName3),

@@ -1,5 +1,5 @@
 const PROMPT_BOX_MIN_HEIGHT = 96,
-  PROMPT_BOX_MAX_HEIGHT = 0x208;
+  PROMPT_BOX_MAX_HEIGHT = 520;
 function toNumberOrNull(value) {
   const item = Number(value);
   return Number.isFinite(item) ? item : null;

@@ -35,7 +35,7 @@ function glbFile(json = { asset: { version: '2.0' } }, { name = 'x.glb', type = 
   const pad = (4 - (jsonBytes.length % 4)) % 4;
   const chunk = new Uint8Array(jsonBytes.length + pad);
   chunk.set(jsonBytes);
-  chunk.fill(0x20, jsonBytes.length);
+  chunk.fill(32, jsonBytes.length);
   const total = 12 + 8 + chunk.length;
   const bytes = new Uint8Array(total);
   const view = new DataView(bytes.buffer);
@@ -150,7 +150,7 @@ test('模型导入：内容嗅探识别 glTF/OBJ/FBX/STL', async () => {
   assert.match(badObj.errors[0].message, /不是有效的 OBJ 模型/);
 
   const fbx = await inspectStoryboard3DModelFile(
-    bytesFile('Kaydara FBX Binary  \u0000\u001a\u0000', { name: 'a.fbx', type: 'application/octet-stream' }),
+    bytesFile('Kaydara FBX Binary  \x00\x1a\x00', { name: 'a.fbx', type: 'application/octet-stream' }),
   );
   assert.equal(fbx.ok, true);
   assert.equal(fbx.parserId, 'fbx');

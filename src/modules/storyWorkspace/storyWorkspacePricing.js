@@ -1,6 +1,6 @@
 import { bindWorkspacePrices } from '../../components/shared/workspacePriceBindings.js';
 import { resolveStoryClipVideoGenerationParams } from './storyVideoGenerationSettings.js';
-const actions = (list) => list['map']((value) => '[data-story-action="' + value + '\x22]')['join'](',');
+const actions = (list) => list['map']((value) => '[data-story-action="' + value + '"]')['join'](',');
 export function bindStoryWorkspacePricing(
   item,
   {
@@ -34,7 +34,7 @@ export function bindStoryWorkspacePricing(
             state['videoGenerationParams'],
           ),
           hasReferences: Object['values'](getVideoReferenceCounts(prompt) || {})['some'](
-            (count) => count > 0x0,
+            (count) => count > 0,
           ),
         };
       },

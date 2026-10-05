@@ -15,11 +15,11 @@ export function renderRunningHubInstanceControl(
       (index) => !isOptionHidden(index, value),
     ),
     result = Math['max'](
-      0x0,
+      0,
       list['findIndex']((el) => String(el?.['value'] ?? el) === key),
     ),
-    el2 = list[result] || list[0x0] || {},
-    el3 = list[(result + 0x1) % Math['max'](0x1, list['length'])] || el2,
+    el2 = list[result] || list[0] || {},
+    el3 = list[(result + 1) % Math['max'](1, list['length'])] || el2,
     list2 = Array['isArray'](args?.['developerOptions'])
       ? args['developerOptions']['filter']((data) => !isOptionHidden(data, value))
       : [],
@@ -30,7 +30,7 @@ export function renderRunningHubInstanceControl(
     options = list2['map']((el5) => String(el5?.['value'] ?? el5)),
     target = list3['some']((el6) => el6['value'] === String(args?.['defaultValue'] ?? ''))
       ? String(args?.['defaultValue'] ?? '')
-      : list3[0x0]?.['value'] || 'default',
+      : list3[0]?.['value'] || 'default',
     source = { ...args, options: [...list, ...list2], developerOptions: [] },
     next = list2['length']
       ? '<div class="ui-schema-instance-developer-control">' +
@@ -43,9 +43,9 @@ export function renderRunningHubInstanceControl(
         '</div>'
       : '';
   return (
-    '<div\x20class=\x22ui-schema-field\x20rh-vram-wrap\x20ui-schema-instance-toggle\x22\x20data-ui-schema-field=\x22' +
+    '<div class="ui-schema-field rh-vram-wrap ui-schema-instance-toggle" data-ui-schema-field="' +
     escapeHtmlAttr(item) +
-    '\x22\x20data-ui-schema-type=\x22segmented\x22\x20data-ui-schema-default=\x22' +
+    '" data-ui-schema-type="segmented" data-ui-schema-default="' +
     escapeHtmlAttr(args?.['defaultValue'] ?? '') +
     '" data-ui-schema-normal-default="' +
     escapeHtmlAttr(target) +
@@ -73,9 +73,9 @@ export function syncRunningHubInstanceControl(el7, current) {
     list4 = [];
   }
   const count = list4['findIndex']((el8) => String(el8?.['value'] ?? '') === String(current ?? '')),
-    entry = count >= 0x0 ? count : 0x0,
+    entry = count >= 0 ? count : 0,
     record = list4[entry] || {},
-    el9 = list4[(entry + 0x1) % Math['max'](0x1, list4['length'])] || record,
+    el9 = list4[(entry + 1) % Math['max'](1, list4['length'])] || record,
     el10 = el7['querySelector']('.ui-schema-instance-normal-control .ui-schema-pill-label');
   if (el10) el10['textContent'] = record?.['label'] || '24G';
   const el11 = el7['querySelector']('.ui-schema-instance-normal-control[data-ui-schema-value]');

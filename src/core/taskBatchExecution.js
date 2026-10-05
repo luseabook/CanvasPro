@@ -1,7 +1,7 @@
 function normalizeConcurrency(value, item) {
   const count = Math['trunc'](Number(value));
-  if (!Number['isFinite'](count) || count <= 0x0) return 0x1;
-  return Math['max'](0x1, Math['min'](count, Math['max'](0x1, item)));
+  if (!Number['isFinite'](count) || count <= 0) return 1;
+  return Math['max'](1, Math['min'](count, Math['max'](1, item)));
 }
 export function createTaskBatchCancellationController() {
   let key = ![];
@@ -15,7 +15,7 @@ export function createTaskBatchCancellationController() {
 }
 export async function runTaskBatchQueue({
   targets: targets = [],
-  concurrency: concurrency = 0x1,
+  concurrency: concurrency = 1,
   shouldStop: shouldStop = () => ![],
   runTarget: runTarget,
   onTargetStart: onTargetStart = () => {},
@@ -27,12 +27,12 @@ export async function runTaskBatchQueue({
   if (!total['length']) return [];
   if (typeof runTarget !== 'function') throw new TypeError('runTarget must be a function');
   const enabled = new Array(total['length']);
-  let result = 0x0;
+  let result = 0;
   const length = normalizeConcurrency(concurrency, total['length']),
     data = Array['from']({ length: length }, async () => {
       while (result < total['length'] && !shouldStop()) {
         const index2 = result;
-        result += 0x1;
+        result += 1;
         const target = total[index2];
         onTargetStart({ target: target, index: index2, total: total['length'] });
         let args;
@@ -46,7 +46,7 @@ export async function runTaskBatchQueue({
       }
     });
   await Promise['all'](data);
-  for (let options = 0x0; options < total['length']; options += 0x1) {
+  for (let options = 0; options < total['length']; options += 1) {
     !enabled[options] && (enabled[options] = { target: total[options], status: 'cancelled' });
   }
   return enabled;

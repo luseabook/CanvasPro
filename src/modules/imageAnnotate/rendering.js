@@ -25,35 +25,35 @@ import {
   traceWhiteboardShapePath,
 } from './whiteboardShapes.js';
 const getCanvasRenderSize = (el) => ({
-    width: Number(el?.['style']?.['width']?.['replace']('px', '')) || 0x1,
-    height: Number(el?.['style']?.['height']?.['replace']('px', '')) || 0x1,
+    width: Number(el?.['style']?.['width']?.['replace']('px', '')) || 1,
+    height: Number(el?.['style']?.['height']?.['replace']('px', '')) || 1,
   }),
   getViewportZoom = (box) => {
     const count = Number(box?.['zoom']);
-    return Number['isFinite'](count) && count > 0x0 ? count : 0x1;
+    return Number['isFinite'](count) && count > 0 ? count : 1;
   },
-  getCommandOpacity = (value, item = 0x1) => {
+  getCommandOpacity = (value, item = 1) => {
     const key = Number(value?.['opacity']),
-      index = Number['isFinite'](key) ? key : 0x1,
-      result = Number['isFinite'](Number(item)) ? Number(item) : 0x1;
-    return Math['max'](0x0, Math['min'](0x1, index * result));
+      index = Number['isFinite'](key) ? key : 1,
+      result = Number['isFinite'](Number(item)) ? Number(item) : 1;
+    return Math['max'](0, Math['min'](1, index * result));
   },
   isFreehandCommand = (data) => data?.['type'] === 'brush' || data?.['type'] === 'eraser',
   getCommandStrokeZoom = (options, target, source) =>
-    source === 'screen' && isFreehandCommand(options) ? 0x1 : target,
+    source === 'screen' && isFreehandCommand(options) ? 1 : target,
   worldToScreenPoint = (box2, box3) => {
     const viewportZoom = getViewportZoom(box3),
-      next = Number(box3?.['x']) || 0x0,
-      current = Number(box3?.['y']) || 0x0;
+      next = Number(box3?.['x']) || 0,
+      current = Number(box3?.['y']) || 0;
     return {
-      x: ((Number(box2?.['x']) || 0x0) - next) * viewportZoom,
-      y: ((Number(box2?.['y']) || 0x0) - current) * viewportZoom,
+      x: ((Number(box2?.['x']) || 0) - next) * viewportZoom,
+      y: ((Number(box2?.['y']) || 0) - current) * viewportZoom,
     };
   },
   getScreenX = (entry, box4) =>
-    ((Number(entry) || 0x0) - (Number(box4?.['x']) || 0x0)) * getViewportZoom(box4),
+    ((Number(entry) || 0) - (Number(box4?.['x']) || 0)) * getViewportZoom(box4),
   getScreenY = (record, box5) =>
-    ((Number(record) || 0x0) - (Number(box5?.['y']) || 0x0)) * getViewportZoom(box5),
+    ((Number(record) || 0) - (Number(box5?.['y']) || 0)) * getViewportZoom(box5),
   getCommandPoints = (payload, handle) =>
     (Array['isArray'](payload?.['points']) ? payload['points'] : [])
       ['map']((box6) => {
@@ -66,17 +66,17 @@ const getCanvasRenderSize = (el) => ({
   applyStrokeDash = (enabled, scope, input) => {
     if (!enabled) return;
     if (scope === 'dashed')
-      enabled['setLineDash']([Math['max'](0x6, input * 0x3), Math['max'](0x4, input * 1.5)]);
+      enabled['setLineDash']([Math['max'](6, input * 3), Math['max'](4, input * 1.5)]);
     else
       scope === 'dotted'
-        ? enabled['setLineDash']([Math['max'](0x1, input * 0.2), Math['max'](0x4, input * 1.8)])
+        ? enabled['setLineDash']([Math['max'](1, input * 0.2), Math['max'](4, input * 1.8)])
         : enabled['setLineDash']([]);
   },
   rotateCanvasAroundBounds = (enabled2, box7, output) => {
-    const value2 = Number(output) || 0x0;
+    const value2 = Number(output) || 0;
     if (!enabled2 || Math['abs'](value2) < 0.000001) return;
-    const value3 = box7['x'] + box7['width'] / 0x2,
-      value4 = box7['y'] + box7['height'] / 0x2;
+    const value3 = box7['x'] + box7['width'] / 2,
+      value4 = box7['y'] + box7['height'] / 2;
     (enabled2['translate'](value3, value4),
       enabled2['rotate'](value2),
       enabled2['translate'](-value3, -value4));
@@ -102,13 +102,13 @@ const getCanvasRenderSize = (el) => ({
       value11 = Number(opposite?.['y']) - Number(point?.['y']),
       count2 = Math['hypot'](value10, value11);
     if (!ctx || !Number['isFinite'](count2) || count2 < 0.5) return ![];
-    const value12 = Math['max'](lineWidth, Math['min'](lineWidth * 0x3, compareLength / 0x5)),
+    const value12 = Math['max'](lineWidth, Math['min'](lineWidth * 3, compareLength / 5)),
       value13 = {
         x: point['x'] + (value10 / count2) * value12,
         y: point['y'] + (value11 / count2) * value12,
       },
-      box9 = rotatePointAround(value13, point, Math['PI'] / 0x6),
-      box10 = rotatePointAround(value13, point, -Math['PI'] / 0x6);
+      box9 = rotatePointAround(value13, point, Math['PI'] / 6),
+      box10 = rotatePointAround(value13, point, -Math['PI'] / 6);
     return (
       ctx['beginPath'](),
       ctx['moveTo'](box9['x'], box9['y']),
@@ -141,7 +141,7 @@ const getCanvasRenderSize = (el) => ({
     if (!Number['isFinite'](count3) || count3 < 0.5) return ![];
     const y2 = { x: x2 / count3, y: y / count3 },
       box11 = { x: -y2['y'], y: y2['x'] },
-      value14 = Math['max'](lineWidth2 * 1.6, Math['min'](lineWidth2 * 3.2, compareLength2 / 0x5)),
+      value14 = Math['max'](lineWidth2 * 1.6, Math['min'](lineWidth2 * 3.2, compareLength2 / 5)),
       x3 = {
         x: point2['x'] + y2['x'] * value14,
         y: point2['y'] + y2['y'] * value14,
@@ -163,8 +163,8 @@ const getCanvasRenderSize = (el) => ({
           point2['x'] + y2['x'] * value16,
           point2['y'] + y2['y'] * value16,
           value16,
-          0x0,
-          Math['PI'] * 0x2,
+          0,
+          Math['PI'] * 2,
         ),
         ctx2['fill'](),
         ctx2['stroke'](),
@@ -254,7 +254,7 @@ const getCanvasRenderSize = (el) => ({
     cmd: cmd,
     viewport: viewport,
     isDraft: isDraft = ![],
-    opacityMultiplier: opacityMultiplier = 0x1,
+    opacityMultiplier: opacityMultiplier = 1,
   } = {}) => {
     const viewportZoom2 = getViewportZoom(viewport),
       list = getArrowGeometry(cmd),
@@ -270,7 +270,7 @@ const getCanvasRenderSize = (el) => ({
       (ctx3['lineWidth'] = lineWidth3),
       (ctx3['lineCap'] = 'round'),
       (ctx3['lineJoin'] = 'round'));
-    if (isDraft) ctx3['setLineDash']([0x6, 0x5]);
+    if (isDraft) ctx3['setLineDash']([6, 5]);
     else applyStrokeDash(ctx3, cmd['dash'], lineWidth3);
     ((ctx3['globalAlpha'] = getCommandOpacity(cmd, opacityMultiplier)),
       ctx3['beginPath'](),
@@ -287,13 +287,13 @@ const getCanvasRenderSize = (el) => ({
       );
     } else
       list['type'] === 'elbow'
-        ? list['points']['slice'](0x1)['forEach']((value17) => {
+        ? list['points']['slice'](1)['forEach']((value17) => {
             const box16 = worldToScreenPoint(value17, viewport);
             ctx3['lineTo'](box16['x'], box16['y']);
           })
         : ctx3['lineTo'](point4['x'], point4['y']);
     (ctx3['stroke'](), ctx3['setLineDash']([]));
-    const value18 = Math['max'](0x1, lineWidth3);
+    const value18 = Math['max'](1, lineWidth3);
     return (
       cmd['arrowEnd'] !== 'none' &&
         drawArrowTerminal({
@@ -328,7 +328,7 @@ const getCanvasRenderSize = (el) => ({
     cmd: cmd2,
     viewport: viewport2,
     isDraft: isDraft = ![],
-    opacityMultiplier: opacityMultiplier = 0x1,
+    opacityMultiplier: opacityMultiplier = 1,
   } = {}) => {
     if (!ctx4) return ![];
     const viewportZoom3 = getViewportZoom(viewport2),
@@ -351,7 +351,7 @@ const getCanvasRenderSize = (el) => ({
       (ctx4['lineCap'] = 'round'),
       (ctx4['lineJoin'] = 'round'),
       (ctx4['globalAlpha'] = getCommandOpacity(cmd2, opacityMultiplier)));
-    if (isDraft) ctx4['setLineDash']([0x6, 0x5]);
+    if (isDraft) ctx4['setLineDash']([6, 5]);
     else applyStrokeDash(ctx4, cmd2['dash'], brushLineWidth);
     (ctx4['beginPath'](), traceWhiteboardShapePath(ctx4, cmd2['shapeType'], box17));
     if (cmd2['fill'] === 'solid' && isClosedWhiteboardShape(cmd2['shapeType'])) ctx4['fill']();
@@ -360,7 +360,7 @@ const getCanvasRenderSize = (el) => ({
   drawTextControlButton = (ctx5, box18, handler, value19) => {
     (ctx5['save'](),
       ctx5['beginPath'](),
-      ctx5['arc'](box18['x'], box18['y'], TEXT_CONTROL_BUTTON_RADIUS, 0x0, Math['PI'] * 0x2),
+      ctx5['arc'](box18['x'], box18['y'], TEXT_CONTROL_BUTTON_RADIUS, 0, Math['PI'] * 2),
       (ctx5['fillStyle'] = value19['fill']),
       (ctx5['strokeStyle'] = value19['stroke']),
       (ctx5['lineWidth'] = 1.5),
@@ -375,7 +375,7 @@ const getCanvasRenderSize = (el) => ({
       ctx5['restore']());
   },
   getBoundaryCommands = (list2, value20) =>
-    list2['slice'](0x0, value20)['filter'](
+    list2['slice'](0, value20)['filter'](
       (value21) =>
         value21?.['type'] === 'brush' ||
         value21?.['type'] === 'rect' ||
@@ -420,7 +420,7 @@ export const drawTextSelectionControls = ({
     const list3 = [...geom['corners'], ...(box23 ? [box23] : [])];
     (list3['forEach']((box24) => {
       (ctx6['beginPath'](),
-        ctx6['arc'](box24['x'], box24['y'], 5.5, 0x0, Math['PI'] * 0x2),
+        ctx6['arc'](box24['x'], box24['y'], 5.5, 0, Math['PI'] * 2),
         (ctx6['fillStyle'] = fill),
         (ctx6['strokeStyle'] = stroke),
         (ctx6['lineWidth'] = 1.5),
@@ -439,8 +439,8 @@ export const drawTextSelectionControls = ({
             box25['x'],
             box25['y'],
             TEXT_CONTROL_SIDE_HANDLE_RADIUS,
-            0x0,
-            Math['PI'] * 0x2,
+            0,
+            Math['PI'] * 2,
           ),
           (ctx6['fillStyle'] = fill),
           (ctx6['strokeStyle'] = stroke),
@@ -454,10 +454,10 @@ export const drawTextSelectionControls = ({
       box19,
       (ctx7, box26) => {
         (ctx7['beginPath'](),
-          ctx7['moveTo'](box26['x'] - 0x3, box26['y'] - 0x3),
-          ctx7['lineTo'](box26['x'] + 0x3, box26['y'] + 0x3),
-          ctx7['moveTo'](box26['x'] + 0x3, box26['y'] - 0x3),
-          ctx7['lineTo'](box26['x'] - 0x3, box26['y'] + 0x3),
+          ctx7['moveTo'](box26['x'] - 3, box26['y'] - 3),
+          ctx7['lineTo'](box26['x'] + 3, box26['y'] + 3),
+          ctx7['moveTo'](box26['x'] + 3, box26['y'] - 3),
+          ctx7['lineTo'](box26['x'] - 3, box26['y'] + 3),
           ctx7['stroke']());
       },
       value22,
@@ -466,8 +466,8 @@ export const drawTextSelectionControls = ({
       ctx6,
       box22,
       (value24, box27) => {
-        (value24['strokeRect'](box27['x'] - 0x2, box27['y'] - 0x4, 0x6, 0x6),
-          value24['strokeRect'](box27['x'] - 0x5, box27['y'] - 0x1, 0x6, 0x6));
+        (value24['strokeRect'](box27['x'] - 2, box27['y'] - 4, 6, 6),
+          value24['strokeRect'](box27['x'] - 5, box27['y'] - 1, 6, 6));
       },
       value22,
     ),
@@ -476,12 +476,12 @@ export const drawTextSelectionControls = ({
       box20,
       (ctx8, box28) => {
         (ctx8['beginPath'](),
-          ctx8['arc'](box28['x'], box28['y'], 0x4, Math['PI'] * 0.15, Math['PI'] * 1.55),
+          ctx8['arc'](box28['x'], box28['y'], 4, Math['PI'] * 0.15, Math['PI'] * 1.55),
           ctx8['stroke'](),
           ctx8['beginPath'](),
-          ctx8['moveTo'](box28['x'] + 0x4, box28['y'] - 0x3),
-          ctx8['lineTo'](box28['x'] + 0x5, box28['y'] + 0x2),
-          ctx8['lineTo'](box28['x'] + 0x1, box28['y']),
+          ctx8['moveTo'](box28['x'] + 4, box28['y'] - 3),
+          ctx8['lineTo'](box28['x'] + 5, box28['y'] + 2),
+          ctx8['lineTo'](box28['x'] + 1, box28['y']),
           ctx8['stroke']());
       },
       value22,
@@ -491,14 +491,14 @@ export const drawTextSelectionControls = ({
       box21,
       (ctx9, box29) => {
         (ctx9['beginPath'](),
-          ctx9['moveTo'](box29['x'] - 0x4, box29['y'] + 0x4),
-          ctx9['lineTo'](box29['x'] + 0x4, box29['y'] - 0x4),
-          ctx9['moveTo'](box29['x'] + 0x1, box29['y'] - 0x4),
-          ctx9['lineTo'](box29['x'] + 0x4, box29['y'] - 0x4),
-          ctx9['lineTo'](box29['x'] + 0x4, box29['y'] - 0x1),
-          ctx9['moveTo'](box29['x'] - 0x1, box29['y'] + 0x4),
-          ctx9['lineTo'](box29['x'] - 0x4, box29['y'] + 0x4),
-          ctx9['lineTo'](box29['x'] - 0x4, box29['y'] + 0x1),
+          ctx9['moveTo'](box29['x'] - 4, box29['y'] + 4),
+          ctx9['lineTo'](box29['x'] + 4, box29['y'] - 4),
+          ctx9['moveTo'](box29['x'] + 1, box29['y'] - 4),
+          ctx9['lineTo'](box29['x'] + 4, box29['y'] - 4),
+          ctx9['lineTo'](box29['x'] + 4, box29['y'] - 1),
+          ctx9['moveTo'](box29['x'] - 1, box29['y'] + 4),
+          ctx9['lineTo'](box29['x'] - 4, box29['y'] + 4),
+          ctx9['lineTo'](box29['x'] - 4, box29['y'] + 1),
           ctx9['stroke']());
       },
       value22,
@@ -518,8 +518,8 @@ export const renderEraseSceneCommands = ({
   const el2 = documentRef || globalThis['document'],
     viewportZoom4 = getViewportZoom(viewport3),
     width = getCanvasRenderSize(canvasEl),
-    value25 = Math['max'](0x1, Math['round'](width['width'])),
-    value26 = Math['max'](0x1, Math['round'](width['height']));
+    value25 = Math['max'](1, Math['round'](width['width'])),
+    value26 = Math['max'](1, Math['round'](width['height']));
   let maskCanvas = eraseMaskCanvasEl;
   (!maskCanvas || maskCanvas['width'] !== value25 || maskCanvas['height'] !== value26) &&
     ((maskCanvas = el2['createElement']('canvas')),
@@ -527,7 +527,7 @@ export const renderEraseSceneCommands = ({
     (maskCanvas['height'] = value26));
   const ctx11 = maskCanvas['getContext']('2d');
   if (!ctx11) return maskCanvas;
-  (ctx11['clearRect'](0x0, 0x0, value25, value26),
+  (ctx11['clearRect'](0, 0, value25, value26),
     (ctx11['lineCap'] = 'round'),
     (ctx11['lineJoin'] = 'round'));
   const run = (type) => {
@@ -579,7 +579,7 @@ export const renderCommands = ({
     const opacityMultiplier2 =
       typeof getCommandOpacityMultiplier === 'function'
         ? getCommandOpacityMultiplier(strokeStyle, value27)
-        : 0x1;
+        : 1;
     if (strokeStyle['type'] === 'brush') {
       ctx12['save']();
       const points2 = getCommandPoints(strokeStyle, viewport4);
@@ -669,7 +669,7 @@ export const renderCommands = ({
         (ctx12['fillStyle'] = strokeStyle['color']),
         ctx12['fillRect'](x6, y3, width3, height),
         ctx12['restore']());
-      if (isDraft) ctx12['setLineDash']([0x6, 0x5]);
+      if (isDraft) ctx12['setLineDash']([6, 5]);
       else applyStrokeDash(ctx12, strokeStyle['dash'], ctx12['lineWidth']);
       (ctx12['strokeRect'](x6, y3, width3, height), ctx12['restore']());
       return;
@@ -697,9 +697,9 @@ export const renderCommands = ({
     if (strokeStyle['type'] === 'text') {
       const screenX3 = getScreenX(strokeStyle['x'], viewport4),
         screenY3 = getScreenY(strokeStyle['y'], viewport4),
-        value28 = Math['max'](0x1, strokeStyle['sizeWorld'] * checkerZoom),
+        value28 = Math['max'](1, strokeStyle['sizeWorld'] * checkerZoom),
         { scaleX: scaleX, scaleY: scaleY } = getTextScalePair(strokeStyle),
-        value29 = Number(strokeStyle['rotation']) || 0x0;
+        value29 = Number(strokeStyle['rotation']) || 0;
       (ctx12['save'](),
         (ctx12['globalCompositeOperation'] = 'source-over'),
         (ctx12['globalAlpha'] = getCommandOpacity(strokeStyle, opacityMultiplier2)),
@@ -720,10 +720,10 @@ export const renderCommands = ({
         value31 = box30?.['lineHeight'] || value28 * 1.2,
         value32 =
           ctx12['textAlign'] === 'center'
-            ? (box30?.['width'] || 0x0) / 0x2
+            ? (box30?.['width'] || 0) / 2
             : ctx12['textAlign'] === 'right'
-              ? box30?.['width'] || 0x0
-              : 0x0;
+              ? box30?.['width'] || 0
+              : 0;
       (ctx12['translate'](screenX3, screenY3),
         ctx12['rotate'](value29),
         ctx12['scale'](scaleX, scaleY),
@@ -733,7 +733,7 @@ export const renderCommands = ({
             typeof ctx12['strokeText'] === 'function' &&
             (ctx12['save'](),
             (ctx12['strokeStyle'] = textOutlineColor),
-            (ctx12['lineWidth'] = Math['max'](1.5, Math['min'](0x3, value28 * 0.08))),
+            (ctx12['lineWidth'] = Math['max'](1.5, Math['min'](3, value28 * 0.08))),
             (ctx12['lineJoin'] = 'round'),
             ctx12['strokeText'](value33, value32, value35),
             ctx12['restore']()),
@@ -766,8 +766,8 @@ export const renderCommands = ({
       const seedX = Math['floor'](getScreenX(strokeStyle['x'], viewport4)),
         seedY = Math['floor'](getScreenY(strokeStyle['y'], viewport4)),
         fillStyle = strokeStyle['color'] || defaultTextColor,
-        value36 = Number(viewport4?.['x']) || 0x0,
-        value37 = Number(viewport4?.['y']) || 0x0,
+        value36 = Number(viewport4?.['x']) || 0,
+        value37 = Number(viewport4?.['y']) || 0,
         cachedSealedFillRegion = getCachedSealedFillRegion({
           cache: fillRegionCache,
           width: width2['width'],

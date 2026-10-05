@@ -40,7 +40,7 @@ const PERSON_REPLACEMENT_DEFAULT_ASSET_PROMPT_PRESET_ID =
     PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['find'](
       (item) => item['id'] === 'character-three-view',
     )?.['id'] ||
-    PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS[0x0]?.['id'] ||
+    PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS[0]?.['id'] ||
     'character-three-view',
   PERSON_REPLACEMENT_IMAGE_GENERATION_STATUSES = new Set([
     'idle',
@@ -72,7 +72,7 @@ function normalizePromptEnhancementSnapshot(options = {}) {
 function getPositiveSize(box = {}) {
   const count = Number(box?.['width']),
     count2 = Number(box?.['height']);
-  return Number['isFinite'](count) && count > 0x0 && Number['isFinite'](count2) && count2 > 0x0
+  return Number['isFinite'](count) && count > 0 && Number['isFinite'](count2) && count2 > 0
     ? { width: count, height: count2 }
     : null;
 }
@@ -140,9 +140,9 @@ export function createPersonReplacementImagePromptRequestResolver({
           promptEl: el,
           assetInputRefs: next,
           assetMediaCounts: {
-            image: promptPackage['referenceImages']?.['length'] || 0x0,
-            video: 0x0,
-            audio: 0x0,
+            image: promptPackage['referenceImages']?.['length'] || 0,
+            video: 0,
+            audio: 0,
           },
           allowedAssetTypes: ['image'],
           resolveAssetMentionRef: (config) =>
@@ -214,8 +214,8 @@ export function createPersonReplacementImageGenerationRequestRevision({
       shot['replacementPromptMode'] === 'positioning'
         ? buildPersonReplacementPromptPackage({ project: project, shot: shot })
         : null,
-    value2 = output?.['locationGuideSlot'] || 0x0,
-    value3 = output?.['referenceImages'][value2 - 0x1]?.['ref'] || '';
+    value2 = output?.['locationGuideSlot'] || 0,
+    value3 = output?.['referenceImages'][value2 - 1]?.['ref'] || '';
   return stableSerialize({
     mappingRevision: createPersonReplacementImageGenerationMappingRevision({ project: project, shot: shot }),
     payload:
@@ -223,13 +223,13 @@ export function createPersonReplacementImageGenerationRequestRevision({
       payload['inputUrls']?.['length']
         ? {
             ...payload,
-            inputUrls: [resolvePersonReplacementImageSourceRef(shot), ...payload['inputUrls']['slice'](0x1)],
+            inputUrls: [resolvePersonReplacementImageSourceRef(shot), ...payload['inputUrls']['slice'](1)],
           }
         : value2 && payload['inputUrls']?.['length']
           ? {
               ...payload,
               inputUrls: payload['inputUrls']['map']((value4, value5) =>
-                value5 === value2 - 0x1 ? value3 : value4,
+                value5 === value2 - 1 ? value3 : value4,
               ),
             }
           : payload,
@@ -242,7 +242,7 @@ export function appendPersonReplacementImageResult(options2 = {}, args = {}) {
     count3 = list['findIndex'](
       (value6) => resolvePersonReplacementImageResultRef(value6) === personReplacementImageResultRef,
     );
-  if (count3 >= 0x0) return { results: list, activeIndex: count3 };
+  if (count3 >= 0) return { results: list, activeIndex: count3 };
   return { results: [...list, { ...args }], activeIndex: list['length'] };
 }
 export function normalizePersonReplacementAssetPromptPresetId(value7 = '') {
@@ -258,11 +258,11 @@ export function applyPersonReplacementCharacterAssetPromptPreset(value10 = '', v
     return text3;
   return applyWorkspaceCharacterAssetPromptPreset(text4, text3, { hasImageInput: !![] });
 }
-export function resolveGeneratedPersonReplacementAppearanceName(value13 = '', value14 = 0x1) {
+export function resolveGeneratedPersonReplacementAppearanceName(value13 = '', value14 = 1) {
   const value15 = PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['find'](
       (value16) => value16['id'] === normalizeText(value13),
     ),
-    value17 = '形象\x20' + Math['max'](0x1, Number(value14) || 0x1);
+    value17 = '形象 ' + Math['max'](1, Number(value14) || 1);
   return value15?.['template'] ? normalizeText(value15['label']) || value17 : value17;
 }
 export function normalizePersonReplacementImageGenerationState(options3 = {}, value18 = '') {
@@ -404,7 +404,7 @@ export function resolvePersonReplacementImageGenerationParams({
       adaptiveSource: 'explicit',
     };
   const box2 = getPositiveSize(sourceImageSize) ||
-      getPositiveSize(shot?.['frame']) || { width: 0x0, height: 0x0 },
+      getPositiveSize(shot?.['frame']) || { width: 0, height: 0 },
     box3 = resolveAdaptiveSourceSize({ inputWidth: box2['width'], inputHeight: box2['height'] }),
     closestRatioForProviderModel = pickClosestRatioForProviderModel({
       provider: modelProvider,

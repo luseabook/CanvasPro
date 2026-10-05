@@ -16,10 +16,10 @@ function connect() {
         !reconnectTimer &&
           (reconnectTimer = setTimeout(() => {
             ((reconnectTimer = null), connect());
-          }, 0x7d0)));
+          }, 2000)));
     }));
 }
 export function startServerConnectionMonitor() {
   if (started) return;
-  ((started = true), setTimeout(connect, 0x3e8));
+  ((started = true), setTimeout(connect, 1000));
 }

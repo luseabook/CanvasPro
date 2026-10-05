@@ -19,8 +19,8 @@ export const bailianImageModelManifests = Object['freeze']([
     ratioPolicy: { capability: 'dimensions' },
     inputSlots: {
       allowedKinds: ['text', 'image'],
-      minByKind: { image: 0x0 },
-      maxByKind: { image: 0x3, video: 0x0, audio: 0x0 },
+      minByKind: { image: 0 },
+      maxByKind: { image: 3, video: 0, audio: 0 },
     },
     fields: [
       APIMART_QWEN_IMAGE_MODE_FIELD,
@@ -40,8 +40,8 @@ export const bailianImageModelManifests = Object['freeze']([
     extensions: {
       imageMenu: {
         group: 'bailian',
-        order: 0xa,
-        title: 'Qwen\x20Image\x203.0',
+        order: 10,
+        title: 'Qwen Image 3.0',
         subtitle: '标准 / Pro · 最多 3 张参考图',
         iconAlt: 'qwen',
       },
@@ -57,7 +57,7 @@ export const bailianImageExecutionManifests = Object['freeze']([
     modeModels: { standard: 'qwen-image-3.0', pro: 'qwen-image-3.0-pro' },
     bodyMapping: [
       { path: 'model', from: 'model' },
-      { path: 'parameters.n', from: 'param', field: 'batchSize', defaultValue: 0x1 },
+      { path: 'parameters.n', from: 'param', field: 'batchSize', defaultValue: 1 },
       { path: 'parameters.prompt_extend', from: 'param', field: 'promptExtend' },
       { path: 'parameters.enable_thinking', from: 'param', field: 'enableThinking' },
       { path: 'parameters.negative_prompt', from: 'param', field: 'negativePrompt', omitWhenEmpty: !![] },
@@ -70,7 +70,7 @@ export const bailianImageExecutionManifests = Object['freeze']([
     extensions: {
       bodyResolver: 'bailianImage',
       batchSubmitMode: 'providerN',
-      requestTimeoutMs: 0x927c0,
+      requestTimeoutMs: 600000,
       strictInputCounts: !![],
       imageInputUpload: {
         provider: 'freeImageHost',

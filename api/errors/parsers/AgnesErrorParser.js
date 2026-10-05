@@ -1,23 +1,23 @@
 import { ApiError, ErrorType } from '../ApiError.js';
 const PROVIDER = 'agnes',
   AGNES_HTTP_STATUS_MAP = {
-    0x190: {
+    400: {
       type: ErrorType.INVALID_PARAMS,
       message: '请求参数错误，请检查提示词、图片 URL 和视频参数',
       retryable: false,
     },
-    0x191: {
+    401: {
       type: ErrorType.AUTH_ERROR,
       message: 'API Key 无效或未授权，请检查 Agnes AI 配置',
       retryable: false,
     },
-    0x194: {
+    404: {
       type: ErrorType.INVALID_PARAMS,
       message: '任务不存在或已过期，请重新提交生成任务',
       retryable: false,
     },
-    0x1f4: { type: ErrorType.SERVER_ERROR, message: 'Agnes AI 服务器内部错误，请稍后重试', retryable: true },
-    0x1f7: {
+    500: { type: ErrorType.SERVER_ERROR, message: 'Agnes AI 服务器内部错误，请稍后重试', retryable: true },
+    503: {
       type: ErrorType.SERVICE_UNAVAILABLE,
       message: 'Agnes AI 服务繁忙，请稍后重试',
       retryable: true,
@@ -115,7 +115,7 @@ function extractTaskStatus(response) {
     .toLowerCase();
 }
 export function parseError(raw, status) {
-  if (!raw && status < 0x190) return null;
+  if (!raw && status < 400) return null;
   const message = extractErrorMessage(raw),
     code = extractErrorCode(raw, status),
     keywordError = buildKeywordError(message, code);
@@ -131,7 +131,7 @@ export function parseError(raw, status) {
       raw: raw,
       retryable: type.retryable,
     });
-  if (status >= 0x190) return ApiError.fromHttpStatus(status, PROVIDER, message);
+  if (status >= 400) return ApiError.fromHttpStatus(status, PROVIDER, message);
   return null;
 }
 export function parseTaskError(enabled2) {

@@ -47,7 +47,7 @@ function stripStoryCharacterAssetPromptPrefix(item = '') {
 function ensureStoryCharacterAssetPromptPrefix(key = '') {
   const stripStoryCharacterAssetPromptPrefix2 = stripStoryCharacterAssetPromptPrefix(key);
   return stripStoryCharacterAssetPromptPrefix2
-    ? STORY_CHARACTER_ASSET_PROMPT_PREFIX + '\x0a' + stripStoryCharacterAssetPromptPrefix2
+    ? STORY_CHARACTER_ASSET_PROMPT_PREFIX + '\n' + stripStoryCharacterAssetPromptPrefix2
     : '';
 }
 function applyStoryCharacterAssetPromptPrefix(args = {}) {
@@ -61,7 +61,7 @@ function applyStoryCharacterAssetPromptPrefix(args = {}) {
   return {
     ...args,
     appearances: index,
-    prompt: index[0x0]?.['prompt'] || ensureStoryCharacterAssetPromptPrefix(args?.['prompt']),
+    prompt: index[0]?.['prompt'] || ensureStoryCharacterAssetPromptPrefix(args?.['prompt']),
   };
 }
 function removeStoryCharacterAssetPromptPrefix(args3 = {}) {
@@ -80,17 +80,17 @@ function removeStoryCharacterAssetPromptPrefix(args3 = {}) {
 export function normalizeStoryAssetDisplayName(result, data, options) {
   const target =
       data === 'scene'
-        ? '场景 ' + (options + 0x1)
+        ? '场景 ' + (options + 1)
         : data === 'prop'
-          ? '道具 ' + (options + 0x1)
-          : '角色\x20' + (options + 0x1),
+          ? '道具 ' + (options + 1)
+          : '角色 ' + (options + 1),
     text2 = normalizeText(result)
       ['replace'](/^(?:角色名|人物名|姓名|名称)\s*[:：]\s*/u, '')
       ['replace'](/^[“”"'‘’]+|[“”"'‘’]+$/gu, ''),
-    args5 = text2['split'](/[，,。；;\n]/u)[0x0]?.['trim']() || '';
+    args5 = text2['split'](/[，,。；;\n]/u)[0]?.['trim']() || '';
   if (!args5) return target;
-  const source = data === 'character' ? 0xc : 0x14;
-  return [...args5]['slice'](0x0, source)['join']('');
+  const source = data === 'character' ? 12 : 20;
+  return [...args5]['slice'](0, source)['join']('');
 }
 export function normalizeStoryCharacterRole(next, current = '') {
   const text3 = normalizeText(next),
@@ -111,7 +111,7 @@ export function ensureStoryVisualStylePrefix(entry, record = '') {
     text6 = normalizeText(record);
   if (!text6) return text5;
   if (!text5 || text5['startsWith'](text6)) return text5 || text6;
-  return text6 + '\x0a' + text5;
+  return text6 + '\n' + text5;
 }
 function replaceStoryVisualStylePrefix(
   payload,
@@ -133,28 +133,28 @@ function normalizeTextArray(handle) {
 }
 function normalizePositiveNumber(state) {
   const count = Number(state);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 export function normalizeDurationSeconds(config) {
   const positiveNumber = normalizePositiveNumber(config);
   if (positiveNumber) return positiveNumber;
   const count2 = Number['parseFloat'](normalizeText(config));
-  return Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x0;
+  return Number['isFinite'](count2) && count2 > 0 ? count2 : 0;
 }
 function stableHash(scope) {
   const list2 = String(scope || '');
   let input = 0x811c9dc5;
-  for (let output = 0x0; output < list2['length']; output += 0x1) {
+  for (let output = 0; output < list2['length']; output += 1) {
     ((input ^= list2['charCodeAt'](output)), (input = Math['imul'](input, 0x1000193)));
   }
-  return (input >>> 0x0)['toString'](0x24);
+  return (input >>> 0)['toString'](36);
 }
 function normalizeIdPart(value2) {
   return normalizeText(value2)
     ['toLowerCase']()
     ['replace'](/[^a-z0-9]+/g, '-')
     ['replace'](/^-+|-+$/g, '')
-    ['slice'](0x0, 0x28);
+    ['slice'](0, 40);
 }
 export function createStableStoryPlanningId(value3, ...args6) {
   const idPart = normalizeIdPart(value3) || 'story',
@@ -163,22 +163,22 @@ export function createStableStoryPlanningId(value3, ...args6) {
   return [idPart, idPart2, stableHash(value4)]['filter'](Boolean)['join']('-');
 }
 export function formatStoryClockDuration(value6) {
-  const value7 = Math['max'](0x0, Math['round'](Number(value6) || 0x0)),
-    count3 = Math['floor'](value7 / 0xe10),
-    value8 = Math['floor']((value7 % 0xe10) / 0x3c),
-    value9 = value7 % 0x3c,
-    value10 = String(value8)['padStart'](0x2, '0'),
-    value11 = String(value9)['padStart'](0x2, '0');
-  return count3 > 0x0
-    ? String(count3)['padStart'](0x2, '0') + ':' + value10 + ':' + value11
+  const value7 = Math['max'](0, Math['round'](Number(value6) || 0)),
+    count3 = Math['floor'](value7 / 3600),
+    value8 = Math['floor']((value7 % 3600) / 60),
+    value9 = value7 % 60,
+    value10 = String(value8)['padStart'](2, '0'),
+    value11 = String(value9)['padStart'](2, '0');
+  return count3 > 0
+    ? String(count3)['padStart'](2, '0') + ':' + value10 + ':' + value11
     : value10 + ':' + value11;
 }
 export function formatStoryClipDuration(value12) {
-  const value13 = Math['max'](0x0, Number(value12) || 0x0);
-  return value13['toFixed'](0x1) + 's';
+  const value13 = Math['max'](0, Number(value12) || 0);
+  return value13['toFixed'](1) + 's';
 }
-function formatGeneratedStoryClipTitle(value14 = 0x0) {
-  return '片段' + String(value14 + 0x1)['padStart'](0x2, '0');
+function formatGeneratedStoryClipTitle(value14 = 0) {
+  return '片段' + String(value14 + 1)['padStart'](2, '0');
 }
 function normalizeStoryAssetUsages(value15, value16 = []) {
   const list3 = Array['isArray'](value15)
@@ -227,18 +227,18 @@ function normalizeStoryEpisodeShot(options2 = {}) {
 function normalizeStoryMinimaxH3ClipShots(list5 = [], value21 = '') {
   if (!isStoryMinimaxH3PromptMode(value21) || !list5['length']) return list5;
   const count4 = Number(
-    list5['reduce']((value22, value23) => value22 + value23['durationSec'], 0x0)['toFixed'](0x3),
+    list5['reduce']((value22, value23) => value22 + value23['durationSec'], 0)['toFixed'](3),
   );
-  if (count4 <= 0x0 || count4 > 0xf || (Number['isInteger'](count4) && count4 >= 0x4)) return list5;
-  const count5 = Math['max'](0x4, Math['ceil'](count4));
-  if (count5 > 0xf) return list5;
-  const value24 = list5['length'] - 0x1,
-    value25 = list5['slice'](0x0, value24)['reduce'](
+  if (count4 <= 0 || count4 > 15 || (Number['isInteger'](count4) && count4 >= 4)) return list5;
+  const count5 = Math['max'](4, Math['ceil'](count4));
+  if (count5 > 15) return list5;
+  const value24 = list5['length'] - 1,
+    value25 = list5['slice'](0, value24)['reduce'](
       (value26, value27) => value26 + value27['durationSec'],
-      0x0,
+      0,
     );
   return list5['map']((args7, value28) =>
-    value28 === value24 ? { ...args7, durationSec: Number((count5 - value25)['toFixed'](0x3)) } : args7,
+    value28 === value24 ? { ...args7, durationSec: Number((count5 - value25)['toFixed'](3)) } : args7,
   );
 }
 function ensurePromptSentence(value29) {
@@ -277,7 +277,7 @@ function resolveStoryAssetUsage(value35, value36) {
       addStrictLookupEntry(value37, value38?.['id'], value38));
   });
   const value39 = text13 || normalizeText(enabled2?.['baseAppearanceId']),
-    value40 = value39 ? value37['get'](value39) || null : list7[0x0] || null;
+    value40 = value39 ? value37['get'](value39) || null : list7[0] || null;
   return { assetRef: text12, appearanceRef: value39, asset: enabled2, appearance: value40 };
 }
 function buildStoryShotAssetReferenceText(
@@ -315,7 +315,7 @@ function buildStoryShotAssetReferenceText(
       }
       if (!enabled4['has'](value43)) return;
       const text15 = normalizeText(appearance?.['name']),
-        value45 = '@' + text14 + (text15 ? '\x20·\x20' + text15 : '');
+        value45 = '@' + text14 + (text15 ? ' · ' + text15 : '');
       if (!enabled5[value43]['includes'](value45)) enabled5[value43]['push'](value45);
     }),
     [
@@ -327,7 +327,7 @@ function buildStoryShotAssetReferenceText(
     ]
       ['filter'](Boolean)
       ['map'](ensurePromptSentence)
-      ['join']('\x20')
+      ['join'](' ')
   );
 }
 const STORY_SUBJECT_FEATURE_NOISE_PATTERN =
@@ -361,7 +361,7 @@ function getStoryCharacterSubjectFeatures(value48, value49, value50 = '') {
             ['map'](normalizeText)
             ['filter']((value54) => value54 && !STORY_SUBJECT_FEATURE_NOISE_PATTERN['test'](value54)),
         ),
-      ]['slice'](0x0, 0x3);
+      ]['slice'](0, 3);
     if (value53['length']) return value53;
   }
   return [];
@@ -401,11 +401,11 @@ function buildStoryClipCharacterSubjectDefinitions(list9 = [], value55 = [], val
     }),
     [...args8, value58['length'] ? '未解析形象：' + value58['join']('、') + '。' : '']
       ['filter'](Boolean)
-      ['join']('\x0a')
+      ['join']('\n')
   );
 }
 function extractStorySceneTimeLabel(value62 = '') {
-  return normalizeText(value62)['match'](STORY_SCENE_TIME_PATTERN)?.[0x0] || '';
+  return normalizeText(value62)['match'](STORY_SCENE_TIME_PATTERN)?.[0] || '';
 }
 function resolveStoryClipSceneTimeLabel(list11 = [], value63 = []) {
   const storyAssetUsageLookup3 = buildStoryAssetUsageLookup(value63),
@@ -437,7 +437,7 @@ function stripStoryDialogueOuterQuotes(value68 = '') {
   let list12 = normalizeText(value68);
   const value69 = [
     ['“', '”'],
-    ['\x22', '\x22'],
+    ['"', '"'],
   ];
   return (
     value69['forEach'](([value70, value71]) => {
@@ -454,8 +454,8 @@ function getStoryDialogueSpeakerLabels(value72 = '') {
   const args9 = normalizeText(value72);
   if (!args9) return [];
   const enabled7 = [...args9['matchAll'](STORY_DIALOGUE_SPEAKER_PATTERN)];
-  if (!enabled7['length'] || normalizeText(args9['slice'](0x0, enabled7[0x0]['index']))) return [];
-  return enabled7['map']((value73) => normalizeText(value73[0x2]))['filter'](Boolean);
+  if (!enabled7['length'] || normalizeText(args9['slice'](0, enabled7[0]['index']))) return [];
+  return enabled7['map']((value73) => normalizeText(value73[2]))['filter'](Boolean);
 }
 function resolveStoryDialogueSpeakerCandidate(value74 = '', value75 = [], value76 = []) {
   const list13 = normalizeText(value74);
@@ -466,19 +466,19 @@ function resolveStoryDialogueSpeakerCandidate(value74 = '', value75 = [], value7
         const args10 = resolveStoryAssetUsage(value77, storyAssetUsageLookup4),
           text20 = normalizeText(args10['asset']?.['name']);
         if (args10['asset']?.['kind'] !== 'character' || !text20) return null;
-        let value78 = 0x0,
+        let value78 = 0,
           value79 = '';
-        if (list13 === text20) value78 = 0x3;
+        if (list13 === text20) value78 = 3;
         else {
-          if (list13['startsWith'](text20)) ((value78 = 0x2), (value79 = list13['slice'](text20['length'])));
-          else list13['length'] >= 0x2 && text20['endsWith'](list13) && (value78 = 0x1);
+          if (list13['startsWith'](text20)) ((value78 = 2), (value79 = list13['slice'](text20['length'])));
+          else list13['length'] >= 2 && text20['endsWith'](list13) && (value78 = 1);
         }
         return value78 ? { ...args10, assetName: text20, score: value78, suffix: value79 } : null;
       })
       ['filter'](Boolean)
       ['sort']((value80, value81) => value81['score'] - value80['score']);
-  if (!list14['length'] || (list14[0x1] && list14[0x1]['score'] === list14[0x0]['score'])) return null;
-  return list14[0x0];
+  if (!list14['length'] || (list14[1] && list14[1]['score'] === list14[0]['score'])) return null;
+  return list14[0];
 }
 function resolveStoryDialogueSpeakerMention(value82 = '', value83 = [], value84 = []) {
   const text21 = normalizeText(value82);
@@ -494,20 +494,20 @@ function formatStoryClipDialogue(value87 = '', { assetUsages: assetUsages = [], 
   const list15 = normalizeText(value87);
   if (!list15) return '';
   const enabled8 = [...list15['matchAll'](STORY_DIALOGUE_SPEAKER_PATTERN)];
-  if (!enabled8['length'] || normalizeText(list15['slice'](0x0, enabled8[0x0]['index'])))
+  if (!enabled8['length'] || normalizeText(list15['slice'](0, enabled8[0]['index'])))
     return '“' + stripStoryDialogueOuterQuotes(list15) + '”';
   return enabled8['map']((value88, value89) => {
-    const value90 = enabled8[value89 + 0x1],
-      value91 = Number(value88['index'] || 0x0) + value88[0x0]['length'],
+    const value90 = enabled8[value89 + 1],
+      value91 = Number(value88['index'] || 0) + value88[0]['length'],
       value92 = value90
-        ? Number(value90['index'] || 0x0) + String(value90[0x1] || '')['length']
+        ? Number(value90['index'] || 0) + String(value90[1] || '')['length']
         : list15['length'],
-      storyDialogueSpeakerMention = resolveStoryDialogueSpeakerMention(value88[0x2], assetUsages, assets),
+      storyDialogueSpeakerMention = resolveStoryDialogueSpeakerMention(value88[2], assetUsages, assets),
       stripStoryDialogueOuterQuotes2 = stripStoryDialogueOuterQuotes(list15['slice'](value91, value92));
     return storyDialogueSpeakerMention + '：“' + stripStoryDialogueOuterQuotes2 + '”';
   })
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function getStoryClipDialogueSpeakerAssetIds(options3 = {}, value93 = []) {
   const value94 = [],
@@ -532,7 +532,7 @@ export function getStoryClipDialogueSpeakerAssetIds(options3 = {}, value93 = [])
   );
 }
 function normalizeStoryDialogueVoiceDescription(value99 = '') {
-  return [...normalizeText(value99)['replace'](/\s+/gu, '\x20')]['slice'](0x0, 0x258)['join']('');
+  return [...normalizeText(value99)['replace'](/\s+/gu, ' ')]['slice'](0, 600)['join']('');
 }
 function buildStoryClipDialogueVoiceGuidanceLines(options4 = {}, value100 = []) {
   const list16 = [],
@@ -576,9 +576,9 @@ function buildStoryClipDialogueVoiceGuidanceLines(options4 = {}, value100 = []) 
         : [];
     }),
     value108 =
-      list16['length'] === 0x1
+      list16['length'] === 1
         ? '发声与口型约束：本分镜仅' +
-          list16[0x0]['name'] +
+          list16[0]['name'] +
           '发声并同步口型；' +
           (value107['length'] ? value107['join']('、') + '及' : '') +
           '其他画面角色保持静默，不张嘴、不做说话口型。'
@@ -605,7 +605,7 @@ function buildStoryClipDialoguePromptBlock(
         ...buildStoryClipDialogueVoiceGuidanceLines({ dialogue: value109, assetUsages: assetUsages }, assets),
       ),
     list17['push'](formatStoryClipDialogue2),
-    list17['join']('\x0a')
+    list17['join']('\n')
   );
 }
 function removeStoryClipDialoguePrefix(value110 = '') {
@@ -616,9 +616,9 @@ export function applyStoryClipDialogueVoiceGuidance(value111 = '', value112 = {}
   const removeStoryClipDialoguePrefix2 = removeStoryClipDialoguePrefix(value111 || '');
   if (!removeStoryClipDialoguePrefix2 || !Array['isArray'](value112?.['shots']))
     return removeStoryClipDialoguePrefix2;
-  const value114 = removeStoryClipDialoguePrefix2['split']('\x0a')
+  const value114 = removeStoryClipDialoguePrefix2['split']('\n')
       ['filter']((value115) => !/^(?:声音设定（.+?）|发声与口型约束)：/u['test'](value115['trim']()))
-      ['join']('\x0a'),
+      ['join']('\n'),
     value116 = value112['shots']['map'](normalizeStoryEpisodeShot)['flatMap']((value117) => {
       if (!normalizeText(value117['dialogue'])) return [];
       const storyClipDialogueVoiceGuidanceLines = buildStoryClipDialogueVoiceGuidanceLines(
@@ -627,7 +627,7 @@ export function applyStoryClipDialogueVoiceGuidance(value111 = '', value112 = {}
       );
       return storyClipDialogueVoiceGuidanceLines['length'] ? [storyClipDialogueVoiceGuidanceLines] : [];
     }),
-    value118 = value114['split']('\x0a'),
+    value118 = value114['split']('\n'),
     enabled10 = value118['map']((value119) => {
       const value120 = value119['replace'](/<[^>]+>/gu, '')['trim']();
       return (
@@ -635,14 +635,14 @@ export function applyStoryClipDialogueVoiceGuidance(value111 = '', value112 = {}
         /^(?:[^：:\n“”"()（）]+(?:[（(][^）)\n]*[)）])?[：:]\s*)?[“"]/u['test'](value120)
       );
     }),
-    enabled11 = enabled10['map']((value121, value122) => value121 && !enabled10[value122 - 0x1]);
+    enabled11 = enabled10['map']((value121, value122) => value121 && !enabled10[value122 - 1]);
   if (enabled11['filter'](Boolean)['length'] !== value116['length']) return removeStoryClipDialoguePrefix2;
-  let value123 = 0x0;
+  let value123 = 0;
   return value118['flatMap']((value124, value125) => {
     if (!enabled11[value125]) return [value124];
     const args12 = value116[value123];
-    return ((value123 += 0x1), [...args12, value124]);
-  })['join']('\x0a');
+    return ((value123 += 1), [...args12, value124]);
+  })['join']('\n');
 }
 export function syncStoryEpisodeClipDialogueMentions(
   args13 = {},
@@ -700,7 +700,7 @@ function buildStoryClipSceneSettingText(list18 = [], value131 = []) {
       storyClipSceneTimeLabel ? ensurePromptSentence('时间：' + storyClipSceneTimeLabel) : '',
     ]
       ['filter'](Boolean)
-      ['join']('\x20');
+      ['join'](' ');
   return storyShotAssetReferenceText ? '本片段场景设定在：' + value133 : '';
 }
 function buildStoryClipPropSettingText(list19 = [], value134 = []) {
@@ -736,7 +736,7 @@ function buildStoryClipSeedance25ReferenceBindings(list20 = [], value136 = []) {
         return;
       }
       const text30 = normalizeText(appearance4?.['name']),
-        value139 = '@' + text29 + (text30 ? '\x20·\x20' + text30 : '');
+        value139 = '@' + text29 + (text30 ? ' · ' + text30 : '');
       if (asset7?.['kind'] === 'character')
         list21['push'](
           value139 +
@@ -758,11 +758,11 @@ function buildStoryClipSeedance25ReferenceBindings(list20 = [], value136 = []) {
       }
     }),
     [
-      list21['length'] ? '参考素材绑定：\n' + [...new Set(list21)]['join']('\x0a') : '',
+      list21['length'] ? '参考素材绑定：\n' + [...new Set(list21)]['join']('\n') : '',
       list22['length'] ? '未解析素材：' + [...new Set(list22)]['join']('、') + '。' : '',
     ]
       ['filter'](Boolean)
-      ['join']('\x0a')
+      ['join']('\n')
   );
 }
 function buildStoryClipWan30ReferenceBindings(list23 = [], value140 = []) {
@@ -790,7 +790,7 @@ function buildStoryClipWan30ReferenceBindings(list23 = [], value140 = []) {
         return;
       }
       const text32 = normalizeText(appearance5?.['name']),
-        value143 = '@' + text31 + (text32 ? '\x20·\x20' + text32 : '');
+        value143 = '@' + text31 + (text32 ? ' · ' + text32 : '');
       if (asset8?.['kind'] === 'character')
         list24['push'](
           value143 +
@@ -809,11 +809,11 @@ function buildStoryClipWan30ReferenceBindings(list23 = [], value140 = []) {
       }
     }),
     [
-      list24['length'] ? '参考素材绑定：\n' + [...new Set(list24)]['join']('\x0a') : '',
+      list24['length'] ? '参考素材绑定：\n' + [...new Set(list24)]['join']('\n') : '',
       list25['length'] ? '未解析素材：' + [...new Set(list25)]['join']('、') + '。' : '',
     ]
       ['filter'](Boolean)
-      ['join']('\x0a')
+      ['join']('\n')
   );
 }
 function replaceStoryClipBoundMentionsWithNames(value144 = '', value145 = [], value146 = []) {
@@ -844,8 +844,8 @@ function replaceStoryClipBoundMentionsWithNames(value144 = '', value145 = [], va
 }
 function formatStoryContinuousTimelineRange(
   options5 = {},
-  value151 = 0x0,
-  value152 = 0x0,
+  value151 = 0,
+  value152 = 0,
   value153 = '视频模型',
 ) {
   const value154 = Number(options5?.['startSec']),
@@ -857,18 +857,18 @@ function formatStoryContinuousTimelineRange(
     value154 !== value152 ||
     count6 <= value154 ||
     count6 - value154 !== value155 ||
-    count6 > 0x1e
+    count6 > 30
   )
-    throw new Error(value153 + ' 的分镜 ' + (value151 + 0x1) + '\x20缺少模型返回的连续整数时间区间。');
+    throw new Error(value153 + ' 的分镜 ' + (value151 + 1) + ' 缺少模型返回的连续整数时间区间。');
   return value154 + '-' + count6 + '秒';
 }
 function splitStoryClipOpeningPosition(value156 = '') {
   const list27 = normalizeText(value156);
   if (!list27['startsWith']('人物站位：')) return { position: '', visual: list27 };
   const count7 = list27['search'](/[。！？\n]/u);
-  if (count7 < 0x0) return { position: list27, visual: list27 };
-  const value157 = list27['slice'](0x0, count7 + 0x1)['trim'](),
-    value158 = list27['slice'](count7 + 0x1)['trim']();
+  if (count7 < 0) return { position: list27, visual: list27 };
+  const value157 = list27['slice'](0, count7 + 1)['trim'](),
+    value158 = list27['slice'](count7 + 1)['trim']();
   return { position: value157, visual: value158 || list27 };
 }
 export function buildStoryEpisodeClipPrompt({
@@ -886,7 +886,7 @@ export function buildStoryEpisodeClipPrompt({
     isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode),
     isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(storyPromptMode),
     enabled13 = Array['isArray'](clip?.['shots'])
-      ? clip['shots']['map'](normalizeStoryEpisodeShot)['filter']((value159) => value159['durationSec'] > 0x0)
+      ? clip['shots']['map'](normalizeStoryEpisodeShot)['filter']((value159) => value159['durationSec'] > 0)
       : [];
   if (!enabled13['length']) {
     const storyVisualStylePrefix = ensureStoryVisualStylePrefix(clip?.['prompt'], visualStyle);
@@ -899,9 +899,9 @@ export function buildStoryEpisodeClipPrompt({
       : storyVisualStylePrefix;
   }
   const count8 = Number(
-    enabled13['reduce']((value160, value161) => value160 + value161['durationSec'], 0x0)['toFixed'](0x3),
+    enabled13['reduce']((value160, value161) => value160 + value161['durationSec'], 0)['toFixed'](3),
   );
-  if (isStoryMinimaxH3PromptMode2 && (!Number['isInteger'](count8) || count8 < 0x4 || count8 > 0xf))
+  if (isStoryMinimaxH3PromptMode2 && (!Number['isInteger'](count8) || count8 < 4 || count8 > 15))
     throw new Error('MiniMax H3 的单个片段总时长必须是 4 至 15 秒的整数。');
   if (isStoryMinimaxH3PromptMode2) {
     const storyMinimaxH3Prompt = buildStoryMinimaxH3Prompt({ clip: clip, shots: enabled13, assets: assets });
@@ -949,9 +949,9 @@ export function buildStoryEpisodeClipPrompt({
       isStoryContinuousTimelinePromptMode2 ? '' : buildStoryClipPropSettingText(enabled13, assets),
       isStoryWan30PromptMode2
         ? '视频目标：生成 ' +
-          (Number(enabled13['at'](-0x1)?.['endSec']) || 0x0) +
-          '\x20秒' +
-          (enabled13['length'] === 0x1 ? '单镜头一镜到底' : '多镜头连续叙事') +
+          (Number(enabled13['at'](-1)?.['endSec']) || 0) +
+          ' 秒' +
+          (enabled13['length'] === 1 ? '单镜头一镜到底' : '多镜头连续叙事') +
           '视频；严格按下方时间轴执行。'
         : '',
       ...(args14 || value162 ? getStorySpatialContinuityPromptLines() : []),
@@ -970,12 +970,12 @@ export function buildStoryEpisodeClipPrompt({
               : '',
             value162
               ? '本段开场镜头为' +
-                ensurePromptSentence(value163['currentOpeningCamera'] || enabled13[0x0]?.['camera'])
+                ensurePromptSentence(value163['currentOpeningCamera'] || enabled13[0]?.['camera'])
               : '',
             '只有当前分镜明确表现出移动、操作、状态变化、换场或时间跳跃时，才允许改变交接状态。',
           ]
             ['filter'](Boolean)
-            ['join']('\x20')
+            ['join'](' ')
         : '',
       text36
         ? (isStoryContinuousTimelinePromptMode2 ? '核心故事' : '这一幕想要呈现的感觉') +
@@ -985,7 +985,7 @@ export function buildStoryEpisodeClipPrompt({
       text37 ? '分镜过渡：' + ensurePromptSentence(text37) : '',
     ]['filter'](Boolean),
     value165 = enabled13['flatMap']((value166) => value166['assetUsages'] || []);
-  let value167 = 0x0;
+  let value167 = 0;
   enabled13['forEach']((value168, count9) => {
     const replaceStoryClipBoundMentionsWithNames2 = replaceStoryClipBoundMentionsWithNames(
         value168['camera'],
@@ -998,7 +998,7 @@ export function buildStoryEpisodeClipPrompt({
         assets,
       ),
       value169 =
-        count9 === 0x0 && !args14
+        count9 === 0 && !args14
           ? splitStoryClipOpeningPosition(replaceStoryClipBoundMentionsWithNames3)
           : { position: '', visual: replaceStoryClipBoundMentionsWithNames3 },
       value170 = value169['visual'],
@@ -1026,16 +1026,16 @@ export function buildStoryEpisodeClipPrompt({
       value170 ? ensurePromptSentence(value170) : '',
     ]
       ['filter'](Boolean)
-      ['join']('\x20');
+      ['join'](' ');
     value162 &&
       text38 &&
-      list28['push']((count9 === 0x0 ? '开场衔接' : '镜头衔接') + '：' + ensurePromptSentence(text38));
+      list28['push']((count9 === 0 ? '开场衔接' : '镜头衔接') + '：' + ensurePromptSentence(text38));
     if (isStoryContinuousTimelinePromptMode2) {
       const formatStoryContinuousTimelineRange2 = formatStoryContinuousTimelineRange(
         value168,
         count9,
         value167,
-        isStoryWan30PromptMode2 ? 'Wan 3.0' : 'Seedance\x202.5',
+        isStoryWan30PromptMode2 ? 'Wan 3.0' : 'Seedance 2.5',
       );
       ((value167 = Number(value168['endSec'])),
         list28['push'](
@@ -1079,7 +1079,7 @@ export function buildStoryEpisodeClipPrompt({
       list28['push'](
         '全局要求：角色、场景与道具严格沿用开头绑定；保持人物位置、朝向、持物、服装、情绪和场景方向连续；多人对白始终使用唯一角色名，不用他或她代替说话人；对白口型、动作与说话人一致；不新增人物、道具、对白、旁白、字幕、标识或水印。',
       );
-  const syncStoryClipPromptReferences2 = syncStoryClipPromptReferences(list28['join']('\x0a'), assets);
+  const syncStoryClipPromptReferences2 = syncStoryClipPromptReferences(list28['join']('\n'), assets);
   return sourceMode === 'video-replication'
     ? syncStoryReplicationPromptReferences(
         syncStoryClipPromptReferences2,
@@ -1089,8 +1089,8 @@ export function buildStoryEpisodeClipPrompt({
     : syncStoryClipPromptReferences2;
 }
 function hasMeaningfulMediaValue(value172) {
-  if (Array['isArray'](value172)) return value172['length'] > 0x0;
-  if (value172 && typeof value172 === 'object') return Object['keys'](value172)['length'] > 0x0;
+  if (Array['isArray'](value172)) return value172['length'] > 0;
+  if (value172 && typeof value172 === 'object') return Object['keys'](value172)['length'] > 0;
   return normalizeText(value172) !== '';
 }
 function preserveMediaFields(args15, enabled14, enabled15) {
@@ -1152,7 +1152,7 @@ function findMatchingAsset(value181, value182, value183) {
       (value184) =>
         (text39 && normalizeText(value184?.['id']) === text39) ||
         (planningRef && getPlanningRef(value184) === planningRef) ||
-        (normalizeText(value184?.['id']) === 'story-asset-' + (value183 + 0x1) &&
+        (normalizeText(value184?.['id']) === 'story-asset-' + (value183 + 1) &&
           !normalizeText(value184?.['name'])) ||
         getAssetIdentity(value184) === assetIdentity,
     ) || null
@@ -1182,7 +1182,7 @@ function normalizeStoryPlanningAppearance(
     visualStyle: visualStyle2,
   } = {},
 ) {
-  const planningRef3 = getPlanningRef(error2, assetRef6 + '-appearance-' + (index2 + 0x1)),
+  const planningRef3 = getPlanningRef(error2, assetRef6 + '-appearance-' + (index2 + 1)),
     text41 =
       normalizeText(existingAppearance?.['id']) ||
       createStableStoryPlanningId(
@@ -1190,13 +1190,13 @@ function normalizeStoryPlanningAppearance(
         assetId,
         planningRef3,
         error2?.['name'],
-        String(index2 + 0x1),
+        String(index2 + 1),
       ),
     value186 = {
       ...error2,
       id: text41,
       planningRef: planningRef3,
-      name: normalizeText(error2?.['name']) || (index2 === 0x0 ? '基础形象' : '形象 ' + (index2 + 0x1)),
+      name: normalizeText(error2?.['name']) || (index2 === 0 ? '基础形象' : '形象 ' + (index2 + 1)),
       description: normalizeText(error2?.['description']),
       occurrences: normalizeText(error2?.['occurrences'] || assetOccurrences) || '当前项目',
       sourceChapterIds: normalizeTextArray(error2?.['sourceChapterIds']),
@@ -1210,7 +1210,7 @@ function normalizeStoryPlanningAppearance(
 }
 export function normalizeStoryPlanningAsset(
   args16 = {},
-  value187 = 0x0,
+  value187 = 0,
   {
     existingAsset: existingAsset = null,
     preserveMedia: preserveMedia = !![],
@@ -1219,10 +1219,10 @@ export function normalizeStoryPlanningAsset(
 ) {
   const value188 = ['scene', 'prop']['includes'](args16?.['kind']) ? args16['kind'] : 'character',
     storyAssetDisplayName = normalizeStoryAssetDisplayName(args16?.['name'], value188, value187),
-    planningRef4 = getPlanningRef(args16, 'asset-' + (value187 + 0x1)),
+    planningRef4 = getPlanningRef(args16, 'asset-' + (value187 + 1)),
     text42 =
       normalizeText(existingAsset?.['id']) ||
-      createStableStoryPlanningId(value188, planningRef4, storyAssetDisplayName, String(value187 + 0x1)),
+      createStableStoryPlanningId(value188, planningRef4, storyAssetDisplayName, String(value187 + 1)),
     value189 =
       Array['isArray'](args16?.['appearances']) && args16['appearances']['length']
         ? args16['appearances']
@@ -1243,7 +1243,7 @@ export function normalizeStoryPlanningAsset(
         assetId: text42,
         assetRef: planningRef4,
         assetOccurrences: args16?.['occurrences'],
-        fallbackPrompt: count10 === 0x0 ? args16?.['prompt'] || args16?.['description'] : '',
+        fallbackPrompt: count10 === 0 ? args16?.['prompt'] || args16?.['description'] : '',
         index: count10,
         existingAppearance: matchingAppearance,
         preserveMedia: preserveMedia,
@@ -1264,16 +1264,16 @@ export function normalizeStoryPlanningAsset(
       voiceDescription: value188 === 'character' ? normalizeText(args16?.['voiceDescription']) : '',
       occurrences: normalizeText(args16?.['occurrences']) || '当前项目',
       sourceChapterIds: normalizeTextArray(args16?.['sourceChapterIds']),
-      prompt: normalizeText(value191[0x0]?.['prompt'] || args16?.['prompt']),
+      prompt: normalizeText(value191[0]?.['prompt'] || args16?.['prompt']),
       imageUrl: normalizeText(args16?.['imageUrl']),
       appearances: value191,
     },
     preserveMediaFields2 = preserveMediaFields(value193, existingAsset, preserveMedia),
     text43 = normalizeText(preserveMediaFields2['baseAppearanceId']),
-    value194 = value191['find']((value195) => value195['id'] === text43) || value191[0x0];
+    value194 = value191['find']((value195) => value195['id'] === text43) || value191[0];
   return (
     (preserveMediaFields2['baseAppearanceId'] =
-      value188 === 'character' && value191['length'] > 0x1 ? value194?.['id'] || '' : ''),
+      value188 === 'character' && value191['length'] > 1 ? value194?.['id'] || '' : ''),
     preserveMediaFields2
   );
 }
@@ -1288,12 +1288,12 @@ export function clearStoryPlanningForRebuild(options9 = {}) {
         ...args18,
         assetRefs: [],
         assetIds: [],
-        characterCount: 0x0,
-        sceneCount: 0x0,
-        propCount: 0x0,
+        characterCount: 0,
+        sceneCount: 0,
+        propCount: 0,
         coverUrl: '',
         clips: [],
-        clipCount: 0x0,
+        clipCount: 0,
         durationSec: durationSeconds,
         duration: durationSeconds ? formatStoryClockDuration(durationSeconds) : '--:--',
         status: '待拆分',
@@ -1357,7 +1357,7 @@ export function syncStoryPlanningVisualStyle(
           return {
             ...args21,
             appearances: value204,
-            prompt: value204[0x0]?.['prompt'] || run(args21?.['prompt']),
+            prompt: value204[0]?.['prompt'] || run(args21?.['prompt']),
           };
         })
       : [],
@@ -1445,13 +1445,13 @@ export function deriveStoryEpisodeAssetSummary(options11 = {}, value220 = []) {
 function findMatchingEpisode(value229, value230, value231) {
   const text45 = normalizeText(value230?.['id']),
     planningRef6 = getPlanningRef(value230),
-    value232 = Math['max'](0x1, Math['trunc'](Number(value230?.['number']) || value231 + 0x1));
+    value232 = Math['max'](1, Math['trunc'](Number(value230?.['number']) || value231 + 1));
   return (
     value229['find'](
       (value233, value234) =>
         (text45 && normalizeText(value233?.['id']) === text45) ||
         (planningRef6 && getPlanningRef(value233) === planningRef6) ||
-        Math['max'](0x1, Math['trunc'](Number(value233?.['number']) || value234 + 0x1)) === value232,
+        Math['max'](1, Math['trunc'](Number(value233?.['number']) || value234 + 1)) === value232,
     ) || null
   );
 }
@@ -1502,10 +1502,10 @@ export function deriveStoryEpisodeStatus(list39 = []) {
 }
 export function normalizeStoryEpisodePlan(
   args26 = {},
-  value242 = 0x0,
+  value242 = 0,
   { assets: assets = [], existingEpisode: existingEpisode = null, preserveMedia: preserveMedia = !![] } = {},
 ) {
-  const value243 = Math['max'](0x1, Math['trunc'](Number(args26?.['number']) || value242 + 0x1)),
+  const value243 = Math['max'](1, Math['trunc'](Number(args26?.['number']) || value242 + 1)),
     planningRef7 = getPlanningRef(args26, 'episode-' + value243),
     text46 = normalizeText(existingEpisode?.['id']) || 'episode-' + value243,
     assetLookup2 = buildAssetLookup(assets),
@@ -1525,7 +1525,7 @@ export function normalizeStoryEpisodePlan(
         normalizeDurationSeconds(
           value247?.['durationSec'] || value247?.['durationSeconds'] || value247?.['duration'],
         ),
-      0x0,
+      0,
     ),
     value248 = value245 || durationSeconds2,
     value249 = {
@@ -1533,7 +1533,7 @@ export function normalizeStoryEpisodePlan(
       id: text46,
       planningRef: planningRef7,
       number: value243,
-      title: normalizeText(args26?.['title']) || '第\x20' + value243 + '\x20集',
+      title: normalizeText(args26?.['title']) || '第 ' + value243 + ' 集',
       synopsis: normalizeText(args26?.['synopsis'] || args26?.['content']),
       sourceChapterIds: normalizeTextArray(args26?.['sourceChapterIds']),
       assetRefs: textArray,
@@ -1570,19 +1570,19 @@ export function isStoryEpisodeScriptComplete(options13 = {}) {
   return (
     normalizeText(options13?.['script']?.['fullText']) !== '' &&
     Array['isArray'](options13?.['script']?.['scenes']) &&
-    options13['script']['scenes']['length'] > 0x0
+    options13['script']['scenes']['length'] > 0
   );
 }
 export function getNextStoryEpisodeScriptIndex(list43 = []) {
   const value255 = Array['isArray'](list43) ? list43 : [],
     count11 = value255['findIndex']((value256) => !isStoryEpisodeScriptComplete(value256));
-  return count11 < 0x0 ? value255['length'] : count11;
+  return count11 < 0 ? value255['length'] : count11;
 }
-export function canGenerateStoryEpisodeScript(list44 = [], value257 = 0x0) {
+export function canGenerateStoryEpisodeScript(list44 = [], value257 = 0) {
   const value258 = Array['isArray'](list44) ? list44 : [],
     count12 = Math['trunc'](Number(value257));
   return (
-    count12 >= 0x0 && count12 < value258['length'] && getNextStoryEpisodeScriptIndex(value258) === count12
+    count12 >= 0 && count12 < value258['length'] && getNextStoryEpisodeScriptIndex(value258) === count12
   );
 }
 export function saveStoryEpisodeScriptDraft(args27 = {}, enabled19 = null) {
@@ -1622,7 +1622,7 @@ export function mergeStoryEpisodeScript(options14 = {}, args28 = {}) {
     endingState: value260,
     scriptStatus: 'completed',
     script: {
-      schemaVersion: Number(args28?.['schemaVersion']) || 0x1,
+      schemaVersion: Number(args28?.['schemaVersion']) || 1,
       episodeRef: normalizeText(args28?.['episodeRef']) || getPlanningRef(options14),
       scenes: enabled20,
       fullText: text47,
@@ -1637,25 +1637,25 @@ export function compileStoryEpisodeScripts(list45 = []) {
   const list46 = Array['isArray'](list45) ? list45 : [],
     value261 = list46['filter'](isStoryEpisodeScriptComplete),
     value262 = value261['map']((value263, value264) => ({
-      id: normalizeText(value263?.['id']) || 'episode-' + (value264 + 0x1),
+      id: normalizeText(value263?.['id']) || 'episode-' + (value264 + 1),
       title:
-        '第\x20' +
-        Math['max'](0x1, Math['trunc'](Number(value263?.['number']) || value264 + 0x1)) +
+        '第 ' +
+        Math['max'](1, Math['trunc'](Number(value263?.['number']) || value264 + 1)) +
         ' 集：' +
-        (normalizeText(value263?.['title']) || '第\x20' + (value264 + 0x1) + '\x20集'),
+        (normalizeText(value263?.['title']) || '第 ' + (value264 + 1) + ' 集'),
       content: normalizeText(value263?.['script']?.['fullText']),
     }));
   return {
     completedCount: value261['length'],
     totalCount: list46['length'],
-    complete: list46['length'] > 0x0 && value261['length'] === list46['length'],
+    complete: list46['length'] > 0 && value261['length'] === list46['length'],
     chapters: value262,
-    fullText: value262['map']((value265) => value265['content'])['join']('\x0a\x0a'),
+    fullText: value262['map']((value265) => value265['content'])['join']('\n\n'),
   };
 }
-export function invalidateStoryEpisodeScriptsFrom(list47 = [], value266 = 0x0) {
+export function invalidateStoryEpisodeScriptsFrom(list47 = [], value266 = 0) {
   const list48 = Array['isArray'](list47) ? list47 : [],
-    value267 = Math['max'](0x0, Math['trunc'](Number(value266) || 0x0));
+    value267 = Math['max'](0, Math['trunc'](Number(value266) || 0));
   return list48['map']((value268, value269) => {
     if (value269 < value267) return value268;
     const { scriptDraft: scriptDraft2, ...args30 } = value268;
@@ -1664,7 +1664,7 @@ export function invalidateStoryEpisodeScriptsFrom(list47 = [], value266 = 0x0) {
       scriptStatus: 'pending',
       script: null,
       clips: [],
-      clipCount: 0x0,
+      clipCount: 0,
       status: '待生成剧本',
     };
   });
@@ -1676,7 +1676,7 @@ export function getStoryEpisodeScriptBatchTargets(list49 = [], value270 = []) {
   const enabled21 = new Set(normalizeTextArray(value270));
   if (!enabled21['size']) return list50['slice'](nextStoryEpisodeScriptIndex);
   const list51 = [];
-  for (let value271 = nextStoryEpisodeScriptIndex; value271 < list50['length']; value271 += 0x1) {
+  for (let value271 = nextStoryEpisodeScriptIndex; value271 < list50['length']; value271 += 1) {
     const value272 = list50[value271];
     if (!enabled21['has'](normalizeText(value272?.['id']))) break;
     list51['push'](value272);
@@ -1686,14 +1686,14 @@ export function getStoryEpisodeScriptBatchTargets(list49 = [], value270 = []) {
 function findMatchingClip(value273, value274, value275, enabled22 = new Set()) {
   const text48 = normalizeText(value274?.['id']),
     planningRef8 = getPlanningRef(value274),
-    value276 = Math['max'](0x1, Math['trunc'](Number(value274?.['number']) || value275 + 0x1));
+    value276 = Math['max'](1, Math['trunc'](Number(value274?.['number']) || value275 + 1));
   return (
     value273['find'](
       (value277, value278) =>
         !enabled22['has'](value277) &&
         ((text48 && normalizeText(value277?.['id']) === text48) ||
           (planningRef8 && getPlanningRef(value277) === planningRef8) ||
-          Math['max'](0x1, Math['trunc'](Number(value277?.['number']) || value278 + 0x1)) === value276),
+          Math['max'](1, Math['trunc'](Number(value277?.['number']) || value278 + 1)) === value276),
     ) || null
   );
 }
@@ -1705,11 +1705,11 @@ export function ensureUniqueStoryEpisodeClipIds(args31 = {}) {
   const value281 = value279['map']((args32, value282) => {
     const text50 = normalizeText(args32?.['id']);
     if (text50 && !enabled23['has'](text50)) return (enabled23['add'](text50), args32);
-    const value283 = text49 + '-clip-' + (value282 + 0x1);
+    const value283 = text49 + '-clip-' + (value282 + 1);
     let value284 = value283,
-      value285 = 0x2;
+      value285 = 2;
     while (enabled23['has'](value284)) {
-      ((value284 = value283 + '-' + value285), (value285 += 0x1));
+      ((value284 = value283 + '-' + value285), (value285 += 1));
     }
     (enabled23['add'](value284), (value280 = !![]));
     const value286 = { ...args32, id: value284 };
@@ -1741,7 +1741,7 @@ function resolveStoryClipContinuitySceneKey(options15 = {}, value288 = new Map()
         }),
       ),
     ];
-  return list53['length'] === 0x1 ? list53[0x0] : '';
+  return list53['length'] === 1 ? list53[0] : '';
 }
 function addStoryEpisodeClipContinuityHandoffs(list54 = [], value291 = []) {
   const list55 = Array['isArray'](list54) ? list54 : [],
@@ -1750,15 +1750,15 @@ function addStoryEpisodeClipContinuityHandoffs(list54 = [], value291 = []) {
       resolveStoryClipContinuitySceneKey(value293, storyAssetUsageLookup9),
     );
   return list55['map']((args33, count13) => {
-    const value294 = count13 > 0x0 ? list55[count13 - 0x1] : null,
-      enabled24 = Boolean(value294 && value292[count13] && value292[count13] === value292[count13 - 0x1]);
+    const value294 = count13 > 0 ? list55[count13 - 1] : null,
+      enabled24 = Boolean(value294 && value292[count13] && value292[count13] === value292[count13 - 1]);
     if (!enabled24) {
       if (!args33?.['continuityHandoff']) return args33;
       const value295 = { ...args33 };
       return (delete value295['continuityHandoff'], value295);
     }
-    const value296 = Array['isArray'](value294?.['shots']) ? value294['shots']['at'](-0x1) : null,
-      value297 = Array['isArray'](args33?.['shots']) ? args33['shots'][0x0] : null;
+    const value296 = Array['isArray'](value294?.['shots']) ? value294['shots']['at'](-1) : null,
+      value297 = Array['isArray'](args33?.['shots']) ? args33['shots'][0] : null;
     return {
       ...args33,
       continuityHandoff: {
@@ -1773,7 +1773,7 @@ function addStoryEpisodeClipContinuityHandoffs(list54 = [], value291 = []) {
 }
 export function normalizeStoryEpisodeClip(
   args34 = {},
-  value298 = 0x0,
+  value298 = 0,
   {
     episodeId: episodeId = 'episode-1',
     assets: assets = [],
@@ -1786,13 +1786,13 @@ export function normalizeStoryEpisodeClip(
   } = {},
 ) {
   const storyPromptMode2 = normalizeStoryPromptMode(promptMode, { allowDeveloperModes: !![] }),
-    value299 = Math['max'](0x1, Math['trunc'](Number(args34?.['number']) || value298 + 0x1)),
+    value299 = Math['max'](1, Math['trunc'](Number(args34?.['number']) || value298 + 1)),
     planningRef9 = getPlanningRef(args34, 'clip-' + value299),
     text52 = normalizeText(existingClip?.['id']) || episodeId + '-clip-' + value299,
     value300 = Array['isArray'](args34?.['shots'])
       ? args34['shots']
           ['map'](normalizeStoryEpisodeShot)
-          ['filter']((value301) => value301['durationSec'] > 0x0)
+          ['filter']((value301) => value301['durationSec'] > 0)
       : [],
     storyMinimaxH3ClipShots = normalizeStoryMinimaxH3ClipShots(value300, storyPromptMode2),
     value302 =
@@ -1800,7 +1800,7 @@ export function normalizeStoryEpisodeClip(
         ? completeReplicationScenePropUsages(storyMinimaxH3ClipShots, assets)
         : storyMinimaxH3ClipShots,
     value303 = value302['length']
-      ? value302['reduce']((value304, value305) => value304 + value305['durationSec'], 0x0)
+      ? value302['reduce']((value304, value305) => value304 + value305['durationSec'], 0)
       : normalizeDurationSeconds(
           args34?.['durationSec'] || args34?.['durationSeconds'] || args34?.['duration'],
         ),
@@ -1849,23 +1849,23 @@ export function normalizeStoryEpisodeClip(
 export function insertStoryEpisodeClip(
   args35 = {},
   value309 = '',
-  { durationSec: durationSec = 0x5, promptMode: promptMode = args35?.['promptMode'] } = {},
+  { durationSec: durationSec = 5, promptMode: promptMode = args35?.['promptMode'] } = {},
 ) {
   const list56 = Array['isArray'](args35?.['clips']) ? args35['clips'] : [],
     count14 = list56['findIndex']((value310) => normalizeText(value310?.['id']) === normalizeText(value309));
-  if (count14 < 0x0) return null;
+  if (count14 < 0) return null;
   const text55 = normalizeText(args35?.['id']) || 'episode-1',
     value311 = new Set(list56['map']((value312) => normalizeText(value312?.['id']))['filter'](Boolean));
-  let value313 = list56['length'] + 0x1,
+  let value313 = list56['length'] + 1,
     value314 = text55 + '-clip-manual-' + value313;
   while (value311['has'](value314)) {
-    ((value313 += 0x1), (value314 = text55 + '-clip-manual-' + value313));
+    ((value313 += 1), (value314 = text55 + '-clip-manual-' + value313));
   }
-  const durationSeconds3 = normalizeDurationSeconds(durationSec) || 0x5,
+  const durationSeconds3 = normalizeDurationSeconds(durationSec) || 5,
     value315 = {
       id: value314,
       planningRef: 'manual-clip-' + value313,
-      number: count14 + 0x2,
+      number: count14 + 2,
       title: '新片段',
       script: '',
       promptMode: normalizeText(promptMode)
@@ -1882,8 +1882,8 @@ export function insertStoryEpisodeClip(
       assetIds: [],
       result: { status: 'idle', taskId: '', videoUrl: '', error: '' },
     },
-    list57 = [...list56['slice'](0x0, count14 + 0x1), value315, ...list56['slice'](count14 + 0x1)]['map'](
-      (args36, value316) => ({ ...args36, number: value316 + 0x1 }),
+    list57 = [...list56['slice'](0, count14 + 1), value315, ...list56['slice'](count14 + 1)]['map'](
+      (args36, value316) => ({ ...args36, number: value316 + 1 }),
     ),
     value317 = list57['reduce'](
       (value318, value319) =>
@@ -1891,7 +1891,7 @@ export function insertStoryEpisodeClip(
         normalizeDurationSeconds(
           value319?.['durationSec'] || value319?.['durationSeconds'] || value319?.['duration'],
         ),
-      0x0,
+      0,
     );
   return {
     episode: {
@@ -1902,17 +1902,17 @@ export function insertStoryEpisodeClip(
       duration: formatStoryClockDuration(value317),
       status: deriveStoryEpisodeStatus(list57),
     },
-    clip: list57[count14 + 0x1],
+    clip: list57[count14 + 1],
   };
 }
 export function removeStoryEpisodeClip(args37 = {}, value320 = '') {
   const list58 = Array['isArray'](args37?.['clips']) ? args37['clips'] : [],
     count15 = list58['findIndex']((value321) => normalizeText(value321?.['id']) === normalizeText(value320));
-  if (count15 < 0x0) return null;
+  if (count15 < 0) return null;
   const value322 = list58[count15],
     list59 = list58['filter']((value323, value324) => value324 !== count15)['map']((args38, value325) => ({
       ...args38,
-      number: value325 + 0x1,
+      number: value325 + 1,
     })),
     value326 = list59['reduce'](
       (value327, value328) =>
@@ -1920,7 +1920,7 @@ export function removeStoryEpisodeClip(args37 = {}, value320 = '') {
         normalizeDurationSeconds(
           value328?.['durationSec'] || value328?.['durationSeconds'] || value328?.['duration'],
         ),
-      0x0,
+      0,
     );
   return {
     episode: {
@@ -1932,7 +1932,7 @@ export function removeStoryEpisodeClip(args37 = {}, value320 = '') {
       status: deriveStoryEpisodeStatus(list59),
     },
     removedClip: value322,
-    nextClip: list59[Math['min'](count15, list59['length'] - 0x1)] || null,
+    nextClip: list59[Math['min'](count15, list59['length'] - 1)] || null,
   };
 }
 export function mergeStoryEpisodeSplit(
@@ -1976,7 +1976,7 @@ export function mergeStoryEpisodeSplit(
     uniqueStoryEpisodeClipIds = ensureUniqueStoryEpisodeClipIds({ id: text56, clips: value334 })['clips'],
     value336 = uniqueStoryEpisodeClipIds['reduce'](
       (value337, value338) => value337 + value338['durationSec'],
-      0x0,
+      0,
     ),
     storyEpisodeAssetSummary = deriveStoryEpisodeAssetSummary(
       { ...args39, clips: uniqueStoryEpisodeClipIds },
@@ -2015,7 +2015,7 @@ function isStoryEpisodeSplitTransportErrorEnvelope(value340) {
     map2 = new Set(['error', 'code', 'message', 'status', 'statusCode', 'details']);
   return (
     Object['prototype']['hasOwnProperty']['call'](enabled25, 'error') &&
-    value341['length'] > 0x0 &&
+    value341['length'] > 0 &&
     value341['every']((value342) => map2['has'](value342))
   );
 }
@@ -2025,12 +2025,12 @@ export function discardStaleStoryEpisodeSplitTransportDraft(options16 = {}) {
   if (!enabled26['length'] || !enabled27 || typeof enabled27 !== 'object' || Array['isArray'](enabled27))
     return options16;
   const value343 =
-    (Array['isArray'](enabled27['clips']) && enabled27['clips']['length'] > 0x0) ||
+    (Array['isArray'](enabled27['clips']) && enabled27['clips']['length'] > 0) ||
     (Array['isArray'](enabled27['items']) &&
       enabled27['items']['some'](
         (value344) =>
-          (Array['isArray'](value344?.['clips']) && value344['clips']['length'] > 0x0) ||
-          (Array['isArray'](value344?.['rawClips']) && value344['rawClips']['length'] > 0x0),
+          (Array['isArray'](value344?.['clips']) && value344['clips']['length'] > 0) ||
+          (Array['isArray'](value344?.['rawClips']) && value344['rawClips']['length'] > 0),
       ));
   if (value343 || !isStoryEpisodeSplitTransportErrorEnvelope(enabled27['rawResponse'])) return options16;
   const { splitDraft: splitDraft, ...args41 } = options16;

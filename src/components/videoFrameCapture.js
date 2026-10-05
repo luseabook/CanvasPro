@@ -101,7 +101,7 @@ export function buildVideoFrameCaptureNodeName(
   }
   return payload || sourceName + '.' + frameIndex4;
 }
-export function waitForVideoFrame(el, { timeoutMs: timeoutMs = 0x9c4 } = {}) {
+export function waitForVideoFrame(el, { timeoutMs: timeoutMs = 2500 } = {}) {
   if (isVideoFrameReady(el)) return Promise.resolve(true);
   if (!getVideoFrameSource(el)) return Promise.resolve(false);
   return new Promise((handler) => {
@@ -275,4 +275,4 @@ export async function saveVideoFrameCapture(
   return saveVideoFrameSnapshot(captureVideoFrameSnapshot2, value22);
 }
 
-export const DEFAULT_VIDEO_FRAME_CAPTURE_FPS = 0x18;
+export const DEFAULT_VIDEO_FRAME_CAPTURE_FPS = 24;

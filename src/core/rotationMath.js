@@ -1,10 +1,10 @@
 export function normalizeRotationDegrees(value) {
   const item = Number(value);
-  if (!Number['isFinite'](item)) return 0x0;
-  return Math['round'](((((item % 0x168) + 0x21c) % 0x168) - 0xb4) * 0xa) / 0xa;
+  if (!Number['isFinite'](item)) return 0;
+  return Math['round'](((((item % 360) + 540) % 360) - 180) * 10) / 10;
 }
 export function getRotatedSize(key, index, result) {
-  const data = (normalizeRotationDegrees(result) * Math['PI']) / 0xb4,
+  const data = (normalizeRotationDegrees(result) * Math['PI']) / 180,
     options = Math['abs'](Math['cos'](data)),
     target = Math['abs'](Math['sin'](data));
   return {
@@ -13,7 +13,7 @@ export function getRotatedSize(key, index, result) {
   };
 }
 export function rotatePointAroundCenter(box, x, source) {
-  const next = (normalizeRotationDegrees(source) * Math['PI']) / 0xb4,
+  const next = (normalizeRotationDegrees(source) * Math['PI']) / 180,
     current = Math['cos'](next),
     entry = Math['sin'](next),
     record = box['x'] - x['x'],
@@ -31,11 +31,11 @@ export function getImageRotationLayout(width, height, handle, state = ![]) {
         height: height,
         scale: Math['min'](width / box2['width'], height / box2['height']),
       }
-    : { ...box2, scale: 0x1 };
+    : { ...box2, scale: 1 };
 }
 export function inverseImageRotationPoint(box3, x2, y, config, scope = ![]) {
   const { scale: scale } = getImageRotationLayout(x2, y, config, scope),
-    x3 = { x: x2 / 0x2, y: y / 0x2 };
+    x3 = { x: x2 / 2, y: y / 2 };
   return rotatePointAroundCenter(
     {
       x: x3['x'] + (box3['x'] - x3['x']) / scale,

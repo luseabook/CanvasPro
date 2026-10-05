@@ -39,7 +39,7 @@ function _clamp(entry, record, payload) {
   return Math.min(Math.max(entry, record), payload);
 }
 function _roundTrackWeight(handle) {
-  return Math.round(handle * 0x2710) / 0x2710;
+  return Math.round(handle * 10000) / 10000;
 }
 function _getTrackTotal(list) {
   return list.reduce((item2, state) => item2 + state, 0);

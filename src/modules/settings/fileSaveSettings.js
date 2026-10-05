@@ -8,7 +8,7 @@ import { t } from '../../i18n/index.js';
 import { fileSavePathChanges } from './fileSaveMigrationGuard.js';
 import { initLegacyFileSaveImport } from './legacyFileSaveImport.js';
 import { showError, showSuccess } from '../../services/toastService.js';
-const MIGRATION_POLL_INTERVAL_MS = 0x15e,
+const MIGRATION_POLL_INTERVAL_MS = 350,
   ROOT_FIELD_ID = 'fileSaveRootDir',
   ROOT_BUTTON_ID = 'btnFileSaveRootDirPick',
   FIELD_IDS = { canvasDir: 'fileSaveCanvasDir', dataDir: 'fileSaveDataDir', outputDir: 'fileSaveOutputDir' },

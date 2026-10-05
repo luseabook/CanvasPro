@@ -2,12 +2,12 @@ import { queryRendererSpatialIndexIds, screenViewportToWorldBounds } from './ren
 import { resolveRendererVirtualizationTier } from './rendererVirtualization.js';
 const BOUNDS_EPSILON = 0.000001;
 export const RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG = Object['freeze']({
-  maxDirectVisibleNodeCount: 0x80,
-  maxRasterAssistedVisibleNodeCount: 0x180,
+  maxDirectVisibleNodeCount: 128,
+  maxRasterAssistedVisibleNodeCount: 384,
   minRasterVisibleShare: 0.5,
-  rasterAssistedImmediateCreateLimit: 0x10,
+  rasterAssistedImmediateCreateLimit: 16,
 });
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -27,14 +27,14 @@ function buildInteractionSignature(state = {}) {
     target = state['pickConnectMode'] || {};
   return [
     normalizeIds(state['selectedNodeIds']),
-    options['active'] === !![] ? 0x1 : 0x0,
+    options['active'] === !![] ? 1 : 0,
     options['srcId'] || '',
     options['hoverId'] || '',
     normalizeIds(options['invalidNodeIds']),
-    target['active'] === !![] ? 0x1 : 0x0,
+    target['active'] === !![] ? 1 : 0,
     target['sourceNodeId'] || target['srcId'] || '',
     target['hoverNodeId'] || target['hoverId'] || '',
-    state['ui']?.['showVideoMeta'] === !![] ? 0x1 : 0x0,
+    state['ui']?.['showVideoMeta'] === !![] ? 1 : 0,
   ]['join']('\x1e');
 }
 function containsBounds(enabled2, enabled3) {
@@ -52,36 +52,36 @@ function containsBounds(enabled2, enabled3) {
 }
 export function shouldPrepareRendererViewportPreviewCoverage({
   viewport: viewport,
-  nodeCount: nodeCount = 0x0,
-  visibleNodeCount: visibleNodeCount = 0x0,
-  rasterVisibleNodeCount: rasterVisibleNodeCount = 0x0,
+  nodeCount: nodeCount = 0,
+  visibleNodeCount: visibleNodeCount = 0,
+  rasterVisibleNodeCount: rasterVisibleNodeCount = 0,
 } = {}) {
-  const nodeCount2 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0))),
-    source = Math['max'](0x0, Math['trunc'](finiteNumber(visibleNodeCount, 0x0)));
+  const nodeCount2 = Math['max'](0, Math['trunc'](finiteNumber(nodeCount, 0))),
+    source = Math['max'](0, Math['trunc'](finiteNumber(visibleNodeCount, 0)));
   if (resolveRendererVirtualizationTier({ viewport: viewport, nodeCount: nodeCount2 }) === 'default')
     return ![];
   if (source <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount']) return !![];
   if (source > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']) return ![];
-  const next = Math['max'](0x0, Math['trunc'](finiteNumber(rasterVisibleNodeCount, 0x0)));
+  const next = Math['max'](0, Math['trunc'](finiteNumber(rasterVisibleNodeCount, 0)));
   return (
-    next / Math['max'](0x1, source) >= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['minRasterVisibleShare']
+    next / Math['max'](1, source) >= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['minRasterVisibleShare']
   );
 }
 export function createRendererViewportPreviewCoverage({
   viewport: viewport2,
   containerWidth: containerWidth,
   containerHeight: containerHeight,
-  padding: padding = 0x0,
-  nodeCount: nodeCount = 0x0,
+  padding: padding = 0,
+  nodeCount: nodeCount = 0,
   snapshot: snapshot = {},
   spatialIndex: spatialIndex = null,
   presentedNodeIds: presentedNodeIds = null,
   ready: ready = !![],
 } = {}) {
   if (ready !== !![]) return null;
-  const containerWidth2 = Math['max'](0x1, finiteNumber(containerWidth, 0x1)),
-    containerHeight2 = Math['max'](0x1, finiteNumber(containerHeight, 0x1)),
-    nodeCount3 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0)));
+  const containerWidth2 = Math['max'](1, finiteNumber(containerWidth, 1)),
+    containerHeight2 = Math['max'](1, finiteNumber(containerHeight, 1)),
+    nodeCount3 = Math['max'](0, Math['trunc'](finiteNumber(nodeCount, 0)));
   return {
     bounds: screenViewportToWorldBounds({
       viewport: viewport2,
@@ -107,10 +107,10 @@ export function createRendererViewportPreviewCoverage({
 }
 export function canReuseRendererViewportPreviewCoverage(
   containerWidth3,
-  { viewport: viewport3, nodeCount: nodeCount = 0x0, snapshot: snapshot = {} } = {},
+  { viewport: viewport3, nodeCount: nodeCount = 0, snapshot: snapshot = {} } = {},
 ) {
   if (!containerWidth3?.['bounds']) return ![];
-  const nodeCount4 = Math['max'](0x0, Math['trunc'](finiteNumber(nodeCount, 0x0))),
+  const nodeCount4 = Math['max'](0, Math['trunc'](finiteNumber(nodeCount, 0))),
     rendererVirtualizationTier = resolveRendererVirtualizationTier({
       viewport: viewport3,
       nodeCount: nodeCount4,
@@ -142,7 +142,7 @@ export function canReuseRendererViewportPreviewCoverage(
     viewport: viewport3,
     containerWidth: containerWidth3['containerWidth'],
     containerHeight: containerWidth3['containerHeight'],
-    padding: 0x0,
+    padding: 0,
   });
   if (containerWidth3['presentedNodeIds'] instanceof Set) {
     if (!containerWidth3['spatialIndex']) return ![];

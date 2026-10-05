@@ -1,4 +1,4 @@
-let audioVoiceConfirmSequence = 0x0;
+let audioVoiceConfirmSequence = 0;
 function createElement(el, value, item = '', key = '') {
   const el2 = el['createElement'](value);
   if (item) el2['className'] = item;
@@ -78,7 +78,7 @@ export function createAudioVoiceConfirmDialog({
           }),
           documentObject?.['addEventListener']?.('keydown', handleKeydown, !![]),
           el3['appendChild'](overlay),
-          windowObject?.['setTimeout']?.(() => el5['focus']?.(), 0x0));
+          windowObject?.['setTimeout']?.(() => el5['focus']?.(), 0));
       });
     };
   return Object['freeze']({ confirm: confirm, close: close, destroy: () => close(![]) });

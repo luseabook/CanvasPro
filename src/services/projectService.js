@@ -47,8 +47,8 @@ function _getActiveProjectIdentity() {
   return stripProjectFileExtension(window['currentProjectId'] || window['_v2CurrentFile'] || '');
 }
 const DEFAULT_PROJECT_NAME = 'default_v2_project',
-  REMOTE_SAVE_CACHE_LIMIT = 0x1f4,
-  REMOTE_IMAGE_MAX_BYTES = 0x400 * 0x400 * 0x12c,
+  REMOTE_SAVE_CACHE_LIMIT = 500,
+  REMOTE_IMAGE_MAX_BYTES = 1024 * 1024 * 300,
   _remoteSaveInflight = new Map(),
   _remoteSaveCache = new Map(),
   _localStagedAssetImportInflight = new Map(),
@@ -159,7 +159,7 @@ function _migrateCanvasDataInPlace(input) {
     enabled6['nodes'] = list['filter'](
       (value4) => !RETIRED_CANVAS_NODE_TYPES['has'](String(value4?.['type'] || '')),
     );
-    map['size'] > 0x0 &&
+    map['size'] > 0 &&
       (enabled6['edges'] = (Array['isArray'](enabled6['edges']) ? enabled6['edges'] : [])['filter'](
         (value5) =>
           !map['has'](String(value5?.['sourceId'] || '')) && !map['has'](String(value5?.['targetId'] || '')),
@@ -176,22 +176,22 @@ export function resolveCanvasData(canvases) {
   if (!canvases)
     return _migrateCanvasDataInPlace({
       canvases: [
-        { id: 'canvas_1', name: '默认画布', nodes: [], edges: [], viewport: { x: 0x0, y: 0x0, zoom: 1.1 } },
+        { id: 'canvas_1', name: '默认画布', nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1.1 } },
       ],
       activeCanvasId: 'canvas_1',
     });
-  if (Array['isArray'](canvases['canvases']) && canvases['canvases']['length'] > 0x0) {
-    let activeCanvasId = canvases['activeCanvasId'] || canvases['canvases'][0x0]['id'];
+  if (Array['isArray'](canvases['canvases']) && canvases['canvases']['length'] > 0) {
+    let activeCanvasId = canvases['activeCanvasId'] || canvases['canvases'][0]['id'];
     const enabled7 = canvases['canvases']['find']((value8) => value8['id'] === activeCanvasId);
     if (
       enabled7 &&
-      (!enabled7['nodes'] || enabled7['nodes']['length'] === 0x0) &&
-      (!enabled7['storyboard3dProjects'] || enabled7['storyboard3dProjects']['length'] === 0x0)
+      (!enabled7['nodes'] || enabled7['nodes']['length'] === 0) &&
+      (!enabled7['storyboard3dProjects'] || enabled7['storyboard3dProjects']['length'] === 0)
     ) {
       const value9 = canvases['canvases']['find'](
         (state2) =>
-          (state2['nodes'] && state2['nodes']['length'] > 0x0) ||
-          (state2['storyboard3dProjects'] && state2['storyboard3dProjects']['length'] > 0x0),
+          (state2['nodes'] && state2['nodes']['length'] > 0) ||
+          (state2['storyboard3dProjects'] && state2['storyboard3dProjects']['length'] > 0),
       );
       if (value9) activeCanvasId = value9['id'];
     }
@@ -206,7 +206,7 @@ export function resolveCanvasData(canvases) {
     name: '默认画布',
     nodes: nodes,
     edges: edges,
-    viewport: canvases['viewport'] || { x: 0x0, y: 0x0, zoom: 1.1 },
+    viewport: canvases['viewport'] || { x: 0, y: 0, zoom: 1.1 },
   };
   return _migrateCanvasDataInPlace({ canvases: [value10], activeCanvasId: 'canvas_1' });
 }
@@ -235,11 +235,11 @@ async function _loadProjectStrict(value14) {
   const canvasData = resolveCanvasData(fetchV2ProjectFromServer2);
   return (
     console['log'](
-      '[projectService]\x20项目\x20' +
+      '[projectService] 项目 ' +
         value14 +
         ' 已加载，共 ' +
         canvasData['canvases']['length'] +
-        '\x20个画布页面',
+        ' 个画布页面',
     ),
     canvasData
   );
@@ -259,7 +259,7 @@ async function _persistProjectSnapshot(value16, value17, value18) {
         (window['currentProjectId'] = stripProjectFileExtension(response['filename'])),
         _clearElectronRecoverySnapshotAfterSave()),
       console['log'](
-        '[projectService]\x20项目\x20' +
+        '[projectService] 项目 ' +
           value16 +
           ' 已持久化（' +
           value17['canvases']['length'] +
@@ -277,7 +277,7 @@ export async function saveProject(value22, value23) {
     'project.save',
     {
       projectRef: diagnosticReference(value22),
-      canvasCount: Array['isArray'](value23?.['canvases']) ? value23['canvases']['length'] : 0x0,
+      canvasCount: Array['isArray'](value23?.['canvases']) ? value23['canvases']['length'] : 0,
     },
     () => _saveProject(value22, value23),
   );
@@ -355,7 +355,7 @@ async function _importAssetWithElectron(name, projectId2) {
 export function importLocalStagedAsset(value33, projectId3 = {}) {
   const localPath = normalizeLocalPath(value33);
   if (!localPath['startsWith']('data/uploads/'))
-    throw new Error('Only\x20staged\x20local\x20uploads\x20can\x20be\x20imported\x20as\x20assets');
+    throw new Error('Only staged local uploads can be imported as assets');
   if (!desktopBridge['isChromeShell']) return null;
   const run2 = _getElectronImportAsset();
   if (!run2) return null;
@@ -431,7 +431,7 @@ export function discardLocalStagedAsset(value36) {
 export async function uploadFile(value37, value38) {
   return runDiagnosticOperation(
     'asset.upload',
-    { projectRef: diagnosticReference(value38), sizeBytes: Number(value37?.['size'] || 0x0) },
+    { projectRef: diagnosticReference(value38), sizeBytes: Number(value37?.['size'] || 0) },
     () => _uploadFile(value37, value38),
   );
 }
@@ -463,7 +463,7 @@ async function _uploadFile(value39, value40) {
 export async function saveOutputBlob(value43, value44 = {}) {
   return runDiagnosticOperation(
     'output.save_blob',
-    { sizeBytes: Number(value43?.['size'] || 0x0) },
+    { sizeBytes: Number(value43?.['size'] || 0) },
     async () => _normalizeImageSaveResult(await saveOutputToServer(value43, value44)),
   );
 }
@@ -488,8 +488,8 @@ async function _saveOutputFromUrl(value48, args2 = {}) {
       return await saveOutputBlob(fetchRemoteBlob2, args2);
     } catch (error4) {
       return (
-        console['error']('[projectService]\x20Client-side\x20output\x20blob\x20save\x20failed:', error4),
-        { error: 'Client-side\x20output\x20blob\x20save\x20failed:\x20' + error4['message'] }
+        console['error']('[projectService] Client-side output blob save failed:', error4),
+        { error: 'Client-side output blob save failed: ' + error4['message'] }
       );
     }
   return _normalizeImageSaveResult(await saveOutputFromUrlToServer({ url: url, ...args2 }));
@@ -498,7 +498,7 @@ function _guessAudioExtFromUrl(value49) {
   try {
     const uRL = new URL(String(value49 || ''), 'http://localhost'),
       value50 = String(uRL['pathname'] || '')['match'](/\.([a-z0-9]{1,5})$/i),
-      value51 = String(value50?.[0x1] || '')['toLowerCase']();
+      value51 = String(value50?.[1] || '')['toLowerCase']();
     if (['wav', 'mp3', 'm4a', 'flac', 'aac', 'ogg', 'opus', 'wma', 'amr', 'webm']['includes'](value51))
       return value51;
   } catch {}
@@ -543,7 +543,7 @@ export async function saveRemoteAudioLocallyDetailed(value54, args3 = {}) {
     const ext2 = _guessAudioExtFromUrl(enabled10) || 'mp3';
     try {
       return _toLocalAudioResult(
-        await saveOutputFromUrl(enabled10, { ext: ext2, maxBytes: 0x400 * 0x400 * 0xc8, ...args3 }),
+        await saveOutputFromUrl(enabled10, { ext: ext2, maxBytes: 1024 * 1024 * 200, ...args3 }),
       );
     } catch {}
     const fetchRemoteBlob4 = await fetchRemoteBlob(enabled10),
@@ -588,7 +588,7 @@ function _createRemoteImageSaveError({
   if (_stringifyRemoteSaveError2) list2['push']('服务端下载失败：' + _stringifyRemoteSaveError2);
   if (_stringifyRemoteSaveError3) list2['push']('浏览器下载失败：' + _stringifyRemoteSaveError3);
   const error6 = new Error(
-    list2['length'] > 0x0 ? '保存到本地失败：' + list2['join']('；') : '保存到本地失败',
+    list2['length'] > 0 ? '保存到本地失败：' + list2['join']('；') : '保存到本地失败',
   );
   return (
     (error6['serverError'] = serverError || null),
@@ -624,7 +624,7 @@ function _guessImageExtFromUrl(value58) {
     const uRL2 = new URL(enabled11, window['location']['href']),
       value59 = String(uRL2['pathname'] || ''),
       value60 = value59['match'](/\.([a-z0-9]{1,5})$/i),
-      enabled12 = (value60?.[0x1] || '')['toLowerCase']();
+      enabled12 = (value60?.[1] || '')['toLowerCase']();
     if (!enabled12) return '';
     if (enabled12 === 'jpeg') return 'jpg';
     if (enabled12 === 'jpg') return 'jpg';
@@ -716,7 +716,7 @@ export async function saveRemoteImageLocally(value65, value66, value67 = {}) {
 export function exportProject(filename, value68) {
   return saveTextDownload({
     filename: filename + '.aicanvas',
-    content: JSON['stringify'](value68, null, 0x2),
+    content: JSON['stringify'](value68, null, 2),
     mimeType: 'application/json',
     filterName: 'SHUO Canvas Project',
   });
@@ -730,7 +730,7 @@ export async function importProject(value69) {
           canvasData2 = resolveCanvasData(value70);
         handler(canvasData2);
       } catch (value71) {
-        handler2(new Error('解析\x20JSON\x20存档失败'));
+        handler2(new Error('解析 JSON 存档失败'));
       }
     }),
       (fileReader['onerror'] = () => handler2(new Error('文件读取失败'))),

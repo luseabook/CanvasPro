@@ -123,7 +123,7 @@ test('an explicit null selection controller falls back to the real one', () => {
 test('the injected selection controller is the one the shortcut controller captures from', async () => {
   const { controllers, stub } = build();
   await controllers.globalTextPresetShortcutController.captureSelectedText();
-  assert.deepEqual(stub.calls.captureArguments, [0x0]);
+  assert.deepEqual(stub.calls.captureArguments, [0]);
 });
 
 test('the default accelerator reaches the real shortcut controller', () => {
@@ -159,7 +159,7 @@ test('an explicit accelerator replaces the launcher binding', () => {
 test('the launcher capture is served by the assembled capture window, not by a fallback panel', async () => {
   const { controllers, stub, logs } = build();
   const result = await controllers.globalTextPresetShortcutController.captureSelectedText();
-  assert.equal(stub.calls.captureArguments.length, 0x1);
+  assert.equal(stub.calls.captureArguments.length, 1);
   assert.equal(result.ok, false);
   assert.equal(result.reason, 'window-show-failed');
   assert.ok(
@@ -184,10 +184,10 @@ test('prewarm aggregates both controllers in order', async () => {
   const { controllers, stub, logs } = build();
   const result = await controllers.globalCaptureWindowController.prewarm();
   assert.ok(Array.isArray(result));
-  assert.equal(result.length, 0x2);
-  assert.equal(result[0x0], undefined);
-  assert.deepEqual(result[0x1], { ok: true, prewarmed: true });
-  assert.equal(stub.calls.prewarm, 0x1);
+  assert.equal(result.length, 2);
+  assert.equal(result[0], undefined);
+  assert.deepEqual(result[1], { ok: true, prewarmed: true });
+  assert.equal(stub.calls.prewarm, 1);
   assert.ok(logs.events.some((event) => event.type === 'global_capture.window_prewarm_failed'));
 });
 
@@ -195,22 +195,22 @@ test('the aggregating prewarm is not memoized across calls', async () => {
   const { controllers, stub } = build();
   await controllers.globalCaptureWindowController.prewarm();
   await controllers.globalCaptureWindowController.prewarm();
-  assert.equal(stub.calls.prewarm, 0x2);
+  assert.equal(stub.calls.prewarm, 2);
 });
 
 test('prewarm still settles after destroy', async () => {
   const { controllers } = build();
   controllers.globalCaptureWindowController.destroy();
   const result = await controllers.globalCaptureWindowController.prewarm();
-  assert.equal(result.length, 0x2);
+  assert.equal(result.length, 2);
 });
 
 test('destroy reaches the selection controller and is repeatable', () => {
   const { controllers, stub } = build();
   controllers.globalCaptureWindowController.destroy();
-  assert.equal(stub.calls.destroy, 0x1);
+  assert.equal(stub.calls.destroy, 1);
   controllers.globalCaptureWindowController.destroy();
-  assert.equal(stub.calls.destroy, 0x2);
+  assert.equal(stub.calls.destroy, 2);
 });
 
 test('destroy reaches the real shortcut controller', async () => {

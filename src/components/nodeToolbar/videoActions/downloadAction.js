@@ -27,11 +27,11 @@ export function bindVideoDownloadAction(item) {
       }
       try {
         const signal = new AbortController(),
-          setTimeout2 = setTimeout(() => signal.abort(), 0x4e20),
+          setTimeout2 = setTimeout(() => signal.abort(), 20000),
           index = await fetchRemoteBlob(enabled, { signal: signal.signal });
         clearTimeout(setTimeout2);
         const result = window.URL.createObjectURL(index);
-        (_triggerHrefDownload(result, key), setTimeout(() => window.URL.revokeObjectURL(result), 0x5dc));
+        (_triggerHrefDownload(result, key), setTimeout(() => window.URL.revokeObjectURL(result), 1500));
       } catch {
         _triggerHrefDownload(enabled, key);
       }

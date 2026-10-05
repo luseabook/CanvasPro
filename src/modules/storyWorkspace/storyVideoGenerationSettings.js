@@ -55,22 +55,22 @@ function getStoryVideoDurationSchemaField(source) {
 }
 function normalizeDurationSeconds(current) {
   const entry = String(current ?? '')['match'](/\d+(?:\.\d+)?/),
-    count = Number(entry?.[0x0]);
-  return Number['isFinite'](count) && count > 0x0 ? Number(count['toFixed'](0x1)) : 0x0;
+    count = Number(entry?.[0]);
+  return Number['isFinite'](count) && count > 0 ? Number(count['toFixed'](1)) : 0;
 }
 export function resolveStoryVideoGenerationDurationSeconds(record, payload = {}) {
   const storyVideoDurationSchemaField = getStoryVideoDurationSchemaField(record);
-  if (!storyVideoDurationSchemaField?.['id']) return 0x0;
+  if (!storyVideoDurationSchemaField?.['id']) return 0;
   const storyVideoGenerationParams = normalizeStoryVideoGenerationParams(record, payload);
   return normalizeDurationSeconds(storyVideoGenerationParams[storyVideoDurationSchemaField['id']]);
 }
-export function applyStoryVideoGenerationDurationSeconds(handle, state = {}, config = 0x0) {
+export function applyStoryVideoGenerationDurationSeconds(handle, state = {}, config = 0) {
   const storyVideoDurationSchemaField2 = getStoryVideoDurationSchemaField(handle),
     args = normalizeStoryVideoGenerationParams(handle, state),
     durationSeconds = normalizeDurationSeconds(config);
   if (!storyVideoDurationSchemaField2?.['id'] || !durationSeconds) return args;
-  const count2 = Number(resolveStoryVideoClipDurationConstraints(handle)?.['maxSeconds']) || 0x0,
-    scope = count2 > 0x0 ? Math['min'](durationSeconds, count2) : durationSeconds;
+  const count2 = Number(resolveStoryVideoClipDurationConstraints(handle)?.['maxSeconds']) || 0,
+    scope = count2 > 0 ? Math['min'](durationSeconds, count2) : durationSeconds;
   return normalizeStoryVideoGenerationParams(handle, {
     ...args,
     [storyVideoDurationSchemaField2['id']]: scope,
@@ -79,25 +79,25 @@ export function applyStoryVideoGenerationDurationSeconds(handle, state = {}, con
 export function getStoryClipVideoGenerationDurationOverride(options2 = {}) {
   return normalizeDurationSeconds(options2?.['videoGenerationDurationSec']);
 }
-export function resolveStoryVideoInitialGenerationDurationSeconds(input, output = 0x0) {
+export function resolveStoryVideoInitialGenerationDurationSeconds(input, output = 0) {
   const storyVideoDurationSchemaField3 = getStoryVideoDurationSchemaField(input),
     durationSeconds2 = normalizeDurationSeconds(output);
-  if (!storyVideoDurationSchemaField3?.['id'] || !durationSeconds2) return 0x0;
+  if (!storyVideoDurationSchemaField3?.['id'] || !durationSeconds2) return 0;
   const storyVideoClipDurationConstraints = resolveStoryVideoClipDurationConstraints(input),
     list2 = Array['isArray'](storyVideoClipDurationConstraints?.['allowedSeconds'])
       ? storyVideoClipDurationConstraints['allowedSeconds']
       : [];
   if (list2['length'])
-    return list2['find']((value2) => value2 >= durationSeconds2) || list2['at'](-0x1) || 0x0;
-  const value3 = Number(storyVideoClipDurationConstraints?.['minSeconds']) || 0x0,
-    count3 = Number(storyVideoClipDurationConstraints?.['maxSeconds']) || 0x0,
-    count4 = Number(storyVideoClipDurationConstraints?.['stepSeconds']) || 0x0;
+    return list2['find']((value2) => value2 >= durationSeconds2) || list2['at'](-1) || 0;
+  const value3 = Number(storyVideoClipDurationConstraints?.['minSeconds']) || 0,
+    count3 = Number(storyVideoClipDurationConstraints?.['maxSeconds']) || 0,
+    count4 = Number(storyVideoClipDurationConstraints?.['stepSeconds']) || 0;
   let value4 = Math['max'](value3, durationSeconds2);
-  if (count4 > 0x0) {
-    const value5 = value3 || 0x0;
+  if (count4 > 0) {
+    const value5 = value3 || 0;
     value4 = value5 + Math['ceil']((value4 - value5 - 1e-9) / count4) * count4;
   }
-  if (count3 > 0x0) value4 = Math['min'](value4, count3);
+  if (count3 > 0) value4 = Math['min'](value4, count3);
   return normalizeDurationSeconds(value4);
 }
 export function initializeStoryClipVideoGenerationDuration(enabled2, value6) {
@@ -114,10 +114,10 @@ export function initializeStoryClipVideoGenerationDuration(enabled2, value6) {
   return ((enabled2['videoGenerationDurationSec'] = storyVideoInitialGenerationDurationSeconds), !![]);
 }
 export function initializeStoryEpisodeVideoGenerationDurations(enabled3, value7) {
-  if (!enabled3 || typeof enabled3 !== 'object') return 0x0;
+  if (!enabled3 || typeof enabled3 !== 'object') return 0;
   return (Array['isArray'](enabled3['clips']) ? enabled3['clips'] : [])['reduce'](
     (value8, value9) => value8 + Number(initializeStoryClipVideoGenerationDuration(value9, value7)),
-    0x0,
+    0,
   );
 }
 export function setStoryClipVideoGenerationDurationOverride(enabled4, value10) {
@@ -155,7 +155,7 @@ export function formatStoryClipVideoGenerationDuration(value17, value18, value19
     value19,
   );
   return storyClipVideoGenerationDurationSeconds
-    ? storyClipVideoGenerationDurationSeconds['toFixed'](0x1) + 's'
+    ? storyClipVideoGenerationDurationSeconds['toFixed'](1) + 's'
     : '--';
 }
 export function reconcileStoryClipVideoGenerationDurationChange({
@@ -190,13 +190,13 @@ export function reconcileStoryClipVideoGenerationDurationChange({
     value20 = Boolean(getStoryClipVideoGenerationDurationOverride(clip2)),
     durationChanged =
       Boolean(generationParamsChanged) &&
-      storyVideoGenerationDurationSeconds2 > 0x0 &&
+      storyVideoGenerationDurationSeconds2 > 0 &&
       storyVideoGenerationDurationSeconds2 !== storyClipVideoGenerationDurationSeconds2,
     overrideChanged = durationChanged
       ? setStoryClipVideoGenerationDurationOverride(clip2, storyVideoGenerationDurationSeconds2)
       : ![];
   return (
-    storyVideoGenerationDurationSeconds > 0x0 &&
+    storyVideoGenerationDurationSeconds > 0 &&
       (durationChanged || value20 || getStoryClipVideoGenerationDurationOverride(clip2)) &&
       (generationParams = applyStoryVideoGenerationDurationSeconds(
         modelId,
@@ -233,16 +233,16 @@ export function resolveStoryVideoClipDurationConstraints(value24) {
           ? storyVideoDurationSchemaField4['options']
           : [])
           ['map']((el2) => Number(el2 && typeof el2 === 'object' ? el2['value'] : el2))
-          ['filter']((count5) => Number['isFinite'](count5) && count5 > 0x0),
+          ['filter']((count5) => Number['isFinite'](count5) && count5 > 0),
       ),
     ]['sort']((value25, value26) => value25 - value26),
     count6 = Number(storyVideoDurationSchemaField4['min']),
     count7 = Number(storyVideoDurationSchemaField4['max']),
     count8 = Number(storyVideoDurationSchemaField4['step']),
     value27 = {
-      minSeconds: Number['isFinite'](count6) && count6 > 0x0 ? count6 : allowedSeconds[0x0] || 0x0,
-      maxSeconds: Number['isFinite'](count7) && count7 > 0x0 ? count7 : allowedSeconds['at'](-0x1) || 0x0,
-      stepSeconds: Number['isFinite'](count8) && count8 > 0x0 ? count8 : 0x0,
+      minSeconds: Number['isFinite'](count6) && count6 > 0 ? count6 : allowedSeconds[0] || 0,
+      maxSeconds: Number['isFinite'](count7) && count7 > 0 ? count7 : allowedSeconds['at'](-1) || 0,
+      stepSeconds: Number['isFinite'](count8) && count8 > 0 ? count8 : 0,
       allowedSeconds: allowedSeconds,
     };
   return value27['minSeconds'] || value27['maxSeconds'] || value27['allowedSeconds']['length']

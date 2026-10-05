@@ -159,7 +159,7 @@ function _positionSlashMenu() {
     closeSlashMenu();
     return;
   }
-  const count3 = el17.offsetHeight || enabled3.menuHeight || 0x118;
+  const count3 = el17.offsetHeight || enabled3.menuHeight || 280;
   ((enabled3.menuHeight = count3),
     (el17.style.left = box2.left + 'px'),
     (el17.style.visibility = 'visible'),
@@ -395,7 +395,7 @@ function _renderSlashMenu({
       menu: menu,
       anchorEl: anchorEl || promptEl3.parentNode || promptEl3,
       placement: ['above-end', 'expanded-panel'].includes(placement) ? placement : 'auto-start',
-      menuHeight: menu.offsetHeight || 0x118,
+      menuHeight: menu.offsetHeight || 280,
       onOpenChange: onOpenChange,
     }),
     _positionSlashMenu(),

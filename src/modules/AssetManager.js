@@ -100,8 +100,8 @@ function _escapeHtml(data) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function _clonePlain(options, target) {
   if (options == null) return target;
@@ -145,7 +145,7 @@ function _renderAssetIcon(payload) {
   if (_normalizeAssetType3 === 'text') return createReferenceFallbackThumbHtml('text', 'v2-asset-icon');
   if (_normalizeAssetType3 === 'audio') return createReferenceFallbackThumbHtml('audio', 'v2-asset-icon');
   if (_normalizeAssetType3 === 'video')
-    return '<div\x20class=\x22v2-asset-icon\x20v2-asset-icon--video\x22\x20aria-hidden=\x22true\x22>\x0a\x20\x20\x20\x20\x20\x20<svg\x20class=\x22v2-asset-icon-svg\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22currentColor\x22\x20opacity=\x220.5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<polygon\x20points=\x225\x203\x2019\x2012\x205\x2021\x205\x203\x22\x20/>\x0a\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20</div>';
+    return '<div class="v2-asset-icon v2-asset-icon--video" aria-hidden="true">\n      <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">\n        <polygon points="5 3 19 12 5 21 5 3" />\n      </svg>\n    </div>';
   return '<div class="v2-asset-icon v2-asset-icon--other" aria-hidden="true">\n    <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">\n      <rect x="3" y="3" width="18" height="18" rx="2" />\n    </svg>\n  </div>';
 }
 function _buildAssetItem(name) {
@@ -163,14 +163,14 @@ function _resolveMaterialItemPreviewSrc(state) {
 }
 function _sortAssetsByUpdatedTime(config) {
   return [...(Array['isArray'](config) ? config : [])]['sort']((scope, input) => {
-    const output = Number(scope?.['updatedAt'] || scope?.['createdAt'] || 0x0),
-      value2 = Number(input?.['updatedAt'] || input?.['createdAt'] || 0x0);
+    const output = Number(scope?.['updatedAt'] || scope?.['createdAt'] || 0),
+      value2 = Number(input?.['updatedAt'] || input?.['createdAt'] || 0);
     return value2 - output;
   });
 }
 function _formatAssetDateTime(value3) {
   const count2 = Number(value3);
-  if (!Number['isFinite'](count2) || count2 <= 0x0) return assetManagerText('unknownTime');
+  if (!Number['isFinite'](count2) || count2 <= 0) return assetManagerText('unknownTime');
   return new Date(count2)['toLocaleString'](getLocale(), {
     year: 'numeric',
     month: '2-digit',
@@ -193,14 +193,14 @@ class AssetManager {
       (this['_thumbPreloadSet'] = new Set()),
       (this['_thumbDecodePromiseMap'] = new Map()),
       (this['_videoThumbInFlight'] = new Set()),
-      (this['_videoThumbTimer'] = 0x0),
-      (this['_sidebarRenderRaf'] = 0x0),
+      (this['_videoThumbTimer'] = 0),
+      (this['_sidebarRenderRaf'] = 0),
       (this['_pendingDeleteAssetId'] = ''),
       (this['_renamingAssetId'] = ''),
       (this['_renamingMaterialItemKey'] = ''),
       (this['_savingMaterialItemKey'] = ''),
       (this['_newAssetPulseId'] = ''),
-      (this['_sidebarTabsLayoutRaf'] = 0x0),
+      (this['_sidebarTabsLayoutRaf'] = 0),
       (this['_assetPackageUpsertByKey'] = new Map()),
       (this['_materialSearchQuery'] = ''),
       (this['_materialFavoritesOnly'] = ![]),
@@ -214,12 +214,12 @@ class AssetManager {
       (this['_materialMenuState'] = null),
       (this['_materialMenuOutsideHandler'] = null),
       (this['_materialMenuKeydownHandler'] = null),
-      (this['_materialAssetRowClickTimer'] = 0x0),
+      (this['_materialAssetRowClickTimer'] = 0),
       (this['_materialAssetRowClickToggle'] = null),
       (this['_materialPreviewEl'] = null),
       (this['_materialPreviewRow'] = null),
       (this['_materialDropTarget'] = null),
-      (this['_materialLoadingCount'] = 0x0),
+      (this['_materialLoadingCount'] = 0),
       (this['activeTab'] = '人物'),
       (this['_materialCurrentFolderCategory'] = this['activeTab']),
       (this['tabs'] = [...DEFAULT_ASSET_CATEGORIES]),
@@ -327,14 +327,14 @@ class AssetManager {
     return (
       Object['entries'](this['materialCategoryParents'] || {})['find'](
         ([value28]) => this['_categoryKey'](value28) === enabled8,
-      )?.[0x1] || ''
+      )?.[1] || ''
     );
   }
   ['_createUniqueMaterialFolderName']() {
     const value29 = this['_normalizeCategoryName'](assetManagerText('newFolder'));
     if (!this['_findCategoryByName'](value29, this['_getAssetCategories']())) return value29;
-    for (let value30 = 0x2; value30 <= ASSET_CATEGORY_LIMIT; value30 += 0x1) {
-      const value31 = value29 + '\x20' + value30;
+    for (let value30 = 2; value30 <= ASSET_CATEGORY_LIMIT; value30 += 1) {
+      const value31 = value29 + ' ' + value30;
       if (!this['_findCategoryByName'](value31, this['_getAssetCategories']())) return value31;
     }
     return '';
@@ -415,13 +415,13 @@ class AssetManager {
         parents: this['materialCategoryParents'],
       }),
       !this['_findCategoryByName'](this['activeTab'], this['tabs']) &&
-        ((this['activeTab'] = DEFAULT_ASSET_CATEGORIES[0x0]), (this['_openAssetId'] = null)));
+        ((this['activeTab'] = DEFAULT_ASSET_CATEGORIES[0]), (this['_openAssetId'] = null)));
   }
   ['_renderSidebarTabsHtml']() {
     return (this['tabs'] || [])
       ['map']((value42) => {
         const value43 =
-            this['_categoryKey'](value42) === this['_categoryKey'](this['activeTab']) ? '\x20active' : '',
+            this['_categoryKey'](value42) === this['_categoryKey'](this['activeTab']) ? ' active' : '',
           _escapeHtml2 = _escapeHtml(value42),
           _escapeHtml3 = _escapeHtml(this['_formatCategoryLabel'](value42)),
           value44 = this['_isUserCategory'](value42)
@@ -434,11 +434,11 @@ class AssetManager {
               '"\n            >×</button>'
             : '';
         return (
-          '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-tab' +
+          '\n          <div class="v2-asset-sidebar-tab' +
           value43 +
           '" data-cat="' +
           _escapeHtml2 +
-          '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-sidebar-tab-text\x22>' +
+          '">\n            <span class="v2-asset-sidebar-tab-text">' +
           _escapeHtml3 +
           '</span>\n            ' +
           value44 +
@@ -459,15 +459,15 @@ class AssetManager {
     if (!this['sidebarPanel']) return;
     (this['_sidebarTabsLayoutRaf'] && window['cancelAnimationFrame']?.(this['_sidebarTabsLayoutRaf']),
       (this['_sidebarTabsLayoutRaf'] = window['requestAnimationFrame'](() => {
-        ((this['_sidebarTabsLayoutRaf'] = 0x0), this['_syncSidebarTabsViewport']());
+        ((this['_sidebarTabsLayoutRaf'] = 0), this['_syncSidebarTabsViewport']());
       })));
   }
   ['_syncSidebarTabsViewport']() {
     const el2 = this['sidebarPanel']?.['querySelector']('#asset-sidebar-tabs');
     if (!el2) return;
     const el3 = el2['querySelector']('.v2-asset-sidebar-tab.active');
-    if (el3 && el2['clientWidth'] > 0x0) {
-      if (this['_isDefaultCategory'](this['activeTab'])) el2['scrollLeft'] = 0x0;
+    if (el3 && el2['clientWidth'] > 0) {
+      if (this['_isDefaultCategory'](this['activeTab'])) el2['scrollLeft'] = 0;
       else {
         const value45 = el3['offsetLeft'],
           value46 = value45 + el3['offsetWidth'],
@@ -483,10 +483,10 @@ class AssetManager {
     const el4 = this['sidebarPanel']?.['querySelector']('#asset-sidebar-tabs-shell'),
       el5 = this['sidebarPanel']?.['querySelector']('#asset-sidebar-tabs');
     if (!el4 || !el5) return;
-    const count3 = Math['max'](0x0, el5['scrollWidth'] - el5['clientWidth']),
-      enabled11 = count3 > 0x2,
-      value49 = !enabled11 || el5['scrollLeft'] <= 0x2,
-      value50 = !enabled11 || el5['scrollLeft'] >= count3 - 0x2;
+    const count3 = Math['max'](0, el5['scrollWidth'] - el5['clientWidth']),
+      enabled11 = count3 > 2,
+      value49 = !enabled11 || el5['scrollLeft'] <= 2,
+      value50 = !enabled11 || el5['scrollLeft'] >= count3 - 2;
     (el4['classList']['toggle']('has-overflow', enabled11),
       el4['classList']['toggle']('is-at-start', value49),
       el4['classList']['toggle']('is-at-end', value50));
@@ -495,15 +495,15 @@ class AssetManager {
     if (el6) el6['hidden'] = !enabled11 || value49;
     if (el7) el7['hidden'] = !enabled11 || value50;
   }
-  ['_scrollSidebarTabs'](count4 = 0x1) {
+  ['_scrollSidebarTabs'](count4 = 1) {
     const el8 = this['sidebarPanel']?.['querySelector']('#asset-sidebar-tabs');
     if (!el8) return;
-    const value51 = Math['max'](0x1, Math['floor'](el8['clientWidth'] * 0.75)),
-      left = el8['scrollLeft'] + value51 * (count4 < 0x0 ? -0x1 : 0x1);
+    const value51 = Math['max'](1, Math['floor'](el8['clientWidth'] * 0.75)),
+      left = el8['scrollLeft'] + value51 * (count4 < 0 ? -1 : 1);
     (typeof el8['scrollTo'] === 'function'
       ? el8['scrollTo']({ left: left, behavior: 'smooth' })
       : (el8['scrollLeft'] = left),
-      window['setTimeout'](() => this['_updateSidebarTabsOverflowHint'](), 0xdc));
+      window['setTimeout'](() => this['_updateSidebarTabsOverflowHint'](), 220));
   }
   ['_getCreatePanelCategories']() {
     const list4 = this['_getAssetCategories'](),
@@ -602,19 +602,19 @@ class AssetManager {
   ['_normalizeAssetEntity'](args2) {
     if (!args2 || typeof args2 !== 'object') return null;
     const state2 = { ...args2 },
-      count5 = Number(state2['createdAt'] || 0x0),
-      count6 = Number(state2['updatedAt'] || count5 || 0x0);
-    count5 > 0x0 ? (state2['createdAt'] = count5) : delete state2['createdAt'];
-    if (count6 > 0x0) state2['updatedAt'] = count6;
-    else count5 > 0x0 && (state2['updatedAt'] = count5);
+      count5 = Number(state2['createdAt'] || 0),
+      count6 = Number(state2['updatedAt'] || count5 || 0);
+    count5 > 0 ? (state2['createdAt'] = count5) : delete state2['createdAt'];
+    if (count6 > 0) state2['updatedAt'] = count6;
+    else count5 > 0 && (state2['updatedAt'] = count5);
     Array['isArray'](state2['nodes']) &&
-      state2['nodes'][0x0] &&
+      state2['nodes'][0] &&
       !isAssetMaterialThumbnailUrl(state2['coverUrl']) &&
       (state2['coverUrl'] =
-        resolveAssetNodeCoverUrl(state2['nodes'][0x0]) || state2['coverUrl'] || '');
+        resolveAssetNodeCoverUrl(state2['nodes'][0]) || state2['coverUrl'] || '');
     const list5 = getMaterialAssetItems(state2);
     return (
-      list5['length'] > 0x0 &&
+      list5['length'] > 0 &&
         (state2['items'] = list5['map']((args3) => ({
           ...args3,
           thumbSrc: _resolveMaterialItemThumbSrc(args3),
@@ -659,7 +659,7 @@ class AssetManager {
       coverHtml: coverUrl2
         ? '<img src="' +
           _escapeHtml(coverUrl2) +
-          '\x22\x20alt=\x22' +
+          '" alt="' +
           _escapeHtml(assetManagerText('coverAlt')) +
           '" id="asset-create-cover-img" draggable="false" />'
         : _renderAssetIcon(coverType2),
@@ -688,10 +688,10 @@ class AssetManager {
   }
   ['_applyCreatePanelCoverAspect'](el9, value80) {
     if (!el9) return;
-    const value81 = Number(value80) > 0x0 ? Number(value80) : 0x4 / 0x3;
+    const value81 = Number(value80) > 0 ? Number(value80) : 4 / 3;
     (el9['style']['setProperty']('--asset-create-cover-aspect', String(value81)),
-      el9['style']['setProperty']('--asset-create-cover-width-limit', value81 * 0x64 + 'cqh'),
-      el9['style']['setProperty']('--asset-create-cover-height-limit', 0x64 / value81 + 'cqw'));
+      el9['style']['setProperty']('--asset-create-cover-width-limit', value81 * 100 + 'cqh'),
+      el9['style']['setProperty']('--asset-create-cover-height-limit', 100 / value81 + 'cqw'));
   }
   ['_applyCreatePanelCoverInfo'](el10, coverType3) {
     const value82 = String(coverType3?.['objectUrl'] || '');
@@ -708,9 +708,9 @@ class AssetManager {
       coverUrl: String(coverType3?.['coverUrl'] || ''),
       coverType: coverType3?.['coverType'] || 'other',
       aspectRatio:
-        Number(coverType3?.['aspectRatio']) > 0x0
+        Number(coverType3?.['aspectRatio']) > 0
           ? Number(coverType3['aspectRatio'])
-          : Number(this['_createPanelState']?.['coverInfo']?.['aspectRatio']) || 0x4 / 0x3,
+          : Number(this['_createPanelState']?.['coverInfo']?.['aspectRatio']) || 4 / 3,
       coverHtml: coverType3?.['coverHtml'] || _renderAssetIcon(coverType3?.['coverType'] || 'other'),
     };
     this['_setCreatePanelState']({ coverInfo: coverInfo });
@@ -724,7 +724,7 @@ class AssetManager {
   }
   ['_buildAssetPayloadFromSelection'](value83, error = {}) {
     const items = this['_getSelectedAssetNodes'](value83),
-      value84 = items[0x0] || null,
+      value84 = items[0] || null,
       value85 = Date['now'](),
       name2 = String(error['name'] || '')['trim']() || assetManagerText('unnamedAsset'),
       category2 = String(error['category'] || '')['trim']() || this['activeTab'],
@@ -770,7 +770,7 @@ class AssetManager {
         ? _clonePlain(id2['items'], [])
         : list11['map']((value91) => _buildAssetItem(value91)),
       args9 = Array['isArray'](id2?.['edges']) ? _clonePlain(id2['edges'], []) : [],
-      value92 = list10[0x0] || null,
+      value92 = list10[0] || null,
       value93 = value92 ? resolveAssetNodeCoverUrl(value92) : '',
       coverUrl4 = id2?.['coverUrl'] || value93,
       coverType5 = id2?.['coverType'] || value92?.['type'] || 'other';
@@ -814,7 +814,7 @@ class AssetManager {
       coverInfo: coverInfo2 || {
         coverUrl: '',
         coverType: 'other',
-        aspectRatio: 0x4 / 0x3,
+        aspectRatio: 4 / 3,
         coverHtml: _renderAssetIcon('other'),
       },
     };
@@ -870,7 +870,7 @@ class AssetManager {
       updateConfirmOpen: ![],
       error: '',
     });
-    const error5 = this['_getFilteredUpdateAssets']()[0x0] || null;
+    const error5 = this['_getFilteredUpdateAssets']()[0] || null;
     if (!error5) return;
     this['_setCreatePanelState']({
       draft: {
@@ -900,26 +900,26 @@ class AssetManager {
   }
   ['_renderCreatePanelFolderAssetHtml'](error6) {
     const materialAssetItems = getMaterialAssetItems(error6),
-      value102 = materialAssetItems[0x0] || null,
+      value102 = materialAssetItems[0] || null,
       _resolveMaterialItemThumbSrc2 = _resolveMaterialItemThumbSrc(value102) || String(error6?.['coverUrl'] || ''),
       value103 = value102?.['type'] || error6?.['coverType'] || 'other',
       value104 =
         _resolveMaterialItemThumbSrc2 && !this['_isNonImageMediaSrc'](_resolveMaterialItemThumbSrc2)
-          ? '<img\x20src=\x22' +
+          ? '<img src="' +
             _escapeHtml(_resolveMaterialItemThumbSrc2) +
             '" alt="" loading="lazy" decoding="async" draggable="false" />'
           : _renderAssetIcon(value103);
     return (
       '\n      <div class="v2-material-asset-row" role="treeitem">\n        <button type="button" class="v2-material-asset-toggle" disabled aria-hidden="true" tabindex="-1"></button>\n        <div class="v2-material-asset-use">\n          <span class="v2-material-row-thumb" aria-hidden="true">' +
       value104 +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-material-asset-name\x22>' +
+      '</span>\n          <span class="v2-material-asset-name">' +
       _escapeHtml(error6?.['name'] || assetManagerText('unnamedAsset')) +
       '</span>\n        </div>\n      </div>\n    '
     );
   }
   ['_createMaterialFolderSection']({
     category: category5,
-    count: count = 0x0,
+    count: count = 0,
     expanded: expanded = ![],
     canManageFolder: canManageFolder = ![],
     isRenamingFolder: isRenamingFolder = ![],
@@ -958,7 +958,7 @@ class AssetManager {
       (folderToggle['disabled'] = isRenamingFolder || isDeletingFolder),
       (folderToggle['innerHTML'] =
         '\n      <span class="v2-material-tree-chevron' +
-        (expanded ? '\x20is-open' : '') +
+        (expanded ? ' is-open' : '') +
         '" aria-hidden="true">\n        ' +
         MATERIAL_TREE_CHEVRON_ICON_SVG +
         '\n      </span>\n      <span class="v2-material-folder-icon" aria-hidden="true">\n        ' +
@@ -972,7 +972,7 @@ class AssetManager {
         (el12['dataset']['category'] = value105),
         (el12['dataset']['categoryKey'] = value106),
         (el12['value'] = String(renameValue || name4)),
-        (el12['maxLength'] = 0x20),
+        (el12['maxLength'] = 32),
         (el12['disabled'] = isSavingFolder),
         el12['setAttribute'](
           'aria-label',
@@ -1022,14 +1022,14 @@ class AssetManager {
             (el17['dataset']['uiAction'] = handler3('delete-confirm')),
             (el17['dataset']['category'] = value105),
             (el17['textContent'] = assetManagerText('confirm')),
-            el17['setAttribute']('aria-label', assetManagerText('confirm') + '\x20' + name4));
+            el17['setAttribute']('aria-label', assetManagerText('confirm') + ' ' + name4));
           const el18 = document['createElement']('button');
           ((el18['type'] = 'button'),
             (el18['className'] = 'v2-material-folder-delete-choice is-cancel'),
             (el18['dataset']['uiAction'] = handler3('delete-cancel')),
             (el18['dataset']['category'] = value105),
             (el18['textContent'] = assetManagerText('cancel')),
-            el18['setAttribute']('aria-label', assetManagerText('cancel') + '\x20' + name4),
+            el18['setAttribute']('aria-label', assetManagerText('cancel') + ' ' + name4),
             el15['append'](el17, el18));
         } else {
           const el19 = document['createElement']('button');
@@ -1042,7 +1042,7 @@ class AssetManager {
               assetManagerText('deleteCategoryAria', { category: name4 }),
             ),
             (el19['innerHTML'] =
-              '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20aria-hidden=\x22true\x22\x20fill=\x22none\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<path\x20d=\x22M4\x207h16M9\x203h6l1\x204H8l1-4Zm-2\x204\x201\x2014h8l1-14M10\x2011v6m4-6v6\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'),
+              '\n          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none">\n            <path d="M4 7h16M9 3h6l1 4H8l1-4Zm-2 4 1 14h8l1-14M10 11v6m4-6v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>\n          </svg>\n        '),
             el15['appendChild'](el19));
         }
       }
@@ -1149,10 +1149,10 @@ class AssetManager {
     const el31 = this['createPanel'],
       enabled18 = this['_createPanelState'];
     if (!el31 || !enabled18) return;
-    const count9 = Array['isArray'](enabled18['selectedIds']) ? enabled18['selectedIds']['length'] : 0x0,
+    const count9 = Array['isArray'](enabled18['selectedIds']) ? enabled18['selectedIds']['length'] : 0,
       value119 = enabled18['coverInfo'] || {},
       value120 = value119['coverHtml'] || _renderAssetIcon(value119['coverType'] || 'other'),
-      value121 = Number(value119['aspectRatio']) > 0x0 ? Number(value119['aspectRatio']) : 0x4 / 0x3,
+      value121 = Number(value119['aspectRatio']) > 0 ? Number(value119['aspectRatio']) : 4 / 3,
       value122 = enabled18['saving']
         ? assetManagerText('createPanel.saving')
         : assetManagerText('createPanel.save');
@@ -1167,13 +1167,13 @@ class AssetManager {
       assetManagerText('createPanel.selectedNodes', { count: count9 }) +
       '</div>\n            </div>\n            <div class="v2-asset-create-preview-stage">\n              <div class="v2-asset-create-cover">\n                ' +
       value120 +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label\x20class=\x22v2-asset-create-field\x22\x20for=\x22asset-create-name\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-create-label\x22>' +
+      '\n              </div>\n            </div>\n            <label class="v2-asset-create-field" for="asset-create-name">\n              <span class="v2-asset-create-label">' +
       assetManagerText('createPanel.assetName') +
       '</span>\n              <input\n                type="text"\n                id="asset-create-name"\n                placeholder="' +
       _escapeHtml(assetManagerText('createPanel.assetNamePlaceholder')) +
       '"\n                value="' +
       _escapeHtml(enabled18['draft']?.['name'] || '') +
-      '\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20autocomplete=\x22off\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-error\x22\x20role=\x22alert\x22' +
+      '"\n                autocomplete="off"\n              />\n            </label>\n            <div class="v2-asset-create-error" role="alert"' +
       (enabled18['error'] ? '' : ' hidden') +
       '>' +
       _escapeHtml(enabled18['error'] || '') +
@@ -1187,11 +1187,11 @@ class AssetManager {
       (enabled18['saving'] ? 'true' : 'false') +
       '"\n          ' +
       (enabled18['saving'] ? 'disabled' : '') +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-create-submit-spinner\x22\x20aria-hidden=\x22true\x22' +
+      '\n        >\n          <span class="v2-asset-create-submit-spinner" aria-hidden="true"' +
       (enabled18['saving'] ? '' : ' hidden') +
       '></span>\n          <span>' +
       value122 +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20'),
+      '</span>\n        </button>\n      </div>\n    '),
       this['_applyCreatePanelCoverAspect'](el31['querySelector']('.v2-asset-create-cover'), value121),
       this['_renderCreatePanelFolderTree'](),
       this['_bindLibrarySavePanelEvents']());
@@ -1200,11 +1200,11 @@ class AssetManager {
     const el32 = this['createPanel'],
       enabled19 = this['_createPanelState'];
     if (!el32 || !enabled19) return;
-    (el32['querySelector']('[data-ui-action=\x27asset-create-cancel\x27]')?.['addEventListener'](
+    (el32['querySelector']('[data-ui-action=\'asset-create-cancel\']')?.['addEventListener'](
       'click',
       () => this['closeCreatePanel'](),
     ),
-      el32['querySelector']('[data-ui-action=\x27asset-create-new-folder\x27]')?.['addEventListener'](
+      el32['querySelector']('[data-ui-action=\'asset-create-new-folder\']')?.['addEventListener'](
         'click',
         () => {
           this['_createMaterialFolder']({
@@ -1250,7 +1250,7 @@ class AssetManager {
         return;
       const el35 = event['target']['closest']('.v2-material-folder-row'),
         el36 = el35?.['querySelector']("[data-ui-action='asset-create-folder-toggle']");
-      if (el36 && !el36['disabled'] && event['detail'] <= 0x1) {
+      if (el36 && !el36['disabled'] && event['detail'] <= 1) {
         this['_toggleCreatePanelFolderDisclosure'](el36['dataset']['category']);
         return;
       }
@@ -1377,8 +1377,8 @@ class AssetManager {
       );
     const category8 =
         this['_findCategoryByName']('Others', this['tabs']) ||
-        this['tabs'][0x0] ||
-        DEFAULT_ASSET_CATEGORIES[0x0],
+        this['tabs'][0] ||
+        DEFAULT_ASSET_CATEGORIES[0],
       expandedFolderKeys3 = new Set(this['_createPanelState']['expandedFolderKeys'] || []);
     expandedFolderKeys3['delete'](deletingFolderKey);
     const customCategories2 = (this['_createPanelState']['customCategories'] || [])['filter'](
@@ -1473,7 +1473,7 @@ class AssetManager {
         enabled26['mode'] === 'update'
           ? assetManagerText('createPanel.updateTitle')
           : assetManagerText('createPanel.createTitle'),
-      count10 = Array['isArray'](enabled26['selectedIds']) ? enabled26['selectedIds']['length'] : 0x0,
+      count10 = Array['isArray'](enabled26['selectedIds']) ? enabled26['selectedIds']['length'] : 0,
       value136 = enabled26['saving']
         ? enabled26['mode'] === 'update' && enabled26['savingAction'] === 'join'
           ? assetManagerText('createPanel.overwrite')
@@ -1517,8 +1517,8 @@ class AssetManager {
             ) +
             '"\n                value="' +
             _escapeHtml(enabled26['updateSearchKeyword'] || '') +
-            '\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-list\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
-            (list15['length'] === 0x0
+            '"\n              />\n              <div class="v2-asset-update-list">\n                ' +
+            (list15['length'] === 0
               ? '<div class="v2-asset-update-empty">' +
                 (String(enabled26['updateSearchKeyword'] || '')['trim']()
                   ? _escapeHtml(assetManagerText('createPanel.noMatchedAssets'))
@@ -1539,7 +1539,7 @@ class AssetManager {
                         '" draggable="false" />'
                       : _renderAssetIcon(error7?.['coverType'] || 'other');
                   return (
-                    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22v2-asset-update-item' +
+                    '\n                            <button\n                              type="button"\n                              class="v2-asset-update-item' +
                     value143 +
                     '"\n                              data-asset-id="' +
                     _escapeHtml(error7['id']) +
@@ -1552,24 +1552,24 @@ class AssetManager {
                     '</small>\n                              </div>\n                            </button>\n                          '
                   );
                 })['join']('')) +
-            '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-update-editor\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'
+            '\n              </div>\n            </div>\n            <div class="v2-asset-update-editor">\n        '
           : '',
       value145 = enabled26['mode'] === 'update' ? '</div></div>' : '',
       value146 = enabled26['mode'] === 'update',
       value147 = value146 ? 'v2-asset-create-body v2-asset-create-body--update' : 'v2-asset-create-body',
       value148 = value146
         ? ''
-        : '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-panel\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-source-title\x22>' +
+        : '\n        <div class="v2-asset-create-source-panel">\n          <div class="v2-asset-create-source-header">\n            <div class="v2-asset-create-source-title">' +
           assetManagerText('createPanel.currentSelection') +
           '</div>\n            <div class="v2-asset-create-source-scope">' +
           assetManagerText('createPanel.selectedNodes', { count: count10 }) +
-          '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-cover\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+          '</div>\n          </div>\n          <div class="v2-asset-create-cover">\n            ' +
           value134 +
           '\n          </div>\n        </div>\n      ';
     ((el40['innerHTML'] =
       '\n      <div class="v2-asset-create-header">\n        <div class="v2-asset-create-title">\n          <span class="v2-asset-create-header-text">' +
       value135 +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22v2-asset-create-close\x22\x20data-ui-action=\x22asset-create-close\x22\x20aria-label=\x22' +
+      '</span>\n        </div>\n        <button type="button" class="v2-asset-create-close" data-ui-action="asset-create-close" aria-label="' +
       _escapeHtml(assetManagerText('close')) +
       '">×</button>\n      </div>\n      <div class="v2-asset-create-tabs">\n        <button\n          type="button"\n          class="v2-asset-create-tab' +
       (enabled26['mode'] === 'create' ? ' active' : '') +
@@ -1585,15 +1585,15 @@ class AssetManager {
       value147 +
       '">\n          ' +
       value148 +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-right\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-field\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-create-label\x22>' +
+      '\n          <div class="v2-asset-create-right">\n            <div class="v2-asset-create-field">\n              <div class="v2-asset-create-label">' +
       assetManagerText('createPanel.assetName') +
       '</div>\n              <input\n                type="text"\n                id="asset-create-name"\n                placeholder="' +
       _escapeHtml(assetManagerText('createPanel.assetNamePlaceholder')) +
-      '\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20value=\x22' +
+      '"\n                value="' +
       _escapeHtml(enabled26['draft']?.['name'] || '') +
       '"\n              />\n            </div>\n            <div class="v2-asset-create-field">\n              <div class="v2-asset-create-label">' +
       assetManagerText('createPanel.category') +
-      '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22v2-asset-create-select-trigger\x22\x20id=\x22asset-create-category-trigger\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20id=\x22asset-create-category-val\x22>' +
+      '</div>\n              <button type="button" class="v2-asset-create-select-trigger" id="asset-create-category-trigger">\n                <span id="asset-create-category-val">' +
       _escapeHtml(this['_formatCategoryLabel'](enabled26['draft']?.['category'] || this['activeTab'])) +
       '</span>\n                <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">\n                  <path d="M1 1.5L6 6.5L11 1.5" stroke="var(--white-40)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>\n                </svg>\n              </button>\n            </div>\n            ' +
       value140 +
@@ -1602,7 +1602,7 @@ class AssetManager {
       '\n          </div>\n        </div>\n        ' +
       value145 +
       '\n      </div>\n      <div class="v2-asset-create-footer' +
-      (value146 ? '\x20v2-asset-create-footer--update' : '') +
+      (value146 ? ' v2-asset-create-footer--update' : '') +
       '">\n        <button\n          type="button"\n          class="v2-asset-create-btn"\n          id="asset-create-submit"\n          ' +
       (enabled26['saving'] ? 'disabled' : '') +
       '\n        >' +
@@ -1615,7 +1615,7 @@ class AssetManager {
           value137 +
           '</button>'
         : '') +
-      '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20'),
+      '\n      </div>\n    '),
       this['_bindCreatePanelEvents']());
   }
   ['_bindCreatePanelEvents']() {
@@ -1648,7 +1648,7 @@ class AssetManager {
                   value152 +
                   '" data-val="' +
                   _escapeHtml4 +
-                  '\x22>' +
+                  '">' +
                   _escapeHtml5 +
                   '</div>'
                 );
@@ -1661,7 +1661,7 @@ class AssetManager {
                   '"\n                  value="' +
                   _escapeHtml(this['_createPanelState']?.['customCategoryDraft'] || '') +
                   '"\n                />\n              </div>'
-                : '<div\x20class=\x22v2-asset-select-item\x20v2-asset-select-item--custom\x22\x20data-custom-category=\x221\x22>' +
+                : '<div class="v2-asset-select-item v2-asset-select-item--custom" data-custom-category="1">' +
                   assetManagerText('categories.custom') +
                   '</div>'
               : '';
@@ -1715,7 +1715,7 @@ class AssetManager {
         }
         const box = el42['getBoundingClientRect']();
         ((el44['style']['left'] = box['left'] + 'px'),
-          (el44['style']['top'] = box['bottom'] + 0x4 + 'px'),
+          (el44['style']['top'] = box['bottom'] + 4 + 'px'),
           (el44['style']['width'] = box['width'] + 'px'),
           el44['classList']['add']('show'),
           el42['classList']['add']('active'));
@@ -1789,7 +1789,7 @@ class AssetManager {
           error: '',
         });
         if (mode === 'update' && !this['_createPanelState']?.['selectedAssetId']) {
-          const value157 = this['_getFilteredUpdateAssets']()[0x0] || null;
+          const value157 = this['_getFilteredUpdateAssets']()[0] || null;
           value157 && this['_syncCreatePanelDraftFromTarget'](value157);
         }
         this['_renderCreatePanelContent']();
@@ -1976,13 +1976,13 @@ class AssetManager {
   }
   ['_getCanvasCenterWorld']() {
     const { viewport: viewport } = appStore['getState'](),
-      value170 = window['innerWidth'] / 0x2,
-      value171 = window['innerHeight'] / 0x2,
-      enabled36 = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0x0,
-      enabled37 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0x0;
+      value170 = window['innerWidth'] / 2,
+      value171 = window['innerHeight'] / 2,
+      enabled36 = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0,
+      enabled37 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0;
     if (!enabled36 || !enabled37) return screenToWorld(value170, value171, viewport);
-    let value172 = 0x0,
-      value173 = 0x0,
+    let value172 = 0,
+      value173 = 0,
       value174 = enabled36,
       value175 = enabled37;
     const list19 = [],
@@ -1991,7 +1991,7 @@ class AssetManager {
     const value177 = document['querySelector']('.sidebar-floating');
     if (value177) list19['push'](value177);
     if (this['sidebarPanel']?.['classList']?.['contains']('show')) list19['push'](this['sidebarPanel']);
-    const value178 = 0x8;
+    const value178 = 8;
     for (const el53 of list19) {
       if (!el53?.['isConnected']) continue;
       const box2 = el53['getBoundingClientRect'](),
@@ -2019,8 +2019,8 @@ class AssetManager {
     }
     const count11 = value174 - value172,
       count12 = value175 - value173,
-      value183 = count11 > 0x28 ? value172 + count11 / 0x2 : value170,
-      value184 = count12 > 0x28 ? value173 + count12 / 0x2 : value171;
+      value183 = count11 > 40 ? value172 + count11 / 2 : value170,
+      value184 = count12 > 40 ? value173 + count12 / 2 : value171;
     return screenToWorld(value183, value184, viewport);
   }
   ['_calcNodesBBox'](value185) {
@@ -2030,19 +2030,19 @@ class AssetManager {
       maxY = -Infinity;
     for (const box3 of value185 || []) {
       if (!box3) continue;
-      const value186 = Number(box3['x']) || 0x0,
-        value187 = Number(box3['y']) || 0x0,
-        value188 = Number(box3['width'] ?? box3['w']) || 0x64,
-        value189 = Number(box3['height'] ?? box3['h']) || 0x64;
+      const value186 = Number(box3['x']) || 0,
+        value187 = Number(box3['y']) || 0,
+        value188 = Number(box3['width'] ?? box3['w']) || 100,
+        value189 = Number(box3['height'] ?? box3['h']) || 100;
       ((minX = Math['min'](minX, value186)),
         (minY = Math['min'](minY, value187)),
         (maxX = Math['max'](maxX, value186 + value188)),
         (maxY = Math['max'](maxY, value187 + value189)));
     }
     if (!Number['isFinite'](minX) || !Number['isFinite'](minY))
-      return { minX: 0x0, minY: 0x0, maxX: 0x0, maxY: 0x0, w: 0x0, h: 0x0, cx: 0x0, cy: 0x0 };
-    const w = Math['max'](0x0, maxX - minX),
-      h = Math['max'](0x0, maxY - minY);
+      return { minX: 0, minY: 0, maxX: 0, maxY: 0, w: 0, h: 0, cx: 0, cy: 0 };
+    const w = Math['max'](0, maxX - minX),
+      h = Math['max'](0, maxY - minY);
     return {
       minX: minX,
       minY: minY,
@@ -2050,8 +2050,8 @@ class AssetManager {
       maxY: maxY,
       w: w,
       h: h,
-      cx: minX + w / 0x2,
-      cy: minY + h / 0x2,
+      cx: minX + w / 2,
+      cy: minY + h / 2,
     };
   }
   ['_preloadThumb'](value190) {
@@ -2068,21 +2068,21 @@ class AssetManager {
   ['_renderMaterialLoadingState']() {
     const el54 = this['sidebarPanel']?.['querySelector']('[data-material-loading]');
     if (!el54) return;
-    el54['hidden'] = this['_materialLoadingCount'] <= 0x0;
+    el54['hidden'] = this['_materialLoadingCount'] <= 0;
   }
   ['_warmVisibleAssetMedia']() {
     if (!this['_isSidebarOpen']()) return ![];
-    let count13 = 0x0;
+    let count13 = 0;
     for (const value191 of this['_getSortedAssets']()) {
-      if (count13 >= 0x20) break;
-      value191?.['coverUrl'] && (this['_preloadThumb'](value191['coverUrl']), (count13 += 0x1));
+      if (count13 >= 32) break;
+      value191?.['coverUrl'] && (this['_preloadThumb'](value191['coverUrl']), (count13 += 1));
       const value192 = Array['isArray'](value191?.['items']) ? value191['items'] : [];
       for (const value193 of value192) {
-        if (count13 >= 0x20) break;
-        value193?.['thumbSrc'] && (this['_preloadThumb'](value193['thumbSrc']), (count13 += 0x1));
+        if (count13 >= 32) break;
+        value193?.['thumbSrc'] && (this['_preloadThumb'](value193['thumbSrc']), (count13 += 1));
       }
     }
-    return (this['_scheduleVideoThumbJobs'](), count13 > 0x0);
+    return (this['_scheduleVideoThumbJobs'](), count13 > 0);
   }
   ['_ensureThumbDecoded'](value194) {
     const enabled39 = String(value194 || '')['trim']();
@@ -2091,7 +2091,7 @@ class AssetManager {
     if (this['_isNonImageMediaSrc'](enabled39)) return Promise['resolve'](![]);
     const value195 = this['_thumbDecodePromiseMap']['get'](enabled39);
     if (value195) return value195;
-    const preloadCanvasImage2 = preloadCanvasImage(enabled39, { priority: 0x14, fetchPriority: 'auto' })['then'](
+    const preloadCanvasImage2 = preloadCanvasImage(enabled39, { priority: 20, fetchPriority: 'auto' })['then'](
       () => !![],
       () => ![],
     );
@@ -2132,12 +2132,12 @@ class AssetManager {
         },
         async2 = async () => {
           try {
-            const count14 = Number['isFinite'](el55['duration']) ? el55['duration'] : 0x0,
-              value202 = count14 > 0x0 ? Math['min'](0.08, Math['max'](0x0, count14 - 0.08)) : 0x0,
+            const count14 = Number['isFinite'](el55['duration']) ? el55['duration'] : 0,
+              value202 = count14 > 0 ? Math['min'](0.08, Math['max'](0, count14 - 0.08)) : 0,
               value203 = () => {
                 try {
-                  const enabled41 = el55['videoWidth'] || 0x0,
-                    enabled42 = el55['videoHeight'] || 0x0;
+                  const enabled41 = el55['videoWidth'] || 0,
+                    enabled42 = el55['videoHeight'] || 0;
                   if (!enabled41 || !enabled42) return handler6();
                   const { width: width, height: height } = fitAssetMaterialVideoThumbnail(
                       enabled41,
@@ -2146,7 +2146,7 @@ class AssetManager {
                     box4 = document['createElement']('canvas');
                   ((box4['width'] = width), (box4['height'] = height));
                   const ctx = box4['getContext']('2d');
-                  ctx['drawImage'](el55, 0x0, 0x0, width, height);
+                  ctx['drawImage'](el55, 0, 0, width, height);
                   const value204 = box4['toDataURL']('image/jpeg', 0.9);
                   (run3(), handler5(value204));
                 } catch (value205) {
@@ -2177,10 +2177,10 @@ class AssetManager {
     if (!this['_isSidebarOpen']()) return;
     if (this['_videoThumbTimer']) return;
     this['_videoThumbTimer'] = window['setTimeout'](() => {
-      this['_videoThumbTimer'] = 0x0;
+      this['_videoThumbTimer'] = 0;
       if (!this['_isSidebarOpen']()) return;
       this['_runVideoThumbJobs']();
-    }, 0x0);
+    }, 0);
   }
   ['_scheduleSidebarRender']() {
     if (!this['_isSidebarOpen']()) return;
@@ -2188,7 +2188,7 @@ class AssetManager {
       return;
     if (this['_sidebarRenderRaf']) return;
     this['_sidebarRenderRaf'] = window['requestAnimationFrame'](() => {
-      this['_sidebarRenderRaf'] = 0x0;
+      this['_sidebarRenderRaf'] = 0;
       if (!this['_isSidebarOpen']()) return;
       if (
         this['_renamingAssetId'] ||
@@ -2235,7 +2235,7 @@ class AssetManager {
     }
     ((error8['name'] = enabled45), (error8['updatedAt'] = Date['now']()));
     const el56 = this['sidebarPanel']?.['querySelector'](
-      '.v2-material-name-input[data-asset-id="' + CSS['escape'](enabled44) + '\x22]',
+      '.v2-material-name-input[data-asset-id="' + CSS['escape'](enabled44) + '"]',
     );
     el56?.['setAttribute']('aria-busy', 'true');
     if (el56) el56['disabled'] = !![];
@@ -2257,7 +2257,7 @@ class AssetManager {
   ['_materialItemKey'](value214, value215) {
     const value216 = String(value214 || ''),
       count15 = Number(value215);
-    return value216 && Number['isInteger'](count15) && count15 >= 0x0 ? value216 + ':' + count15 : '';
+    return value216 && Number['isInteger'](count15) && count15 >= 0 ? value216 + ':' + count15 : '';
   }
   ['_beginRenameMaterialItem'](value217, value218) {
     const enabled46 = this['_materialItemKey'](value217, value218),
@@ -2292,7 +2292,7 @@ class AssetManager {
         window['showToast']?.(assetManagerText('errors.nameRequired'), 'error'),
         this['sidebarPanel']
           ?.['querySelector'](
-            '.v2-material-item-name-input[data-item-key="' + CSS['escape'](enabled47) + '\x22]',
+            '.v2-material-item-name-input[data-item-key="' + CSS['escape'](enabled47) + '"]',
           )
           ?.['focus'](),
         ![]
@@ -2327,7 +2327,7 @@ class AssetManager {
     };
     this['_savingMaterialItemKey'] = enabled47;
     const el57 = this['sidebarPanel']?.['querySelector'](
-      '.v2-material-item-name-input[data-item-key=\x22' + CSS['escape'](enabled47) + '\x22]',
+      '.v2-material-item-name-input[data-item-key="' + CSS['escape'](enabled47) + '"]',
     );
     el57?.['setAttribute']('aria-busy', 'true');
     if (el57) el57['disabled'] = !![];
@@ -2458,7 +2458,7 @@ class AssetManager {
     const list20 = [];
     let value243 = ![];
     try {
-      for (let value244 = 0x0; value244 < nextCategory2['renamedAssets']['length']; value244 += 0x1) {
+      for (let value244 = 0; value244 < nextCategory2['renamedAssets']['length']; value244 += 1) {
         (list20['push'](nextCategory2['originalAssets'][value244]),
           await saveAssetToServer(nextCategory2['renamedAssets'][value244]));
       }
@@ -2516,15 +2516,15 @@ class AssetManager {
   }
   async ['_runVideoThumbJobs']() {
     if (!this['_isSidebarOpen']()) return;
-    let count16 = 0x2;
+    let count16 = 2;
     for (const value250 of this['_getSortedAssets']()) {
       if (!this['_isSidebarOpen']()) break;
-      if (count16 <= 0x0) break;
+      if (count16 <= 0) break;
       const assetId = String(value250?.['id'] || '')['trim']();
       if (!assetId) continue;
       const list22 = Array['isArray'](value250?.['items']) ? value250['items'] : [];
-      for (let count17 = 0x0; count17 < list22['length']; count17++) {
-        if (count16 <= 0x0) break;
+      for (let count17 = 0; count17 < list22['length']; count17++) {
+        if (count16 <= 0) break;
         const value251 = list22[count17],
           _normalizeAssetType4 = _normalizeAssetType(value251?.['type']);
         if (_normalizeAssetType4 !== 'video') continue;
@@ -2537,7 +2537,7 @@ class AssetManager {
           (this['_isVideoMediaSrc'](value252) ? value252 : '');
         if (!assetMaterialVideoSourceUrl) continue;
         (this['_videoThumbInFlight']['add'](value253),
-          (count16 -= 0x1),
+          (count16 -= 1),
           this['_captureVideoFirstFrameDataUrl'](assetMaterialVideoSourceUrl)
             ['then'](async (dataUrl) => {
               if (!String(dataUrl || '')['startsWith']('data:image/')) return;
@@ -2549,7 +2549,7 @@ class AssetManager {
                 enabled51 = String(response?.['url'] || '');
               if (!enabled51) return;
               value251['thumbSrc'] = enabled51;
-              if (count17 === 0x0) value250['coverUrl'] = enabled51;
+              if (count17 === 0) value250['coverUrl'] = enabled51;
               (await saveAssetToServer(value250),
                 upsertAssetMentionAsset(value250),
                 this['sidebarPanel']?.['classList']['contains']('show') && this['_scheduleSidebarRender']());
@@ -2562,7 +2562,7 @@ class AssetManager {
     }
   }
   async ['loadAssetsFromServer']() {
-    ((this['_materialLoadingCount'] += 0x1), this['_renderMaterialLoadingState']());
+    ((this['_materialLoadingCount'] += 1), this['_renderMaterialLoadingState']());
     try {
       const fetchAssetsFromServer2 = await fetchAssetsFromServer();
       ((this['assets'] = _sortAssetsByUpdatedTime(
@@ -2574,10 +2574,10 @@ class AssetManager {
         this['_renderSidebarTabs'](),
         this['assets']['forEach']((state5) => {
           state5['nodes'] &&
-            state5['nodes'][0x0] &&
+            state5['nodes'][0] &&
             !isAssetMaterialThumbnailUrl(state5['coverUrl']) &&
             (state5['coverUrl'] =
-              resolveAssetNodeCoverUrl(state5['nodes'][0x0]) || state5['coverUrl'] || '');
+              resolveAssetNodeCoverUrl(state5['nodes'][0]) || state5['coverUrl'] || '');
           if (Array['isArray'](state5['items']))
             state5['items'] = getMaterialAssetItems(state5)['map']((args16) => ({
               ...args16,
@@ -2595,7 +2595,7 @@ class AssetManager {
     } catch (value256) {
       console['error']('加载全局素材失败', value256);
     } finally {
-      ((this['_materialLoadingCount'] = Math['max'](0x0, this['_materialLoadingCount'] - 0x1)),
+      ((this['_materialLoadingCount'] = Math['max'](0, this['_materialLoadingCount'] - 1)),
         this['_renderMaterialLoadingState']());
     }
   }
@@ -2658,7 +2658,7 @@ class AssetManager {
     }
   }
   ['showCreatePanel'](list23, value262, value263 = {}) {
-    if (!list23 || list23['length'] === 0x0) return;
+    if (!list23 || list23['length'] === 0) return;
     (void value262, this['closeCreatePanel']());
     const presentation2 = value263['presentation'] === 'library-save' ? 'library-save' : 'default',
       el61 = document['createElement']('div');
@@ -2673,7 +2673,7 @@ class AssetManager {
         presentation2 === 'library-save' ? assetManagerText('createPanel.saveTitle') : assetManagerText('title'),
       ));
     const state6 = appStore['getState'](),
-      error10 = state6['nodes'][list23[0x0]];
+      error10 = state6['nodes'][list23[0]];
     (el61['appendChild'](el62),
       document['body']['appendChild'](el61),
       (this['createPanelBackdrop'] = el61),
@@ -2746,12 +2746,12 @@ class AssetManager {
   }
   ['initSidebarPanel']() {
     ((this['sidebarPanel'] = document['createElement']('div')),
-      (this['sidebarPanel']['className'] = 'v2-asset-sidebar-panel\x20canvas-toolbar-panel-surface'),
+      (this['sidebarPanel']['className'] = 'v2-asset-sidebar-panel canvas-toolbar-panel-surface'),
       this['sidebarPanel']['setAttribute']('aria-label', assetManagerText('libraryTitle')),
       (this['sidebarPanel']['innerHTML'] =
         '\n      <div class="v2-asset-sidebar-header">\n        <button type="button" class="v2-material-library-close" data-ui-action="material-library-close" aria-label="' +
         _escapeHtml(assetManagerText('back')) +
-        '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22m15\x2018-6-6\x206-6\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-asset-sidebar-title\x22\x20id=\x22asset-sidebar-title\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-asset-sidebar-title-text\x22\x20id=\x22asset-sidebar-title-text\x22>' +
+        '">\n          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>\n        </button>\n        <div class="v2-asset-sidebar-title" id="asset-sidebar-title">\n          <span class="v2-asset-sidebar-title-text" id="asset-sidebar-title-text">' +
         assetManagerText('libraryTitle') +
         '</span>\n          <span class="v2-material-library-loading" data-material-loading role="status" aria-live="polite" hidden>\n            <span class="v2-material-library-loading-spinner" aria-hidden="true"></span>\n            <span class="v2-material-library-loading-label">' +
         _escapeHtml(assetManagerText('loading')) +
@@ -2887,24 +2887,24 @@ class AssetManager {
           const el70 = el69['querySelector']('[data-ui-action="material-folder-toggle"]');
           el70 &&
             !el70['disabled'] &&
-            event14['detail'] <= 0x1 &&
+            event14['detail'] <= 1 &&
             this['_toggleMaterialFolderDisclosure'](el70);
           return;
         }
         const el71 = event14['target']['closest']('.v2-material-project-row');
         if (el71) {
-          const el72 = el71['querySelector']('[data-ui-action=\x22material-asset-toggle\x22]');
+          const el72 = el71['querySelector']('[data-ui-action="material-asset-toggle"]');
           el72 &&
             !el72['disabled'] &&
-            event14['detail'] <= 0x1 &&
+            event14['detail'] <= 1 &&
             this['_toggleMaterialAssetDisclosure'](el72);
           return;
         }
         const el73 = event14['target']['closest']('.v2-material-asset-row');
         if (el73) {
-          const el74 = el73['querySelector']('[data-ui-action=\x22material-asset-toggle\x22]');
+          const el74 = el73['querySelector']('[data-ui-action="material-asset-toggle"]');
           if (!el74 || el74['disabled']) return;
-          if (event14['detail'] > 0x1) {
+          if (event14['detail'] > 1) {
             this['_cancelPendingMaterialAssetRowToggle']();
             return;
           }
@@ -3053,7 +3053,7 @@ class AssetManager {
         if (!enabled59) {
           enabled59 = !![];
           const value277 =
-            this['_materialLoadingCount'] > 0x0 ? this['_assetLoadPromise'] : this['loadAssetsFromServer']();
+            this['_materialLoadingCount'] > 0 ? this['_assetLoadPromise'] : this['loadAssetsFromServer']();
           ((this['_assetLoadPromise'] = Promise['resolve'](value277)),
             this['_assetLoadPromise']['finally'](() => {
               enabled59 = ![];
@@ -3143,9 +3143,9 @@ class AssetManager {
       duplicate:
         '<rect x="7" y="7" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.7"/>',
       download:
-        '<path\x20d=\x22M12\x203v12m0\x200\x204-4m-4\x204-4-4M5\x2018v3h14v-3\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/>',
+        '<path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18v3h14v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
       cancel:
-        '<path\x20d=\x22m6\x206\x2012\x2012M18\x206\x206\x2018\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22\x20stroke-linecap=\x22round\x22/>',
+        '<path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>',
       delete:
         '<path d="M4 7h16M9 3h6l1 2H8l1-2Zm-3 4 1 14h10l1-14M10 11v6m4-6v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>',
     };
@@ -3156,14 +3156,14 @@ class AssetManager {
   ['_materialMenuButton'](value286, value287, value288, value289 = '', value290 = '') {
     const value291 = String(value290 || '')['trim'](),
       value292 = value291 ? getShortcutLabel(value291) : '',
-      value293 = value291 ? ' data-shortcut-action="' + _escapeHtml(value291) + '\x22' : '',
-      value294 = value292 ? '<span\x20class=\x22v2-menu-kbd\x22>' + _escapeHtml(value292) + '</span>' : '';
+      value293 = value291 ? ' data-shortcut-action="' + _escapeHtml(value291) + '"' : '',
+      value294 = value292 ? '<span class="v2-menu-kbd">' + _escapeHtml(value292) + '</span>' : '';
     return (
       '<button type="button" role="menuitem" data-material-menu-action="' +
       value286 +
-      '\x22' +
+      '"' +
       value293 +
-      '\x20' +
+      ' ' +
       value289 +
       '>\n      ' +
       this['_materialMenuIcon'](value287) +
@@ -3171,7 +3171,7 @@ class AssetManager {
       _escapeHtml(value288) +
       '</span>\n      ' +
       value294 +
-      '\x0a\x20\x20\x20\x20</button>'
+      '\n    </button>'
     );
   }
   ['_openMaterialMenu'](value295, anchorEl) {
@@ -3247,15 +3247,15 @@ class AssetManager {
     }
     const box5 = el91['getBoundingClientRect'](),
       box6 = el90['getBoundingClientRect'](),
-      value297 = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0x0,
-      value298 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0x0,
-      value299 = 0x8;
+      value297 = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0,
+      value298 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0,
+      value299 = 8;
     let value300 = box5['right'] + value299;
-    value300 + box6['width'] > value297 - 0xc &&
-      (value300 = Math['max'](0xc, box5['left'] - box6['width'] - value299));
+    value300 + box6['width'] > value297 - 12 &&
+      (value300 = Math['max'](12, box5['left'] - box6['width'] - value299));
     const value301 = Math['max'](
-      0xc,
-      Math['min'](box5['top'] - 0x8, value298 - box6['height'] - 0xc),
+      12,
+      Math['min'](box5['top'] - 8, value298 - box6['height'] - 12),
     );
     ((el90['style']['left'] = Math['round'](value300) + 'px'),
       (el90['style']['top'] = Math['round'](value301) + 'px'));
@@ -3270,7 +3270,7 @@ class AssetManager {
     }
     if (enabled64['busy']) {
       ((el92['innerHTML'] =
-        '<div\x20class=\x22v2-material-menu-pending\x22\x20role=\x22status\x22><span></span>' +
+        '<div class="v2-material-menu-pending" role="status"><span></span>' +
         _escapeHtml(assetManagerText('menu.processing')) +
         '</div>'),
         this['_positionMaterialMenu']());
@@ -3284,7 +3284,7 @@ class AssetManager {
             name: name11['name'] || assetManagerText('unnamedAsset'),
           }),
         ) +
-        '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-menu-confirm-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '</div>\n        <div class="v2-material-menu-confirm-actions">\n          ' +
         this['_materialMenuButton'](
           'delete-cancel',
           'cancel',
@@ -3292,7 +3292,7 @@ class AssetManager {
           '',
           'context-material-cancel-delete',
         ) +
-        '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '\n          ' +
         this['_materialMenuButton'](
           'delete-confirm',
           'delete',
@@ -3317,7 +3317,7 @@ class AssetManager {
                 (value305) =>
                   '<button type="button" role="menuitem" data-material-menu-action="move-target" data-category="' +
                   _escapeHtml(value305) +
-                  '\x22>' +
+                  '">' +
                   this['_materialMenuIcon']('move') +
                   '<span>' +
                   _escapeHtml(this['_formatCategoryLabel'](value305)) +
@@ -3347,12 +3347,12 @@ class AssetManager {
         '',
         'context-material-rename',
       ) +
-      '\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-menu-submenu-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n      <div class="v2-material-menu-submenu-wrap">\n        ' +
       this['_materialMenuButton'](
         'move',
         'move',
         assetManagerText('menu.moveTo'),
-        'aria-haspopup="menu" aria-expanded="' + (enabled64['showMove'] ? 'true' : 'false') + '\x22',
+        'aria-haspopup="menu" aria-expanded="' + (enabled64['showMove'] ? 'true' : 'false') + '"',
         'context-material-open-move-menu',
       ) +
       '\n        ' +
@@ -3365,7 +3365,7 @@ class AssetManager {
         '',
         'context-material-duplicate',
       ) +
-      '\x0a\x20\x20\x20\x20\x20\x20' +
+      '\n      ' +
       this['_materialMenuButton'](
         'download',
         'download',
@@ -3553,8 +3553,8 @@ class AssetManager {
         previewAspectRatio: resolveAssetNodePreviewAspectRatio(args20?.['nodeData']),
       })),
       list27 = Number['isFinite'](value318)
-        ? list26['slice'](value318, value318 + 0x1)
-        : list26['slice'](0x0, 0x4),
+        ? list26['slice'](value318, value318 + 1)
+        : list26['slice'](0, 4),
       error13 = Number['isFinite'](value318) ? list26[value318] : null,
       value319 =
         error13?.['name'] ||
@@ -3562,14 +3562,14 @@ class AssetManager {
         error12['name'] ||
         assetManagerText('unnamedAsset'),
       el96 = this['_ensureMaterialPreview'](),
-      value320 = list27['length'] === 0x1 ? list27[0x0] : null,
-      value321 = value320?.['previewAspectRatio'] || 0x4 / 0x3;
+      value320 = list27['length'] === 1 ? list27[0] : null,
+      value321 = value320?.['previewAspectRatio'] || 4 / 3;
     el96['classList']['toggle']('is-single', Boolean(value320));
     value320
       ? el96['style']['setProperty']('--material-preview-aspect', String(value321))
       : el96['style']['removeProperty']('--material-preview-aspect');
     el96['innerHTML'] =
-      '\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-preview-media\x22></div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-preview-copy\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<strong>' +
+      '\n      <div class="v2-material-preview-media"></div>\n      <div class="v2-material-preview-copy">\n        <strong>' +
       _escapeHtml(value319) +
       '</strong>\n      </div>\n    ';
     const value322 = el96['querySelector']('.v2-material-preview-media');
@@ -3579,7 +3579,7 @@ class AssetManager {
       if (value320) this['_setThumbContent'](value322, value320['previewSrc'], value320['type']);
       else {
         const el97 = document['createElement']('div');
-        ((el97['className'] = 'v2-material-preview-grid has-' + Math['min'](0x4, list27['length'])),
+        ((el97['className'] = 'v2-material-preview-grid has-' + Math['min'](4, list27['length'])),
           list27['forEach']((value323) => {
             const value324 = document['createElement']('div');
             ((value324['className'] = 'v2-material-preview-cell'),
@@ -3593,14 +3593,14 @@ class AssetManager {
     const box7 = el95['getBoundingClientRect'](),
       box8 = this['sidebarPanel']['getBoundingClientRect'](),
       box9 = el96['getBoundingClientRect'](),
-      value325 = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0x0,
-      value326 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0x0;
-    let value327 = box8['right'] + 0xc;
-    value327 + box9['width'] > value325 - 0xc &&
-      (value327 = Math['max'](0xc, box8['left'] - box9['width'] - 0xc));
+      value325 = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0,
+      value326 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0;
+    let value327 = box8['right'] + 12;
+    value327 + box9['width'] > value325 - 12 &&
+      (value327 = Math['max'](12, box8['left'] - box9['width'] - 12));
     const value328 = Math['max'](
-      0xc,
-      Math['min'](box7['top'] - 0x8, value326 - box9['height'] - 0xc),
+      12,
+      Math['min'](box7['top'] - 8, value326 - box9['height'] - 12),
     );
     ((el96['style']['left'] = Math['round'](value327) + 'px'),
       (el96['style']['top'] = Math['round'](value328) + 'px'));
@@ -3611,7 +3611,7 @@ class AssetManager {
   }
   ['_getVisibleAssetCardsInList']() {
     const listView = this['sidebarPanel']?.['querySelector'](
-      '#asset-sidebar-content\x20>\x20.v2-asset-view-list',
+      '#asset-sidebar-content > .v2-asset-view-list',
     );
     if (!listView) return { listView: null, cards: [] };
     const cards = Array['from'](listView['querySelectorAll'](':scope > .v2-asset-item'))['filter'](
@@ -3653,7 +3653,7 @@ class AssetManager {
           { transform: 'translate(' + enabled71 + 'px, ' + enabled72 + 'px)' },
           { transform: 'translate(0, 0)' },
         ],
-        { duration: 0xdc, easing: 'cubic-bezier(0.2,\x200,\x200,\x201)' },
+        { duration: 220, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
       );
     }
   }
@@ -3664,7 +3664,7 @@ class AssetManager {
       el104['classList']['add']('is-delete-shaking'),
       window['setTimeout'](() => {
         if (el104['isConnected']) el104['classList']['remove']('is-delete-shaking');
-      }, 0xf0));
+      }, 240));
   }
   async ['_deleteAsset'](value331) {
     const enabled73 = String(value331 || '');
@@ -3727,7 +3727,7 @@ class AssetManager {
       list31 = [];
     let value342 = ![];
     try {
-      for (let value343 = 0x0; value343 < list30['length']; value343 += 0x1) {
+      for (let value343 = 0; value343 < list30['length']; value343 += 1) {
         (list31['push'](list28[value343]), await saveAssetToServer(list30[value343]));
       }
       return (
@@ -3741,10 +3741,10 @@ class AssetManager {
         (this['materialCategoryParents'] = deleteMaterialFolderParent2),
         list30['forEach']((value344) => this['_upsertLocalAsset'](value344)),
         this['_categoryKey'](this['activeTab']) === this['_categoryKey'](category15) &&
-          ((this['activeTab'] = DEFAULT_ASSET_CATEGORIES[0x0]), (this['_openAssetId'] = null)),
+          ((this['activeTab'] = DEFAULT_ASSET_CATEGORIES[0]), (this['_openAssetId'] = null)),
         this['_expandedMaterialCategories']['delete'](this['_categoryKey'](category15)),
         this['_categoryKey'](this['_materialCurrentFolderCategory']) === this['_categoryKey'](category15) &&
-          (this['_materialCurrentFolderCategory'] = value337 || DEFAULT_ASSET_CATEGORIES[0x0]),
+          (this['_materialCurrentFolderCategory'] = value337 || DEFAULT_ASSET_CATEGORIES[0]),
         this['_syncTabsFromAssets'](),
         this['_renderSidebarTabs'](),
         this['renderSidebarContent'](),
@@ -3786,7 +3786,7 @@ class AssetManager {
       if (
         el106['dataset']['thumbKind'] === 'img' &&
         value352 === value351 &&
-        el106['querySelector'](':scope\x20>\x20img')
+        el106['querySelector'](':scope > img')
       )
         return;
       const el107 = document['createElement']('img');
@@ -3865,7 +3865,7 @@ class AssetManager {
         const name14 =
           error14?.['name'] ||
           error14?.['nodeData']?.['name'] ||
-          assetManagerText('detail.childAssetName', { index: index2 + 0x1 });
+          assetManagerText('detail.childAssetName', { index: index2 + 1 });
         el110['setAttribute']('aria-label', assetManagerText('doubleClickMaterial', { name: name14 }));
         const value359 = document['createElement']('span');
         ((value359['className'] = 'v2-material-row-thumb is-child'),
@@ -3936,7 +3936,7 @@ class AssetManager {
   }
   ['_cancelPendingMaterialAssetRowToggle']() {
     (this['_materialAssetRowClickTimer'] && window['clearTimeout'](this['_materialAssetRowClickTimer']),
-      (this['_materialAssetRowClickTimer'] = 0x0),
+      (this['_materialAssetRowClickTimer'] = 0),
       (this['_materialAssetRowClickToggle'] = null));
   }
   ['_scheduleMaterialAssetRowToggle'](el116) {
@@ -3945,19 +3945,19 @@ class AssetManager {
     ((this['_materialAssetRowClickToggle'] = el116),
       (this['_materialAssetRowClickTimer'] = window['setTimeout'](() => {
         const el117 = this['_materialAssetRowClickToggle'];
-        ((this['_materialAssetRowClickTimer'] = 0x0),
+        ((this['_materialAssetRowClickTimer'] = 0),
           (this['_materialAssetRowClickToggle'] = null),
           el117?.['isConnected'] &&
             !el117['disabled'] &&
             this['_toggleMaterialAssetDisclosure'](el117));
-      }, 0x104)));
+      }, 260)));
   }
   ['_toggleMaterialAssetDisclosure'](el118) {
     if (this['_materialSearchQuery'] || this['_materialFavoritesOnly']) return;
     const enabled77 = String(el118?.['dataset']?.['assetId'] || ''),
       name15 = this['_getMaterialAsset'](enabled77),
       list34 = getMaterialAssetItems(name15);
-    if (!enabled77 || !name15 || list34['length'] < 0x1) return;
+    if (!enabled77 || !name15 || list34['length'] < 1) return;
     const el119 = el118['closest']('.v2-material-project-folder'),
       enabled78 = el118['closest']('.v2-material-project-row, .v2-material-asset-row'),
       el120 = el119 || enabled78;
@@ -3976,18 +3976,18 @@ class AssetManager {
           name: name15['name'] || assetManagerText('unnamedAsset'),
         }),
       ),
-      el118['querySelector']('.v2-material-tree-chevron,\x20svg')?.['classList']['toggle'](
+      el118['querySelector']('.v2-material-tree-chevron, svg')?.['classList']['toggle'](
         'is-open',
         enabled79,
       ));
     let el121 = el119
       ? el119['querySelector'](
-          ':scope\x20>\x20.v2-material-asset-children[data-asset-id=\x22' +
+          ':scope > .v2-material-asset-children[data-asset-id="' +
             CSS['escape'](enabled77) +
-            '\x22]',
+            '"]',
         )
       : enabled78['nextElementSibling']?.['matches']?.(
-            '.v2-material-asset-children[data-asset-id="' + CSS['escape'](enabled77) + '\x22]',
+            '.v2-material-asset-children[data-asset-id="' + CSS['escape'](enabled77) + '"]',
           )
         ? enabled78['nextElementSibling']
         : null;
@@ -4124,7 +4124,7 @@ class AssetManager {
           ) +
           '</strong>'),
         el133['appendChild'](el136),
-        (el132['scrollTop'] = 0x0));
+        (el132['scrollTop'] = 0));
       return;
     }
     for (const category17 of groups2) {
@@ -4168,7 +4168,7 @@ class AssetManager {
         const enabled82 = String(name17?.['id'] || '');
         if (!enabled82) continue;
         const list36 = getMaterialAssetItems(name17),
-          enabled83 = list36['length'] > 0x1,
+          enabled83 = list36['length'] > 1,
           value366 = enabled83 && this['_expandedMaterialAssets']['has'](enabled82),
           el138 = document['createElement']('div');
         ((el138['className'] = 'v2-material-asset-row'),
@@ -4195,7 +4195,7 @@ class AssetManager {
           (el139['innerHTML'] = enabled83
             ? '<svg class="' +
               (value366 ? 'is-open' : '') +
-              '\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22m9\x206\x206\x206-6\x206\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/></svg>'
+              '" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             : ''),
           el138['appendChild'](el139));
         const el140 = document['createElement']('div');
@@ -4212,7 +4212,7 @@ class AssetManager {
           ));
         const value367 = document['createElement']('span');
         value367['className'] = 'v2-material-row-thumb';
-        const value368 = list36[0x0],
+        const value368 = list36[0],
           _resolveMaterialItemThumbSrc3 = _resolveMaterialItemThumbSrc(value368) || name17['coverUrl'];
         (this['_setThumbContent'](
           value367,
@@ -4266,10 +4266,10 @@ class AssetManager {
       const value370 = this['_newAssetPulseId'];
       ((this['_newAssetPulseId'] = ''),
         window['setTimeout'](() => {
-          el133['querySelector']('[data-asset-id="' + CSS['escape'](value370) + '\x22]')?.['classList'][
+          el133['querySelector']('[data-asset-id="' + CSS['escape'](value370) + '"]')?.['classList'][
             'remove'
           ]('is-new');
-        }, 0x28a));
+        }, 650));
     }
     if (this['_renamingAssetId'])
       window['requestAnimationFrame'](() => {
@@ -4282,7 +4282,7 @@ class AssetManager {
           const el145 = el133['querySelector'](
             '.v2-material-item-name-input[data-item-key="' +
               CSS['escape'](this['_renamingMaterialItemKey']) +
-              '\x22]',
+              '"]',
           );
           (el145?.['focus'](), el145?.['select']?.());
         });
@@ -4318,17 +4318,17 @@ class AssetManager {
       handler8 = (value373, value374, value375) =>
         this['_setThumbContent'](value373, value374, value375),
       handler9 = (el149) => {
-        let el150 = el149['querySelector'](':scope\x20>\x20.v2-asset-cover-grid');
+        let el150 = el149['querySelector'](':scope > .v2-asset-cover-grid');
         if (!el150) {
           ((el150 = document['createElement']('div')), (el150['className'] = 'v2-asset-cover-grid'));
-          for (let count19 = 0x0; count19 < 0x4; count19++) {
+          for (let count19 = 0; count19 < 4; count19++) {
             const value376 = document['createElement']('div');
             ((value376['className'] = 'v2-asset-cover-cell'), el150['appendChild'](value376));
           }
           el149['replaceChildren'](el150);
         } else {
           const list37 = el150['querySelectorAll'](':scope > .v2-asset-cover-cell');
-          for (let count20 = list37['length']; count20 < 0x4; count20++) {
+          for (let count20 = list37['length']; count20 < 4; count20++) {
             const value377 = document['createElement']('div');
             ((value377['className'] = 'v2-asset-cover-cell'), el150['appendChild'](value377));
           }
@@ -4339,7 +4339,7 @@ class AssetManager {
         let el152 = el151['querySelector'](':scope > .v2-asset-item-load'),
           el153 = el151['querySelector'](':scope > .v2-asset-item-delete'),
           el154 = el151['querySelector'](':scope > .v2-asset-item-delete-confirm'),
-          enabled84 = el151['querySelector'](':scope\x20>\x20.v2-asset-item-cover'),
+          enabled84 = el151['querySelector'](':scope > .v2-asset-item-cover'),
           el155 = el151['querySelector'](':scope > .v2-asset-item-name');
         !el152 &&
           ((el152 = document['createElement']('button')),
@@ -4348,7 +4348,7 @@ class AssetManager {
           (el152['dataset']['uiAction'] = 'asset-add-all'),
           el152['setAttribute']('aria-label', assetManagerText('loadToCanvas')),
           (el152['innerHTML'] =
-            '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20aria-hidden=\x22true\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22><path\x20d=\x22M16.5\x205.5a7.5\x207.5\x200\x201\x200-1\x2013.5\x22/><path\x20d=\x22M12\x2014h6v6\x22/><path\x20d=\x22m18\x2014-6\x206\x22/></svg>'),
+            '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 5.5a7.5 7.5 0 1 0-1 13.5"/><path d="M12 14h6v6"/><path d="m18 14-6 6"/></svg>'),
           el151['appendChild'](el152));
         !el153 &&
           ((el153 = document['createElement']('button')),
@@ -4372,7 +4372,7 @@ class AssetManager {
           const el156 = document['createElement']('button');
           ((el156['type'] = 'button'),
             (el156['className'] =
-              'v2-asset-item-delete-confirm-btn\x20v2-asset-item-delete-confirm-btn--danger'),
+              'v2-asset-item-delete-confirm-btn v2-asset-item-delete-confirm-btn--danger'),
             (el156['dataset']['uiAction'] = 'asset-delete-confirm'),
             (el156['textContent'] = '✔'),
             el156['setAttribute']('aria-label', assetManagerText('confirm')));
@@ -4390,7 +4390,7 @@ class AssetManager {
         const value378 = String(error15?.['id'] || '');
         ((el152['dataset']['assetId'] = value378),
           (el152['disabled'] =
-            !Array['isArray'](error15?.['nodes']) || error15['nodes']['length'] === 0x0),
+            !Array['isArray'](error15?.['nodes']) || error15['nodes']['length'] === 0),
           (el153['dataset']['assetId'] = value378),
           el154['querySelectorAll'](':scope > button')['forEach']((el158) => {
             el158['dataset']['assetId'] = value378;
@@ -4458,10 +4458,10 @@ class AssetManager {
           : Array['isArray'](error15?.['nodes'])
             ? error15['nodes']['map']((value383) => _buildAssetItem(value383))
             : [];
-        if (list38['length'] > 0x0) {
+        if (list38['length'] > 0) {
           const el161 = handler9(enabled84),
             value384 = el161['querySelectorAll'](':scope > .v2-asset-cover-cell');
-          for (let count21 = 0x0; count21 < 0x4; count21++) {
+          for (let count21 = 0; count21 < 4; count21++) {
             const enabled86 = list38[count21];
             if (!enabled86) {
               const el162 = value384[count21];
@@ -4506,10 +4506,10 @@ class AssetManager {
       el163['className'] = 'v2-asset-detail';
       const value388 = document['createElement']('div');
       ((value388['className'] = 'v2-asset-detail-cover'), el163['appendChild'](value388));
-      if (list40['length'] > 0x0) {
+      if (list40['length'] > 0) {
         const el164 = handler9(value388),
-          value389 = el164['querySelectorAll'](':scope\x20>\x20.v2-asset-cover-cell');
-        for (let count22 = 0x0; count22 < 0x4; count22++) {
+          value389 = el164['querySelectorAll'](':scope > .v2-asset-cover-cell');
+        for (let count22 = 0; count22 < 4; count22++) {
           const value390 = list40[count22];
           if (value390) handler8(value389[count22], value390['thumbSrc'], value390['type']);
           else value389[count22] && value389[count22]['replaceChildren']();
@@ -4540,13 +4540,13 @@ class AssetManager {
         el167['appendChild'](el168));
       const el169 = document['createElement']('div');
       el169['className'] = 'v2-asset-subgrid';
-      if (list40['length'] === 0x0) {
+      if (list40['length'] === 0) {
         const el170 = document['createElement']('div');
         ((el170['className'] = 'v2-asset-empty'),
           (el170['textContent'] = assetManagerText('detail.empty')),
           el169['appendChild'](el170));
       } else
-        for (let index3 = 0x0; index3 < list40['length']; index3++) {
+        for (let index3 = 0; index3 < list40['length']; index3++) {
           const error16 = list40[index3],
             el171 = document['createElement']('button');
           ((el171['type'] = 'button'),
@@ -4566,7 +4566,7 @@ class AssetManager {
           const value393 = String(
             error16?.['name'] ||
               error16?.['type'] ||
-              assetManagerText('detail.childAssetName', { index: index3 + 0x1 }),
+              assetManagerText('detail.childAssetName', { index: index3 + 1 }),
           );
           ((el173['textContent'] = value393),
             value392['append'](el172, el173),
@@ -4599,8 +4599,8 @@ class AssetManager {
       (el176['className'] = 'v2-asset-empty'),
       listView5['appendChild'](el176));
     const value394 = this['_getSortedAssets']();
-    let count24 = 0x0,
-      value395 = 0x0;
+    let count24 = 0,
+      value395 = 0;
     for (const value396 of value394) {
       const enabled87 = String(value396?.['id'] || '');
       if (!enabled87) continue;
@@ -4627,13 +4627,13 @@ class AssetManager {
               el177['classList']['add']('is-new');
               const value398 = window['setTimeout'](() => {
                 if (el177['isConnected']) el177['classList']['remove']('is-new');
-              }, 0x28a);
+              }, 650);
               el177['dataset']['_pulseTimer'] = String(value398);
             })),
-          (count24 += 0x1)));
+          (count24 += 1)));
     }
-    ((el176['style']['display'] = count24 === 0x0 ? '' : 'none'),
-      count24 === 0x0 &&
+    ((el176['style']['display'] = count24 === 0 ? '' : 'none'),
+      count24 === 0 &&
         ((el176['textContent'] = assetManagerText('emptyCategory', {
           category: this['_formatCategoryLabel'](this['activeTab']),
         })),
@@ -4646,10 +4646,10 @@ class AssetManager {
     if (!box13) return;
     const value402 = Number['isFinite'](box12?.['x']) && Number['isFinite'](box12?.['y']),
       box14 = value402 ? box12 : this['_getCanvasCenterWorld'](),
-      value403 = Number(box13['width'] ?? box13['w']) || 0xf0,
-      value404 = Number(box13['height'] ?? box13['h']) || 0xf0,
-      x = box14['x'] - value403 / 0x2,
-      y = box14['y'] - value404 / 0x2,
+      value403 = Number(box13['width'] ?? box13['w']) || 240,
+      value404 = Number(box13['height'] ?? box13['h']) || 240,
+      x = box14['x'] - value403 / 2,
+      y = box14['y'] - value404 / 2,
       box15 = value402
         ? { x: x, y: y }
         : findAvailablePosition(
@@ -4658,7 +4658,7 @@ class AssetManager {
             y,
             value403,
             value404,
-            0x18,
+            24,
             'right',
           );
     (appStore['batch'](() => {
@@ -4674,7 +4674,7 @@ class AssetManager {
   ['restoreAssetToCanvas'](value405, box17 = null) {
     const enabled89 = (this['assets'] || [])['find']((value406) => value406['id'] === value405);
     if (!enabled89 || !enabled89['nodes']) return;
-    const list41 = prepareAssetNodesForRestore(enabled89, 0x18),
+    const list41 = prepareAssetNodesForRestore(enabled89, 24),
       value407 = Number['isFinite'](box17?.['x']) && Number['isFinite'](box17?.['y']),
       box18 = value407 ? box17 : this['_getCanvasCenterWorld'](),
       value408 = this['_calcNodesBBox'](list41),
@@ -4688,9 +4688,9 @@ class AssetManager {
             appStore['getState']()['nodes'],
             x2,
             y2,
-            Math['max'](0x1, value408['w']),
-            Math['max'](0x1, value408['h']),
-            0x18,
+            Math['max'](1, value408['w']),
+            Math['max'](1, value408['h']),
+            24,
             'right',
           ),
       value411 = value409 + (box19['x'] - x2),
@@ -4703,8 +4703,8 @@ class AssetManager {
           generateId3 = generateId(box20['type']);
         ((value413[value415] = generateId3),
           (box20['id'] = generateId3),
-          (box20['x'] = (Number(box20['x']) || 0x0) + value411),
-          (box20['y'] = (Number(box20['y']) || 0x0) + value412),
+          (box20['x'] = (Number(box20['x']) || 0) + value411),
+          (box20['y'] = (Number(box20['y']) || 0) + value412),
           appStore['addNode'](box20));
       }),
         enabled89['edges'] &&

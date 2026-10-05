@@ -3,26 +3,26 @@ import { buildAgentCanvasSummary } from './agentCanvasSummary.js';
 import { buildAgentReferenceContext } from './agentReferenceContext.js';
 import { routeAgentCapabilities } from './agentCapabilityRouter.js';
 import { defaultAgentSkillRegistry, listAgentSkillCatalog, selectAgentSkills } from './agentSkillCatalog.js';
-export const DEFAULT_AGENT_CONTEXT_BUDGET_CHARS = 0x8ca0;
-export const MAX_EMPTY_CANVAS_CONTEXT_CHARS = 0x9c40;
-const AGENT_INPUT_REF_CONTEXT_LIMIT = 0xc,
-  AGENT_SELECTED_NODE_DETAIL_LIMIT = 0xc;
+export const DEFAULT_AGENT_CONTEXT_BUDGET_CHARS = 36000;
+export const MAX_EMPTY_CANVAS_CONTEXT_CHARS = 40000;
+const AGENT_INPUT_REF_CONTEXT_LIMIT = 12,
+  AGENT_SELECTED_NODE_DETAIL_LIMIT = 12;
 function estimateJsonChars(value) {
   try {
     return JSON['stringify'](value)['length'];
   } catch {
-    return 0x0;
+    return 0;
   }
 }
 function normalizeContextBudget(item) {
   const count = Number(item);
-  if (!Number['isFinite'](count) || count <= 0x0) return DEFAULT_AGENT_CONTEXT_BUDGET_CHARS;
+  if (!Number['isFinite'](count) || count <= 0) return DEFAULT_AGENT_CONTEXT_BUDGET_CHARS;
   return Math['trunc'](count);
 }
 function getModelLimitForBudget(count2) {
-  if (count2 <= 0x61a8) return 0x6;
-  if (count2 <= 0x7d00) return 0x8;
-  return 0xa;
+  if (count2 <= 25000) return 6;
+  if (count2 <= 32000) return 8;
+  return 10;
 }
 function summarizeWorkflowsFromModels(list = []) {
   return list['filter']((key) => key?.['adapterType'] === 'workflow')['map'](
@@ -41,12 +41,12 @@ function markCanvasCatalogTruncated(enabled = {}) {
   ((enabled['modelCatalog']['truncated'] = !![]),
     (enabled['modelCatalog']['includedModels'] = Array['isArray'](enabled['availableModels'])
       ? enabled['availableModels']['length']
-      : 0x0));
+      : 0));
 }
 function truncatePreviewText(index, result) {
   const list2 = String(index || '');
   if (list2['length'] <= result) return list2;
-  return list2['slice'](0x0, Math['max'](0x0, result - 0x3)) + '...';
+  return list2['slice'](0, Math['max'](0, result - 3)) + '...';
 }
 function normalizeInputKind(data = '') {
   const list3 = String(data || '')['trim']();
@@ -71,15 +71,15 @@ function normalizeAgentInputRefs(list4 = []) {
         id: nodeId,
         type: type,
         kind: String(box['kind'] || normalizeInputKind(type))['trim'](),
-        label: truncatePreviewText(box['label'] || box['name'] || nodeId, 0x50),
+        label: truncatePreviewText(box['label'] || box['name'] || nodeId, 80),
         source: String(box['source'] || 'agent-panel')['trim'](),
       };
-    if (Number['isFinite'](count3) && count3 > 0x0) box2['width'] = Math['round'](count3);
-    if (Number['isFinite'](count4) && count4 > 0x0) box2['height'] = Math['round'](count4);
+    if (Number['isFinite'](count3) && count3 > 0) box2['width'] = Math['round'](count3);
+    if (Number['isFinite'](count4) && count4 > 0) box2['height'] = Math['round'](count4);
     return box2;
   })
     ['filter'](Boolean)
-    ['slice'](0x0, AGENT_INPUT_REF_CONTEXT_LIMIT);
+    ['slice'](0, AGENT_INPUT_REF_CONTEXT_LIMIT);
 }
 function updateBudgetMetadata(canvas, maxChars, truncated = ![]) {
   const commandSchemasRetained = Array['isArray'](canvas['commands'])
@@ -93,16 +93,16 @@ function updateBudgetMetadata(canvas, maxChars, truncated = ![]) {
     : !![];
   canvas['contextBudget'] = {
     maxChars: maxChars,
-    estimatedChars: 0x0,
+    estimatedChars: 0,
     truncated: truncated === !![] || canvas['canvas']?.['modelCatalog']?.['truncated'] === !![],
     availableModels: Array['isArray'](canvas['canvas']?.['availableModels'])
       ? canvas['canvas']['availableModels']['length']
-      : 0x0,
+      : 0,
     commandSchemasRetained: commandSchemasRetained,
     schemaIntegrity: commandSchemasRetained,
     budgetExceeded: ![],
   };
-  for (let count5 = 0x0; count5 < 0x3; count5 += 0x1) {
+  for (let count5 = 0; count5 < 3; count5 += 1) {
     canvas['contextBudget']['estimatedChars'] = estimateJsonChars(canvas);
   }
   return (
@@ -121,18 +121,18 @@ function compactCommandDescription(id = {}) {
     returnAliasFields: id['returnAliasFields'],
   };
 }
-function compactSelectedSkill(args = {}, target = 0xfa0, source = 0xfa0) {
+function compactSelectedSkill(args = {}, target = 4000, source = 4000) {
   const instructions = truncatePreviewText(args['instructions'], target);
   return {
     ...args,
     instructions: instructions,
     resourceNames: Array['isArray'](args['resourceNames'])
-      ? args['resourceNames']['slice'](0x0, 0xc)
+      ? args['resourceNames']['slice'](0, 12)
       : [],
     resources: (Array['isArray'](args['resources']) ? args['resources'] : [])
-      ['slice'](0x0, 0x8)
+      ['slice'](0, 8)
       ['map']((error = {}) => ({
-        name: truncatePreviewText(error['name'], 0xa0),
+        name: truncatePreviewText(error['name'], 160),
         content: truncatePreviewText(error['content'], source),
       })),
   };
@@ -145,7 +145,7 @@ function getPinnedCanvasNodeIds(options2 = {}) {
     };
   return (
     (options2['selectedNodes'] || [])
-      ['slice'](0x0, AGENT_SELECTED_NODE_DETAIL_LIMIT)
+      ['slice'](0, AGENT_SELECTED_NODE_DETAIL_LIMIT)
       ['forEach']((record) => handler(record?.['id'] || record?.['nodeId'])),
     (options2['inputRefs'] || [])['forEach']((payload) =>
       handler(payload?.['nodeId'] || payload?.['id']),
@@ -164,24 +164,24 @@ function getPinnedCanvasNodeIds(options2 = {}) {
     next
   );
 }
-function pruneCanvasGraph(state2 = {}, input = 0x1e) {
+function pruneCanvasGraph(state2 = {}, input = 30) {
   const list5 = Array['isArray'](state2['nodes']) ? state2['nodes'] : [],
     list6 = Array['isArray'](state2['edges']) ? state2['edges'] : [],
     totalSelected = Array['isArray'](state2['selectedNodes']) ? state2['selectedNodes'] : [],
-    includedSelectedNodeDetails = totalSelected['slice'](0x0, AGENT_SELECTED_NODE_DETAIL_LIMIT),
+    includedSelectedNodeDetails = totalSelected['slice'](0, AGENT_SELECTED_NODE_DETAIL_LIMIT),
     map2 = getPinnedCanvasNodeIds(state2),
     pinnedNodes = list5['filter']((output) => map2['has'](String(output?.['id'] || ''))),
     list7 = list5['filter']((value2) => !map2['has'](String(value2?.['id'] || ''))),
     value3 = Math['max'](input, pinnedNodes['length']),
-    includedNodes = [...pinnedNodes, ...list7['slice'](0x0, Math['max'](0x0, value3 - pinnedNodes['length']))],
+    includedNodes = [...pinnedNodes, ...list7['slice'](0, Math['max'](0, value3 - pinnedNodes['length']))],
     map3 = new Set(includedNodes['map']((value4) => String(value4?.['id'] || ''))['filter'](Boolean)),
     list8 = list6['filter'](
       (value5) =>
         map3['has'](String(value5?.['sourceId'] || '')) &&
         map3['has'](String(value5?.['targetId'] || '')),
     ),
-    value6 = Math['max'](0x18, value3 * 0x3),
-    includedEdges = list8['slice'](0x0, value6),
+    value6 = Math['max'](24, value3 * 3),
+    includedEdges = list8['slice'](0, value6),
     totalNodes = Number(state2['graphCatalog']?.['totalNodes'] ?? list5['length']),
     totalEdges = Number(state2['graphCatalog']?.['totalEdges'] ?? list6['length']),
     enabled2 =
@@ -199,7 +199,7 @@ function pruneCanvasGraph(state2 = {}, input = 0x1e) {
         includedSelectedNodeDetails: includedSelectedNodeDetails['length'],
         selectedNodeIdsRetained: Array['isArray'](state2['selectedNodeIds'])
           ? state2['selectedNodeIds']['length']
-          : 0x0,
+          : 0,
         truncated: !![],
       }),
     (state2['graphCatalog'] = {
@@ -217,25 +217,25 @@ function enforceContextBudget(canvas2, value7) {
   let updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7),
     value8 = canvas2['contextBudget']['truncated'];
   const state3 = canvas2['canvas'] || {};
-  for (const value9 of [0x3c, 0x1e, 0xc]) {
+  for (const value9 of [60, 30, 12]) {
     if (updateBudgetMetadata2 <= value7) break;
     if (!pruneCanvasGraph(state3, value9)) continue;
     ((value8 = !![]), (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
-  for (const value10 of [0xe, 0xa, 0x6]) {
+  for (const value10 of [14, 10, 6]) {
     if (updateBudgetMetadata2 <= value7) break;
     if (
       !Array['isArray'](state3['availableModels']) ||
       state3['availableModels']['length'] <= value10
     )
       continue;
-    ((state3['availableModels'] = state3['availableModels']['slice'](0x0, value10)),
+    ((state3['availableModels'] = state3['availableModels']['slice'](0, value10)),
       (state3['availableWorkflows'] = summarizeWorkflowsFromModels(state3['availableModels'])),
       markCanvasCatalogTruncated(state3),
       (value8 = !![]),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
-  for (const value11 of [0xa, 0x5, 0x0]) {
+  for (const value11 of [10, 5, 0]) {
     if (updateBudgetMetadata2 <= value7) break;
     if (!Array['isArray'](state3['recentCommands']) || state3['recentCommands']['length'] <= value11)
       continue;
@@ -243,9 +243,9 @@ function enforceContextBudget(canvas2, value7) {
       (value8 = !![]),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
-  for (const value12 of [0xf0, 0x78, 0x3c]) {
+  for (const value12 of [240, 120, 60]) {
     if (updateBudgetMetadata2 <= value7) break;
-    if (!Array['isArray'](state3['nodes']) || state3['nodes']['length'] === 0x0) continue;
+    if (!Array['isArray'](state3['nodes']) || state3['nodes']['length'] === 0) continue;
     ((state3['nodes'] = state3['nodes']['map']((args2) => ({
       ...args2,
       promptPreview: truncatePreviewText(args2['promptPreview'], value12),
@@ -255,12 +255,12 @@ function enforceContextBudget(canvas2, value7) {
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   for (const [value13, value14] of [
-    [0x1770, 0x1770],
-    [0xbb8, 0xbb8],
-    [0x4b0, 0x4b0],
+    [6000, 6000],
+    [3000, 3000],
+    [1200, 1200],
   ]) {
     if (updateBudgetMetadata2 <= value7) break;
-    if (!Array['isArray'](canvas2['skills']) || canvas2['skills']['length'] === 0x0) continue;
+    if (!Array['isArray'](canvas2['skills']) || canvas2['skills']['length'] === 0) continue;
     ((canvas2['skills'] = canvas2['skills']['map']((value15) =>
       compactSelectedSkill(value15, value13, value14),
     )),
@@ -272,14 +272,14 @@ function enforceContextBudget(canvas2, value7) {
     ((canvas2['commands'] = canvas2['commands']['map'](compactCommandDescription)),
     (value8 = !![]),
     (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
-  for (const value16 of [0x3, 0x1, 0x0]) {
+  for (const value16 of [3, 1, 0]) {
     if (updateBudgetMetadata2 <= value7) break;
     if (
       !Array['isArray'](state3['availableModels']) ||
       state3['availableModels']['length'] <= value16
     )
       continue;
-    ((state3['availableModels'] = state3['availableModels']['slice'](0x0, value16)),
+    ((state3['availableModels'] = state3['availableModels']['slice'](0, value16)),
       (state3['availableWorkflows'] = summarizeWorkflowsFromModels(state3['availableModels'])),
       markCanvasCatalogTruncated(state3),
       (value8 = !![]),
@@ -364,14 +364,14 @@ export function buildAgentContext({
     ((canvas3['availableModels'] = []),
     (canvas3['availableWorkflows'] = []),
     canvas3['modelCatalog'] &&
-      ((canvas3['modelCatalog']['includedModels'] = 0x0),
-      (canvas3['modelCatalog']['truncated'] = canvas3['modelCatalog']['totalMatched'] > 0x0)));
+      ((canvas3['modelCatalog']['includedModels'] = 0),
+      (canvas3['modelCatalog']['truncated'] = canvas3['modelCatalog']['totalMatched'] > 0)));
   const deferredSkillIds = listAgentSkillCatalog({ registry: skillRegistry }),
     value21 = skillRegistry?.['getState']?.() || {},
     includedSkillIds = skills['map']((value22) => value22['id']),
     map5 = new Set(includedSkillIds),
     canvas4 = {
-      schemaVersion: 0x1,
+      schemaVersion: 1,
       canvas: canvas3,
       commands: commands2['commands'],
       skills: skills,
@@ -384,10 +384,10 @@ export function buildAgentContext({
         ),
         available: deferredSkillIds,
         totalAvailable: deferredSkillIds['length'],
-        installedCount: Number(value21['installedCount'] || 0x0),
+        installedCount: Number(value21['installedCount'] || 0),
         diagnosticCount: Array['isArray'](value21['diagnostics'])
           ? value21['diagnostics']['length']
-          : 0x0,
+          : 0,
       },
       policies: {
         actionPlanOnly: !![],
@@ -398,7 +398,7 @@ export function buildAgentContext({
         noArbitraryStoreWrites: !![],
         noDirectNetwork: !![],
         noElectronAccess: !![],
-        batchConfirmThreshold: 0x5,
+        batchConfirmThreshold: 5,
       },
     };
   return ((canvas4['canvas']['inputRefs'] = inputRefs2), enforceContextBudget(canvas4, contextBudget));

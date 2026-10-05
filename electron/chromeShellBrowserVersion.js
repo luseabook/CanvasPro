@@ -6,34 +6,34 @@ import { resolveWindowsSystemToolPath } from './windowsSystemTools.js';
 export const DEFAULT_MIN_CHROME_VERSION = '148.0.7778.280';
 export const DEFAULT_MIN_EDGE_VERSION = '148.0.0.0';
 export const DEFAULT_MIN_CHROMIUM_VERSION = DEFAULT_MIN_CHROME_VERSION;
-const VERSION_CHECK_TIMEOUT_MS = 0x1388,
+const VERSION_CHECK_TIMEOUT_MS = 5000,
   SUPPORTED_BROWSER_KINDS = new Set(['chrome', 'edge', 'chromium']),
   WINDOWS_BROWSER_PATH_ENV_NAME = 'AIC_CHROME_SHELL_BROWSER_PATH_BASE64',
   WINDOWS_VERSION_SCRIPT = [
     '$encodedTarget = $env:' + WINDOWS_BROWSER_PATH_ENV_NAME,
     'if (-not $encodedTarget) { exit 2 }',
     '$target = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($encodedTarget))',
-    'if\x20(-not\x20$target)\x20{\x20exit\x202\x20}',
+    'if (-not $target) { exit 2 }',
     '$item = Get-Item -LiteralPath $target -ErrorAction Stop',
     '[Console]::Out.Write($item.VersionInfo.ProductVersion)',
-  ]['join'](';\x20');
+  ]['join']('; ');
 function parseVersionParts(value) {
   const match = String(value || '')['match'](/\b(\d+(?:\.\d+){1,3})\b/);
   if (!match) return null;
-  const parts = match[0x1]['split']('.')['map']((part) => Number['parseInt'](part, 0xa));
-  if (parts['some']((part) => !Number['isFinite'](part) || part < 0x0)) return null;
-  while (parts['length'] < 0x4) parts['push'](0x0);
-  return { text: match[0x1], parts: parts };
+  const parts = match[1]['split']('.')['map']((part) => Number['parseInt'](part, 10));
+  if (parts['some']((part) => !Number['isFinite'](part) || part < 0)) return null;
+  while (parts['length'] < 4) parts['push'](0);
+  return { text: match[1], parts: parts };
 }
 export function compareBrowserVersions(left, right) {
   const leftParsed = parseVersionParts(left),
     rightParsed = parseVersionParts(right);
   if (!leftParsed || !rightParsed) return null;
-  for (let index = 0x0; index < 0x4; index += 0x1) {
-    if (leftParsed['parts'][index] < rightParsed['parts'][index]) return -0x1;
-    if (leftParsed['parts'][index] > rightParsed['parts'][index]) return 0x1;
+  for (let index = 0; index < 4; index += 1) {
+    if (leftParsed['parts'][index] < rightParsed['parts'][index]) return -1;
+    if (leftParsed['parts'][index] > rightParsed['parts'][index]) return 1;
   }
-  return 0x0;
+  return 0;
 }
 export function identifyChromeShellBrowser(browserPath) {
   const baseName = path['basename'](String(browserPath || ''))['toLowerCase']();
@@ -57,7 +57,7 @@ export function identifyChromeShellBrowser(browserPath) {
   return 'unknown';
 }
 function extractVersionFromProcessResult(result) {
-  if (result?.['status'] !== 0x0 || result?.['error'] || result?.['signal']) return '';
+  if (result?.['status'] !== 0 || result?.['error'] || result?.['signal']) return '';
   return parseVersionParts(result?.['stdout'])?.['text'] || '';
 }
 export function readBrowserExecutableVersion({
@@ -163,8 +163,8 @@ export function inspectChromeShellBrowserVersion({
     version: version,
     minimumVersion: minimumVersion,
     checked: true,
-    outdated: comparison < 0x0,
-    reason: comparison < 0x0 ? 'version-too-old' : 'supported',
+    outdated: comparison < 0,
+    reason: comparison < 0 ? 'version-too-old' : 'supported',
   };
 }
 export async function checkChromeShellBrowserVersionBeforeLaunch({
@@ -215,7 +215,7 @@ export async function checkChromeShellBrowserVersionBeforeLaunch({
         type: 'chrome_shell.fallback_browser_version_checked',
         level: fallbackInspection['checked'] && !fallbackInspection['outdated'] ? 'info' : 'warn',
         source: 'main',
-        message: 'Fallback\x20browser\x20version\x20check\x20completed',
+        message: 'Fallback browser version check completed',
         context: fallbackInspection,
       }));
     if (fallbackInspection['checked'] && !fallbackInspection['outdated'])

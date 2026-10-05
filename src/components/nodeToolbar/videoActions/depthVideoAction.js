@@ -167,8 +167,8 @@ export function bindVideoDepthAction(data) {
             return;
           }
           const { width: width, height: height } = getAutoMediaSizeByShortSide(
-              sourceNodeId['width'] || 0x12c,
-              sourceNodeId['height'] || 0x12c,
+              sourceNodeId['width'] || 300,
+              sourceNodeId['height'] || 300,
             ),
             { x: x, y: y } = calcSafeSpawnPosNearNode(
               store['getState']()['nodes'],
@@ -181,7 +181,7 @@ export function bindVideoDepthAction(data) {
               '-' +
               Date['now']() +
               '-' +
-              Math['random']()['toString'](0x24)['slice'](0x2, 0x6),
+              Math['random']()['toString'](36)['slice'](2, 6),
             fileName = () => modelId2['fileNamePrefix'] + '_' + Date['now']() + '.mp4',
             response = await submitTask(
               {

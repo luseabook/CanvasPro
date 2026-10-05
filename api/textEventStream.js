@@ -1,9 +1,9 @@
 import { createTextResponseDeadline } from './textResponseDeadline.js';
 export function visibleTextStreamContent(value) {
   let list = String(value || '')['replace'](/<think>[\s\S]*?(?:<\/think>\n?|$)/gu, '');
-  for (let count = Math['min'](0x6, list['length']); count > 0x0; count--) {
+  for (let count = Math['min'](6, list['length']); count > 0; count--) {
     if ('<think>'['startsWith'](list['slice'](-count))) {
-      list = list['slice'](0x0, -count);
+      list = list['slice'](0, -count);
       break;
     }
   }
@@ -21,7 +21,7 @@ export function enableTextRequestStreaming(dom, item, key = ![]) {
         : { ...dom, textStream: !![], url: apiUrl['href'] }
     );
   }
-  const result = String(dom?.['body']?.['apiUrl'] || dom?.['url'] || '')['split']('?')[0x0],
+  const result = String(dom?.['body']?.['apiUrl'] || dom?.['url'] || '')['split']('?')[0],
     enabled =
       /(?:\/chat\/completions|\/responses|\/proxy\/completions)\/?$/u['test'](result) ||
       dom?.['url'] === '/api/v2/proxy/completions';
@@ -36,7 +36,7 @@ export function enableTextRequestStreaming(dom, item, key = ![]) {
 export function shouldRetryWithoutTextStreaming(dom2, data, options) {
   return (
     dom2?.['body']?.['stream'] === !![] &&
-    [0x190, 0x1a6]['includes'](data) &&
+    [400, 422]['includes'](data) &&
     /\bstream(?:ing)?\b|流式/iu['test'](options) &&
     /not supported|unsupported|not available|must be false|不支持|不允许/iu['test'](options)
   );
@@ -68,8 +68,8 @@ export async function readTextEventStream(
   function run(source) {
     const enabled3 = source['split'](/\r?\n/u)
       ['filter']((next) => next['startsWith']('data:'))
-      ['map']((list4) => list4['slice'](0x5)['replace'](/^ /u, ''))
-      ['join']('\x0a');
+      ['map']((list4) => list4['slice'](5)['replace'](/^ /u, ''))
+      ['join']('\n');
     if (!enabled3['trim']()) return;
     if (enabled3['trim']() === '[DONE]') {
       enabled2 = !![];
@@ -92,7 +92,7 @@ export async function readTextEventStream(
     if (current['type'] === 'response.output_text.delta') record = current['delta'];
     if (typeof record === 'string' && record) {
       list3 += record;
-      if (list3['length'] > 0xf4240) throw new Error('回答超过长度限制，请分段生成');
+      if (list3['length'] > 1000000) throw new Error('回答超过长度限制，请分段生成');
       onText?.(visibleTextStreamContent(list3));
     }
     if (entry?.['finish_reason']) {
@@ -127,10 +127,10 @@ export async function readTextEventStream(
       list2 += done ? textDecoder['decode']() : textDecoder['decode'](value2, { stream: !![] });
       let state;
       while ((state = /\r?\n\r?\n/u['exec'](list2))) {
-        (run(list2['slice'](0x0, state['index'])),
-          (list2 = list2['slice'](state['index'] + state[0x0]['length'])));
+        (run(list2['slice'](0, state['index'])),
+          (list2 = list2['slice'](state['index'] + state[0]['length'])));
       }
-      if (list2['length'] > 0x1e8480) throw new Error('回答流格式异常');
+      if (list2['length'] > 2000000) throw new Error('回答流格式异常');
       if (done) break;
       if (enabled2 && list2['trim']() === '') break;
     }

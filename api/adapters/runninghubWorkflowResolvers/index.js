@@ -158,7 +158,7 @@ function resolveBerniniModeValue(value8, value9 = '') {
 }
 function normalizeBerniniResolutionBase(value11) {
   const value12 = Number(value11);
-  return [0x340, 0x400, 0x500, 0x5a0].includes(value12) ? value12 : 0x340;
+  return [832, 1024, 1280, 1440].includes(value12) ? value12 : 832;
 }
 function parseBerniniAspectRatio(value13) {
   const value14 = String(value13 || '16:9').trim(),
@@ -307,7 +307,7 @@ async function resolveRunningHubVideoMattingPayload({
       pushManifestNode3(
         nodeInfoList3,
         appId.maskResolutionNode,
-        String(normalizeRhVideoResolution2(payload3.rhVideoResolution, 0x400)),
+        String(normalizeRhVideoResolution2(payload3.rhVideoResolution, 1024)),
       ),
       pushManifestNode3(nodeInfoList3, appId.maskImageNode, enabled5));
     const instanceType = payload3.rhInstanceType === 'plus' ? 'plus' : 'default';

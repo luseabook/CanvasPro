@@ -9,10 +9,10 @@ import {
   createStoryAssetPromptContracts,
 } from './storyAssetExtractionRequest.js';
 import { getResultText } from './storyTextRequest.js';
-export const STORY_ASSET_EXTRACTION_SCHEMA_VERSION = 0x2;
+export const STORY_ASSET_EXTRACTION_SCHEMA_VERSION = 2;
 export const STORY_ASSET_EXTRACTION_KINDS = Object['freeze'](['character', 'scene', 'prop']);
-const STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS = 0x4b0,
-  STORY_ASSET_SOURCE_CHAPTER_MAX_ITEMS = 0x64;
+const STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS = 1200,
+  STORY_ASSET_SOURCE_CHAPTER_MAX_ITEMS = 100;
 export function mergeStoryAssetVisualPromptRepair(value, item, key = STORY_ASSET_EXTRACTION_KINDS) {
   const assets = getStoryAssetExtractionRawAssets(parseStrictJson(getResultText(value)), key),
     list = getStoryAssetExtractionRawAssets(parseStrictJson(getResultText(item)), key),
@@ -22,13 +22,13 @@ export function mergeStoryAssetVisualPromptRepair(value, item, key = STORY_ASSET
       const list2 = list['filter'](
           (index) => handler(index) === handler(appearances) && index['kind'] === appearances['kind'],
         ),
-        result = list2['length'] === 0x1 ? list2[0x0] : null;
+        result = list2['length'] === 1 ? list2[0] : null;
       return {
         ...appearances,
         appearances: appearances['appearances']['map']((args) => {
           if (sanitizeStoryAssetPublicPromptText(args['prompt'])) return args;
           const prompt = (result?.['appearances'] || [])['filter']((data) => handler(data) === handler(args));
-          return prompt['length'] === 0x1 ? { ...args, prompt: prompt[0x0]['prompt'] } : args;
+          return prompt['length'] === 1 ? { ...args, prompt: prompt[0]['prompt'] } : args;
         }),
       };
     }),
@@ -38,7 +38,7 @@ export function normalizeStoryAssetReference(options, target) {
   return normalizeText(options)['replace'](/\s+/g, '-') || target;
 }
 function assertConciseStoryAssetName(args2, source) {
-  const next = source === 'character' ? 0xc : 0x14;
+  const next = source === 'character' ? 12 : 20;
   if (
     [...args2]['length'] > next ||
     /[，,。；;\n]/u['test'](args2) ||
@@ -69,8 +69,8 @@ export function createStoryAssetExtractionResponseSchema(record = STORY_ASSET_EX
     properties: {
       assets: {
         type: 'array',
-        minItems: 0x0,
-        maxItems: 0x80,
+        minItems: 0,
+        maxItems: 128,
         items: {
           type: 'object',
           additionalProperties: ![],
@@ -86,36 +86,36 @@ export function createStoryAssetExtractionResponseSchema(record = STORY_ASSET_EX
             'appearances',
           ],
           properties: {
-            ref: { type: 'string', maxLength: 0x40 },
+            ref: { type: 'string', maxLength: 64 },
             kind: { type: 'string', enum: enumValue },
             name: {
               type: 'string',
-              maxLength: enumValue['length'] === 0x1 && enumValue[0x0] === 'character' ? 0xc : 0x14,
+              maxLength: enumValue['length'] === 1 && enumValue[0] === 'character' ? 12 : 20,
             },
-            role: { type: 'string', maxLength: 0x10 },
-            description: { type: 'string', maxLength: 0x140 },
-            voiceDescription: { type: 'string', maxLength: 0xf0 },
-            occurrences: { type: 'string', maxLength: 0xa0 },
+            role: { type: 'string', maxLength: 16 },
+            description: { type: 'string', maxLength: 320 },
+            voiceDescription: { type: 'string', maxLength: 240 },
+            occurrences: { type: 'string', maxLength: 160 },
             sourceChapterIds: sourceChapterIds,
             appearances: {
               type: 'array',
-              minItems: 0x1,
+              minItems: 1,
               maxItems: enumValue['some']((handle) => handle === 'character' || handle === 'scene')
-                ? 0x4
-                : 0x1,
+                ? 4
+                : 1,
               items: {
                 type: 'object',
                 additionalProperties: ![],
                 required: ['ref', 'name', 'description', 'occurrences', 'sourceChapterIds', 'prompt'],
                 properties: {
-                  ref: { type: 'string', maxLength: 0x40 },
-                  name: { type: 'string', maxLength: 0x20 },
-                  description: { type: 'string', maxLength: 0x140 },
-                  occurrences: { type: 'string', maxLength: 0xa0 },
+                  ref: { type: 'string', maxLength: 64 },
+                  name: { type: 'string', maxLength: 32 },
+                  description: { type: 'string', maxLength: 320 },
+                  occurrences: { type: 'string', maxLength: 160 },
                   sourceChapterIds: sourceChapterIds,
                   prompt: {
                     type: 'string',
-                    minLength: 0x1,
+                    minLength: 1,
                     maxLength: STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS,
                   },
                 },
@@ -134,7 +134,7 @@ export function createStoryAssetCompactExtractionResponseSchema(
   const list4 = normalizeStringArray(state)['filter']((scope) =>
       STORY_ASSET_EXTRACTION_KINDS['includes'](scope),
     ),
-    maxLength = list4['length'] === 0x1 ? list4[0x0] : '',
+    maxLength = list4['length'] === 1 ? list4[0] : '',
     enumValue2 = normalizeStringArray(config),
     minItems = enumValue2['length'];
   return {
@@ -153,16 +153,16 @@ export function createStoryAssetCompactExtractionResponseSchema(
           properties: {
             clientKey: {
               type: 'string',
-              maxLength: 0xc,
+              maxLength: 12,
               ...(enumValue2['length'] ? { enum: enumValue2 } : {}),
             },
             include: { type: 'boolean' },
-            description: { type: 'string', maxLength: 0x78 },
+            description: { type: 'string', maxLength: 120 },
             visualPrompt: {
               type: 'string',
-              maxLength: maxLength === 'character' ? 0x168 : maxLength === 'scene' ? 0x140 : 0x118,
+              maxLength: maxLength === 'character' ? 360 : maxLength === 'scene' ? 320 : 280,
             },
-            voiceDescription: { type: 'string', maxLength: maxLength === 'character' ? 0xb4 : 0x0 },
+            voiceDescription: { type: 'string', maxLength: maxLength === 'character' ? 180 : 0 },
           },
         },
       },
@@ -204,7 +204,7 @@ function getStoryAssetExtractionRawAssets(enabled, value3 = STORY_ASSET_EXTRACTI
   const list5 = normalizeStringArray(value3)['filter']((value4) =>
       STORY_ASSET_EXTRACTION_KINDS['includes'](value4),
     ),
-    value5 = list5['length'] === 0x1 ? list5[0x0] : '',
+    value5 = list5['length'] === 1 ? list5[0] : '',
     value6 = {
       character: ['characters', 'characterAssets', 'roles', '人物', '角色', '角色资产'],
       scene: ['scenes', 'sceneAssets', 'settings', 'locations', '场景', '场景资产'],
@@ -267,7 +267,7 @@ export function parseStoryAssetExtractionResult(
       STORY_ASSET_EXTRACTION_KINDS['includes'](value20),
     ),
     map2 = new Set(allowedKinds2),
-    value21 = allowedKinds2['length'] === 0x1 ? allowedKinds2[0x0] : '',
+    value21 = allowedKinds2['length'] === 1 ? allowedKinds2[0] : '',
     returnedAssetCount = getStoryAssetExtractionRawAssets(strictJson, allowedKinds2),
     assets2 = Array['isArray'](returnedAssetCount)
       ? returnedAssetCount['map']((error2, value22) => {
@@ -288,7 +288,7 @@ export function parseStoryAssetExtractionResult(
           assertConciseStoryAssetName(name, kind2);
           if (kind2 === 'character') assertStoryCharacterRole(error2?.['role']);
           const value23 = kind2 === 'character' ? normalizeText(error2?.['voiceDescription']) : '',
-            ref = normalizeStoryAssetReference(error2?.['ref'], 'asset-' + (value22 + 0x1)),
+            ref = normalizeStoryAssetReference(error2?.['ref'], 'asset-' + (value22 + 1)),
             sourceChapterIds2 = normalizeStringArray(error2?.['sourceChapterIds']);
           if (map['size']) {
             const list14 = sourceChapterIds2['filter']((value24) => !map['has'](value24));
@@ -298,7 +298,7 @@ export function parseStoryAssetExtractionResult(
           const prompt2 = Array['isArray'](error2?.['appearances']) ? error2['appearances'] : [];
           if (!prompt2['length']) throw new Error('资产“' + name + '”缺少形象和图片提示词。');
           const list15 =
-              kind2 === 'prop' && prompt2['length'] > 0x1
+              kind2 === 'prop' && prompt2['length'] > 1
                 ? [
                     {
                       ref: ref + '-base',
@@ -331,9 +331,9 @@ export function parseStoryAssetExtractionResult(
             appearances2 = list15['map']((error4, value29) => {
               const name2 = normalizeText(error4?.['name']);
               if (!name2)
-                throw new Error('资产“' + name + '”的第\x20' + (value29 + 0x1) + ' 个形象缺少具体形象名称。');
+                throw new Error('资产“' + name + '”的第 ' + (value29 + 1) + ' 个形象缺少具体形象名称。');
               return {
-                ref: normalizeStoryAssetReference(error4?.['ref'], ref + '-appearance-' + (value29 + 0x1)),
+                ref: normalizeStoryAssetReference(error4?.['ref'], ref + '-appearance-' + (value29 + 1)),
                 name: name2,
                 description: sanitizeStoryAssetPublicDescriptionText(error4?.['description']),
                 occurrences: sanitizeStoryAssetPublicDescriptionText(
@@ -370,15 +370,15 @@ export function parseStoryAssetExtractionResult(
         })['filter'](Boolean)
       : [],
     enabled3 =
-      Boolean(allowEmptyResult) || (allowedKinds2['length'] === 0x1 && allowedKinds2[0x0] === 'prop');
+      Boolean(allowEmptyResult) || (allowedKinds2['length'] === 1 && allowedKinds2[0] === 'prop');
   if (!assets2['length'] && !enabled3) {
     const topLevelKeys =
         strictJson && typeof strictJson === 'object' && !Array['isArray'](strictJson)
-          ? Object['keys'](strictJson)['slice'](0x0, 0xc)
+          ? Object['keys'](strictJson)['slice'](0, 12)
           : [],
       value32 =
-        allowedKinds2['length'] === 0x1
-          ? { character: '角色', scene: '场景', prop: '道具' }[allowedKinds2[0x0]] || '资产'
+        allowedKinds2['length'] === 1
+          ? { character: '角色', scene: '场景', prop: '道具' }[allowedKinds2[0]] || '资产'
           : '角色或场景',
       error6 = new Error('Agent 返回结果没有可用的' + value32 + '资产。');
     error6['raw'] = {
@@ -395,7 +395,7 @@ export function parseStoryAssetExtractionResult(
 function createStoryAssetCompactOccurrence(list18 = []) {
   const list19 = normalizeStringArray(list18)
     ['map']((value34) => {
-      const text4 = normalizeText(value34)['match'](/(\d+)\s*$/u)?.[0x1];
+      const text4 = normalizeText(value34)['match'](/(\d+)\s*$/u)?.[1];
       return (
         text4 ||
         normalizeText(value34)
@@ -417,7 +417,7 @@ export function parseStoryAssetCompactExtractionResult(
     contractSnapshot: contractSnapshot = null,
   } = {},
 ) {
-  const strictJson2 = parseStrictJson(getResultText(value35), 'Agent\x20未返回紧凑资产结果。'),
+  const strictJson2 = parseStrictJson(getResultText(value35), 'Agent 未返回紧凑资产结果。'),
     list20 = Array['isArray'](strictJson2?.['assets']) ? strictJson2['assets'] : [],
     value36 =
       contractSnapshot &&
@@ -443,18 +443,18 @@ export function parseStoryAssetCompactExtractionResult(
     list22 = [...list21, ...args3],
     map3 = new Map(list22['map']((value37) => [normalizeText(value37?.['clientKey']), value37]));
   if (map3['size'] !== list22['length'] || [...map3['keys']()]['some']((enabled4) => !enabled4))
-    throw new Error('客户端紧凑资产合同包含空或重复\x20clientKey。');
+    throw new Error('客户端紧凑资产合同包含空或重复 clientKey。');
   const required = new Set(list21['map']((value38) => normalizeText(value38?.['clientKey']))),
     map4 = new Map();
   list20['forEach']((value39, value40) => {
     const text5 = normalizeText(value39?.['clientKey']);
     if (!map3['has'](text5))
       throw new Error(
-        'Agent 紧凑结果返回了未知 clientKey：' + (text5 || '第' + (value40 + 0x1) + '行') + '。',
+        'Agent 紧凑结果返回了未知 clientKey：' + (text5 || '第' + (value40 + 1) + '行') + '。',
       );
-    if (map4['has'](text5)) throw new Error('Agent\x20紧凑结果重复返回\x20clientKey：' + text5 + '。');
+    if (map4['has'](text5)) throw new Error('Agent 紧凑结果重复返回 clientKey：' + text5 + '。');
     if (typeof value39?.['include'] !== 'boolean')
-      throw new Error('Agent\x20紧凑结果中的\x20' + text5 + ' 缺少明确 include 裁决。');
+      throw new Error('Agent 紧凑结果中的 ' + text5 + ' 缺少明确 include 裁决。');
     if (required['has'](text5) && value39['include'] === ![])
       throw new Error('Agent 紧凑结果试图排除必需资产 ' + text5 + '；必需资产不能排除。');
     map4['set'](text5, value39);
@@ -463,7 +463,7 @@ export function parseStoryAssetCompactExtractionResult(
     (value42) => value42['clientKey'],
   );
   if (list23['length'])
-    throw new Error('Agent 紧凑结果缺少合同裁决：' + list23['slice'](0x0, 0x8)['join']('、') + '。');
+    throw new Error('Agent 紧凑结果缺少合同裁决：' + list23['slice'](0, 8)['join']('、') + '。');
   if (list20['length'] !== list22['length'])
     throw new Error(
       'Agent 紧凑结果必须返回 ' + list22['length'] + ' 条合同裁决，实际返回 ' + list20['length'] + ' 条。',
@@ -475,7 +475,7 @@ export function parseStoryAssetCompactExtractionResult(
         name3 = normalizeText(clientKey['name']),
         value44 = kind3 + ':' + name3['normalize']('NFKC')['toLowerCase']();
       if (!kind3 || !name3)
-        throw new Error('客户端紧凑资产合同 ' + clientKey['clientKey'] + '\x20缺少\x20kind\x20或\x20name。');
+        throw new Error('客户端紧凑资产合同 ' + clientKey['clientKey'] + ' 缺少 kind 或 name。');
       const include = value43['include'] === !![],
         description = sanitizeStoryAssetPublicDescriptionText(value43['description']),
         visualPrompt = sanitizeStoryAssetPublicPromptText(value43['visualPrompt']),

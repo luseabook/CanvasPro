@@ -40,7 +40,7 @@ export function createStoryClipInputWorkspaceController({
     typeof render !== 'function'
   )
     throw new TypeError(
-      'Story\x20clip\x20inputs\x20require\x20selection,\x20project,\x20and\x20presentation\x20adapters.',
+      'Story clip inputs require selection, project, and presentation adapters.',
     );
   const syncVideoDurationInPlace = (item) => {
       const text = normalizeText(item?.['id']);

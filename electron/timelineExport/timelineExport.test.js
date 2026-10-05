@@ -30,7 +30,7 @@ test('XML has an actual frame-based sequence, video and linked stereo audio', ()
   assert.match(xml, /clipitem id="a-0-1"/); assert.match(xml, /clipitem id="a-0-2"/);
   assert.match(xml, /<file id="file-0"\/>/); assert.match(xml, /<pathurl>file:\/\//);
   assert.ok(!xml.includes('output/a.mp4')); assert.match(xml, /%20/);
-  assert.equal(xmlText('< & "\u0000'), '&lt; &amp; &quot;');
+  assert.equal(xmlText('< & "\x00'), '&lt; &amp; &quot;');
 });
 test('silent sequence has no audio clips; no source URL or DTD external dependency', () => {
   const req = normalizeTimelineRequest({ ...payload(), includeAudio: false });

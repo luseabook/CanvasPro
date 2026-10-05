@@ -25,7 +25,7 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
     sourceVideoTaskName: Object['freeze']({
       key: 'depth',
       textNeedles: Object['freeze'](['转为深度视频', '深度视频']),
-      managedNamePattern: '^深度视频(?:\x5cs*\x5c((?:处理中|恢复中|失败|已取消)\x5c))?$',
+      managedNamePattern: '^深度视频(?:\\s*\\((?:处理中|恢复中|失败|已取消)\\))?$',
       names: Object['freeze']({
         success: '深度视频',
         failed: '深度视频 (失败)',
@@ -36,8 +36,8 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
   fixedAssetSlots: ['sourceVideo'],
   inputSlots: {
     allowedKinds: ['video'],
-    minByKind: { video: 0x1 },
-    maxByKind: { image: 0x0, video: 0x1, audio: 0x0 },
+    minByKind: { video: 1 },
+    maxByKind: { image: 0, video: 1, audio: 0 },
     fixedSlots: Object['freeze']([
       Object['freeze']({ id: 'sourceVideo', kind: 'video', label: '源视频', required: !![] }),
     ]),
@@ -61,13 +61,13 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
       ...RH_VIDEO_RESOLUTION_FIELD,
       type: 'segmented',
       placement: 'resolution',
-      defaultValue: 0x400,
+      defaultValue: 1024,
       tooltip: '视频最长边的分辨率',
       showInfoTip: !![],
       options: Object['freeze']([
-        Object['freeze']({ value: 0x300, label: '768' }),
-        Object['freeze']({ value: 0x400, label: '1024' }),
-        Object['freeze']({ value: 0x500, label: '1280' }),
+        Object['freeze']({ value: 768, label: '768' }),
+        Object['freeze']({ value: 1024, label: '1024' }),
+        Object['freeze']({ value: 1280, label: '1280' }),
       ]),
     }),
   ],
@@ -108,7 +108,7 @@ export const rhVideoDepthExecutionManifest = createRunningHubVideoExecutionManif
         fieldName: 'value',
         source: 'param',
         field: 'rhVideoResolution',
-        defaultValue: 0x400,
+        defaultValue: 1024,
         description: '分辨率',
       }),
     ]),

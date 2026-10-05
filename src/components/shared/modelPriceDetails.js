@@ -1,7 +1,7 @@
 import { computeTooltipPosition } from '../../modules/tooltipUnifier.js';
 import { formatPrice, priceText } from '../../services/modelPricingText.js';
 import { registerEscapeScope } from '../../services/escapeScope.js';
-let nextId = 0x0;
+let nextId = 0;
 export function bindModelPriceDetails(el, handler, handler2) {
   const el2 = el['ownerDocument'],
     width = el2['defaultView'];
@@ -34,7 +34,7 @@ export function bindModelPriceDetails(el, handler, handler2) {
       if (!el['contains'](event['target']) && !el3?.['contains'](event['target'])) close();
     },
     key = () => {
-      if (!enabled) setTimeout2 = setTimeout(close, 0xb4);
+      if (!enabled) setTimeout2 = setTimeout(close, 180);
     },
     handler4 = () => clearTimeout(setTimeout2),
     render = () => {
@@ -51,7 +51,7 @@ export function bindModelPriceDetails(el, handler, handler2) {
       handler5('strong', response['title'], 'model-price-details-title');
       if (response['status']) handler5('p', response['status'], 'model-price-details-note');
       if (response['estimate'] !== null && response['estimate'] !== undefined)
-        handler5('p', priceText('total') + '\x20' + formatPrice(response['estimate'], response['currency']));
+        handler5('p', priceText('total') + ' ' + formatPrice(response['estimate'], response['currency']));
       let target = null;
       for (const source of response['rows'] || []) {
         if (source['section'] && source['section'] !== target)
@@ -77,7 +77,7 @@ export function bindModelPriceDetails(el, handler, handler2) {
         (el3['className'] = 'model-price-details'),
         el3['setAttribute']('role', 'region'),
         el3['setAttribute']('aria-label', priceText('price')),
-        (el3['tabIndex'] = 0x0),
+        (el3['tabIndex'] = 0),
         el3['addEventListener']('mouseenter', handler4),
         el3['addEventListener']('mouseleave', key),
         el3['addEventListener']('focusin', handler4),

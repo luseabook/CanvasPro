@@ -10,7 +10,7 @@ export async function reportAppStartupActivity(options = {}) {
     url: APP_STARTUP_ACTIVITY_PATH,
     method: 'POST',
     provider: 'local',
-    timeout: 0x1388,
+    timeout: 5000,
     headers: { 'Content-Type': 'application/json' },
     body: JSON['stringify']({
       deviceId: deviceId,

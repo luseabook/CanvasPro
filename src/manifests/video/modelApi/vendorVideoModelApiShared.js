@@ -4,10 +4,10 @@ export const VIDEO_DURATION_FIELD = Object['freeze']({
   placement: 'mode',
   variant: 'durationPill',
   label: '视频时长',
-  defaultValue: 0x5,
-  min: 0x4,
-  max: 0xf,
-  step: 0x1,
+  defaultValue: 5,
+  min: 4,
+  max: 15,
+  step: 1,
 });
 export const VIDEO_RESOLUTION_FIELD = Object['freeze']({
   id: 'resolution',
@@ -79,10 +79,10 @@ export const VIDEO_SEED_FIELD = Object['freeze']({
   variant: 'randomSeedRow',
   label: '随机种子',
   defaultValue: '8888',
-  min: 0x0,
+  min: 0,
   max: 0x7fffffff,
-  step: 0x1,
-  randomSeedMin: 0x0,
+  step: 1,
+  randomSeedMin: 0,
   randomSeedMax: 0x7fffffff,
   randomSeedModeField: 'seed_mode',
   randomSeedDefaultMode: 'random',
@@ -140,7 +140,7 @@ export const VIDEO_ENABLE_GIF_FIELD = Object['freeze']({
   type: 'toggle',
   placement: 'advanced',
   variant: 'advancedRow',
-  label: '启用\x20GIF\x20输出格式',
+  label: '启用 GIF 输出格式',
   defaultValue: ![],
 });
 export const VIDEO_AUDIO_SETTING_FIELD = Object['freeze']({
@@ -250,14 +250,14 @@ export const VEO3_FRAME_HELP_TOOLTIP = [
   '[[red:放 1 张图]]：就是普通图生视频，把这张图当作视频起点。',
   '[[red:放 2 张图]]：第一张是开头，第二张是结尾，VEO3 补中间变化。',
   '提示词例子：女孩从照片里的姿势慢慢转身看向镜头，阳光穿过窗帘，头发轻轻飘动，电影感，慢动作。',
-]['join']('\x0a');
+]['join']('\n');
 export const VEO3_REFERENCE_HELP_TOOLTIP = [
-  'VEO3\x20参考图模式',
+  'VEO3 参考图模式',
   '[[red:不放参考图]]：就是文生视频，只按提示词生成。',
   '[[red:放 1-3 张参考图]]：参考人物、主体、风格或场景，不会固定成开头和结尾。',
   '重点写清 [[red:想生成什么动作和镜头]]；quality 档不支持参考图。',
   '提示词例子：参考图中的机器人在未来街道上奔跑，镜头低角度跟拍，背景灯牌快速掠过，速度感强。',
-]['join']('\x0a');
+]['join']('\n');
 export const VEO3_FRAME_PROMPT_PLACEHOLDER =
   '描述首帧到尾帧的变化。例如：首帧中的女孩慢慢转身看向镜头，尾帧定格在微笑特写，阳光穿过窗帘，电影感，慢动作。';
 export const VEO3_REFERENCE_PROMPT_PLACEHOLDER =
@@ -268,9 +268,9 @@ export const VEO3_FIXED_DURATION_FIELD = Object['freeze']({
   placement: 'mode',
   variant: 'pillMenu',
   label: '视频时长',
-  defaultValue: 0x8,
+  defaultValue: 8,
   readOnly: !![],
-  options: Object['freeze']([Object['freeze']({ value: 0x8, label: '8s' })]),
+  options: Object['freeze']([Object['freeze']({ value: 8, label: '8s' })]),
 });
 export const VEO3_ENABLE_GIF_FIELD = Object['freeze']({
   ...VIDEO_ENABLE_GIF_FIELD,
@@ -301,7 +301,7 @@ export const RUNNINGHUB_VEO3_MODEL_FIELD = Object['freeze']({
     Object['freeze']({ value: 'pro', label: 'Pro 版' }),
     Object['freeze']({
       value: 'lite',
-      label: 'Lite\x20版',
+      label: 'Lite 版',
       disableWhen: Object['freeze']({ field: 'rh_veo3_channel', value: 'lowCost' }),
     }),
   ]),
@@ -313,7 +313,7 @@ export const RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD = Object['freeze']({
   variant: 'sectionMenu',
   label: '模式选择',
   description:
-    '首尾帧：支持文生、图生、首尾帧。\x0a参考图：官方\x20Fast\x20/\x20Pro\x20支持\x201-3\x20张参考图。\x0a视频续写：官方\x20Fast\x20/\x20Pro\x20支持\x201\x20个原视频。',
+    '首尾帧：支持文生、图生、首尾帧。\n参考图：官方 Fast / Pro 支持 1-3 张参考图。\n视频续写：官方 Fast / Pro 支持 1 个原视频。',
   defaultValue: 'frame',
   options: Object['freeze']([
     Object['freeze']({ value: 'frame', label: '首尾帧' }),
@@ -341,8 +341,8 @@ export const RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD = Object['freeze']({
 });
 export const RUNNINGHUB_VEO3_DURATION_FIELD = Object['freeze']({
   ...createFooterDurationSliderOptionsField({
-    values: [0x4, 0x6, 0x8],
-    defaultValue: 0x8,
+    values: [4, 6, 8],
+    defaultValue: 8,
     label: '视频时长（秒）',
   }),
   hideWhen: Object['freeze']({ field: 'generation_type', value: 'extend' }),
@@ -409,19 +409,19 @@ export const RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP = [
   '[[red:放 1 张图]]：图生视频，把图片作为视频起点。',
   '[[red:放 2 张图]]：低价 Fast / Pro 或官方 Lite 走首尾帧接口。',
   '官方 Fast / Pro 暂按文生、图生、参考图接入；官方首尾帧请选 Lite。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_VEO3_REFERENCE_HELP_TOOLTIP = [
   'RunningHub Veo3 参考图模式',
   '[[red:官方 Fast / Pro]]：支持 1-3 张参考图。',
   '[[red:低价版和 Lite]]：官方文档未提供参考图接口，已在 UI 中禁用。',
   '适合角色一致性、主体参考和风格延续。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_VEO3_EXTEND_HELP_TOOLTIP = [
-  'RunningHub\x20Veo3\x20视频续写',
+  'RunningHub Veo3 视频续写',
   '[[red:官方 Fast / Pro]]：支持 1 个原视频。',
-  '[[red:低价版和\x20Lite]]：官方文档未提供\x20video-extend\x20接口，已在\x20UI\x20中禁用。',
-  '请求只提交\x20video\x20和\x20resolution。',
-]['join']('\x0a');
+  '[[red:低价版和 Lite]]：官方文档未提供 video-extend 接口，已在 UI 中禁用。',
+  '请求只提交 video 和 resolution。',
+]['join']('\n');
 export const VIDU_Q3_GENERATION_MODE_FIELD = Object['freeze']({
   id: 'vidu_q3_generation_mode',
   type: 'segmented',
@@ -450,7 +450,7 @@ export const VIDU_Q3_MODEL_FIELD = Object['freeze']({
     }),
     Object['freeze']({
       value: 'viduq3-pro',
-      label: 'Pro\x20版',
+      label: 'Pro 版',
       disableWhen: Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'reference' }),
     }),
     Object['freeze']({
@@ -474,7 +474,7 @@ export const VIDU_Q3_HELP_TOOLTIP = [
   'Vidu Q3 视频生成',
   '[[red:视频生成]]：Turbo / Pro，支持文生、图生、首尾帧，最多 2 张图；传图时比例由图片决定。',
   '[[red:参考生视频]]：Standard / Mix，必须接入 1-7 张参考图，适合角色一致性和风格延续。',
-]['join']('\x0a');
+]['join']('\n');
 export const GROK_IMAGINE_QUALITY_FIELD = Object['freeze']({
   id: 'quality',
   type: 'segmented',
@@ -490,11 +490,11 @@ export const GROK_IMAGINE_QUALITY_FIELD = Object['freeze']({
 export const GROK_IMAGINE_PROMPT_PLACEHOLDER =
   '描述视频内容、动作和镜头；接入参考图时会按参考图生成动态视频。';
 export const GROK_IMAGINE_HELP_TOOLTIP = [
-  'Grok\x20Imagine\x201.5',
+  'Grok Imagine 1.5',
   '[[red:不放图]]：文生视频，只按提示词生成。',
-  '[[red:放\x201-7\x20张图]]：图生视频，参考图需为公网可访问\x20URL。',
-  '时长支持\x206-30\x20秒，质量支持\x20480p\x20/\x20720p。',
-]['join']('\x0a');
+  '[[red:放 1-7 张图]]：图生视频，参考图需为公网可访问 URL。',
+  '时长支持 6-30 秒，质量支持 480p / 720p。',
+]['join']('\n');
 export const GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER =
   '描述视频内容、动作、环境和镜头；可接入首帧、1 或 3 张参考图或 1 段参考视频。';
 export const GEMINI_OMNI_FLASH_HELP_TOOLTIP = [
@@ -503,17 +503,17 @@ export const GEMINI_OMNI_FLASH_HELP_TOOLTIP = [
   '[[red:首帧模式]]：接入 1 张图片作为视频首帧。',
   '[[red:参考图模式]]：接入 1 张或 3 张参考图；不支持 2 张图。',
   '[[red:参考视频]]：最多 1 段，可同时接入参考图；接入后不发送时长。',
-  '时长支持\x204\x20/\x206\x20/\x208\x20/\x2010\x20秒，分辨率支持\x20720p\x20/\x201080p\x20/\x204K。',
-]['join']('\x0a');
+  '时长支持 4 / 6 / 8 / 10 秒，分辨率支持 720p / 1080p / 4K。',
+]['join']('\n');
 export const GEMINI_OMNI_FLASH_PREVIEW_PROMPT_PLACEHOLDER =
   '描述视频内容、动作、风格或编辑指令；可混合接入图片或 1 段参考视频。';
 export const GEMINI_OMNI_FLASH_PREVIEW_HELP_TOOLTIP = [
   'Gemini Omni Flash',
   '[[red:不放图]]：文生视频，只按提示词生成。',
   '[[red:放图片]]：最多 16 张参考图，支持多主体或风格参考。',
-  '[[red:放视频]]：最多\x201\x20段参考\x20/\x20待编辑视频，官方建议\x203\x20秒以内。',
+  '[[red:放视频]]：最多 1 段参考 / 待编辑视频，官方建议 3 秒以内。',
   '输出为 720p / 24fps，支持 16:9 / 9:16。',
-]['join']('\x0a');
+]['join']('\n');
 export const GEMINI_OMNI_FLASH_EXTEND_TASK_FIELD = Object['freeze']({
   id: 'extend_from_task_id',
   type: 'text',
@@ -522,17 +522,17 @@ export const GEMINI_OMNI_FLASH_EXTEND_TASK_FIELD = Object['freeze']({
   label: '续写任务 ID',
   defaultValue: '',
   allowEmpty: !![],
-  description: '可选；填写上一次生成返回的\x20task_id，用于基于上个任务继续生成。',
+  description: '可选；填写上一次生成返回的 task_id，用于基于上个任务继续生成。',
 });
 export const HAILUO_23_PROMPT_EXAMPLE = '[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写';
 export const HAILUO_23_HELP_TOOLTIP = [
   'Hailuo 2.3 适用场景',
   '[[red:标准版不放图]]：文生视频，适合快速把一句场景描述变成短视频。',
   '[[red:标准版放 1 张首帧]]：图生视频，把这张图当开头，适合人物转身、表情变化、镜头推进。',
-  '[[red:Fast\x20版必须放\x201\x20张首帧]]：更快生成，适合已有首帧的快速预览。',
+  '[[red:Fast 版必须放 1 张首帧]]：更快生成，适合已有首帧的快速预览。',
   '[[red:1080p 只做 6 秒]]；想做 10 秒就用 768p。',
   '提示词例子：画面中的猫咪向镜头奔跑，镜头缓缓推进，草地和阳光有电影感。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAILUO_23_MODEL_FIELD = Object['freeze']({
   id: 'mode',
   type: 'segmented',
@@ -563,7 +563,7 @@ export const RUNNINGHUB_HAILUO_23_HELP_TOOLTIP = [
   '[[red:Pro 版]]：文生或首帧图生，1080P 质量，固定 5 秒，不传 duration。',
   '[[red:Fast 版]]：必须接 1 张首帧图，768P，支持 6 秒或 10 秒。',
   '[[red:Fast Pro 版]]：必须接 1 张首帧图，1080P，固定 6 秒。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_HAILUO_23_QUALITY_FIELD = Object['freeze']({
   id: 'rh_hailuo_23_quality',
   type: 'segmented',
@@ -591,8 +591,8 @@ export const RUNNINGHUB_HAILUO_23_QUALITY_FIELD = Object['freeze']({
 });
 export const RUNNINGHUB_HAILUO_23_DURATION_FIELD = Object['freeze']({
   ...createFooterDurationSliderOptionsField({
-    values: [0x6, 0xa],
-    defaultValue: 0x6,
+    values: [6, 10],
+    defaultValue: 6,
     label: '视频时长（秒）',
   }),
   hideWhen: Object['freeze']({ field: 'rh_hailuo_23_quality', values: Object['freeze'](['pro', 'fastPro']) }),
@@ -602,7 +602,7 @@ export const RUNNINGHUB_HAILUO_23_FIXED_INPUT_SLOTS = Object['freeze']([
     id: 'firstFrame',
     kind: 'image',
     label: '首帧',
-    description: '图生视频起始帧；Fast\x20/\x20Fast\x20Pro\x20必填。',
+    description: '图生视频起始帧；Fast / Fast Pro 必填。',
   }),
 ]);
 export const HAPPYHORSE_TEXT_HELP_TOOLTIP = [
@@ -610,56 +610,56 @@ export const HAPPYHORSE_TEXT_HELP_TOOLTIP = [
   '[[red:没入参时]]：只写提示词，就是文生视频。',
   '适合直接生成新画面、动作和镜头。',
   '提示词例子：一只白色小狗在草地上奔跑，镜头低角度跟拍，阳光明亮，慢动作。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_IMAGE_HELP_TOOLTIP = [
   'HappyHorse 1.0 图生视频',
   '[[red:接 1 张图]]：把这张图当视频起点，让画面动起来。',
   '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
   '适合人物转身、表情变化、镜头推进这类从一张图开始的变化。',
   '提示词例子：画面中的女孩慢慢转身看向镜头，发丝被风吹动，背景轻微虚化。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_REFERENCE_HELP_TOOLTIP = [
   'HappyHorse 1.0 参考图生视频',
-  '[[red:接\x201-9\x20张参考图]]：参考人物、主体、风格或场景，生成全新画面。',
+  '[[red:接 1-9 张参考图]]：参考人物、主体、风格或场景，生成全新画面。',
   '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
   '适合统一角色或风格，多张图可以给更多外观参考。',
   '提示词例子：参考图中的角色在未来城市中行走，镜头从侧面缓慢环绕，灯光有电影感。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_EDIT_HELP_TOOLTIP = [
-  'HappyHorse\x201.0\x20视频编辑',
+  'HappyHorse 1.0 视频编辑',
   '[[red:接 1 个视频]]：在原视频基础上改画面或动作，可再接最多 5 张参考图。',
   '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
   '适合改风格、换场景、增强画面，或让原视频更贴近参考图。',
   '提示词例子：把原视频改成夜晚赛博朋克街道风格，保留人物动作，增加霓虹灯和雨水反光。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_HELP_TOOLTIP = HAPPYHORSE_TEXT_HELP_TOOLTIP;
 export const HAPPYHORSE_11_TEXT_HELP_TOOLTIP = [
   'HappyHorse 1.1 文生视频',
   '[[red:没入参时]]：只写提示词，就是文生视频。',
   '适合直接生成新画面、动作和镜头。',
   '提示词例子：一只白色小狗在草地上奔跑，镜头低角度跟拍，阳光明亮，慢动作。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_11_IMAGE_HELP_TOOLTIP = [
   'HappyHorse 1.1 图生视频',
   '[[red:接 1 张图]]：把这张图当视频起点，让画面动起来。',
   '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
   '适合人物转身、表情变化、镜头推进这类从一张图开始的变化。',
   '提示词例子：画面中的女孩慢慢转身看向镜头，发丝被风吹动，背景轻微虚化。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_11_REFERENCE_HELP_TOOLTIP = [
   'HappyHorse 1.1 参考图生视频',
   '[[red:接 1-9 张参考图]]：参考人物、主体、风格或场景，生成全新画面。',
   '[[red:没入参时]]：仍然是文生视频，只按提示词生成。',
   '适合统一角色或风格，多张图可以给更多外观参考。',
   '提示词例子：参考图中的角色在未来城市中行走，镜头从侧面缓慢环绕，灯光有电影感。',
-]['join']('\x0a');
+]['join']('\n');
 export const HAPPYHORSE_11_HELP_TOOLTIP = HAPPYHORSE_11_TEXT_HELP_TOOLTIP;
 export const HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER =
   '描述要生成的视频内容。例如：夕阳下的海边公路，慢镜头推进，电影感画面。';
 export const HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER =
   '描述首帧图要如何动起来。例如：让图片中的场景动起来，镜头缓慢推近，主体轻微转身，电影感。';
 export const HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER =
-  '描述参考图之间的主体、场景和动作关系。例如：@图片1\x20中的主角在\x20@图片2\x20的场景中奔跑，随后拿起\x20@图片3\x20中的道具，保持3D卡通风格，动作流畅。';
+  '描述参考图之间的主体、场景和动作关系。例如：@图片1 中的主角在 @图片2 的场景中奔跑，随后拿起 @图片3 中的道具，保持3D卡通风格，动作流畅。';
 export const HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER =
   '描述如何改写源视频，可用参考图补充风格。例如：把视频中的角色换成卡通风格，保留原有动作和节奏。';
 export const HAPPYHORSE_MODE_FIELD = Object['freeze']({
@@ -899,10 +899,10 @@ export const VOLCENGINE_SEEDANCE_2_PRIORITY_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '任务优先级',
-  defaultValue: 0x0,
-  min: 0x0,
-  max: 0x9,
-  step: 0x1,
+  defaultValue: 0,
+  min: 0,
+  max: 9,
+  step: 1,
 });
 export function createRunningHubSeedance2FixedSlot({
   id: id2,
@@ -919,9 +919,9 @@ export function createRunningHubSeedance2FixedSlot({
         ['filter'](Boolean),
     ),
     showWhen =
-      values['length'] > 0x1
+      values['length'] > 1
         ? Object['freeze']({ field: 'rh_seedance_2_mode', values: values })
-        : Object['freeze']({ field: 'rh_seedance_2_mode', value: values[0x0] || '' });
+        : Object['freeze']({ field: 'rh_seedance_2_mode', value: values[0] || '' });
   return Object['freeze']({
     id: id2,
     kind: kind2,
@@ -937,7 +937,7 @@ export const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     modes: ['image2video', 'frames2video'],
-    displayOrder: 0xa,
+    displayOrder: 10,
     description: '图生或首尾帧生成的起始图片',
   }),
   createRunningHubSeedance2FixedSlot({
@@ -945,7 +945,7 @@ export const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '尾帧',
     mode: 'frames2video',
-    displayOrder: 0x14,
+    displayOrder: 20,
     description: '首尾帧生成的结束图片',
   }),
   createRunningHubSeedance2FixedSlot({
@@ -953,7 +953,7 @@ export const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '参考视频',
     mode: 'multimodal2video',
-    displayOrder: 0x1e,
+    displayOrder: 30,
     description: '全能参考模式的参考视频',
   }),
   createRunningHubSeedance2FixedSlot({
@@ -961,7 +961,7 @@ export const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'multimodal2video',
-    displayOrder: 0x28,
+    displayOrder: 40,
     description: '全能参考模式的参考图片',
   }),
   createRunningHubSeedance2FixedSlot({
@@ -969,7 +969,7 @@ export const RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'audio',
     label: '参考音频',
     mode: 'multimodal2video',
-    displayOrder: 0x32,
+    displayOrder: 50,
     description: '可选，需搭配参考图片或参考视频',
   }),
 ]);
@@ -982,58 +982,58 @@ export const RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER =
 export const RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP = [
   'RunningHub Seedance 2.0',
   '模型选择：Fast 版 / 标准版。',
-  '模式：文生视频\x20/\x20图生视频\x20/\x20首尾帧\x20/\x20全能参考。',
-  '分辨率：480p、720p、native1080p\x20为原生输出；1080p、2k、4k\x20为基于\x20720p\x20原生生成后超分放大。',
-  '图生需\x201\x20张图；首尾帧需\x202\x20张图；全能参考最多\x209\x20图、3\x20视频、3\x20音频。',
-]['join']('\x0a');
+  '模式：文生视频 / 图生视频 / 首尾帧 / 全能参考。',
+  '分辨率：480p、720p、native1080p 为原生输出；1080p、2k、4k 为基于 720p 原生生成后超分放大。',
+  '图生需 1 张图；首尾帧需 2 张图；全能参考最多 9 图、3 视频、3 音频。',
+]['join']('\n');
 export const VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP = [
   '火山方舟 Seedance 2.0',
   '模式：全能参考 / 首尾帧。',
   '无入参时只使用提示词；首尾帧模式接 1 张图时按首帧输入处理。',
   '分辨率：Fast 版支持 480p、720p；标准版支持 480p、720p、1080p。',
-  '全能参考最多\x209\x20图、3\x20视频、3\x20音频；音频需搭配图片或视频。',
-]['join']('\x0a');
+  '全能参考最多 9 图、3 视频、3 音频；音频需搭配图片或视频。',
+]['join']('\n');
 export const APIMART_SEEDANCE_2_MINI_HELP_TOOLTIP = [
   'APIMart Seedance 2.0 Mini',
   '建议：中文提示词不超过500字，英文提示词不超过1000词。',
   '字数过多易导致信息分散，模型可能忽略细节、仅关注重点，进而造成视频缺失部分元素。',
-]['join']('\x0a');
+]['join']('\n');
 export const WAN27_HELP_TOOLTIP = [
   'Wan2.7 模式说明',
   '图生视频：可接首帧、尾帧和音频；没入参时就是文生视频。',
-  '视频续写：接\x201\x20个续写视频；没入参时就是文生视频。',
+  '视频续写：接 1 个续写视频；没入参时就是文生视频。',
   '参考生视频：接参考图或参考视频；音频需搭配参考图。',
   '视频编辑：接原视频，可再接参考视频。',
-]['join']('\x0a');
+]['join']('\n');
 export const WAN27_IMAGE_HELP_TOOLTIP = [
-  'Wan2.7\x20图生视频',
+  'Wan2.7 图生视频',
   '[[red:没入参时]]：只写提示词，就是文生视频。',
-  '[[red:接\x201\x20张首帧]]：从这张图开始生成视频。',
+  '[[red:接 1 张首帧]]：从这张图开始生成视频。',
   '[[red:接首帧 + 尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。',
   '[[red:接音频]]：可作为背景或驱动音频，2-30 秒且不超过 15MB。',
   '提示词例子：一只猫咪在草地上追逐蝴蝶，阳光明媚，镜头慢慢推进，慢动作。',
-]['join']('\x0a');
+]['join']('\n');
 export const WAN27_VIDEO_HELP_TOOLTIP = [
   'Wan2.7 视频续写',
   '[[red:接 1 个续写视频]]：在原视频后继续往下生成。',
   '[[red:没入参时]]：只写提示词，就是文生视频。',
-  '[[red:视频超过\x2010\x20秒]]：生成前会拦截。',
+  '[[red:视频超过 10 秒]]：生成前会拦截。',
   '提示词例子：延续原视频里的镜头，人物继续向前走，镜头跟随，动作自然衔接。',
-]['join']('\x0a');
+]['join']('\n');
 export const WAN27_REFERENCE_HELP_TOOLTIP = [
   'Wan2.7 参考生视频',
   '[[red:接参考图或参考视频]]：参考主体、动作、风格或场景，生成新视频。',
   '[[red:音频需搭配参考图]]：作为角色声音参考使用。',
   '提示词里可以用图 1、视频 1 指代对应入参。',
   '提示词例子：图 1 中的人物来到视频 1 的街道场景中，环顾四周，镜头从侧面缓慢跟拍。',
-]['join']('\x0a');
+]['join']('\n');
 export const WAN27_EDIT_HELP_TOOLTIP = [
   'Wan2.7 视频编辑',
   '[[red:接 1 个原视频]]：在原视频基础上改画面、换背景或改风格。',
   '[[red:参考视频可选]]：用来补充目标动作或风格参考。',
   '[[red:原视频 2-10 秒]]：超过会在生成前拦截。',
   '提示词例子：将原视频背景替换为雪山场景，保留人物动作，整体变成电影感冷色调。',
-]['join']('\x0a');
+]['join']('\n');
 export const WAN27_IMAGE_PROMPT_PLACEHOLDER =
   '不接素材时描述文生视频；接首帧/尾帧时描述动作、运镜和过渡。例如：人物缓缓站起身，向镜头走来；或镜头从海边缓慢移向山顶。';
 export const WAN27_VIDEO_PROMPT_PLACEHOLDER =
@@ -1043,14 +1043,14 @@ export const WAN27_REFERENCE_PROMPT_PLACEHOLDER =
 export const WAN27_EDIT_PROMPT_PLACEHOLDER =
   '描述要对原视频做什么编辑，可用参考图补充风格。例如：将背景替换为雪山场景，保留人物动作和镜头节奏。';
 export const KLING_V3_HELP_TOOLTIP = [
-  'Kling\x20V3\x20视频生成',
+  'Kling V3 视频生成',
   '[[red:不放图]]：只写提示词，就是文生视频。',
-  '[[red:接\x201\x20张首帧]]：从这张图开始生成视频。',
+  '[[red:接 1 张首帧]]：从这张图开始生成视频。',
   '[[red:接首帧 + 尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。',
   '[[red:生成有声视频]]：在高级设置打开音频，让模型同时生成声音。',
   '标准 / 专业 / 4K 可在参数区选择；多镜头分镜模式暂未开放。',
   '提示词例子：女孩从照片里的姿势慢慢转身看向镜头，镜头缓慢推进，阳光穿过窗帘，电影感。',
-]['join']('\x0a');
+]['join']('\n');
 export const KLING_V3_PROMPT_PLACEHOLDER =
   '不接素材时描述文生视频；接首帧/尾帧时描述 @图片1 到 @图片2 的变化。例如：@图片1 中的猫咪缓缓向前走，最后过渡到 @图片2 的画面，电影质感。';
 export const KLING_V3_OMNI_IMAGE_HELP_TOOLTIP = [
@@ -1060,19 +1060,19 @@ export const KLING_V3_OMNI_IMAGE_HELP_TOOLTIP = [
   '[[red:接首帧 + 尾帧]]：第一张是开头，第二张是结尾，中间变化由模型补。',
   '[[red:生成有声视频]]：在高级设置打开音频，让模型同时生成声音。',
   '提示词例子：画面中的女孩慢慢转身看向镜头，镜头缓慢推进，窗外阳光穿过窗帘，电影感。',
-]['join']('\x0a');
+]['join']('\n');
 export const KLING_V3_OMNI_REFERENCE_HELP_TOOLTIP = [
-  'Kling\x20V3\x20Omni\x20参考生视频',
+  'Kling V3 Omni 参考生视频',
   '[[red:接参考图或参考视频]]：参考主体、动作、风格或场景生成新视频。',
   '参考视频会作为特征参考；有参考视频时不会发送生成有声视频参数。',
   '提示词例子：参考图中的角色走进参考视频的街道场景，镜头从侧面缓慢跟拍，灯光有电影感。',
-]['join']('\x0a');
+]['join']('\n');
 export const KLING_V3_OMNI_EDIT_HELP_TOOLTIP = [
-  'Kling\x20V3\x20Omni\x20视频编辑',
+  'Kling V3 Omni 视频编辑',
   '[[red:接 1 个原视频]]：在原视频基础上改画面、换风格或调整内容。',
   '[[red:不能同时接首尾帧]]：视频编辑模式只使用原视频作为基础输入。',
   '提示词例子：将原视频改成夜晚赛博朋克街道风格，保留人物动作，增加霓虹灯和雨水反光。',
-]['join']('\x0a');
+]['join']('\n');
 export const KLING_V3_OMNI_HELP_TOOLTIP = KLING_V3_OMNI_IMAGE_HELP_TOOLTIP;
 export const KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER =
   '不接素材时描述文生视频；接首帧/尾帧时可用 @图片1 / @图片2 指代。例如：让 @图片1 中的人物向镜头挥手，随后过渡到 @图片2 的街景。';
@@ -1117,7 +1117,7 @@ export const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     mode: 'image',
-    displayOrder: 0xa,
+    displayOrder: 10,
     description: '图生视频使用的首帧图片',
   }),
   createKlingV3OmniFixedSlot({
@@ -1125,7 +1125,7 @@ export const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '尾帧',
     mode: 'image',
-    displayOrder: 0x14,
+    displayOrder: 20,
     description: '可选，图生视频使用的尾帧图片',
   }),
   createKlingV3OmniFixedSlot({
@@ -1133,7 +1133,7 @@ export const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'reference',
-    displayOrder: 0x1e,
+    displayOrder: 30,
     description: '参考生视频使用的参考图片',
   }),
   createKlingV3OmniFixedSlot({
@@ -1141,7 +1141,7 @@ export const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '参考视频',
     mode: 'reference',
-    displayOrder: 0x28,
+    displayOrder: 40,
     description: '参考生视频使用的特征参考视频',
   }),
   createKlingV3OmniFixedSlot({
@@ -1149,17 +1149,17 @@ export const KLING_V3_OMNI_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '原视频',
     mode: 'edit',
-    displayOrder: 0x32,
+    displayOrder: 50,
     description: '视频编辑使用的原视频',
   }),
 ]);
 export const KLING_O1_HELP_TOOLTIP = [
   'Kling Video O1 视频生成',
-  '[[red:@图片引用]]：O1\x20会把\x20@图片1\x20/\x20@图片2\x20解析为\x20<<<image_1>>>\x20/\x20<<<image_2>>>，用于在提示词中精确引用图片。',
+  '[[red:@图片引用]]：O1 会把 @图片1 / @图片2 解析为 <<<image_1>>> / <<<image_2>>>，用于在提示词中精确引用图片。',
   '[[red:参考图片]]：最多 2 张；如果同时接特征参考视频，只使用第 1 张参考图片。',
   '[[red:编辑视频 / 特征参考视频]]：两个视频槽互斥，只能接其中一个；视频需 3-10 秒。',
   '提示词例子：让@图片1中的人物向镜头挥手，随后走向@图片2中的街景，镜头缓慢推进。',
-]['join']('\x0a');
+]['join']('\n');
 export const KLING_O1_PROMPT_PLACEHOLDER =
   '描述视频内容，按 @ 引用参考图片。例如：让 @图片1 中的人物向镜头挥手，随后走向 @图片2 中的街景；接编辑视频时描述要改什么画面或风格。';
 export const KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
@@ -1167,29 +1167,29 @@ export const KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
     id: 'editVideo',
     kind: 'video',
     label: '编辑视频',
-    description: '待编辑的原视频，需\x203-10\x20秒；与特征参考视频互斥。',
-    displayOrder: 0xa,
+    description: '待编辑的原视频，需 3-10 秒；与特征参考视频互斥。',
+    displayOrder: 10,
   }),
   Object['freeze']({
     id: 'featureReferenceVideo',
     kind: 'video',
     label: '特征参考视频',
     description: '作为特征参考的视频，需 3-10 秒；与编辑视频互斥。',
-    displayOrder: 0x14,
+    displayOrder: 20,
   }),
   Object['freeze']({
     id: 'referenceImage',
     kind: 'image',
     label: '参考图片',
-    description: 'O1\x20提示词里可用\x20@图片1\x20/\x20@图片2\x20引用，提交时会转换为\x20<<<image_N>>>。',
-    displayOrder: 0x1e,
+    description: 'O1 提示词里可用 @图片1 / @图片2 引用，提交时会转换为 <<<image_N>>>。',
+    displayOrder: 30,
   }),
 ]);
 export const KLING_O1_VIDEO_EXCLUSIVE_GROUPS = Object['freeze']([
   Object['freeze']({
     id: 'klingO1VideoInput',
     slots: Object['freeze'](['editVideo', 'featureReferenceVideo']),
-    max: 0x1,
+    max: 1,
   }),
 ]);
 export const RUNNINGHUB_KLING_O1_GENERATION_MODE_FIELD = Object['freeze']({
@@ -1229,19 +1229,19 @@ export const RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP = [
   '[[red:接 1 张首帧]]：走图生视频接口，把这张图作为视频起点。',
   '[[red:接首帧 + 尾帧]]：走首尾帧接口，中间变化由 O1 补齐。',
   '提示词例子：@图片1 中的人物慢慢转身，最后过渡到 @图片2 的夜晚街景，电影感，镜头缓慢推进。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_O1_REFERENCE_HELP_TOOLTIP = [
   'RunningHub Kling O1 参考生视频',
   '[[red:必须接 1-7 张参考图 + 1 个参考视频]]：参考图用于主体/风格，参考视频用于动作或镜头特征。',
   '[[red:保留原声]]：开启后提交 keepOriginalSound。',
   '提示词例子：参考 @图片1 的角色外观和 @视频1 的动作节奏，生成夜晚街道行走镜头。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_O1_EDIT_HELP_TOOLTIP = [
-  'RunningHub\x20Kling\x20O1\x20视频编辑',
+  'RunningHub Kling O1 视频编辑',
   '[[red:接 1 个原视频]]：走官方 edit-video 接口。',
   '[[red:保留原声]]：开启后提交 keepOriginalSound。',
   '提示词里直接描述要修改的画面、元素或风格。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_O1_HELP_TOOLTIP = RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP;
 export const RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER =
   '不接素材时描述文生视频；接首帧/尾帧时可用 @图片1 / @图片2 指代。例如：让 @图片1 中的人物向镜头挥手，随后过渡到 @图片2 的街景。';
@@ -1281,7 +1281,7 @@ export const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     mode: 'frame',
-    displayOrder: 0xa,
+    displayOrder: 10,
     description: '图生视频或首尾帧使用的起始图片',
   }),
   createRunningHubKlingO1FixedSlot({
@@ -1289,7 +1289,7 @@ export const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '尾帧',
     mode: 'frame',
-    displayOrder: 0x14,
+    displayOrder: 20,
     description: '可选，首尾帧使用的结束图片',
   }),
   createRunningHubKlingO1FixedSlot({
@@ -1297,7 +1297,7 @@ export const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '编辑视频',
     mode: 'edit',
-    displayOrder: 0x1e,
+    displayOrder: 30,
     description: '官方 edit-video 使用的原视频',
   }),
   createRunningHubKlingO1FixedSlot({
@@ -1305,7 +1305,7 @@ export const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '参考视频',
     mode: 'reference',
-    displayOrder: 0x28,
+    displayOrder: 40,
     description: '参考生视频必填，作为动作或镜头特征参考',
   }),
   createRunningHubKlingO1FixedSlot({
@@ -1313,7 +1313,7 @@ export const RUNNINGHUB_KLING_O1_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'reference',
-    displayOrder: 0x32,
+    displayOrder: 50,
     description: '参考生视频使用，支持 1-7 张参考图',
   }),
 ]);
@@ -1335,7 +1335,7 @@ export const RUNNINGHUB_KLING_O3_RATIO_FIELD = Object['freeze']({
   hideWhen: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'edit' }),
 });
 export const RUNNINGHUB_KLING_O3_DURATION_FIELD = Object['freeze']({
-  ...createFooterDurationField({ defaultValue: 0x5, min: 0x3, max: 0xf }),
+  ...createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
   hideWhen: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'edit' }),
 });
 export const RUNNINGHUB_KLING_O3_AUDIO_FIELD = Object['freeze']({
@@ -1366,21 +1366,21 @@ export const RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP = [
   'RunningHub Kling O3 视频生成',
   '[[red:不接图]]：走文生视频接口。',
   '[[red:接 1 张首帧]]：走图生视频接口。',
-  '[[red:接首帧\x20+\x20尾帧]]：std/pro\x20走首尾帧图生视频；4K\x20文档只公开首帧字段，暂只使用首帧。',
+  '[[red:接首帧 + 尾帧]]：std/pro 走首尾帧图生视频；4K 文档只公开首帧字段，暂只使用首帧。',
   '标准版 / 专业版 / 4K 可在模型选择里切换。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_O3_REFERENCE_HELP_TOOLTIP = [
-  'RunningHub\x20Kling\x20O3\x20参考生视频',
-  '[[red:接\x201-7\x20张参考图]]：用于保持主体、风格或场景一致。',
+  'RunningHub Kling O3 参考生视频',
+  '[[red:接 1-7 张参考图]]：用于保持主体、风格或场景一致。',
   '[[red:可选参考视频]]：有参考视频时最多使用 4 张参考图。',
   '[[red:保留原声]]：开启后提交 keepOriginalSound。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_O3_EDIT_HELP_TOOLTIP = [
   'RunningHub Kling O3 视频编辑',
   '[[red:接 1 个原视频]]：基于原视频按提示词编辑画面。',
   '[[red:可选参考图]]：用于补充目标风格、主体或局部参考。',
   '[[red:4K 不支持编辑]]：请选择标准版或专业版。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_O3_HELP_TOOLTIP = RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP;
 export const RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER =
   '不接素材时描述文生视频；接首帧/尾帧时可用 @图片1 / @图片2 指代。例如：让 @图片1 中的人物向镜头挥手，随后过渡到 @图片2 的街景。';
@@ -1413,7 +1413,7 @@ export const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     mode: 'image',
-    displayOrder: 0xa,
+    displayOrder: 10,
     description: '图生视频使用的起始图片',
   }),
   createRunningHubKlingO3FixedSlot({
@@ -1421,7 +1421,7 @@ export const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '尾帧',
     mode: 'image',
-    displayOrder: 0x14,
+    displayOrder: 20,
     description: '可选，std/pro 首尾帧使用的结束图片',
     hideWhen: { field: 'resolution', value: '4k' },
   }),
@@ -1430,7 +1430,7 @@ export const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '参考视频',
     mode: 'reference',
-    displayOrder: 0x1e,
+    displayOrder: 30,
     description: '参考生视频可选，作为动作或镜头特征参考',
   }),
   createRunningHubKlingO3FixedSlot({
@@ -1438,7 +1438,7 @@ export const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'reference',
-    displayOrder: 0x28,
+    displayOrder: 40,
     description: '参考生视频使用，支持 1-7 张参考图',
   }),
   createRunningHubKlingO3FixedSlot({
@@ -1446,7 +1446,7 @@ export const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '原视频',
     mode: 'edit',
-    displayOrder: 0x32,
+    displayOrder: 50,
     description: '视频编辑必填，作为待编辑原视频',
   }),
   createRunningHubKlingO3FixedSlot({
@@ -1454,7 +1454,7 @@ export const RUNNINGHUB_KLING_O3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'edit',
-    displayOrder: 0x3c,
+    displayOrder: 60,
     description: '视频编辑可选，用于补充风格或主体参考',
   }),
 ]);
@@ -1466,7 +1466,7 @@ export const RUNNINGHUB_KLING_V3_HELP_TOOLTIP = [
   '[[red:接 1 张首帧]]：走图生视频接口。',
   '[[red:接首帧 + 尾帧]]：std/pro 走首尾帧图生视频；4K 文档只公开 imageUrl，暂只使用首帧。',
   '版本选择对应 RunningHub 的 std / pro / 4K endpoint。',
-]['join']('\x0a');
+]['join']('\n');
 export const RUNNINGHUB_KLING_V3_MODEL_FIELD = Object['freeze']({
   ...KLING_V3_MODE_FIELD,
   label: '模型选择',
@@ -1483,8 +1483,8 @@ export const RUNNINGHUB_KLING_V3_CFG_SCALE_FIELD = Object['freeze']({
   label: 'CFG 引导系数',
   description: 'RunningHub Kling V3.0 支持 0-1，默认 0.5。',
   defaultValue: 0.5,
-  min: 0x0,
-  max: 0x1,
+  min: 0,
+  max: 1,
   step: 0.1,
 });
 export const RUNNINGHUB_KLING_V3_SHOT_TYPE_FIELD = Object['freeze']({
@@ -1505,14 +1505,14 @@ export const RUNNINGHUB_KLING_V3_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     description: '图生视频使用的起始图片。',
-    displayOrder: 0xa,
+    displayOrder: 10,
   }),
   Object['freeze']({
     id: 'lastFrame',
     kind: 'image',
     label: '尾帧',
-    description: 'std/pro\x20可选，4K\x20当前文档未公开尾帧字段。',
-    displayOrder: 0x14,
+    description: 'std/pro 可选，4K 当前文档未公开尾帧字段。',
+    displayOrder: 20,
     hideWhen: Object['freeze']({ field: 'resolution', value: '4k' }),
   }),
 ]);
@@ -1533,7 +1533,7 @@ export const WAN27_MODE_FIELD = Object['freeze']({
 });
 export const WAN27_PROMPT_EXTEND_FIELD = Object['freeze']({
   ...VIDEO_PROMPT_EXTEND_FIELD,
-  label: 'prompt\x20智能改写',
+  label: 'prompt 智能改写',
 });
 export const WAN27_NEGATIVE_PROMPT_FIELD = Object['freeze']({
   ...VIDEO_NEGATIVE_PROMPT_FIELD,
@@ -1558,12 +1558,12 @@ export function createWan27FixedSlot({
       : [String(mode6 || '')['trim']()]['filter'](Boolean),
     list2 = [];
   list2['push'](
-    value2['length'] > 0x1
+    value2['length'] > 1
       ? Object['freeze']({ field: 'wan27_mode', values: Object['freeze'](value2) })
-      : Object['freeze']({ field: 'wan27_mode', value: value2[0x0] || '' }),
+      : Object['freeze']({ field: 'wan27_mode', value: value2[0] || '' }),
   );
   const showWhen3 =
-    showWhen2 || (list2['length'] > 0x1 ? Object['freeze']({ all: Object['freeze'](list2) }) : list2[0x0]);
+    showWhen2 || (list2['length'] > 1 ? Object['freeze']({ all: Object['freeze'](list2) }) : list2[0]);
   return Object['freeze']({
     id: id6,
     kind: kind6,
@@ -1579,7 +1579,7 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     mode: 'image',
-    displayOrder: 0xa,
+    displayOrder: 10,
     description: '图生视频使用的首帧图片',
   }),
   createWan27FixedSlot({
@@ -1587,7 +1587,7 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '尾帧',
     mode: 'image',
-    displayOrder: 0x14,
+    displayOrder: 20,
     description: '可选，图生视频使用的尾帧图片',
   }),
   createWan27FixedSlot({
@@ -1595,15 +1595,15 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'audio',
     label: '音频',
     mode: 'image',
-    displayOrder: 0x46,
-    description: '可选，2-30\x20秒且不超过\x2015MB',
+    displayOrder: 70,
+    description: '可选，2-30 秒且不超过 15MB',
   }),
   createWan27FixedSlot({
     id: 'sourceVideo',
     kind: 'video',
     label: '续写视频',
     mode: 'video',
-    displayOrder: 0x1e,
+    displayOrder: 30,
     description: '视频续写使用，不能超过 10 秒',
   }),
   createWan27FixedSlot({
@@ -1611,7 +1611,7 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'reference',
-    displayOrder: 0x28,
+    displayOrder: 40,
     description: '参考生视频使用的参考图片',
   }),
   createWan27FixedSlot({
@@ -1619,7 +1619,7 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '参考视频',
     mode: Object['freeze'](['reference', 'edit']),
-    displayOrder: 0x3c,
+    displayOrder: 60,
     description: '参考生视频使用的参考视频',
   }),
   createWan27FixedSlot({
@@ -1627,7 +1627,7 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '原视频',
     mode: 'edit',
-    displayOrder: 0x32,
+    displayOrder: 50,
     description: '视频编辑使用的原视频，需为 2-10 秒',
   }),
   createWan27FixedSlot({
@@ -1635,7 +1635,7 @@ export const WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'audio',
     label: '音频',
     mode: 'reference',
-    displayOrder: 0x46,
+    displayOrder: 70,
     description: '可选，参考生视频使用的音色音频，2-30 秒且不超过 15MB',
   }),
 ]);
@@ -1645,7 +1645,7 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '首帧',
     mode: 'image',
-    displayOrder: 0xa,
+    displayOrder: 10,
     description: '图生视频使用的首帧图片',
   }),
   createWan27FixedSlot({
@@ -1653,7 +1653,7 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '尾帧',
     mode: 'image',
-    displayOrder: 0x14,
+    displayOrder: 20,
     description: '可选，图生视频使用的尾帧图片',
   }),
   createWan27FixedSlot({
@@ -1661,7 +1661,7 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'audio',
     label: '音频',
     mode: Object['freeze'](['image', 'video']),
-    displayOrder: 0x46,
+    displayOrder: 70,
     description: '可选，文生、图生或视频续写使用的音频',
   }),
   createWan27FixedSlot({
@@ -1669,7 +1669,7 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '续写视频',
     mode: 'video',
-    displayOrder: 0x1e,
+    displayOrder: 30,
     description: '视频续写使用，不能超过 10 秒',
   }),
   createWan27FixedSlot({
@@ -1677,7 +1677,7 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'image',
     label: '参考图',
     mode: 'reference',
-    displayOrder: 0x28,
+    displayOrder: 40,
     description: '参考生视频使用的参考图片',
   }),
   createWan27FixedSlot({
@@ -1685,7 +1685,7 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '参考视频',
     mode: 'reference',
-    displayOrder: 0x32,
+    displayOrder: 50,
     description: '参考生视频使用的参考视频',
   }),
   createWan27FixedSlot({
@@ -1693,15 +1693,15 @@ export const RUNNINGHUB_WAN27_FIXED_INPUT_SLOTS = Object['freeze']([
     kind: 'video',
     label: '原视频',
     mode: 'edit',
-    displayOrder: 0x32,
-    description: '视频编辑使用的原视频，需为\x202-10\x20秒',
+    displayOrder: 50,
+    description: '视频编辑使用的原视频，需为 2-10 秒',
   }),
   createWan27FixedSlot({
     id: 'editRefImage',
     kind: 'image',
     label: '参考图',
     mode: 'edit',
-    displayOrder: 0x3c,
+    displayOrder: 60,
     description: '视频编辑可选参考图，最多 3 张',
   }),
 ]);
@@ -1744,9 +1744,9 @@ export function createSegmentedField({
   });
 }
 export function createDurationField({
-  defaultValue: defaultValue = 0x5,
-  min: min = 0x4,
-  max: max = 0xf,
+  defaultValue: defaultValue = 5,
+  min: min = 4,
+  max: max = 15,
   label: label = VIDEO_DURATION_FIELD['label'],
 } = {}) {
   return Object['freeze']({
@@ -1759,22 +1759,22 @@ export function createDurationField({
 }
 export function createDurationSliderOptionsField({
   values: values2,
-  defaultValue: defaultValue = values2?.[0x0],
+  defaultValue: defaultValue = values2?.[0],
   label: label = VIDEO_DURATION_FIELD['label'],
   optionOverridesByValue: optionOverridesByValue = null,
 } = {}) {
   const list5 = (Array['isArray'](values2) ? values2 : [])
       ['map']((target) => Number(target))
       ['filter'](Number['isFinite']),
-    min2 = list5[0x0] ?? Number(defaultValue) ?? 0x1,
-    max2 = list5[list5['length'] - 0x1] ?? min2;
+    min2 = list5[0] ?? Number(defaultValue) ?? 1,
+    max2 = list5[list5['length'] - 1] ?? min2;
   return Object['freeze']({
     ...VIDEO_DURATION_FIELD,
     label: label,
     defaultValue: defaultValue,
     min: min2,
     max: max2,
-    step: 0x1,
+    step: 1,
     options: Object['freeze'](
       list5['map']((value4) =>
         Object['freeze']({
@@ -1787,7 +1787,7 @@ export function createDurationSliderOptionsField({
     ),
   });
 }
-export function createDurationOptionsField(options3, defaultValue3 = options3[0x0]) {
+export function createDurationOptionsField(options3, defaultValue3 = options3[0]) {
   return createSegmentedField({
     id: 'duration',
     label: VIDEO_DURATION_FIELD['label'],
@@ -1848,10 +1848,10 @@ function freezeVideoInputPolicyCondition(list6) {
   });
 }
 export function createVideoInputSlots({
-  image: image = 0x9,
-  video: video = 0x3,
-  audio: audio = 0x3,
-  minImage: minImage = 0x0,
+  image: image = 9,
+  video: video = 3,
+  audio: audio = 3,
+  minImage: minImage = 0,
   fixedSlots: fixedSlots = null,
   exclusiveGroups: exclusiveGroups = null,
   cycleFixedInputWhenFull: cycleFixedInputWhenFull = ![],
@@ -1863,19 +1863,19 @@ export function createVideoInputSlots({
 } = {}) {
   const list7 = ['text'],
     source = {};
-  image > 0x0 && (list7['push']('image'), (source['image'] = image));
-  video > 0x0 && (list7['push']('video'), (source['video'] = video));
-  audio > 0x0 && (list7['push']('audio'), (source['audio'] = audio));
+  image > 0 && (list7['push']('image'), (source['image'] = image));
+  video > 0 && (list7['push']('video'), (source['video'] = video));
+  audio > 0 && (list7['push']('audio'), (source['audio'] = audio));
   const next = {
     allowedKinds: Object['freeze'](list7),
-    minByKind: Object['freeze']({ text: 0x0, ...(minImage > 0x0 ? { image: minImage } : {}) }),
+    minByKind: Object['freeze']({ text: 0, ...(minImage > 0 ? { image: minImage } : {}) }),
     maxByKind: Object['freeze'](source),
   };
   Array['isArray'](fixedSlots) &&
-    fixedSlots['length'] > 0x0 &&
+    fixedSlots['length'] > 0 &&
     (next['fixedSlots'] = Object['freeze'](fixedSlots['map']((args3) => Object['freeze']({ ...args3 }))));
   Array['isArray'](exclusiveGroups) &&
-    exclusiveGroups['length'] > 0x0 &&
+    exclusiveGroups['length'] > 0 &&
     (next['exclusiveGroups'] = Object['freeze'](
       exclusiveGroups['map']((args4) =>
         Object['freeze']({
@@ -1898,7 +1898,7 @@ export function createVideoInputSlots({
           ['filter'](Boolean),
       ),
     );
-    list8['length'] > 0x0 && (next['preserveHiddenInputsByKindFields'] = Object['freeze'](list8));
+    list8['length'] > 0 && (next['preserveHiddenInputsByKindFields'] = Object['freeze'](list8));
   }
   return (
     maxTotalDurationSecondsByKind &&
@@ -1922,7 +1922,7 @@ export function createVideoInputSlots({
         ),
       )),
     Array['isArray'](policyVariants) &&
-      policyVariants['length'] > 0x0 &&
+      policyVariants['length'] > 0 &&
       (next['policyVariants'] = Object['freeze'](
         policyVariants['map']((args6) =>
           Object['freeze']({
@@ -2150,7 +2150,7 @@ export const APIMART_VIDEO_HAILUO_23_BODY_MAPPING = createApimartVideoBodyMappin
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x6,
+    defaultValue: 6,
     transform: 'apimartHailuo23VideoDuration',
   }),
   Object['freeze']({
@@ -2189,7 +2189,7 @@ export const RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'runninghubHappyHorseDuration',
   }),
   Object['freeze']({
@@ -2246,7 +2246,7 @@ export const RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'runninghubSeedance2Duration',
   }),
   Object['freeze']({
@@ -2374,7 +2374,7 @@ export const RUNNINGHUB_VIDEO_KLING_O1_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'runninghubKlingO1Duration',
   }),
   Object['freeze']({
@@ -2417,7 +2417,7 @@ export const RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'runninghubKlingO3Duration',
   }),
   Object['freeze']({
@@ -2480,7 +2480,7 @@ export const RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'runninghubKlingV3Duration',
   }),
   Object['freeze']({
@@ -2568,7 +2568,7 @@ export const RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x8,
+    defaultValue: 8,
     transform: 'runninghubVeo3Duration',
   }),
   Object['freeze']({
@@ -2611,7 +2611,7 @@ export const RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'runninghubWan27Duration',
   }),
   Object['freeze']({
@@ -2652,7 +2652,7 @@ export const RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x6,
+    defaultValue: 6,
     transform: 'runninghubHailuo23Duration',
   }),
   Object['freeze']({
@@ -2671,7 +2671,7 @@ export const RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING = freezeBodyMapping([
 export const APIMART_VIDEO_VIDU_BODY_MAPPING = createApimartVideoBodyMapping([
   Object['freeze']({
     ...APIMART_VIDEO_DURATION_ENTRY,
-    defaultValue: 0x5,
+    defaultValue: 5,
     transform: 'apimartViduVideoDuration',
   }),
   APIMART_VIDEO_RESOLUTION_VIDU_ENTRY,
@@ -2684,8 +2684,8 @@ export const APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING = createApimartVideoBodyMap
   APIMART_VIDEO_SIZE_ENTRY,
   Object['freeze']({
     ...APIMART_VIDEO_DURATION_ENTRY,
-    defaultValue: 0x6,
-    transform: Object['freeze']({ name: 'integerRange', min: 0x6, max: 0x1e, fallback: 0x6 }),
+    defaultValue: 6,
+    transform: Object['freeze']({ name: 'integerRange', min: 6, max: 30, fallback: 6 }),
   }),
   Object['freeze']({
     path: 'quality',
@@ -2696,7 +2696,7 @@ export const APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING = createApimartVideoBodyMap
   APIMART_VIDEO_IMAGE_URLS_ENTRY,
 ]);
 export const APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING = createApimartVideoBodyMapping([
-  Object['freeze']({ ...APIMART_VIDEO_DURATION_ENTRY, defaultValue: 0x6 }),
+  Object['freeze']({ ...APIMART_VIDEO_DURATION_ENTRY, defaultValue: 6 }),
   APIMART_VIDEO_RESOLUTION_4K_ENTRY,
   APIMART_VIDEO_ASPECT_RATIO_ENTRY,
   APIMART_VIDEO_GENERATION_TYPE_ENTRY,
@@ -2704,7 +2704,7 @@ export const APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING = createApimartVideoBodyMappi
     ...APIMART_VIDEO_IMAGE_URLS_ENTRY,
     transform: Object['freeze']({
       name: 'imageCountOptions',
-      allowedCounts: Object['freeze']([0x1, 0x3]),
+      allowedCounts: Object['freeze']([1, 3]),
       label: 'Gemini Omni 1.1 Flash Ext',
     }),
   }),
@@ -2755,7 +2755,7 @@ export const VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
     path: 'duration',
     from: 'param',
     field: Object['freeze'](['generationParams.duration', 'duration']),
-    defaultValue: 0x5,
+    defaultValue: 5,
   }),
   Object['freeze']({
     path: 'generate_audio',
@@ -2842,10 +2842,10 @@ export const APIMART_SEEDANCE_2_0_VIDEO_POLICY = Object['freeze']({
   allowedResolutions: Object['freeze'](['480p', '720p', '1080p', '4k']),
   supportsVideoReferences: !![],
   supportsAudioReferences: !![],
-  maxRoleImageCount: 0x2,
-  maxImageCount: 0x9,
-  maxVideoReferenceCount: 0x3,
-  maxAudioReferenceCount: 0x3,
+  maxRoleImageCount: 2,
+  maxImageCount: 9,
+  maxVideoReferenceCount: 3,
+  maxAudioReferenceCount: 3,
   privateAvatarAssets: Object['freeze']({
     enabled: !![],
     provider: 'apimart',
@@ -2872,19 +2872,19 @@ export const VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY = Object['freeze']({
 export const VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY = Object['freeze']({
   defaultRatio: 'adaptive',
   defaultResolution: '720p',
-  maxImageCount: 0x9,
-  maxVideoReferenceCount: 0x3,
-  maxAudioReferenceCount: 0x3,
-  minDuration: 0x4,
-  maxDuration: 0xf,
+  maxImageCount: 9,
+  maxVideoReferenceCount: 3,
+  maxAudioReferenceCount: 3,
+  minDuration: 4,
+  maxDuration: 15,
 });
 export const APIMART_SEEDANCE_1_5_VIDEO_POLICY = Object['freeze']({
   ratioField: 'aspect_ratio',
   defaultResolution: '720p',
   supportsVideoReferences: ![],
   supportsAudioReferences: ![],
-  maxRoleImageCount: 0x2,
-  maxImageCount: 0x2,
+  maxRoleImageCount: 2,
+  maxImageCount: 2,
   supportsGenerateAudioParam: !![],
   supportsCameraFixedParam: !![],
 });
@@ -2893,8 +2893,8 @@ export const APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY = Object['freeze']({
   defaultResolution: '1080p',
   supportsVideoReferences: ![],
   supportsAudioReferences: ![],
-  maxRoleImageCount: 0x1,
-  maxImageCount: 0x1,
+  maxRoleImageCount: 1,
+  maxImageCount: 1,
   roleImageLimitError: 'Seedance 1.0 Pro Fast does not support last-frame input',
 });
 export const APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY = Object['freeze']({
@@ -2902,8 +2902,8 @@ export const APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY = Object['freeze']({
   defaultResolution: '1080p',
   supportsVideoReferences: ![],
   supportsAudioReferences: ![],
-  maxRoleImageCount: 0x2,
-  maxImageCount: 0x1,
+  maxRoleImageCount: 2,
+  maxImageCount: 1,
 });
 export function createSeedanceVideoExecutionExtensions(seedanceVideo) {
   return Object['freeze']({
@@ -2952,22 +2952,22 @@ export const APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK = Object['freeze']({
   multimodal2video: Object['freeze'](['480p', '720p']),
 });
 export const APIMART_SEEDANCE_DEFAULT_DURATION_BY_TASK = Object['freeze']({
-  text2video: Object['freeze']({ min: 0x4, max: 0xf, step: 0x1 }),
-  image2video: Object['freeze']({ min: 0x4, max: 0xf, step: 0x1 }),
-  frames2video: Object['freeze']({ min: 0x4, max: 0xf, step: 0x1 }),
-  multimodal2video: Object['freeze']({ min: 0x4, max: 0xf, step: 0x1 }),
+  text2video: Object['freeze']({ min: 4, max: 15, step: 1 }),
+  image2video: Object['freeze']({ min: 4, max: 15, step: 1 }),
+  frames2video: Object['freeze']({ min: 4, max: 15, step: 1 }),
+  multimodal2video: Object['freeze']({ min: 4, max: 15, step: 1 }),
 });
 export const APIMART_SEEDANCE_1_5_DURATION_BY_TASK = Object['freeze']({
-  text2video: Object['freeze']({ min: 0x4, max: 0xc, step: 0x1 }),
-  image2video: Object['freeze']({ min: 0x4, max: 0xc, step: 0x1 }),
-  frames2video: Object['freeze']({ min: 0x4, max: 0xc, step: 0x1 }),
-  multimodal2video: Object['freeze']({ min: 0x4, max: 0xc, step: 0x1 }),
+  text2video: Object['freeze']({ min: 4, max: 12, step: 1 }),
+  image2video: Object['freeze']({ min: 4, max: 12, step: 1 }),
+  frames2video: Object['freeze']({ min: 4, max: 12, step: 1 }),
+  multimodal2video: Object['freeze']({ min: 4, max: 12, step: 1 }),
 });
 export const APIMART_SEEDANCE_1_0_DURATION_BY_TASK = Object['freeze']({
-  text2video: Object['freeze']({ min: 0x2, max: 0xc, step: 0x1 }),
-  image2video: Object['freeze']({ min: 0x2, max: 0xc, step: 0x1 }),
-  frames2video: Object['freeze']({ min: 0x2, max: 0xc, step: 0x1 }),
-  multimodal2video: Object['freeze']({ min: 0x2, max: 0xc, step: 0x1 }),
+  text2video: Object['freeze']({ min: 2, max: 12, step: 1 }),
+  image2video: Object['freeze']({ min: 2, max: 12, step: 1 }),
+  frames2video: Object['freeze']({ min: 2, max: 12, step: 1 }),
+  multimodal2video: Object['freeze']({ min: 2, max: 12, step: 1 }),
 });
 export const APIMART_SEEDANCE_RATIO_FIELD = createAspectRatioField({
   options: ['16:9', '9:16', '1:1', '4:3', '3:4', '21:9'],
@@ -3023,7 +3023,7 @@ export function createVideoModelApiManifest({
       icon: icon,
       description:
         description ||
-        (provider === 'apimart' ? 'APIMart video model API' : displayName + '\x20video\x20model\x20API'),
+        (provider === 'apimart' ? 'APIMart video model API' : displayName + ' video model API'),
       inputSlots: inputSlots,
       uiSchema: Object['freeze']({
         fields: freezeFields(fields),

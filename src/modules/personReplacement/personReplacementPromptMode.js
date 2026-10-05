@@ -14,21 +14,21 @@ export const PERSON_REPLACEMENT_MARKER_COLORS = [
   '--group-pink',
   '--cyan-text',
 ];
-export function getPersonReplacementPromptMarker(value, item, subject, referenceSlot = 0x0) {
+export function getPersonReplacementPromptMarker(value, item, subject, referenceSlot = 0) {
   if (value === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL) return null;
   const key =
-      subject === 0x1
+      subject === 1
         ? '人物'
-        : subject === 0x2
+        : subject === 2
           ? ['左侧', '右侧'][item]
-          : subject === 0x3
+          : subject === 3
             ? ['左侧', '中间', '右侧'][item]
-            : String(item + 0x1),
+            : String(item + 1),
     label =
       value === PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING || value === PERSON_REPLACEMENT_PROMPT_MODE_TEST;
   return {
     label: label ? formatPersonReplacementPersonLabel(item)['replace']('人物', '') : key,
-    subject: subject > 0x3 ? '从左到右第' + (item + 0x1) + '个人物' : subject === 0x1 ? '人物' : key + '人物',
+    subject: subject > 3 ? '从左到右第' + (item + 1) + '个人物' : subject === 1 ? '人物' : key + '人物',
     referenceSlot: referenceSlot,
     colorToken:
       label && referenceSlot
@@ -66,7 +66,7 @@ function describePromptSubject({ marker: marker, person: person }, result) {
 export function describePersonReplacementBoxPosition(target, args) {
   const run = (source) => {
       const x = source['locator']?.['bbox'] || source['bbox'];
-      return { x: x['x'] + x['width'] / 0x2, y: x['y'] + x['height'] / 0x2 };
+      return { x: x['x'] + x['width'] / 2, y: x['y'] + x['height'] / 2 };
     },
     list = [...args]['sort'](
       (next, current) =>
@@ -74,13 +74,13 @@ export function describePersonReplacementBoxPosition(target, args) {
         run(next)['y'] - run(current)['y'] ||
         String(next['id'])['localeCompare'](String(current['id'])),
     );
-  return '从左到右第' + (list['findIndex']((entry) => entry['id'] === target['id']) + 0x1) + '个';
+  return '从左到右第' + (list['findIndex']((entry) => entry['id'] === target['id']) + 1) + '个';
 }
 export function buildPersonReplacementPositioningPrompt(
   list2,
-  record = 0x0,
+  record = 0,
   payload = PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING,
-  handle = 0x0,
+  handle = 0,
 ) {
   const state = {
     'full-person': '完整人物',
@@ -106,7 +106,7 @@ export function buildPersonReplacementPositioningPrompt(
       }),
       '去掉画面中的字幕和LOGO。保留原人物的位置、大小、姿态和遮挡关系，除字幕和LOGO外，其余人物及未指定部分保持不变，不补画画外或被遮挡部分。',
       record ? '背景改用图' + record + '的场景，不引用其中人物。' : '背景和光线保持不变。',
-    ]['join']('\x0a');
+    ]['join']('\n');
   return [
     payload === PERSON_REPLACEMENT_PROMPT_MODE_TEST
       ? '编辑图1，框和标签仅用于指认要替换的人物，输出时去除这些框和标签。'
@@ -136,10 +136,10 @@ export function buildPersonReplacementPositioningPrompt(
     record ? '把图1的背景替换成图' + record + '的场景。' : '',
   ]
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function composePersonReplacementImagePrompt(options2 = {}, output = '') {
   if (options2['promptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL) return String(output);
   if (!String(output)['trim']()) return options2['prompt'];
-  return [options2['guidedBindingPrompt'], output]['filter'](Boolean)['join']('\x0a\x0a');
+  return [options2['guidedBindingPrompt'], output]['filter'](Boolean)['join']('\n\n');
 }

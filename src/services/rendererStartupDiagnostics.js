@@ -33,7 +33,7 @@ export function installRendererStartupDiagnostics({
       args = readChromeShellStartupMetadata(href);
     if (!args) return;
     void (async () => {
-      for (let count = 0x0; count < 0x3 && !enabled; count += 0x1) {
+      for (let count = 0; count < 3 && !enabled; count += 1) {
         try {
           const response = await report({
             type: CHROME_SHELL_STARTUP_FAILED_EVENT,

@@ -24,20 +24,20 @@ import {
   getStoryboard3DObjectTransformCapabilities,
 } from './objectTransformCapabilities.js';
 const TRANSFORM_TOOLS = new Set(['move', 'rotate', 'scale']);
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function vectorFromArray(index, box) {
   const result = Array['isArray'](index) ? index : [];
   return {
-    x: finiteNumber(result[0x0], box['x']),
-    y: finiteNumber(result[0x1], box['y']),
-    z: finiteNumber(result[0x2], box['z']),
+    x: finiteNumber(result[0], box['x']),
+    y: finiteNumber(result[1], box['y']),
+    z: finiteNumber(result[2], box['z']),
   };
 }
 function scaleFromArray(data) {
-  const box2 = vectorFromArray(data, { x: 0x1, y: 0x1, z: 0x1 });
+  const box2 = vectorFromArray(data, { x: 1, y: 1, z: 1 });
   return {
     x: Math['max'](0.001, box2['x']),
     y: Math['max'](0.001, box2['y']),
@@ -46,8 +46,8 @@ function scaleFromArray(data) {
 }
 function transformToBridgePose(box3) {
   return {
-    position: vectorFromArray(box3?.['position'], { x: 0x0, y: 0x0, z: 0x0 }),
-    rotation: vectorFromArray(box3?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
+    position: vectorFromArray(box3?.['position'], { x: 0, y: 0, z: 0 }),
+    rotation: vectorFromArray(box3?.['rotation'], { x: 0, y: 0, z: 0 }),
     scale: scaleFromArray(box3?.['scale']),
   };
 }
@@ -56,26 +56,26 @@ function convexHullXZ(options) {
   for (const box4 of options || []) {
     const x = finiteNumber(box4?.['x']),
       z = finiteNumber(box4?.['z']);
-    map['set'](x['toFixed'](0x6) + ':' + z['toFixed'](0x6), {
+    map['set'](x['toFixed'](6) + ':' + z['toFixed'](6), {
       x: x,
       z: z,
     });
   }
   const list = [...map['values']()]['sort']((box5, box6) => box5['x'] - box6['x'] || box5['z'] - box6['z']);
-  if (list['length'] <= 0x2) return list;
+  if (list['length'] <= 2) return list;
   const run = (box7, box8, box9) =>
       (box8['x'] - box7['x']) * (box9['z'] - box7['z']) - (box8['z'] - box7['z']) * (box9['x'] - box7['x']),
     list2 = [];
   for (const target of list) {
-    while (list2['length'] >= 0x2 && run(list2['at'](-0x2), list2['at'](-0x1), target) <= 0x0) {
+    while (list2['length'] >= 2 && run(list2['at'](-2), list2['at'](-1), target) <= 0) {
       list2['pop']();
     }
     list2['push'](target);
   }
   const list3 = [];
-  for (let count = list['length'] - 0x1; count >= 0x0; count -= 0x1) {
+  for (let count = list['length'] - 1; count >= 0; count -= 1) {
     const source = list[count];
-    while (list3['length'] >= 0x2 && run(list3['at'](-0x2), list3['at'](-0x1), source) <= 0x0) {
+    while (list3['length'] >= 2 && run(list3['at'](-2), list3['at'](-1), source) <= 0) {
       list3['pop']();
     }
     list3['push'](source);
@@ -85,17 +85,17 @@ function convexHullXZ(options) {
 function collectGeometryTopViewPoints(enabled, enabled2) {
   if (!enabled || !enabled2) return [];
   const next = enabled['attributes']?.['position'];
-  if (next?.['count'] > 0x0) {
+  if (next?.['count'] > 0) {
     const list4 = [],
-      count2 = Math['max'](0x1, Math['floor'](next['count'] / 0x180));
-    for (let current = 0x0; current < next['count']; current += count2) {
+      count2 = Math['max'](1, Math['floor'](next['count'] / 384));
+    for (let current = 0; current < next['count']; current += count2) {
       const x2 = new threeRuntime['Vector3']()
         ['fromBufferAttribute'](next, current)
         ['applyMatrix4'](enabled2);
       list4['push']({ x: x2['x'], z: x2['z'] });
     }
-    const entry = next['count'] - 0x1;
-    if (entry % count2 !== 0x0) {
+    const entry = next['count'] - 1;
+    if (entry % count2 !== 0) {
       const x3 = new threeRuntime['Vector3']()['fromBufferAttribute'](next, entry)['applyMatrix4'](enabled2);
       list4['push']({ x: x3['x'], z: x3['z'] });
     }
@@ -129,9 +129,9 @@ function collectObjectTopViewFootprint(enabled4) {
   );
 }
 function collectInstanceTopViewFootprint(state, config) {
-  const count3 = state?.['objectIds']?.['indexOf']?.(config) ?? -0x1,
+  const count3 = state?.['objectIds']?.['indexOf']?.(config) ?? -1,
     enabled6 = state?.['mesh'];
-  if (count3 < 0x0 || !enabled6?.['geometry'] || typeof enabled6['getMatrixAt'] !== 'function') return [];
+  if (count3 < 0 || !enabled6?.['geometry'] || typeof enabled6['getMatrixAt'] !== 'function') return [];
   enabled6['updateMatrixWorld']?.(!![]);
   const scope = new threeRuntime['Matrix4']();
   enabled6['getMatrixAt'](count3, scope);
@@ -140,13 +140,13 @@ function collectInstanceTopViewFootprint(state, config) {
 }
 function createFallbackTopViewFootprint(output) {
   const box10 = output?.['transform'] || {},
-    x5 = vectorFromArray(box10['position'], { x: 0x0, y: 0x0, z: 0x0 }),
-    box11 = vectorFromArray(box10['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
+    x5 = vectorFromArray(box10['position'], { x: 0, y: 0, z: 0 }),
+    box11 = vectorFromArray(box10['rotation'], { x: 0, y: 0, z: 0 }),
     box12 = scaleFromArray(box10['scale']),
-    value2 = output?.['type'] === 'character' ? 0.65 : output?.['type'] === 'light' ? 0.4 : 0x1,
-    value3 = output?.['type'] === 'character' ? 0.45 : output?.['type'] === 'light' ? 0.4 : 0x1,
-    value4 = Math['max'](0.08, (value2 * box12['x']) / 0x2),
-    value5 = Math['max'](0.08, (value3 * box12['z']) / 0x2),
+    value2 = output?.['type'] === 'character' ? 0.65 : output?.['type'] === 'light' ? 0.4 : 1,
+    value3 = output?.['type'] === 'character' ? 0.45 : output?.['type'] === 'light' ? 0.4 : 1,
+    value4 = Math['max'](0.08, (value2 * box12['x']) / 2),
+    value5 = Math['max'](0.08, (value3 * box12['z']) / 2),
     value6 = Math['cos'](box11['y']),
     value7 = Math['sin'](box11['y']);
   return [
@@ -160,8 +160,8 @@ function createFallbackTopViewFootprint(output) {
   }));
 }
 function cameraToSceneView(event) {
-  const x6 = vectorFromArray(event?.['position'], { x: 0x5, y: 0x4, z: 0x7 }),
-    target2 = vectorFromArray(event?.['target'], { x: 0x0, y: 1.2, z: 0x0 }),
+  const x6 = vectorFromArray(event?.['position'], { x: 5, y: 4, z: 7 }),
+    target2 = vectorFromArray(event?.['target'], { x: 0, y: 1.2, z: 0 }),
     box13 = {
       x: x6['x'] - target2['x'],
       y: x6['y'] - target2['y'],
@@ -171,7 +171,7 @@ function cameraToSceneView(event) {
   return {
     target: target2,
     orbitYaw: Math['atan2'](box13['x'], box13['z']),
-    orbitPitch: Math['asin'](Math['max'](-0x1, Math['min'](0x1, box13['y'] / orbitDistance))),
+    orbitPitch: Math['asin'](Math['max'](-1, Math['min'](1, box13['y'] / orbitDistance))),
     orbitDistance: orbitDistance,
   };
 }
@@ -180,13 +180,13 @@ function resolveScene(value10, value11) {
   return (
     list7['find']((value12) => value12['id'] === value11) ||
     list7['find']((value13) => value13['id'] === value10?.['activeSceneId']) ||
-    list7[0x0] ||
+    list7[0] ||
     null
   );
 }
 function resolveActiveShot(value14) {
   const list8 = Array['isArray'](value14?.['shots']) ? value14['shots'] : [];
-  return list8['find']((value15) => value15['id'] === value14?.['activeShotId']) || list8[0x0] || null;
+  return list8['find']((value15) => value15['id'] === value14?.['activeShotId']) || list8[0] || null;
 }
 function bridgeObjectType(value16) {
   const value17 = value16 && typeof value16 === 'object' ? value16 : null,
@@ -249,7 +249,7 @@ function createSelection(value25, value26, value27) {
       ['filter']((value32) => canStoryboard3DObjectUseTransformTool(value32, value27))
       ['map']((objectId) => ({ objectType: bridgeObjectType(objectId), objectId: objectId['id'] }))
       ['filter']((value33) => value33['objectType']),
-    selectedObjectType = selectedObjects[selectedObjects['length'] - 0x1] || null;
+    selectedObjectType = selectedObjects[selectedObjects['length'] - 1] || null;
   return {
     selectedObjectType: selectedObjectType?.['objectType'] || null,
     selectedObjectId: selectedObjectType?.['objectId'] || null,
@@ -319,7 +319,7 @@ function mapSceneObjects(value36) {
       id['type'] === 'camera' &&
         cameras['push']({
           id: id['id'],
-          slot: slot + 0x1,
+          slot: slot + 1,
           name: id['name'],
           position: position['position'],
           rotation: position['rotation'],
@@ -341,7 +341,7 @@ export function adaptStoryboard3DSceneToDirectorState({
     transformTool = TRANSFORM_TOOLS['has'](activeTool) ? activeTool : 'move',
     args2 = mapSceneObjects(environmentMode),
     value40 = {
-      version: 0x2,
+      version: 2,
       mode: 'scene',
       environmentMode: environmentMode['environment']?.['type'] === 'outdoor' ? 'day' : 'night',
       viewport: {
@@ -370,7 +370,7 @@ export function adaptStoryboard3DSceneToDirectorState({
     scene: environmentMode,
     activeShot: activeShot,
     state: state2,
-    focalLength: finiteNumber(activeShot?.['camera']?.['focalLength'], 0x23),
+    focalLength: finiteNumber(activeShot?.['camera']?.['focalLength'], 35),
     unsupportedObjectIds: (environmentMode['objects'] || [])
       ['filter']((value41) => !bridgeObjectType(value41) && !['camera', 'light']['includes'](value41['type']))
       ['map']((value42) => value42['id']),
@@ -406,7 +406,7 @@ export class Storyboard3DSceneRuntime {
       (this['viewportUIPatch'] = {}),
       (this['backgroundTexture'] = null),
       (this['backgroundTextureUrl'] = ''),
-      (this['backgroundTextureToken'] = 0x0),
+      (this['backgroundTextureToken'] = 0),
       (this['backgroundCameraLockApplied'] = ![]),
       (this['characterAnimationFrame'] = null),
       (this['timelinePreviewObjectIds'] = new Set()),
@@ -512,7 +512,7 @@ export class Storyboard3DSceneRuntime {
     for (const enabled8 of this['adapted']?.['scene']?.['objects'] || []) {
       if (enabled8['type'] !== 'light' || enabled8['visible'] === ![]) continue;
       const color = enabled8['color'] || 0xffffff,
-        value55 = Math['max'](0x0, Number(enabled8['intensity']) || 0x0);
+        value55 = Math['max'](0, Number(enabled8['intensity']) || 0);
       let event2;
       if (enabled8['lightType'] === 'ambient') event2 = new threeRuntime['AmbientLight'](color, value55);
       else {
@@ -520,16 +520,16 @@ export class Storyboard3DSceneRuntime {
           event2 = new threeRuntime['PointLight'](
             color,
             value55,
-            Number(enabled8['distance']) || 0x0,
-            Number(enabled8['decay']) || 0x2,
+            Number(enabled8['distance']) || 0,
+            Number(enabled8['decay']) || 2,
           );
         else {
           if (enabled8['lightType'] === 'spot')
             event2 = new threeRuntime['SpotLight'](
               color,
               value55,
-              Number(enabled8['distance']) || 0x0,
-              Number(enabled8['angle']) || Math['PI'] / 0x6,
+              Number(enabled8['distance']) || 0,
+              Number(enabled8['angle']) || Math['PI'] / 6,
             );
           else event2 = new threeRuntime['DirectionalLight'](color, value55);
         }
@@ -545,11 +545,11 @@ export class Storyboard3DSceneRuntime {
         !enabled8['lightType']
       ) {
         const value56 = new threeRuntime['Object3D']();
-        (value56['position']['set'](0x0, 0x0, -0x1), group['add'](value56), (event2['target'] = value56));
+        (value56['position']['set'](0, 0, -1), group['add'](value56), (event2['target'] = value56));
       }
       if (enabled8['lightType'] !== 'ambient') {
         const value57 = new threeRuntime['Mesh'](
-          new threeRuntime['SphereGeometry'](0.12, 0xc, 0x8),
+          new threeRuntime['SphereGeometry'](0.12, 12, 8),
           new threeRuntime['MeshBasicMaterial']({ color: color }),
         );
         ((value57['userData']['storyboardObjectId'] = enabled8['id']), group['add'](value57));
@@ -571,9 +571,9 @@ export class Storyboard3DSceneRuntime {
       const box16 = this['bridge']['renderer']?.['getSize']?.(new threeRuntime['Vector2']()),
         value59 = Math['max'](
           0.1,
-          Number(box16?.['x']) / Math['max'](0x1, Number(box16?.['y'])) ||
-            args3['imageWidth'] / Math['max'](0x1, args3['imageHeight']) ||
-            0x10 / 0x9,
+          Number(box16?.['x']) / Math['max'](1, Number(box16?.['y'])) ||
+            args3['imageWidth'] / Math['max'](1, args3['imageHeight']) ||
+            16 / 9,
         );
       return (
         this['previewCamera']({
@@ -595,7 +595,7 @@ export class Storyboard3DSceneRuntime {
       enabled9 = String(value60?.['imageUrl'] || '')['trim']();
     this['bridge']['setGroundFillVisible']?.(!enabled9);
     if (!enabled9) {
-      this['backgroundTextureToken'] += 0x1;
+      this['backgroundTextureToken'] += 1;
       this['bridge']['scene']?.['background'] === this['backgroundTexture'] &&
         (this['bridge']['scene']['background'] = null);
       (this['backgroundTexture']?.['dispose']?.(),
@@ -604,47 +604,47 @@ export class Storyboard3DSceneRuntime {
       return;
     }
     const run3 = (value61) => {
-      const value62 = Math['max'](0.1, Math['min'](0xa, Number(value60['imageScale']) || 0x1)),
-        value63 = Math['max'](0x1, Number(this['adapted']?.['focalLength']) || 0x23),
-        value64 = (0x2 * Math['atan'](0x24 / (0x2 * value63)) * 0xb4) / Math['PI'],
+      const value62 = Math['max'](0.1, Math['min'](10, Number(value60['imageScale']) || 1)),
+        value63 = Math['max'](1, Number(this['adapted']?.['focalLength']) || 35),
+        value64 = (2 * Math['atan'](36 / (2 * value63)) * 180) / Math['PI'],
         box17 = this['bridge']['renderer']?.['getSize']?.(new threeRuntime['Vector2']()),
         value65 = Math['max'](
           0.1,
-          Number(box17?.['x']) / Math['max'](0x1, Number(box17?.['y'])) || 0x10 / 0x9,
+          Number(box17?.['x']) / Math['max'](1, Number(box17?.['y'])) || 16 / 9,
         ),
         value66 =
-          (0x2 * Math['atan'](Math['tan']((value64 * Math['PI']) / 0x168) / value65) * 0xb4) / Math['PI'],
+          (2 * Math['atan'](Math['tan']((value64 * Math['PI']) / 360) / value65) * 180) / Math['PI'],
         value67 = value60['lockedCamera'] === !![] && value60['lockedCameraSnapshot'],
         value68 = Math['max'](
           0.01,
           Math['min'](
-            0xa,
+            10,
             value67
-              ? 0x1 / value62
-              : value64 / Math['max'](0x1, Number(value60['horizontalFov']) || 0x3c) / value62,
+              ? 1 / value62
+              : value64 / Math['max'](1, Number(value60['horizontalFov']) || 60) / value62,
           ),
         ),
         value69 = Math['max'](
           0.01,
           Math['min'](
-            0xa,
+            10,
             value67
-              ? 0x1 / value62
-              : value66 / Math['max'](0x1, Number(value60['verticalFov']) || value66) / value62,
+              ? 1 / value62
+              : value66 / Math['max'](1, Number(value60['verticalFov']) || value66) / value62,
           ),
         ),
         value70 = Array['isArray'](value60['vanishingPoint']) ? value60['vanishingPoint'] : [0.5, 0.5],
-        value71 = Array['isArray'](value60['imageOffset']) ? value60['imageOffset'] : [0x0, 0x0];
+        value71 = Array['isArray'](value60['imageOffset']) ? value60['imageOffset'] : [0, 0];
       (value61['repeat']?.['set']?.(value68, value69),
         value61['offset']?.['set']?.(
           0.5 -
-            value68 / 0x2 +
-            (Number(value71[0x0]) || 0x0) +
-            (value67 ? 0x0 : 0.5 - (Number(value70[0x0]) || 0.5)),
+            value68 / 2 +
+            (Number(value71[0]) || 0) +
+            (value67 ? 0 : 0.5 - (Number(value70[0]) || 0.5)),
           0.5 -
-            value69 / 0x2 +
-            (Number(value71[0x1]) || 0x0) +
-            (value67 ? 0x0 : 0.5 - (Number(value60['horizonY']) || 0.5)),
+            value69 / 2 +
+            (Number(value71[1]) || 0) +
+            (value67 ? 0 : 0.5 - (Number(value60['horizonY']) || 0.5)),
         ),
         (value61['needsUpdate'] = !![]),
         (this['bridge']['scene']['background'] = value61),
@@ -697,15 +697,15 @@ export class Storyboard3DSceneRuntime {
     const list13 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
       (value75) => value75['type'] === 'character' && value75['actionPlaying'] === !![],
     );
-    if (list13['length'] === 0x0 || typeof globalThis['requestAnimationFrame'] !== 'function') return;
+    if (list13['length'] === 0 || typeof globalThis['requestAnimationFrame'] !== 'function') return;
     const value76 = globalThis['performance']?.['now']?.() || Date['now'](),
       value77 = (value78) => {
         if (this['disposed']) return;
-        const value79 = Math['max'](0x0, ((Number(value78) || Date['now']()) - value76) / 0x3e8);
+        const value79 = Math['max'](0, ((Number(value78) || Date['now']()) - value76) / 1000);
         for (const args4 of list13) {
           const storyboard3DCharacterPose = resolveStoryboard3DCharacterPose({
               ...args4,
-              actionTime: (Number(args4['actionTime']) || 0x0) + value79,
+              actionTime: (Number(args4['actionTime']) || 0) + value79,
             }),
             args5 = Object['fromEntries'](
               Object['entries'](storyboard3DCharacterPose['boneOverrides'] || {})['map'](
@@ -743,17 +743,17 @@ export class Storyboard3DSceneRuntime {
     const map4 = new Set();
     for (const [value85, objects] of map3) {
       if (objects['length'] < STORYBOARD_3D_INSTANCE_BATCH_MIN_COUNT) continue;
-      const value86 = this['importedModelResolver'](objects[0x0]['assetId']),
+      const value86 = this['importedModelResolver'](objects[0]['assetId']),
         template = applyImportedNormalizationToTemplate(findStoryboard3DInstancingTemplate(value86), value86);
       if (!template) continue;
       const storyboard3DInstanceBatch = createStoryboard3DInstanceBatch({
         template: template,
         objects: objects,
-        tint: objects[0x0]['tint'] || '',
-        castShadow: objects[0x0]['castShadow'] !== ![],
-        receiveShadow: objects[0x0]['receiveShadow'] !== ![],
+        tint: objects[0]['tint'] || '',
+        castShadow: objects[0]['castShadow'] !== ![],
+        receiveShadow: objects[0]['receiveShadow'] !== ![],
       });
-      ((storyboard3DInstanceBatch['mesh']['name'] = 'storyboard3d-instances-' + objects[0x0]['assetId']),
+      ((storyboard3DInstanceBatch['mesh']['name'] = 'storyboard3d-instances-' + objects[0]['assetId']),
         this['bridge']['scene']['add'](storyboard3DInstanceBatch['mesh']),
         this['importedInstanceBatches']['set'](value85, storyboard3DInstanceBatch),
         objects['forEach']((value87) => {
@@ -789,7 +789,7 @@ export class Storyboard3DSceneRuntime {
             if (value91 !== value90) list15['push'](value91);
             return (value91?.['color']?.['set']?.(storyboardObjectId['tint']), value91);
           });
-        enabled11['material'] = Array['isArray'](enabled11['material']) ? value89 : value89[0x0];
+        enabled11['material'] = Array['isArray'](enabled11['material']) ? value89 : value89[0];
       }),
         (group2['userData']['storyboardOwnedMaterials'] = list15),
         this['_applyImportedModelTransform'](group2, storyboardObjectId['transform']),
@@ -812,7 +812,7 @@ export class Storyboard3DSceneRuntime {
       this['importedModelVisuals']['set'](enabled12['id'], enabled15));
     this['_applyImportedModelTransform'](enabled15['group'], value93);
     const count4 = enabled13['objectIds']['indexOf'](enabled12['id']);
-    if (count4 < 0x0) return;
+    if (count4 < 0) return;
     const value94 = new threeRuntime['Matrix4']();
     (enabled13['mesh']['getMatrixAt'](count4, value94), enabled13['mesh']['updateMatrixWorld']?.(!![]));
     const value95 = enabled13['mesh']['matrixWorld']['clone']()['multiply'](value94);
@@ -821,9 +821,9 @@ export class Storyboard3DSceneRuntime {
   }
   ['_pickImportedModel'](value96, value97) {
     if (
-      this['importedModelRoots']['size'] === 0x0 &&
-      this['importedInstanceBatches']['size'] === 0x0 &&
-      this['lightRoots']['size'] === 0x0
+      this['importedModelRoots']['size'] === 0 &&
+      this['importedInstanceBatches']['size'] === 0 &&
+      this['lightRoots']['size'] === 0
     )
       return null;
     if (!this['bridge']['camera']) return null;
@@ -834,19 +834,19 @@ export class Storyboard3DSceneRuntime {
     const value98 = new threeRuntime['Raycaster']();
     value98['setFromCamera'](
       {
-        x: ((value96 - box18['left']) / box18['width']) * 0x2 - 0x1,
-        y: -((value97 - box18['top']) / box18['height']) * 0x2 + 0x1,
+        x: ((value96 - box18['left']) / box18['width']) * 2 - 1,
+        y: -((value97 - box18['top']) / box18['height']) * 2 + 1,
       },
       this['bridge']['camera'],
     );
     let objectId2 = null;
     for (const [objectId3, value99] of [...this['importedModelRoots'], ...this['lightRoots']]) {
-      const args6 = value98['intersectObject'](value99, !![])[0x0];
+      const args6 = value98['intersectObject'](value99, !![])[0];
       if (args6 && (!objectId2 || args6['distance'] < objectId2['distance']))
         objectId2 = { ...args6, objectId: objectId3 };
     }
     for (const value100 of this['importedInstanceBatches']['values']()) {
-      const args7 = value98['intersectObject'](value100['mesh'], ![])[0x0],
+      const args7 = value98['intersectObject'](value100['mesh'], ![])[0],
         objectId4 = Number['isInteger'](args7?.['instanceId'])
           ? value100['objectIds'][args7['instanceId']]
           : null;
@@ -930,7 +930,7 @@ export class Storyboard3DSceneRuntime {
   ['resolveDollyAnchor'](value113, value114) {
     return this['bridge']['resolveDollyAnchor']?.(value113, value114) || null;
   }
-  ['resolveGroundPosition'](value115, value116, value117 = 0x0) {
+  ['resolveGroundPosition'](value115, value116, value117 = 0) {
     const enabled16 = this['bridge']['camera'],
       box19 =
         this['bridge']['renderer']?.['domElement']?.['getBoundingClientRect']?.() ||
@@ -940,28 +940,28 @@ export class Storyboard3DSceneRuntime {
     const enabled17 = new threeRuntime['Raycaster']();
     enabled17['setFromCamera'](
       {
-        x: ((finiteNumber(value115) - box19['left']) / box19['width']) * 0x2 - 0x1,
-        y: -((finiteNumber(value116) - box19['top']) / box19['height']) * 0x2 + 0x1,
+        x: ((finiteNumber(value115) - box19['left']) / box19['width']) * 2 - 1,
+        y: -((finiteNumber(value116) - box19['top']) / box19['height']) * 2 + 1,
       },
       enabled16,
     );
     const box20 = new threeRuntime['Vector3'](),
       value118 = new threeRuntime['Plane'](
-        new threeRuntime['Vector3'](0x0, 0x1, 0x0),
+        new threeRuntime['Vector3'](0, 1, 0),
         -finiteNumber(value117),
       );
     if (!enabled17['ray']['intersectPlane'](value118, box20)) return null;
-    if (box20['distanceTo'](enabled16['position']) > 0x2710) return null;
+    if (box20['distanceTo'](enabled16['position']) > 10000) return null;
     return [box20['x'], finiteNumber(value117), box20['z']];
   }
-  ['resolveViewportGroundPosition'](value119 = 0x0) {
+  ['resolveViewportGroundPosition'](value119 = 0) {
     const box21 =
       this['bridge']['renderer']?.['domElement']?.['getBoundingClientRect']?.() ||
       this['container']?.['getBoundingClientRect']?.();
     if (!box21?.['width'] || !box21?.['height']) return null;
     return this['resolveGroundPosition'](
-      box21['left'] + box21['width'] / 0x2,
-      box21['top'] + box21['height'] / 0x2,
+      box21['left'] + box21['width'] / 2,
+      box21['top'] + box21['height'] / 2,
       value119,
     );
   }
@@ -987,7 +987,7 @@ export class Storyboard3DSceneRuntime {
       if (!enabled21['isEmpty']()) enabled20 = enabled21;
     }
     if (!enabled20 || !Number['isFinite'](enabled20['min']['y'])) return null;
-    const finiteNumber2 = finiteNumber(enabled18['transform']?.['position']?.[0x1]);
+    const finiteNumber2 = finiteNumber(enabled18['transform']?.['position']?.[1]);
     return finiteNumber2 - enabled20['min']['y'];
   }
   ['resolveObjectGroundPositions'](value125) {
@@ -1121,7 +1121,7 @@ export class Storyboard3DSceneRuntime {
       let points = value148
         ? collectInstanceTopViewFootprint(value148, objectId5['id'])
         : collectObjectTopViewFootprint(value149 || value150?.['group']);
-      if (points['length'] < 0x3) points = createFallbackTopViewFootprint(objectId5);
+      if (points['length'] < 3) points = createFallbackTopViewFootprint(objectId5);
       return { objectId: objectId5['id'], objectType: objectId5['type'], points: points };
     });
   }
@@ -1158,9 +1158,9 @@ export class Storyboard3DSceneRuntime {
   }
   ['computeGizmoDragValue'](value156, value157) {
     if (value156?.['mode'] === 'rotate')
-      return this['bridge']['computeRotateGizmoAngle']?.(value156, value157) ?? 0x0;
+      return this['bridge']['computeRotateGizmoAngle']?.(value156, value157) ?? 0;
     if (String(value156?.['mode'] || '')['startsWith']('scale'))
-      return this['bridge']['computeScaleGizmoFactor']?.(value156, value157) ?? 0x1;
+      return this['bridge']['computeScaleGizmoFactor']?.(value156, value157) ?? 1;
     return this['bridge']['computeMoveGizmoDelta']?.(value156, value157) || null;
   }
   ['clearGizmoState']() {
@@ -1248,17 +1248,17 @@ export class Storyboard3DSceneRuntime {
   }
   ['previewCamera'](event3) {
     if (!event3) return ![];
-    const box22 = vectorFromArray(event3['position'], { x: 0x5, y: 0x4, z: 0x7 }),
-      box23 = vectorFromArray(event3['target'], { x: 0x0, y: 1.2, z: 0x0 }),
+    const box22 = vectorFromArray(event3['position'], { x: 5, y: 4, z: 7 }),
+      box23 = vectorFromArray(event3['target'], { x: 0, y: 1.2, z: 0 }),
       x7 = new threeRuntime['Vector3'](box22['x'], box22['y'], box22['z']),
       x8 = new threeRuntime['Vector3'](box23['x'], box23['y'], box23['z']),
-      value168 = new threeRuntime['Matrix4']()['lookAt'](x7, x8, new threeRuntime['Vector3'](0x0, 0x1, 0x0)),
+      value168 = new threeRuntime['Matrix4']()['lookAt'](x7, x8, new threeRuntime['Vector3'](0, 1, 0)),
       x9 = new threeRuntime['Quaternion']()['setFromRotationMatrix'](value168)['normalize'](),
-      finiteNumber3 = finiteNumber(event3['roll'], 0x0);
+      finiteNumber3 = finiteNumber(event3['roll'], 0);
     Math['abs'](finiteNumber3) > 1e-8 &&
       x9['multiply'](
         new threeRuntime['Quaternion']()['setFromAxisAngle'](
-          new threeRuntime['Vector3'](0x0, 0x0, 0x1),
+          new threeRuntime['Vector3'](0, 0, 1),
           finiteNumber3,
         ),
       )['normalize']();
@@ -1307,7 +1307,7 @@ export class Storyboard3DSceneRuntime {
   ['withCleanCaptureCanvas'](handler) {
     return this['bridge']['_withCleanCaptureFrame'](() => handler(this['bridge']['renderer']['domElement']));
   }
-  async ['waitForCaptureReady']({ signal: signal, timeout: timeout = 0x7530 } = {}) {
+  async ['waitForCaptureReady']({ signal: signal, timeout: timeout = 30000 } = {}) {
     const value170 = Date['now']();
     while (!![]) {
       if (signal?.['aborted'] || this['disposed']) throw new DOMException('已取消录制', 'AbortError');
@@ -1324,7 +1324,7 @@ export class Storyboard3DSceneRuntime {
       )
         return;
       if (Date['now']() - value170 > timeout) throw new Error('场景资源加载超时，请检查模型与背景后重试。');
-      await new Promise((value175) => globalThis['setTimeout'](value175, 0x32));
+      await new Promise((value175) => globalThis['setTimeout'](value175, 50));
     }
   }
   ['getSnapshot']() {
@@ -1348,7 +1348,7 @@ export class Storyboard3DSceneRuntime {
       this['directorViewport']?.['disposeMonitor'](),
       this['_clearImportedModels'](),
       this['_clearSceneLights'](),
-      (this['backgroundTextureToken'] += 0x1),
+      (this['backgroundTextureToken'] += 1),
       this['backgroundTexture']?.['dispose']?.(),
       (this['backgroundTexture'] = null),
       this['_stopCharacterAnimation'](),

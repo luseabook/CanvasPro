@@ -95,7 +95,7 @@ export function showProviderApiKeyMissingToast(result, actionLabel = {}) {
 export function inferProviderIdFromApiKeyMessage(data) {
   const target = String(data || '')['trim'](),
     source = target['match'](/厂商[:：]\s*([A-Za-z0-9_-]+)/i);
-  if (source?.[0x1]) return normalizeProviderId(source[0x1]);
+  if (source?.[1]) return normalizeProviderId(source[1]);
   for (const [next, current] of PROVIDER_MESSAGE_PATTERNS) {
     if (current['test'](target)) return next;
   }

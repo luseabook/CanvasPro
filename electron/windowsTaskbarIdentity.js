@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { APP_WINDOW_MIN_HEIGHT, APP_WINDOW_MIN_WIDTH } from './appWindowSizePolicy.js';
-const WINDOWS_CHROME_SHELL_IDENTITY_TIMEOUT_MS = 0x1770;
+const WINDOWS_CHROME_SHELL_IDENTITY_TIMEOUT_MS = 6000;
 export function configureWindowsTaskbarIdentity({
   window: targetWindow,
   platform: platform = process['platform'],
@@ -22,7 +22,7 @@ export function configureWindowsTaskbarIdentity({
       targetWindow['setAppDetails']({
         appId: appId,
         appIconPath: iconPath,
-        appIconIndex: 0x0,
+        appIconIndex: 0,
         relaunchCommand: executablePath,
         relaunchDisplayName: displayName,
       }),
@@ -49,11 +49,11 @@ function encodePowerShellValue(value) {
 }
 function readPositiveInteger(value) {
   const parsed = Number(value);
-  return Number['isFinite'](parsed) && parsed > 0x0 ? Math['round'](parsed) : 0x0;
+  return Number['isFinite'](parsed) && parsed > 0 ? Math['round'](parsed) : 0;
 }
 function readNonNegativeInteger(value, fallback) {
   const parsed = Number(value);
-  if (!Number['isFinite'](parsed) || parsed < 0x0) return fallback;
+  if (!Number['isFinite'](parsed) || parsed < 0) return fallback;
   return Math['round'](parsed);
 }
 function buildWindowsChromeShellTaskbarIdentityScriptInternal({
@@ -85,7 +85,7 @@ function buildWindowsChromeShellTaskbarIdentityScriptInternal({
     resolvedTimeoutMs +
     '\n$minimumWidth = ' +
     resolvedMinWidth +
-    '\x0a$minimumHeight\x20=\x20' +
+    '\n$minimumHeight = ' +
     resolvedMinHeight +
     '\nfunction Decode-TaskbarIdentityValue([string]$encodedValue) {\n  return [System.Text.Encoding]::UTF8.GetString(\n    [System.Convert]::FromBase64String($encodedValue)\n  )\n}\n$browserPath = Decode-TaskbarIdentityValue "' +
     encodePowerShellValue(browserPath) +
@@ -130,7 +130,7 @@ function waitForTaskbarIdentityHelperReady(helper, timeoutMs = WINDOWS_CHROME_SH
       },
       onData = (chunk) => {
         output += String(chunk || '');
-        if (/(^|\r?\n)READY\r?\n/['test'](output + '\x0a')) finish(!![]);
+        if (/(^|\r?\n)READY\r?\n/['test'](output + '\n')) finish(!![]);
       },
       onError = () => finish(![]),
       onExit = () => finish(![]),
@@ -169,13 +169,13 @@ export async function prepareWindowsChromeShellTaskbarIdentity({
         logTaskbarIdentityFailure(
           logEvent,
           'chrome_shell.taskbar_identity_not_ready',
-          'Windows\x20Chrome\x20shell\x20taskbar\x20identity\x20helper\x20was\x20not\x20ready\x20before\x20launch',
+          'Windows Chrome shell taskbar identity helper was not ready before launch',
         ),
         null
       );
     return (
       helper?.['once']?.('exit', (code, signal) => {
-        if (code === 0x0) return;
+        if (code === 0) return;
         logTaskbarIdentityFailure(
           logEvent,
           'chrome_shell.taskbar_identity_timeout',
@@ -192,7 +192,7 @@ export async function prepareWindowsChromeShellTaskbarIdentity({
           const pid = readPositiveInteger(launch?.['pid']);
           if (!pid || typeof helper?.['stdin']?.['write'] !== 'function') return (this['cancel'](), ![]);
           return (
-            helper['stdin']['write'](pid + '\x0a'),
+            helper['stdin']['write'](pid + '\n'),
             helper['stdin']['end']?.(),
             helper['stdout']?.['destroy']?.(),
             helper['unref']?.(),
@@ -206,7 +206,7 @@ export async function prepareWindowsChromeShellTaskbarIdentity({
       logTaskbarIdentityFailure(
         logEvent,
         'chrome_shell.taskbar_identity_spawn_error',
-        'Windows\x20Chrome\x20shell\x20taskbar\x20identity\x20helper\x20could\x20not\x20start',
+        'Windows Chrome shell taskbar identity helper could not start',
         { error: error },
       ),
       null

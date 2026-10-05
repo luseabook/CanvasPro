@@ -79,9 +79,9 @@ async function flushUntil(handler, value = 20) {
           model: 'runninghub/2064961300823896065',
           provider: 'runninghubwf',
           generationParams: {
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
-            rhVideoFrames: 0x12c,
+            rhVideoFrames: 300,
             rhScail2PersonCount: 2,
             rhScailDetectPrompt: 'person, face',
             rhScail2ReplaceSubject: true,
@@ -115,9 +115,9 @@ async function flushUntil(handler, value = 20) {
       assert.deepEqual(runningHubVideoWorkflowSubmitPatch.payloadPatch.inputUrls, [
         '/data/uploads/scail2-ref.png',
       ]),
-      assert.equal(runningHubVideoWorkflowSubmitPatch.payloadPatch.rhVideoResolution, 0x340),
+      assert.equal(runningHubVideoWorkflowSubmitPatch.payloadPatch.rhVideoResolution, 832),
       assert.equal(runningHubVideoWorkflowSubmitPatch.payloadPatch.rhVideoFps, 24),
-      assert.equal(runningHubVideoWorkflowSubmitPatch.payloadPatch.rhVideoFrames, 0x12c),
+      assert.equal(runningHubVideoWorkflowSubmitPatch.payloadPatch.rhVideoFrames, 300),
       assert.equal(runningHubVideoWorkflowSubmitPatch.payloadPatch.generationParams.rhScail2PersonCount, 2),
       assert.equal(
         runningHubVideoWorkflowSubmitPatch.payloadPatch.generationParams.rhScailDetectPrompt,
@@ -138,9 +138,9 @@ async function flushUntil(handler, value = 20) {
           provider: 'runninghubwf',
           model: 'runninghub/2064961300823896065',
           generationParams: {
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
-            rhVideoFrames: 0x12c,
+            rhVideoFrames: 300,
             rhScail2PersonCount: 2,
             rhScail2ReplaceSubject: false,
             rhInstanceType: 'default',
@@ -180,7 +180,7 @@ async function flushUntil(handler, value = 20) {
             provider: 'runninghubwf',
             generationParams: {
               rhBerniniFunction: 'i2v',
-              rhVideoResolution: 0x340,
+              rhVideoResolution: 832,
               rhBerniniAspectRatio: '16:9',
             },
             ...args,
@@ -248,7 +248,7 @@ function createLipSyncPayloadContext({
   includeImage: includeImage = false,
   includeText: includeText = false,
   rhInstanceType: rhInstanceType = 'default',
-  rhVideoResolution: rhVideoResolution = 0x340,
+  rhVideoResolution: rhVideoResolution = 832,
 } = {}) {
   const targetId2 = 'node-lipsync',
     nodes3 = {},
@@ -386,8 +386,8 @@ function createLipSyncPayloadContext({
           model: 'runninghub/2055639633148563458',
           provider: 'runninghubwf',
           generationParams: {
-            rhVideoResolution: 0x5a0,
-            rhVideoFrames: 0x141,
+            rhVideoResolution: 1440,
+            rhVideoFrames: 321,
             rhDigitalHumanMotionAmplitude: '2',
             rhDigitalHumanSceneMotionAmplitude: '1',
             rhInstanceType: 'plus',
@@ -397,8 +397,8 @@ function createLipSyncPayloadContext({
       });
     ctx7._isRunninghubWorkflowModel = () => true;
     const input = await proto7._buildPayloadImpl.call(ctx7);
-    (assert.equal(input.rhVideoResolution, 0x5a0),
-      assert.equal(input.rhVideoFrames, 0x141),
+    (assert.equal(input.rhVideoResolution, 1440),
+      assert.equal(input.rhVideoFrames, 321),
       assert.equal(input.generationParams?.rhDigitalHumanMotionAmplitude, '2'),
       assert.equal(input.generationParams?.rhDigitalHumanSceneMotionAmplitude, '1'),
       assert.equal(input.rhInstanceType, 'plus'),
@@ -421,7 +421,7 @@ function createLipSyncPayloadContext({
           id: targetId4,
           model: 'runninghub/2055639633148563458',
           provider: 'runninghubwf',
-          generationParams: { rhVideoResolution: 0x500, rhVideoFrames: 150, rhInstanceType: 'default' },
+          generationParams: { rhVideoResolution: 1280, rhVideoFrames: 150, rhInstanceType: 'default' },
         },
         prompt: 'commercial singing prompt',
       });
@@ -451,7 +451,7 @@ function createLipSyncPayloadContext({
             id: targetId5,
             model: 'runninghub/2055639633148563458',
             provider: 'runninghubwf',
-            generationParams: { rhVideoResolution: 0x500, rhVideoFrames: 151, rhInstanceType: 'default' },
+            generationParams: { rhVideoResolution: 1280, rhVideoFrames: 151, rhInstanceType: 'default' },
           },
           prompt: 'commercial singing prompt',
         });
@@ -539,10 +539,10 @@ function createLipSyncPayloadContext({
     const { proto: proto15, ctx: ctx15 } = createLipSyncPayloadContext({
         rhVideoFrames: 120,
         audioDuration: 5,
-        rhVideoResolution: 0x200,
+        rhVideoResolution: 512,
       }),
       value11 = await proto15._buildPayloadImpl.call(ctx15);
-    assert.equal(value11.rhVideoResolution, 0x340);
+    assert.equal(value11.rhVideoResolution, 832);
   }),
   test.afterEach(() => {
     (_resetPreviewRuntimeForTests(), _resetAssetMentionRegistryForTests());
@@ -787,7 +787,7 @@ function createTestContext({
             type: 'source-audio',
             audioUrl: 'https://cdn.apimart.ai/ref-audio.mp3',
             duration: 8,
-            fileSize: 5 * 0x400 * 0x400,
+            fileSize: 5 * 1024 * 1024,
           },
         },
         incomingEdges: [
@@ -852,8 +852,8 @@ function createTestContext({
           model: 'runninghub-model/wan2.7',
           provider: 'runninghub',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           generationParams: { wan27_mode: 'image', aspectRatio: '自适应' },
         },
         nodes: {
@@ -861,8 +861,8 @@ function createTestContext({
             id: id4,
             type: 'source-image',
             imageUrl: 'https://www.runninghub.cn/assets/portrait.png',
-            originalWidth: 0x2d0,
-            originalHeight: 0x500,
+            originalWidth: 720,
+            originalHeight: 1280,
           },
         },
         incomingEdges: [{ id: 'edge-wan-portrait', sourceId: id4, targetId: targetId11 }],
@@ -879,10 +879,10 @@ function createTestContext({
           id: targetId12,
           model: 'runninghub/2062515720147259393',
           provider: 'runninghubwf',
-          width: 0x384,
-          height: 0x640,
+          width: 900,
+          height: 1600,
           generationParams: {
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
             rhVideoFrames: 121,
             rhBerniniAspectRatio: '自适应',
@@ -894,8 +894,8 @@ function createTestContext({
             id: 'source-video-landscape',
             type: 'source-video',
             videoUrl: 'https://www.runninghub.cn/assets/source-landscape.mp4',
-            width: 0x500,
-            height: 0x2d0,
+            width: 1280,
+            height: 720,
           },
         },
         incomingEdges: [
@@ -922,8 +922,8 @@ function createTestContext({
           model: 'runninghub-model/veo3',
           provider: 'runninghub',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           generationParams: { rh_veo3_channel: 'lowCost', mode: 'fast', aspectRatio: '自适应' },
         },
         prompt: 'wide city lights',
@@ -1131,7 +1131,7 @@ function createTestContext({
             type: 'source-audio',
             audioUrl: 'https://cdn.apimart.ai/large.mp3',
             duration: 10,
-            fileSize: 16 * 0x400 * 0x400,
+            fileSize: 16 * 1024 * 1024,
           },
         },
         incomingEdges: [
@@ -1166,7 +1166,7 @@ function createTestContext({
               type: 'source-audio',
               audioUrl: 'https://cdn.apimart.ai/ref-voice.mp3',
               audioDuration: 8,
-              audioSizeBytes: 0x400 * 0x400,
+              audioSizeBytes: 1024 * 1024,
             },
             video1: {
               id: 'video1',
@@ -2001,7 +2001,7 @@ function createTestContext({
           isGenerating: false,
           jobStatus: 'success',
           jobError: null,
-          generationDuration: 0x4d2,
+          generationDuration: 1234,
           asyncTaskStatus: 'success',
           rhTaskStatus: 'success',
           dreaminaTaskStatus: 'success',
@@ -2113,8 +2113,8 @@ function createTestContext({
           model: 'dreamina/seedance2.0fast',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '自适应',
-          width: 0x6a4,
-          height: 0x384,
+          width: 1700,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -2133,8 +2133,8 @@ function createTestContext({
           model: 'dreamina/seedance2.0fast',
           dreaminaRouteMode: 'frames2video',
           aspectRatio: '自适应',
-          width: 0x6a4,
-          height: 0x384,
+          width: 1700,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -2153,8 +2153,8 @@ function createTestContext({
           model: 'dreamina/seedance2.0fast',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '4:3',
-          width: 0x6a4,
-          height: 0x384,
+          width: 1700,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -2410,7 +2410,7 @@ function createTestContext({
         provider: 'runninghubwf',
         model: 'runninghub/2054101324521844738',
         rhVideoFrames: 120,
-        rhVideoResolution: 0x340,
+        rhVideoResolution: 832,
         generationParams: { rhInstanceType: 'default' },
       },
       promptEl: createPromptEl([
@@ -2451,7 +2451,7 @@ function createTestContext({
         provider: 'runninghubwf',
         model: 'runninghub/2054101324521844738',
         rhVideoFrames: 120,
-        rhVideoResolution: 0x340,
+        rhVideoResolution: 832,
         generationParams: { rhInstanceType: 'default' },
         promptAssetInputRefs: [
           { assetId: 'asset-av-hidden', itemIndex: 0, type: 'video' },
@@ -2580,7 +2580,7 @@ function createTestContext({
             rhRemoveWatermark: true,
             rhVideoFps: 30,
             rhVideoFrames: 12,
-            rhVideoResolution: 0x3c0,
+            rhVideoResolution: 960,
             rhInstanceType: 'default',
           },
         },
@@ -2618,7 +2618,7 @@ function createTestContext({
       assert.equal(value117.maskImageDataUrl, '/data/uploads/manual-mask.png'),
       assert.equal(value117.rhVideoFps, 30),
       assert.equal(value117.rhVideoFrames, 12),
-      assert.equal(value117.rhVideoResolution, 0x3c0),
+      assert.equal(value117.rhVideoResolution, 960),
       assert.equal(value117.generationParams.rhWatermarkRemoveMode, 'mode2'),
       assert.equal(value117.generationParams.rhRemoveWatermark, true));
   }),
@@ -2636,7 +2636,7 @@ function createTestContext({
             rhRemoveWatermark: false,
             rhVideoFps: 24,
             rhVideoFrames: 0,
-            rhVideoResolution: 0x3c0,
+            rhVideoResolution: 960,
             rhInstanceType: 'default',
           },
         },
@@ -2898,8 +2898,8 @@ function createTestContext({
           model: 'dreamina/seedance2.0fast',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -3054,8 +3054,8 @@ function createTestContext({
           model: 'apimart/doubao-seedance-1-5-pro',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -3064,8 +3064,8 @@ function createTestContext({
             id: id35,
             type: 'source-image',
             originalLocalPath: 'data/uploads/portrait.png',
-            originalWidth: 0x2d0,
-            originalHeight: 0x500,
+            originalWidth: 720,
+            originalHeight: 1280,
           },
         },
         incomingEdges: [{ id: 'edge-apimart-portrait', sourceId: id35, targetId: targetId65, refSlot: '' }],
@@ -3087,8 +3087,8 @@ function createTestContext({
           model: 'apimart/doubao-seedance-1-0-pro-quality',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -3097,8 +3097,8 @@ function createTestContext({
             id: id36,
             type: 'source-image',
             originalLocalPath: 'data/uploads/portrait-10.png',
-            originalWidth: 0x2d0,
-            originalHeight: 0x500,
+            originalWidth: 720,
+            originalHeight: 1280,
           },
         },
         incomingEdges: [
@@ -3122,8 +3122,8 @@ function createTestContext({
           model: 'apimart/doubao-seedance-2.0-fast',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -3132,8 +3132,8 @@ function createTestContext({
             id: id37,
             type: 'source-image',
             originalLocalPath: 'data/uploads/portrait-20.png',
-            originalWidth: 0x2d0,
-            originalHeight: 0x500,
+            originalWidth: 720,
+            originalHeight: 1280,
           },
         },
         incomingEdges: [
@@ -3155,8 +3155,8 @@ function createTestContext({
           model: 'apimart/doubao-seedance-2.0-fast',
           dreaminaRouteMode: 'multimodal2video',
           aspectRatio: '自适应',
-          width: 0x640,
-          height: 0x384,
+          width: 1600,
+          height: 900,
           resolution: '720p',
           duration: 5,
         },
@@ -3282,7 +3282,7 @@ function createTestContext({
   }),
   test('task orchestration: dreamina video recovery writes terminal state through runtime', async () => {
     const targetId70 = 'node-video-dreamina-recovery-success',
-      dreaminaTaskStartedAt = Date.now() - 0xea60;
+      dreaminaTaskStartedAt = Date.now() - 60000;
     let value139 = 0,
       value140 = 0;
     const {
@@ -3300,7 +3300,7 @@ function createTestContext({
         dreaminaTaskPhase: 'generating',
         dreaminaTaskLabel: '生成中',
         dreaminaTaskStartedAt: dreaminaTaskStartedAt,
-        dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+        dreaminaTaskLastCheckedAt: Date.now() - 30000,
         dreaminaTaskRecovering: false,
         generationStartTime: dreaminaTaskStartedAt,
         generationDuration: null,
@@ -3366,7 +3366,7 @@ function createTestContext({
   }),
   test('task orchestration: dreamina video recovery returns failed reason and clears loading state', async () => {
     const targetId71 = 'node-video-dreamina-recovery-failed',
-      dreaminaTaskStartedAt2 = Date.now() - 0xea60,
+      dreaminaTaskStartedAt2 = Date.now() - 60000,
       {
         proto: proto69,
         ctx: ctx69,
@@ -3382,7 +3382,7 @@ function createTestContext({
           dreaminaTaskPhase: 'generating',
           dreaminaTaskLabel: '生成中',
           dreaminaTaskStartedAt: dreaminaTaskStartedAt2,
-          dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+          dreaminaTaskLastCheckedAt: Date.now() - 30000,
           dreaminaTaskRecovering: false,
           generationStartTime: dreaminaTaskStartedAt2,
           generationDuration: null,
@@ -3425,7 +3425,7 @@ function createTestContext({
   }),
   test('task orchestration: RunningHub video recovery writes terminal state through runtime', async () => {
     const targetId72 = 'node-video-rh-recovery-success',
-      rhTaskStartedAt = Date.now() - 0xea60;
+      rhTaskStartedAt = Date.now() - 60000;
     let value144 = 0,
       value145 = 0;
     const {
@@ -3488,7 +3488,7 @@ function createTestContext({
   }),
   test('task orchestration: async video recovery writes terminal state through runtime', async () => {
     const targetId73 = 'node-video-async-recovery-success',
-      asyncTaskStartedAt = Date.now() - 0xea60;
+      asyncTaskStartedAt = Date.now() - 60000;
     let value150 = 0,
       value151 = 0;
     const {
@@ -3549,7 +3549,7 @@ function createTestContext({
   }),
   test('task orchestration: async video recovery rebuilds only the resume payload', async () => {
     const targetId74 = 'node-video-async-recovery-minimal-payload',
-      asyncTaskStartedAt2 = Date.now() - 0xea60;
+      asyncTaskStartedAt2 = Date.now() - 60000;
     let value156 = 0;
     const {
       proto: proto72,
@@ -3614,7 +3614,7 @@ function createTestContext({
   }),
   test('task orchestration: apimart 即梦后台恢复使用 APIMart 异步轮询错误', async () => {
     const targetId75 = 'node-video-apimart-dreamina-recovery-failed',
-      dreaminaTaskStartedAt3 = Date.now() - 0xea60;
+      dreaminaTaskStartedAt3 = Date.now() - 60000;
     let value161 = 0;
     const {
       proto: proto73,
@@ -3631,7 +3631,7 @@ function createTestContext({
         dreaminaTaskPhase: 'generating',
         dreaminaTaskLabel: '生成中',
         dreaminaTaskStartedAt: dreaminaTaskStartedAt3,
-        dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+        dreaminaTaskLastCheckedAt: Date.now() - 30000,
         dreaminaTaskRecovering: false,
         generationStartTime: dreaminaTaskStartedAt3,
         generationDuration: null,
@@ -3672,7 +3672,7 @@ function createTestContext({
   }),
   test('task orchestration: dreamina video recovery does not abort itself on reentrant state update', async () => {
     const targetId76 = 'node-video-dreamina-reentrant-recovery',
-      dreaminaTaskStartedAt4 = Date.now() - 0xea60,
+      dreaminaTaskStartedAt4 = Date.now() - 60000,
       {
         proto: proto74,
         ctx: ctx74,
@@ -3689,7 +3689,7 @@ function createTestContext({
           dreaminaTaskPhase: 'generating',
           dreaminaTaskLabel: '生成中',
           dreaminaTaskStartedAt: dreaminaTaskStartedAt4,
-          dreaminaTaskLastCheckedAt: Date.now() - 0x7530,
+          dreaminaTaskLastCheckedAt: Date.now() - 30000,
           dreaminaTaskRecovering: false,
           generationStartTime: dreaminaTaskStartedAt4,
           generationDuration: null,
@@ -3727,7 +3727,7 @@ function createTestContext({
   }),
   test('task orchestration: dreamina active video submit skips duplicate recovery until stale', async () => {
     const targetId77 = 'node-video-dreamina-active-submit',
-      dreaminaTaskStartedAt5 = Date.now() - 0xea60;
+      dreaminaTaskStartedAt5 = Date.now() - 60000;
     let value170 = 0;
     const {
       proto: proto75,
@@ -3794,7 +3794,7 @@ function createTestContext({
       await proto75._maybeResumeDreaminaTaskImpl.call(ctx75),
       assert.equal(value170, 0),
       assert.equal(ctx75._dreaminaResumePromise, undefined),
-      (state15.nodes[targetId77].dreaminaTaskLastCheckedAt = Date.now() - 0x4e20),
+      (state15.nodes[targetId77].dreaminaTaskLastCheckedAt = Date.now() - 20000),
       await proto75._maybeResumeDreaminaTaskImpl.call(ctx75),
       ctx75._dreaminaResumePromise && (await ctx75._dreaminaResumePromise),
       assert.equal(value170, 1),

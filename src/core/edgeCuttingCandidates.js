@@ -5,8 +5,8 @@ import {
 } from './rendererEdgeVisibilityIndex.js';
 import { createNodeGeometryOverlay } from './nodeGeometryOverlay.js';
 const EDGE_CUT_BOUNDS_EPSILON = 0.001,
-  EDGE_CUT_DEFAULT_NODE_WIDTH = 0x104,
-  EDGE_CUT_DEFAULT_NODE_HEIGHT = 0x64;
+  EDGE_CUT_DEFAULT_NODE_WIDTH = 260,
+  EDGE_CUT_DEFAULT_NODE_HEIGHT = 100;
 export function resolveEdgeCutNodeGeometry(box) {
   if (!box) return null;
   return {
@@ -22,9 +22,9 @@ export function resolveEdgeCutSegment(value, item) {
   if (!box2 || !box3) return null;
   return {
     startX: box2['x'] + box2['width'],
-    startY: box2['y'] + box2['height'] / 0x2,
+    startY: box2['y'] + box2['height'] / 2,
     endX: box3['x'],
-    endY: box3['y'] + box3['height'] / 0x2,
+    endY: box3['y'] + box3['height'] / 2,
   };
 }
 export function createEdgeCutCandidateIndex(
@@ -47,7 +47,7 @@ export function createEdgeCutCandidateIndex(
         (result[options] = { width: box4['width'], height: box4['height'] });
     }
   }
-  const target = Math['max'](0x0, Number(threshold) || 0x0),
+  const target = Math['max'](0, Number(threshold) || 0),
     source =
       list['length'] >= target
         ? createEdgeVisibilityIndex(list, createNodeGeometryOverlay(index, result))
@@ -58,7 +58,7 @@ export function createEdgeCutQueryBounds(next, current, entry, record, payload =
   const enabled3 = [next, current, entry, record]['map'](Number);
   if (!enabled3['every'](Number['isFinite'])) return null;
   const [handle, state, config, scope] = enabled3,
-    input = Math['max'](EDGE_CUT_BOUNDS_EPSILON, Number(payload) || 0x0);
+    input = Math['max'](EDGE_CUT_BOUNDS_EPSILON, Number(payload) || 0);
   return {
     minX: Math['min'](handle, config) - input,
     maxX: Math['max'](handle, config) + input,

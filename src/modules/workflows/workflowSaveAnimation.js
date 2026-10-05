@@ -76,7 +76,7 @@ export function playWorkflowSaveFly({
               { transform: 'scale(1.08)', filter: 'brightness(1.2)' },
               { transform: 'scale(1)', filter: 'brightness(1)' },
             ],
-            { duration: 0x104, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
+            { duration: 260, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
           ));
       };
     })();
@@ -86,9 +86,9 @@ export function playWorkflowSaveFly({
         { transform: 'translate(0,0) scale(1)', opacity: 1 },
         { transform: 'translate(' + next + 'px,' + current + 'px) scale(0.12)', opacity: 0.2 },
       ],
-      { duration: 0x208, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
+      { duration: 520, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
     );
     return ((animation.onfinish = entry), (animation.oncancel = entry), { fly: fly, animation: animation });
   }
-  return (enabled.setTimeout?.(entry, 0x208), { fly: fly, animation: null });
+  return (enabled.setTimeout?.(entry, 520), { fly: fly, animation: null });
 }

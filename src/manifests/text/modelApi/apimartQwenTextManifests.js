@@ -28,8 +28,8 @@ export const apimartQwenTextModelManifests = Object['freeze'](
         : 'APIMart chat completion model API',
       inputSlots: Object['freeze']({
         allowedKinds: Object['freeze'](['text', 'image', 'video']),
-        minByKind: Object['freeze']({ text: 0x0, image: 0x0 }),
-        maxByKind: Object['freeze']({ image: 0x8, video: 0x1, audio: 0x0 }),
+        minByKind: Object['freeze']({ text: 0, image: 0 }),
+        maxByKind: Object['freeze']({ image: 8, video: 1, audio: 0 }),
       }),
       uiSchema: description
         ? Object['freeze']({
@@ -73,14 +73,14 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                 placement: 'mode',
                 variant: 'pillMenu',
                 label: '输出上限',
-                defaultValue: 0x2000,
+                defaultValue: 8192,
                 menuDescription: '上限包含思考与正文；本模型的思考不可关闭。',
                 options: Object['freeze'](
-                  [0x1000, 0x2000, 0x4000, 0x8000, 0x10000, 0x20000]['map']((value2) =>
+                  [4096, 8192, 16384, 32768, 0x10000, 0x20000]['map']((value2) =>
                     Object['freeze']({
                       value: value2,
                       label: value2['toLocaleString']('en-US') + ' tokens',
-                      selectedLabel: '上限：' + value2 / 0x400 + 'K',
+                      selectedLabel: '上限：' + value2 / 1024 + 'K',
                     }),
                   ),
                 ),

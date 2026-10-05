@@ -1,7 +1,7 @@
 import { AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT, AGENT_EXTERNAL_DOCUMENT_TOOL_ID } from './agentDocumentInput.js';
 export const AGENT_EXTERNAL_INFORMATION_TOOL_ID = 'web.read_url';
-export const AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT = 0x3;
-export const AGENT_EXTERNAL_INFORMATION_CONTENT_LIMIT = 0x36b0;
+export const AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT = 3;
+export const AGENT_EXTERNAL_INFORMATION_CONTENT_LIMIT = 14000;
 const URL_PATTERN = /https?:\/\/[^\s<>"'，。；！？、）】》」』]+/giu,
   READ_INTENT_PATTERNS = [
     /(?:阅读|读取|打开|查看|看看|总结|概括|分析|提取|了解|检查|根据|参考).{0,20}(?:网页|页面|网址|链接|url)/i,
@@ -24,26 +24,26 @@ function truncateText(item, key) {
   const list = String(item || '')
     ['replace'](/\u0000/g, '')
     ['trim']();
-  return list['length'] <= key ? list : list['slice'](0x0, Math['max'](0x0, key - 0x3)) + '...';
+  return list['length'] <= key ? list : list['slice'](0, Math['max'](0, key - 3)) + '...';
 }
-function normalizeCount(index, result = 0x0) {
+function normalizeCount(index, result = 0) {
   const data = Number(index);
-  return Number['isFinite'](data) ? Math['max'](0x0, data) : result;
+  return Number['isFinite'](data) ? Math['max'](0, data) : result;
 }
 export function extractAgentExternalUrls(options = '') {
   const list2 = String(options || '')['match'](URL_PATTERN) || [];
   return [...new Set(list2['map'](stripUrlPunctuation)['filter'](Boolean))]['slice'](
-    0x0,
+    0,
     AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT,
   );
 }
 export function detectAgentExternalInformationIntent(target = '') {
   const source = String(target || '')['trim'](),
     requests = extractAgentExternalUrls(source);
-  if (requests['length'] === 0x0 || NEGATED_READ_PATTERNS['some']((next) => next['test'](source)))
+  if (requests['length'] === 0 || NEGATED_READ_PATTERNS['some']((next) => next['test'](source)))
     return null;
   const current = source['replace'](URL_PATTERN, '')
-      ['replace'](/[:：,，。.!！?？]/g, '\x20')
+      ['replace'](/[:：,，。.!！?？]/g, ' ')
       ['trim'](),
     reason = READ_INTENT_PATTERNS['some']((entry) => entry['test'](source));
   if (!reason && !SHORT_READ_INTENT_PATTERN['test'](current)) return null;
@@ -59,7 +59,7 @@ export function createAgentExternalInformationRequests({
 } = {}) {
   const list3 = (Array['isArray'](documentFiles) ? documentFiles : [])
       ['filter']((error) => error && String(error['name'] || '')['trim']())
-      ['slice'](0x0, AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT)
+      ['slice'](0, AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT)
       ['map']((file) => ({
         toolId: AGENT_EXTERNAL_DOCUMENT_TOOL_ID,
         args: { file: file },
@@ -74,8 +74,8 @@ export function createAgentExternalInformationRequests({
         sourceKind: 'url',
       })),
     );
-  const requests2 = list3['slice'](0x0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT);
-  if (requests2['length'] === 0x0) return null;
+  const requests2 = list3['slice'](0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT);
+  if (requests2['length'] === 0) return null;
   return {
     reason: [
       requests2['some']((record) => record['sourceKind'] === 'document') ? 'attached-document' : '',
@@ -91,8 +91,8 @@ export function compactAgentExternalInformationForPrompt(
   { maxContentChars: maxContentChars = AGENT_EXTERNAL_INFORMATION_CONTENT_LIMIT } = {},
 ) {
   const list4 = Array['isArray'](value2?.['sources']) ? value2['sources'] : [],
-    list5 = list4['slice'](0x0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT),
-    handle = Math['max'](0x3e8, Math['floor'](maxContentChars / Math['max'](0x1, list5['length'])));
+    list5 = list4['slice'](0, AGENT_EXTERNAL_INFORMATION_SOURCE_LIMIT),
+    handle = Math['max'](1000, Math['floor'](maxContentChars / Math['max'](1, list5['length'])));
   return list5['map']((truncated = {}, state) => {
     const sourceKind = truncated['sourceKind'] === 'document' ? 'document' : 'url',
       list6 = String(truncated['content'] || '')
@@ -100,35 +100,35 @@ export function compactAgentExternalInformationForPrompt(
         ['trim'](),
       displayName = truncateText(truncated['displayName'] || truncated['fileName'], 0xff)['replace'](
         /\s+/g,
-        '\x20',
+        ' ',
       ),
-      finalUrl = truncateText(truncated['finalUrl'] || truncated['url'], 0x7d0);
+      finalUrl = truncateText(truncated['finalUrl'] || truncated['url'], 2000);
     return {
-      sourceId: String(truncated['sourceId'] || 'external-source-' + (state + 0x1))['slice'](0x0, 0x50),
+      sourceId: String(truncated['sourceId'] || 'external-source-' + (state + 1))['slice'](0, 80),
       toolId: String(
         truncated['toolId'] ||
           (sourceKind === 'document' ? AGENT_EXTERNAL_DOCUMENT_TOOL_ID : AGENT_EXTERNAL_INFORMATION_TOOL_ID),
-      )['slice'](0x0, 0x50),
+      )['slice'](0, 80),
       sourceKind: sourceKind,
       ...(sourceKind === 'url'
         ? {
-            requestedUrl: truncateText(truncated['requestedUrl'] || truncated['url'], 0x7d0),
+            requestedUrl: truncateText(truncated['requestedUrl'] || truncated['url'], 2000),
             finalUrl: finalUrl,
           }
         : {
             displayName: displayName,
-            extension: truncateText(truncated['extension'], 0xc),
+            extension: truncateText(truncated['extension'], 12),
             characterCount: normalizeCount(truncated['characterCount'], list6['length']),
             ...(Number['isFinite'](Number(truncated['pageCount']))
               ? { pageCount: normalizeCount(truncated['pageCount']) }
               : {}),
             warnings: (Array['isArray'](truncated['warnings']) ? truncated['warnings'] : [])
-              ['map']((config) => truncateText(config, 0x12c))
+              ['map']((config) => truncateText(config, 300))
               ['filter'](Boolean)
-              ['slice'](0x0, 0x8),
+              ['slice'](0, 8),
           }),
-      title: truncateText(truncated['title'] || displayName, 0x12c),
-      contentType: truncateText(truncated['contentType'], 0xa0),
+      title: truncateText(truncated['title'] || displayName, 300),
+      contentType: truncateText(truncated['contentType'], 160),
       content: truncateText(list6, handle),
       truncated: truncated['truncated'] === !![] || list6['length'] > handle,
       trust: 'untrusted_external',

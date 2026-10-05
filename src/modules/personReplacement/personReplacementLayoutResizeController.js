@@ -14,8 +14,8 @@ export function renderPersonReplacementLayoutSplitter(item, key, index = {}) {
       : item === 'center'
         ? key['centerTop']
         : key[item],
-    target = result ? 0x20 : item === 'center' ? 0x26 : item === 'left' ? 0x12 : 0x18,
-    source = result ? 0x44 : item === 'center' ? 0x52 : item === 'left' ? 0x26 : 0x2a,
+    target = result ? 32 : item === 'center' ? 38 : item === 'left' ? 18 : 24,
+    source = result ? 0x44 : item === 'center' ? 82 : item === 'left' ? 38 : 42,
     next =
       index['label'] ||
       (result
@@ -33,19 +33,19 @@ export function renderPersonReplacementLayoutSplitter(item, key, index = {}) {
     item +
     '" data-person-replacement-layout-splitter="' +
     item +
-    '\x22' +
+    '"' +
     current +
     ' role="separator" aria-orientation="' +
     (data ? 'horizontal' : 'vertical') +
     '" aria-label="' +
     next +
-    '\x22\x20aria-valuemin=\x22' +
+    '" aria-valuemin="' +
     target +
     '" aria-valuemax="' +
     source +
     '" aria-valuenow="' +
     Math['round'](options) +
-    '\x22\x20tabindex=\x220\x22></div>'
+    '" tabindex="0"></div>'
   );
 }
 export function applyPersonReplacementCompositeSidebarWidthToLayout(el, el2, entry) {
@@ -73,7 +73,7 @@ export function createPersonReplacementLayoutResizeController({
     },
     begin = (event, el3) => {
       if (!event || !el3) return ![];
-      if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0x0))
+      if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0))
         return ![];
       const text = normalizeText(el3['dataset']?.['personReplacementLayoutSplitter']);
       if (!['left', 'center', 'right', 'asset-detail']['includes'](text)) return ![];
@@ -89,7 +89,7 @@ export function createPersonReplacementLayoutResizeController({
         el5 = el3['closest']?.('[data-person-replacement-layout]'),
         box = el4?.['getBoundingClientRect']?.(),
         count = handle ? Number(box?.['height']) : Number(box?.['width']);
-      if (!(count > 0x0)) return ![];
+      if (!(count > 0)) return ![];
       (event['preventDefault']?.(), event['stopPropagation']?.(), destroy());
       const state = event['pointerId'];
       try {
@@ -102,13 +102,13 @@ export function createPersonReplacementLayoutResizeController({
         !Number['isFinite'](Number(event2?.['pointerId'])) ||
         Number(event2['pointerId']) === Number(state);
       let value3 = null,
-        config = 0x0;
+        config = 0;
       const run2 = (event3) => {
           if (!event3) return;
           const scope = handle ? event3['clientY'] : event3['clientX'],
             input = handle ? box['top'] : box['left'],
-            output = ((Number(scope) - Number(input || 0x0)) / count) * 0x64,
-            centerTop = Math['round']((text === 'right' ? 0x64 - output : output) * 0x64) / 0x64,
+            output = ((Number(scope) - Number(input || 0)) / count) * 100,
+            centerTop = Math['round']((text === 'right' ? 100 - output : output) * 100) / 100,
             value4 = getProject();
           if (record) {
             const personReplacementAssetDetailSplitRatio =
@@ -145,7 +145,7 @@ export function createPersonReplacementLayoutResizeController({
             ));
         },
         handler = () => {
-          config = 0x0;
+          config = 0;
           const value5 = value3;
           ((value3 = null), run2(value5));
         },
@@ -176,7 +176,7 @@ export function createPersonReplacementLayoutResizeController({
           config &&
             typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
             windowObject['cancelAnimationFrame'](config);
-          ((config = 0x0),
+          ((config = 0),
             (value3 = null),
             el3['classList']?.['remove']?.('is-active'),
             documentObject?.['body']?.['classList']?.['remove']?.('person-replacement-layout-resizing'));

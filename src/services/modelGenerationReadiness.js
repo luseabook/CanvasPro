@@ -87,7 +87,7 @@ function getCliLoginFieldIds(next) {
 }
 function getCliProviderLabel(current, entry) {
   if (current === 'dreamina') return '即梦 CLI';
-  if (current === 'codex') return 'OpenAI\x20CLI';
+  if (current === 'codex') return 'OpenAI CLI';
   return entry;
 }
 function getCredentialFieldIds({
@@ -298,7 +298,7 @@ function isProviderConnectionCapabilityVerified(value7, value8 = {}) {
 }
 function getConnectionCapabilityLabel(value9 = '') {
   return value9 === 'workflow'
-    ? '工作流\x20API\x20Key'
+    ? '工作流 API Key'
     : value9 === 'modelApi'
       ? '模型 API Key'
       : value9 === 'cloud'
@@ -308,7 +308,7 @@ function getConnectionCapabilityLabel(value9 = '') {
           : 'API 连接';
 }
 function buildUnverifiedConnectionMessage(value10, value11 = '') {
-  return '请先验证\x20' + value10['providerLabel'] + '\x20' + getConnectionCapabilityLabel(value11);
+  return '请先验证 ' + value10['providerLabel'] + ' ' + getConnectionCapabilityLabel(value11);
 }
 function isModelAuthorizationVerified(value12, value13 = {}) {
   const enabled3 = String(value12?.['authorizationCapability'] || '')['trim']();
@@ -413,7 +413,7 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
             ...message,
             message: message2
               ? message['providerLabel'] +
-                '\x20' +
+                ' ' +
                 getConnectionCapabilityLabel(message2) +
                 ' 验证失败，请检查 Key 后重试'
               : message['providerLabel'] + ' API 验证失败，请检查 Key 后重试',
@@ -512,7 +512,7 @@ export async function ensureModelGenerationReadiness(options7 = {}) {
 export function createMissingModelCredentialError(response3) {
   const error2 =
       response3?.['status'] === 'missing' ? response3 : evaluateModelGenerationReadiness(response3 || {}),
-    error3 = new Error(error2['message'] || '当前模型缺少可用的\x20API\x20Key');
+    error3 = new Error(error2['message'] || '当前模型缺少可用的 API Key');
   return (
     (error3['name'] = 'ModelCredentialMissingError'),
     (error3['code'] = 'MODEL_CREDENTIAL_MISSING'),

@@ -4,8 +4,8 @@ import {
 } from '../../services/desktopMediaBlobSource.js';
 import { buildPersonReplacementCompositePreviewSnapshot } from './personReplacementCompositePreviewProjection.js';
 import { getPersonReplacementShotDurationSec } from './personReplacementShotCutModel.js';
-export const PERSON_REPLACEMENT_COMPOSITE_PREWARM_MAX_BYTES = 0x40 * 0x400 * 0x400;
-export const PERSON_REPLACEMENT_COMPOSITE_PREWARM_TIMEOUT_MS = 0x1388;
+export const PERSON_REPLACEMENT_COMPOSITE_PREWARM_MAX_BYTES = 64 * 1024 * 1024;
+export const PERSON_REPLACEMENT_COMPOSITE_PREWARM_TIMEOUT_MS = 5000;
 function normalizeText(value, item = '') {
   const key = String(value ?? '')['trim']();
   return key || item;
@@ -15,9 +15,9 @@ function clamp(index, result, data, options = result) {
   return Number['isFinite'](target) ? Math['min'](data, Math['max'](result, target)) : options;
 }
 function formatPreviewTime(source) {
-  const next = Math['max'](0x0, Number(source) || 0x0),
-    current = Math['floor'](next / 0x3c);
-  return current + ':' + String(Math['floor'](next % 0x3c))['padStart'](0x2, '0');
+  const next = Math['max'](0, Number(source) || 0),
+    current = Math['floor'](next / 60);
+  return current + ':' + String(Math['floor'](next % 60))['padStart'](2, '0');
 }
 export function createPersonReplacementCompositePlaybackBinding({
   root: root,
@@ -31,7 +31,7 @@ export function createPersonReplacementCompositePlaybackBinding({
   adoptedReplacementPlayback: adoptedReplacementPlayback = null,
 } = {}) {
   if (!root || !project || typeof createVideoPlayback !== 'function')
-    throw new Error('person\x20replacement\x20composite\x20playback\x20requires\x20workspace\x20adapters');
+    throw new Error('person replacement composite playback requires workspace adapters');
   const el = root['querySelector']?.('[data-person-replacement-composite-preview]'),
     el2 = root['querySelector']?.('[data-person-replacement-compare-original-audio]'),
     text = normalizeText(el2?.['dataset']?.['personReplacementCompareOriginalAudioUrl']),
@@ -58,10 +58,10 @@ export function createPersonReplacementCompositePlaybackBinding({
     payload = record
       ? {
           id: 'complete-video',
-          startTimeSec: 0x0,
+          startTimeSec: 0,
           durationSec: durationSec['reduce'](
             (handle, state) => handle + getPersonReplacementShotDurationSec(state),
-            0x0,
+            0,
           ),
         }
       : entry;
@@ -123,65 +123,65 @@ export function createPersonReplacementCompositePlaybackBinding({
             shouldAssign: () => !enabled && el2['isConnected'] !== ![],
           })['catch'](() => '')
         : Promise['resolve'](''),
-    value3 = Math['max'](0x0, Number(payload?.['startTimeSec']) || 0x0);
-  let value4 = 0x0,
-    value5 = 0x0,
+    value3 = Math['max'](0, Number(payload?.['startTimeSec']) || 0);
+  let value4 = 0,
+    value5 = 0,
     value6 = null,
-    value7 = 0x0,
+    value7 = 0,
     enabled2 = ![],
     clamp2 = clamp(
       Number(el3?.['volume'] ?? replacementVideo?.['volume'] ?? originalVideo?.['volume']),
-      0x0,
-      0x1,
-      0x1,
+      0,
+      1,
+      1,
     ),
-    value8 = clamp2 || 0x1;
+    value8 = clamp2 || 1;
   const run = () => (getProject()?.['audio']?.['previewTrack'] === 'original' ? 'original' : 'replacement'),
     handler = () => {
       const count = Number(el10['duration']);
-      if (Number['isFinite'](count) && count > 0x0) return count;
-      return Math['max'](0x0, Number(payload?.['durationSec']) || 0x0);
+      if (Number['isFinite'](count) && count > 0) return count;
+      return Math['max'](0, Number(payload?.['durationSec']) || 0);
     },
     handler2 = () => {
       const count2 = Number(el10['currentTime']);
-      return Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x0;
+      return Number['isFinite'](count2) && count2 > 0 ? count2 : 0;
     },
     handler3 = () => {
       const count3 = handler(),
         value9 = Math['min'](handler2(), count3 || handler2()),
-        value10 = count3 > 0x0 ? clamp(value9 / count3, 0x0, 0x1, 0x0) : 0x0;
-      if (el5?.['style']) el5['style']['width'] = value10 * 0x64 + '%';
-      (el4?.['setAttribute']?.('aria-valuenow', String(Math['round'](value10 * 0x64))),
+        value10 = count3 > 0 ? clamp(value9 / count3, 0, 1, 0) : 0;
+      if (el5?.['style']) el5['style']['width'] = value10 * 100 + '%';
+      (el4?.['setAttribute']?.('aria-valuenow', String(Math['round'](value10 * 100))),
         el4?.['setAttribute']?.(
           'aria-valuetext',
-          formatPreviewTime(value9) + '\x20/\x20' + formatPreviewTime(count3),
+          formatPreviewTime(value9) + ' / ' + formatPreviewTime(count3),
         ));
       if (el6) el6['textContent'] = formatPreviewTime(value9);
       if (el7) el7['textContent'] = formatPreviewTime(count3);
     },
     handler4 = () => {
       if (!el8) return;
-      const count4 = Math['round'](clamp2 * 0x64);
+      const count4 = Math['round'](clamp2 * 100);
       ((el8['value'] = String(count4)),
         el8['style']?.['setProperty']?.('--story-video-volume-progress', count4 + '%'),
         el8['setAttribute']?.('aria-valuetext', count4 + '%'));
-      const value11 = count4 === 0x0;
+      const value11 = count4 === 0;
       (el9?.['classList']?.['toggle']?.('is-muted', value11),
         el9?.['setAttribute']?.('aria-pressed', String(value11)),
         el9?.['setAttribute']?.('aria-label', (value11 ? '恢复' : '静音') + '原视频和替换视频'));
     },
     handler5 = (value12) => {
-      const value13 = value3 + Math['max'](0x0, Number(value12) || 0x0),
+      const value13 = value3 + Math['max'](0, Number(value12) || 0),
         count5 = Number(el3?.['duration']);
-      return Number['isFinite'](count5) && count5 > 0x0
-        ? Math['min'](value13, Math['max'](0x0, count5 - 0.04))
+      return Number['isFinite'](count5) && count5 > 0
+        ? Math['min'](value13, Math['max'](0, count5 - 0.04))
         : value13;
     },
     handler6 = ({ force: force = ![] } = {}) => {
       const value14 = handler2();
       list2['forEach']((value15) => {
         if (value15 === el10) return;
-        const count6 = Math['abs']((Number(value15['currentTime']) || 0x0) - value14);
+        const count6 = Math['abs']((Number(value15['currentTime']) || 0) - value14);
         if (force || count6 > 0.1)
           try {
             value15['currentTime'] = value14;
@@ -189,14 +189,14 @@ export function createPersonReplacementCompositePlaybackBinding({
       });
       if (el3) {
         const value16 = handler5(value14),
-          count7 = Math['abs']((Number(el3['currentTime']) || 0x0) - value16);
+          count7 = Math['abs']((Number(el3['currentTime']) || 0) - value16);
         if (force || count7 > 0.12)
           try {
             el3['currentTime'] = value16;
           } catch {}
       }
       if (el2) {
-        const count8 = Math['abs']((Number(el2['currentTime']) || 0x0) - value14);
+        const count8 = Math['abs']((Number(el2['currentTime']) || 0) - value14);
         if (force || count8 > 0.12)
           try {
             el2['currentTime'] = value14;
@@ -232,23 +232,23 @@ export function createPersonReplacementCompositePlaybackBinding({
       handler4();
     },
     handler10 = () => {
-      (value4 && (windowObject?.['cancelAnimationFrame']?.(value4), (value4 = 0x0)),
-        value5 && (windowObject?.['clearTimeout']?.(value5), (value5 = 0x0)));
+      (value4 && (windowObject?.['cancelAnimationFrame']?.(value4), (value4 = 0)),
+        value5 && (windowObject?.['clearTimeout']?.(value5), (value5 = 0)));
     },
     handler11 = () => {
       handler10();
       if (enabled || !handler8()) return;
       const value22 = () => {
-        ((value4 = 0x0), (value5 = 0x0));
+        ((value4 = 0), (value5 = 0));
         if (enabled || !handler8()) return;
         (handler6(), handler3(), handler11());
       };
       typeof windowObject?.['requestAnimationFrame'] === 'function'
         ? (value4 = windowObject['requestAnimationFrame'](value22))
-        : (value5 = windowObject?.['setTimeout']?.(value22, 0x20) || 0x0);
+        : (value5 = windowObject?.['setTimeout']?.(value22, 32) || 0);
     },
     handler12 = ({ cancelPending: cancelPending = !![] } = {}) => {
-      if (cancelPending) value7 += 0x1;
+      if (cancelPending) value7 += 1;
       ((enabled2 = ![]),
         list2['forEach']((value23) => value23['pause']?.()),
         el2?.['pause']?.(),
@@ -257,10 +257,10 @@ export function createPersonReplacementCompositePlaybackBinding({
         handler9());
     },
     handler13 = async () => {
-      const value24 = value7 + 0x1;
+      const value24 = value7 + 1;
       ((value7 = value24), (enabled2 = !![]), handler9());
       const count9 = handler();
-      (el10['ended'] || (count9 > 0x0 && handler2() >= count9 - 0.04)) && (el10['currentTime'] = 0x0);
+      (el10['ended'] || (count9 > 0 && handler2() >= count9 - 0.04)) && (el10['currentTime'] = 0);
       (handler6({ force: !![] }), handler7());
       const list3 = [...list2],
         value25 = run(),
@@ -320,14 +320,14 @@ export function createPersonReplacementCompositePlaybackBinding({
     },
     handler14 = (value34) => {
       const count10 = handler();
-      if (!(count10 > 0x0)) return ![];
-      const clamp3 = clamp(Number(value34), 0x0, 0x1, 0x0);
+      if (!(count10 > 0)) return ![];
+      const clamp3 = clamp(Number(value34), 0, 1, 0);
       return ((el10['currentTime'] = clamp3 * count10), handler6({ force: !![] }), handler3(), !![]);
     },
     handler15 = (value35) => {
       const box = el4?.['getBoundingClientRect']?.();
-      if (!(Number(box?.['width']) > 0x0)) return ![];
-      return handler14((Number(value35) - Number(box['left'] || 0x0)) / Number(box['width']));
+      if (!(Number(box?.['width']) > 0)) return ![];
+      return handler14((Number(value35) - Number(box['left'] || 0)) / Number(box['width']));
     },
     handler16 = () => {
       const value36 = value6;
@@ -364,13 +364,13 @@ export function createPersonReplacementCompositePlaybackBinding({
     value41 = (event5) => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](event5['key'])) return;
       const count11 = handler();
-      if (!(count11 > 0x0)) return;
+      if (!(count11 > 0)) return;
       (event5['preventDefault']?.(), event5['stopPropagation']?.());
-      if (event5['key'] === 'Home') handler14(0x0);
+      if (event5['key'] === 'Home') handler14(0);
       else {
-        if (event5['key'] === 'End') handler14(0x1);
+        if (event5['key'] === 'End') handler14(1);
         else {
-          const value42 = event5['key'] === 'ArrowLeft' ? -0x5 : 0x5;
+          const value42 = event5['key'] === 'ArrowLeft' ? -5 : 5;
           handler14((handler2() + value42) / count11);
         }
       }
@@ -378,8 +378,8 @@ export function createPersonReplacementCompositePlaybackBinding({
     },
     value43 = (event6) => {
       (event6['stopPropagation']?.(),
-        (clamp2 = clamp(Number(event6['currentTarget']?.['value']) / 0x64, 0x0, 0x1, clamp2)));
-      if (clamp2 > 0x0) value8 = clamp2;
+        (clamp2 = clamp(Number(event6['currentTarget']?.['value']) / 100, 0, 1, clamp2)));
+      if (clamp2 > 0) value8 = clamp2;
       ([...list2, el2, el3]['filter'](Boolean)['forEach']((value44) => {
         value44['volume'] = clamp2;
       }),
@@ -388,7 +388,7 @@ export function createPersonReplacementCompositePlaybackBinding({
     value45 = (event7) => {
       (event7?.['preventDefault']?.(),
         event7?.['stopPropagation']?.(),
-        (clamp2 = clamp2 > 0x0 ? 0x0 : value8),
+        (clamp2 = clamp2 > 0 ? 0 : value8),
         [...list2, el2, el3]['filter'](Boolean)['forEach']((value46) => {
           value46['volume'] = clamp2;
         }),

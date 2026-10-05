@@ -53,7 +53,7 @@ function libraryAssignmentItems(source, projectAssets, list2, getTabLabel, next)
     return [
       {
         label:
-          '加入到音频项目' + (projectAssets['assetSelectionMode'] ? '\x20(' + list4['length'] + ')' : ''),
+          '加入到音频项目' + (projectAssets['assetSelectionMode'] ? ' (' + list4['length'] + ')' : ''),
         icon: 'folder-open',
         action: () => {
           if (
@@ -96,7 +96,7 @@ function libraryAssignmentItems(source, projectAssets, list2, getTabLabel, next)
             subItems: [
               ...label3['appearances']['map']((error) => ({
                 label: normalizeText(error['name']) || '未命名形象',
-                disabled: selectedCount['length'] !== 0x1,
+                disabled: selectedCount['length'] !== 1,
                 action: () => handler(label3['id'], error['id'], ![]),
               })),
               { label: '新增形象', icon: 'add', action: () => handler(label3['id'], '', !![]) },
@@ -126,7 +126,7 @@ export function resolveStoryWorkspaceContextMenuItems({
       value4 = (Array['isArray'](projects) ? projects : [])['find'](
         (value5) => normalizeText(value5?.['id'] || value5?.['data']?.['project']?.['id']) === text,
       ),
-      archived = Number(value4?.['archivedAt'] || 0x0) > 0x0;
+      archived = Number(value4?.['archivedAt'] || 0) > 0;
     return createWorkspaceProjectContextMenuItems({
       archived: archived,
       onOpen: () => commands['openProject']?.(text),

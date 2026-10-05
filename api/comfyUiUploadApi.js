@@ -102,7 +102,7 @@ function inferFileName(state, config, scope = 'image') {
   } catch {
     decodeURIComponent2 =
       String(state || '')
-        ['split'](/[?#]/, 0x1)[0x0]
+        ['split'](/[?#]/, 1)[0]
         ['split'](/[\\/]/)
         ['filter'](Boolean)
         ['pop']() || '';
@@ -145,7 +145,7 @@ export async function uploadMediaInputToComfyUi(value3, { baseUrl: baseUrl2, kin
       provider: 'remote',
       buildUrl: ![],
       responseType: 'blob',
-      timeout: 0xea60,
+      timeout: 60000,
     }),
     formData = new FormData();
   (formData['append']('image', get2, inferFileName(text6, get2, mediaKind2)),
@@ -153,7 +153,7 @@ export async function uploadMediaInputToComfyUi(value3, { baseUrl: baseUrl2, kin
     formData['append']('overwrite', 'true'));
   const post2 = await post(buildComfyUiUploadUrl(baseUrl2), formData, {
     provider: 'comfyui',
-    timeout: 0xea60,
+    timeout: 60000,
   });
   return resolveUploadedComfyUiFileName(post2);
 }

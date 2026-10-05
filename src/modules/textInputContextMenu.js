@@ -66,7 +66,7 @@ function isSensitiveTextTarget(el6) {
     el6?.['dataset']?.['sensitive'],
   ]
     ['filter'](Boolean)
-    ['join']('\x20');
+    ['join'](' ');
   return /(?:api[\s_-]*key|secret|access[\s_-]*token|password|密码|密钥|令牌)/iu['test'](next);
 }
 export function getEditableTextTarget(el7) {
@@ -103,7 +103,7 @@ function dispatchInputEvent(handle) {
 function clampSelection(config, scope) {
   const input = Number(config);
   if (!Number['isFinite'](input)) return scope;
-  return Math['max'](0x0, Math['min'](scope, input));
+  return Math['max'](0, Math['min'](scope, input));
 }
 function setFieldSelection(output, value2, value3) {
   if (typeof output?.['setSelectionRange'] !== 'function') return;
@@ -122,8 +122,8 @@ export function captureEditableSelection(el11) {
   }
   const dom = el11?.['ownerDocument']?.['defaultView'] || getWindow(),
     enabled3 = dom?.['getSelection']?.();
-  if (!enabled3 || enabled3['rangeCount'] === 0x0) return null;
-  const range = enabled3['getRangeAt'](0x0),
+  if (!enabled3 || enabled3['rangeCount'] === 0) return null;
+  const range = enabled3['getRangeAt'](0),
     value5 = range['commonAncestorContainer'];
   if (!el11['contains']?.(value5)) return null;
   return { kind: 'contenteditable', range: range['cloneRange']() };
@@ -161,7 +161,7 @@ function selectAllEditableText(el15) {
   if (isSupportedTextInput(el15) || isSupportedTextArea(el15))
     return (
       el15['focus']?.({ preventScroll: !![] }),
-      setFieldSelection(el15, 0x0, String(el15['value'] || '')['length']),
+      setFieldSelection(el15, 0, String(el15['value'] || '')['length']),
       !![]
     );
   if (!isContentEditableElement(el15)) return ![];
@@ -228,12 +228,12 @@ function insertTextIntoField(el17, list2, value18) {
     try {
       el17['setRangeText'](list2, clampSelection2, clampSelection3, 'end');
     } catch (value19) {
-      el17['value'] = list3['slice'](0x0, clampSelection2) + list2 + list3['slice'](clampSelection3);
+      el17['value'] = list3['slice'](0, clampSelection2) + list2 + list3['slice'](clampSelection3);
       const value20 = clampSelection2 + list2['length'];
       setFieldSelection(el17, value20, value20);
     }
   else {
-    el17['value'] = list3['slice'](0x0, clampSelection2) + list2 + list3['slice'](clampSelection3);
+    el17['value'] = list3['slice'](0, clampSelection2) + list2 + list3['slice'](clampSelection3);
     const value21 = clampSelection2 + list2['length'];
     setFieldSelection(el17, value21, value21);
   }
@@ -257,8 +257,8 @@ function insertTextIntoContentEditable(el18, value22, value23) {
   if (insertPlainTextAtSelection(value22, { documentObject: documentObject })) return !![];
   const dom5 = documentObject?.['defaultView'] || getWindow(),
     value26 = dom5?.['getSelection']?.();
-  if (value26 && value26['rangeCount'] > 0x0) {
-    const value27 = value26['getRangeAt'](0x0);
+  if (value26 && value26['rangeCount'] > 0) {
+    const value27 = value26['getRangeAt'](0);
     value27['deleteContents']();
     const value28 = documentObject['createTextNode'](String(value22 || ''));
     (value27['insertNode'](value28),
@@ -321,7 +321,7 @@ export function showTextInputContextMenu({
     list4['push']({
       label: textInputContextMenuText('undo'),
       icon: 'undo',
-      kbd: 'Ctrl\x20Z',
+      kbd: 'Ctrl Z',
       shortcutActionId: 'undo',
       action: () => undoEditableChange(ownerElement, value36),
     });
@@ -362,7 +362,7 @@ export function showTextInputContextMenu({
         action: () => deleteEditableSelection(ownerElement, value36),
       }));
   if (getTargetText(ownerElement)) {
-    if (list4['length'] > 0x0) list4['push']('sep');
+    if (list4['length'] > 0) list4['push']('sep');
     list4['push']({
       label: textInputContextMenuText('selectAll'),
       icon: 'select-all',
@@ -371,7 +371,7 @@ export function showTextInputContextMenu({
       action: () => selectAllEditableText(ownerElement),
     });
   }
-  if (list4['length'] === 0x0) return null;
+  if (list4['length'] === 0) return null;
   return (
     (activeTextInputContextMenuSession = showContextMenu(screenX, screenY, list4, {
       className: 'v2-canvas-ctx-menu v2-text-input-context-menu',
@@ -394,8 +394,8 @@ export function initTextInputContextMenu(el20 = getDocument()) {
     (target3['focus']?.({ preventScroll: !![] }),
       showTextInputContextMenu({
         target: target3,
-        screenX: screenX2['clientX'] || 0x0,
-        screenY: screenX2['clientY'] || 0x0,
+        screenX: screenX2['clientX'] || 0,
+        screenY: screenX2['clientY'] || 0,
         snapshot: snapshot2,
       }));
   };

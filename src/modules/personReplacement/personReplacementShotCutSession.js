@@ -9,7 +9,7 @@ import {
 } from './personReplacementShotCutModel.js';
 import { togglePersonReplacementShotReverseAtTimelineSec } from './personReplacementShotReverse.js';
 import { createPersonReplacementShotCutPlaybackController } from './personReplacementShotCutPlaybackController.js';
-const DEFAULT_TIMELINE_ZOOM = 0x1,
+const DEFAULT_TIMELINE_ZOOM = 1,
   SHOT_CUT_ACTIONS = Object['freeze']({
     'edit-shot-cuts': 'open',
     'toggle-shot-cut-smart-detect': 'toggleSmartDetect',
@@ -54,21 +54,21 @@ function createInitialState() {
     isKeyframeCapturing: ![],
     isSmartDetectOpen: ![],
     isSmartDetecting: ![],
-    smartDetectionToken: 0x0,
+    smartDetectionToken: 0,
     previewShotId: '',
-    playheadSec: 0x0,
+    playheadSec: 0,
     hoverPreviewActive: ![],
     hoverPreviewTimeSec: null,
     timelineZoom: DEFAULT_TIMELINE_ZOOM,
     soundEnabled: ![],
     selectedShotIds: [],
     openingCleanup: null,
-    motionTimer: 0x0,
+    motionTimer: 0,
     boundaryDrag: null,
     previewMetadataCleanup: null,
     bufferedWarmupCleanup: null,
     pendingPreviewSeek: null,
-    hoverPreviewRaf: 0x0,
+    hoverPreviewRaf: 0,
     hoverPreviewRequest: null,
     playheadElement: null,
     clockElement: null,
@@ -76,15 +76,15 @@ function createInitialState() {
     bufferedSourceId: '',
     bufferedMediaRef: '',
     boundPreviewVideos: new WeakSet(),
-    previewSeekToken: 0x0,
-    previewFrameReadyToken: 0x0,
+    previewSeekToken: 0,
+    previewFrameReadyToken: 0,
     previewFrameCallbackId: null,
     previewFrameCallbackVideo: null,
   };
 }
 function clampTimelineSec(key, index) {
   const personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(key);
-  return Math['min'](personReplacementShotCutTotalDuration, Math['max'](0x0, Number(index) || 0x0));
+  return Math['min'](personReplacementShotCutTotalDuration, Math['max'](0, Number(index) || 0));
 }
 export function createPersonReplacementShotCutSession({
   initialProject: initialProject = {},
@@ -112,7 +112,7 @@ export function createPersonReplacementShotCutSession({
       if (!soundEnabled['motionTimer']) return ![];
       return (
         windowObject?.['clearTimeout']?.(soundEnabled['motionTimer']),
-        (soundEnabled['motionTimer'] = 0x0),
+        (soundEnabled['motionTimer'] = 0),
         !![]
       );
     },
@@ -135,7 +135,7 @@ export function createPersonReplacementShotCutSession({
         try {
           windowObject?.['clearTimeout']?.(soundEnabled['hoverPreviewRaf']);
         } catch {}
-        soundEnabled['hoverPreviewRaf'] = 0x0;
+        soundEnabled['hoverPreviewRaf'] = 0;
       }
       soundEnabled['hoverPreviewRequest'] = null;
     },
@@ -187,7 +187,7 @@ export function createPersonReplacementShotCutSession({
         bufferedSourceId = soundEnabled['bufferedSourceId'],
         bufferedMediaRef = soundEnabled['bufferedMediaRef'];
       if (releaseBuffer) releasePreviewBuffer2();
-      const smartDetectionToken = soundEnabled['smartDetectionToken'] + 0x1,
+      const smartDetectionToken = soundEnabled['smartDetectionToken'] + 1,
         boundPreviewVideos = soundEnabled['boundPreviewVideos'];
       Object['assign'](soundEnabled, createInitialState(), {
         smartDetectionToken: smartDetectionToken,
@@ -215,10 +215,10 @@ export function createPersonReplacementShotCutSession({
           isOpen: !![],
           draft: draft,
           initialDraft: clone(draft),
-          previewShotId: normalizeId(next?.['workspace']?.['selectedShotId'] || draft[0x0]?.['shotId']),
+          previewShotId: normalizeId(next?.['workspace']?.['selectedShotId'] || draft[0]?.['shotId']),
           soundEnabled: soundEnabled['soundEnabled'],
           timelineZoom: soundEnabled['timelineZoom'],
-          smartDetectionToken: soundEnabled['smartDetectionToken'] + 0x1,
+          smartDetectionToken: soundEnabled['smartDetectionToken'] + 1,
           boundPreviewVideos: boundPreviewVideos2,
           ...(bufferedVideo2
             ? {
@@ -247,7 +247,7 @@ export function createPersonReplacementShotCutSession({
       if (JSON['stringify'](soundEnabled['draft']) === JSON['stringify'](record)) return ![];
       if (recordHistory) {
         soundEnabled['undoStack']['push'](clone(soundEnabled['draft']));
-        if (soundEnabled['undoStack']['length'] > 0x32) soundEnabled['undoStack']['shift']();
+        if (soundEnabled['undoStack']['length'] > 50) soundEnabled['undoStack']['shift']();
       }
       soundEnabled['draft'] = clone(record);
       const map = new Set(
@@ -272,7 +272,7 @@ export function createPersonReplacementShotCutSession({
       return (
         (soundEnabled['previewShotId'] =
           personReplacementShotCutPositionAtTimelineSec['shotId'] ||
-          soundEnabled['draft'][0x0]?.['shotId'] ||
+          soundEnabled['draft'][0]?.['shotId'] ||
           ''),
         (soundEnabled['selectedShotIds'] = []),
         !![]
@@ -311,9 +311,9 @@ export function createPersonReplacementShotCutSession({
               (input) => normalizeId(input?.['shotId']) === normalizeId(scope),
             ),
           )
-          ['filter']((count) => count >= 0x0)
+          ['filter']((count) => count >= 0)
           ['sort']((output, value3) => output - value3),
-        value4 = config[0x0],
+        value4 = config[0],
         personReplacementShotCutRanges = mergePersonReplacementShotCutRanges(
           soundEnabled['draft'],
           soundEnabled['selectedShotIds'],
@@ -383,8 +383,8 @@ export function createPersonReplacementShotCutSession({
           return ![];
         return (
           commitDraft(list2),
-          (soundEnabled['playheadSec'] = 0x0),
-          (soundEnabled['previewShotId'] = list2[0x0]?.['shotId'] || ''),
+          (soundEnabled['playheadSec'] = 0),
+          (soundEnabled['previewShotId'] = list2[0]?.['shotId'] || ''),
           (soundEnabled['selectedShotIds'] = []),
           !![]
         );
@@ -400,7 +400,7 @@ export function createPersonReplacementShotCutSession({
       motion: soundEnabled['motion'],
       draft: clone(soundEnabled['draft']),
       initialDraft: clone(soundEnabled['initialDraft']),
-      canUndo: soundEnabled['undoStack']['length'] > 0x0,
+      canUndo: soundEnabled['undoStack']['length'] > 0,
       isSubmitting: soundEnabled['isSubmitting'],
       isKeyframeCapturing: soundEnabled['isKeyframeCapturing'],
       isSmartDetectOpen: soundEnabled['isSmartDetectOpen'],
@@ -428,7 +428,7 @@ export function createPersonReplacementShotCutSession({
       cutEditorSoundEnabled: soundEnabled['soundEnabled'],
       cutEditorSelectedShotIds: [...soundEnabled['selectedShotIds']],
       cutEditorBufferedMediaRef: soundEnabled['bufferedVideo'] ? soundEnabled['bufferedMediaRef'] : '',
-      cutEditorCanUndo: soundEnabled['undoStack']['length'] > 0x0,
+      cutEditorCanUndo: soundEnabled['undoStack']['length'] > 0,
       ...args,
     }),
     dispose = () => {
@@ -502,7 +502,7 @@ export function createPersonReplacementShotCutSession({
     },
     setTimelineZoom(value20) {
       handler() &&
-        (soundEnabled['timelineZoom'] = Math['max'](0x1, Number(value20) || DEFAULT_TIMELINE_ZOOM));
+        (soundEnabled['timelineZoom'] = Math['max'](1, Number(value20) || DEFAULT_TIMELINE_ZOOM));
     },
     setSoundEnabled(value21) {
       if (handler()) soundEnabled['soundEnabled'] = Boolean(value21);

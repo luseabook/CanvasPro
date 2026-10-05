@@ -103,7 +103,7 @@ export function prepareRendererNodeRuntime({
     syncNodeMediaMetricsDataset(wrapperEl, node));
   const canonicalType = normalizeNodeType(node['type']),
     nodeWrapperExtraClasses = getNodeWrapperExtraClasses(canonicalType);
-  wrapperEl['className'] = 'v2-node node' + (nodeWrapperExtraClasses ? '\x20' + nodeWrapperExtraClasses : '');
+  wrapperEl['className'] = 'v2-node node' + (nodeWrapperExtraClasses ? ' ' + nodeWrapperExtraClasses : '');
   const result = map['has'](nodeId);
   result && wrapperEl['classList']['add']('selected', 'v2-selected');
   (Object['assign'](wrapperEl['style'], {
@@ -113,7 +113,7 @@ export function prepareRendererNodeRuntime({
     width: node['width'] + 'px',
     height: node['height'] + 'px',
     transform: 'translate(' + node['x'] + 'px, ' + node['y'] + 'px)',
-    zIndex: getRendererNodeZIndex(node, result, selectedNodeRankMap?.['get']?.(nodeId) ?? -0x1),
+    zIndex: getRendererNodeZIndex(node, result, selectedNodeRankMap?.['get']?.(nodeId) ?? -1),
     display: 'flex',
     flexDirection: 'column',
   }),

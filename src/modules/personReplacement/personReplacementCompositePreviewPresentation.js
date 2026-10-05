@@ -14,8 +14,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
   const index = String(item ?? '')['trim']();
@@ -26,10 +26,10 @@ function normalizeMediaUrl(result) {
   return text ? localPathToUrl(text) || text : '';
 }
 function formatClock(data) {
-  const options = Math['max'](0x0, Number(data) || 0x0),
-    target = Math['floor'](options / 0x3c),
-    source = Math['floor'](options % 0x3c);
-  return String(target)['padStart'](0x2, '0') + ':' + String(source)['padStart'](0x2, '0');
+  const options = Math['max'](0, Number(data) || 0),
+    target = Math['floor'](options / 60),
+    source = Math['floor'](options % 60);
+  return String(target)['padStart'](2, '0') + ':' + String(source)['padStart'](2, '0');
 }
 function renderVideoIcon() {
   return '<svg class="person-replacement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="14" height="14" rx="3"/><path d="m17 10 4-2v8l-4-2"/></svg>';
@@ -60,10 +60,10 @@ function renderCompositePreviewShotList(selectedAssetIds) {
         record = id === selectedAssetId,
         payload = Boolean(current?.['resultVideoRef']),
         personReplacementShotDurationSec = getPersonReplacementShotDurationSec(current),
-        name = '镜头片段' + String(entry + 0x1)['padStart'](0x2, '0'),
+        name = '镜头片段' + String(entry + 1)['padStart'](2, '0'),
         imageUrl = normalizeMediaUrl(current?.['replacementImageRef'] || current?.['keyframeRef']),
         statusText =
-          (personReplacementShotDurationSec > 0x0 ? formatClock(personReplacementShotDurationSec) : '00:00') +
+          (personReplacementShotDurationSec > 0 ? formatClock(personReplacementShotDurationSec) : '00:00') +
           ' · ' +
           (payload ? '替换视频已就绪' : '等待替换视频'),
         handle = imageUrl ? 'data-person-replacement-composite-shot-hover-preview="true"' : '';
@@ -81,15 +81,15 @@ function renderCompositePreviewShotList(selectedAssetIds) {
           statusText: statusText,
           cardClassName: 'person-replacement-shot-card person-replacement-preview-shot-card',
           cardAttributes:
-            'data-person-replacement-shot-card=\x22true\x22\x20data-shot-id=\x22' +
+            'data-person-replacement-shot-card="true" data-shot-id="' +
             escapeHtml(id) +
-            '\x22\x20' +
+            '" ' +
             handle +
-            '\x20aria-current=\x22' +
+            ' aria-current="' +
             record +
-            '\x22\x20aria-label=\x22' +
+            '" aria-label="' +
             escapeHtml(name + '，' + statusText + (record ? '，当前片段' : '')) +
-            '\x22',
+            '"',
         },
       );
     })
@@ -99,7 +99,7 @@ function renderCompositeFullVideoEntry(enabled) {
   if (!enabled['fullAvailable']) return '';
   const state = enabled['composedShots']['reduce'](
       (config, scope) => config + getPersonReplacementShotDurationSec(scope),
-      0x0,
+      0,
     ),
     input = enabled['previewMode'] === 'full',
     output = enabled['composedShots']['length'] + ' 个片段 · ' + formatClock(state),
@@ -114,23 +114,23 @@ function renderCompositeFullVideoEntry(enabled) {
     escapeHtml(value2) +
     '，' +
     escapeHtml(value3) +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-composite-full-icon\x22\x20aria-hidden=\x22true\x22>' +
+    '">\n      <span class="person-replacement-composite-full-icon" aria-hidden="true">' +
     renderVideoIcon() +
     '</span>\n      <span class="person-replacement-composite-full-copy"><strong>' +
     escapeHtml(value2) +
     '</strong><small>' +
     escapeHtml(value3) +
-    '</small></span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20</div>'
+    '</small></span>\n    </button>\n  </div>'
   );
 }
 function renderCompositePreviewShotRail(value4) {
   const value5 =
-      value4['shots']['length'] > 0x0 &&
+      value4['shots']['length'] > 0 &&
       value4['shots']['every']((value6) => value4['selectedShotIds']['includes'](value6['id'])),
     value7 =
       '<button type="button" class="story-secondary-button" data-story-action="toggle-all-shots" aria-pressed="' +
       value5 +
-      '\x22\x20' +
+      '" ' +
       (value4['shots']['length'] ? '' : 'disabled') +
       '>' +
       (value5 ? '取消全选' : '全选') +
@@ -143,7 +143,7 @@ function renderCompositePreviewShotRail(value4) {
     (value4['fullAvailable'] ? ' has-complete-video' : '') +
     '" aria-label="待检查片段">\n    ' +
     renderCompositeFullVideoEntry(value4) +
-    '\x0a\x20\x20\x20\x20<header\x20class=\x22' +
+    '\n    <header class="' +
     (value4['selectionMode'] ? 'is-selection-mode' : '') +
     '">\n      <div class="person-replacement-preview-shot-heading"><strong>镜头片段</strong><small>' +
     (value4['selectionMode'] ? '拖拽空白区域可框选' : '逐段检查替换结果') +
@@ -151,7 +151,7 @@ function renderCompositePreviewShotRail(value4) {
     value8 +
     '</span>' +
     value7 +
-    '</div>\x0a\x20\x20\x20\x20</header>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-preview-shot-list\x22\x20data-story-marquee-surface=\x22shots\x22\x20tabindex=\x220\x22>' +
+    '</div>\n    </header>\n    <div class="person-replacement-preview-shot-list" data-story-marquee-surface="shots" tabindex="0">' +
     renderCompositePreviewShotList(value4) +
     '</div>\n  </aside>'
   );
@@ -183,7 +183,7 @@ function renderCompositePreviewMediaCard({
           action: 'next-shot',
           label: '下一个片段',
           className:
-            'person-replacement-shot-navigation-arrow\x20' +
+            'person-replacement-shot-navigation-arrow ' +
             'person-replacement-composite-shot-navigation-arrow',
         })
       : '',
@@ -197,11 +197,11 @@ function renderCompositePreviewMediaCard({
     escapeHtml(kind) +
     '">\n    <header class="person-replacement-compare-card-heading">\n      <span class="person-replacement-compare-card-label"><i aria-hidden="true"></i>' +
     escapeHtml(label) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20<small>' +
+    '</span>\n      <small>' +
     escapeHtml(description) +
     '</small>\n    </header>\n    <div class="person-replacement-compare-media-frame' +
     (loading ? ' img-preview-loading' : '') +
-    '\x22' +
+    '"' +
     value11 +
     (loading ? ' aria-busy="true" inert' : '') +
     '>\n      <button type="button" class="person-replacement-compare-media" data-person-replacement-compare-playback="' +
@@ -215,8 +215,8 @@ function renderCompositePreviewMediaCard({
         '" data-person-replacement-compare-video-url="' +
         escapeHtml(normalizeMediaUrl(text2)) +
         '" playsinline preload="metadata" muted' +
-        (text3 ? ' poster="' + escapeHtml(normalizeMediaUrl(text3)) + '\x22' : '') +
-        '\x20aria-label=\x22' +
+        (text3 ? ' poster="' + escapeHtml(normalizeMediaUrl(text3)) + '"' : '') +
+        ' aria-label="' +
         escapeHtml(label) +
         '"></video>'
       : '<div class="person-replacement-compare-empty"><span aria-hidden="true">' +
@@ -235,7 +235,7 @@ function renderCompositePreviewMediaCard({
           description: '正在合成替换片段，完成后会自动显示完整视频。',
         })
       : '') +
-    '\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<footer><span>' +
+    '\n    </div>\n    <footer><span>' +
     (text2 ? '已载入' : '未载入') +
     '</span><small>' +
     escapeHtml(footerDetail || (value9 ? '生成结果' : '原始片段')) +
@@ -245,13 +245,13 @@ function renderCompositePreviewMediaCard({
 function renderCompositeSidebarSplitter(value12) {
   const personReplacementCompositeSidebarWidth = normalizePersonReplacementCompositeSidebarWidth(value12);
   return (
-    '<div\x20class=\x22person-replacement-composite-sidebar-splitter\x20panel-resize-handle\x20panel-resize-handle--transient\x22\x20data-person-replacement-composite-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整镜头片段侧栏与显示区域宽度\x22\x20aria-valuemin=\x22' +
+    '<div class="person-replacement-composite-sidebar-splitter panel-resize-handle panel-resize-handle--transient" data-person-replacement-composite-sidebar-splitter role="separator" aria-orientation="vertical" aria-label="调整镜头片段侧栏与显示区域宽度" aria-valuemin="' +
     PERSON_REPLACEMENT_COMPOSITE_SIDEBAR_WIDTH_RANGE['min'] +
     '" aria-valuemax="' +
     PERSON_REPLACEMENT_COMPOSITE_SIDEBAR_WIDTH_RANGE['max'] +
-    '\x22\x20aria-valuenow=\x22' +
+    '" aria-valuenow="' +
     Math['round'](personReplacementCompositeSidebarWidth) +
-    '\x22\x20tabindex=\x220\x22></div>'
+    '" tabindex="0"></div>'
   );
 }
 function renderCompositePreview(
@@ -269,11 +269,11 @@ function renderCompositePreview(
         ? '<span>旧合成视频</span><small>图像或视频已更新 · 需重新合成</small>'
         : '<span>完整视频</span><small>' +
           mediaRef2['composedShots']['length'] +
-          '\x20个片段\x20·\x20对比已就绪</small>'
+          ' 个片段 · 对比已就绪</small>'
       : '<span>' +
-        String(mediaRef2['selectedShotIndex'] + 0x1)['padStart'](0x2, '0') +
+        String(mediaRef2['selectedShotIndex'] + 1)['padStart'](2, '0') +
         ' / ' +
-        String(Math['max'](mediaRef2['total'], 0x1))['padStart'](0x2, '0') +
+        String(Math['max'](mediaRef2['total'], 1))['padStart'](2, '0') +
         '</span><small>' +
         (mediaRef2['composeSucceeded']
           ? '全部视频已合成'
@@ -282,7 +282,7 @@ function renderCompositePreview(
   return (
     '<div class="person-replacement-preview-page" data-person-replacement-composite-preview data-preview-track="' +
     escapeHtml(mediaRef2['previewTrack']) +
-    '\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-preview-workbench\x22\x20style=\x22--person-replacement-composite-sidebar-width:' +
+    '">\n    <div class="person-replacement-preview-workbench" style="--person-replacement-composite-sidebar-width:' +
     mediaRef2['sidebarWidth'] +
     'px;">\n      ' +
     renderCompositePreviewShotRail(mediaRef2) +
@@ -302,7 +302,7 @@ function renderCompositePreview(
       mediaRef: mediaRef2['media']['originalRef'],
       posterRef: description2 ? '' : mediaRef2['selectedShot']?.['keyframeRef'],
       playable: mediaRef2['canCompare'],
-      showShotNavigation: !description2 && mediaRef2['total'] > 0x1,
+      showShotNavigation: !description2 && mediaRef2['total'] > 1,
       footerDetail: description2 ? '原片完整对照' : '原始片段',
     }) +
     '\n          ' +
@@ -314,7 +314,7 @@ function renderCompositePreview(
       posterRef: description2 ? '' : mediaRef2['selectedShot']?.['replacementImageRef'],
       playable: mediaRef2['canCompare'],
       loading: composeOutputPending,
-      showShotNavigation: !description2 && mediaRef2['total'] > 0x1,
+      showShotNavigation: !description2 && mediaRef2['total'] > 1,
       footerDetail: description2 ? '替换完整结果' : '生成结果',
     }) +
     '\n        </div>\n        <div class="person-replacement-compare-controls" data-person-replacement-compare-footer>\n          ' +
@@ -331,17 +331,17 @@ function renderCompositePreview(
     escapeHtml(value13) +
     '</small></button>\n            </div></div>\n          </div>\n        </div>\n        ' +
     (description2 && mediaRef2['media']['originalAudioRef']
-      ? '<audio\x20data-person-replacement-compare-original-audio\x20data-person-replacement-compare-original-audio-url=\x22' +
+      ? '<audio data-person-replacement-compare-original-audio data-person-replacement-compare-original-audio-url="' +
         escapeHtml(normalizeMediaUrl(mediaRef2['media']['originalAudioRef'])) +
-        '\x22\x20preload=\x22none\x22></audio>'
+        '" preload="none"></audio>'
       : '') +
     '\n        ' +
     (mediaRef2['media']['replacementAudioRef']
       ? '<audio data-person-replacement-compare-replacement-audio data-person-replacement-compare-replacement-audio-url="' +
         escapeHtml(normalizeMediaUrl(mediaRef2['media']['replacementAudioRef'])) +
-        '\x22\x20preload=\x22none\x22></audio>'
+        '" preload="none"></audio>'
       : '') +
-    '\x0a\x20\x20\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
+    '\n      </section>\n    </div>\n  </div>'
   );
 }
 export function createPersonReplacementCompositePreviewPresentation() {

@@ -68,9 +68,9 @@ test('promptModes: official MiniMax tags are normalized with stable section name
 });
 
 test('promptModes: Wan serialization removes image/video/audio mention sigils', () => {
-  const input = '@\u56fe\u72471 @\u89c6\u98911 @\u97f3\u98911';
+  const input = '@图片1 @视频1 @音频1';
   const result = serializeStoryPromptForMode(input, 'wan-3.0');
-  assert.equal(result, '\u56fe1 \u89c6\u98911 \u97f3\u98911');
+  assert.equal(result, '图1 视频1 音频1');
 });
 
 test('promptModes: MiniMax serialization keeps reference prompts and converts T2VA sections', () => {

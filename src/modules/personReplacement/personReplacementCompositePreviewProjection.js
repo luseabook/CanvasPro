@@ -13,15 +13,15 @@ function projectShot(options = {}) {
     resultVideoRef: normalizeText(options?.['resultVideoRef']),
     keyframeRef: normalizeText(options?.['keyframeRef']),
     replacementImageRef: normalizeText(options?.['replacementImageRef']),
-    startTimeSec: Number(options?.['startTimeSec']) || 0x0,
-    endTimeSec: Number(options?.['endTimeSec']) || 0x0,
-    durationSec: Number(options?.['durationSec']) || 0x0,
-    outputFps: Number(options?.['outputFps']) || 0x0,
+    startTimeSec: Number(options?.['startTimeSec']) || 0,
+    endTimeSec: Number(options?.['endTimeSec']) || 0,
+    durationSec: Number(options?.['durationSec']) || 0,
+    outputFps: Number(options?.['outputFps']) || 0,
   });
 }
 function resolveSelectedShot(index, list) {
   const text = normalizeText(index['workspace']?.['selectedShotId']);
-  return list['find']((result) => normalizeText(result?.['id']) === text) || list[0x0] || null;
+  return list['find']((result) => normalizeText(result?.['id']) === text) || list[0] || null;
 }
 function resolveFullMedia(data) {
   const originalRef = normalizeText(data['output']?.['originalMasterRef']);
@@ -41,14 +41,14 @@ function resolveShotMedia(target, list2, source) {
     text2 = normalizeText(target['audio']?.['selectedSourceId']),
     replacementAudioRef =
       target['audio']?.['replacementAudioRef'] &&
-      (!text2 || text2 === normalizeText(source?.['sourceId']) || list3['length'] <= 0x1)
+      (!text2 || text2 === normalizeText(source?.['sourceId']) || list3['length'] <= 1)
         ? normalizeText(target['audio']['replacementAudioRef'])
         : '';
   return {
     originalRef: normalizeText(source?.['videoRef'] || source?.['sourceVideoRef'] || next?.['videoRef']),
     replacementRef: normalizeText(
       source?.['resultVideoRef'] ||
-        (list2['length'] === 0x1
+        (list2['length'] === 1
           ? target['output']?.['finalVideoRef'] || target['output']?.['visualMasterRef']
           : ''),
     ),
@@ -95,7 +95,7 @@ export function buildPersonReplacementCompositePreviewSnapshot(selectionMode = {
     completed: completed['filter']((record) => normalizeText(record?.['resultVideoRef']))['length'],
     total: completed['length'],
     selectedShotIndex: Math['max'](
-      0x0,
+      0,
       completed['findIndex'](
         (payload) => normalizeText(payload?.['id']) === normalizeText(selectedShot?.['id']),
       ),

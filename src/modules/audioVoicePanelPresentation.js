@@ -2,7 +2,7 @@ import { positionAnchoredSubmenu } from '../utils/submenuPosition.js';
 export function positionAudioVoiceModelSubmenu(
   value,
   item,
-  { windowObject: windowObject = globalThis['window'], gap: gap = 0x0, container: container = value } = {},
+  { windowObject: windowObject = globalThis['window'], gap: gap = 0, container: container = value } = {},
 ) {
   const enabled = value?.['getBoundingClientRect']?.();
   if (!enabled) return null;
@@ -46,7 +46,7 @@ export function bindAudioVoiceModelSubmenuPosition(el, el2, index, args) {
             return;
           (el?.['classList']?.['remove']('is-model-submenu-open'),
             el2?.['classList']?.['remove']('is-model-submenu-open'));
-        }, 0x50)));
+        }, 80)));
     };
   (el?.['addEventListener']?.('mouseenter', data),
     el?.['addEventListener']?.('mouseleave', options),
@@ -99,10 +99,10 @@ export function iconSvg(value4) {
       'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"',
     value6 = {
       align:
-        '<path\x20d=\x22M4\x206h16\x22></path><path\x20d=\x22M4\x2012h10\x22></path><path\x20d=\x22M4\x2018h16\x22></path>',
+        '<path d="M4 6h16"></path><path d="M4 12h10"></path><path d="M4 18h16"></path>',
       audio:
         '<path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle>',
-      check: '<path\x20d=\x22m5\x2012\x204\x204L19\x206\x22></path>',
+      check: '<path d="m5 12 4 4L19 6"></path>',
       close: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>',
       device:
         '<rect x="4" y="4" width="16" height="16" rx="2"></rect><rect x="9" y="9" width="6" height="6"></rect><path d="M9 1v3"></path><path d="M15 1v3"></path><path d="M9 20v3"></path><path d="M15 20v3"></path><path d="M20 9h3"></path><path d="M20 15h3"></path><path d="M1 9h3"></path><path d="M1 15h3"></path>',
@@ -114,14 +114,14 @@ export function iconSvg(value4) {
       history:
         '<path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 3v6h-6"></path><path d="M12 7v5l3 2"></path>',
       insert: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
-      loading: '<path\x20d=\x22M21\x2012a9\x209\x200\x201\x201-2.64-6.36\x22></path>',
+      loading: '<path d="M21 12a9 9 0 1 1-2.64-6.36"></path>',
       merge:
         '<path d="M12 3v7"></path><path d="m8 7 4 4 4-4"></path><path d="M12 21v-7"></path><path d="m16 17-4-4-4 4"></path>',
       more: '<path d="M12 12h.01"></path><path d="M19 12h.01"></path><path d="M5 12h.01"></path>',
       play: '<path d="m8 5 11 7-11 7V5Z"></path>',
       plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
       settings:
-        '<path\x20d=\x22M12\x2015.5a3.5\x203.5\x200\x201\x200\x200-7\x203.5\x203.5\x200\x200\x200\x200\x207Z\x22></path><path\x20d=\x22M19.4\x2015a1.7\x201.7\x200\x200\x200\x20.3\x201.9l.1.1a2\x202\x200\x201\x201-2.8\x202.8l-.1-.1a1.7\x201.7\x200\x200\x200-1.9-.3\x201.7\x201.7\x200\x200\x200-1\x201.6V21a2\x202\x200\x201\x201-4\x200v-.1a1.7\x201.7\x200\x200\x200-1-1.6\x201.7\x201.7\x200\x200\x200-1.9.3l-.1.1a2\x202\x200\x201\x201-2.8-2.8l.1-.1a1.7\x201.7\x200\x200\x200\x20.3-1.9\x201.7\x201.7\x200\x200\x200-1.6-1H3a2\x202\x200\x201\x201\x200-4h.1a1.7\x201.7\x200\x200\x200\x201.6-1\x201.7\x201.7\x200\x200\x200-.3-1.9l-.1-.1a2\x202\x200\x201\x201\x202.8-2.8l.1.1a1.7\x201.7\x200\x200\x200\x201.9.3h.1a1.7\x201.7\x200\x200\x200\x20.9-1.5V3a2\x202\x200\x201\x201\x204\x200v.1a1.7\x201.7\x200\x200\x200\x201\x201.6\x201.7\x201.7\x200\x200\x200\x201.9-.3l.1-.1a2\x202\x200\x201\x201\x202.8\x202.8l-.1.1a1.7\x201.7\x200\x200\x200-.3\x201.9v.1a1.7\x201.7\x200\x200\x200\x201.5.9H21a2\x202\x200\x201\x201\x200\x204h-.1a1.7\x201.7\x200\x200\x200-1.5.9Z\x22></path>',
+        '<path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h.1a1.7 1.7 0 0 0 .9-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.5.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5.9Z"></path>',
       speaker: '<path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15 9.5a4 4 0 0 1 0 5"></path>',
       translate:
         '<path d="m5 8 6 6"></path><path d="m4 14 6-7 2-3"></path><path d="M2 4h12"></path><path d="M7 2h1"></path><path d="m12 20 4-9 4 9"></path><path d="m13.5 17h5"></path>',

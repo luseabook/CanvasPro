@@ -70,14 +70,14 @@ function normalizeIntent(value) {
 export function createPersonReplacementWorkspaceIntentPort({ handlers: handlers = {} } = {}) {
   if (!handlers || typeof handlers !== 'object' || Array['isArray'](handlers))
     throw new TypeError(
-      'Replacement\x20Studio\x20workspace\x20intent\x20handlers\x20must\x20be\x20an\x20object.',
+      'Replacement Studio workspace intent handlers must be an object.',
     );
   const map = new Map();
   return (
     Object['entries'](handlers)['forEach'](([item, key]) => {
       const intent = normalizeIntent(item);
       if (!KNOWN_INTENTS['has'](intent))
-        throw new TypeError('Unsupported\x20Replacement\x20Studio\x20workspace\x20intent:\x20' + item);
+        throw new TypeError('Unsupported Replacement Studio workspace intent: ' + item);
       if (typeof key !== 'function')
         throw new TypeError('Replacement Studio workspace intent handler must be a function: ' + item);
       map['set'](intent, key);
@@ -90,7 +90,7 @@ export function createPersonReplacementWorkspaceIntentPort({ handlers: handlers 
       request(result, ...args) {
         const intent3 = normalizeIntent(result);
         if (!KNOWN_INTENTS['has'](intent3))
-          throw new TypeError('Unsupported\x20Replacement\x20Studio\x20workspace\x20intent:\x20' + result);
+          throw new TypeError('Unsupported Replacement Studio workspace intent: ' + result);
         return map['get'](intent3)?.(...args);
       },
     })

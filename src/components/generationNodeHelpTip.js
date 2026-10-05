@@ -275,7 +275,7 @@ export function createGenerationNodeHelpTipController({
       if (!el2 || !el3) return;
       const value21 = 12,
         box = el2.getBoundingClientRect(),
-        value22 = el3.offsetWidth || 0x154,
+        value22 = el3.offsetWidth || 340,
         value23 = el3.offsetHeight || 0,
         value24 = Math.max(value21, window.innerWidth - value22 - value21),
         value25 = box.right - value22 + 6,

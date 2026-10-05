@@ -20,11 +20,11 @@ export function initEmptyCanvasShortcuts({
     }),
     handler = () => shortcutLibraryView['render'](catalogStore['getState']()['catalog']),
     handler2 = (count) => {
-      if (!window['_isAppLoaded'] || count > 0x0) shortcutLibraryView['close']();
-      el['classList']['toggle']('hidden', !window['_isAppLoaded'] || count > 0x0);
+      if (!window['_isAppLoaded'] || count > 0) shortcutLibraryView['close']();
+      el['classList']['toggle']('hidden', !window['_isAppLoaded'] || count > 0);
     };
-  ((window['_checkEmptyHint'] = () => handler2(store['getStateRaw']()['_nodeCount'] || 0x0)),
-    store['subscribeSelector']((value) => value['_nodeCount'] || 0x0, handler2),
+  ((window['_checkEmptyHint'] = () => handler2(store['getStateRaw']()['_nodeCount'] || 0)),
+    store['subscribeSelector']((value) => value['_nodeCount'] || 0, handler2),
     window['_checkEmptyHint'](),
     catalogStore['subscribe'](handler),
     handler(),
@@ -49,8 +49,8 @@ export function initEmptyCanvasShortcuts({
         const box2 = getNodeDefaultSize(type['action']['nodeType']);
         executeCommand('create_node', {
           type: type['action']['nodeType'],
-          x: x['x'] - box2['width'] / 0x2,
-          y: x['y'] - box2['height'] / 0x2,
+          x: x['x'] - box2['width'] / 2,
+          y: x['y'] - box2['height'] / 2,
         });
       } else {
         const insertShortcutGraph2 = insertShortcutGraph({
@@ -59,7 +59,7 @@ export function initEmptyCanvasShortcuts({
           center: x,
           commit: commit,
         });
-        focusNodes(insertShortcutGraph2, 0x50, 0xfa);
+        focusNodes(insertShortcutGraph2, 80, 250);
       }
     } catch (error2) {
       window['showToast']?.(error2['message'] || '模板添加失败', 'error');

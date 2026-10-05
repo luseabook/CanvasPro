@@ -1,5 +1,5 @@
 import { get, post } from './requester.js';
-const DEFAULT_LONG_TIMEOUT = 0x493e0;
+const DEFAULT_LONG_TIMEOUT = 300000;
 export async function prepareSam3Matting(value, signal = {}) {
   return (
     await post('/api/v2/matting/sam3/prepare', value || {}, {
@@ -35,7 +35,7 @@ export async function segmentSam3Raw(item, signal3 = {}) {
       maskHeight: Number(blob?.headers?.get('X-Mask-Height') || blob?.headers?.get('x-mask-height') || NaN),
     };
   } catch (response) {
-    if (Number(response?.status) === 0x194) return null;
+    if (Number(response?.status) === 404) return null;
     throw response;
   }
 }

@@ -6,36 +6,36 @@ export const PROVIDER_API_KEY_GUIDES = Object['freeze']({
     consoleUrl: 'https://apimart.ai/register?aff=ashuoai',
     guideImage: 'images/apimart-api-key-guide.svg',
     inputIds: Object['freeze'](['providerKey-apimart']),
-    imageWidth: 0x3c0,
-    imageHeight: 0x834,
+    imageWidth: 960,
+    imageHeight: 2100,
   }),
   agnes: Object['freeze']({
     consoleUrl: 'https://platform.agnes-ai.com/settings/apiKeys',
     guideImage: 'images/agnes-api-key-guide.svg',
     inputIds: Object['freeze'](['providerKey-agnes']),
-    imageWidth: 0x3c0,
-    imageHeight: 0x834,
+    imageWidth: 960,
+    imageHeight: 2100,
   }),
   'agnes-domestic': Object['freeze']({
     consoleUrl: 'https://platform.agnes-ai.cn/settings/apiKeys',
     guideImage: 'images/agnes-api-key-guide.svg',
     inputIds: Object['freeze'](['providerKey-agnes-domestic']),
-    imageWidth: 0x3c0,
-    imageHeight: 0x834,
+    imageWidth: 960,
+    imageHeight: 2100,
   }),
   volcengine: Object['freeze']({
     consoleUrl: 'https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement',
     guideImage: 'images/volcengine-ark-api-key-guide.svg',
     inputIds: Object['freeze'](['providerKey-volcengine']),
-    imageWidth: 0x3c0,
-    imageHeight: 0x834,
+    imageWidth: 960,
+    imageHeight: 2100,
   }),
   grsai: Object['freeze']({
     consoleUrl: 'https://grsai.com/zh/dashboard/api-keys',
     guideImage: 'images/grsai-api-key-guide.svg',
     inputIds: Object['freeze'](['providerKey-grsai']),
-    imageWidth: 0x3c0,
-    imageHeight: 0x834,
+    imageWidth: 960,
+    imageHeight: 2100,
   }),
 });
 const GUIDE_BACKDROP_ID = 'provider-api-key-guide-backdrop',
@@ -149,7 +149,7 @@ export function showProviderApiKeyGuide(state) {
       label: guideText(guideConfig2['id'], 'openSettings'),
     },
   ]['forEach'](({ action: action, className: className, label: label }) => {
-    const el14 = createEl('button', 'audio-voice-api-key-guide-image-link\x20' + className, label);
+    const el14 = createEl('button', 'audio-voice-api-key-guide-image-link ' + className, label);
     ((el14['type'] = 'button'),
       (el14['dataset']['providerApiKeyGuideAction'] = action),
       el14['setAttribute']('aria-label', label),
@@ -166,7 +166,7 @@ export function showProviderApiKeyGuide(state) {
   ((el16['type'] = 'button'), (el16['dataset']['providerApiKeyGuideAction'] = 'open-settings'));
   const el17 = createEl(
     'button',
-    'audio-voice-api-key-guide-btn\x20audio-voice-api-key-guide-btn-primary',
+    'audio-voice-api-key-guide-btn audio-voice-api-key-guide-btn-primary',
     guideText(guideConfig2['id'], 'openConsole'),
   );
   ((el17['type'] = 'button'),

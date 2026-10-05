@@ -53,7 +53,7 @@ export function initLocalAssetCleanupSettings() {
     ((response = args
       ? { ...args, items: Array['isArray'](args['items']) ? args['items'] : [] }
       : null),
-      (el5['textContent'] = String(response?.['items']['length'] || 0x0)),
+      (el5['textContent'] = String(response?.['items']['length'] || 0)),
       (el6['textContent'] = formatCleanupBytes(response?.['orphanBytes'])),
       localAssetCleanupList['setScan'](response));
     if (response) run(summarizeLocalAssetCleanupScan(response), response['ok'] ? '' : 'error');
@@ -82,7 +82,7 @@ export function initLocalAssetCleanupSettings() {
         runtimeText('confirmTrash', {
           count: count['length'],
           bytes: formatCleanupBytes(
-            count['reduce']((current, entry) => current + Number(entry['size'] || 0x0), 0x0),
+            count['reduce']((current, entry) => current + Number(entry['size'] || 0), 0),
           ),
         }),
       );
@@ -93,10 +93,10 @@ export function initLocalAssetCleanupSettings() {
             response,
             count['map']((record) => record['localPath']),
           ),
-          skipped = count2?.['skipped']?.['length'] || 0x0,
-          failed = count2?.['errors']?.['length'] || 0x0,
+          skipped = count2?.['skipped']?.['length'] || 0,
+          failed = count2?.['errors']?.['length'] || 0,
           message = runtimeText('trashedMessage', {
-            count: count2?.['trashedCount'] || 0x0,
+            count: count2?.['trashedCount'] || 0,
             bytes: formatCleanupBytes(count2?.['trashedBytes']),
           }),
           message2 =

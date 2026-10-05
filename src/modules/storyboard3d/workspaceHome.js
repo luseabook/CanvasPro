@@ -18,8 +18,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item) {
   return String(item || '')['trim']();
@@ -28,32 +28,32 @@ function normalizeSearchText(key) {
   return normalizeText(key)['toLocaleLowerCase']('zh-CN');
 }
 function formatModelPackSize(index) {
-  const enabled = Math['max'](0x0, Number(index) || 0x0);
+  const enabled = Math['max'](0, Number(index) || 0);
   if (!enabled) return '';
-  return Math['max'](0x1, Math['round'](enabled / (0x400 * 0x400))) + ' MB';
+  return Math['max'](1, Math['round'](enabled / (1024 * 1024))) + ' MB';
 }
 function formatDownloadedBytes(result) {
-  const count = Math['max'](0x0, Number(result) || 0x0);
-  if (count < 0x400) return Math['floor'](count) + '\x20B';
-  if (count < 0x400 * 0x400) return (count / 0x400)['toFixed'](0x1) + '\x20KB';
-  return (count / (0x400 * 0x400))['toFixed'](0x1) + ' MB';
+  const count = Math['max'](0, Number(result) || 0);
+  if (count < 1024) return Math['floor'](count) + ' B';
+  if (count < 1024 * 1024) return (count / 1024)['toFixed'](1) + ' KB';
+  return (count / (1024 * 1024))['toFixed'](1) + ' MB';
 }
 function getModelPackInstallProgress(options = {}) {
   const error =
       options?.['installProgress'] && typeof options['installProgress'] === 'object'
         ? options['installProgress']
         : {},
-    downloadedBytes = Math['max'](0x0, Number(error['downloadedBytes']) || 0x0),
-    totalBytes = Math['max'](0x0, Number(error['totalBytes']) || Number(options?.['downloadBytes']) || 0x0),
-    data = totalBytes > 0x0 ? (downloadedBytes / totalBytes) * 0x64 : 0x0;
+    downloadedBytes = Math['max'](0, Number(error['downloadedBytes']) || 0),
+    totalBytes = Math['max'](0, Number(error['totalBytes']) || Number(options?.['downloadBytes']) || 0),
+    data = totalBytes > 0 ? (downloadedBytes / totalBytes) * 100 : 0;
   return {
     state: normalizeText(error['state']),
     downloadedBytes: downloadedBytes,
     totalBytes: totalBytes,
-    percent: Math['min'](0x64, Math['max'](0x0, Number(error['percent']) || data)),
+    percent: Math['min'](100, Math['max'](0, Number(error['percent']) || data)),
     currentSource: normalizeText(error['currentSource']),
-    completedSources: Math['max'](0x0, Math['floor'](Number(error['completedSources']) || 0x0)),
-    totalSources: Math['max'](0x0, Math['floor'](Number(error['totalSources']) || 0x0)),
+    completedSources: Math['max'](0, Math['floor'](Number(error['completedSources']) || 0)),
+    totalSources: Math['max'](0, Math['floor'](Number(error['totalSources']) || 0)),
     message: normalizeText(error['message']),
   };
 }
@@ -68,20 +68,20 @@ export function isStoryboard3DModelPackReady(options2 = {}) {
   return (
     options2?.['installed'] === !![] &&
     Array['isArray'](options2?.['assets']) &&
-    options2['assets']['length'] > 0x0
+    options2['assets']['length'] > 0
   );
 }
 export function formatStoryboard3DProjectUpdatedAt(target, { now: now = Date['now']() } = {}) {
-  const count2 = Number(target || 0x0);
-  if (!Number['isFinite'](count2) || count2 <= 0x0) return '刚刚更新';
-  const source = Math['max'](0x0, Number(now) - count2),
-    next = 0x3c * 0x3e8,
-    current = 0x3c * next,
-    entry = 0x18 * current;
+  const count2 = Number(target || 0);
+  if (!Number['isFinite'](count2) || count2 <= 0) return '刚刚更新';
+  const source = Math['max'](0, Number(now) - count2),
+    next = 60 * 1000,
+    current = 60 * next,
+    entry = 24 * current;
   if (source < next) return '刚刚更新';
-  if (source < current) return Math['max'](0x1, Math['floor'](source / next)) + ' 分钟前';
-  if (source < entry) return Math['max'](0x1, Math['floor'](source / current)) + ' 小时前';
-  if (source < entry * 0x7) return Math['max'](0x1, Math['floor'](source / entry)) + ' 天前';
+  if (source < current) return Math['max'](1, Math['floor'](source / next)) + ' 分钟前';
+  if (source < entry) return Math['max'](1, Math['floor'](source / current)) + ' 小时前';
+  if (source < entry * 7) return Math['max'](1, Math['floor'](source / entry)) + ' 天前';
   return new Date(count2)['toLocaleDateString']('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -102,7 +102,7 @@ export function getStoryboard3DWorkspaceProjects(options3 = {}) {
         previewUrl: previewUrl?.['thumbnailUrl'] || '',
         activeSceneName: activeSceneName?.['name'] || '未命名场景',
         ...args,
-        updatedAt: Number(projectId['updatedAt'] || 0x0),
+        updatedAt: Number(projectId['updatedAt'] || 0),
       };
     })
     ['sort'](
@@ -114,16 +114,16 @@ export function filterStoryboard3DWorkspaceProjects(list2 = [], config = '') {
   const searchText = normalizeSearchText(config);
   if (!searchText) return [...list2];
   return list2['filter']((scope) =>
-    normalizeSearchText((scope?.['title'] || '') + '\x20' + (scope?.['activeSceneName'] || ''))['includes'](
+    normalizeSearchText((scope?.['title'] || '') + ' ' + (scope?.['activeSceneName'] || ''))['includes'](
       searchText,
     ),
   );
 }
 function renderCubeIcon(input = '') {
   return (
-    '<svg\x20class=\x22' +
+    '<svg class="' +
     escapeHtml(input) +
-    '\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22>\x0a\x20\x20\x20\x20<path\x20d=\x22m12\x203\x208\x204.5v9L12\x2021l-8-4.5v-9z\x22/>\x0a\x20\x20\x20\x20<path\x20d=\x22m4\x207.5\x208\x204.5\x208-4.5M12\x2012v9\x22/>\x0a\x20\x20\x20\x20<circle\x20cx=\x2212\x22\x20cy=\x228\x22\x20r=\x221.5\x22/>\x0a\x20\x20</svg>'
+    '" viewBox="0 0 24 24" fill="none" aria-hidden="true">\n    <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/>\n    <path d="m4 7.5 8 4.5 8-4.5M12 12v9"/>\n    <circle cx="12" cy="8" r="1.5"/>\n  </svg>'
   );
 }
 function renderProjectPreview(output) {
@@ -153,22 +153,22 @@ export function renderStoryboard3DProjectCard(
     confirmingDelete: confirmingDelete = ![],
   } = {},
 ) {
-  const value3 = value2['title'] + '\x20' + value2['activeSceneName'],
+  const value3 = value2['title'] + ' ' + value2['activeSceneName'],
     escapeHtml2 = escapeHtml(value2['projectId']);
   return (
     '<article class="storyboard-3d-home-project-card' +
     (menuOpen ? ' is-menu-open' : '') +
     (editing ? ' is-renaming' : '') +
-    (confirmingDelete ? '\x20is-delete-confirming' : '') +
+    (confirmingDelete ? ' is-delete-confirming' : '') +
     '" data-storyboard-3d-project-id="' +
     escapeHtml2 +
     '" data-storyboard-3d-project-search="' +
     escapeHtml(normalizeSearchText(value3)) +
-    '\x22>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-home-project-preview\x22\x20data-storyboard-3d-home-action=\x22open-project\x22\x20data-storyboard-3d-project-id=\x22' +
+    '">\n    <button type="button" class="storyboard-3d-home-project-preview" data-storyboard-3d-home-action="open-project" data-storyboard-3d-project-id="' +
     escapeHtml2 +
-    '\x22\x20aria-label=\x22打开项目\x20' +
+    '" aria-label="打开项目 ' +
     escapeHtml(value2['title']) +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20' +
+    '">\n      ' +
     renderProjectPreview(value2) +
     '\n    </button>\n    ' +
     (confirmingDelete
@@ -178,12 +178,12 @@ export function renderStoryboard3DProjectCard(
         escapeHtml2 +
         '">删除</button>\n          <button type="button" class="storyboard-3d-home-project-delete-confirm-button" data-storyboard-3d-home-action="cancel-project-delete" data-storyboard-3d-project-id="' +
         escapeHtml2 +
-        '\x22>取消</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>'
+        '">取消</button>\n        </div>'
       : '<button type="button" class="storyboard-3d-home-project-more" data-storyboard-3d-home-action="toggle-project-menu" data-storyboard-3d-project-id="' +
         escapeHtml2 +
         '" aria-label="' +
         escapeHtml(value2['title']) +
-        '\x20的更多选项\x22\x20aria-haspopup=\x22menu\x22\x20aria-expanded=\x22' +
+        ' 的更多选项" aria-haspopup="menu" aria-expanded="' +
         menuOpen +
         '">\n          <span aria-hidden="true">•••</span>\n        </button>\n        <div class="storyboard-3d-home-project-menu" role="menu" aria-label="' +
         escapeHtml(value2['title']) +
@@ -191,21 +191,21 @@ export function renderStoryboard3DProjectCard(
         (menuOpen ? '' : 'hidden') +
         '>\n          <button type="button" role="menuitem" data-storyboard-3d-home-action="clone-project" data-storyboard-3d-project-id="' +
         escapeHtml2 +
-        '\x22>克隆</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20role=\x22menuitem\x22\x20data-storyboard-3d-home-action=\x22start-project-rename\x22\x20data-storyboard-3d-project-id=\x22' +
+        '">克隆</button>\n          <button type="button" role="menuitem" data-storyboard-3d-home-action="start-project-rename" data-storyboard-3d-project-id="' +
         escapeHtml2 +
         '">重命名</button>\n          <button type="button" class="is-danger" role="menuitem" data-storyboard-3d-home-action="delete-project" data-storyboard-3d-project-id="' +
         escapeHtml2 +
         '">删除</button>\n        </div>') +
     '\n    <span class="storyboard-3d-home-project-copy">\n      <span class="storyboard-3d-home-project-heading">\n        ' +
     (editing
-      ? '<input\x20type=\x22text\x22\x20value=\x22' +
+      ? '<input type="text" value="' +
         escapeHtml(editingName) +
         '" maxlength="120" data-storyboard-3d-project-rename-input data-storyboard-3d-project-id="' +
         escapeHtml2 +
         '" aria-label="重命名项目 ' +
         escapeHtml(value2['title']) +
-        '\x22>'
-      : '<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-home-project-title\x22\x20data-storyboard-3d-home-action=\x22start-project-rename\x22\x20data-storyboard-3d-project-id=\x22' +
+        '">'
+      : '<button type="button" class="storyboard-3d-home-project-title" data-storyboard-3d-home-action="start-project-rename" data-storyboard-3d-project-id="' +
         escapeHtml2 +
         '" title="点击重命名"><strong>' +
         escapeHtml(value2['title']) +
@@ -226,7 +226,7 @@ export function renderStoryboard3DProjectCard(
     value2['shotCount'] +
     '</b> 镜头</span>\n          <span><b>' +
     value2['objectCount'] +
-    '</b>\x20物体</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20</span>\x0a\x20\x20</article>'
+    '</b> 物体</span>\n        </span>\n      </button>\n    </span>\n  </article>'
   );
 }
 function renderHome({
@@ -253,20 +253,20 @@ function renderHome({
     value5 = Boolean(normalizeText(prompt) && modelId && provider && isStoryboard3DModelPackReady2),
     value6 = modelPackStatus?.['state'] === 'installing',
     value7 = Math['max'](
-      0x0,
-      Math['floor'](Number(modelPackStatus?.['assetCount']) || 0x0),
-      Array['isArray'](modelPackStatus?.['assets']) ? modelPackStatus['assets']['length'] : 0x0,
+      0,
+      Math['floor'](Number(modelPackStatus?.['assetCount']) || 0),
+      Array['isArray'](modelPackStatus?.['assets']) ? modelPackStatus['assets']['length'] : 0,
     ),
     formatModelPackSize2 = formatModelPackSize(modelPackStatus?.['downloadBytes']),
     modelPackInstallProgress = getModelPackInstallProgress(modelPackStatus),
     value8 = [
       value7 ? value7['toLocaleString']('zh-CN') + ' 项素材' : '',
-      formatModelPackSize2 ? '约\x20' + formatModelPackSize2 : '',
+      formatModelPackSize2 ? '约 ' + formatModelPackSize2 : '',
     ]
       ['filter'](Boolean)
       ['join'](' · ');
   return (
-    '<div\x20class=\x22storyboard-3d-workspace-home-page\x22>\x0a\x20\x20\x20\x20<section\x20class=\x22storyboard-3d-home-hero\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-home-eyebrow\x22>SHUO\x20Canvas\x20·\x20Previz\x20Studio</span>\x0a\x20\x20\x20\x20\x20\x20<h1>先在空间里走一遍，再把镜头交给生成模型</h1>\x0a\x20\x20\x20\x20\x20\x20<p>用场景、人物、道具和机位搭建可持续编辑的\x203D\x20预演项目，让镜头关系在生成前就清晰可控。</p>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-home-composer\x20' +
+    '<div class="storyboard-3d-workspace-home-page">\n    <section class="storyboard-3d-home-hero">\n      <span class="storyboard-3d-home-eyebrow">SHUO Canvas · Previz Studio</span>\n      <h1>先在空间里走一遍，再把镜头交给生成模型</h1>\n      <p>用场景、人物、道具和机位搭建可持续编辑的 3D 预演项目，让镜头关系在生成前就清晰可控。</p>\n      <div class="storyboard-3d-home-composer ' +
     (isGenerating ? 'is-generating' : '') +
     '" aria-busy="' +
     (isGenerating ? 'true' : 'false') +
@@ -289,7 +289,7 @@ function renderHome({
     '\n          <div class="storyboard-3d-home-composer-actions">\n            <input type="file" accept="image/*" multiple data-storyboard-3d-reference-image-input hidden>\n            <button type="button" class="storyboard-3d-home-reference-button" data-storyboard-3d-home-action="choose-reference-image">\n              <span aria-hidden="true">▧</span><span>参考图</span>\n            </button>\n            <button type="button" class="storyboard-3d-home-primary storyboard-3d-home-generate" data-storyboard-3d-home-action="generate-project" ' +
     (value5 && !isGenerating ? '' : 'disabled') +
     '>\n              <span data-storyboard-3d-generate-label>' +
-    escapeHtml(isGenerating ? generationStatus || '正在创建\x203D\x20场景' : '生成 3D 场景') +
+    escapeHtml(isGenerating ? generationStatus || '正在创建 3D 场景' : '生成 3D 场景') +
     '</span>\n              <span class="storyboard-3d-home-generate-arrow" aria-hidden="true">→</span>\n            </button>\n          </div>\n        </div>\n        ' +
     (referenceImages['length']
       ? referenceImages
@@ -300,20 +300,20 @@ function renderHome({
         (error3, value9) =>
           '<div class="storyboard-3d-home-reference-preview" data-storyboard-3d-reference-preview>\n              <img src="' +
           escapeHtml(error3['url']) +
-          '\x22\x20alt=\x22参考图\x20' +
-          (value9 + 0x1) +
+          '" alt="参考图 ' +
+          (value9 + 1) +
           '">\n              <span><strong>' +
           escapeHtml(error3['name'] || '参考图') +
           '</strong><small>' +
-          (value9 + 0x1) +
+          (value9 + 1) +
           ' / 6 · AI 估计人物、物品和空间关系</small></span>\n              <button type="button" data-storyboard-3d-home-action="remove-reference-image" data-reference-index="' +
           value9 +
-          '\x22\x20aria-label=\x22移除参考图\x20' +
-          (value9 + 0x1) +
+          '" aria-label="移除参考图 ' +
+          (value9 + 1) +
           '">×</button>\n            </div>',
       )
       ['join']('') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n        ' +
     (!isStoryboard3DModelPackReady2 && modelPackStatus?.['state'] !== 'checking'
       ? '<div class="storyboard-3d-home-model-pack-hint" role="status">需要先下载基础轻量模型包，场景 Agent 才能调用固定素材搭建场景。</div>'
       : '') +
@@ -324,7 +324,7 @@ function renderHome({
     '</div>\n        <div class="storyboard-3d-home-generation-loading storyboard-script-loading-overlay" data-storyboard-3d-generation-loading role="status" aria-live="polite" ' +
     (isGenerating ? '' : 'hidden') +
     '>\n          <div class="storyboard-script-loading-spinner"></div>\n          <div class="storyboard-script-loading-label" data-storyboard-3d-generation-loading-label>' +
-    escapeHtml(generationStatus || '正在创建\x203D\x20场景') +
+    escapeHtml(generationStatus || '正在创建 3D 场景') +
     '</div>\n          <div class="storyboard-script-loading-bar"><div class="storyboard-script-loading-bar-fill"></div></div>\n        </div>\n      </div>\n    </section>\n\n    <section class="storyboard-3d-home-projects" aria-labelledby="storyboard3DHomeProjectsTitle">\n      <div class="storyboard-3d-home-section-heading">\n        <div>\n          <span class="storyboard-3d-home-eyebrow">独立项目 · ' +
     projects['length'] +
     '</span>\n          <h2 id="storyboard3DHomeProjectsTitle">我的3D场景项目</h2>\n        </div>\n        ' +
@@ -335,7 +335,7 @@ function renderHome({
       : '') +
     '\n      </div>\n      ' +
     (projects['length']
-      ? '<div\x20class=\x22storyboard-3d-home-project-grid\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      ? '<div class="storyboard-3d-home-project-grid">\n            ' +
         projects['map']((menuOpen2) =>
           renderStoryboard3DProjectCard(menuOpen2, value4, {
             menuOpen: menuOpen2['projectId'] === openProjectMenuId,
@@ -346,14 +346,14 @@ function renderHome({
           }),
         )['join']('') +
         '\n            <button type="button" class="storyboard-3d-home-create-card" data-storyboard-3d-home-action="new-project">\n              <span aria-hidden="true">+</span><strong>新建 3D 场景项目</strong><small>创建空场景与首个镜头</small>\n            </button>\n          </div>\n          <div class="storyboard-3d-home-search-empty" data-storyboard-3d-search-empty hidden>\n            <strong>没有找到匹配的项目</strong><span>换一个项目名称或场景名称试试。</span>\n          </div>'
-      : '<div\x20class=\x22storyboard-3d-home-empty-projects\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>' +
+      : '<div class="storyboard-3d-home-empty-projects">\n            <div>' +
         renderCubeIcon('storyboard-3d-home-empty-icon') +
         '</div>\n            <strong>还没有 3D 场景项目</strong>\n            <span>创建项目后，它会保存在当前用户项目数据中。</span>\n            <button type="button" class="storyboard-3d-home-primary" data-storyboard-3d-home-action="new-project">创建第一个项目</button>\n          </div>') +
     '\n    </section>\n    ' +
     (modelPackDialogOpen
       ? '<div class="storyboard-3d-model-pack-backdrop" data-storyboard-3d-model-pack-dialog role="presentation">\n          <section class="storyboard-3d-model-pack-dialog" role="dialog" aria-modal="true" aria-labelledby="storyboard3DModelPackTitle">\n            <span class="storyboard-3d-model-pack-mark" aria-hidden="true">' +
         renderCubeIcon() +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-home-eyebrow\x22>首次使用准备</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20id=\x22storyboard3DModelPackTitle\x22>下载\x203D\x20场景基础模型包</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>场景\x20Agent\x20只会调用这个固定的轻量素材库来搭建人物、家具和环境物品，不会在线搜索模型。素材以性能友好的中低复杂度模型为主，未下载时无法生成\x203D\x20场景。</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '</span>\n            <div>\n              <span class="storyboard-3d-home-eyebrow">首次使用准备</span>\n              <h2 id="storyboard3DModelPackTitle">下载 3D 场景基础模型包</h2>\n              <p>场景 Agent 只会调用这个固定的轻量素材库来搭建人物、家具和环境物品，不会在线搜索模型。素材以性能友好的中低复杂度模型为主，未下载时无法生成 3D 场景。</p>\n              ' +
         (value8 ? '<small>' + escapeHtml(value8) + ' · 按需加载，不会一次性占用内存</small>' : '') +
         '\n              <small>下载渠道：本地服务通过 HTTPS 从 Kenney 官方与 OpenGameArt 镜像获取，并在安装前校验文件。</small>\n              ' +
         (value6
@@ -375,13 +375,13 @@ function renderHome({
                 modelPackInstallProgress['completedSources'] +
                 ' / ' +
                 modelPackInstallProgress['totalSources'] +
-                '\x20个资源包</span>'
+                ' 个资源包</span>'
               : '') +
-            '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+            '\n                    </div>\n                    ' +
             (modelPackInstallProgress['currentSource']
               ? '<small title="' +
                 escapeHtml(modelPackInstallProgress['currentSource']) +
-                '\x22>下载源\x20·\x20' +
+                '">下载源 · ' +
                 escapeHtml(modelPackInstallProgress['currentSource']) +
                 '</small>'
               : '') +
@@ -399,9 +399,9 @@ function renderHome({
         (value6 ? 'disabled' : '') +
         '>' +
         (value6 ? '正在下载模型包…' : '下载模型包') +
-        '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</footer>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>'
+        '</button>\n            </footer>\n          </section>\n        </div>'
       : '') +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 export class Storyboard3DWorkspaceHome {
@@ -419,7 +419,7 @@ export class Storyboard3DWorkspaceHome {
     urlApi: urlApi = globalThis['URL'],
     setTimeoutFn: setTimeoutFn = globalThis['setTimeout'],
     clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout'],
-    modelPackProgressPollIntervalMs: modelPackProgressPollIntervalMs = 0x15e,
+    modelPackProgressPollIntervalMs: modelPackProgressPollIntervalMs = 350,
   } = {}) {
     ((this['document'] = documentObject),
       (this['getProjects'] = getProjects),
@@ -435,8 +435,8 @@ export class Storyboard3DWorkspaceHome {
       (this['setTimeoutFn'] = setTimeoutFn),
       (this['clearTimeoutFn'] = clearTimeoutFn),
       (this['modelPackProgressPollIntervalMs'] = Math['min'](
-        0x1f4,
-        Math['max'](0xfa, Number(modelPackProgressPollIntervalMs) || 0x15e),
+        500,
+        Math['max'](250, Number(modelPackProgressPollIntervalMs) || 350),
       )),
       (this['root'] = null),
       (this['searchQuery'] = ''),
@@ -458,7 +458,7 @@ export class Storyboard3DWorkspaceHome {
       (this['confirmingDeleteProjectId'] = ''),
       (this['_modelPackCheckPromise'] = null),
       (this['_modelPackProgressTimer'] = null),
-      (this['_modelPackProgressPollGeneration'] = 0x0),
+      (this['_modelPackProgressPollGeneration'] = 0),
       (this['_destroyed'] = ![]),
       (this['_promptForMissingModelPack'] = ![]),
       (this['_modelSelectorController'] = null),
@@ -490,12 +490,12 @@ export class Storyboard3DWorkspaceHome {
       (this['root'] = el),
       (this['_pricing'] = bindWorkspacePrices(el, [
         {
-          selector: '[data-storyboard-3d-home-action=\x22generate-project\x22]',
+          selector: '[data-storyboard-3d-home-action="generate-project"]',
           getData: () => ({
             model: this['modelId'],
             provider: this['provider'],
             prompt: this['prompt'],
-            hasReferences: this['referenceImages']['length'] > 0x0,
+            hasReferences: this['referenceImages']['length'] > 0,
           }),
         },
       ])),
@@ -571,7 +571,7 @@ export class Storyboard3DWorkspaceHome {
     const el4 = this['root']['querySelector']('[data-storyboard-3d-generate-label]');
     el4 &&
       (el4['textContent'] = this['isGenerating']
-        ? this['generationStatus'] || '正在创建\x203D\x20场景'
+        ? this['generationStatus'] || '正在创建 3D 场景'
         : '生成 3D 场景');
     const el5 = this['root']['querySelector']('.storyboard-3d-home-composer');
     (el5?.['classList']['toggle']('is-generating', this['isGenerating']),
@@ -584,7 +584,7 @@ export class Storyboard3DWorkspaceHome {
     el8 && ((el8['hidden'] = !this['generationError']), (el8['textContent'] = this['generationError']));
     const el9 = this['root']['querySelector']('[data-storyboard-3d-prompt-count]');
     el9 &&
-      (el9['textContent'] = this['prompt']['length'] + '\x20/\x20' + STORYBOARD_3D_PROMPT_MAX_CHARACTERS);
+      (el9['textContent'] = this['prompt']['length'] + ' / ' + STORYBOARD_3D_PROMPT_MAX_CHARACTERS);
   }
   async ['_generateProject']() {
     if (this['isGenerating']) return null;
@@ -646,15 +646,15 @@ export class Storyboard3DWorkspaceHome {
   ['_applySearch']() {
     if (!this['root']) return;
     const searchText2 = normalizeSearchText(this['searchQuery']);
-    let count3 = 0x0;
+    let count3 = 0;
     this['root']['querySelectorAll']('[data-storyboard-3d-project-search]')['forEach']((el10) => {
       const list3 = el10['getAttribute']('data-storyboard-3d-project-search') || '',
         enabled4 = !searchText2 || list3['includes'](searchText2);
       el10['hidden'] = !enabled4;
-      if (enabled4) count3 += 0x1;
+      if (enabled4) count3 += 1;
     });
     const el11 = this['root']['querySelector']('[data-storyboard-3d-search-empty]');
-    if (el11) el11['hidden'] = count3 > 0x0 || !searchText2;
+    if (el11) el11['hidden'] = count3 > 0 || !searchText2;
   }
   ['_findProject'](value17) {
     const text = normalizeText(value17);
@@ -686,7 +686,7 @@ export class Storyboard3DWorkspaceHome {
   ['_commitProjectRename']({ render: render = !![] } = {}) {
     const value21 = this['editingProjectId'],
       enabled8 = this['_findProject'](value21),
-      text2 = normalizeText(this['editingProjectName'])['slice'](0x0, 0x78);
+      text2 = normalizeText(this['editingProjectName'])['slice'](0, 120);
     if (!enabled8) return (this['_cancelProjectRename']({ render: render }), ![]);
     if (!text2) {
       this['onNotify']?.('项目名称不能为空。', 'error');
@@ -762,7 +762,7 @@ export class Storyboard3DWorkspaceHome {
       this['render'](),
       [
         ...(this['root']?.['querySelectorAll'](
-          '[data-storyboard-3d-home-action=\x22confirm-project-delete\x22]',
+          '[data-storyboard-3d-home-action="confirm-project-delete"]',
         ) || []),
       ]
         ['find'](
@@ -782,7 +782,7 @@ export class Storyboard3DWorkspaceHome {
         value26 &&
         [
           ...(this['root']?.['querySelectorAll'](
-            '[data-storyboard-3d-home-action=\x22toggle-project-menu\x22]',
+            '[data-storyboard-3d-home-action="toggle-project-menu"]',
           ) || []),
         ]
           ['find']((value28) => value28['getAttribute']('data-storyboard-3d-project-id') === value26)
@@ -838,9 +838,9 @@ export class Storyboard3DWorkspaceHome {
       const value31 = Number(el15['dataset']['referenceIndex']);
       if (Number['isInteger'](value31) && this['referenceImages'][value31])
         (this['urlApi']?.['revokeObjectURL']?.(this['referenceImages'][value31]['url']),
-          this['referenceImages']['splice'](value31, 0x1),
-          (this['referenceImageUrl'] = this['referenceImages'][0x0]?.['url'] || ''),
-          (this['referenceImageName'] = this['referenceImages'][0x0]?.['name'] || ''));
+          this['referenceImages']['splice'](value31, 1),
+          (this['referenceImageUrl'] = this['referenceImages'][0]?.['url'] || ''),
+          (this['referenceImageName'] = this['referenceImages'][0]?.['name'] || ''));
       else this['_clearReferenceImage']();
       this['render']();
       return;
@@ -851,7 +851,7 @@ export class Storyboard3DWorkspaceHome {
     }
     if (value29 === 'skip-model-pack') {
       ((this['modelPackDialogOpen'] = ![]),
-        (this['generationError'] = '未下载模型包，暂时不能生成\x203D\x20场景。'),
+        (this['generationError'] = '未下载模型包，暂时不能生成 3D 场景。'),
         this['render']());
       return;
     }
@@ -867,12 +867,12 @@ export class Storyboard3DWorkspaceHome {
   }
   ['_handleInput'](event4) {
     if (event4['target']['matches']('[data-storyboard-3d-project-rename-input]')) {
-      this['editingProjectName'] = String(event4['target']['value'] || '')['slice'](0x0, 0x78);
+      this['editingProjectName'] = String(event4['target']['value'] || '')['slice'](0, 120);
       return;
     }
     if (event4['target']['matches']('[data-storyboard-3d-prompt-input]')) {
       ((this['prompt'] = String(event4['target']['value'] || '')['slice'](
-        0x0,
+        0,
         STORYBOARD_3D_PROMPT_MAX_CHARACTERS,
       )),
         (this['generationError'] = ''),
@@ -887,7 +887,7 @@ export class Storyboard3DWorkspaceHome {
       (this['_commitProjectRename']({ render: ![] }),
         this['setTimeoutFn']?.(() => {
           if (!this['_destroyed']) this['render']();
-        }, 0x0));
+        }, 0));
       return;
     }
     if (!event5['target']['matches']('[data-storyboard-3d-reference-image-input]')) return;
@@ -899,9 +899,9 @@ export class Storyboard3DWorkspaceHome {
         (value32) =>
           !String(value32['type'] || '')
             ['toLowerCase']()
-            ['startsWith']('image/') || value32['size'] > 0x20 * 0x400 * 0x400,
+            ['startsWith']('image/') || value32['size'] > 32 * 1024 * 1024,
       ) ||
-      this['referenceImages']['length'] + list4['length'] > 0x6
+      this['referenceImages']['length'] + list4['length'] > 6
     ) {
       ((this['generationError'] = '最多添加 6 张参考图，每张图片不超过 32 MB。'),
         this['_syncGenerationUi']());
@@ -914,8 +914,8 @@ export class Storyboard3DWorkspaceHome {
         name: String(file['name'] || '参考图'),
       })),
     ),
-      (this['referenceImageUrl'] = this['referenceImages'][0x0]?.['url'] || ''),
-      (this['referenceImageName'] = this['referenceImages'][0x0]?.['name'] || ''),
+      (this['referenceImageUrl'] = this['referenceImages'][0]?.['url'] || ''),
+      (this['referenceImageName'] = this['referenceImages'][0]?.['name'] || ''),
       !this['referenceImageUrl'] && (this['generationError'] = '无法读取参考图，请重新选择。'),
       this['render']());
   }
@@ -947,7 +947,7 @@ export class Storyboard3DWorkspaceHome {
     const value34 = Promise['resolve'](this['modelPackApi']['getStatus']())
       ['then']((args2) => {
         const assets = Array['isArray'](args2?.['assets']) ? args2['assets'] : [],
-          state2 = args2?.['installed'] === !![] && assets['length'] > 0x0;
+          state2 = args2?.['installed'] === !![] && assets['length'] > 0;
         return (
           (this['modelPackStatus'] = {
             ...args2,
@@ -992,12 +992,12 @@ export class Storyboard3DWorkspaceHome {
         error: '',
         installProgress: {
           state: 'downloading',
-          downloadedBytes: 0x0,
-          totalBytes: Math['max'](0x0, Number(this['modelPackStatus']['downloadBytes']) || 0x0),
-          percent: 0x0,
+          downloadedBytes: 0,
+          totalBytes: Math['max'](0, Number(this['modelPackStatus']['downloadBytes']) || 0),
+          percent: 0,
           currentSource: '',
-          completedSources: 0x0,
-          totalSources: 0x0,
+          completedSources: 0,
+          totalSources: 0,
           message: '正在连接模型包下载源',
         },
       }),
@@ -1007,7 +1007,7 @@ export class Storyboard3DWorkspaceHome {
       this['_startModelPackProgressPolling']();
       const args3 = await value35,
         assets2 = Array['isArray'](args3?.['assets']) ? args3['assets'] : [];
-      if (args3?.['installed'] !== !![] || assets2['length'] === 0x0)
+      if (args3?.['installed'] !== !![] || assets2['length'] === 0)
         throw new Error('模型包下载未完成，请重试。');
       return (
         this['_stopModelPackProgressPolling'](),
@@ -1029,7 +1029,7 @@ export class Storyboard3DWorkspaceHome {
       try {
         const args4 = await this['modelPackApi']['getStatus']?.(),
           assets3 = Array['isArray'](args4?.['assets']) ? args4['assets'] : [];
-        if (args4?.['installed'] === !![] && assets3['length'] > 0x0)
+        if (args4?.['installed'] === !![] && assets3['length'] > 0)
           return (
             (this['modelPackStatus'] = {
               ...args4,
@@ -1101,7 +1101,7 @@ export class Storyboard3DWorkspaceHome {
     void handler();
   }
   ['_stopModelPackProgressPolling']() {
-    ((this['_modelPackProgressPollGeneration'] += 0x1),
+    ((this['_modelPackProgressPollGeneration'] += 1),
       this['_modelPackProgressTimer'] !== null &&
         (this['clearTimeoutFn']?.(this['_modelPackProgressTimer']),
         (this['_modelPackProgressTimer'] = null)));
@@ -1115,7 +1115,7 @@ export class Storyboard3DWorkspaceHome {
       if (event6['isComposing']) return;
       if (event6['key'] === 'Enter')
         (event6['preventDefault'](),
-          (this['editingProjectName'] = String(event6['target']['value'] || '')['slice'](0x0, 0x78)),
+          (this['editingProjectName'] = String(event6['target']['value'] || '')['slice'](0, 120)),
           this['_commitProjectRename']());
       else event6['key'] === 'Escape' && (event6['preventDefault'](), this['_cancelProjectRename']());
       return;
@@ -1156,7 +1156,7 @@ export class Storyboard3DWorkspaceHome {
     if (!enabled13 || !this['root'] || this['root']['hidden']) return ![];
     const el16 = [
       ...this['root']['querySelectorAll'](
-        '.storyboard-3d-home-project-details[data-storyboard-3d-home-action=\x22open-project\x22]',
+        '.storyboard-3d-home-project-details[data-storyboard-3d-home-action="open-project"]',
       ),
     ]['find']((value38) => value38['getAttribute']('data-storyboard-3d-project-id') === enabled13);
     if (!el16 || typeof el16['focus'] !== 'function') return ![];

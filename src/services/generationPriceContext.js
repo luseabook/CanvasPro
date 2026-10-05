@@ -7,9 +7,9 @@ export function resolveGenerationPriceContext(value, { edges: edges = [], nodes:
   return (
     (event['hasReferences'] =
       value['hasReferences'] === !![] ||
-      edges['length'] > 0x0 ||
+      edges['length'] > 0 ||
       value['hasInputImages'] === !![] ||
-      getAssetInputRefsFromNodeData(value)['length'] > 0x0 ||
+      getAssetInputRefsFromNodeData(value)['length'] > 0 ||
       [
         value['inputUrls'],
         value['image_urls'],
@@ -20,7 +20,7 @@ export function resolveGenerationPriceContext(value, { edges: edges = [], nodes:
         value['imageRefs'],
         value['videoRefs'],
         value['audioRefs'],
-      ]['some']((list) => list?.['length'] > 0x0)),
+      ]['some']((list) => list?.['length'] > 0)),
     event['persist'] === ![] &&
       ((event['references'] = resolveModelPricingInputs(value, edges, nodes)),
       (event['key'] +=

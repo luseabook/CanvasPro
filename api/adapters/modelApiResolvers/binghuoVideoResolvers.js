@@ -33,12 +33,12 @@ function getPolicy(current) {
 }
 function requireMaximum(record, list4, handle) {
   const count = Number(handle);
-  if (!Number['isFinite'](count) || count < 0x0 || list4['length'] <= count) return;
-  throw new Error('便宜渠道当前模型最多支持\x20' + count + '\x20个' + record);
+  if (!Number['isFinite'](count) || count < 0 || list4['length'] <= count) return;
+  throw new Error('便宜渠道当前模型最多支持 ' + count + ' 个' + record);
 }
 function requireMinimumImages(list5, state) {
   const count2 = Number(state);
-  if (!Number['isFinite'](count2) || count2 <= 0x0 || list5['length'] >= count2) return;
+  if (!Number['isFinite'](count2) || count2 <= 0 || list5['length'] >= count2) return;
   throw new Error('便宜渠道当前模型至少需要 ' + count2 + ' 张参考图');
 }
 function getMode(config, scope) {
@@ -103,11 +103,11 @@ function validateRawFieldValue(value11, value12, value13) {
       ['trim']()
       ['toLowerCase'](),
     list6 = getFieldOptionValues(value12);
-  if (list6['length'] > 0x0 && !list6['some']((value16) => isSameOptionValue(value16, rawFieldValue)))
+  if (list6['length'] > 0 && !list6['some']((value16) => isSameOptionValue(value16, rawFieldValue)))
     throw new Error(
-      '便宜渠道\x20' +
+      '便宜渠道 ' +
         value13 +
-        '\x20的' +
+        ' 的' +
         value14 +
         '不支持“' +
         rawFieldValue +
@@ -121,27 +121,27 @@ function validateRawFieldValue(value11, value12, value13) {
       rawFieldValue !== ![] &&
       !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value17)
     )
-      throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '只能开启或关闭');
+      throw new Error('便宜渠道 ' + value13 + ' 的' + value14 + '只能开启或关闭');
     return;
   }
-  if (value15 !== 'slider' || list6['length'] > 0x0) return;
+  if (value15 !== 'slider' || list6['length'] > 0) return;
   const value18 = Number(rawFieldValue),
     value19 = Number(value12?.['min']),
     value20 = Number(value12?.['max']),
     count3 = Number(value12?.['step']);
   if (!Number['isFinite'](value18))
-    throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '必须是数字');
+    throw new Error('便宜渠道 ' + value13 + ' 的' + value14 + '必须是数字');
   if (Number['isFinite'](value19) && value18 < value19)
-    throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '不能小于 ' + value19);
+    throw new Error('便宜渠道 ' + value13 + ' 的' + value14 + '不能小于 ' + value19);
   if (Number['isFinite'](value20) && value18 > value20)
-    throw new Error('便宜渠道 ' + value13 + '\x20的' + value14 + '不能大于 ' + value20);
+    throw new Error('便宜渠道 ' + value13 + ' 的' + value14 + '不能大于 ' + value20);
   if (
     Number['isFinite'](count3) &&
-    count3 > 0x0 &&
+    count3 > 0 &&
     Number['isFinite'](value19) &&
     Math['abs']((value18 - value19) / count3 - Math['round']((value18 - value19) / count3)) > 1e-9
   )
-    throw new Error('便宜渠道\x20' + value13 + '\x20的' + value14 + '必须按\x20' + count3 + ' 递增');
+    throw new Error('便宜渠道 ' + value13 + ' 的' + value14 + '必须按 ' + count3 + ' 递增');
 }
 function validateRawUiSchemaParams(value21, value22) {
   const list7 = Array['isArray'](value22?.['uiSchema']?.['fields']) ? value22['uiSchema']['fields'] : [],
@@ -213,7 +213,7 @@ function validateRawInputCounts(value36, image) {
         : 'reference',
     value38 =
       value37 === 'frames'
-        ? { image: 0x2, video: 0x0, audio: 0x0 }
+        ? { image: 2, video: 0, audio: 0 }
         : { image: image['maxImages'], video: image['maxVideos'], audio: image['maxAudios'] };
   for (const [value39, value40] of [
     ['image', '参考图'],
@@ -229,9 +229,9 @@ function validateRawInputCounts(value36, image) {
       throw new Error(
         '便宜渠道当前模型最多支持 ' +
           value41 +
-          '\x20个' +
+          ' 个' +
           value40 +
-          '，当前传入\x20' +
+          '，当前传入 ' +
           list9['length'] +
           ' 个，请删减后重试',
       );
@@ -283,13 +283,13 @@ function applySeedanceInputs({
       args4 = getSlotUrls(finalUrlsBySlot2, 'lastFrame'),
       map3 = new Set([...args3, ...args4, ...getSlotUrls(finalUrlsBySlot2, 'referenceImage')]),
       value52 = list13['filter']((value53) => !map3['has'](value53)),
-      enabled4 = args3[0x0] || value52[0x0] || '',
-      value54 = args4[0x0] || value52[0x1] || '';
-    (requireMaximum('首帧', args3, 0x1),
-      requireMaximum('尾帧', args4, 0x1),
-      requireMaximum('参考视频', list11, 0x0),
-      requireMaximum('参考音频', list12, 0x0));
-    if (!enabled4) throw new Error('便宜渠道首尾帧模式至少需要\x201\x20张首帧图片');
+      enabled4 = args3[0] || value52[0] || '',
+      value54 = args4[0] || value52[1] || '';
+    (requireMaximum('首帧', args3, 1),
+      requireMaximum('尾帧', args4, 1),
+      requireMaximum('参考视频', list11, 0),
+      requireMaximum('参考音频', list12, 0));
+    if (!enabled4) throw new Error('便宜渠道首尾帧模式至少需要 1 张首帧图片');
     body['start_frame'] = [enabled4];
     if (value54) body['end_frame'] = [value54];
     return body;
@@ -302,15 +302,15 @@ function applySeedanceInputs({
   }),
     requireMinimumImages(list14, policy['minImages']),
     requireMaximum('参考图', list14, policy['maxImages']));
-  if (policy['audioRequiresImage'] === !![] && list12['length'] > 0x0 && list14['length'] === 0x0)
-    throw new Error('便宜渠道当前模型使用参考音频时至少需要\x201\x20张参考图');
+  if (policy['audioRequiresImage'] === !![] && list12['length'] > 0 && list14['length'] === 0)
+    throw new Error('便宜渠道当前模型使用参考音频时至少需要 1 张参考图');
   if (
     policy['audioRequiresVisual'] === !![] &&
-    list12['length'] > 0x0 &&
-    list14['length'] === 0x0 &&
-    list11['length'] === 0x0
+    list12['length'] > 0 &&
+    list14['length'] === 0 &&
+    list11['length'] === 0
   )
-    throw new Error('便宜渠道当前模型使用参考音频时至少需要\x201\x20张参考图或\x201\x20个参考视频');
+    throw new Error('便宜渠道当前模型使用参考音频时至少需要 1 张参考图或 1 个参考视频');
   if (list14['length']) body['images'] = list14;
   if (list11['length']) body['reference_videos'] = list11;
   if (list12['length']) body['reference_audios'] = list12;
@@ -332,7 +332,7 @@ function applyHappyHorseInputs({
   (requireMaximum('参考图', list15, policy2['maxImages']),
     requireMaximum('参考视频', urlList, policy2['maxVideos']),
     requireMaximum('参考音频', list16, policy2['maxAudios']));
-  if ((mode === 'image' || mode === 'reference') && list15['length'] === 0x0)
+  if ((mode === 'image' || mode === 'reference') && list15['length'] === 0)
     throw new Error('便宜渠道 HappyHorse 图像模式需要参考图');
   if (list15['length']) body2['images'] = list15;
   else delete body2['images'];

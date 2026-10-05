@@ -21,7 +21,7 @@ export function resolveStoryboard3DTextModelSelection(index = '') {
     projectedModelOption =
       findProjectedModelOption(storyboard3DTextModelOptions, normalizeText(index)) ||
       findProjectedModelOption(storyboard3DTextModelOptions, STORYBOARD_3D_DEFAULT_TEXT_MODEL_ID) ||
-      storyboard3DTextModelOptions[0x0] ||
+      storyboard3DTextModelOptions[0] ||
       null;
   return {
     modelId: projectedModelOption?.['modelId'] || '',

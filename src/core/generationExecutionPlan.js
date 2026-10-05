@@ -40,7 +40,7 @@ export function resolveGenerationTaskIdentity(options2 = {}) {
       modelId: modelId = '',
       executionId: executionId = '',
       taskId: taskId = '',
-      startedAt: startedAt = 0x0,
+      startedAt: startedAt = 0,
     } = options2 || {},
     protocol = inferGenerationTaskProtocol({
       taskProtocol: taskProtocol,
@@ -84,7 +84,7 @@ export function resolveGenerationTaskIdentity(options2 = {}) {
       taskId2?.['readTaskId'](node, taskId) ||
       firstTrimmed(taskId, node['rhTaskId'], node['asyncTaskId'], node['dreaminaSubmitId'], node['taskId']),
     startedAt:
-      taskId2?.['readStartedAt'](node, startedAt) || Number(startedAt || node['generationStartTime'] || 0x0),
+      taskId2?.['readStartedAt'](node, startedAt) || Number(startedAt || node['generationStartTime'] || 0),
     async: taskId2?.['async'] === !![],
   };
 }
@@ -183,7 +183,7 @@ function createGenerationPlanFromNode(current, entry = {}) {
       modelId: modelId = '',
       executionId: executionId = '',
       taskId: taskId = '',
-      startedAt: startedAt = 0x0,
+      startedAt: startedAt = 0,
       ...kind3
     } = entry || {},
     provider5 = resolveGenerationTaskIdentity({

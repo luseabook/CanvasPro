@@ -28,7 +28,7 @@ export function deriveAgentPrecreatedNodeType({
   const key = Object['values'](canvasState?.['nodes'] || {})['some']((error) => {
     if (String(error?.['type'] || '')['trim']() !== requestedCreatedNodeType) return ![];
     const list3 = String(error?.['name'] || '')['trim']();
-    return list3['length'] >= 0x2 && list['includes'](list3);
+    return list3['length'] >= 2 && list['includes'](list3);
   });
   if (!EXPLICIT_NEW_TARGET_PATTERN['test'](list) && (value || key)) return '';
   return requestedCreatedNodeType;
@@ -74,7 +74,7 @@ export function createAgentPrecreatedNodeRuntime({
           ...buildExecutionOptions(message2['runId']),
         });
       if (!isActiveRun(message2['runId'])) return message2;
-      const nodeId2 = String(response?.['createdNodeIds']?.[0x0] || '')['trim']();
+      const nodeId2 = String(response?.['createdNodeIds']?.[0] || '')['trim']();
       if (response?.['ok'] !== !![] || !nodeId2)
         return (
           sessionStore?.['recordTrace']?.({
@@ -85,7 +85,7 @@ export function createAgentPrecreatedNodeRuntime({
           }),
           message2
         );
-      ids['length'] > 0x0 &&
+      ids['length'] > 0 &&
         (await executeActions([{ type: 'node.select', args: { ids: ids } }], {
           commandContext: commandContext,
           ...buildExecutionOptions(message2['runId']),

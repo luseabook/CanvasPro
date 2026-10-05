@@ -16,8 +16,8 @@ const PANORAMA_SCENE_NODE_TYPE = 'panorama-scene',
   PANORAMA_360_NODE_TYPE = 'panorama-360',
   PANORAMA_360_NODE_ALIASES = ['panorama_360', 'panorama360'],
   PANORAMA_SCENE_CAMERA_LIMIT = 10,
-  PANORAMA_SCENE_DEFAULT_SIZE = Object.freeze({ width: 0x400, height: 0x240 }),
-  PANORAMA_SCENE_COLLAPSED_MAX_SIZE = 0x120,
+  PANORAMA_SCENE_DEFAULT_SIZE = Object.freeze({ width: 1024, height: 576 }),
+  PANORAMA_SCENE_COLLAPSED_MAX_SIZE = 288,
   PANORAMA_SCENE_DEFAULT_NAME = '3D导演台',
   PANORAMA_360_DEFAULT_NAME = '360全景图';
 function getPanoramaSceneDefaultName() {

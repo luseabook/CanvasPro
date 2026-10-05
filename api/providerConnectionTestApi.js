@@ -1,8 +1,8 @@
 import { PROVIDERS_META, getApimartApiUrlForRoute } from '../src/modules/providers.js';
 import { post, request } from './apiBase.js';
 import { normalizeApimartBaseUrl } from './apimartUploadApi.js';
-const TEST_TIMEOUT_MS = 0x7530,
-  TEST_UPLOAD_TIMEOUT_MS = 0xea60,
+const TEST_TIMEOUT_MS = 30000,
+  TEST_UPLOAD_TIMEOUT_MS = 60000,
   DEFAULT_PROVIDER_TEST_IDS = Object.freeze([
     'apimart',
     'volcengine',
@@ -337,7 +337,7 @@ function normalizeErrorText(value18 = '') {
 }
 function isAuthFailure(response5 = {}) {
   const count2 = Number(response5.status || 0);
-  if (count2 === 0x191 || count2 === 0x193) return true;
+  if (count2 === 401 || count2 === 403) return true;
   const probeText2 = probeText(response5).toLowerCase();
   return /(?:\b401\b|\b403\b|unauthorized|forbidden|authentication|authorization|invalid\s+(?:api\s*)?key|invalid\s+token|api\s*key\s+invalid|apikey|bearer|access\s*token|鉴权|认证|未授权|无权限|密钥|令牌)/i.test(
     probeText2,
@@ -352,7 +352,7 @@ function classifyProbeFailure(response6 = {}, value19 = 'provider_error') {
     /timeout|timed out|network|failed to fetch|dns|econn|请求超时|网络请求失败/i.test(probeText3)
   )
     return 'network_failed';
-  if (count3 === 0x1ad || /rate limit|too many requests|限流|请求过于频繁/i.test(probeText3))
+  if (count3 === 429 || /rate limit|too many requests|限流|请求过于频繁/i.test(probeText3))
     return 'rate_limited';
   if (/insufficient|quota|balance|billing|credit|payment|额度|余额|欠费|付费|账户余额/i.test(probeText3))
     return 'quota_or_balance';
@@ -363,7 +363,7 @@ function classifyProbeFailure(response6 = {}, value19 = 'provider_error') {
   )
     return 'model_unavailable';
   if (
-    count3 === 0x194 ||
+    count3 === 404 ||
     /not found|invalid url|unsupported endpoint|cannot post|cannot get|接口地址|地址不兼容/i.test(probeText3)
   )
     return 'bad_base_url';
@@ -389,7 +389,7 @@ function humanizeCategory(value20, value21, value22 = '连接测试未通过') {
 function isSuccessfulProbe(response7 = {}) {
   if (!response7.success) return false;
   const count4 = Number(response7.status || 0);
-  if (count4 && (count4 < 200 || count4 >= 0x12c)) return false;
+  if (count4 && (count4 < 200 || count4 >= 300)) return false;
   return !isAuthFailure(response7);
 }
 function summarizeFailure(options5 = {}, value24 = '连接测试未通过') {
@@ -818,7 +818,7 @@ function runningHubProbePassed(response12 = {}) {
   if (isAuthFailure(response12)) return false;
   if (response12.success) return true;
   const count5 = Number(response12.status || 0);
-  return count5 >= 0x190 && count5 < 0x1f4;
+  return count5 >= 400 && count5 < 500;
 }
 async function runningHubWorkflowProbe(apiKey3) {
   const post5 = await post(

@@ -17,17 +17,17 @@ export const zImageTextToImageModelManifest = Object['freeze']({
   description: 'Z-image 文生图工作流，支持尺寸比例、提示词增强、高清与 LoRA 选择',
   prompt: Object['freeze']({ placeholder: '输入画面描述' }),
   extensions: Object['freeze']({
-    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 0x46 }),
+    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 70 }),
     ratioPolicy: Object['freeze']({ capability: 'dimensions' }),
   }),
   capabilities: Object['freeze']({
     inputKinds: Object['freeze'](['text']),
     outputType: 'image',
-    maxImages: 0x0,
+    maxImages: 0,
   }),
   inputSlots: Object['freeze']({
     allowedKinds: Object['freeze'](['text']),
-    maxByKind: Object['freeze']({ text: 0x1, image: 0x0, video: 0x0, audio: 0x0 }),
+    maxByKind: Object['freeze']({ text: 1, image: 0, video: 0, audio: 0 }),
   }),
   uiSchema: Object['freeze']({
     fields: Object['freeze']([
@@ -107,8 +107,8 @@ export const zImageTextToImageExecutionManifest = Object['freeze']({
     dimensionsNode: Object['freeze']({
       defaultImageSize: '2K',
       defaultAspectRatio: '2:3',
-      longSideByImageSize: Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 }),
-      align: 0x40,
+      longSideByImageSize: Object['freeze']({ '1K': 1024, '1.5K': 1536, '2K': 1920 }),
+      align: 64,
       widthNode: Object['freeze']({ nodeId: '13', fieldName: 'width', description: 'width' }),
       heightNode: Object['freeze']({ nodeId: '13', fieldName: 'height', description: 'height' }),
     }),
@@ -135,7 +135,7 @@ export const zImageTextToImageExecutionManifest = Object['freeze']({
         field: 'generationParams.rhZImageLora',
         fallbackFields: Object['freeze'](['rhZImageLora']),
         defaultValue: '1',
-        allowedValues: Object['freeze']([0x0, 0x1]),
+        allowedValues: Object['freeze']([0, 1]),
         description: 'LoRA 选择',
       }),
     ]),

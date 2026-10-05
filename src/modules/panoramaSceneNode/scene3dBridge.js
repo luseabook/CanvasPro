@@ -73,13 +73,13 @@ import { t } from '../../i18n/index.js';
 function panoramaSceneText(value, item = {}) {
   return t('panoramaSceneNode.' + value, item);
 }
-const GRID_MINOR_STEP = 0x1,
-  GRID_MAJOR_STEP = 0xa,
-  GRID_BASE_SPAN = 0xdc,
+const GRID_MINOR_STEP = 1,
+  GRID_MAJOR_STEP = 10,
+  GRID_BASE_SPAN = 220,
   GRID_SNAP_HYSTERESIS = 0.12,
-  VIEW_DAMPING_TIME_CONSTANT_MS = 0x78,
-  VIEW_DAMPING_WINDOW_MS = 0xdc,
-  VIEW_DAMPING_MAX_DT_MS = 0x40,
+  VIEW_DAMPING_TIME_CONSTANT_MS = 120,
+  VIEW_DAMPING_WINDOW_MS = 220,
+  VIEW_DAMPING_MAX_DT_MS = 64,
   POSE_SETTLE_EPSILON = 0.0005,
   GIZMO_MARGIN_WORLD_MIN = 0.12,
   GIZMO_MARGIN_WORLD_RATIO = 0.12,
@@ -92,18 +92,18 @@ function setLineGeometryPoints(enabled, result, data) {
   const box = result?.['isVector3'] ? result : toVector3Like(result),
     box2 = data?.['isVector3'] ? data : toVector3Like(data),
     enabled2 = enabled['geometry']['getAttribute']('position');
-  if (!enabled2 || enabled2['count'] < 0x2) {
+  if (!enabled2 || enabled2['count'] < 2) {
     (enabled['geometry']['dispose']?.(),
       (enabled['geometry'] = createLineGeometry(box, box2)));
     return;
   }
-  (enabled2['setXYZ'](0x0, box['x'], box['y'], box['z']),
-    enabled2['setXYZ'](0x1, box2['x'], box2['y'], box2['z']),
+  (enabled2['setXYZ'](0, box['x'], box['y'], box['z']),
+    enabled2['setXYZ'](1, box2['x'], box2['y'], box2['z']),
     (enabled2['needsUpdate'] = !![]),
     enabled['geometry']['computeBoundingSphere']?.(),
     enabled['geometry']['computeBoundingBox']?.());
 }
-function configureGizmoMaterial(enabled3, { transparent: transparent = ![], opacity: opacity = 0x1 } = {}) {
+function configureGizmoMaterial(enabled3, { transparent: transparent = ![], opacity: opacity = 1 } = {}) {
   if (!enabled3) return enabled3;
   enabled3['transparent'] = transparent;
   if ('opacity' in enabled3) enabled3['opacity'] = opacity;
@@ -117,23 +117,23 @@ function configureGizmoMaterial(enabled3, { transparent: transparent = ![], opac
 }
 function configureGizmoObject(enabled4) {
   if (!enabled4) return enabled4;
-  return ((enabled4['frustumCulled'] = ![]), (enabled4['renderOrder'] = 0x64), enabled4);
+  return ((enabled4['frustumCulled'] = ![]), (enabled4['renderOrder'] = 100), enabled4);
 }
 function orientAxisHead(enabled5, options) {
   if (!enabled5) return;
-  enabled5['rotation']['set'](0x0, 0x0, 0x0);
-  if (options === 'x') enabled5['rotation']['z'] = -Math['PI'] / 0x2;
-  if (options === 'z') enabled5['rotation']['x'] = Math['PI'] / 0x2;
+  enabled5['rotation']['set'](0, 0, 0);
+  if (options === 'x') enabled5['rotation']['z'] = -Math['PI'] / 2;
+  if (options === 'z') enabled5['rotation']['x'] = Math['PI'] / 2;
 }
 function setAxisLineEnd(enabled6, target, source) {
   if (!enabled6?.['geometry']) return;
   const box3 = vectorFromAxisName(target),
-    next = Math['max'](0x0, Number(source) || 0x0),
+    next = Math['max'](0, Number(source) || 0),
     enabled7 = enabled6['geometry']['getAttribute']('position');
-  if (!enabled7 || enabled7['count'] < 0x2) return;
-  (enabled7['setXYZ'](0x0, 0x0, 0x0, 0x0),
+  if (!enabled7 || enabled7['count'] < 2) return;
+  (enabled7['setXYZ'](0, 0, 0, 0),
     enabled7['setXYZ'](
-      0x1,
+      1,
       box3['x'] * next,
       box3['y'] * next,
       box3['z'] * next,
@@ -142,13 +142,13 @@ function setAxisLineEnd(enabled6, target, source) {
     enabled6['geometry']['computeBoundingSphere']?.(),
     enabled6['geometry']['computeBoundingBox']?.());
 }
-function setAxisHandleLayout(enabled8, current, entry = 0x0) {
+function setAxisHandleLayout(enabled8, current, entry = 0) {
   if (!enabled8) return;
   const enabled9 = enabled8['userData']?.['axisName'] || enabled8['axisName'];
   if (!enabled9) return;
   const vectorFromAxisName2 = vectorFromAxisName(enabled9),
-    record = Math['max'](0x0, Number(current) || 0x0),
-    payload = Number(entry) || 0x0;
+    record = Math['max'](0, Number(current) || 0),
+    payload = Number(entry) || 0;
   enabled8['position']['copy'](vectorFromAxisName2['multiplyScalar'](record + payload));
 }
 function createMoveAxis(handle, axisName) {
@@ -166,7 +166,7 @@ function createMoveAxis(handle, axisName) {
     ),
     shaftLine = new threeRuntime['Line'](
       createLineGeometry(
-        new threeRuntime['Vector3'](0x0, 0x0, 0x0),
+        new threeRuntime['Vector3'](0, 0, 0),
         axis['clone']()['multiplyScalar'](GIZMO_MOVE_SHAFT_LENGTH),
       ),
       material,
@@ -181,7 +181,7 @@ function createMoveAxis(handle, axisName) {
       { transparent: !![], opacity: 0.98 },
     ),
     headMesh = new threeRuntime['Mesh'](
-      new threeRuntime['ConeGeometry'](0.06, GIZMO_MOVE_HEAD_LENGTH, 0xe),
+      new threeRuntime['ConeGeometry'](0.06, GIZMO_MOVE_HEAD_LENGTH, 14),
       material2,
     );
   ((headMesh['userData']['axisName'] = axisName),
@@ -194,15 +194,15 @@ function createMoveAxis(handle, axisName) {
     configureGizmoObject(headMesh),
     group['add'](headMesh));
   const pickMesh = new threeRuntime['Mesh'](
-    new threeRuntime['CylinderGeometry'](0.14, 0.14, GIZMO_MOVE_PICK_LENGTH, 0xa),
+    new threeRuntime['CylinderGeometry'](0.14, 0.14, GIZMO_MOVE_PICK_LENGTH, 10),
     configureGizmoMaterial(
       new threeRuntime['MeshBasicMaterial']({
         color: 0xffffff,
         transparent: !![],
-        opacity: 0x0,
+        opacity: 0,
         depthWrite: ![],
       }),
-      { transparent: !![], opacity: 0x0 },
+      { transparent: !![], opacity: 0 },
     ),
   );
   return (
@@ -218,8 +218,8 @@ function createMoveAxis(handle, axisName) {
       shaftLine: shaftLine,
       headMesh: headMesh,
       visuals: [
-        { material: material, color: color['clone'](), opacity: 0x1 },
-        { material: material2, color: color['clone'](), opacity: 0x1 },
+        { material: material, color: color['clone'](), opacity: 1 },
+        { material: material2, color: color['clone'](), opacity: 1 },
       ],
       pickMesh: pickMesh,
     }
@@ -240,7 +240,7 @@ function createScaleAxis(state, axisName2) {
     ),
     shaftLine2 = new threeRuntime['Line'](
       createLineGeometry(
-        new threeRuntime['Vector3'](0x0, 0x0, 0x0),
+        new threeRuntime['Vector3'](0, 0, 0),
         axis2['clone']()['multiplyScalar'](GIZMO_SCALE_SHAFT_LENGTH),
       ),
       material3,
@@ -268,15 +268,15 @@ function createScaleAxis(state, axisName2) {
     configureGizmoObject(headMesh2),
     group2['add'](headMesh2));
   const pickMesh2 = new threeRuntime['Mesh'](
-    new threeRuntime['CylinderGeometry'](0.14, 0.14, GIZMO_SCALE_PICK_LENGTH, 0xa),
+    new threeRuntime['CylinderGeometry'](0.14, 0.14, GIZMO_SCALE_PICK_LENGTH, 10),
     configureGizmoMaterial(
       new threeRuntime['MeshBasicMaterial']({
         color: 0xffffff,
         transparent: !![],
-        opacity: 0x0,
+        opacity: 0,
         depthWrite: ![],
       }),
-      { transparent: !![], opacity: 0x0 },
+      { transparent: !![], opacity: 0 },
     ),
   );
   return (
@@ -292,8 +292,8 @@ function createScaleAxis(state, axisName2) {
       shaftLine: shaftLine2,
       headMesh: headMesh2,
       visuals: [
-        { material: material3, color: color2['clone'](), opacity: 0x1 },
-        { material: material4, color: color2['clone'](), opacity: 0x1 },
+        { material: material3, color: color2['clone'](), opacity: 1 },
+        { material: material4, color: color2['clone'](), opacity: 1 },
       ],
       pickMesh: pickMesh2,
     }
@@ -313,22 +313,22 @@ function createRotateRing(config, axisName3) {
       { transparent: !![], opacity: 0.86 },
     ),
     scope = new threeRuntime['Mesh'](
-      new threeRuntime['TorusGeometry'](GIZMO_BASE_ROTATE_RADIUS, 0.016, 0x8, 0x40),
+      new threeRuntime['TorusGeometry'](GIZMO_BASE_ROTATE_RADIUS, 0.016, 8, 64),
       material5,
     );
-  if (axisName3 === 'x') scope['rotation']['y'] = Math['PI'] / 0x2;
-  else axisName3 === 'y' && (scope['rotation']['x'] = Math['PI'] / 0x2);
+  if (axisName3 === 'x') scope['rotation']['y'] = Math['PI'] / 2;
+  else axisName3 === 'y' && (scope['rotation']['x'] = Math['PI'] / 2);
   (configureGizmoObject(scope), group3['add'](scope));
   const pickMesh3 = new threeRuntime['Mesh'](
-    new threeRuntime['TorusGeometry'](GIZMO_BASE_ROTATE_RADIUS, 0.11, 0x8, 0x40),
+    new threeRuntime['TorusGeometry'](GIZMO_BASE_ROTATE_RADIUS, 0.11, 8, 64),
     configureGizmoMaterial(
       new threeRuntime['MeshBasicMaterial']({
         color: 0xffffff,
         transparent: !![],
-        opacity: 0x0,
+        opacity: 0,
         depthWrite: ![],
       }),
-      { transparent: !![], opacity: 0x0 },
+      { transparent: !![], opacity: 0 },
     ),
   );
   return (
@@ -343,7 +343,7 @@ function createRotateRing(config, axisName3) {
     }
   );
 }
-function getPlaneCornerMetrics(input = GIZMO_BASE_PLANE_SIZE, output = 0x0) {
+function getPlaneCornerMetrics(input = GIZMO_BASE_PLANE_SIZE, output = 0) {
   const armLength = input * 0.56,
     armThickness = Math['max'](input * 0.065, 0.012),
     cornerInset = input * 0.06,
@@ -423,7 +423,7 @@ function createPlaneCornerVisual(
           new threeRuntime['PlaneGeometry'](value8, value9),
           material6,
         );
-      (value12['position']['set'](value10, value11, 0x0),
+      (value12['position']['set'](value10, value11, 0),
         configureGizmoObject(value12),
         group4['add'](value12),
         visuals['push']({ material: material6, color: color5['clone'](), opacity: 0.98 }));
@@ -457,7 +457,7 @@ function createPlaneCornerVisual(
         new threeRuntime['PlaneGeometry'](planeCornerMetrics2['armThickness'], planeCornerMetrics2['armThickness']),
         material7,
       );
-    (value13['position']['set'](planeCornerMetrics2['outer'], planeCornerMetrics2['outer'], 0x0),
+    (value13['position']['set'](planeCornerMetrics2['outer'], planeCornerMetrics2['outer'], 0),
       configureGizmoObject(value13),
       group4['add'](value13),
       visuals['push']({ material: material7, color: color4['clone'](), opacity: 0.98 }));
@@ -481,18 +481,18 @@ function createPlaneCornerVisual(
         [
           planeCornerMetrics2['diagonalStart'],
           planeCornerMetrics2['outer'] - value14,
-          0x0,
+          0,
           planeCornerMetrics2['outer'] - value14,
           planeCornerMetrics2['outer'] - value14,
-          0x0,
+          0,
           planeCornerMetrics2['outer'] - value14,
           planeCornerMetrics2['diagonalEnd'],
-          0x0,
+          0,
         ],
-        0x3,
+        3,
       ),
     ),
-      el['setIndex']([0x0, 0x1, 0x2]),
+      el['setIndex']([0, 1, 2]),
       el['computeVertexNormals']());
     const value15 = new threeRuntime['Mesh'](el, material8);
     (configureGizmoObject(value15),
@@ -520,9 +520,9 @@ function createMannequinVisual(color6) {
       metalness: 0.08,
     }),
     headMaterial = material9['clone']();
-  headMaterial['color'] = material9['color']['clone']()['offsetHSL'](0x0, 0x0, 0.08);
+  headMaterial['color'] = material9['color']['clone']()['offsetHSL'](0, 0, 0.08);
   const head = new threeRuntime['Mesh'](
-    new threeRuntime['SphereGeometry'](0.155, 0x12, 0x10),
+    new threeRuntime['SphereGeometry'](0.155, 18, 16),
     headMaterial,
   );
   ((head['position']['y'] = 1.7),
@@ -530,12 +530,12 @@ function createMannequinVisual(color6) {
     proxyRoot['add'](head),
     fallbackObjects['push'](head));
   const neck = new threeRuntime['Mesh'](
-    new threeRuntime['CylinderGeometry'](0.052, 0.064, 0.12, 0xc),
+    new threeRuntime['CylinderGeometry'](0.052, 0.064, 0.12, 12),
     material9,
   );
   ((neck['position']['y'] = 1.51), proxyRoot['add'](neck), fallbackObjects['push'](neck));
   const chest = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.17, 0.42, 0x6, 0xc),
+    new threeRuntime['CapsuleGeometry'](0.17, 0.42, 6, 12),
     material9,
   );
   ((chest['position']['y'] = 1.26),
@@ -543,7 +543,7 @@ function createMannequinVisual(color6) {
     proxyRoot['add'](chest),
     fallbackObjects['push'](chest));
   const waist = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.105, 0.18, 0x5, 0xa),
+    new threeRuntime['CapsuleGeometry'](0.105, 0.18, 5, 10),
     material9,
   );
   ((waist['position']['y'] = 0.98),
@@ -551,22 +551,22 @@ function createMannequinVisual(color6) {
     proxyRoot['add'](waist),
     fallbackObjects['push'](waist));
   const pelvis = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.14, 0.2, 0x5, 0xc),
+    new threeRuntime['CapsuleGeometry'](0.14, 0.2, 5, 12),
     material9,
   );
   ((pelvis['position']['y'] = 0.77),
     pelvis['scale']['set'](1.28, 0.96, 0.98),
     proxyRoot['add'](pelvis),
     fallbackObjects['push'](pelvis));
-  const value17 = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.07, 0xc, 0xc), material9);
-  (value17['position']['set'](-0.31, 1.43, 0x0), proxyRoot['add'](value17), fallbackObjects['push'](value17));
+  const value17 = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.07, 12, 12), material9);
+  (value17['position']['set'](-0.31, 1.43, 0), proxyRoot['add'](value17), fallbackObjects['push'](value17));
   const value18 = value17['clone']();
   ((value18['position']['x'] = 0.31), proxyRoot['add'](value18), fallbackObjects['push'](value18));
   const value19 = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.048, 0.28, 0x4, 0xa),
+    new threeRuntime['CapsuleGeometry'](0.048, 0.28, 4, 10),
     material9,
   );
-  (value19['position']['set'](-0.39, 1.17, 0x0),
+  (value19['position']['set'](-0.39, 1.17, 0),
     (value19['rotation']['z'] = 0.16),
     (value19['rotation']['x'] = 0.03),
     proxyRoot['add'](value19),
@@ -578,7 +578,7 @@ function createMannequinVisual(color6) {
     proxyRoot['add'](value20),
     fallbackObjects['push'](value20));
   const value21 = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.038, 0.26, 0x4, 0xa),
+    new threeRuntime['CapsuleGeometry'](0.038, 0.26, 4, 10),
     material9,
   );
   (value21['position']['set'](-0.42, 0.86, 0.01),
@@ -592,18 +592,18 @@ function createMannequinVisual(color6) {
     (value22['rotation']['x'] = -0.04),
     proxyRoot['add'](value22),
     fallbackObjects['push'](value22));
-  const box4 = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.048, 0xa, 0xa), material9);
+  const box4 = new threeRuntime['Mesh'](new threeRuntime['SphereGeometry'](0.048, 10, 10), material9);
   (box4['position']['set'](-0.425, 0.62, 0.01),
-    box4['scale']['set'](0.9, 0x1, 0.72),
+    box4['scale']['set'](0.9, 1, 0.72),
     proxyRoot['add'](box4),
     fallbackObjects['push'](box4));
   const value23 = box4['clone']();
   ((value23['position']['x'] = 0.425), proxyRoot['add'](value23), fallbackObjects['push'](value23));
   const value24 = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.072, 0.34, 0x5, 0xc),
+    new threeRuntime['CapsuleGeometry'](0.072, 0.34, 5, 12),
     material9,
   );
-  (value24['position']['set'](-0.12, 0.47, 0x0),
+  (value24['position']['set'](-0.12, 0.47, 0),
     (value24['rotation']['z'] = 0.03),
     proxyRoot['add'](value24),
     fallbackObjects['push'](value24));
@@ -613,7 +613,7 @@ function createMannequinVisual(color6) {
     proxyRoot['add'](value25),
     fallbackObjects['push'](value25));
   const value26 = new threeRuntime['Mesh'](
-    new threeRuntime['CapsuleGeometry'](0.055, 0.34, 0x5, 0xc),
+    new threeRuntime['CapsuleGeometry'](0.055, 0.34, 5, 12),
     material9,
   );
   (value26['position']['set'](-0.12, 0.03, 0.01),
@@ -639,7 +639,7 @@ function createMannequinVisual(color6) {
       proxyRoot: proxyRoot,
       fallbackObjects: fallbackObjects,
       modelGender: null,
-      modelLoadToken: 0x0,
+      modelLoadToken: 0,
       modelRoot: null,
       modelBodyProfileBase: null,
       baseBonePose: null,
@@ -713,31 +713,31 @@ function createCameraVisual() {
         value40,
       ),
     value41 = handler3(0.26, 0.16, 0.14, bodyMaterial);
-  (value41['position']['set'](0x0, 0x0, 0.075), marker['add'](value41));
+  (value41['position']['set'](0, 0, 0.075), marker['add'](value41));
   const value42 = handler3(0.1, 0.045, 0.06, bodyMaterial);
-  (value42['position']['set'](0x0, 0.102, 0.08), marker['add'](value42));
+  (value42['position']['set'](0, 0.102, 0.08), marker['add'](value42));
   const value43 = handler3(0.06, 0.045, 0.08, bodyMaterial);
   (value43['position']['set'](-0.105, 0.05, 0.155), marker['add'](value43));
   const value44 = handler3(0.12, 0.09, 0.02, bodyMaterial);
-  (value44['position']['set'](0x0, 0x0, -0.01), marker['add'](value44));
+  (value44['position']['set'](0, 0, -0.01), marker['add'](value44));
   const hitProxy = new threeRuntime['Mesh'](
     new threeRuntime['BoxGeometry'](0.42, 0.3, 0.72),
     new threeRuntime['MeshBasicMaterial']({
       transparent: !![],
-      opacity: 0x0,
+      opacity: 0,
       depthWrite: ![],
       colorWrite: ![],
     }),
   );
-  (hitProxy['position']['set'](0x0, 0x0, -0.16), marker['add'](hitProxy));
+  (hitProxy['position']['set'](0, 0, -0.16), marker['add'](hitProxy));
   const value45 = new threeRuntime['BufferGeometry']()['setFromPoints']([
-    new threeRuntime['Vector3'](-0.025, 0x0, 0x0),
-    new threeRuntime['Vector3'](0.025, 0x0, 0x0),
-    new threeRuntime['Vector3'](0x0, -0.025, 0x0),
-    new threeRuntime['Vector3'](0x0, 0.025, 0x0),
+    new threeRuntime['Vector3'](-0.025, 0, 0),
+    new threeRuntime['Vector3'](0.025, 0, 0),
+    new threeRuntime['Vector3'](0, -0.025, 0),
+    new threeRuntime['Vector3'](0, 0.025, 0),
   ]);
   marker['add'](new threeRuntime['LineSegments'](value45, bodyMaterial));
-  const box5 = new threeRuntime['Vector3'](0x0, 0x0, -0.02),
+  const box5 = new threeRuntime['Vector3'](0, 0, -0.02),
     value46 = 0.55,
     value47 = 0.18,
     value48 = 0.1,
@@ -804,21 +804,21 @@ function applyGenderShape(value56, value57) {
     [box10, box11] = dom['feet'] || [];
   if (value57 === 'female') {
     (dom['head']?.['scale']['set'](0.94, 1.08, 0.92),
-      dom['neck']?.['scale']['set'](0.92, 0x1, 0.92),
+      dom['neck']?.['scale']['set'](0.92, 1, 0.92),
       dom['chest']?.['scale']['set'](1.2, 0.98, 0.82),
       dom['waist']?.['scale']['set'](0.84, 0.92, 0.72),
       dom['pelvis']?.['scale']['set'](1.38, 0.98, 1.08));
-    if (value58) value58['position']['set'](-0.27, 1.42, 0x0);
-    if (value59) value59['position']['set'](0.27, 1.42, 0x0);
-    if (value60) value60['position']['set'](-0.34, 1.14, 0x0);
-    if (value61) value61['position']['set'](0.34, 1.14, 0x0);
+    if (value58) value58['position']['set'](-0.27, 1.42, 0);
+    if (value59) value59['position']['set'](0.27, 1.42, 0);
+    if (value60) value60['position']['set'](-0.34, 1.14, 0);
+    if (value61) value61['position']['set'](0.34, 1.14, 0);
     if (value62) value62['position']['set'](-0.37, 0.84, 0.01);
     if (value63) value63['position']['set'](0.37, 0.84, 0.01);
     if (value64) value64['position']['set'](-0.375, 0.59, 0.01);
     if (value65) value65['position']['set'](0.375, 0.59, 0.01);
     box6 &&
-      (box6['position']['set'](-0.115, 0.45, 0x0), box6['scale']['set'](0.94, 0x1, 0.94));
-    box7 && (box7['position']['set'](0.115, 0.45, 0x0), box7['scale']['set'](0.94, 0x1, 0.94));
+      (box6['position']['set'](-0.115, 0.45, 0), box6['scale']['set'](0.94, 1, 0.94));
+    box7 && (box7['position']['set'](0.115, 0.45, 0), box7['scale']['set'](0.94, 1, 0.94));
     box8 &&
       (box8['position']['set'](-0.115, 0.01, 0.01), box8['scale']['set'](0.92, 1.02, 0.9));
     box9 &&
@@ -827,25 +827,25 @@ function applyGenderShape(value56, value57) {
     if (box11) box11['scale']['set'](0.88, 0.96, 0.95);
   } else {
     (dom['head']?.['scale']['set'](0.98, 1.08, 0.95),
-      dom['neck']?.['scale']['set'](1.02, 0x1, 1.02),
+      dom['neck']?.['scale']['set'](1.02, 1, 1.02),
       dom['chest']?.['scale']['set'](1.48, 1.04, 0.98),
       dom['waist']?.['scale']['set'](1.02, 0.96, 0.84),
       dom['pelvis']?.['scale']['set'](1.2, 0.94, 0.96));
-    if (value58) value58['position']['set'](-0.33, 1.44, 0x0);
-    if (value59) value59['position']['set'](0.33, 1.44, 0x0);
-    if (value60) value60['position']['set'](-0.42, 1.18, 0x0);
-    if (value61) value61['position']['set'](0.42, 1.18, 0x0);
+    if (value58) value58['position']['set'](-0.33, 1.44, 0);
+    if (value59) value59['position']['set'](0.33, 1.44, 0);
+    if (value60) value60['position']['set'](-0.42, 1.18, 0);
+    if (value61) value61['position']['set'](0.42, 1.18, 0);
     if (value62) value62['position']['set'](-0.45, 0.87, 0.01);
     if (value63) value63['position']['set'](0.45, 0.87, 0.01);
     if (value64) value64['position']['set'](-0.455, 0.63, 0.01);
     if (value65) value65['position']['set'](0.455, 0.63, 0.01);
     box6 &&
-      (box6['position']['set'](-0.125, 0.47, 0x0), box6['scale']['set'](1.06, 0x1, 1.02));
-    box7 && (box7['position']['set'](0.125, 0.47, 0x0), box7['scale']['set'](1.06, 0x1, 1.02));
-    box8 && (box8['position']['set'](-0.125, 0.03, 0.01), box8['scale']['set'](0x1, 0x1, 0x1));
-    box9 && (box9['position']['set'](0.125, 0.03, 0.01), box9['scale']['set'](0x1, 0x1, 0x1));
-    if (box10) box10['scale']['set'](0x1, 0x1, 0x1);
-    if (box11) box11['scale']['set'](0x1, 0x1, 0x1);
+      (box6['position']['set'](-0.125, 0.47, 0), box6['scale']['set'](1.06, 1, 1.02));
+    box7 && (box7['position']['set'](0.125, 0.47, 0), box7['scale']['set'](1.06, 1, 1.02));
+    box8 && (box8['position']['set'](-0.125, 0.03, 0.01), box8['scale']['set'](1, 1, 1));
+    box9 && (box9['position']['set'](0.125, 0.03, 0.01), box9['scale']['set'](1, 1, 1));
+    if (box10) box10['scale']['set'](1, 1, 1);
+    if (box11) box11['scale']['set'](1, 1, 1);
   }
 }
 function disposeMaterial(list2) {
@@ -862,28 +862,28 @@ function disposeObject3D(value66) {
   });
 }
 function vectorFromAxisName(value68) {
-  if (value68 === 'x') return new threeRuntime['Vector3'](0x1, 0x0, 0x0);
-  if (value68 === 'y') return new threeRuntime['Vector3'](0x0, 0x1, 0x0);
-  return new threeRuntime['Vector3'](0x0, 0x0, 0x1);
+  if (value68 === 'x') return new threeRuntime['Vector3'](1, 0, 0);
+  if (value68 === 'y') return new threeRuntime['Vector3'](0, 1, 0);
+  return new threeRuntime['Vector3'](0, 0, 1);
 }
-function toVector3Like(box12, box13 = { x: 0x0, y: 0x0, z: 0x0 }) {
+function toVector3Like(box12, box13 = { x: 0, y: 0, z: 0 }) {
   return new threeRuntime['Vector3'](
-    Number['isFinite'](Number(box12?.['x'])) ? Number(box12['x']) : Number(box13?.['x']) || 0x0,
-    Number['isFinite'](Number(box12?.['y'])) ? Number(box12['y']) : Number(box13?.['y']) || 0x0,
-    Number['isFinite'](Number(box12?.['z'])) ? Number(box12['z']) : Number(box13?.['z']) || 0x0,
+    Number['isFinite'](Number(box12?.['x'])) ? Number(box12['x']) : Number(box13?.['x']) || 0,
+    Number['isFinite'](Number(box12?.['y'])) ? Number(box12['y']) : Number(box13?.['y']) || 0,
+    Number['isFinite'](Number(box12?.['z'])) ? Number(box12['z']) : Number(box13?.['z']) || 0,
   );
 }
-function toEulerLike(box14, box15 = { x: 0x0, y: 0x0, z: 0x0 }, value69 = 'XYZ') {
+function toEulerLike(box14, box15 = { x: 0, y: 0, z: 0 }, value69 = 'XYZ') {
   return new threeRuntime['Euler'](
-    Number['isFinite'](Number(box14?.['x'])) ? Number(box14['x']) : Number(box15?.['x']) || 0x0,
-    Number['isFinite'](Number(box14?.['y'])) ? Number(box14['y']) : Number(box15?.['y']) || 0x0,
-    Number['isFinite'](Number(box14?.['z'])) ? Number(box14['z']) : Number(box15?.['z']) || 0x0,
+    Number['isFinite'](Number(box14?.['x'])) ? Number(box14['x']) : Number(box15?.['x']) || 0,
+    Number['isFinite'](Number(box14?.['y'])) ? Number(box14['y']) : Number(box15?.['y']) || 0,
+    Number['isFinite'](Number(box14?.['z'])) ? Number(box14['z']) : Number(box15?.['z']) || 0,
     value69,
   );
 }
 function toScaleVector(box16) {
   if (Number['isFinite'](box16)) {
-    const x2 = Math['max'](0.01, Number(box16) || 0x1);
+    const x2 = Math['max'](0.01, Number(box16) || 1);
     return { x: x2, y: x2, z: x2 };
   }
   if (
@@ -893,11 +893,11 @@ function toScaleVector(box16) {
     Number['isFinite'](box16['z'])
   )
     return {
-      x: Math['max'](0.01, Number(box16['x']) || 0x1),
-      y: Math['max'](0.01, Number(box16['y']) || 0x1),
-      z: Math['max'](0.01, Number(box16['z']) || 0x1),
+      x: Math['max'](0.01, Number(box16['x']) || 1),
+      y: Math['max'](0.01, Number(box16['y']) || 1),
+      z: Math['max'](0.01, Number(box16['z']) || 1),
     };
-  return { x: 0x1, y: 0x1, z: 0x1 };
+  return { x: 1, y: 1, z: 1 };
 }
 function applyGroupScale(box17, value70) {
   const box18 = toScaleVector(value70);
@@ -905,19 +905,19 @@ function applyGroupScale(box17, value70) {
 }
 function applyGroupTransform(value71, value72) {
   value71['position']['set'](
-    Number(value72?.['position']?.['x']) || 0x0,
-    Number(value72?.['position']?.['y']) || 0x0,
-    Number(value72?.['position']?.['z']) || 0x0,
+    Number(value72?.['position']?.['x']) || 0,
+    Number(value72?.['position']?.['y']) || 0,
+    Number(value72?.['position']?.['z']) || 0,
   );
   if (hasFiniteQuaternion(value72?.['quaternion'])) {
-    const box19 = normalizeQuaternionData(value72['quaternion'], { x: 0x0, y: 0x0, z: 0x0, w: 0x1 });
+    const box19 = normalizeQuaternionData(value72['quaternion'], { x: 0, y: 0, z: 0, w: 1 });
     value71['quaternion']['set'](box19['x'], box19['y'], box19['z'], box19['w']);
     return;
   }
   value71['rotation']['set'](
-    Number(value72?.['rotation']?.['x']) || 0x0,
-    Number(value72?.['rotation']?.['y']) || 0x0,
-    Number(value72?.['rotation']?.['z']) || 0x0,
+    Number(value72?.['rotation']?.['x']) || 0,
+    Number(value72?.['rotation']?.['y']) || 0,
+    Number(value72?.['rotation']?.['z']) || 0,
   );
 }
 function hasFiniteQuaternion(box20) {
@@ -928,7 +928,7 @@ function hasFiniteQuaternion(box20) {
     Number['isFinite'](Number(box20?.['w']))
   );
 }
-function normalizeQuaternionData(box21, args = { x: 0x0, y: 0x0, z: 0x0, w: 0x1 }) {
+function normalizeQuaternionData(box21, args = { x: 0, y: 0, z: 0, w: 1 }) {
   const x3 = Number(box21?.['x']),
     y2 = Number(box21?.['y']),
     z2 = Number(box21?.['z']),
@@ -949,26 +949,26 @@ function normalizeQuaternionData(box21, args = { x: 0x0, y: 0x0, z: 0x0, w: 0x1 
     w: w / count,
   };
 }
-function toQuaternionFromPose(value73, value74 = { x: 0x0, y: 0x0, z: 0x0, w: 0x1 }, value75 = 'XYZ') {
+function toQuaternionFromPose(value73, value74 = { x: 0, y: 0, z: 0, w: 1 }, value75 = 'XYZ') {
   if (hasFiniteQuaternion(value73?.['quaternion'])) {
     const box22 = normalizeQuaternionData(value73['quaternion'], value74);
     return new threeRuntime['Quaternion'](box22['x'], box22['y'], box22['z'], box22['w']);
   }
-  const toEulerLike2 = toEulerLike(value73?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }, value75);
+  const toEulerLike2 = toEulerLike(value73?.['rotation'], { x: 0, y: 0, z: 0 }, value75);
   return new threeRuntime['Quaternion']()['setFromEuler'](toEulerLike2);
 }
 function composeMatrixFromPose(box23 = {}, value76 = 'XYZ') {
-  const toVector3Like2 = toVector3Like(box23?.['position'], { x: 0x0, y: 0x0, z: 0x0 }),
-    toQuaternionFromPose2 = toQuaternionFromPose(box23, { x: 0x0, y: 0x0, z: 0x0, w: 0x1 }, value76),
-    toVector3Like3 = toVector3Like(toScaleVector(box23?.['scale']), { x: 0x1, y: 0x1, z: 0x1 });
+  const toVector3Like2 = toVector3Like(box23?.['position'], { x: 0, y: 0, z: 0 }),
+    toQuaternionFromPose2 = toQuaternionFromPose(box23, { x: 0, y: 0, z: 0, w: 1 }, value76),
+    toVector3Like3 = toVector3Like(toScaleVector(box23?.['scale']), { x: 1, y: 1, z: 1 });
   return new threeRuntime['Matrix4']()['compose'](toVector3Like2, toQuaternionFromPose2, toVector3Like3);
 }
 function quaternionFromRotationYXZ(box24) {
   const value77 = new threeRuntime['Quaternion']()['setFromEuler'](
     new threeRuntime['Euler'](
-      Number(box24?.['x']) || 0x0,
-      Number(box24?.['y']) || 0x0,
-      Number(box24?.['z']) || 0x0,
+      Number(box24?.['x']) || 0,
+      Number(box24?.['y']) || 0,
+      Number(box24?.['z']) || 0,
       'YXZ',
     ),
   );
@@ -1004,23 +1004,23 @@ function resolveObjectOrientationQuaternion(value85, value86) {
     const value87 = new threeRuntime['Quaternion']();
     return (value86['group']['getWorldQuaternion'](value87), value87);
   }
-  return toQuaternionFromPose(value85, { x: 0x0, y: 0x0, z: 0x0, w: 0x1 });
+  return toQuaternionFromPose(value85, { x: 0, y: 0, z: 0, w: 1 });
 }
 function areOrientationQuaternionsAligned(box25, box26, value88 = 0.00001) {
   if (!box25 || !box26) return ![];
   const value89 = Math['abs'](
-    (Number(box25['x']) || 0x0) * (Number(box26['x']) || 0x0) +
-      (Number(box25['y']) || 0x0) * (Number(box26['y']) || 0x0) +
-      (Number(box25['z']) || 0x0) * (Number(box26['z']) || 0x0) +
-      (Number(box25['w']) || 0x0) * (Number(box26['w']) || 0x0),
+    (Number(box25['x']) || 0) * (Number(box26['x']) || 0) +
+      (Number(box25['y']) || 0) * (Number(box26['y']) || 0) +
+      (Number(box25['z']) || 0) * (Number(box26['z']) || 0) +
+      (Number(box25['w']) || 0) * (Number(box26['w']) || 0),
   );
-  return Math['abs'](0x1 - value89) <= value88;
+  return Math['abs'](1 - value89) <= value88;
 }
 function resolveSelectionGizmoOrientation(list3, value90, enabled14) {
   const orientationQuaternion = value90?.['orientationQuaternion']?.['clone']?.() || new threeRuntime['Quaternion']();
   if (!enabled14) return { orientationQuaternion: orientationQuaternion, usesLocalOrientation: !![] };
   const orientationQuaternion2 =
-    list3['length'] > 0x0 &&
+    list3['length'] > 0 &&
     list3['every']((value91) =>
       areOrientationQuaternionsAligned(orientationQuaternion, value91['orientationQuaternion']),
     );
@@ -1039,9 +1039,9 @@ function rotationFromQuaternionYXZ(value92) {
 }
 function normalizeCameraPoseData(options2 = {}) {
   const position = {
-      x: Number(options2?.['position']?.['x']) || 0x0,
-      y: Number(options2?.['position']?.['y']) || 0x0,
-      z: Number(options2?.['position']?.['z']) || 0x0,
+      x: Number(options2?.['position']?.['x']) || 0,
+      y: Number(options2?.['position']?.['y']) || 0,
+      z: Number(options2?.['position']?.['z']) || 0,
     },
     hasFiniteQuaternion2 = hasFiniteQuaternion(options2?.['quaternion']),
     quaternion = hasFiniteQuaternion2
@@ -1050,9 +1050,9 @@ function normalizeCameraPoseData(options2 = {}) {
     rotation = hasFiniteQuaternion2
       ? rotationFromQuaternionYXZ(quaternion)
       : {
-          x: Number(options2?.['rotation']?.['x']) || 0x0,
-          y: Number(options2?.['rotation']?.['y']) || 0x0,
-          z: Number(options2?.['rotation']?.['z']) || 0x0,
+          x: Number(options2?.['rotation']?.['x']) || 0,
+          y: Number(options2?.['rotation']?.['y']) || 0,
+          z: Number(options2?.['rotation']?.['z']) || 0,
         };
   return {
     position: position,
@@ -1102,7 +1102,7 @@ function collectSelectedObjects(value93) {
   list8['forEach']((value99) => {
     handler4(value99?.['objectType'], value99?.['objectId']);
   });
-  if (list7['length'] > 0x0) return list7;
+  if (list7['length'] > 0) return list7;
   const value100 = value93?.['selection']?.['selectedGroupId'] || null;
   if (value100) {
     const value101 = (value93?.['groups'] || [])['find']((value102) => value102['id'] === value100),
@@ -1110,7 +1110,7 @@ function collectSelectedObjects(value93) {
     list9['forEach']((value103) => {
       handler4('mannequin', value103);
     });
-    if (list7['length'] > 0x0) return list7;
+    if (list7['length'] > 0) return list7;
   }
   const enabled16 =
     value93?.['selection']?.['selectedObjectType'] === 'cube' ||
@@ -1122,11 +1122,11 @@ function collectSelectedObjects(value93) {
   const list10 = Array['isArray'](value93?.['selection']?.['selectedObjectIds'])
     ? value93['selection']['selectedObjectIds']
     : [];
-  if (list10['length'] > 0x0) {
+  if (list10['length'] > 0) {
     list10['forEach']((value104) => {
       handler4(enabled16, value104);
     });
-    if (list7['length'] > 0x0) return list7;
+    if (list7['length'] > 0) return list7;
   }
   return (handler4(enabled16, value93?.['selection']?.['selectedObjectId'] || null), list7);
 }
@@ -1137,7 +1137,7 @@ function collectSelectedObjectIds(value105, value106) {
 }
 function buildTransformSelectionSignature(value109) {
   const list11 = collectSelectedObjects(value109);
-  if (list11['length'] === 0x0) return '';
+  if (list11['length'] === 0) return '';
   return list11['map']((value110) => value110['objectType'] + ':' + value110['objectId'])
     ['sort']()
     ['join']('|');
@@ -1152,24 +1152,24 @@ function cloneGizmoDisplayContext(isMultiSelection) {
       isMultiSelection['orientationQuaternion']?.['clone']?.() || new threeRuntime['Quaternion'](),
     bounds: {
       box: isMultiSelection['bounds']?.['box']?.['clone']?.() || createFallbackBounds()['box'],
-      size: isMultiSelection['bounds']?.['size']?.['clone']?.() || new threeRuntime['Vector3'](0x1, 0x1, 0x1),
+      size: isMultiSelection['bounds']?.['size']?.['clone']?.() || new threeRuntime['Vector3'](1, 1, 1),
       sphere: isMultiSelection['bounds']?.['sphere']
         ? new threeRuntime['Sphere'](
             isMultiSelection['bounds']['sphere']['center']?.['clone']?.() || new threeRuntime['Vector3'](),
-            Number(isMultiSelection['bounds']['sphere']['radius']) || 0x0,
+            Number(isMultiSelection['bounds']['sphere']['radius']) || 0,
           )
-        : new threeRuntime['Sphere'](new threeRuntime['Vector3'](0x0, 0.5, 0x0), Math['sqrt'](0.75)),
+        : new threeRuntime['Sphere'](new threeRuntime['Vector3'](0, 0.5, 0), Math['sqrt'](0.75)),
       extents: {
-        x: Number(isMultiSelection['bounds']?.['extents']?.['x']) || 0x0,
-        y: Number(isMultiSelection['bounds']?.['extents']?.['y']) || 0x0,
-        z: Number(isMultiSelection['bounds']?.['extents']?.['z']) || 0x0,
+        x: Number(isMultiSelection['bounds']?.['extents']?.['x']) || 0,
+        y: Number(isMultiSelection['bounds']?.['extents']?.['y']) || 0,
+        z: Number(isMultiSelection['bounds']?.['extents']?.['z']) || 0,
       },
     },
     gizmoWorldMetrics: {
       extents: {
-        x: Number(isMultiSelection['gizmoWorldMetrics']?.['extents']?.['x']) || 0x0,
-        y: Number(isMultiSelection['gizmoWorldMetrics']?.['extents']?.['y']) || 0x0,
-        z: Number(isMultiSelection['gizmoWorldMetrics']?.['extents']?.['z']) || 0x0,
+        x: Number(isMultiSelection['gizmoWorldMetrics']?.['extents']?.['x']) || 0,
+        y: Number(isMultiSelection['gizmoWorldMetrics']?.['extents']?.['y']) || 0,
+        z: Number(isMultiSelection['gizmoWorldMetrics']?.['extents']?.['z']) || 0,
       },
       maxExtent: Number(isMultiSelection['gizmoWorldMetrics']?.['maxExtent']) || 0.01,
       sphereRadius: Number(isMultiSelection['gizmoWorldMetrics']?.['sphereRadius']) || 0.01,
@@ -1190,9 +1190,9 @@ function measureVisualBounds(enabled17) {
         size: size,
         sphere: sphere,
         extents: {
-          x: Math['max'](0x0, size['x'] * 0.5),
-          y: Math['max'](0x0, size['y'] * 0.5),
-          z: Math['max'](0x0, size['z'] * 0.5),
+          x: Math['max'](0, size['x'] * 0.5),
+          y: Math['max'](0, size['y'] * 0.5),
+          z: Math['max'](0, size['z'] * 0.5),
         },
       }
     );
@@ -1211,9 +1211,9 @@ function measureVisualBounds(enabled17) {
       size: size2,
       sphere: sphere2,
       extents: {
-        x: Math['max'](0x0, size2['x'] * 0.5),
-        y: Math['max'](0x0, size2['y'] * 0.5),
-        z: Math['max'](0x0, size2['z'] * 0.5),
+        x: Math['max'](0, size2['x'] * 0.5),
+        y: Math['max'](0, size2['y'] * 0.5),
+        z: Math['max'](0, size2['z'] * 0.5),
       },
     }
   );
@@ -1255,9 +1255,9 @@ function measureVisualBoundsForSelection(list12 = []) {
       size: size3,
       sphere: sphere3,
       extents: {
-        x: Math['max'](0x0, size3['x'] * 0.5),
-        y: Math['max'](0x0, size3['y'] * 0.5),
-        z: Math['max'](0x0, size3['z'] * 0.5),
+        x: Math['max'](0, size3['x'] * 0.5),
+        y: Math['max'](0, size3['y'] * 0.5),
+        z: Math['max'](0, size3['z'] * 0.5),
       },
     }
   );
@@ -1265,11 +1265,11 @@ function measureVisualBoundsForSelection(list12 = []) {
 function createFallbackBounds() {
   return {
     box: new threeRuntime['Box3'](
-      new threeRuntime['Vector3'](-0.5, 0x0, -0.5),
-      new threeRuntime['Vector3'](0.5, 0x1, 0.5),
+      new threeRuntime['Vector3'](-0.5, 0, -0.5),
+      new threeRuntime['Vector3'](0.5, 1, 0.5),
     ),
-    size: new threeRuntime['Vector3'](0x1, 0x1, 0x1),
-    sphere: new threeRuntime['Sphere'](new threeRuntime['Vector3'](0x0, 0.5, 0x0), Math['sqrt'](0.75)),
+    size: new threeRuntime['Vector3'](1, 1, 1),
+    sphere: new threeRuntime['Sphere'](new threeRuntime['Vector3'](0, 0.5, 0), Math['sqrt'](0.75)),
     extents: { x: 0.5, y: 0.5, z: 0.5 },
   };
 }
@@ -1295,9 +1295,9 @@ function computeGizmoWorldMetrics(value115, box31) {
       : value116,
     maxExtent = Math['max'](
       0.01,
-      Number(extents['x']) || 0x0,
-      Number(extents['y']) || 0x0,
-      Number(extents['z']) || 0x0,
+      Number(extents['x']) || 0,
+      Number(extents['y']) || 0,
+      Number(extents['z']) || 0,
     ),
     sphereRadius = Math['max'](0.01, Number(value115?.['sphere']?.['radius']) || 0.01),
     margin = Math['max'](GIZMO_MARGIN_WORLD_MIN, sphereRadius * GIZMO_MARGIN_WORLD_RATIO, maxExtent * 0.18);
@@ -1319,18 +1319,18 @@ function cloneRenderPose(event) {
     return {
       kind: 'panorama-default',
       position: { ...event['position'] },
-      yaw: Number(event['yaw']) || 0x0,
-      pitch: Number(event['pitch']) || 0x0,
-      fov: Number(event['fov']) || 0x48,
+      yaw: Number(event['yaw']) || 0,
+      pitch: Number(event['pitch']) || 0,
+      fov: Number(event['fov']) || 72,
     };
   return {
     kind: 'scene-default',
     position: { ...event['position'] },
     target: { ...event['target'] },
-    yaw: Number(event['yaw']) || 0x0,
-    pitch: Number(event['pitch']) || 0x0,
-    distance: Number(event['distance']) || 0x0,
-    fov: Number(event['fov']) || 0x3a,
+    yaw: Number(event['yaw']) || 0,
+    pitch: Number(event['pitch']) || 0,
+    distance: Number(event['distance']) || 0,
+    fov: Number(event['fov']) || 58,
   };
 }
 function measurePoseDistance(event2, event3) {
@@ -1348,43 +1348,43 @@ function measurePoseDistance(event2, event3) {
           cameraPoseData2['quaternion']['z'] * cameraPoseData['quaternion']['z'] +
           cameraPoseData2['quaternion']['w'] * cameraPoseData['quaternion']['w'],
       ),
-      value120 = 0x1 - Math['min'](0x1, Math['max'](0x0, value119));
+      value120 = 1 - Math['min'](1, Math['max'](0, value119));
     return value118 + value120 + Math['abs'](cameraPoseData2['fov'] - cameraPoseData['fov']);
   }
   if (event3['kind'] === 'panorama-default') {
     const value121 =
-        Math['abs']((event3['position']?.['x'] || 0x0) - (event2['position']?.['x'] || 0x0)) +
-        Math['abs']((event3['position']?.['y'] || 0x0) - (event2['position']?.['y'] || 0x0)) +
-        Math['abs']((event3['position']?.['z'] || 0x0) - (event2['position']?.['z'] || 0x0)),
+        Math['abs']((event3['position']?.['x'] || 0) - (event2['position']?.['x'] || 0)) +
+        Math['abs']((event3['position']?.['y'] || 0) - (event2['position']?.['y'] || 0)) +
+        Math['abs']((event3['position']?.['z'] || 0) - (event2['position']?.['z'] || 0)),
       value122 =
-        Math['abs']((event3['yaw'] || 0x0) - (event2['yaw'] || 0x0)) +
-        Math['abs']((event3['pitch'] || 0x0) - (event2['pitch'] || 0x0));
-    return value121 + value122 + Math['abs']((event3['fov'] || 0x0) - (event2['fov'] || 0x0));
+        Math['abs']((event3['yaw'] || 0) - (event2['yaw'] || 0)) +
+        Math['abs']((event3['pitch'] || 0) - (event2['pitch'] || 0));
+    return value121 + value122 + Math['abs']((event3['fov'] || 0) - (event2['fov'] || 0));
   }
   const value123 =
-      Math['abs']((event3['position']?.['x'] || 0x0) - (event2['position']?.['x'] || 0x0)) +
-      Math['abs']((event3['position']?.['y'] || 0x0) - (event2['position']?.['y'] || 0x0)) +
-      Math['abs']((event3['position']?.['z'] || 0x0) - (event2['position']?.['z'] || 0x0)),
+      Math['abs']((event3['position']?.['x'] || 0) - (event2['position']?.['x'] || 0)) +
+      Math['abs']((event3['position']?.['y'] || 0) - (event2['position']?.['y'] || 0)) +
+      Math['abs']((event3['position']?.['z'] || 0) - (event2['position']?.['z'] || 0)),
     value124 =
-      Math['abs']((event3['target']?.['x'] || 0x0) - (event2['target']?.['x'] || 0x0)) +
-      Math['abs']((event3['target']?.['y'] || 0x0) - (event2['target']?.['y'] || 0x0)) +
-      Math['abs']((event3['target']?.['z'] || 0x0) - (event2['target']?.['z'] || 0x0));
-  return value123 + value124 + Math['abs']((event3['fov'] || 0x0) - (event2['fov'] || 0x0));
+      Math['abs']((event3['target']?.['x'] || 0) - (event2['target']?.['x'] || 0)) +
+      Math['abs']((event3['target']?.['y'] || 0) - (event2['target']?.['y'] || 0)) +
+      Math['abs']((event3['target']?.['z'] || 0) - (event2['target']?.['z'] || 0));
+  return value123 + value124 + Math['abs']((event3['fov'] || 0) - (event2['fov'] || 0));
 }
 function areSceneViewsEquivalent(event4, event5, value125 = 0.00001) {
   if (!event4 || !event5) return ![];
   const box32 = event4['target'] || {},
     box33 = event5['target'] || {};
   return (
-    Math['abs']((Number(box32['x']) || 0x0) - (Number(box33['x']) || 0x0)) <= value125 &&
-    Math['abs']((Number(box32['y']) || 0x0) - (Number(box33['y']) || 0x0)) <= value125 &&
-    Math['abs']((Number(box32['z']) || 0x0) - (Number(box33['z']) || 0x0)) <= value125 &&
+    Math['abs']((Number(box32['x']) || 0) - (Number(box33['x']) || 0)) <= value125 &&
+    Math['abs']((Number(box32['y']) || 0) - (Number(box33['y']) || 0)) <= value125 &&
+    Math['abs']((Number(box32['z']) || 0) - (Number(box33['z']) || 0)) <= value125 &&
     Math['abs'](
-      normalizeAngle((Number(event4['orbitYaw']) || 0x0) - (Number(event5['orbitYaw']) || 0x0)),
+      normalizeAngle((Number(event4['orbitYaw']) || 0) - (Number(event5['orbitYaw']) || 0)),
     ) <= value125 &&
-    Math['abs']((Number(event4['orbitPitch']) || 0x0) - (Number(event5['orbitPitch']) || 0x0)) <=
+    Math['abs']((Number(event4['orbitPitch']) || 0) - (Number(event5['orbitPitch']) || 0)) <=
       value125 &&
-    Math['abs']((Number(event4['orbitDistance']) || 0x0) - (Number(event5['orbitDistance']) || 0x0)) <=
+    Math['abs']((Number(event4['orbitDistance']) || 0) - (Number(event5['orbitDistance']) || 0)) <=
       value125
   );
 }
@@ -1393,7 +1393,7 @@ export class PanoramaScene3DBridge {
     ((this['container'] = container),
       (this['onPanoramaStatusChange'] = onPanoramaStatusChange),
       (this['scene'] = new threeRuntime['Scene']()),
-      (this['camera'] = new threeRuntime['PerspectiveCamera'](0x37, 0x1, 0.1, 0xfa)),
+      (this['camera'] = new threeRuntime['PerspectiveCamera'](55, 1, 0.1, 250)),
       (this['camera']['rotation']['order'] = 'YXZ'),
       (this['renderer'] = new threeRuntime['WebGLRenderer']({
         antialias: !![],
@@ -1402,16 +1402,16 @@ export class PanoramaScene3DBridge {
       })),
       (this['renderer']['sortObjects'] = !![]),
       (this['renderer']['outputColorSpace'] = threeRuntime['SRGBColorSpace']),
-      this['renderer']['setPixelRatio'](Math['min'](window['devicePixelRatio'] || 0x1, 0x2)),
-      this['renderer']['setClearAlpha'](0x0),
+      this['renderer']['setPixelRatio'](Math['min'](window['devicePixelRatio'] || 1, 2)),
+      this['renderer']['setClearAlpha'](0),
       (this['renderer']['domElement']['className'] = 'panorama-scene-webgl'),
       (this['renderer']['domElement']['draggable'] = ![]),
       this['container']?.['appendChild'](this['renderer']['domElement']),
       (this['_ambientLight'] = new threeRuntime['AmbientLight'](0xffffff, 0.88)),
       (this['_keyLight'] = new threeRuntime['DirectionalLight'](0xffffff, 1.05)),
-      this['_keyLight']['position']['set'](0x6, 0xa, 0x4),
+      this['_keyLight']['position']['set'](6, 10, 4),
       (this['_rimLight'] = new threeRuntime['DirectionalLight'](0x88b6ff, 0.38)),
-      this['_rimLight']['position']['set'](-0x6, 0x8, -0xa),
+      this['_rimLight']['position']['set'](-6, 8, -10),
       this['scene']['add'](this['_ambientLight'], this['_keyLight'], this['_rimLight']));
     const themeColorValue = resolveThemeColorValue('--panorama-scene-grid-night', '--indigo-35');
     ((this['_gridMinor'] = new threeRuntime['GridHelper'](
@@ -1426,7 +1426,7 @@ export class PanoramaScene3DBridge {
           (value126['depthWrite'] = ![]),
           (value126['depthTest'] = !![]));
       }),
-      (this['_gridMinor']['renderOrder'] = 0x1),
+      (this['_gridMinor']['renderOrder'] = 1),
       this['scene']['add'](this['_gridMinor']),
       (this['_gridMajor'] = new threeRuntime['GridHelper'](
         GRID_BASE_SPAN,
@@ -1440,10 +1440,10 @@ export class PanoramaScene3DBridge {
           (value127['depthWrite'] = ![]),
           (value127['depthTest'] = !![]));
       }),
-      (this['_gridMajor']['renderOrder'] = 0x2),
+      (this['_gridMajor']['renderOrder'] = 2),
       this['scene']['add'](this['_gridMajor']),
       (this['_ground'] = new threeRuntime['Mesh'](
-        new threeRuntime['PlaneGeometry'](0x1, 0x1),
+        new threeRuntime['PlaneGeometry'](1, 1),
         new threeRuntime['MeshBasicMaterial']({
           color: resolveThemeColor('--panorama-scene-ground-night', '--indigo-12'),
           transparent: !![],
@@ -1452,16 +1452,16 @@ export class PanoramaScene3DBridge {
           depthWrite: ![],
           depthTest: !![],
           polygonOffset: !![],
-          polygonOffsetFactor: 0x1,
-          polygonOffsetUnits: 0x1,
+          polygonOffsetFactor: 1,
+          polygonOffsetUnits: 1,
         }),
       )),
-      (this['_ground']['rotation']['x'] = -Math['PI'] / 0x2),
+      (this['_ground']['rotation']['x'] = -Math['PI'] / 2),
       (this['_ground']['position']['y'] = -0.001),
-      (this['_ground']['renderOrder'] = 0x0),
+      (this['_ground']['renderOrder'] = 0),
       this['scene']['add'](this['_ground']),
       (this['_panoramaSphere'] = new threeRuntime['Mesh'](
-        new threeRuntime['SphereGeometry'](0x3c, 0x30, 0x20),
+        new threeRuntime['SphereGeometry'](60, 48, 32),
         new threeRuntime['MeshBasicMaterial']({ color: 0xffffff, side: threeRuntime['BackSide'] }),
       )),
       (this['_panoramaSphere']['visible'] = ![]),
@@ -1479,8 +1479,8 @@ export class PanoramaScene3DBridge {
       (this['_pickMap'] = new Map()),
       (this['_pickRoots'] = []),
       (this['_sceneState'] = null),
-      (this['_sceneContentExtent'] = 0x10),
-      (this['_sceneContentBounds'] = { center: { x: 0x0, y: 0x0, z: 0x0 }, radius: 0x10 }),
+      (this['_sceneContentExtent'] = 16),
+      (this['_sceneContentBounds'] = { center: { x: 0, y: 0, z: 0 }, radius: 16 }),
       (this['_draftView'] = null),
       (this['_draftObjects'] = new Map()),
       (this['_draftMannequinBonePoses'] = new Map()),
@@ -1488,15 +1488,15 @@ export class PanoramaScene3DBridge {
       (this['_loadedPanoramaUrl'] = ''),
       (this['_pendingPanoramaUrl'] = ''),
       (this['_panoramaSourceKey'] = ''),
-      (this['_panoramaLoadToken'] = 0x0),
+      (this['_panoramaLoadToken'] = 0),
       (this['_panoramaTexture'] = null),
       (this['_panoramaTextureAbortController'] = null),
       (this['_panoramaFullLoadFrame'] = null),
       (this['_renderPose'] = null),
       (this['_defaultSceneFocalLength'] = SCENE_DEFAULT_FOCAL_LENGTH_MM),
       (this['_smoothedPose'] = null),
-      (this['_lastRenderTime'] = 0x0),
-      (this['_viewSmoothingUntil'] = 0x0),
+      (this['_lastRenderTime'] = 0),
+      (this['_viewSmoothingUntil'] = 0),
       (this['_gridSnapState'] = { minorX: null, minorZ: null, majorX: null, majorZ: null }),
       (this['_lastStableGizmoSelectionSignature'] = ''),
       (this['_lastStableGizmoContext'] = null),
@@ -1512,8 +1512,8 @@ export class PanoramaScene3DBridge {
       this['scene']['add'](this['_gizmo']['root']),
       (this['_gizmoMoveGuideLine'] = new threeRuntime['Line'](
         createLineGeometry(
-          new threeRuntime['Vector3'](0x0, 0x0, 0x0),
-          new threeRuntime['Vector3'](0x0, 0x0, 0x0),
+          new threeRuntime['Vector3'](0, 0, 0),
+          new threeRuntime['Vector3'](0, 0, 0),
         ),
         configureGizmoMaterial(
           new threeRuntime['LineBasicMaterial']({
@@ -1527,15 +1527,15 @@ export class PanoramaScene3DBridge {
       )),
       configureGizmoObject(this['_gizmoMoveGuideLine']),
       (this['_gizmoMoveGuideLine']['visible'] = ![]),
-      (this['_gizmoMoveGuideLine']['renderOrder'] = 0x3),
+      (this['_gizmoMoveGuideLine']['renderOrder'] = 3),
       this['scene']['add'](this['_gizmoMoveGuideLine']),
-      this['resize'](0x280, 0x168),
+      this['resize'](640, 360),
       this['requestRender']());
   }
   ['resize'](value129, value130) {
-    const value131 = Math['max'](0x1, Math['floor'](value129 || this['container']?.['clientWidth'] || 0x1)),
-      value132 = Math['max'](0x1, Math['floor'](value130 || this['container']?.['clientHeight'] || 0x1));
-    (this['renderer']['setPixelRatio'](Math['min'](window['devicePixelRatio'] || 0x1, 0x2)),
+    const value131 = Math['max'](1, Math['floor'](value129 || this['container']?.['clientWidth'] || 1)),
+      value132 = Math['max'](1, Math['floor'](value130 || this['container']?.['clientHeight'] || 1));
+    (this['renderer']['setPixelRatio'](Math['min'](window['devicePixelRatio'] || 1, 2)),
       scene3dViewProjection['resizeBridgeViewProjection'](this, value131, value132),
       this['renderer']['setSize'](value131, value132, ![]),
       this['requestRender']());
@@ -1580,7 +1580,7 @@ export class PanoramaScene3DBridge {
   ['setDraftObjectTransform'](value142, value143, box34) {
     const value144 = value142 + ':' + value143,
       quaternion2 = hasFiniteQuaternion(box34?.['quaternion'])
-        ? normalizeQuaternionData(box34['quaternion'], { x: 0x0, y: 0x0, z: 0x0, w: 0x1 })
+        ? normalizeQuaternionData(box34['quaternion'], { x: 0, y: 0, z: 0, w: 1 })
         : value142 === 'camera'
           ? normalizeCameraPoseData(box34)['quaternion']
           : undefined;
@@ -1653,12 +1653,12 @@ export class PanoramaScene3DBridge {
       this['requestRender']());
   }
   ['markViewSmoothingWindow'](value160 = VIEW_DAMPING_WINDOW_MS) {
-    const value161 = Math['max'](0x0, Number(value160) || VIEW_DAMPING_WINDOW_MS),
+    const value161 = Math['max'](0, Number(value160) || VIEW_DAMPING_WINDOW_MS),
       value162 = performance['now']();
-    this['_viewSmoothingUntil'] = Math['max'](this['_viewSmoothingUntil'] || 0x0, value162 + value161);
+    this['_viewSmoothingUntil'] = Math['max'](this['_viewSmoothingUntil'] || 0, value162 + value161);
   }
   ['readCurrentViewPose']() {
-    const x5 = new threeRuntime['Vector3'](0x0, 0x0, -0x1)['applyQuaternion'](
+    const x5 = new threeRuntime['Vector3'](0, 0, -1)['applyQuaternion'](
         this['camera']['quaternion'],
       ),
       fov2 = scene3dViewProjection['readBridgePerspectiveFov'](this);
@@ -1681,7 +1681,7 @@ export class PanoramaScene3DBridge {
       },
       forward: { x: x5['x'], y: x5['y'], z: x5['z'] },
       yaw: Math['atan2'](x5['x'], x5['z']),
-      pitch: Math['asin'](Math['max'](-0x1, Math['min'](0x1, x5['y']))),
+      pitch: Math['asin'](Math['max'](-1, Math['min'](1, x5['y']))),
       fov: fov2,
       focalLength: fovToFocalLength(fov2),
       projection: this['readViewProjection'](),
@@ -1709,8 +1709,8 @@ export class PanoramaScene3DBridge {
   ['_resolvePointerRay'](value163, value164) {
     const box35 = this['renderer']['domElement']['getBoundingClientRect'](),
       value165 = new threeRuntime['Vector2'](
-        ((value163 - box35['left']) / box35['width']) * 0x2 - 0x1,
-        -(((value164 - box35['top']) / box35['height']) * 0x2 - 0x1),
+        ((value163 - box35['left']) / box35['width']) * 2 - 1,
+        -(((value164 - box35['top']) / box35['height']) * 2 - 1),
       ),
       value166 = new threeRuntime['Raycaster']();
     return (value166['setFromCamera'](value165, this['camera']), value166);
@@ -1741,7 +1741,7 @@ export class PanoramaScene3DBridge {
   ['setGizmoMoveGuideLine']({ from: from2, to: to } = {}) {
     const enabled28 = this['_gizmoMoveGuideLine'];
     if (!enabled28) return;
-    const toVector3Like4 = toVector3Like(from2, { x: 0x0, y: 0x0, z: 0x0 }),
+    const toVector3Like4 = toVector3Like(from2, { x: 0, y: 0, z: 0 }),
       toVector3Like5 = toVector3Like(to, toVector3Like4);
     (setLineGeometryPoints(enabled28, toVector3Like4, toVector3Like5),
       (enabled28['visible'] = !![]),
@@ -1776,7 +1776,7 @@ export class PanoramaScene3DBridge {
       this['_gizmo']?.['scaleGroup']?.['visible'];
     if (!enabled31) return null;
     const list13 = Array['isArray'](this['_gizmo']['pickMeshes']) ? this['_gizmo']['pickMeshes'] : [];
-    if (list13['length'] === 0x0) return null;
+    if (list13['length'] === 0) return null;
     const value176 = this['_resolvePointerRay'](value174, value175),
       value177 = value176['intersectObjects'](list13, !![]);
     for (const x6 of value177) {
@@ -1828,12 +1828,12 @@ export class PanoramaScene3DBridge {
       const value181 = this['camera']['getWorldDirection'](new threeRuntime['Vector3']())['normalize'](),
         value182 = new threeRuntime['Vector3']()['crossVectors'](value181, vectorFromAxisName3);
       (value182['lengthSq']() < 0.00001 &&
-        (value182['copy'](new threeRuntime['Vector3'](0x0, 0x1, 0x0)['cross'](vectorFromAxisName3)),
+        (value182['copy'](new threeRuntime['Vector3'](0, 1, 0)['cross'](vectorFromAxisName3)),
         value182['lengthSq']() < 0.00001 &&
-          value182['copy'](new threeRuntime['Vector3'](0x1, 0x0, 0x0)['cross'](vectorFromAxisName3))),
+          value182['copy'](new threeRuntime['Vector3'](1, 0, 0)['cross'](vectorFromAxisName3))),
         (planeNormalWorld = new threeRuntime['Vector3']()['crossVectors'](vectorFromAxisName3, value182)['normalize']()));
     }
-    planeNormalWorld['lengthSq']() < 0.000001 && (planeNormalWorld = new threeRuntime['Vector3'](0x0, 0x1, 0x0));
+    planeNormalWorld['lengthSq']() < 0.000001 && (planeNormalWorld = new threeRuntime['Vector3'](0, 1, 0));
     const dragPlane = new threeRuntime['Plane']()['setFromNormalAndCoplanarPoint'](planeNormalWorld, pivot),
       value183 = this['_resolvePointerRay'](clientX, clientY),
       value184 = new threeRuntime['Vector3'](),
@@ -1886,7 +1886,7 @@ export class PanoramaScene3DBridge {
     );
   }
   ['computeRotateGizmoAngle'](x7, currentPoint) {
-    if (!x7?.['startPoint'] || !currentPoint) return 0x0;
+    if (!x7?.['startPoint'] || !currentPoint) return 0;
     return computeSignedRotationDelta({
       startPoint: {
         x: x7['startPoint']['x'],
@@ -1936,8 +1936,8 @@ export class PanoramaScene3DBridge {
           gizmoQuaternion: gizmoQuaternion3['clone'](),
           dragPlane: dragPlane3,
           startPoint: startPoint3['clone'](),
-          startClientX: Number(clientX3) || 0x0,
-          startClientY: Number(clientY3) || 0x0,
+          startClientX: Number(clientX3) || 0,
+          startClientY: Number(clientY3) || 0,
           referenceDistance: Math['max'](0.25, startPoint3['distanceTo'](pivot3)),
         }
       );
@@ -1946,9 +1946,9 @@ export class PanoramaScene3DBridge {
       value189 = this['camera']['getWorldDirection'](new threeRuntime['Vector3']())['normalize']();
     let value190 = new threeRuntime['Vector3']()['crossVectors'](value189, axisWorld2);
     value190['lengthSq']() < 0.00001 &&
-      ((value190 = new threeRuntime['Vector3'](0x0, 0x1, 0x0)['cross'](axisWorld2)),
+      ((value190 = new threeRuntime['Vector3'](0, 1, 0)['cross'](axisWorld2)),
       value190['lengthSq']() < 0.00001 &&
-        (value190 = new threeRuntime['Vector3'](0x1, 0x0, 0x0)['cross'](axisWorld2)));
+        (value190 = new threeRuntime['Vector3'](1, 0, 0)['cross'](axisWorld2)));
     const planeNormalWorld2 = new threeRuntime['Vector3']()['crossVectors'](axisWorld2, value190)['normalize'](),
       dragPlane4 = new threeRuntime['Plane']()['setFromNormalAndCoplanarPoint'](planeNormalWorld2, pivot3),
       startPoint4 = new threeRuntime['Vector3'](),
@@ -1958,7 +1958,7 @@ export class PanoramaScene3DBridge {
     const worldDistance = Math['max'](
         0.35,
         Math['abs'](startPoint4['clone']()['sub'](pivot3)['dot'](axisWorld2)),
-        (Number(this['_gizmo']?.['root']?.['scale']?.['x']) || 0x1) * 0.9,
+        (Number(this['_gizmo']?.['root']?.['scale']?.['x']) || 1) * 0.9,
       ),
       axisScreenDirection = resolveAxisScreenDragMetric({
         pivot: pivot3,
@@ -1980,15 +1980,15 @@ export class PanoramaScene3DBridge {
       gizmoQuaternion: gizmoQuaternion3['clone'](),
       dragPlane: dragPlane4,
       startPoint: startPoint4['clone'](),
-      startClientX: Number(clientX3) || 0x0,
-      startClientY: Number(clientY3) || 0x0,
+      startClientX: Number(clientX3) || 0,
+      startClientY: Number(clientY3) || 0,
       axisScreenDirection: axisScreenDirection?.['axisScreenDirection'] || null,
       screenReferencePixels: axisScreenDirection?.['screenReferencePixels'] || null,
       referenceDistance: worldDistance,
     };
   }
   ['computeScaleGizmoFactor'](startX, currentX) {
-    if (!startX?.['startPoint'] || !currentX) return 0x1;
+    if (!startX?.['startPoint'] || !currentX) return 1;
     if (startX['mode'] === 'scale-axis') {
       if (
         startX['axisScreenDirection'] &&
@@ -2038,9 +2038,9 @@ export class PanoramaScene3DBridge {
       Number['isFinite'](Number(currentX['clientX'])) &&
       Number['isFinite'](Number(currentX['clientY']))
     ) {
-      const value191 = Number(currentX['clientX']) - Number(startX['startClientX'] || 0x0),
-        value192 = Number(startX['startClientY'] || 0x0) - Number(currentX['clientY']);
-      return Math['max'](0.001, Math['exp']((value192 + value191 * 0.35) / 0xb4));
+      const value191 = Number(currentX['clientX']) - Number(startX['startClientX'] || 0),
+        value192 = Number(startX['startClientY'] || 0) - Number(currentX['clientY']);
+      return Math['max'](0.001, Math['exp']((value192 + value191 * 0.35) / 180));
     }
     return computeUniformScaleFactor({
       startPoint: {
@@ -2119,16 +2119,16 @@ export class PanoramaScene3DBridge {
           value199['group']['getWorldPosition'](value200);
           const depth = value200['clone']()['project'](this['camera']);
           if (
-            depth['x'] < -0x1 ||
-            depth['x'] > 0x1 ||
-            depth['y'] < -0x1 ||
-            depth['y'] > 0x1 ||
-            depth['z'] < -0x1 ||
-            depth['z'] > 0x1
+            depth['x'] < -1 ||
+            depth['x'] > 1 ||
+            depth['y'] < -1 ||
+            depth['y'] > 1 ||
+            depth['z'] < -1 ||
+            depth['z'] > 1
           )
             return;
-          const value201 = box37['left'] + (depth['x'] + 0x1) * 0.5 * box37['width'],
-            value202 = box37['top'] + (0x1 - depth['y']) * 0.5 * box37['height'];
+          const value201 = box37['left'] + (depth['x'] + 1) * 0.5 * box37['width'],
+            value202 = box37['top'] + (1 - depth['y']) * 0.5 * box37['height'];
           value201 >= box36['left'] &&
             value201 <= box36['right'] &&
             value202 >= box36['top'] &&
@@ -2157,10 +2157,10 @@ export class PanoramaScene3DBridge {
       camera: this['camera'],
     });
   }
-  ['intersectGround'](value207, value208, value209 = 0x0) {
+  ['intersectGround'](value207, value208, value209 = 0) {
     if (this['_isPanorama360Mode']()) return null;
     const value210 = this['_resolvePointerRay'](value207, value208),
-      value211 = new threeRuntime['Plane'](new threeRuntime['Vector3'](0x0, 0x1, 0x0), -value209),
+      value211 = new threeRuntime['Plane'](new threeRuntime['Vector3'](0, 1, 0), -value209),
       x11 = new threeRuntime['Vector3'](),
       enabled41 = value210['ray']['intersectPlane'](value211, x11);
     if (!enabled41) return null;
@@ -2239,10 +2239,10 @@ export class PanoramaScene3DBridge {
         try {
           const list19 = value221['toDataURL']('image/png'),
             [, value222] = list19['split'](','),
-            type = list19['slice'](list19['indexOf'](':') + 0x1, list19['indexOf'](';')),
+            type = list19['slice'](list19['indexOf'](':') + 1, list19['indexOf'](';')),
             list20 = atob(value222 || ''),
             uint8Array = new Uint8Array(list20['length']);
-          for (let value223 = 0x0; value223 < list20['length']; value223 += 0x1) {
+          for (let value223 = 0; value223 < list20['length']; value223 += 1) {
             uint8Array[value223] = list20['charCodeAt'](value223);
           }
           handler7(new Blob([uint8Array], { type: type || 'image/png' }));
@@ -2289,12 +2289,12 @@ export class PanoramaScene3DBridge {
   }
   ['dispose']() {
     (this['_rafId'] !== null && (cancelAnimationFrame(this['_rafId']), (this['_rafId'] = null)),
-      (this['_panoramaLoadToken'] += 0x1),
+      (this['_panoramaLoadToken'] += 1),
       this['_abortPanoramaTextureLoad'](),
       this['_cancelPanoramaFullLoad'](),
       (this['_smoothedPose'] = null),
-      (this['_lastRenderTime'] = 0x0),
-      (this['_viewSmoothingUntil'] = 0x0),
+      (this['_lastRenderTime'] = 0),
+      (this['_viewSmoothingUntil'] = 0),
       this['_mannequinMap']['forEach']((value228) => {
         (this['scene']['remove'](value228['group']), disposeObject3D(value228['group']));
       }),
@@ -2334,10 +2334,10 @@ export class PanoramaScene3DBridge {
         value232 ? '--panorama-scene-fog-night' : '--panorama-scene-fog-day',
       );
     ((this['scene']['background'] = null),
-      this['renderer']['setClearColor'](0x0, 0x0),
+      this['renderer']['setClearColor'](0, 0),
       (this['scene']['fog'] = this['_isPanorama360Mode'](this['_sceneState'])
         ? null
-        : new threeRuntime['Fog'](themeColor, value232 ? 0x2e : 0x3a, value232 ? 0x8a : 0xaa)),
+        : new threeRuntime['Fog'](themeColor, value232 ? 46 : 58, value232 ? 138 : 0xaa)),
       (this['_ambientLight']['intensity'] = value232 ? 0.56 : 0.94),
       (this['_keyLight']['intensity'] = value232 ? 0.72 : 1.12),
       (this['_rimLight']['intensity'] = value232 ? 0.2 : 0.16),
@@ -2396,8 +2396,8 @@ export class PanoramaScene3DBridge {
       (el2['dataset']['panoramaEmpty'] = value239 ? '1' : '0'));
   }
   ['_syncInfiniteGrid']() {
-    const value240 = Number(this['camera']?.['position']?.['x']) || 0x0,
-      value241 = Number(this['camera']?.['position']?.['z']) || 0x0,
+    const value240 = Number(this['camera']?.['position']?.['x']) || 0,
+      value241 = Number(this['camera']?.['position']?.['z']) || 0,
       stableGridSnap = computeStableGridSnap(
         value240,
         GRID_MINOR_STEP,
@@ -2426,28 +2426,28 @@ export class PanoramaScene3DBridge {
       (this['_gridSnapState']['minorZ'] = stableGridSnap2),
       (this['_gridSnapState']['majorX'] = stableGridSnap3),
       (this['_gridSnapState']['majorZ'] = stableGridSnap4),
-      this['_gridMinor']['position']['set'](stableGridSnap, 0x0, stableGridSnap2),
+      this['_gridMinor']['position']['set'](stableGridSnap, 0, stableGridSnap2),
       this['_gridMajor']['position']['set'](stableGridSnap3, 0.0002, stableGridSnap4));
-    const value242 = Number(this['_renderPose']?.['distance']) || 0x0,
+    const value242 = Number(this['_renderPose']?.['distance']) || 0,
       value243 = Math['max'](
         GRID_BASE_SPAN,
-        Math['abs'](Number(this['camera']?.['position']?.['y']) || 0x0) * 0x1a,
-        value242 * 0x1c,
+        Math['abs'](Number(this['camera']?.['position']?.['y']) || 0) * 26,
+        value242 * 28,
       );
     (this['_ground']['position']['set'](stableGridSnap3, -0.001, stableGridSnap4),
-      this['_ground']['scale']['set'](value243, value243, 0x1));
+      this['_ground']['scale']['set'](value243, value243, 1));
     const value244 = this['_sceneState']?.['environmentMode'] === 'night',
       value245 = value244 ? 0.28 : 0.24,
       value246 = value244 ? 0.52 : 0.42,
       value247 = Math['abs'](
         Number['isFinite'](this['_renderPose']?.['pitch'])
           ? this['_renderPose']['pitch']
-          : Number(this['camera']?.['rotation']?.['x']) || 0x0,
+          : Number(this['camera']?.['rotation']?.['x']) || 0,
       ),
       clamp012 = clamp01((value247 - 0.08) / 0.32),
       value248 = 0.18 + 0.82 * clamp012,
-      clamp013 = clamp01((value242 - 0x8) / 0x1a),
-      value249 = 0x1 - 0.52 * clamp013,
+      clamp013 = clamp01((value242 - 8) / 26),
+      value249 = 1 - 0.52 * clamp013,
       value250 = value248 * value249,
       value251 = value245 * value250,
       value252 = value246 * (0.32 + 0.68 * value250);
@@ -2463,7 +2463,7 @@ export class PanoramaScene3DBridge {
       panoramaTextureUrl = normalizePanoramaTextureUrl(value255?.['previewImageUrl'], null),
       enabled46 = fullUrl2 || panoramaTextureUrl;
     if (!enabled46) {
-      ((this['_panoramaLoadToken'] += 0x1),
+      ((this['_panoramaLoadToken'] += 1),
         this['_abortPanoramaTextureLoad'](),
         this['_cancelPanoramaFullLoad'](),
         (this['_panoramaSourceKey'] = ''),
@@ -2476,10 +2476,10 @@ export class PanoramaScene3DBridge {
         this['_syncPanoramaCanvasVisibility']());
       return;
     }
-    const value256 = panoramaTextureUrl + '\x0a' + fullUrl2;
+    const value256 = panoramaTextureUrl + '\n' + fullUrl2;
     value256 !== this['_panoramaSourceKey'] &&
       ((this['_panoramaSourceKey'] = value256),
-      (this['_panoramaLoadToken'] += 0x1),
+      (this['_panoramaLoadToken'] += 1),
       this['_abortPanoramaTextureLoad'](),
       (this['_pendingPanoramaUrl'] = ''),
       this['_cancelPanoramaFullLoad']());
@@ -2553,7 +2553,7 @@ export class PanoramaScene3DBridge {
   ['_loadCharacterModelForVisual'](style, value270, value271) {
     if (!style) return;
     const panoramaCharacterGender = resolvePanoramaCharacterGender(value271),
-      value272 = (style['modelLoadToken'] || 0x0) + 0x1;
+      value272 = (style['modelLoadToken'] || 0) + 1;
     ((style['modelLoadToken'] = value272),
       (style['modelGender'] = panoramaCharacterGender),
       (style['modelLoadError'] = null),
@@ -2631,7 +2631,7 @@ export class PanoramaScene3DBridge {
           this['_loadCharacterModelForVisual'](mannequinVisual, box38['id'], box38['gender']));
       const value279 = this['_resolveMannequinColor'](box38['colorKey']);
       (mannequinVisual['material']['color']['copy'](value279),
-        mannequinVisual['headMaterial']['color']['copy'](value279['clone']()['offsetHSL'](0x0, 0x0, 0.08)),
+        mannequinVisual['headMaterial']['color']['copy'](value279['clone']()['offsetHSL'](0, 0, 0.08)),
         applyGenderShape(mannequinVisual, box38['gender']),
         applyCharacterBodyProfile(mannequinVisual, box38['bodyProfile']));
       const value280 = this['_draftMannequinBonePoses']?.['get']?.(box38['id']),
@@ -2645,8 +2645,8 @@ export class PanoramaScene3DBridge {
       const box39 = this['_draftObjects']['get']('mannequin:' + box38['id']);
       (applyGroupTransform(mannequinVisual['group'], box39 || box38),
         (mannequinVisual['group']['position']['y'] =
-          box39?.['position']?.['y'] ?? box38['position']['y'] ?? 0x0),
-        applyGroupScale(mannequinVisual['group'], box39?.['scale'] ?? box38['scale'] ?? 0x1));
+          box39?.['position']?.['y'] ?? box38['position']['y'] ?? 0),
+        applyGroupScale(mannequinVisual['group'], box39?.['scale'] ?? box38['scale'] ?? 1));
       const value283 =
         value278 &&
         value277?.['ui']?.['isEditing'] === !![] &&
@@ -2693,8 +2693,8 @@ export class PanoramaScene3DBridge {
       const value291 = this['_draftObjects']['get']('cube:' + box40['id']),
         box41 = value291 || box40;
       (applyGroupTransform(sceneAssetVisual['group'], box41),
-        (sceneAssetVisual['group']['position']['y'] = Number(box41?.['position']?.['y']) || 0x0),
-        applyGroupScale(sceneAssetVisual['group'], box41?.['scale'] ?? box40?.['scale'] ?? 0x1));
+        (sceneAssetVisual['group']['position']['y'] = Number(box41?.['position']?.['y']) || 0),
+        applyGroupScale(sceneAssetVisual['group'], box41?.['scale'] ?? box40?.['scale'] ?? 1));
       const value292 =
         value287 &&
         value286?.['ui']?.['isEditing'] === !![] &&
@@ -2706,7 +2706,7 @@ export class PanoramaScene3DBridge {
           applySelectionEmphasis(value293, value292, 0.22);
         }),
         sceneAssetVisual['edgeMaterialsByColorKey']['forEach']((value294) => {
-          value294['opacity'] = value292 ? 0x1 : 0.78;
+          value294['opacity'] = value292 ? 1 : 0.78;
         }));
     });
     for (const [value295, value296] of this['_cubeMap']['entries']()) {
@@ -2763,8 +2763,8 @@ export class PanoramaScene3DBridge {
         ));
       const value303 = map9['has'](value301);
       ((cameraVisual['group']['visible'] = !enabled50 && (!enabled52 || value303)),
-        (cameraVisual['bodyMaterial']['opacity'] = value303 ? 0x1 : 0.8),
-        (cameraVisual['helperLineMaterial']['opacity'] = value303 ? 0x1 : 0.8));
+        (cameraVisual['bodyMaterial']['opacity'] = value303 ? 1 : 0.8),
+        (cameraVisual['helperLineMaterial']['opacity'] = value303 ? 1 : 0.8));
     });
     for (const [value304, value305] of this['_cameraMap']['entries']()) {
       if (map10['has'](value304)) continue;
@@ -2777,7 +2777,7 @@ export class PanoramaScene3DBridge {
   }
   ['_resolveGizmoContext'](value306) {
     const list24 = collectSelectedObjects(value306);
-    if (list24['length'] === 0x0) return null;
+    if (list24['length'] === 0) return null;
     const activeTransformTool = resolveActiveTransformTool(value306),
       selectedObjects = list24['map']((objectType4) => ({
         objectType: objectType4['objectType'],
@@ -2787,7 +2787,7 @@ export class PanoramaScene3DBridge {
           this['_getObjectStateByObjectType'](objectType4['objectType'], objectType4['objectId']),
         visual: this['_getVisualByObjectType'](objectType4['objectType'], objectType4['objectId']),
       }))['filter']((enabled54) => !!enabled54['visual'] && !!enabled54['item']);
-    if (selectedObjects['length'] === 0x0) return null;
+    if (selectedObjects['length'] === 0) return null;
     selectedObjects['forEach']((value307) => {
       ((value307['pivotWorld'] = resolveObjectToolPivot(
         value307['item'],
@@ -2813,14 +2813,14 @@ export class PanoramaScene3DBridge {
               (value311) => value311['objectType'] === value308 && value311['id'] === value309,
             ) || null
           : null,
-      activeEntry = value310 || selectedObjects[0x0],
+      activeEntry = value310 || selectedObjects[0],
       pivot4 = new threeRuntime['Vector3'](),
-      isMultiSelection2 = selectedObjects['length'] > 0x1;
+      isMultiSelection2 = selectedObjects['length'] > 1;
     if (isMultiSelection2)
       (selectedObjects['forEach']((value312) => {
         pivot4['add'](value312['pivotWorld']);
       }),
-        pivot4['multiplyScalar'](0x1 / selectedObjects['length']));
+        pivot4['multiplyScalar'](1 / selectedObjects['length']));
     else activeEntry?.['pivotWorld'] && pivot4['copy'](activeEntry['pivotWorld']);
     const bounds = isMultiSelection2
         ? measureVisualBoundsForSelection(selectedObjects) || createFallbackBounds()
@@ -2851,19 +2851,19 @@ export class PanoramaScene3DBridge {
     };
   }
   ['_computeWorldUnitsPerPixelAt'](enabled55) {
-    if (!enabled55 || !this['camera']?.['position']) return 0x0;
+    if (!enabled55 || !this['camera']?.['position']) return 0;
     const value315 = Math['max'](
-      0x1,
+      1,
       Number(this['renderer']?.['domElement']?.['clientHeight']) ||
         Number(this['renderer']?.['domElement']?.['height']) ||
-        0x1,
+        1,
     );
     return scene3dViewProjection['computeScene3DWorldUnitsPerPixel'](this['camera'], value315, enabled55);
   }
-  ['_computeScreenConstantGizmoScale'](value316, value317 = 0x68) {
+  ['_computeScreenConstantGizmoScale'](value316, value317 = 104) {
     const count2 = this['_computeWorldUnitsPerPixelAt'](value316);
-    if (!(count2 > 0x0)) return 0x1;
-    return Math['max'](0.35, Math['min'](0x6, count2 * value317));
+    if (!(count2 > 0)) return 1;
+    return Math['max'](0.35, Math['min'](6, count2 * value317));
   }
   ['_captureGizmoDragLock'](box42) {
     if (!this['_gizmo'] || !box42) return null;
@@ -2871,24 +2871,24 @@ export class PanoramaScene3DBridge {
       orientationQuaternion4 = this['_gizmo']['root']['quaternion']['clone'](),
       bounds2 = {
         box: box42['bounds']?.['box']?.['clone']?.() || createFallbackBounds()['box'],
-        size: box42['bounds']?.['size']?.['clone']?.() || new threeRuntime['Vector3'](0x1, 0x1, 0x1),
+        size: box42['bounds']?.['size']?.['clone']?.() || new threeRuntime['Vector3'](1, 1, 1),
         sphere: box42['bounds']?.['sphere']
           ? new threeRuntime['Sphere'](
               box42['bounds']['sphere']['center']?.['clone']?.() || new threeRuntime['Vector3'](),
-              Number(box42['bounds']['sphere']['radius']) || 0x0,
+              Number(box42['bounds']['sphere']['radius']) || 0,
             )
-          : new threeRuntime['Sphere'](new threeRuntime['Vector3'](0x0, 0.5, 0x0), Math['sqrt'](0.75)),
+          : new threeRuntime['Sphere'](new threeRuntime['Vector3'](0, 0.5, 0), Math['sqrt'](0.75)),
         extents: {
-          x: Number(box42['bounds']?.['extents']?.['x']) || 0x0,
-          y: Number(box42['bounds']?.['extents']?.['y']) || 0x0,
-          z: Number(box42['bounds']?.['extents']?.['z']) || 0x0,
+          x: Number(box42['bounds']?.['extents']?.['x']) || 0,
+          y: Number(box42['bounds']?.['extents']?.['y']) || 0,
+          z: Number(box42['bounds']?.['extents']?.['z']) || 0,
         },
       },
       gizmoWorldMetrics2 = {
         extents: {
-          x: Number(box42['gizmoWorldMetrics']?.['extents']?.['x']) || 0x0,
-          y: Number(box42['gizmoWorldMetrics']?.['extents']?.['y']) || 0x0,
-          z: Number(box42['gizmoWorldMetrics']?.['extents']?.['z']) || 0x0,
+          x: Number(box42['gizmoWorldMetrics']?.['extents']?.['x']) || 0,
+          y: Number(box42['gizmoWorldMetrics']?.['extents']?.['y']) || 0,
+          z: Number(box42['gizmoWorldMetrics']?.['extents']?.['z']) || 0,
         },
         maxExtent: Number(box42['gizmoWorldMetrics']?.['maxExtent']) || 0.01,
         sphereRadius: Number(box42['gizmoWorldMetrics']?.['sphereRadius']) || 0.01,
@@ -2922,7 +2922,7 @@ export class PanoramaScene3DBridge {
     const x12 = enabled57['extents'],
       value320 = enabled57['margin'],
       value321 = Math['max'](0.01, Number(enabled57['maxExtent']) || 0.01),
-      value322 = Math['max'](0.001, Number(value319) || 0x1),
+      value322 = Math['max'](0.001, Number(value319) || 1),
       value323 = GIZMO_MOVE_HEAD_LENGTH * 0.5,
       value324 = GIZMO_SCALE_HEAD_SIZE * 0.5,
       value325 = GIZMO_MOVE_PICK_LENGTH - GIZMO_BASE_AXIS_LENGTH,
@@ -2942,7 +2942,7 @@ export class PanoramaScene3DBridge {
       value329?.['headMesh'] && setAxisHandleLayout(value329['headMesh'], value331 - value323, value323);
       value329?.['pickMesh'] &&
         (setAxisHandleLayout(value329['pickMesh'], value333 * 0.5),
-        value329['pickMesh']['scale']['set'](0x1, value333 / GIZMO_MOVE_PICK_LENGTH, 0x1));
+        value329['pickMesh']['scale']['set'](1, value333 / GIZMO_MOVE_PICK_LENGTH, 1));
       const value334 = enabled56['scaleLength'],
         value335 = Math['max'](GIZMO_SCALE_SHAFT_LENGTH, value334 - value324),
         value336 = Math['max'](GIZMO_SCALE_PICK_LENGTH, value334 + value326);
@@ -2951,11 +2951,11 @@ export class PanoramaScene3DBridge {
           setAxisHandleLayout(value330['headMesh'], value334 - value324, value324),
         value330?.['pickMesh'] &&
           (setAxisHandleLayout(value330['pickMesh'], value336 * 0.5),
-          value330['pickMesh']['scale']['set'](0x1, value336 / GIZMO_SCALE_PICK_LENGTH, 0x1)));
+          value330['pickMesh']['scale']['set'](1, value336 / GIZMO_SCALE_PICK_LENGTH, 1)));
     }),
       ['x', 'y', 'z']['forEach']((value337) => {
         const value338 = this['_gizmo']?.['rotateRings']?.[value337];
-        if (value338?.['group']) value338['group']['scale']['setScalar'](0x1);
+        if (value338?.['group']) value338['group']['scale']['setScalar'](1);
       }));
     const value339 = Math['max'](enabled56['planeOffset'] * 0.5, value320 * 0.42),
       value340 = Math['max'](enabled56['planeOffset'], (x12['x'] + value339) / value322),
@@ -2975,8 +2975,8 @@ export class PanoramaScene3DBridge {
         value352,
         value353,
         value354,
-        value355 = 0x1,
-        value356 = 0x1,
+        value355 = 1,
+        value356 = 1,
       ) => {
         if (!enabled58) return;
         const value357 = value354 / Math['max'](0.001, enabled56['planeSize']);
@@ -2989,11 +2989,11 @@ export class PanoramaScene3DBridge {
       },
       handler11 = (value358, value359) => {
         const value360 = value358?.[value359 + 'xy'];
-        value360 && handler10(value360, value340, value341, value350, value347, 0x1, 0x1);
+        value360 && handler10(value360, value340, value341, value350, value347, 1, 1);
         const value361 = value358?.[value359 + 'xz'];
-        value361 && handler10(value361, value340, value350, value342, value348, 0x1, 0x1);
+        value361 && handler10(value361, value340, value350, value342, value348, 1, 1);
         const value362 = value358?.[value359 + 'yz'];
-        value362 && handler10(value362, value350, value341, value342, value349, 0x1, 0x1);
+        value362 && handler10(value362, value350, value341, value342, value349, 1, 1);
       };
     (handler11(this['_gizmo']?.['planeHandles'], 'plane-'),
       handler11(this['_gizmo']?.['scalePlaneHandles'], 'scale-plane-'));
@@ -3103,8 +3103,8 @@ export class PanoramaScene3DBridge {
     this['_gizmo']?.['handles']?.['forEach']((value373, value374) => {
       const enabled65 = map11['has'](value374),
         value375 = !enabled65 && map12['has'](value374),
-        value376 = enabled65 ? 0.52 : value375 ? 0.3 : 0x0,
-        value377 = enabled65 ? 0x1 : value375 ? 0.92 : 0.8;
+        value376 = enabled65 ? 0.52 : value375 ? 0.3 : 0,
+        value377 = enabled65 ? 1 : value375 ? 0.92 : 0.8;
       (value373['visuals'] || [])['forEach']((value378) => {
         const enabled66 = value378?.['material'],
           enabled67 = value378?.['color'];
@@ -3141,7 +3141,7 @@ export class PanoramaScene3DBridge {
         value383?.['kind'] === 'panorama-default'
           ? value383['panoramaView'] || value382?.['viewport']?.['panoramaView']
           : value382?.['viewport']?.['panoramaView'];
-      panoramaViewPose = resolvePanoramaViewPose(value385, { x: 0x0, y: 0x0, z: 0x0 });
+      panoramaViewPose = resolvePanoramaViewPose(value385, { x: 0, y: 0, z: 0 });
     } else {
       if (value383?.['kind'] === 'camera') {
         const position3 = normalizeCameraPoseData(value383);
@@ -3188,7 +3188,7 @@ export class PanoramaScene3DBridge {
   ['_shouldSmoothTargetPose'](enabled69, value386 = performance['now']()) {
     if (this['_draftView']?.['disableSmoothing'] === !![]) return ![];
     if (!enabled69 || enabled69['kind'] === 'camera') return ![];
-    if (value386 <= (this['_viewSmoothingUntil'] || 0x0)) return !![];
+    if (value386 <= (this['_viewSmoothingUntil'] || 0)) return !![];
     if (!this['_smoothedPose'] || this['_smoothedPose']['kind'] !== enabled69['kind']) return ![];
     return measurePoseDistance(this['_smoothedPose'], enabled69) > POSE_SETTLE_EPSILON;
   }
@@ -3201,7 +3201,7 @@ export class PanoramaScene3DBridge {
       );
     const value388 = Math['min'](
       VIEW_DAMPING_MAX_DT_MS,
-      Math['max'](0x0, value387 - (this['_lastRenderTime'] || value387)),
+      Math['max'](0, value387 - (this['_lastRenderTime'] || value387)),
     );
     this['_lastRenderTime'] = value387;
     const event7 = this['_smoothedPose'];
@@ -3296,7 +3296,7 @@ export class PanoramaScene3DBridge {
   }
   ['_commitCameraFromPose'](event8) {
     if (!event8) return;
-    const value389 = event8?.['kind'] === 'panorama-default' ? 0x37 : 0x3a;
+    const value389 = event8?.['kind'] === 'panorama-default' ? 55 : 58;
     if (scene3dViewProjection['applyBridgeCameraProjection'](this, event8, value389)) return;
     if (event8['kind'] === 'camera') {
       const cameraPoseData5 = normalizeCameraPoseData(event8);
@@ -3315,7 +3315,7 @@ export class PanoramaScene3DBridge {
     }
     if (event8['kind'] === 'panorama-default') {
       const box44 = forwardVectorFromYawPitch(event8['yaw'], event8['pitch']);
-      (this['camera']['position']['set'](0x0, 0x0, 0x0),
+      (this['camera']['position']['set'](0, 0, 0),
         this['camera']['lookAt'](box44['x'], box44['y'], box44['z']));
       return;
     }
@@ -3334,8 +3334,8 @@ export class PanoramaScene3DBridge {
       const value392 = this['_draftObjects']['get']('mannequin:' + value391),
         box46 = value392 || box45;
       (applyGroupTransform(value390['group'], box46),
-        (value390['group']['position']['y'] = Number(box46?.['position']?.['y']) || 0x0),
-        applyGroupScale(value390['group'], box46?.['scale'] ?? box45?.['scale'] ?? 0x1));
+        (value390['group']['position']['y'] = Number(box46?.['position']?.['y']) || 0),
+        applyGroupScale(value390['group'], box46?.['scale'] ?? box45?.['scale'] ?? 1));
     }),
       this['_cubeMap']['forEach']((value393, value394) => {
         const box47 = this['_cubeStateById']['get'](value394);
@@ -3343,8 +3343,8 @@ export class PanoramaScene3DBridge {
         const value395 = this['_draftObjects']['get']('cube:' + value394),
           box48 = value395 || box47;
         (applyGroupTransform(value393['group'], box48),
-          (value393['group']['position']['y'] = Number(box48?.['position']?.['y']) || 0x0),
-          applyGroupScale(value393['group'], box48?.['scale'] ?? box47?.['scale'] ?? 0x1));
+          (value393['group']['position']['y'] = Number(box48?.['position']?.['y']) || 0),
+          applyGroupScale(value393['group'], box48?.['scale'] ?? box47?.['scale'] ?? 1));
       }),
       this['_cameraMap']['forEach']((value396, value397) => {
         const enabled70 = this['_cameraStateById']['get'](value397);

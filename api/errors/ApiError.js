@@ -98,7 +98,7 @@ export class ApiError extends Error {
       provider: provider3,
       message:
         '请求超时（' +
-        (options ? Math.round(options / 0x3e8) + '秒' : '未知') +
+        (options ? Math.round(options / 1000) + '秒' : '未知') +
         '），请检查网络连接或稍后重试',
       retryable: true,
     });
@@ -157,22 +157,22 @@ export class ApiError extends Error {
   static ['fromHttpStatus'](status2, provider10, message4) {
     let type2 = ErrorType.UNKNOWN;
     switch (status2) {
-      case 0x190:
+      case 400:
         type2 = ErrorType.INVALID_PARAMS;
         break;
-      case 0x191:
+      case 401:
         type2 = ErrorType.AUTH_ERROR;
         break;
-      case 0x193:
+      case 403:
         type2 = ErrorType.FORBIDDEN;
         break;
-      case 0x1ad:
+      case 429:
         type2 = ErrorType.RATE_LIMIT;
         break;
-      case 0x1f4:
+      case 500:
         type2 = ErrorType.SERVER_ERROR;
         break;
-      case 0x1f7:
+      case 503:
         type2 = ErrorType.SERVICE_UNAVAILABLE;
         break;
     }
@@ -181,7 +181,7 @@ export class ApiError extends Error {
       provider: provider10,
       status: status2,
       message: message4 || ERROR_MESSAGES[type2],
-      retryable: status2 >= 0x1f4 || status2 === 0x1ad,
+      retryable: status2 >= 500 || status2 === 429,
     });
   }
 }

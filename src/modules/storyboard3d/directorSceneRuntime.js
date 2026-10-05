@@ -5,7 +5,7 @@ export class DirectorSceneRuntime {
   constructor(value) {
     ((this['runtime'] = value),
       (this['materials'] = new Map()),
-      (this['token'] = 0x0),
+      (this['token'] = 0),
       (this['assetId'] = ''),
       (this['pending'] = ![]),
       (this['error'] = null));
@@ -43,37 +43,37 @@ export class DirectorSceneRuntime {
     !this['ground'] &&
       enabled['_ground']?.['material'] &&
       ((this['ground'] = new threeRuntime['Mesh'](
-        new threeRuntime['PlaneGeometry'](0x1, 0x1),
+        new threeRuntime['PlaneGeometry'](1, 1),
         enabled['_ground']['material']['clone'](),
       )),
-      (this['ground']['rotation']['x'] = -Math['PI'] / 0x2),
+      (this['ground']['rotation']['x'] = -Math['PI'] / 2),
       (this['ground']['receiveShadow'] = !![]),
       enabled['scene']['add'](this['ground']));
     if (this['ground']) {
       const enabled2 =
-        directorSceneSettings['groundHeight'] === 0x0 && directorSceneSettings['groundOpacity'] === 0x1;
+        directorSceneSettings['groundHeight'] === 0 && directorSceneSettings['groundOpacity'] === 1;
       enabled['setGroundFillVisible'](
         enabled2 &&
           directorSceneSettings['groundVisible'] &&
           !this['runtime']['adapted']['scene']['background']?.['imageUrl'],
       );
-      const data = this['runtime']['adapted']['scene']['environment']?.['groundSize'] || 0x64;
-      (this['ground']['scale']['set'](data, data, 0x1),
+      const data = this['runtime']['adapted']['scene']['environment']?.['groundSize'] || 100;
+      (this['ground']['scale']['set'](data, data, 1),
         (this['ground']['position']['y'] = directorSceneSettings['groundHeight'] - 0.001),
         (this['ground']['visible'] =
           !enabled2 &&
           directorSceneSettings['groundVisible'] &&
           !this['runtime']['adapted']['scene']['background']?.['imageUrl']),
         (this['ground']['material']['opacity'] = directorSceneSettings['groundOpacity']),
-        (this['ground']['material']['transparent'] = directorSceneSettings['groundOpacity'] < 0x1),
-        (this['ground']['material']['depthWrite'] = directorSceneSettings['groundOpacity'] >= 0x1));
+        (this['ground']['material']['transparent'] = directorSceneSettings['groundOpacity'] < 1),
+        (this['ground']['material']['depthWrite'] = directorSceneSettings['groundOpacity'] >= 1));
     }
     (this['syncMaterials'](directorSceneSettings['displayMode']),
       this['syncPanorama'](directorSceneSettings['panorama']),
       this['syncLabels'](directorSceneSettings['labels']),
       (this['materialWaitStart'] ||= Date['now']()),
       directorSceneSettings['displayMode'] !== 'solid' &&
-        Date['now']() - this['materialWaitStart'] < 0x7530 &&
+        Date['now']() - this['materialWaitStart'] < 30000 &&
         !this['materialTimer'] &&
         [...(enabled['_mannequinMap']?.['values']() || [])]['some'](
           (enabled3) => !enabled3['modelRoot'] && !enabled3['modelLoadError'],
@@ -81,7 +81,7 @@ export class DirectorSceneRuntime {
         (this['materialTimer'] = setTimeout(() => {
           this['materialTimer'] = null;
           if (!this['runtime']['disposed']) this['sync']();
-        }, 0x64)));
+        }, 100)));
   }
   ['syncLabels'](enabled4) {
     if (!enabled4) {
@@ -160,11 +160,11 @@ export class DirectorSceneRuntime {
             this['materials']['set'](original, enabled5),
             (original['material'] = Array['isArray'](original['material'])
               ? enabled5['clones']
-              : enabled5['clones'][0x0]));
+              : enabled5['clones'][0]));
         }
         ((original['material'] = Array['isArray'](enabled5['original'])
           ? enabled5['clones']
-          : enabled5['clones'][0x0]),
+          : enabled5['clones'][0]),
           enabled5['clones']['forEach']((list2, output) => {
             const list3 = Array['isArray'](enabled5['original'])
               ? enabled5['original'][output]
@@ -220,10 +220,10 @@ export class DirectorSceneRuntime {
             ((value9['colorSpace'] = threeRuntime['SRGBColorSpace']),
               !this['sphere'] &&
                 ((this['sphere'] = new threeRuntime['Mesh'](
-                  new threeRuntime['SphereGeometry'](0x1, 0x40, 0x20),
+                  new threeRuntime['SphereGeometry'](1, 64, 32),
                   new threeRuntime['MeshBasicMaterial']({ side: threeRuntime['BackSide'], depthWrite: ![] }),
                 )),
-                (this['sphere']['renderOrder'] = -0x64),
+                (this['sphere']['renderOrder'] = -100),
                 this['runtime']['bridge']['scene']['add'](this['sphere'])),
               this['sphere']['material']['map']?.['dispose'](),
               (this['sphere']['material']['map'] = value9),
@@ -244,8 +244,8 @@ export class DirectorSceneRuntime {
   }
   ['surfaceHeight'](value11, value12, value13 = []) {
     const value14 = new threeRuntime['Raycaster'](
-        new threeRuntime['Vector3'](value11, 0x2710, value12),
-        new threeRuntime['Vector3'](0x0, -0x1, 0x0),
+        new threeRuntime['Vector3'](value11, 10000, value12),
+        new threeRuntime['Vector3'](0, -1, 0),
       ),
       list4 = this['roots'](new Set(value13)),
       value15 = list4['flatMap'](({ root: root3, instanceId: instanceId }) => {
@@ -259,7 +259,7 @@ export class DirectorSceneRuntime {
           )
         );
       })['sort']((value17, value18) => value17['distance'] - value18['distance']);
-    return Math['max'](this['settings']?.['groundHeight'] || 0x0, value15[0x0]?.['point']['y'] ?? -Infinity);
+    return Math['max'](this['settings']?.['groundHeight'] || 0, value15[0]?.['point']['y'] ?? -Infinity);
   }
   ['obstacles'](list5 = []) {
     return this['roots'](new Set(list5))['map'](({ id: id2, root: root4, instanceId: instanceId2 }) => {

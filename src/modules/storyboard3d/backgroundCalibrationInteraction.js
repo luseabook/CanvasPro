@@ -3,17 +3,17 @@ import {
   updateStoryboard3DBackgroundCalibration,
 } from './backgroundCalibration.js';
 function clamp01(value) {
-  return Math['max'](0x0, Math['min'](0x1, Number(value) || 0x0));
+  return Math['max'](0, Math['min'](1, Number(value) || 0));
 }
 function toGuideCoordinate(item) {
-  return Math['round'](clamp01(item) * 0x3e8);
+  return Math['round'](clamp01(item) * 1000);
 }
 export function normalizeStoryboard3DBackgroundPointer(event, box) {
-  const key = Math['max'](0x1, Number(box?.['width']) || 0x1),
-    index = Math['max'](0x1, Number(box?.['height']) || 0x1);
+  const key = Math['max'](1, Number(box?.['width']) || 1),
+    index = Math['max'](1, Number(box?.['height']) || 1);
   return {
-    x: clamp01(((Number(event?.['clientX']) || 0x0) - (Number(box?.['left']) || 0x0)) / key),
-    y: clamp01(((Number(event?.['clientY']) || 0x0) - (Number(box?.['top']) || 0x0)) / index),
+    x: clamp01(((Number(event?.['clientX']) || 0) - (Number(box?.['left']) || 0)) / key),
+    y: clamp01(((Number(event?.['clientY']) || 0) - (Number(box?.['top']) || 0)) / index),
   };
 }
 export function computeStoryboard3DBackgroundCalibrationDrag({
@@ -30,8 +30,8 @@ export function computeStoryboard3DBackgroundCalibrationDrag({
   if (mode === 'horizon')
     ((horizonY = clamp01(args['horizonY'] + box3['y'] - box2['y'])),
       (vanishingPoint = [
-        args['vanishingPoint'][0x0],
-        clamp01(horizonY + args['horizonSlope'] * (args['vanishingPoint'][0x0] - 0.5)),
+        args['vanishingPoint'][0],
+        clamp01(horizonY + args['horizonSlope'] * (args['vanishingPoint'][0] - 0.5)),
       ]));
   else
     mode === 'vanishing-point' &&
@@ -41,12 +41,12 @@ export function computeStoryboard3DBackgroundCalibrationDrag({
     horizonY: horizonY,
     vanishingPoint: vanishingPoint,
     calibrationMethod: 'manual',
-    calibrationConfidence: 0x1,
+    calibrationConfidence: 1,
   });
 }
 export function computeStoryboard3DBackgroundGuideGeometry(result) {
   const groundPoints = normalizeStoryboard3DBackgroundCalibration(result),
-    clamp012 = clamp01(groundPoints['vanishingPoint'][0x0]),
+    clamp012 = clamp01(groundPoints['vanishingPoint'][0]),
     clamp013 = clamp01(groundPoints['horizonY'] + groundPoints['horizonSlope'] * (clamp012 - 0.5));
   return {
     leftY: toGuideCoordinate(groundPoints['horizonY'] - groundPoints['horizonSlope'] * 0.5),
@@ -54,7 +54,7 @@ export function computeStoryboard3DBackgroundGuideGeometry(result) {
     vanishingPoint: [toGuideCoordinate(clamp012), toGuideCoordinate(clamp013)],
     groundPoints: groundPoints['groundRegion']
       ['map'](([data, options]) => toGuideCoordinate(data) + ',' + toGuideCoordinate(options))
-      ['join']('\x20'),
+      ['join'](' '),
   };
 }
 function setAttributes(el, target) {
@@ -86,15 +86,15 @@ export function previewStoryboard3DBackgroundCalibration(el2, current) {
   }
   const payload = {
     horizonY: horizonY2['horizonY'],
-    vanishingPointX: horizonY2['vanishingPoint'][0x0],
-    vanishingPointY: y1 / 0x3e8,
+    vanishingPointX: horizonY2['vanishingPoint'][0],
+    vanishingPointY: y1 / 1000,
   };
   Object['entries'](payload)['forEach'](([handle, state]) => {
-    const el3 = el2?.['querySelector']?.('[data-storyboard-3d-background-field="' + handle + '\x22]');
-    if (el3) el3['value'] = Number(state)['toFixed'](0x3)['replace'](/0+$/, '')['replace'](/\.$/, '');
+    const el3 = el2?.['querySelector']?.('[data-storyboard-3d-background-field="' + handle + '"]');
+    if (el3) el3['value'] = Number(state)['toFixed'](3)['replace'](/0+$/, '')['replace'](/\.$/, '');
   });
   const el4 = el2?.['querySelector']?.('[data-storyboard-3d-background-guide-status]');
-  if (el4) el4['textContent'] = '正在手动调整\x20·\x20100%';
+  if (el4) el4['textContent'] = '正在手动调整 · 100%';
   return horizonY2;
 }
 export function createStoryboard3DBackgroundCalibrationInteraction({
@@ -123,9 +123,9 @@ export function createStoryboard3DBackgroundCalibrationInteraction({
       const currentPoint2 = normalizeStoryboard3DBackgroundPointer(event2, mode2['rect']),
         enabled =
           Math['hypot'](
-            (Number(event2['clientX']) || 0x0) - mode2['startClientX'],
-            (Number(event2['clientY']) || 0x0) - mode2['startClientY'],
-          ) >= 0x1;
+            (Number(event2['clientX']) || 0) - mode2['startClientX'],
+            (Number(event2['clientY']) || 0) - mode2['startClientY'],
+          ) >= 1;
       if (!enabled && !mode2['moved']) return;
       ((mode2['moved'] = !![]),
         (mode2['latest'] = computeStoryboard3DBackgroundCalibrationDrag({
@@ -165,7 +165,7 @@ export function createStoryboard3DBackgroundCalibrationInteraction({
       if (event5['key'] === 'Escape') handler(event5);
     },
     value3 = (pointerId) => {
-      if (pointerId['button'] !== 0x0 || mode2) return;
+      if (pointerId['button'] !== 0 || mode2) return;
       const handle2 = pointerId['target']?.['closest']?.('[data-storyboard-3d-background-drag]');
       if (!handle2 || (root?.['contains'] && !root['contains'](handle2))) return;
       const mode5 = handle2['getAttribute']?.('data-storyboard-3d-background-drag');
@@ -182,8 +182,8 @@ export function createStoryboard3DBackgroundCalibrationInteraction({
           initial: initial,
           latest: initial,
           startPoint: normalizeStoryboard3DBackgroundPointer(pointerId, rect),
-          startClientX: Number(pointerId['clientX']) || 0x0,
-          startClientY: Number(pointerId['clientY']) || 0x0,
+          startClientX: Number(pointerId['clientX']) || 0,
+          startClientY: Number(pointerId['clientY']) || 0,
           rect: rect,
           pointerId: pointerId['pointerId'],
           handle: handle2,

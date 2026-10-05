@@ -19,7 +19,7 @@ export function getAudioVoiceAnalyzeErrorMessage(
 export function createAudioVoiceInitialAnalysisProgress({ isLocal: isLocal, text: text2 }) {
   return {
     stage: isLocal ? 'model-download' : 'model-prepare',
-    progress: 0x0,
+    progress: 0,
     message: text2(isLocal ? 'progress.model-download' : 'progress.model-prepare'),
   };
 }
@@ -49,7 +49,7 @@ export async function recoverAudioVoiceLocalAsrRuntime({
   });
   if (!canCommit()) return ![];
   if (!enabled) return (run(message), ![]);
-  setAnalysisState('analyzing', { stage: 'asr-runtime-check', progress: 0x0 });
+  setAnalysisState('analyzing', { stage: 'asr-runtime-check', progress: 0 });
   try {
     return (
       await repair({

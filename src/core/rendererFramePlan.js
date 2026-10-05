@@ -6,7 +6,7 @@ import {
   screenViewportToWorldBounds,
 } from './rendererSpatialIndex.js';
 import { RENDERER_VIRTUALIZATION_CONFIG } from './rendererVirtualization.js';
-const PRIORITY_MEDIA_VIEWPORT_PADDING = 0xc8;
+const PRIORITY_MEDIA_VIEWPORT_PADDING = 200;
 function resolveNodeCount(value, item, key) {
   if (Number['isFinite'](key)) return Number(key);
   if (Number['isFinite'](value?.['_nodeCount'])) return Number(value['_nodeCount']);
@@ -20,14 +20,14 @@ function resolveGeometryRev(index, result, data) {
 }
 function normalizeContainerRect(box) {
   return Object['freeze']({
-    width: Number['isFinite'](box?.['width']) ? box['width'] : 0x0,
-    height: Number['isFinite'](box?.['height']) ? box['height'] : 0x0,
+    width: Number['isFinite'](box?.['width']) ? box['width'] : 0,
+    height: Number['isFinite'](box?.['height']) ? box['height'] : 0,
   });
 }
 export function createRendererFramePlan({
   snapshot: snapshot = null,
   nodes: nodes = snapshot?.['nodes'] || {},
-  viewport: viewport = snapshot?.['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 },
+  viewport: viewport = snapshot?.['viewport'] || { x: 0, y: 0, zoom: 1 },
   containerRect: containerRect,
   nodeCount: nodeCount,
   geometryRev: geometryRev,

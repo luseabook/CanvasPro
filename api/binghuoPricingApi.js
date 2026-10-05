@@ -2,9 +2,9 @@ import { request } from './apiBase.js';
 import { getProviderConfig } from './configApi.js';
 import { resolveExecutionModelToken } from './adapters/ModelApiManifestNormalizer.js';
 let credential = '',
-  scope = 0x0;
+  scope = 0;
 const catalogs = new Map(),
-  TTL = 0x1e * 0x3c * 0x3e8;
+  TTL = 30 * 60 * 1000;
 export function resolveBinghuoPricingContext(args, kind, generationParams, handler = getProviderConfig) {
   const value = handler('binghuo'),
     apiKey = String(value['apiKey'] || '')['trim']();
@@ -33,7 +33,7 @@ export function parseBinghuoPriceCatalog(response) {
     !response['catalog_version']['trim']() ||
     !Array['isArray'](response['models']) ||
     response['count'] !== response['models']['length'] ||
-    response['models']['length'] > 0x7d0
+    response['models']['length'] > 2000
   )
     throw new Error('BH 价格目录格式无效');
   const list = [];
@@ -47,7 +47,7 @@ export function parseBinghuoPriceCatalog(response) {
     if (
       !Array['isArray'](variants) ||
       !variants['length'] ||
-      variants['length'] > 0x7d0 ||
+      variants['length'] > 2000 ||
       typeof family !== 'string' ||
       !family['trim']() ||
       args2['billing'] !== 'per_second' ||
@@ -74,7 +74,7 @@ export function parseBinghuoPriceCatalog(response) {
       });
     }
   }
-  if (list['length'] > 0x7d0) throw new Error('BH\x20价格目录过大');
+  if (list['length'] > 2000) throw new Error('BH 价格目录过大');
   const map = new Set();
   for (const enabled3 of list) {
     if (
@@ -102,13 +102,13 @@ export function selectBinghuoPrice(list2, key) {
         /price|billing|multiplier|surcharge|tier/i['test'](result),
     )
   )
-    throw new Error('BH\x20当前型号价格暂不可用');
+    throw new Error('BH 当前型号价格暂不可用');
   const data = billing['price'],
     list3 = data && typeof data === 'object' ? Object['keys'](data) : [],
     amount =
-      list3['length'] === 0x1 && list3[0x0] === 'amount'
+      list3['length'] === 1 && list3[0] === 'amount'
         ? data['amount']
-        : list3['length'] === 0x1 && list3[0x0] === 'per_second' && billing['billing'] === 'per_second'
+        : list3['length'] === 1 && list3[0] === 'per_second' && billing['billing'] === 'per_second'
           ? data['per_second']
           : null,
     list4 = key['kind'] === 'image' ? ['per_call', 'per_image'] : ['per_call', 'per_second'];
@@ -116,10 +116,10 @@ export function selectBinghuoPrice(list2, key) {
     !list4['includes'](billing['billing']) ||
     typeof amount !== 'number' ||
     !Number['isFinite'](amount) ||
-    amount < 0x0 ||
-    amount > 0xf4240
+    amount < 0 ||
+    amount > 1000000
   )
-    throw new Error('BH\x20计费规则暂不支持');
+    throw new Error('BH 计费规则暂不支持');
   return { amount: amount, billing: billing['billing'], currency: 'CNY' };
 }
 export async function fetchBinghuoPricing(enabled4) {
@@ -134,7 +134,7 @@ export async function fetchBinghuoPricing(enabled4) {
           method: 'GET',
           headers: { Authorization: 'Bearer ' + enabled4['apiKey'] },
         },
-        0x2ee0,
+        12000,
       )['then']((response2) => {
         if (!response2['success']) throw new Error('BH 价格查询失败');
         return parseBinghuoPriceCatalog(response2['data']);
@@ -142,7 +142,7 @@ export async function fetchBinghuoPricing(enabled4) {
     ((enabled5 = { at: Date['now'](), promise: promise }),
       catalogs['set'](options, enabled5),
       promise['catch'](() => {
-        if (catalogs['get'](options) === enabled5) enabled5['at'] = Date['now']() - TTL + 0xea60;
+        if (catalogs['get'](options) === enabled5) enabled5['at'] = Date['now']() - TTL + 60000;
       }));
   }
   return selectBinghuoPrice(await enabled5['promise'], enabled4);

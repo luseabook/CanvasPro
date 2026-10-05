@@ -95,8 +95,8 @@ export const RH_VIDEO_RESOLUTION_FIELD = Object.freeze({
   type: 'slider',
   placement: 'videoParams',
   label: '分辨率',
-  defaultValue: 0x340,
-  options: Object.freeze([0x340, 0x400, 0x500, 0x5a0, 0x640, 0x6e0, 0x780]),
+  defaultValue: 832,
+  options: Object.freeze([832, 1024, 1280, 1440, 1600, 1760, 1920]),
 });
 export const RH_VIDEO_FPS_FIELD = Object.freeze({
   id: 'rhVideoFps',

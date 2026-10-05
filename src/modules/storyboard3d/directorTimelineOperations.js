@@ -38,7 +38,7 @@ export function shiftDirectorKeys(value, item, index) {
   const data = Math['round'](Number(index) * structuredClone2['fps']) / structuredClone2['fps'];
   if (!Number['isFinite'](data)) throw new Error('请输入有效时间。');
   const args2 = list2['map'](({ key: key3 }) => key3['time'] + data);
-  if (Math['min'](...args2) < 0x0 || Math['max'](...args2) > 0xe10)
+  if (Math['min'](...args2) < 0 || Math['max'](...args2) > 3600)
     throw new Error('移动后关键帧超出 0–3600 秒范围。');
   for (const event2 of list2) {
     if (
@@ -79,7 +79,7 @@ export function pasteDirectorKeys(current, entry, record) {
       time:
         Math['round']((event4['key']['time'] + record) * structuredClone3['fps']) / structuredClone3['fps'],
     };
-    if (payload['time'] < 0x0 || payload['time'] > 0xe10) throw new Error('粘贴超出镜头时长范围。');
+    if (payload['time'] < 0 || payload['time'] > 3600) throw new Error('粘贴超出镜头时长范围。');
     const handle = structuredClone3['objectTracks']['find'](
         (state) => state['objectId'] === event4['objectId'],
       ),
@@ -107,19 +107,19 @@ export function deleteDirectorKeys(scope, input) {
         : structuredClone4['objectTracks']['find']((output) => output['objectId'] === event5['objectId'])[
             event5['property'] + 'Keyframes'
           ];
-    if (event5['type'] === 'camera' && list5['length'] <= 0x1) throw new Error('至少保留一个摄像机关键帧。');
+    if (event5['type'] === 'camera' && list5['length'] <= 1) throw new Error('至少保留一个摄像机关键帧。');
     list5['splice'](
       list5['findIndex']((value2) => value2['id'] === event5['key']['id']),
-      0x1,
+      1,
     );
   }
   return structuredClone4;
 }
-export function directorSnapTime(value3, args3, value4 = 0x0, value5 = []) {
+export function directorSnapTime(value3, args3, value4 = 0, value5 = []) {
   const value6 = Math['round'](value3 * args3['fps']) / args3['fps'],
     map4 = new Set(value5),
     list6 = [
-      0x0,
+      0,
       args3['duration'],
       ...collectDirectorKeys(args3)
         ['filter']((event6) => !map4['has'](event6['key']['id']))
@@ -131,7 +131,7 @@ export function directorSnapTime(value3, args3, value4 = 0x0, value5 = []) {
     ],
     value8 = list6['reduce'](
       (value9, value10) => (Math['abs'](value10 - value6) < Math['abs'](value9 - value6) ? value10 : value9),
-      value6 + value4 + 0x1,
+      value6 + value4 + 1,
     );
   return Math['abs'](value8 - value6) <= value4 ? value8 : value6;
 }

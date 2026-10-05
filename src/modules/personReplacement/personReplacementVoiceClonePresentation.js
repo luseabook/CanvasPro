@@ -19,8 +19,8 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&apos;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&apos;');
 }
 function normalizeMediaUrl(key) {
   const text = normalizeText(key);
@@ -28,14 +28,14 @@ function normalizeMediaUrl(key) {
   return localPathToUrl(text) || text;
 }
 function formatClock(index) {
-  const result = Math['max'](0x0, Number(index) || 0x0),
-    data = Math['floor'](result / 0x3c),
-    options = Math['floor'](result % 0x3c);
-  return String(data)['padStart'](0x2, '0') + ':' + String(options)['padStart'](0x2, '0');
+  const result = Math['max'](0, Number(index) || 0),
+    data = Math['floor'](result / 60),
+    options = Math['floor'](result % 60);
+  return String(data)['padStart'](2, '0') + ':' + String(options)['padStart'](2, '0');
 }
 function getCharacterAppearance(options2 = {}) {
   const workspaceAssetAppearances = getWorkspaceAssetAppearances(options2);
-  return getWorkspaceAssetBaseAppearance(options2) || workspaceAssetAppearances[0x0] || null;
+  return getWorkspaceAssetBaseAppearance(options2) || workspaceAssetAppearances[0] || null;
 }
 function getCharacterVoiceUrl(options3 = {}) {
   return normalizeMediaUrl(
@@ -62,30 +62,30 @@ export function renderPersonReplacementVoiceCloneCharacterCards(target) {
       '<article class="person-replacement-voice-asset-shell' +
       (source ? ' has-audio' : ' is-missing-audio') +
       '">\n      <button type="button" class="person-replacement-voice-asset-card' +
-      (source ? '\x20has-audio' : ' is-missing-audio') +
+      (source ? ' has-audio' : ' is-missing-audio') +
       '" data-person-replacement-action="select-voice-asset" data-person-replacement-voice-asset-id="' +
       escapeHtml(error['id']) +
       '" data-character-id="' +
       escapeHtml(error['id']) +
-      '\x22\x20' +
-      (source ? 'draggable=\x22true\x22' : 'disabled') +
+      '" ' +
+      (source ? 'draggable="true"' : 'disabled') +
       ' aria-label="' +
       escapeHtml(source ? '加载' + error['name'] + '的人物音频' : error['name'] + '无音频') +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-voice-asset-image\x22>' +
+      '">\n        <span class="person-replacement-voice-asset-image">' +
       (mediaUrl
-        ? '<img src="' + escapeHtml(mediaUrl) + '" alt="' + escapeHtml(error['name']) + '\x22>'
+        ? '<img src="' + escapeHtml(mediaUrl) + '" alt="' + escapeHtml(error['name']) + '">'
         : '<span aria-hidden="true">人</span>') +
       '</span>\n        <span class="person-replacement-voice-asset-copy"><strong>' +
       escapeHtml(error['name']) +
       '</strong><small>' +
       (source ? '选择人物素材，使用对应声音' : '无音频') +
-      '</small></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-voice-asset-status' +
-      (source ? '\x20is-ready' : '\x20is-empty') +
-      '\x22>' +
+      '</small></span>\n        <span class="person-replacement-voice-asset-status' +
+      (source ? ' is-ready' : ' is-empty') +
+      '">' +
       (source ? '可用' : '无音频') +
       '</span>\n      </button>\n      ' +
       renderPersonReplacementVoicePreviewPlayer2 +
-      '\x0a\x20\x20\x20\x20</article>'
+      '\n    </article>'
     );
   })['join']('');
 }
@@ -115,18 +115,18 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       isPersonReplacementVoiceSeparationActive2 = isPersonReplacementVoiceSeparationActive(response),
       audioUrl2 = normalizeMediaUrl(response['vocalsAudioRef'] || response['vocalsAudioUrl']),
       config = Boolean(audioUrl2),
-      scope = entry['fileName'] || '视频 ' + (record + 0x1),
+      scope = entry['fileName'] || '视频 ' + (record + 1),
       count = Number(entry['durationSec']),
-      input = Number['isFinite'](count) && count > 0x0 ? formatClock(count) : '完整视频',
+      input = Number['isFinite'](count) && count > 0 ? formatClock(count) : '完整视频',
       output = mediaUrl2
         ? '<img src="' +
           escapeHtml(mediaUrl2) +
           '" alt="' +
-          escapeHtml(scope + '\x20视频封面') +
-          '\x22\x20decoding=\x22async\x22\x20draggable=\x22false\x22>'
+          escapeHtml(scope + ' 视频封面') +
+          '" decoding="async" draggable="false">'
         : mediaUrl3
           ? '<video muted playsinline preload="metadata" src="' + escapeHtml(mediaUrl3) + '"></video>'
-          : '<span\x20aria-hidden=\x22true\x22>视频</span>',
+          : '<span aria-hidden="true">视频</span>',
       renderAudioPlaybackSurface2 = renderAudioPlaybackSurface({
         audioUrl: audioUrl,
         className: 'person-replacement-voice-source-player',
@@ -140,7 +140,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       value2 = config
         ? renderAudioPlaybackSurface({
             audioUrl: audioUrl2,
-            className: 'person-replacement-voice-source-player\x20is-clean-voice',
+            className: 'person-replacement-voice-source-player is-clean-voice',
             playLabel: '播放' + scope + '的清晰人声',
             pauseLabel: '暂停' + scope + '的清晰人声',
             dataAttributes: {
@@ -184,7 +184,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       '<article class="person-replacement-voice-source-shell' +
       (payload ? ' is-selected' : '') +
       (isPersonReplacementVoiceSeparationActive2 ? ' is-extracting' : '') +
-      '\x22\x20data-person-replacement-voice-source-shell\x20data-source-id=\x22' +
+      '" data-person-replacement-voice-source-shell data-source-id="' +
       escapeHtml(entry['id']) +
       '">\n      <div class="person-replacement-voice-source-summary">\n        <button type="button" class="person-replacement-voice-source-card' +
       (payload ? ' is-selected' : '') +
@@ -200,7 +200,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       escapeHtml(scope) +
       '</strong><small>' +
       escapeHtml(input) +
-      '\x20·\x20原始上传</small></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-voice-source-state\x22>' +
+      ' · 原始上传</small></span>\n          <span class="person-replacement-voice-source-state">' +
       (payload ? '当前' : '选择') +
       '</span>\n        </button>\n        <button type="button" class="person-replacement-voice-extraction-action' +
       (isPersonReplacementVoiceSeparationActive2 ? ' is-cancel is-loading' : '') +
@@ -209,13 +209,13 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       (isPersonReplacementVoiceSeparationActive2 ? 'cancel-voice-separation' : 'extract-clean-voice') +
       '" data-source-id="' +
       escapeHtml(entry['id']) +
-      '\x22\x20title=\x22' +
+      '" title="' +
       escapeHtml(value6) +
       '" aria-label="' +
       escapeHtml(value6) +
       '" aria-busy="' +
       isPersonReplacementVoiceSeparationActive2 +
-      '\x22' +
+      '"' +
       (audioUrl ? '' : ' disabled') +
       '>' +
       value7 +
@@ -229,24 +229,24 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
           value2 +
           '\n        </section>'
         : '') +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n        ' +
       value5 +
       '\n        ' +
       (value4
         ? '<footer class="person-replacement-voice-extraction-footer"><span class="person-replacement-voice-extraction-status" title="' +
           escapeHtml(value4) +
-          '\x22>' +
+          '">' +
           escapeHtml(value4) +
           '</span></footer>'
         : '') +
-      '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</article>'
+      '\n      </div>\n    </article>'
     );
   })['join']('');
 }
 function renderVoiceCloneSources(value8) {
   const renderPersonReplacementVoiceCloneSourceCards2 = renderPersonReplacementVoiceCloneSourceCards(value8);
   return (
-    '<aside\x20class=\x22person-replacement-voice-sources\x22\x20aria-label=\x22原始上传视频\x22>\x0a\x20\x20\x20\x20<header\x20class=\x22person-replacement-voice-column-heading\x22><strong>原始视频</strong><small>声音检测始终使用最初上传的完整视频</small></header>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-voice-source-list\x22>' +
+    '<aside class="person-replacement-voice-sources" aria-label="原始上传视频">\n    <header class="person-replacement-voice-column-heading"><strong>原始视频</strong><small>声音检测始终使用最初上传的完整视频</small></header>\n    <div class="person-replacement-voice-source-list">' +
     (renderPersonReplacementVoiceCloneSourceCards2 ||
       '<p class="person-replacement-inline-empty">请先在项目首页上传视频</p>') +
     '</div>\n  </aside>'
@@ -255,19 +255,19 @@ function renderVoiceCloneSources(value8) {
 function renderVoiceLayoutSplitter(value9, value10) {
   const value11 = value9 === 'assets',
     value12 = value11 ? value10['assetsEnd'] : value10['sourcesEnd'],
-    value13 = value11 ? 0x10 : value10['assetsEnd'] + 0x10,
-    value14 = value11 ? value10['sourcesEnd'] - 0x10 : 0x3c,
+    value13 = value11 ? 16 : value10['assetsEnd'] + 16,
+    value14 = value11 ? value10['sourcesEnd'] - 16 : 60,
     value15 = value11 ? '调整原始视频栏宽度' : '调整人物素材栏宽度';
   return (
     '<div class="person-replacement-voice-layout-splitter panel-resize-handle panel-resize-handle--transient is-' +
     value9 +
     '" data-person-replacement-voice-layout-splitter="' +
     value9 +
-    '\x22\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22' +
+    '" role="separator" aria-orientation="vertical" aria-label="' +
     value15 +
     '" aria-valuemin="' +
     Math['round'](value13) +
-    '\x22\x20aria-valuemax=\x22' +
+    '" aria-valuemax="' +
     Math['round'](value14) +
     '" aria-valuenow="' +
     Math['round'](value12) +
@@ -289,7 +289,7 @@ export function applyPersonReplacementVoiceLayoutToElement(el, value16) {
   return (
     el2?.['setAttribute']?.(
       'aria-valuemax',
-      String(Math['round'](personReplacementVoiceLayout['sourcesEnd'] - 0x10)),
+      String(Math['round'](personReplacementVoiceLayout['sourcesEnd'] - 16)),
     ),
     el2?.['setAttribute']?.(
       'aria-valuenow',
@@ -297,7 +297,7 @@ export function applyPersonReplacementVoiceLayoutToElement(el, value16) {
     ),
     el3?.['setAttribute']?.(
       'aria-valuemin',
-      String(Math['round'](personReplacementVoiceLayout['assetsEnd'] + 0x10)),
+      String(Math['round'](personReplacementVoiceLayout['assetsEnd'] + 16)),
     ),
     el3?.['setAttribute']?.(
       'aria-valuenow',
@@ -311,11 +311,11 @@ export function renderPersonReplacementVoiceClonePage(value17, { footerHtml: foo
     value17['workspace']['voiceLayout'],
   );
   return (
-    '<div\x20class=\x22person-replacement-voice-page\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-voice-layout\x22\x20data-person-replacement-voice-layout\x20style=\x22--person-replacement-voice-assets-end:' +
+    '<div class="person-replacement-voice-page">\n    <div class="person-replacement-voice-layout" data-person-replacement-voice-layout style="--person-replacement-voice-assets-end:' +
     personReplacementVoiceLayout2['assetsEnd'] +
     '%;--person-replacement-voice-sources-end:' +
     personReplacementVoiceLayout2['sourcesEnd'] +
-    '%\x22>\x0a\x20\x20\x20\x20\x20\x20' +
+    '%">\n      ' +
     renderVoiceCloneSources(value17) +
     '\n      ' +
     renderVoiceLayoutSplitter('assets', personReplacementVoiceLayout2) +

@@ -13,7 +13,7 @@ export function previewNodeGeometry(
   if (!snapshot?.['nodes']) return;
   const item = {},
     key = new Set();
-  ensureEdgeIndex?.(snapshot['edges'] || {}, snapshot['_edgesRev'] || 0x0);
+  ensureEdgeIndex?.(snapshot['edges'] || {}, snapshot['_edgesRev'] || 0);
   for (const [index, args] of value) {
     const box = snapshot['nodes'][index];
     if (!box) {

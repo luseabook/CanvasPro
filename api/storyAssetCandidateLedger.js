@@ -8,7 +8,7 @@ function normalizeName(item) {
     ['normalize']('NFKC')
     ['replace'](/^[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+/u, '')
     ['replace'](/[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+$/u, '')
-    ['replace'](/\s+/gu, '\x20');
+    ['replace'](/\s+/gu, ' ');
 }
 function normalizeNameKey(key) {
   return normalizeName(key)['toLocaleLowerCase']();
@@ -29,7 +29,7 @@ function sourceSceneRefsOverlap(list = [], data = []) {
 function normalizeProbability(target) {
   const source = Number(target);
   if (!Number['isFinite'](source)) return null;
-  return Math['max'](0x0, Math['min'](0x1, source));
+  return Math['max'](0, Math['min'](1, source));
 }
 function normalizeEvidence(error = {}) {
   const kind = normalizeText(error?.['kind']),
@@ -136,7 +136,7 @@ function sceneHeadingSupportsCandidate(scope, input) {
   return normalizeName(input)
     ['split'](/[\s_\-—·•:：/\\|（）()\[\]【】]+/u)
     ['map'](normalizeSceneSearchText)
-    ['some']((args) => [...args]['length'] >= 0x2 && list7['includes'](args));
+    ['some']((args) => [...args]['length'] >= 2 && list7['includes'](args));
 }
 function sceneBodySupportsCandidate(dom, output) {
   const list9 = normalizeText(dom?.['body'])['normalize']('NFKC')['toLocaleLowerCase'](),
@@ -227,15 +227,15 @@ function summarizeDecisions(list13 = []) {
       (list15) =>
         list15['find']((response) => response['status'] === 'promoted') ||
         list15['find']((response2) => response2['status'] === 'absorbed') ||
-        list15[0x0],
+        list15[0],
     ),
     byReason = {};
   return (
     candidateCount['forEach']((value13) => {
-      byReason[value13['reasonCode']] = (byReason[value13['reasonCode']] || 0x0) + 0x1;
+      byReason[value13['reasonCode']] = (byReason[value13['reasonCode']] || 0) + 1;
     }),
     {
-      schemaVersion: 0x1,
+      schemaVersion: 1,
       summary: {
         candidateCount: candidateCount['length'],
         promotedCount: candidateCount['filter']((response3) => response3['status'] === 'promoted')['length'],
@@ -306,7 +306,7 @@ export function createStoryAssetCandidateLedger({
           evidence: evidence5,
         });
       else {
-        if (args3['size'] > 0x1)
+        if (args3['size'] > 1)
           decision = createDecision({
             kind: kind7,
             name: name9,
@@ -318,8 +318,8 @@ export function createStoryAssetCandidateLedger({
             evidence: evidence5,
           });
         else {
-          if (args3['size'] === 0x1) {
-            const status2 = [...args3][0x0],
+          if (args3['size'] === 1) {
+            const status2 = [...args3][0],
               value17 = origin === 'structured-source' || origin === 'inventory-asset';
             decision = createDecision({
               kind: kind7,
@@ -354,7 +354,7 @@ export function createStoryAssetCandidateLedger({
                 name: name9,
                 sourceSceneRefs: origin === 'inventory-audit' ? [] : sourceSceneRefs5,
               });
-              if (map6['size'] > 0x1)
+              if (map6['size'] > 1)
                 decision = createDecision({
                   kind: kind7,
                   name: name9,
@@ -366,7 +366,7 @@ export function createStoryAssetCandidateLedger({
                   evidence: evidence5,
                 });
               else {
-                if (origin === 'inventory-asset' && map6['size'] === 0x1 && map6['has'](kind7)) {
+                if (origin === 'inventory-asset' && map6['size'] === 1 && map6['has'](kind7)) {
                   const reasonCode2 = evidence5['some'](
                     (value18) => value18['kind'] === kind7 && value18['origin'] === 'local-extractor',
                   );
@@ -382,7 +382,7 @@ export function createStoryAssetCandidateLedger({
                     evidence: evidence5,
                   });
                 } else {
-                  if (origin !== 'inventory-asset' && map6['size'] === 0x1 && map6['has'](kind7))
+                  if (origin !== 'inventory-asset' && map6['size'] === 1 && map6['has'](kind7))
                     decision = createDecision({
                       kind: kind7,
                       name: name9,
@@ -396,7 +396,7 @@ export function createStoryAssetCandidateLedger({
                       evidence: evidence5,
                     });
                   else {
-                    if (origin === 'inventory-audit' && map6['size'] === 0x0) {
+                    if (origin === 'inventory-audit' && map6['size'] === 0) {
                       const evidence6 = collectMatchingEvidence(evidence4, {
                           name: name9,
                           sourceSceneRefs: sourceSceneRefs5,

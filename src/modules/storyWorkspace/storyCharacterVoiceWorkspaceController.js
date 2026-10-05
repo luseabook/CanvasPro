@@ -43,7 +43,7 @@ export function syncStoryCharacterVoicePlayerPreviewUi(
   const count = Number(audioEl?.['duration']),
     result = Number(audioEl?.['currentTime']),
     data =
-      Number['isFinite'](count) && count > 0x0 ? Math['max'](0x0, Math['min'](0x1, result / count)) : 0x0,
+      Number['isFinite'](count) && count > 0 ? Math['max'](0, Math['min'](1, result / count)) : 0,
     options = Boolean(audioEl && audioEl['paused'] === ![] && audioEl['ended'] !== !![]);
   el?.['querySelectorAll']?.('[data-story-character-voice-player]')?.['forEach']?.((el2) => {
     const enabled = el2['dataset']['storyCharacterVoicePlayer'] === assetId,
@@ -56,7 +56,7 @@ export function syncStoryCharacterVoicePlayerPreviewUi(
       el4['hidden'] = !enabled;
       const list = el4['querySelectorAll']('i');
       list['forEach']((el5, target) => {
-        el5['classList']['toggle']('is-played', enabled && data >= (target + 0x1) / list['length']);
+        el5['classList']['toggle']('is-played', enabled && data >= (target + 1) / list['length']);
       });
     }
   });
@@ -101,7 +101,7 @@ export function createStoryCharacterVoiceWorkspaceController({
     storyCharacterVoicePreviewGuard['invalidate']();
     if (audioEl2)
       try {
-        (audioEl2['pause']?.(), (audioEl2['currentTime'] = 0x0));
+        (audioEl2['pause']?.(), (audioEl2['currentTime'] = 0));
       } catch {}
     ((assetId2 = ''), syncPlayerUi());
   }
@@ -148,7 +148,7 @@ export function createStoryCharacterVoiceWorkspaceController({
           shouldAssign: () => storyCharacterVoicePreviewGuard['isCurrent'](handle),
         }));
       if (!storyCharacterVoicePreviewGuard['isCurrent'](handle)) return;
-      if (audioEl3['ended']) audioEl3['currentTime'] = 0x0;
+      if (audioEl3['ended']) audioEl3['currentTime'] = 0;
       ((assetId2 = assetId3), syncPlayerUi());
       const promise = audioEl3['play']?.();
       if (promise && typeof promise['then'] === 'function') await promise;
@@ -220,7 +220,7 @@ export function createStoryCharacterVoiceWorkspaceController({
           if (isEditorSurfaceActive()) render();
         }
         enabled2 = null;
-      }, 0x230)));
+      }, 560)));
   }
   function closeEditor() {
     if (!state['characterVoiceEditor']) return;
@@ -236,7 +236,7 @@ export function createStoryCharacterVoiceWorkspaceController({
           if (isEditorSurfaceActive()) render();
         }
         enabled2 = null;
-      }, 0x230)));
+      }, 560)));
   }
   function resetEditor() {
     (run2(),
@@ -345,7 +345,7 @@ export function createStoryCharacterVoiceWorkspaceController({
         (editor2['error'] = ''),
         schedulePersistence({ immediate: !![] }),
         showNavigableTaskResultToast('角色声音参考已生成。', 'success', projectToken2, {
-          step: 0x2,
+          step: 2,
           assetId: asset6['id'],
         }),
         !![]

@@ -1,11 +1,11 @@
 import { isStorySeedance25PromptMode } from '../../src/domain/storyGeneration/promptModes.js';
 import { normalizeStringArray, normalizeText } from '../utils/storyGenerationValues.js';
-const STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS = 0x320;
+const STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS = 800;
 function buildStoryEpisodeSceneSpatialAnchor(options = {}, value = null) {
   const item = [value?.['description'], value?.['prompt'], options?.['description']]
     ['map'](normalizeText)
     ['filter'](Boolean);
-  return [...new Set(item)]['join']('；')['slice'](0x0, STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS);
+  return [...new Set(item)]['join']('；')['slice'](0, STORY_EPISODE_SCENE_SPATIAL_ANCHOR_MAX_CHARACTERS);
 }
 export function createStoryEpisodeSplitCompactSceneCatalog(
   list = [],
@@ -23,11 +23,11 @@ export function createStoryEpisodeSplitCompactSceneCatalog(
             result['find'](
               (source) => normalizeText(source?.['ref']) === normalizeText(index?.['baseAppearanceRef']),
             ) ||
-            result[0x0] ||
+            result[0] ||
             null,
           args = includeSpatialAnchors ? buildStoryEpisodeSceneSpatialAnchor(index, target) : '';
         list2['push']({
-          code: 's' + (list2['length'] + 0x1),
+          code: 's' + (list2['length'] + 1),
           name: normalizeText(index?.['name']),
           ...(args ? { spatialAnchor: args } : {}),
           assetName: normalizeText(index?.['name']),

@@ -30,22 +30,22 @@ export const createGenerationToolbarMarkup = ({
         (result) =>
           '<button type="button"\n        class="v2-annotate-btn' +
           (scene === result ? ' active' : '') +
-          '\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20data-local-edit-scene=\x22' +
+          '"\n        data-local-edit-scene="' +
           result +
           '" aria-pressed="' +
           (scene === result) +
-          '\x22>' +
+          '">' +
           t('imageAnnotate.localEdit.' + result) +
           '</button>',
       )
       ['join']('') +
-    '\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<div\x20class=\x22v2-annotate-gen-prompt-wrap\x22' +
+    '\n    </div>\n    <div class="v2-annotate-gen-prompt-wrap"' +
     (scene === 'erase' ? ' hidden' : '') +
     '>\n          <input class="v2-annotate-gen-prompt-input" type="text"\n            aria-label="' +
     t('imageAnnotate.localEdit.prompt') +
-    '\x22\x20value=\x22' +
+    '" value="' +
     escapeNodeMenuHtml(String(promptText || '')) +
-    '\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20placeholder=\x22' +
+    '"\n            placeholder="' +
     annotateToolbarText('repaintPlaceholder') +
     '">\n    </div>\n    ' +
     renderImageFunctionControls(selection, modelCatalog) +

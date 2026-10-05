@@ -157,7 +157,7 @@ test('MannequinPosePanel: selected mannequin enables controls and hydrates pose 
   assert.equal(preset.value, 'wave-left');
   assert.equal(bone.disabled, false);
   assert.equal(xControl.value, '90');
-  assert.equal(xOutput.textContent, '90\u00b0');
+  assert.equal(xOutput.textContent, '90°');
   assert.equal(
     preset.options.some((option) => option.value === 'custom-1'),
     true,

@@ -3,7 +3,7 @@ import path from 'node:path';
 function version(list) {
   return typeof list === 'string' &&
     /^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/['test'](list) &&
-    list['length'] <= 0x64
+    list['length'] <= 100
     ? list
     : '';
 }

@@ -6,8 +6,8 @@ export function isPresentValue(item) {
   return item !== undefined && item !== null && String(item)['trim']() !== '';
 }
 export function normalizePositiveInteger(key, index) {
-  const count = Number['parseInt'](String(key ?? '')['trim'](), 0xa);
-  return Number['isFinite'](count) && count >= 0x0 ? count : index;
+  const count = Number['parseInt'](String(key ?? '')['trim'](), 10);
+  return Number['isFinite'](count) && count >= 0 ? count : index;
 }
 export function normalizeOptionalIntegerInRange(result, { min: min = null, max: max = null } = {}) {
   if (!isPresentValue(result)) return null;
@@ -47,11 +47,11 @@ export function normalizeKlingKeepOriginalSound(config) {
   return scope === 'true' || scope === '1' || scope === 'yes';
 }
 export function replaceKlingO1PromptImageReferences(input, output) {
-  const count2 = Math['max'](0x0, Math['trunc'](Number(output) || 0x0));
-  if (count2 <= 0x0) return String(input || '');
+  const count2 = Math['max'](0, Math['trunc'](Number(output) || 0));
+  if (count2 <= 0) return String(input || '');
   return String(input || '')['replace'](/@?\u56fe\u7247\s*([1-9]\d*)/g, (value2, value3) => {
-    const count3 = Number['parseInt'](String(value3 || ''), 0xa);
-    if (!Number['isFinite'](count3) || count3 < 0x1 || count3 > count2) return value2;
+    const count3 = Number['parseInt'](String(value3 || ''), 10);
+    if (!Number['isFinite'](count3) || count3 < 1 || count3 > count2) return value2;
     return '<<<image_' + count3 + '>>>';
   });
 }

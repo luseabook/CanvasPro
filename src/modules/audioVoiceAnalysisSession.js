@@ -2,7 +2,7 @@ function normalizeText(value) {
   return String(value || '')['trim']();
 }
 export function createAudioVoiceAnalysisSession({ cancelMediaTask: cancelMediaTask = async () => {} } = {}) {
-  let item = 0x0,
+  let item = 0,
     value2 = null;
   async function run(args) {
     if (!args || args['tasksCancelled'] === !![]) return;

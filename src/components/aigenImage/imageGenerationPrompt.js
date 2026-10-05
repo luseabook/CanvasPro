@@ -1,18 +1,18 @@
 import { resolveAssetMentionRef } from '../../modules/assetMentionRegistry.js';
 import { getPromptInputSubmitLabelFromPillNode } from '../../modules/nodePromptShared.js';
 function decodeText(value) {
-  const item = { amp: '&', lt: '<', gt: '>', quot: '\x22', apos: '\x27', nbsp: '\u00a0' };
+  const item = { amp: '&', lt: '<', gt: '>', quot: '"', apos: '\'', nbsp: '\xa0' };
   return String(value || '')['replace'](/&(#x[\da-f]+|#\d+|amp|lt|gt|quot|apos|nbsp);/gi, (key, list) => {
-    if (list[0x0] !== '#') return item[list['toLowerCase']()] ?? key;
+    if (list[0] !== '#') return item[list['toLowerCase']()] ?? key;
     const count =
-      list[0x1]['toLowerCase']() === 'x' ? parseInt(list['slice'](0x2), 0x10) : Number(list['slice'](0x1));
-    return count > 0x0 && count <= 0x10ffff ? String['fromCodePoint'](count) : '�';
+      list[1]['toLowerCase']() === 'x' ? parseInt(list['slice'](2), 16) : Number(list['slice'](1));
+    return count > 0 && count <= 0x10ffff ? String['fromCodePoint'](count) : '�';
   });
 }
 export function readStoredImagePromptParts(index) {
   const list2 = [];
   let response = null,
-    count2 = 0x0;
+    count2 = 0;
   for (const enabled of String(index || '')['match'](/<!--[^]*?-->|<(?:[^>"']|"[^"]*"|'[^']*')*>|[^<]+/g) ||
     []) {
     if (enabled['startsWith']('<!--')) continue;
@@ -24,22 +24,22 @@ export function readStoredImagePromptParts(index) {
     }
     const enabled2 = enabled['match'](/^<\s*(\/?)\s*([\w-]+)/);
     if (!enabled2) continue;
-    const result = !!enabled2[0x1],
-      data = enabled2[0x2]['toLowerCase'](),
+    const result = !!enabled2[1],
+      data = enabled2[2]['toLowerCase'](),
       enabled3 = /^(br|img|input|hr|meta|link|wbr)$/['test'](data) || /\/\s*>$/['test'](enabled);
     if (response) {
-      if (result) count2 -= 0x1;
+      if (result) count2 -= 1;
       else {
-        if (!enabled3) count2 += 0x1;
+        if (!enabled3) count2 += 1;
       }
-      count2 === 0x0 &&
+      count2 === 0 &&
         ((response['label'] ||= response['text']['trim']()), list2['push'](response), (response = null));
       continue;
     }
     if (result) continue;
     const nodeId = {};
     for (const options of enabled['matchAll'](/([\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g)) {
-      nodeId[options[0x1]['toLowerCase']()] = decodeText(options[0x2] ?? options[0x3] ?? options[0x4]);
+      nodeId[options[1]['toLowerCase']()] = decodeText(options[2] ?? options[3] ?? options[4]);
     }
     if ((nodeId['class'] || '')['split'](/\s+/)['includes']('ref-pill'))
       ((response = {
@@ -50,11 +50,11 @@ export function readStoredImagePromptParts(index) {
         refLabel: nodeId['data-ref-label'] || '',
         origin: nodeId['data-ref-origin'] || '',
         assetId: nodeId['data-asset-id'] || '',
-        itemIndex: Number(nodeId['data-asset-index'] || 0x0),
+        itemIndex: Number(nodeId['data-asset-index'] || 0),
       }),
-        (count2 = 0x1));
+        (count2 = 1));
     else {
-      if (data === 'br') list2['push']({ text: '\x0a' });
+      if (data === 'br') list2['push']({ text: '\n' });
     }
   }
   return (response && ((response['label'] ||= response['text']['trim']()), list2['push'](response)), list2);
@@ -64,9 +64,9 @@ export function readImagePromptParts(enabled4, target) {
   const list3 = [],
     handler = (source) => {
       for (const text2 of source['childNodes'] || []) {
-        if (text2['nodeType'] === 0x3) list3['push']({ text: text2['textContent'] });
+        if (text2['nodeType'] === 3) list3['push']({ text: text2['textContent'] });
         else {
-          if (text2['nodeType'] === 0x1 && text2['classList']?.['contains']('ref-pill'))
+          if (text2['nodeType'] === 1 && text2['classList']?.['contains']('ref-pill'))
             list3['push']({
               reference: !![],
               domNode: text2,
@@ -74,7 +74,7 @@ export function readImagePromptParts(enabled4, target) {
               label: text2['dataset']['label'] || text2['textContent']['trim'](),
             });
           else {
-            if (text2['tagName'] === 'BR') list3['push']({ text: '\x0a' });
+            if (text2['tagName'] === 'BR') list3['push']({ text: '\n' });
             else handler(text2);
           }
         }

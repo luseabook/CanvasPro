@@ -1,5 +1,5 @@
 import { pickClosestRatio, resolveProviderRatioPayload } from '../imageRatioPolicy.js';
-const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
+const PPIO_MIN_PIXELS = 2560 * 1440,
   PPIO_MAX_PIXELS = 0x9ec290,
   PPIO_MIN_RATIO = 1 / 16,
   PPIO_MAX_RATIO = 16,
@@ -8,10 +8,10 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
   PPIO_DEFAULT_QUALITY = '2K',
   PPIO_DEFAULT_RATIO = '1:1',
   PPIO_QUALITY_PIXEL_MAP = Object.freeze({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   PPIO_RATIO_OPTIONS = Object.freeze([
     Object.freeze({ label: '1:1', w: 1, h: 1 }),

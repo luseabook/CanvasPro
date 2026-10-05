@@ -1,7 +1,7 @@
 import { getRefKindByNodeType, normalizeNodeType } from '../nodeMeta.js';
 export const NODE_MANAGER_FILTERS = Object['freeze'](['all', 'text', 'image', 'video', 'audio']);
 const FILTER_SET = new Set(NODE_MANAGER_FILTERS),
-  CONTENT_CATEGORY_SET = new Set(NODE_MANAGER_FILTERS['slice'](0x1));
+  CONTENT_CATEGORY_SET = new Set(NODE_MANAGER_FILTERS['slice'](1));
 function normalizeId(value) {
   return typeof value === 'string' || typeof value === 'number' ? String(value)['trim']() : '';
 }
@@ -59,7 +59,7 @@ function breakGroupParentCycles(list4, map2) {
         const list6 = list5['slice'](map5['get'](record)),
           payload = list6['reduce']((handle, state) => {
             return map3['get'](state)['sourceIndex'] < map3['get'](handle)['sourceIndex'] ? state : handle;
-          }, list6[0x0]);
+          }, list6[0]);
         map2['set'](payload, '');
         break;
       }
@@ -69,16 +69,16 @@ function breakGroupParentCycles(list4, map2) {
   }
 }
 function countContentNodes(scope) {
-  let input = 0x0;
+  let input = 0;
   for (const el of scope) {
     if (el['isGroup']) input += countContentNodes(el['children']);
-    else input += 0x1;
+    else input += 1;
   }
   return input;
 }
 function addDescendantCounts(el2) {
-  if (!el2['isGroup']) return ((el2['descendantContentCount'] = 0x0), 0x1);
-  let output = 0x0;
+  if (!el2['isGroup']) return ((el2['descendantContentCount'] = 0), 1);
+  let output = 0;
   for (const value2 of el2['children']) {
     output += addDescendantCounts(value2);
   }
@@ -99,14 +99,14 @@ function filterTreeItem(el3, { filter: filter2, query: query2, inheritedQueryMat
       )
       ['filter'](Boolean),
     enabled4 = filter2 === 'all' && !query2;
-  if (!enabled4 && !inheritedQueryMatch2 && children['length'] === 0x0) return null;
+  if (!enabled4 && !inheritedQueryMatch2 && children['length'] === 0) return null;
   return { ...el3, children: children, matchingDescendantContentCount: countContentNodes(children) };
 }
-function flattenTree(value5, map6, depth = 0x0, list7 = []) {
+function flattenTree(value5, map6, depth = 0, list7 = []) {
   for (const el4 of value5) {
     const collapsed = el4['isGroup'] && map6['has'](el4['id']);
     (list7['push']({ ...el4, depth: depth, collapsed: collapsed }),
-      el4['isGroup'] && !collapsed && flattenTree(el4['children'], map6, depth + 0x1, list7));
+      el4['isGroup'] && !collapsed && flattenTree(el4['children'], map6, depth + 1, list7));
   }
   return list7;
 }
@@ -148,8 +148,8 @@ export function buildNodeManagerModel({
         name: resolveNodeManagerName(node2, id3),
         parentId: '',
         children: [],
-        descendantContentCount: 0x0,
-        matchingDescendantContentCount: 0x0,
+        descendantContentCount: 0,
+        matchingDescendantContentCount: 0,
       };
     }),
     map7 = new Map(list8['map']((value10) => [value10['id'], value10])),

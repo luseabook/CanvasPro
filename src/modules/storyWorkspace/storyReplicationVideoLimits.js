@@ -1,6 +1,6 @@
 import { getModelManifest } from '../../manifests/modelRegistry.js';
-export const STORY_REPLICATION_MAX_VIDEO_BYTES = 0x64 * 0x400 * 0x400;
-const VOLCENGINE_MAX_VIDEO_BYTES = 0x1f4 * 0x400 * 0x400;
+export const STORY_REPLICATION_MAX_VIDEO_BYTES = 100 * 1024 * 1024;
+const VOLCENGINE_MAX_VIDEO_BYTES = 500 * 1024 * 1024;
 export function getStoryReplicationVideoMaxBytes(value = '') {
   return getModelManifest(value)?.['provider'] === 'volcengine'
     ? VOLCENGINE_MAX_VIDEO_BYTES
@@ -15,7 +15,7 @@ export function validateStoryReplicationVideoSize(error = {}, item = '') {
           '“' +
           (error['name'] || '原视频') +
           '”超过当前模型 ' +
-          storyReplicationVideoMaxBytes / 0x400 / 0x400 +
+          storyReplicationVideoMaxBytes / 1024 / 1024 +
           'MB 上限，请压缩视频或选择支持更大文件的模型。',
       }
     : { ok: !![], error: '' };

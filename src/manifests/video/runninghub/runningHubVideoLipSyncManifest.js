@@ -109,7 +109,7 @@ export const rhVideoLipSyncExecutionManifest = createRunningHubVideoExecutionMan
         description: '分辨率',
         source: 'param',
         field: 'rhVideoResolution',
-        defaultValue: 0x340,
+        defaultValue: 832,
         transform: 'normalizeRhVideoResolution',
       }),
       Object.freeze({

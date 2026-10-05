@@ -101,7 +101,7 @@ export const getDefaultGenerationModelState = (generationModelCatalog = buildGen
 export const LOCAL_EDIT_STATE_KEY = 'localEditState';
 
 const LOCAL_EDIT_TOOLS = new Set(['brush', 'eraser']),
-  clampPersistedLocalEditBrushSize = (entry) => Math['max'](0x1, Math['min'](0x78, Number(entry) || 0x28)),
+  clampPersistedLocalEditBrushSize = (entry) => Math['max'](1, Math['min'](120, Number(entry) || 40)),
   normalizePersistedLocalEditTool = (record) => {
     const payload = String(record || '')['trim']();
     return LOCAL_EDIT_TOOLS['has'](payload) ? payload : 'brush';

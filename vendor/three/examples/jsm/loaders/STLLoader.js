@@ -184,8 +184,8 @@ class STLLoader extends Loader {
 			for ( let index = 0; index < 80 - 10; index ++ ) {
 
 				if ( ( reader.getUint32( index, false ) == 0x434F4C4F /*COLO*/ ) &&
-					( reader.getUint8( index + 4 ) == 0x52 /*'R'*/ ) &&
-					( reader.getUint8( index + 5 ) == 0x3D /*'='*/ ) ) {
+					( reader.getUint8( index + 4 ) == 82 /*'R'*/ ) &&
+					( reader.getUint8( index + 5 ) == 61 /*'='*/ ) ) {
 
 					hasColors = true;
 					colors = new Float32Array( faces * 3 * 3 );
@@ -220,7 +220,7 @@ class STLLoader extends Loader {
 
 					const packedColor = reader.getUint16( start + 48, true );
 
-					if ( ( packedColor & 0x8000 ) === 0 ) {
+					if ( ( packedColor & 32768 ) === 0 ) {
 
 						// facet has its own unique color
 

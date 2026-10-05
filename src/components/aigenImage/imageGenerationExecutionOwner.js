@@ -15,7 +15,7 @@ export function createImageGenerationExecutionOwner({
   dependencies: dependencies = {},
 }) {
   if (!store2 || typeof getScopeId !== 'function')
-    throw new TypeError('Image\x20execution\x20requires\x20a\x20Store\x20and\x20canvas\x20scope\x20reader');
+    throw new TypeError('Image execution requires a Store and canvas scope reader');
   const map = new Map();
   let enabled = ![];
   function run(nodeId, taskScopeId) {

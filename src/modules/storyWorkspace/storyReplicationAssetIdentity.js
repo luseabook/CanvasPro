@@ -14,7 +14,7 @@ export function reconcileStoryReplicationAssetIdentity(index, list) {
       !text2 ||
       list['filter'](
         (data) => data['episodeId'] === event2['episodeId'] && text(data['character']['name']) === text2,
-      )['length'] !== 0x1
+      )['length'] !== 1
     )
       continue;
     const list3 = list2['filter'](
@@ -33,7 +33,7 @@ export function reconcileStoryReplicationAssetIdentity(index, list) {
     const args = [...list3]['sort'](
         (current, entry) =>
           mediaCount(entry) - mediaCount(current) || Number(entry === source) - Number(current === source),
-      )[0x0],
+      )[0],
       map4 = new Map((args['appearances'] || [])['map']((record) => [record['id'], record])),
       args2 = new Set([...(args['replicationSource']['subjectKeys'] || []), event2['key']]);
     for (const payload of list3) {

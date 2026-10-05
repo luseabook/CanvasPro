@@ -48,8 +48,8 @@ export function buildStoryEpisodeSplitPartialRepairPrompt({
   episode: episode = {},
   assets: assets = [],
   constraints: constraints = {},
-  schemaVersion: schemaVersion = 0x1,
-  clipMaxSeconds: clipMaxSeconds = 0xf,
+  schemaVersion: schemaVersion = 1,
+  clipMaxSeconds: clipMaxSeconds = 15,
   timingGuidance: timingGuidance = '',
   dialogueSpeakerGuidance: dialogueSpeakerGuidance = '',
   groupingGuidance: groupingGuidance = '',
@@ -99,10 +99,10 @@ export function buildStoryEpisodeSplitPartialRepairPrompt({
           ...STORY_ASSET_REFERENCE_RULES,
           REPLICATION_TIMELINE_RULE,
           ...(continuousTimeline ? [REPLICATION_INTEGER_TIMING_RULE] : []),
-          '只修\x20failedClips\x20的\x20rejectionReason/validationDetails\x20指出的结构错误，每个\x20sourceClipRef\x20返回一个同\x20ref\x20的\x20clip；已通过的片段不返回。',
+          '只修 failedClips 的 rejectionReason/validationDetails 指出的结构错误，每个 sourceClipRef 返回一个同 ref 的 clip；已通过的片段不返回。',
           '时间格式按 timingContract 组织，已有合法切点保持；不得重新估算动作或语速，不因换场另拆片段。',
-          '未涉及的画面、镜头、声音原文及归属、素材引用、sceneKey、textElements、spatialStart、spatialEnd\x20原样保留；不重新识别、不润色、不分类或重写内容。',
-          '返回\x20episodeRef\x20和\x20repairs，每项含\x20sourceClipRef、clips；clips\x20沿用\x20rejectedClips\x20的完整结构，只返回严格\x20JSON。',
+          '未涉及的画面、镜头、声音原文及归属、素材引用、sceneKey、textElements、spatialStart、spatialEnd 原样保留；不重新识别、不润色、不分类或重写内容。',
+          '返回 episodeRef 和 repairs，每项含 sourceClipRef、clips；clips 沿用 rejectedClips 的完整结构，只返回严格 JSON。',
         ]
       : [
           ...STORY_ASSET_REFERENCE_RULES,
@@ -112,23 +112,23 @@ export function buildStoryEpisodeSplitPartialRepairPrompt({
           normalizeText(timingGuidance) +
             '修复后的分镜总时长在视频模型的 ' +
             clipMaxSeconds +
-            '\x20秒能力内。',
+            ' 秒能力内。',
           normalizeText(dialogueSpeakerGuidance),
           normalizeText(groupingGuidance),
           ...(Array['isArray'](timelineRequirements) ? timelineRequirements : []),
           '超限时依据完整动作节拍、对白轮次或情绪转折选择语义拆分点；允许重写分镜结构，并将一个失败片段重写成多个独立片段。',
           '禁止按时长均分、按 shots 数量对半切、直接复制失败文案，或遗漏、重复原剧情信息。',
-          '不要返回\x20title；客户端会按最终顺序统一命名为“片段01”“片段02”等。',
-          '每个\x20repairs\x20项必须逐字返回对应\x20sourceClipRef；只返回严格\x20JSON\x20对象。',
+          '不要返回 title；客户端会按最终顺序统一命名为“片段01”“片段02”等。',
+          '每个 repairs 项必须逐字返回对应 sourceClipRef；只返回严格 JSON 对象。',
         ])
       ['filter'](Boolean)
-      ['join']('\x0a'),
+      ['join']('\n'),
     allowedAssetReferences: buildStoryAssetReferenceContract(config['length'] ? config : assets),
     outputContract: args
       ? 'episodeRef and repairs[{sourceClipRef,clips[{ref,durationSec,shots[{durationSec,startSec,endSec,assetUsages,visual,camera,dialogue,voiceover,audio,sceneKey,textElements,spatialStart,spatialEnd}]}]}]'
       : continuousTimeline
         ? 'episodeRef and repairs[{sourceClipRef,clips[{ref,script,creativeIntent,transition,shots[]{durationSec,startSec,endSec,assetUsages,visual,camera,dialogue,voiceover,audio}}]}]'
-        : 'episodeRef\x20and\x20repairs[{sourceClipRef,clips[{ref,script,creativeIntent,transition,shots[]{durationSec,assetUsages,visual,camera,dialogue,voiceover,audio}}]}]',
+        : 'episodeRef and repairs[{sourceClipRef,clips[{ref,script,creativeIntent,transition,shots[]{durationSec,assetUsages,visual,camera,dialogue,voiceover,audio}}]}]',
   });
 }
 export function applyStoryEpisodeSplitPartialRepairs(
@@ -137,7 +137,7 @@ export function applyStoryEpisodeSplitPartialRepairs(
   { parseReplacementClips: parseReplacementClips, serializeValidationError: serializeValidationError } = {},
 ) {
   const reference2 = normalizeReference(value3?.['episodeRef'], args3?.['episodeRef']);
-  if (reference2 !== args3?.['episodeRef']) throw new Error('Agent\x20返回的局部修复结果与当前分集不一致。');
+  if (reference2 !== args3?.['episodeRef']) throw new Error('Agent 返回的局部修复结果与当前分集不一致。');
   const map2 = new Map();
   (Array['isArray'](value3?.['repairs']) ? value3['repairs'] : [])['forEach']((value4) => {
     const reference3 = normalizeReference(value4?.['sourceClipRef']);
@@ -189,7 +189,7 @@ export function applyStoryEpisodeSplitPartialRepairs(
   return {
     ...args3,
     items: value8,
-    attempts: Math['max'](0x1, Math['trunc'](Number(args3?.['attempts']) || 0x1)) + 0x1,
+    attempts: Math['max'](1, Math['trunc'](Number(args3?.['attempts']) || 1)) + 1,
   };
 }
 export function appendStoryEpisodeSplitPartialRepairFailure(args5 = {}, value14) {
@@ -210,6 +210,6 @@ export function appendStoryEpisodeSplitPartialRepairFailure(args5 = {}, value14)
             },
           },
     ),
-    attempts: Math['max'](0x1, Math['trunc'](Number(args5?.['attempts']) || 0x1)) + 0x1,
+    attempts: Math['max'](1, Math['trunc'](Number(args5?.['attempts']) || 1)) + 1,
   };
 }

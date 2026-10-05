@@ -12,8 +12,8 @@ export function createAgentRunStatusPresentation({ root: root } = {}) {
       runEvents: runEvents['runEvents'] || [],
       currentRun: runEvents['currentRun'] || null,
     });
-    (root['replaceChildren'](), (root['hidden'] = list['length'] === 0x0));
-    if (list['length'] === 0x0) return;
+    (root['replaceChildren'](), (root['hidden'] = list['length'] === 0));
+    if (list['length'] === 0) return;
     const el2 = createEl('div', 'agent-run-steps-title', agentPanelText('runStepsTitle')),
       el3 = createEl('div', 'agent-run-steps-list');
     el3['setAttribute']('role', 'list');

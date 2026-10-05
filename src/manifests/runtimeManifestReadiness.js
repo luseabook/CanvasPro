@@ -1,14 +1,14 @@
 let pendingRuntimeManifestLoad = Promise['resolve'](),
-  pendingRuntimeManifestLoadCount = 0x0;
+  pendingRuntimeManifestLoadCount = 0;
 export function trackRuntimeManifestLoad(value) {
-  pendingRuntimeManifestLoadCount += 0x1;
+  pendingRuntimeManifestLoadCount += 1;
   const item = Promise['resolve'](value)
     ['then'](
       () => undefined,
       () => undefined,
     )
     ['finally'](() => {
-      pendingRuntimeManifestLoadCount = Math['max'](0x0, pendingRuntimeManifestLoadCount - 0x1);
+      pendingRuntimeManifestLoadCount = Math['max'](0, pendingRuntimeManifestLoadCount - 1);
     });
   return (
     (pendingRuntimeManifestLoad = Promise['all']([pendingRuntimeManifestLoad, item])['then'](
@@ -18,11 +18,11 @@ export function trackRuntimeManifestLoad(value) {
   );
 }
 export function hasPendingRuntimeManifestLoad() {
-  return pendingRuntimeManifestLoadCount > 0x0;
+  return pendingRuntimeManifestLoadCount > 0;
 }
-export async function waitForRuntimeManifestLoad({ timeoutMs: timeoutMs = 0x1f4 } = {}) {
+export async function waitForRuntimeManifestLoad({ timeoutMs: timeoutMs = 500 } = {}) {
   const promise = pendingRuntimeManifestLoad,
-    enabled = Math['max'](0x0, Number(timeoutMs) || 0x0);
+    enabled = Math['max'](0, Number(timeoutMs) || 0);
   if (!enabled) return (await promise, !![]);
   let setTimeout2 = null;
   try {

@@ -1,6 +1,6 @@
 import { sanitizePromptHtml } from '../utils/dom.js';
-export const PROMPT_VIRTUAL_PASTE_THRESHOLD = 0x40 * 0x400;
-export const PROMPT_VIRTUAL_CHUNK_SIZE = 0x4 * 0x400;
+export const PROMPT_VIRTUAL_PASTE_THRESHOLD = 64 * 1024;
+export const PROMPT_VIRTUAL_CHUNK_SIZE = 4 * 1024;
 const PROMPT_VIRTUAL_CHUNK_SELECTOR = '[data-prompt-virtual-chunk]',
   PROMPT_VIRTUAL_END_SELECTOR = '[data-prompt-virtual-paste-end]',
   PROMPT_CONTAINER_TAGS = new Set(['div', 'p']),
@@ -14,16 +14,16 @@ export function buildVirtualizedPromptPasteHtml(key = '') {
   const list = String(key || '');
   if (!list) return '';
   const list2 = [];
-  for (let index = 0x0; index < list['length']; index += PROMPT_VIRTUAL_CHUNK_SIZE) {
+  for (let index = 0; index < list['length']; index += PROMPT_VIRTUAL_CHUNK_SIZE) {
     list2['push'](
-      '<span\x20class=\x22prompt-virtual-chunk\x22\x20data-prompt-virtual-chunk=\x22true\x22>' +
+      '<span class="prompt-virtual-chunk" data-prompt-virtual-chunk="true">' +
         escapePromptText(list['slice'](index, index + PROMPT_VIRTUAL_CHUNK_SIZE)) +
         '</span>',
     );
   }
   return (
     list2['push'](
-      '<span class="prompt-virtual-paste-end" ' + 'data-prompt-virtual-paste-end=\x22true\x22>&#8203;</span>',
+      '<span class="prompt-virtual-paste-end" ' + 'data-prompt-virtual-paste-end="true">&#8203;</span>',
     ),
     list2['join']('')
   );
@@ -79,11 +79,11 @@ export function hasVirtualizedPromptChunks(el3) {
 }
 function appendSerializedPromptNode(list3, el4) {
   const count = Number(el4?.['nodeType']);
-  if (count === 0x3) {
+  if (count === 3) {
     list3['push'](escapePromptText(el4['textContent'] || ''));
     return;
   }
-  if (count !== 0x1) return;
+  if (count !== 1) return;
   if (el4?.['matches']?.(PROMPT_VIRTUAL_END_SELECTOR)) return;
   const next = String(el4?.['tagName'] || '')['toLowerCase']();
   if (DANGEROUS_TAGS['has'](next)) return;

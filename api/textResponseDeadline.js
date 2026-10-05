@@ -21,9 +21,9 @@ export function createTextResponseDeadline(
           timeoutPhase: timeoutPhase,
         }),
       ),
-    index = timeoutMs == null ? null : setTimeout(() => handler('总时长'), Math['max'](0x1, timeoutMs));
+    index = timeoutMs == null ? null : setTimeout(() => handler('总时长'), Math['max'](1, timeoutMs));
   if (firstChunkTimeoutMs != null)
-    setTimeout3 = setTimeout(() => handler('首次响应'), Math['max'](0x1, firstChunkTimeoutMs));
+    setTimeout3 = setTimeout(() => handler('首次响应'), Math['max'](1, firstChunkTimeoutMs));
   const run2 = () => run(new DOMException('Request aborted', 'AbortError'));
   signal?.['addEventListener']('abort', run2, { once: !![] });
   if (signal?.['aborted']) run2();
@@ -31,7 +31,7 @@ export function createTextResponseDeadline(
     activity() {
       (clearTimeout(setTimeout3), clearTimeout(setTimeout2));
       if (idleTimeoutMs != null)
-        setTimeout2 = setTimeout(() => handler('输出停滞'), Math['max'](0x1, idleTimeoutMs));
+        setTimeout2 = setTimeout(() => handler('输出停滞'), Math['max'](1, idleTimeoutMs));
     },
     check() {
       if (item) throw item;

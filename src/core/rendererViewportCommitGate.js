@@ -1,5 +1,5 @@
 export function createRendererViewportCommitGate({
-  delayMs: delayMs = 0x0,
+  delayMs: delayMs = 0,
   shouldDefer: shouldDefer = () => ![],
 } = {}) {
   let value = null,

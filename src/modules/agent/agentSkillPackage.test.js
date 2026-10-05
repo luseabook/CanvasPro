@@ -49,7 +49,7 @@ test('parseAgentSkillMarkdown reads frontmatter, body, and defaults', () => {
 });
 
 test('parseAgentSkillMarkdown takes packageId, source, and resource context from options', () => {
-  const result = parseAgentSkillMarkdown('\uFEFF' + VALID_MARKDOWN, {
+  const result = parseAgentSkillMarkdown('\ufeff' + VALID_MARKDOWN, {
     packageId: 'my-folder',
     source: 'builtin',
     resourceNames: ['references/a.md', 'references/a.md', '', 'references/b.json'],

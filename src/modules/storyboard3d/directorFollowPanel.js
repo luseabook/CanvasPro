@@ -1,7 +1,7 @@
 const escape = (value) =>
     String(value ?? '')
       ['replaceAll']('&', '&amp;')
-      ['replaceAll']('\x22', '&quot;')
+      ['replaceAll']('"', '&quot;')
       ['replaceAll']('<', '&lt;'),
   modes = [
     ['relative', '相对运动跟拍'],
@@ -13,12 +13,12 @@ export function renderDirectorFollowPanel(item, key) {
     handler = (result, data, list) =>
       '<select data-director-follow="' +
       result +
-      '\x22>' +
+      '">' +
       list['map'](
         ([options, target]) =>
           '<option value="' +
           escape(options) +
-          '\x22\x20' +
+          '" ' +
           (options === data ? 'selected' : '') +
           '>' +
           escape(target) +
@@ -39,7 +39,7 @@ export function renderDirectorFollowPanel(item, key) {
       '</label>' +
       entry['followOffset']
         ['map']((record, payload) =>
-          handler2('followOffset-' + payload, record, '偏移 ' + ['X', 'Y', 'Z'][payload] + '\x20/\x20米'),
+          handler2('followOffset-' + payload, record, '偏移 ' + ['X', 'Y', 'Z'][payload] + ' / 米'),
         )
         ['join']('');
   return (
@@ -51,8 +51,8 @@ export function renderDirectorFollowPanel(item, key) {
         (handle) =>
           '<div class="storyboard-3d-director-fields" data-director-follow-clip="' +
           escape(handle['id']) +
-          '\x22>' +
-          handler2('start', handle['start'], '开始\x20/\x20秒') +
+          '">' +
+          handler2('start', handle['start'], '开始 / 秒') +
           handler2('end', handle['end'], '结束 / 秒') +
           handler3(handle) +
           '<label>跟随' +
@@ -60,7 +60,7 @@ export function renderDirectorFollowPanel(item, key) {
           '</label><label>注视' +
           handler('lookAtObjectId', handle['lookAtObjectId'], key) +
           '</label>' +
-          handler2('lookAtOffset-1', handle['lookAtOffset'][0x1], '注视高度') +
+          handler2('lookAtOffset-1', handle['lookAtOffset'][1], '注视高度') +
           '<button data-storyboard-3d-action="timeline-follow-delete" data-clip-id="' +
           escape(handle['id']) +
           '">删除跟拍段</button></div>',
@@ -87,9 +87,9 @@ export function changeDirectorFollow(state, event) {
         if (
           output === 'mode' &&
           value3 === 'fixed' &&
-          enabled['followOffset']['every']((count) => count === 0x0)
+          enabled['followOffset']['every']((count) => count === 0)
         )
-          enabled['followOffset'] = [0x0, 0x2, 0x5];
+          enabled['followOffset'] = [0, 2, 5];
       }
       return scope;
     }),
@@ -105,12 +105,12 @@ export function clickDirectorFollow(value4, enabled2, el2) {
           (value6) => value6['id'] !== el2['dataset']['clipId'],
         );
       if (enabled2 === 'timeline-follow-add') {
-        const start = Math['min'](0xe0f, value4['timeline']['_timeForShot'](value4['context']()['shot']));
+        const start = Math['min'](3599, value4['timeline']['_timeForShot'](value4['context']()['shot']));
         value5['cameraConstraintClips']['push']({
           ...structuredClone(value5['cameraConstraint']),
           id: 'follow-' + globalThis['crypto']['randomUUID'](),
           start: start,
-          end: Math['min'](0xe10, start + 0x3),
+          end: Math['min'](3600, start + 3),
         });
       }
       return value5;

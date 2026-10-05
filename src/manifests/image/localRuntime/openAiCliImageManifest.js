@@ -5,8 +5,8 @@ import {
 } from '../modelApi/sharedImageModelApiFields.js';
 const OPENAI_CLI_IMAGE_INPUT_SLOTS = Object['freeze']({
     allowedKinds: Object['freeze'](['text', 'image']),
-    minByKind: Object['freeze']({ text: 0x0 }),
-    maxByKind: Object['freeze']({ image: 0x5, video: 0x0, audio: 0x0 }),
+    minByKind: Object['freeze']({ text: 0 }),
+    maxByKind: Object['freeze']({ image: 5, video: 0, audio: 0 }),
   }),
   OPENAI_CLI_IMAGE_UI_SCHEMA = Object['freeze']({
     fields: Object['freeze']([
@@ -19,7 +19,7 @@ const OPENAI_CLI_IMAGE_INPUT_SLOTS = Object['freeze']({
       Object['freeze']({
         ...BATCH_SIZE_FIELD,
         showInfoTip: !![],
-        menuTooltip: '逐次生成独立图片，每次均使用\x20Codex\x20额度。',
+        menuTooltip: '逐次生成独立图片，每次均使用 Codex 额度。',
       }),
     ]),
   }),
@@ -47,7 +47,7 @@ export const openAiCliImageModelManifests = Object['freeze']([
       inputValidation: Object['freeze']({ rejectImageOverflow: !![] }),
       imageMenu: Object['freeze']({
         group: 'openai-cli',
-        order: 0xa,
+        order: 10,
         title: 'GPT Image 2',
         subtitle: 'OpenAI CLI · Codex 额度 · 比例/分辨率为创作要求',
         iconKind: 'openAiBadge',
@@ -70,7 +70,7 @@ export const openAiCliImageExecutionManifests = Object['freeze']([
         Object['freeze']({ field: 'imageSize', template: 'Requested image resolution tier: {value}.' }),
         Object['freeze']({
           field: 'aspectRatio',
-          template: 'Requested\x20image\x20aspect\x20ratio:\x20{value}.',
+          template: 'Requested image aspect ratio: {value}.',
           omitValues: Object['freeze'](['自适应']),
         }),
       ]),

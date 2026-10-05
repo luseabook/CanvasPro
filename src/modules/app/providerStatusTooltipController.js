@@ -24,13 +24,13 @@ export function createProviderStatusTooltipController() {
     const el4 = el,
       box = el3['getBoundingClientRect'](),
       box2 = el4['getBoundingClientRect'](),
-      key = 0x18,
-      index = el3['closest']('.settings-modal')?.['getBoundingClientRect']()['top'] ?? 0x0,
-      result = Math['max'](key, index + 0xa),
+      key = 24,
+      index = el3['closest']('.settings-modal')?.['getBoundingClientRect']()['top'] ?? 0,
+      result = Math['max'](key, index + 10),
       data = Math['max'](key, enabled['innerWidth'] - box2['width'] - key),
-      options = Math['min'](data, Math['max'](key, box['left'] + box['width'] / 0x2 - box2['width'] / 0x2)),
-      target = Math['max'](result, box['top'] - box2['height'] - 0xc),
-      source = Math['min'](box2['width'] - 0xe, Math['max'](0xe, box['left'] + box['width'] / 0x2 - options));
+      options = Math['min'](data, Math['max'](key, box['left'] + box['width'] / 2 - box2['width'] / 2)),
+      target = Math['max'](result, box['top'] - box2['height'] - 12),
+      source = Math['min'](box2['width'] - 14, Math['max'](14, box['left'] + box['width'] / 2 - options));
     ((el4['style']['left'] = options + 'px'),
       (el4['style']['top'] = target + 'px'),
       el4['style']['setProperty']('--settings-provider-test-tooltip-arrow-left', source + 'px'));

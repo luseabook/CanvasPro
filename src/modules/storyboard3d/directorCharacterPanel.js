@@ -8,14 +8,14 @@ import { STORYBOARD_3D_BODY_PRESETS, quaternionToStoryboard3DEuler } from './cha
 const escape = (value) =>
   String(value ?? '')
     ['replaceAll']('&', '&amp;')
-    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('"', '&quot;')
     ['replaceAll']('<', '&lt;');
 export class DirectorCharacterPanel {
   constructor(item) {
     ((this['panel'] = item),
       (this['poseName'] = '自定义姿势'),
       (this['poseId'] = ''),
-      (this['crowd'] = { rows: 0x2, cols: 0x3, spacing: 1.8, yaw: 0x0 }));
+      (this['crowd'] = { rows: 2, cols: 3, spacing: 1.8, yaw: 0 }));
   }
   ['render']() {
     const { project: project, object: object } = this['panel']['context']();
@@ -23,16 +23,16 @@ export class DirectorCharacterPanel {
     const key =
       object['heightCm'] ||
       (STORYBOARD_3D_BODY_PRESETS['find']((index) => index['id'] === object['bodyPresetId'])?.['height'] ||
-        1.78) * 0x64;
+        1.78) * 100;
     return (
-      '<fieldset\x20data-director-character><legend>角色造型与群众</legend><div\x20class=\x22storyboard-3d-director-fields\x22>\x0a\x20\x20\x20\x20\x20\x20<label>身高\x20/\x20厘米<input\x20type=\x22number\x22\x20min=\x2255\x22\x20max=\x22230\x22\x20step=\x221\x22\x20value=\x22' +
+      '<fieldset data-director-character><legend>角色造型与群众</legend><div class="storyboard-3d-director-fields">\n      <label>身高 / 厘米<input type="number" min="55" max="230" step="1" value="' +
       key +
       '" data-director-character="heightCm"></label>\n      <label>辨识色<select data-director-character="colorKey">' +
       DIRECTOR_CHARACTER_COLORS['map'](
         (result, data) =>
           '<option value="' +
           result +
-          '\x22\x20' +
+          '" ' +
           (result === (object['colorKey'] || 'blue') ? 'selected' : '') +
           '>' +
           ['蓝', '红', '绿', '黄', '紫', '青', '白', '黑'][data] +
@@ -41,7 +41,7 @@ export class DirectorCharacterPanel {
       '</select></label>\n    </div><details><summary>语义姿势调节</summary><div class="storyboard-3d-director-fields">' +
       DIRECTOR_POSE_CHANNELS['map'](([options, target, source, next, current], entry) => {
         const storyboard3DEuler =
-          (quaternionToStoryboard3DEuler(object['boneOverrides']?.[target])[source] * 0xb4) / Math['PI'];
+          (quaternionToStoryboard3DEuler(object['boneOverrides']?.[target])[source] * 180) / Math['PI'];
         return (
           '<label>' +
           options +
@@ -54,7 +54,7 @@ export class DirectorCharacterPanel {
           '" data-director-pose-channel="' +
           entry +
           '"><output>' +
-          storyboard3DEuler['toFixed'](0x0) +
+          storyboard3DEuler['toFixed'](0) +
           '°</output></label>'
         );
       })['join']('') +
@@ -66,21 +66,21 @@ export class DirectorCharacterPanel {
           (record) =>
             '<option value="' +
             escape(record['id']) +
-            '\x22\x20' +
+            '" ' +
             (record['id'] === this['poseId'] ? 'selected' : '') +
             '>' +
             escape(record['name']) +
             '</option>',
         )
         ['join']('') +
-      '</select></label><button\x20data-storyboard-3d-action=\x22timeline-character-apply-pose\x22>应用姿势</button><button\x20data-storyboard-3d-action=\x22timeline-character-delete-pose\x22>移除姿势</button>\x0a\x20\x20\x20\x20</div><div\x20class=\x22storyboard-3d-director-fields\x22>' +
+      '</select></label><button data-storyboard-3d-action="timeline-character-apply-pose">应用姿势</button><button data-storyboard-3d-action="timeline-character-delete-pose">移除姿势</button>\n    </div><div class="storyboard-3d-director-fields">' +
       Object['entries'](this['crowd'])
         ['map'](
           ([payload, handle], state) =>
             '<label>' +
-            ['行数', '列数', '间距\x20/\x20米', '朝向 / 度'][state] +
+            ['行数', '列数', '间距 / 米', '朝向 / 度'][state] +
             '<input type="number" step="' +
-            (payload === 'spacing' ? 0.1 : 0x1) +
+            (payload === 'spacing' ? 0.1 : 1) +
             '" value="' +
             handle +
             '" data-director-crowd="' +
@@ -88,7 +88,7 @@ export class DirectorCharacterPanel {
             '"></label>',
         )
         ['join']('') +
-      '<button\x20data-storyboard-3d-action=\x22timeline-character-crowd\x22>创建群众阵列</button></div></fieldset>'
+      '<button data-storyboard-3d-action="timeline-character-crowd">创建群众阵列</button></div></fieldset>'
     );
   }
   ['mutate'](config, handler, { requireUnlocked: requireUnlocked = !![] } = {}) {
@@ -151,7 +151,7 @@ export class DirectorCharacterPanel {
         '角色姿势与群众编排',
         (value11, value12, value13) => {
           if (enabled === 'timeline-character-save-pose') {
-            if ((value11['poseLibrary'] || [])['length'] >= 0xc8)
+            if ((value11['poseLibrary'] || [])['length'] >= 200)
               throw new Error('项目姿势库最多保存 200 项。');
             const {
                 actionId: actionId,

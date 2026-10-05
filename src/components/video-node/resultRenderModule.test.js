@@ -46,7 +46,7 @@ class FakeElement {
       (this.className = ''),
       (this.classList = new FakeClassList(this)),
       (this.innerHTML = ''),
-      (this.offsetWidth = 0x140),
+      (this.offsetWidth = 320),
       (this.offsetHeight = 180),
       (this.offsetTop = 0),
       (this.textContent = ''));

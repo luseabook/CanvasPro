@@ -28,7 +28,7 @@ test('media extension must match kind and cannot be an executable', () => {
 test('safe output naming and sequential numbering avoid collisions/reserved device names', () => {
   const result = normalizeMediaExportItems({ items: [item({ name: 'CON' }), item({ nodeId: 'n2', name: 'CON' })] });
   assert.notEqual(result[0].fileName, result[1].fileName);
-  assert.equal(safeExportName('../bad:name\u202e'), '.._bad_name_');
+  assert.equal(safeExportName('../bad:name‮'), '.._bad_name_');
 });
 test('original media wins over video proxies, posters and thumbnails', () => {
   const { items } = collectNodeMedia({ n1: { type: 'source-video', originalLocalPath: 'data/assets/a.mov',

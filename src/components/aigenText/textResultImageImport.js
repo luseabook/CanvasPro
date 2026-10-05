@@ -14,7 +14,7 @@ export async function addTextResultImageToCanvas({
   projectId: projectId = globalThis['window']?.['currentProjectId'] || 'default_v2_project',
   importRemoteAsset: importRemoteAsset = (value) => desktopBridge['assetImport']['importRemoteAsset'](value),
 } = {}) {
-  const url = normalizeTextResultImages([image])[0x0],
+  const url = normalizeTextResultImages([image])[0],
     enabled = storeInstance['getStateRaw']()['nodes'];
   if (!url || !enabled[nodeId]) throw new Error(t('aigenText.result.imageUnavailable'));
   const item = Object['values'](enabled)['find'](
@@ -63,11 +63,11 @@ export async function addTextResultImageToCanvas({
       }),
       availablePosition = findAvailablePosition(
         enabled,
-        Number(box['x'] || 0x0) + Number(box['width'] || 0x1f4) + 0x28,
-        Number(box['y'] || 0x0),
+        Number(box['x'] || 0) + Number(box['width'] || 500) + 40,
+        Number(box['y'] || 0),
         box2['width'],
         box2['height'],
-        0x18,
+        24,
         'right',
       );
     return (

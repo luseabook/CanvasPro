@@ -265,27 +265,27 @@ export const buildCopiedTextCommand = (box17, box18) => {
 
 export const TEXT_LINE_HEIGHT_RATIO = 1.2;
 
-export const TEXT_ROTATE_HANDLE_OFFSET = 0x18;
+export const TEXT_ROTATE_HANDLE_OFFSET = 24;
 
-export const TEXT_ROTATE_HIT_RADIUS = 0xd;
+export const TEXT_ROTATE_HIT_RADIUS = 13;
 
 const getViewportZoom = (box19) => {
     const count = Number(box19?.['zoom']);
-    return Number['isFinite'](count) && count > 0x0 ? count : 0x1;
+    return Number['isFinite'](count) && count > 0 ? count : 1;
   },
   getScreenX = (value20, box20) =>
-    ((Number(value20) || 0x0) - (Number(box20?.['x']) || 0x0)) * getViewportZoom(box20),
+    ((Number(value20) || 0) - (Number(box20?.['x']) || 0)) * getViewportZoom(box20),
   getScreenY = (value21, box21) =>
-    ((Number(value21) || 0x0) - (Number(box21?.['y']) || 0x0)) * getViewportZoom(box21);
+    ((Number(value21) || 0) - (Number(box21?.['y']) || 0)) * getViewportZoom(box21);
 
 export const getTextRotationHandles = (value22) => {
   const list5 = Array['isArray'](value22?.['corners']) ? value22['corners'] : [];
-  if (list5['length'] < 0x2) return [];
+  if (list5['length'] < 2) return [];
   const [box22, box23] = list5,
     value23 = box23['x'] - box22['x'],
     value24 = box23['y'] - box22['y'],
-    value25 = Math['hypot'](value23, value24) || 0x1,
-    box24 = { x: (box22['x'] + box23['x']) / 0x2, y: (box22['y'] + box23['y']) / 0x2 };
+    value25 = Math['hypot'](value23, value24) || 1,
+    box24 = { x: (box22['x'] + box23['x']) / 2, y: (box22['y'] + box23['y']) / 2 };
   return [
     {
       point: {
@@ -297,7 +297,7 @@ export const getTextRotationHandles = (value22) => {
   ];
 };
 
-export const getTextRotationHandle = (value26) => getTextRotationHandles(value26)[0x0]?.['point'] || null;
+export const getTextRotationHandle = (value26) => getTextRotationHandles(value26)[0]?.['point'] || null;
 
 export const getTextAnchorForCenter = ({
   centerPx: centerPx,
@@ -309,10 +309,10 @@ export const getTextAnchorForCenter = ({
 } = {}) => {
   const box25 = rotateTextLocalPoint(
     {
-      x: ((Number(layoutWidth) || 0x0) * (Number(scaleX3) || 0x0)) / 0x2,
-      y: ((Number(layoutHeight) || 0x0) * (Number(scaleY3) || 0x0)) / 0x2,
+      x: ((Number(layoutWidth) || 0) * (Number(scaleX3) || 0)) / 2,
+      y: ((Number(layoutHeight) || 0) * (Number(scaleY3) || 0)) / 2,
     },
     rotation2,
   );
-  return { x: Number(centerPx?.['x'] || 0x0) - box25['x'], y: Number(centerPx?.['y'] || 0x0) - box25['y'] };
+  return { x: Number(centerPx?.['x'] || 0) - box25['x'], y: Number(centerPx?.['y'] || 0) - box25['y'] };
 };

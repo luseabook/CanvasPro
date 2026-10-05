@@ -11,7 +11,7 @@ function createTimeoutError(command, timeoutMs) {
 export function runToolCapture(
   command,
   args,
-  { cwd: cwd = process.cwd(), input: input = null, timeoutMs: timeoutMs = 0x0, windowsHide: windowsHide = true } = {},
+  { cwd: cwd = process.cwd(), input: input = null, timeoutMs: timeoutMs = 0, windowsHide: windowsHide = true } = {},
 ) {
   return new Promise((resolve, reject) => {
     const hasInput = input !== null && input !== undefined,
@@ -34,7 +34,7 @@ export function runToolCapture(
       child.stderr?.on('data', (chunk) => stderrChunks.push(Buffer.from(chunk))),
       child.once('error', (error) => finish(reject, error)),
       child.once('close', (code, signal) => {
-        if (code === 0x0) {
+        if (code === 0) {
           finish(resolve, Buffer.concat(stdoutChunks));
           return;
         }
@@ -50,8 +50,8 @@ export function runToolCapture(
           ),
         );
       }));
-    const delay = Math.max(0x0, Math.trunc(Number(timeoutMs) || 0x0));
-    (delay > 0x0 &&
+    const delay = Math.max(0, Math.trunc(Number(timeoutMs) || 0));
+    (delay > 0 &&
       ((timer = setTimeout(() => {
         const error = createTimeoutError(command, delay);
         try {

@@ -160,7 +160,7 @@ const AUDIO_WORKFLOW_VALIDATORS = Object.freeze({
   TEXT_INPUT_TYPES = new Set(['source-text', 'text', 'ai-text', 'custom-ai-text']),
   AUDIO_INPUT_TYPES = new Set(['source-audio', 'audio', 'ai-audio']),
   VIDEO_INPUT_TYPES = new Set(['source-video', 'video', 'ai-video']),
-  AUDIO_RESULT_WIDTH = 0x1a4,
+  AUDIO_RESULT_WIDTH = 420,
   AUDIO_RESULT_HEIGHT = 180,
   AUDIO_RESULT_RATIO = AUDIO_RESULT_WIDTH / AUDIO_RESULT_HEIGHT,
   getStoreSnapshot = () =>
@@ -651,7 +651,7 @@ export class AIGenAudioNode {
               ? remoteError.message || aigenAudioText('cancel.failed')
               : count2 === 0
                 ? aigenAudioText('cancel.success')
-                : count2 === 0x327
+                : count2 === 807
                   ? aigenAudioText('cancel.taskMissing')
                   : remoteResult?.msg || aigenAudioText('cancel.failed'));
         return {
@@ -660,7 +660,7 @@ export class AIGenAudioNode {
           localPath: '',
           generationDuration: generationDuration,
           rhStatusMessage: rhStatusMessage,
-          rhStatusCode: rhStatusCode ? 0x32d : Number.isFinite(count2) ? count2 : null,
+          rhStatusCode: rhStatusCode ? 813 : Number.isFinite(count2) ? count2 : null,
           ...this._buildRunningHubTaskPatch({
             taskId: taskId2,
             status: 'cancelled',
@@ -1188,7 +1188,7 @@ export class AIGenAudioNode {
   async ['_resolveAudioDurationSec'](value64) {
     const enabled16 = String(value64 || '').trim();
     if (!enabled16) return 0;
-    return await loadAudioDurationMetadataSec(enabled16, { timeoutMs: 0x1388 });
+    return await loadAudioDurationMetadataSec(enabled16, { timeoutMs: 5000 });
   }
   async ['_validateAdvancedVoiceCloneDurations'](list13 = []) {
     if (this._getCurrentWorkflow().key !== ADVANCED_VOICE_CLONE_WORKFLOW_KEY) return true;
@@ -1534,14 +1534,14 @@ export class AIGenAudioNode {
             box5 = value87.nodes?.[enabled21];
           if (!box5) throw new Error(aigenAudioText('upload.anchorMissing'));
           const localPath4 = pickResultLocalPath(assetId2) || normalizeLocalPath(src),
-            width = 0x140,
+            width = 320,
             height = 140,
             { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
             y2 = direction === 'down' ? 'down' : 'left',
             value88 = Number(box5.x) || 0,
             value89 = Number(box5.y) || 0,
-            value90 = Number(box5.width) || 0x168,
-            value91 = Number(box5.height) || 0x168,
+            value90 = Number(box5.width) || 360,
+            value91 = Number(box5.height) || 360,
             value92 = value89 + Math.round((value91 - height) / 2);
           let value93 = value92;
           if (refSlot5 === 'audioRef' && this._getCurrentWorkflow().key === 'voice_convert')
@@ -1715,7 +1715,7 @@ export class AIGenAudioNode {
           const generateAudioRequest = await buildGenerateAudioRequest(enabled22),
             outputText = formatFinalApiDebugRequest(generateAudioRequest),
             value103 = appStore.getState(),
-            x5 = this._data.x + (this._data.width || 0x12c) + 50,
+            x5 = this._data.x + (this._data.width || 300) + 50,
             y3 = this._data.y;
           let enabled23 = Object.values(value103.nodes).find((item19) => item19.type === 'debug');
           if (!enabled23) {
@@ -1725,8 +1725,8 @@ export class AIGenAudioNode {
               type: 'debug',
               x: x5,
               y: y3,
-              width: 0x17c,
-              height: 0x12c,
+              width: 380,
+              height: 300,
               name: aigenAudioText('debug.nodeName'),
               outputText: outputText,
             });

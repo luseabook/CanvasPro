@@ -22,7 +22,7 @@ function cloneJson(item) {
 function createRequestId() {
   const key = globalThis['crypto']?.['randomUUID']?.();
   return (
-    'replacement-voice-separation-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 0x186a0))
+    'replacement-voice-separation-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 100000))
   );
 }
 function resolveSeparationResultUrls(options = {}) {
@@ -30,14 +30,14 @@ function resolveSeparationResultUrls(options = {}) {
     vocalsAudioUrl = normalizeText(
       options['vocalsAudioUrl'] ||
         list['find']((index) => normalizeText(index?.['role'])['toLowerCase']() === 'vocals')?.['audioUrl'] ||
-        list[0x0]?.['audioUrl'],
+        list[0]?.['audioUrl'],
     ),
     backgroundAudioUrl = normalizeText(
       options['backgroundAudioUrl'] ||
         list['find']((result) => normalizeText(result?.['role'])['toLowerCase']() === 'background')?.[
           'audioUrl'
         ] ||
-        list[0x1]?.['audioUrl'],
+        list[1]?.['audioUrl'],
     );
   if (!vocalsAudioUrl || !backgroundAudioUrl) throw new Error('人声分离完成，但返回结果缺少人声或背景声音频');
   return { vocalsAudioUrl: vocalsAudioUrl, backgroundAudioUrl: backgroundAudioUrl };
@@ -54,7 +54,7 @@ async function cancelRemoteSeparationTask({
   providerProfileId: providerProfileId = '',
 } = {}) {
   const apiKey = await resolveRunningHubWorkflowAccess(providerProfileId);
-  if (!apiKey?.['apiKey']) throw new Error('未配置\x20RunningHub\x20API\x20Key，无法取消远端任务');
+  if (!apiKey?.['apiKey']) throw new Error('未配置 RunningHub API Key，无法取消远端任务');
   return cancelRunningHubAudioTask({
     apiKey: apiKey['apiKey'],
     taskId: taskId2,
@@ -388,7 +388,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
             providerProfileId: requestId5['providerProfileId'] || value13?.['providerProfileId'] || '',
           });
         } catch (value14) {
-          console['warn']('[replacementStudio]\x20voice\x20separation\x20cancel\x20failed', value14);
+          console['warn']('[replacementStudio] voice separation cancel failed', value14);
           const error3 = '已停止本地等待，但云端任务取消失败，可能仍在运行。请到任务平台确认状态。';
           return (handler5(value11, { error: error3 }), showToast(error3, 'warn'), !![]);
         }

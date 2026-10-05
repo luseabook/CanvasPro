@@ -3,7 +3,7 @@ const getPrimaryImageItem = (options = {}) => {
     const value = Array['isArray'](options?.['images']) ? options['images'] : [],
       item = Number['isInteger'](Number(options?.['mainImageIndex']))
         ? Number(options['mainImageIndex'])
-        : 0x0;
+        : 0;
     return value[item] || null;
   },
   firstLocalUrl = (key) => {

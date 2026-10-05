@@ -2319,7 +2319,7 @@ function extractMenuModelOrder(item) {
       model11,
       {
         model: model11,
-        generationParams: { rhVideoResolution: 0x400, rhVideoFps: 24, rhVideoFrames: 0 },
+        generationParams: { rhVideoResolution: 1024, rhVideoFps: 24, rhVideoFrames: 0 },
         rhVideoSourceFrameCount: 123,
       },
       { placement: 'videoParams', unwrap: true, rhVideoFpsOptions: [16, 24, 30] },
@@ -2344,8 +2344,8 @@ function extractMenuModelOrder(item) {
       model16,
       {
         model: model16,
-        generationParams: { rhVideoResolution: 0x340, rhVideoFps: 24, rhVideoFrames: 0x12c },
-        rhVideoSourceFrameCount: 0x1c8,
+        generationParams: { rhVideoResolution: 832, rhVideoFps: 24, rhVideoFrames: 300 },
+        rhVideoSourceFrameCount: 456,
       },
       { placement: 'videoParams', unwrap: true, rhVideoFpsOptions: [16, 24, 30] },
     );
@@ -2366,8 +2366,8 @@ function extractMenuModelOrder(item) {
       model12,
       {
         model: model12,
-        generationParams: { rhVideoResolution: 0x3c0, rhVideoFps: 24, rhVideoFrames: 0 },
-        rhVideoSourceFrameCount: 0x141,
+        generationParams: { rhVideoResolution: 960, rhVideoFps: 24, rhVideoFrames: 0 },
+        rhVideoSourceFrameCount: 321,
       },
       { placement: 'videoParams', unwrap: true, rhVideoFpsOptions: [16, 24, 30] },
     );
@@ -2393,7 +2393,7 @@ function extractMenuModelOrder(item) {
       assert.doesNotMatch(renderModelUiSchemaControls56, /dev-mode-only[^>]+data-value="(?:1600|1920)"/));
     const renderModelUiSchemaControls57 = renderModelUiSchemaControls(
       model13,
-      { model: model13, generationParams: { rhVideoResolution: 0x500, rhVideoFps: 16, rhVideoSeconds: 6 } },
+      { model: model13, generationParams: { rhVideoResolution: 1280, rhVideoFps: 16, rhVideoSeconds: 6 } },
       { placement: 'videoParams', unwrap: true, rhVideoFpsOptions: [16, 24] },
     );
     (assert.match(renderModelUiSchemaControls57, />秒数6·帧率16·分辨率1280</),
@@ -2405,7 +2405,7 @@ function extractMenuModelOrder(item) {
       model14,
       {
         model: model14,
-        generationParams: { rhVideoResolution: 0x400, rhVideoFrames: 77 },
+        generationParams: { rhVideoResolution: 1024, rhVideoFrames: 77 },
         rhVideoSourceFrameCount: 88,
       },
       { placement: 'videoParams', unwrap: true },
@@ -2420,7 +2420,7 @@ function extractMenuModelOrder(item) {
         rhBerniniInputMode: 'videoImage',
         generationParams: {
           rhBerniniFunction: 'rv2v',
-          rhVideoResolution: 0x340,
+          rhVideoResolution: 832,
           rhVideoFps: 24,
           rhVideoFrames: 121,
           rhBerniniAspectRatio: '16:9',
@@ -2453,7 +2453,7 @@ function extractMenuModelOrder(item) {
           generationParams: {
             rhBerniniInputMode: 'image',
             rhBerniniFunction: 'r2v',
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
             rhVideoFrames: 121,
             rhBerniniAspectRatio: '16:9',
@@ -2479,7 +2479,7 @@ function extractMenuModelOrder(item) {
           generationParams: {
             rhBerniniInputMode: 'video',
             rhBerniniFunction: 'mv2v',
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
             rhVideoFrames: 121,
             rhBerniniAspectRatio: '16:9',
@@ -2500,7 +2500,7 @@ function extractMenuModelOrder(item) {
           generationParams: {
             rhBerniniInputMode: 'videoVideo',
             rhBerniniFunction: 'ads2v',
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
             rhVideoFrames: 121,
             rhBerniniAspectRatio: '16:9',
@@ -2597,22 +2597,22 @@ function extractMenuModelOrder(item) {
   test('video workflow model switch: display params come from target generationParams', () => {
     (assert.deepEqual(
       buildVideoWorkflowDisplayParamsPatch('runninghub/2039336644536442882', {
-        rhVideoResolution: 0x500,
+        rhVideoResolution: 1280,
         rhVideoFps: 16,
         rhVideoSeconds: 6,
         rhVideoFrames: 99,
       }),
-      { rhVideoFps: 16, rhVideoSeconds: 6, rhVideoResolution: 0x500 },
+      { rhVideoFps: 16, rhVideoSeconds: 6, rhVideoResolution: 1280 },
     ),
       assert.deepEqual(
         buildVideoWorkflowDisplayParamsPatch('runninghub/1971148165531475969', {
-          rhVideoResolution: 0x400,
+          rhVideoResolution: 1024,
           rhVideoFps: 24,
           rhVideoFrames: 0,
           rhVideoSeconds: 11,
           rhEnableMask: true,
         }),
-        { rhVideoFps: 24, rhVideoFrames: 0, rhVideoResolution: 0x400, rhEnableMask: true },
+        { rhVideoFps: 24, rhVideoFrames: 0, rhVideoResolution: 1024, rhEnableMask: true },
       ));
   }),
   test('video modelApi aspect ratio selection updates existing display size patch', () => {
@@ -2639,7 +2639,7 @@ function extractMenuModelOrder(item) {
           frameCount: 88,
           generationParamsByModel: {
             [value37]: {
-              rhVideoResolution: 0x400,
+              rhVideoResolution: 1024,
               rhVideoFps: 30,
               rhVideoFrames: 88,
               rhSingleControlPreset: 'stable',
@@ -2652,7 +2652,7 @@ function extractMenuModelOrder(item) {
       );
     (assert.equal(videoWorkflowModelSelectionPatch.rhVideoFps, 30),
       assert.equal(videoWorkflowModelSelectionPatch.rhVideoFrames, 88),
-      assert.equal(videoWorkflowModelSelectionPatch.rhVideoResolution, 0x400),
+      assert.equal(videoWorkflowModelSelectionPatch.rhVideoResolution, 1024),
       assert.equal(videoWorkflowModelSelectionPatch.rhSingleControlPreset, 'stable'),
       assert.equal(videoWorkflowModelSelectionPatch.rhMaskExpand, 12),
       assert.equal(videoWorkflowModelSelectionPatch.rhMaskExpandTouched, false),
@@ -2661,7 +2661,7 @@ function extractMenuModelOrder(item) {
     const videoWorkflowModelSelectionPatch2 = buildVideoWorkflowModelSelectionPatch(
       {
         generationParamsByModel: {
-          [value39]: { rhVideoResolution: 0x400, rhVideoFps: 30, rhVideoFrames: 0, rhEnableMask: true },
+          [value39]: { rhVideoResolution: 1024, rhVideoFps: 30, rhVideoFrames: 0, rhEnableMask: true },
         },
       },
       value39,
@@ -2669,14 +2669,14 @@ function extractMenuModelOrder(item) {
     );
     (assert.equal(videoWorkflowModelSelectionPatch2.rhVideoFps, 24),
       assert.equal(videoWorkflowModelSelectionPatch2.rhVideoFrames, 0),
-      assert.equal(videoWorkflowModelSelectionPatch2.rhVideoResolution, 0x400),
+      assert.equal(videoWorkflowModelSelectionPatch2.rhVideoResolution, 1024),
       assert.equal(videoWorkflowModelSelectionPatch2.rhEnableMask, true));
     const videoWorkflowModelSelectionPatch3 = buildVideoWorkflowModelSelectionPatch({}, value38, {
       v54FpsOptions: [16, 24, 30],
     });
     (assert.equal(videoWorkflowModelSelectionPatch3.rhVideoFps, 24),
       assert.equal(videoWorkflowModelSelectionPatch3.rhVideoFrames, 0),
-      assert.equal(videoWorkflowModelSelectionPatch3.rhVideoResolution, 0x3c0),
+      assert.equal(videoWorkflowModelSelectionPatch3.rhVideoResolution, 960),
       assert.equal(videoWorkflowModelSelectionPatch3.frameRate, 24),
       assert.equal(videoWorkflowModelSelectionPatch3.frameCount, 0),
       assert.equal(videoWorkflowModelSelectionPatch3.generationParams.rhWatermarkRemoveMode, 'mode1'),
@@ -2685,10 +2685,10 @@ function extractMenuModelOrder(item) {
       v54FpsOptions: [16, 24, 30],
     });
     (assert.equal(videoWorkflowModelSelectionPatch4.rhVideoFps, 24),
-      assert.equal(videoWorkflowModelSelectionPatch4.rhVideoFrames, 0x12c),
-      assert.equal(videoWorkflowModelSelectionPatch4.rhVideoResolution, 0x400),
+      assert.equal(videoWorkflowModelSelectionPatch4.rhVideoFrames, 300),
+      assert.equal(videoWorkflowModelSelectionPatch4.rhVideoResolution, 1024),
       assert.equal(videoWorkflowModelSelectionPatch4.frameRate, 24),
-      assert.equal(videoWorkflowModelSelectionPatch4.frameCount, 0x12c),
+      assert.equal(videoWorkflowModelSelectionPatch4.frameCount, 300),
       assert.equal(videoWorkflowModelSelectionPatch4.generationParams.rhScail2PersonCount, 2),
       assert.equal(videoWorkflowModelSelectionPatch4.generationParams.rhScailDetectPrompt, 'person'),
       assert.equal(videoWorkflowModelSelectionPatch4.generationParams.rhScail2ReplaceSubject, false));
@@ -2702,22 +2702,22 @@ function extractMenuModelOrder(item) {
       {
         rhLtxMode: 'singing_voice',
         generationParamsByModel: {
-          [value40]: { rhVideoResolution: 0x500, rhVideoFps: 16, rhVideoSeconds: 6 },
+          [value40]: { rhVideoResolution: 1280, rhVideoFps: 16, rhVideoSeconds: 6 },
         },
       },
       value40,
     );
     (assert.equal(videoWorkflowModelSelectionPatch6.rhVideoFps, 16),
       assert.equal(videoWorkflowModelSelectionPatch6.rhVideoSeconds, 6),
-      assert.equal(videoWorkflowModelSelectionPatch6.rhVideoResolution, 0x500),
+      assert.equal(videoWorkflowModelSelectionPatch6.rhVideoResolution, 1280),
       assert.equal(videoWorkflowModelSelectionPatch6.rhLtxMode, 'singing_voice'));
     const videoWorkflowModelSelectionPatch7 = buildVideoWorkflowModelSelectionPatch(
-      { generationParamsByModel: { [value41]: { rhVideoResolution: 0x400, rhVideoFrames: 77 } } },
+      { generationParamsByModel: { [value41]: { rhVideoResolution: 1024, rhVideoFrames: 77 } } },
       value41,
     );
     (assert.equal(videoWorkflowModelSelectionPatch7.rhVideoFps, 24),
       assert.equal(videoWorkflowModelSelectionPatch7.rhVideoFrames, 77),
-      assert.equal(videoWorkflowModelSelectionPatch7.rhVideoResolution, 0x400));
+      assert.equal(videoWorkflowModelSelectionPatch7.rhVideoResolution, 1024));
     const videoWorkflowModelSelectionPatch8 = buildVideoWorkflowModelSelectionPatch({}, value42);
     (assert.equal(Object.hasOwn(videoWorkflowModelSelectionPatch8, 'rhVideoResolution'), false),
       assert.equal(Object.hasOwn(videoWorkflowModelSelectionPatch8, 'rhVideoFps'), false));
@@ -2726,8 +2726,8 @@ function extractMenuModelOrder(item) {
     const videoWorkflowGenerationParamsPatch = buildVideoWorkflowGenerationParamsPatch(
       {
         model: 'runninghub/2039336644536442882',
-        generationParams: { rhVideoResolution: 0x340, rhVideoFps: 24, rhVideoSeconds: 5 },
-        rhVideoResolution: 0x500,
+        generationParams: { rhVideoResolution: 832, rhVideoFps: 24, rhVideoSeconds: 5 },
+        rhVideoResolution: 1280,
         rhVideoFps: 16,
         rhVideoSeconds: 6,
       },
@@ -2736,7 +2736,7 @@ function extractMenuModelOrder(item) {
     (assert.equal(
       videoWorkflowGenerationParamsPatch.generationParamsByModel['runninghub/2039336644536442882']
         .rhVideoResolution,
-      0x500,
+      1280,
     ),
       assert.equal(
         videoWorkflowGenerationParamsPatch.generationParamsByModel['runninghub/2039336644536442882']
@@ -2755,7 +2755,7 @@ function extractMenuModelOrder(item) {
       buildVideoWorkflowDisplayParamsPatch(
         'runninghub/2041741496667348994',
         {
-          rhVideoResolution: 0x400,
+          rhVideoResolution: 1024,
           rhVideoFps: 24,
           rhVideoFrames: 77,
           rhSingleControlPreset: 'stable',
@@ -2771,7 +2771,7 @@ function extractMenuModelOrder(item) {
       {
         rhVideoFps: 24,
         rhVideoFrames: 77,
-        rhVideoResolution: 0x400,
+        rhVideoResolution: 1024,
         rhBlendIntoScene: true,
         rhControlMode: 'single',
         rhSingleControlPreset: 'stable',

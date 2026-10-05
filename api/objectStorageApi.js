@@ -7,9 +7,9 @@ export const OBJECT_STORAGE_UPLOAD_PROVIDER = 'object-storage';
 export { OBJECT_STORAGE_KEY_PREFIX };
 export const DEFAULT_OBJECT_STORAGE_CONFIG = Object['freeze'](resolveObjectStorageConfig({}));
 const OBJECT_STORAGE_MEDIA_DEFAULTS = Object['freeze']({
-  image: Object['freeze']({ fileName: 'image.png', timeout: 0x2bf20 }),
-  video: Object['freeze']({ fileName: 'video.mp4', timeout: 0x927c0 }),
-  audio: Object['freeze']({ fileName: 'audio.mp3', timeout: 0x493e0 }),
+  image: Object['freeze']({ fileName: 'image.png', timeout: 180000 }),
+  video: Object['freeze']({ fileName: 'video.mp4', timeout: 600000 }),
+  audio: Object['freeze']({ fileName: 'audio.mp3', timeout: 300000 }),
 });
 export function normalizeObjectStorageConfig(options = {}) {
   return resolveObjectStorageConfig(options);
@@ -66,7 +66,7 @@ function inferObjectStorageMediaKind(index, result = {}) {
   const target = String(index?.['type'] || '')
       ['trim']()
       ['toLowerCase'](),
-    source = target['split']('/', 0x1)[0x0];
+    source = target['split']('/', 1)[0];
   return OBJECT_STORAGE_MEDIA_DEFAULTS[source] ? source : 'image';
 }
 function resolveUploadFileName(error, next, current = {}) {
@@ -106,7 +106,7 @@ export async function testObjectStorageConnection(options3 = {}) {
     response2 = await post(
       OBJECT_STORAGE_TEST_PATH,
       { config: config },
-      { provider: OBJECT_STORAGE_UPLOAD_PROVIDER, timeout: 0x1d4c0, responseType: 'auto' },
+      { provider: OBJECT_STORAGE_UPLOAD_PROVIDER, timeout: 120000, responseType: 'auto' },
     );
   if (response2?.['success'] !== !![]) throw new Error(response2?.['error'] || '对象存储连接测试失败');
   return response2;

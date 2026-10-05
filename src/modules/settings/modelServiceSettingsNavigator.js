@@ -44,14 +44,14 @@ export function aggregateModelServiceProviderStatus(list = []) {
       text: t('settings.apiInput.readiness.requiredShort'),
       tone: 'unconfigured',
     };
-  if (total['length'] === 0x1) return total[0x0];
+  if (total['length'] === 1) return total[0];
   const count = total['filter']((current) => current['tone'] === 'success')['length'];
   if (count === total['length'])
     return {
       text: t('settings.apiInput.catalog.allRoutesReady'),
       tone: 'success',
     };
-  if (count > 0x0)
+  if (count > 0)
     return {
       text: t('settings.apiInput.catalog.routesReady', {
         count: count,
@@ -61,8 +61,8 @@ export function aggregateModelServiceProviderStatus(list = []) {
     };
   const entry = ['testing', 'partial', 'configured', 'danger', 'deprecated', 'unconfigured'],
     record =
-      entry['find']((payload) => total['some']((handle) => handle['tone'] === payload)) || total[0x0]['tone'];
-  return total['find']((state) => state['tone'] === record) || total[0x0];
+      entry['find']((payload) => total['some']((handle) => handle['tone'] === payload)) || total[0]['tone'];
+  return total['find']((state) => state['tone'] === record) || total[0];
 }
 function readProviderStatusTone(config) {
   return (
@@ -122,7 +122,7 @@ function createProviderGroup(value14, id, cards, value15) {
     (wrapper['dataset']['modelServiceProviderDetail'] = id),
     (wrapper['hidden'] = !![]));
   const routeButtons = new Map();
-  if (cards['length'] > 0x1) {
+  if (cards['length'] > 1) {
     const value16 = value14['createElement']('div');
     value16['className'] = 'model-service-detail-route-header';
     const value17 = value14['createElement']('span');
@@ -135,7 +135,7 @@ function createProviderGroup(value14, id, cards, value15) {
       value18['setAttribute']('aria-label', t('settings.apiInput.catalog.routeAria')),
       cards['forEach']((card, value19) => {
         const value20 =
-            String(card['dataset']['modelServiceRoute'] || '')['trim']() || 'route-' + (value19 + 0x1),
+            String(card['dataset']['modelServiceRoute'] || '')['trim']() || 'route-' + (value19 + 1),
           button = value14['createElement']('button');
         ((button['type'] = 'button'),
           (button['className'] = 'model-service-detail-route-tab'),
@@ -193,7 +193,7 @@ function createProviderGroup(value14, id, cards, value15) {
   );
 }
 function createProviderButton(value26, value27, value28) {
-  const value29 = value27['cards'][0x0],
+  const value29 = value27['cards'][0],
     value30 = value26['createElement']('button');
   ((value30['type'] = 'button'),
     (value30['className'] = 'model-service-provider-option'),
@@ -260,10 +260,10 @@ function createNavigatorController({
         enabled7 =
           value44['find'](([value46]) => value46 === value43) ||
           value44['find'](([value47]) => value47 === enabled6['activeRouteId']) ||
-          value44[0x0];
+          value44[0];
       if (!enabled7) return ![];
       return (
-        (enabled6['activeRouteId'] = enabled7[0x0]),
+        (enabled6['activeRouteId'] = enabled7[0]),
         enabled6['routeButtons']['forEach']((value48, value49) => {
           const enabled8 = value49 === enabled6['activeRouteId'],
             isCardAvailable2 = isCardAvailable(value48['card'], documentObject);
@@ -277,7 +277,7 @@ function createNavigatorController({
       );
     },
     handler4 = (value50) =>
-      handler(value50)['length'] > 0x0 && modelServiceKindsMatchCategory(value50['kinds'], value32),
+      handler(value50)['length'] > 0 && modelServiceKindsMatchCategory(value50['kinds'], value32),
     handler5 = () => groups['find']((value51) => handler4(value51)) || null,
     activateProvider = (value52, value53 = {}) => {
       const enabled9 = groups['find']((value54) => value54['id'] === value52);
@@ -360,13 +360,13 @@ function createNavigatorController({
       value72['addEventListener']('keydown', (value73) => {
         if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](value73['key'])) return;
         const value74 = Array['from'](browserEl['querySelectorAll']('[data-model-service-category]')),
-          value75 = Math['max'](0x0, value74['indexOf'](value72)),
+          value75 = Math['max'](0, value74['indexOf'](value72)),
           value76 =
             value73['key'] === 'Home'
-              ? 0x0
+              ? 0
               : value73['key'] === 'End'
-                ? value74['length'] - 0x1
-                : (value75 + (value73['key'] === 'ArrowRight' ? 0x1 : -0x1) + value74['length']) %
+                ? value74['length'] - 1
+                : (value75 + (value73['key'] === 'ArrowRight' ? 1 : -1) + value74['length']) %
                   value74['length'];
         (value73['preventDefault'](), value74[value76]?.['focus']?.(), value74[value76]?.['click']?.());
       }));
@@ -405,7 +405,7 @@ function createNavigatorController({
   const onLocaleChange2 = onLocaleChange(() => {
     globalThis['queueMicrotask']?.(() => {
       groups['forEach']((value82) => {
-        ((value82['buttonName']['textContent'] = getProviderLabel(value82['id'], value82['cards'][0x0])),
+        ((value82['buttonName']['textContent'] = getProviderLabel(value82['id'], value82['cards'][0])),
           value82['routeButtons']['forEach'](({ card: card4, name: name2 }, value83) => {
             name2['textContent'] = getRouteLabel(value83, card4);
           }),

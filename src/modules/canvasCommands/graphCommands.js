@@ -41,14 +41,14 @@ const SUPPORTED_CREATE_TYPES = new Set([
     'storyboard-script': 'text',
   }),
   DEFAULT_NODE_SIZES = Object['freeze']({
-    'ai-text': Object['freeze']({ width: 0x180, height: 0x120 }),
-    'ai-image': Object['freeze']({ width: 0x120, height: 0x120 }),
-    'ai-video': Object['freeze']({ width: 0x120, height: 0x120 }),
-    'ai-audio': Object['freeze']({ width: 0x140, height: 0xf0 }),
-    'source-text': Object['freeze']({ width: 0x140, height: 0xb4 }),
-    'comment-note': Object['freeze']({ width: 0x104, height: 0x78 }),
-    'storyboard-script': Object['freeze']({ width: 0x2d0, height: 0x1a4 }),
-    'panorama-scene': Object['freeze']({ width: 0x400, height: 0x240 }),
+    'ai-text': Object['freeze']({ width: 384, height: 288 }),
+    'ai-image': Object['freeze']({ width: 288, height: 288 }),
+    'ai-video': Object['freeze']({ width: 288, height: 288 }),
+    'ai-audio': Object['freeze']({ width: 320, height: 240 }),
+    'source-text': Object['freeze']({ width: 320, height: 180 }),
+    'comment-note': Object['freeze']({ width: 260, height: 120 }),
+    'storyboard-script': Object['freeze']({ width: 720, height: 420 }),
+    'panorama-scene': Object['freeze']({ width: 1024, height: 576 }),
   }),
   MEDIA_PREVIEW_KEYS = new Set([
     'base64',
@@ -79,9 +79,9 @@ function normalizeNodeType(result) {
 }
 function toFinitePositiveNumber(data, options) {
   const count = Number(data);
-  return Number['isFinite'](count) && count > 0x0 ? count : options;
+  return Number['isFinite'](count) && count > 0 ? count : options;
 }
-function toFiniteNumber(target, source = 0x0) {
+function toFiniteNumber(target, source = 0) {
   const next = Number(target);
   return Number['isFinite'](next) ? next : source;
 }
@@ -106,28 +106,28 @@ function sanitizeInitialPrompt(state) {
   if (!enabled['trim']()) return '';
   return /[<&]/['test'](enabled) ? sanitizePromptHtmlForCommit(enabled) : enabled;
 }
-function truncateText(config, scope = 0x1f4) {
+function truncateText(config, scope = 500) {
   const list = String(config || '')
-    ['replace'](/<[^>]*>/g, '\x20')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/<[^>]*>/g, ' ')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
   if (list['length'] <= scope) return list;
-  return list['slice'](0x0, Math['max'](0x0, scope - 0x3)) + '...';
+  return list['slice'](0, Math['max'](0, scope - 3)) + '...';
 }
-function omitLargeMedia(list2, count2 = 0x0) {
+function omitLargeMedia(list2, count2 = 0) {
   if (list2 == null) return list2;
   if (typeof list2 !== 'object') return list2;
-  if (count2 > 0x2) return '[omitted]';
+  if (count2 > 2) return '[omitted]';
   if (Array['isArray'](list2)) return '[array:' + list2['length'] + ']';
   const input = {};
   for (const [output, list3] of Object['entries'](list2)) {
     if (MEDIA_PREVIEW_KEYS['has'](output)) input[output] = '[omitted]';
     else {
-      if (typeof list3 === 'string' && list3['length'] > 0x1f4)
-        input[output] = list3['slice'](0x0, 0x78) + '...';
+      if (typeof list3 === 'string' && list3['length'] > 500)
+        input[output] = list3['slice'](0, 120) + '...';
       else
         list3 && typeof list3 === 'object'
-          ? (input[output] = omitLargeMedia(list3, count2 + 0x1))
+          ? (input[output] = omitLargeMedia(list3, count2 + 1))
           : (input[output] = list3);
     }
   }
@@ -136,12 +136,12 @@ function omitLargeMedia(list2, count2 = 0x0) {
 function normalizeNodeIds(
   options2 = {},
   value2 = {},
-  { min: min = 0x1, allowSelection: allowSelection = !![] } = {},
+  { min: min = 1, allowSelection: allowSelection = !![] } = {},
 ) {
   const nodes = getNodes(value2),
     state2 = getState(value2),
     value3 =
-      Array['isArray'](options2['ids']) && options2['ids']['length'] > 0x0
+      Array['isArray'](options2['ids']) && options2['ids']['length'] > 0
         ? options2['ids']
         : options2['nodeId']
           ? [options2['nodeId']]
@@ -162,7 +162,7 @@ function normalizeNodeIds(
   if (list4['length'] < min)
     throw createCanvasCommandError(
       'INSUFFICIENT_NODES',
-      'At least ' + min + '\x20canvas\x20node\x20id(s)\x20are\x20required.',
+      'At least ' + min + ' canvas node id(s) are required.',
     );
   return list4;
 }
@@ -197,30 +197,30 @@ function normalizeRenameOrder(value7 = '') {
 }
 function sortRenameIds(list5 = [], value9 = {}, value10 = 'selection') {
   const renameOrder = normalizeRenameOrder(value10);
-  if (renameOrder === 'selection' || list5['length'] <= 0x1) return list5;
+  if (renameOrder === 'selection' || list5['length'] <= 1) return list5;
   const nodes2 = getNodes(value9),
     map2 = new Map(list5['map']((value11, value12) => [value11, value12])),
     value13 = renameOrder === 'top-to-bottom' || renameOrder === 'bottom-to-top' ? 'y' : 'x',
     value14 = value13 === 'y' ? 'x' : 'y',
-    value15 = renameOrder === 'bottom-to-top' || renameOrder === 'right-to-left' ? -0x1 : 0x1;
+    value15 = renameOrder === 'bottom-to-top' || renameOrder === 'right-to-left' ? -1 : 1;
   return [...list5]['sort']((value16, value17) => {
     const value18 = nodes2[value16] || {},
       value19 = nodes2[value17] || {},
       count3 = (toFiniteNumber(value18[value13]) - toFiniteNumber(value19[value13])) * value15;
-    if (count3 !== 0x0) return count3;
+    if (count3 !== 0) return count3;
     const toFiniteNumber2 = toFiniteNumber(value18[value14]) - toFiniteNumber(value19[value14]);
-    if (toFiniteNumber2 !== 0x0) return toFiniteNumber2;
-    return (map2['get'](value16) || 0x0) - (map2['get'](value17) || 0x0);
+    if (toFiniteNumber2 !== 0) return toFiniteNumber2;
+    return (map2['get'](value16) || 0) - (map2['get'](value17) || 0);
   });
 }
 function normalizeRenameNodeIds(options3 = {}, value20 = {}) {
-  const enabled2 = Array['isArray'](options3['ids']) && options3['ids']['length'] > 0x0,
+  const enabled2 = Array['isArray'](options3['ids']) && options3['ids']['length'] > 0,
     enabled3 = Boolean(String(options3['nodeId'] || '')['trim']()),
     list6 = getState(value20)['selectedNodeIds'],
-    enabled4 = Array['isArray'](list6) && list6['length'] > 0x0;
+    enabled4 = Array['isArray'](list6) && list6['length'] > 0;
   if (!enabled2 && !enabled3 && !enabled4)
     throw createCanvasCommandError('MISSING_NODE_ID', 'node.rename requires nodeId or ids.');
-  return normalizeNodeIds(options3, value20, { min: 0x1, allowSelection: !![] });
+  return normalizeNodeIds(options3, value20, { min: 1, allowSelection: !![] });
 }
 function getNodeKindFromType(value21 = '') {
   const list7 = String(value21 || '');
@@ -233,7 +233,7 @@ function getNodeKindFromType(value21 = '') {
 function formatRenameTemplate(
   value22 = '',
   error = {},
-  { index: index = 0x1, zeroIndex: zeroIndex = 0x0, nodeId: nodeId = '' } = {},
+  { index: index = 1, zeroIndex: zeroIndex = 0, nodeId: nodeId = '' } = {},
 ) {
   const type = String(error['type'] || ''),
     value23 = {
@@ -254,13 +254,13 @@ function formatRenameTemplate(
   );
 }
 function getRenameStartIndex(options4 = {}) {
-  const value26 = Number(options4['startIndex'] ?? options4['start'] ?? 0x1);
-  return Number['isFinite'](value26) ? Math['trunc'](value26) : 0x1;
+  const value26 = Number(options4['startIndex'] ?? options4['start'] ?? 1);
+  return Number['isFinite'](value26) ? Math['trunc'](value26) : 1;
 }
-function buildNumberedRenameName(error2 = {}, value27 = 0x0) {
+function buildNumberedRenameName(error2 = {}, value27 = 0) {
   const renameStartIndex = getRenameStartIndex(error2),
     value28 = renameStartIndex + value27,
-    value29 = String(error2['separator'] ?? '\x20'),
+    value29 = String(error2['separator'] ?? ' '),
     value30 = String(error2['prefix'] ?? ''),
     hasOwn2 = hasOwn(error2, 'name') ? String(error2['name'] ?? '')['trim']() : '',
     value31 = String(error2['suffix'] ?? ''),
@@ -270,7 +270,7 @@ function buildNumberedRenameName(error2 = {}, value27 = 0x0) {
 function hasRenameNameInput(options5 = {}) {
   return (
     hasOwn(options5, 'name') ||
-    (Array['isArray'](options5['names']) && options5['names']['length'] > 0x0) ||
+    (Array['isArray'](options5['names']) && options5['names']['length'] > 0) ||
     hasOwn(options5, 'nameTemplate') ||
     hasOwn(options5, 'template') ||
     hasOwn(options5, 'pattern') ||
@@ -282,7 +282,7 @@ function hasRenameNameInput(options5 = {}) {
 function resolveRenameNames(names = {}, ids = [], value34 = {}) {
   if (!hasRenameNameInput(names))
     throw createCanvasCommandError('MISSING_NODE_NAME', 'node.rename requires name.');
-  if (Array['isArray'](names['names']) && names['names']['length'] > 0x0) {
+  if (Array['isArray'](names['names']) && names['names']['length'] > 0) {
     if (names['names']['length'] !== ids['length'])
       throw createCanvasCommandError(
         'RENAME_NAME_COUNT_MISMATCH',
@@ -345,7 +345,7 @@ function findEdgesByEndpoints(
   });
 }
 function resolveCreateSize(value45, box = {}, value46 = {}) {
-  const box2 = DEFAULT_NODE_SIZES[value45] || { width: 0x12c, height: 0x12c };
+  const box2 = DEFAULT_NODE_SIZES[value45] || { width: 300, height: 300 };
   let value47 = null;
   if (
     PROMPT_NODE_TYPES['has'](value45) &&
@@ -375,8 +375,8 @@ function buildConnectedNodeData(type2 = {}, value48 = {}) {
     box6 = resolveCreateSize(type2['type'], type2, value48),
     value49 =
       (type2['type'] === 'ai-image' || type2['type'] === 'ai-video') &&
-      toFinitePositiveNumber(box5?.['width'], 0x0) > 0x0 &&
-      toFinitePositiveNumber(box5?.['height'], 0x0) > 0x0 &&
+      toFinitePositiveNumber(box5?.['width'], 0) > 0 &&
+      toFinitePositiveNumber(box5?.['height'], 0) > 0 &&
       typeof value48['getAIGenerationNodeSize'] === 'function',
     box7 = value49
       ? value48['getAIGenerationNodeSize'](box5['width'], box5['height'])
@@ -445,21 +445,21 @@ function manifestAllowsImageInput(options8 = {}) {
     list10 = Array['isArray'](value55['allowedKinds']) ? value55['allowedKinds'] : [];
   if (list10['includes']('image')) return !![];
   const count4 = Number(value55['maxByKind']?.['image']);
-  return Number['isFinite'](count4) && count4 > 0x0;
+  return Number['isFinite'](count4) && count4 > 0;
 }
 function manifestAllowsTextInput(options9 = {}) {
   const value56 =
       options9?.['inputSlots'] && typeof options9['inputSlots'] === 'object' ? options9['inputSlots'] : {},
     list11 = Array['isArray'](value56['allowedKinds']) ? value56['allowedKinds'] : [];
-  return list11['length'] === 0x0 || list11['includes']('text');
+  return list11['length'] === 0 || list11['includes']('text');
 }
 function manifestRequiresMissingMedia(options10 = {}, { hasImageInput: hasImageInput = ![] } = {}) {
   const value57 =
       options10?.['inputSlots'] && typeof options10['inputSlots'] === 'object' ? options10['inputSlots'] : {},
     value58 = value57['minByKind'] || {};
-  if (!hasImageInput && Number(value58['image']) > 0x0) return !![];
-  if (Number(value58['video']) > 0x0) return !![];
-  if (Number(value58['audio']) > 0x0) return !![];
+  if (!hasImageInput && Number(value58['image']) > 0) return !![];
+  if (Number(value58['video']) > 0) return !![];
+  if (Number(value58['audio']) > 0) return !![];
   const list12 = Array['isArray'](value57['fixedSlots']) ? value57['fixedSlots'] : [];
   return list12['some']((value59) => {
     if (value59?.['required'] !== !![]) return ![];
@@ -483,7 +483,7 @@ function findAutoCreateModel(options12 = {}, value62 = '', value63 = {}) {
     options12['params'] && typeof options12['params'] === 'object' && !Array['isArray'](options12['params'])
       ? Object['keys'](options12['params'])
       : [];
-  if (enabled7 && list13['length'] === 0x0) return null;
+  if (enabled7 && list13['length'] === 0) return null;
   const value64 = hasImageInput2 ? 'video' : 'image',
     enabled8 = hasImageInput2 && hasSelectedImageInput(value63),
     listModelManifests2 = listModelManifests()
@@ -503,21 +503,21 @@ function findAutoCreateModel(options12 = {}, value62 = '', value63 = {}) {
       })
       ['map']((manifest) => {
         const map4 = getManifestFieldIds(manifest);
-        let score = manifest['vip'] === !![] ? 0x0 : 0xa;
-        hasImageInput2 && !enabled8 && !manifestAllowsImageInput(manifest) && (score += 0x8);
+        let score = manifest['vip'] === !![] ? 0 : 10;
+        hasImageInput2 && !enabled8 && !manifestAllowsImageInput(manifest) && (score += 8);
         for (const value66 of list13) {
-          if (map4['has'](value66)) score += 0x14;
+          if (map4['has'](value66)) score += 20;
         }
-        if (hasImageInput2 && map4['has']('duration')) score += 0x8;
-        if (map4['has']('aspectRatio')) score += 0x4;
+        if (hasImageInput2 && map4['has']('duration')) score += 8;
+        if (map4['has']('aspectRatio')) score += 4;
         const value67 =
           Number(
             hasImageInput2
               ? manifest['extensions']?.['videoMenu']?.['order']
               : manifest['extensions']?.['imageMenu']?.['order'],
-          ) || 0x0;
+          ) || 0;
         return (
-          (score += Math['max'](0x0, 0x64 - value67) / 0x64),
+          (score += Math['max'](0, 100 - value67) / 100),
           { manifest: manifest, score: score }
         );
       })
@@ -527,7 +527,7 @@ function findAutoCreateModel(options12 = {}, value62 = '', value63 = {}) {
           String(value69['manifest']['modelId']),
         );
       });
-  return listModelManifests2[0x0]?.['manifest'] || null;
+  return listModelManifests2[0]?.['manifest'] || null;
 }
 function isAutoModelPlaceholder(value70 = '') {
   const enabled11 = String(value70 || '')
@@ -544,7 +544,7 @@ function validateCreateModelArgs(options13 = {}, value71 = '', value72 = {}) {
       options13['params'] &&
       typeof options13['params'] === 'object' &&
       !Array['isArray'](options13['params']) &&
-      Object['keys'](options13['params'])['length'] > 0x0;
+      Object['keys'](options13['params'])['length'] > 0;
     if (CREATE_TYPE_MODEL_KINDS[value71] && value74)
       return {
         ok: ![],
@@ -568,9 +568,9 @@ function validateCreateModelArgs(options13 = {}, value71 = '', value72 = {}) {
       ok: ![],
       errorCode: 'MODEL_KIND_MISMATCH',
       message:
-        'Model\x20' +
+        'Model ' +
         value73 +
-        '\x20is\x20' +
+        ' is ' +
         (model2['kind'] || '(unknown)') +
         ', not ' +
         value75 +
@@ -674,7 +674,7 @@ function buildCanvasSummary(value81) {
     viewport: {
       x: toFiniteNumber(args7['viewport']?.['x']),
       y: toFiniteNumber(args7['viewport']?.['y']),
-      zoom: toFiniteNumber(args7['viewport']?.['zoom'], 0x1),
+      zoom: toFiniteNumber(args7['viewport']?.['zoom'], 1),
     },
     nodeCount: nodes3['length'],
     edgeCount: edges['length'],
@@ -694,10 +694,10 @@ function validateNodeIds(args8, value84, value85) {
 }
 function validateDeleteNodeIds(args9 = {}, value86 = {}) {
   if (String(args9['nodeId'] || '')['trim']())
-    return validateNodeIds(args9, value86, { min: 0x1, allowSelection: !![] });
+    return validateNodeIds(args9, value86, { min: 1, allowSelection: !![] });
   const state4 = getState(value86),
     value87 =
-      Array['isArray'](args9['ids']) && args9['ids']['length'] > 0x0
+      Array['isArray'](args9['ids']) && args9['ids']['length'] > 0
         ? args9['ids']
         : state4['selectedNodeIds'] || [],
     ids2 = [],
@@ -707,11 +707,11 @@ function validateDeleteNodeIds(args9 = {}, value86 = {}) {
     if (!enabled12 || map5['has'](enabled12) || !state4['nodes']?.[enabled12]) continue;
     (map5['add'](enabled12), ids2['push'](enabled12));
   }
-  if (ids2['length'] === 0x0)
+  if (ids2['length'] === 0)
     return {
       ok: ![],
       errorCode: 'INSUFFICIENT_NODES',
-      message: 'node.delete\x20requires\x20at\x20least\x20one\x20existing\x20node.',
+      message: 'node.delete requires at least one existing node.',
     };
   return { args: { ...args9, ids: ids2 } };
 }
@@ -739,7 +739,7 @@ export function registerGraphCommands(value89) {
         placement: { type: 'string' },
         sequenceKey: { type: 'string' },
       },
-      defaults: { width: 'node\x20default', height: 'node default', placement: 'viewport-center-sequence' },
+      defaults: { width: 'node default', height: 'node default', placement: 'viewport-center-sequence' },
     },
     capabilitySchema: { reads: ['cursor', 'selection', 'modelRegistry'], writes: ['nodes', 'selection'] },
     returnSchema: { aliasFields: ['nodeId', 'node'] },
@@ -954,7 +954,7 @@ export function registerGraphCommands(value89) {
           orderBy: { type: 'string' },
           order: { type: 'string' },
         },
-        defaults: { selectionFallback: !![], orderBy: 'selection', startIndex: 0x1 },
+        defaults: { selectionFallback: !![], orderBy: 'selection', startIndex: 1 },
         selectionFallback: !![],
       },
       capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: !![] },
@@ -962,7 +962,7 @@ export function registerGraphCommands(value89) {
       validate(args12 = {}, value102 = {}) {
         try {
           const entries = buildRenameEntries(args12, value102),
-            nodeId9 = entries[0x0] || {};
+            nodeId9 = entries[0] || {};
           return {
             args: {
               ...args12,
@@ -992,7 +992,7 @@ export function registerGraphCommands(value89) {
                 : store11?.['updateNodeData']?.(name3['nodeId'], { name: name3['name'] });
             }
           };
-        if (ids4['length'] > 0x1 && typeof store11?.['batch'] === 'function')
+        if (ids4['length'] > 1 && typeof store11?.['batch'] === 'function')
           store11['batch'](handler);
         else handler();
         return (
@@ -1015,13 +1015,13 @@ export function registerGraphCommands(value89) {
         properties: {
           nodeId: { type: 'string' },
           ids: { type: 'array', items: { type: 'string' } },
-          copies: { type: 'integer', minimum: 0x1, maximum: 0xc },
+          copies: { type: 'integer', minimum: 1, maximum: 12 },
           dx: { type: 'number' },
           dy: { type: 'number' },
           placement: { type: 'string', enum: ['offset', 'spawn-preferences'] },
           edgePolicy: { type: 'string', enum: ['internal', 'all-touching'] },
         },
-        defaults: { copies: 0x1, dx: 0x28, dy: 0x28, placement: 'offset', edgePolicy: 'internal' },
+        defaults: { copies: 1, dx: 40, dy: 40, placement: 'offset', edgePolicy: 'internal' },
         selectionFallback: !![],
       },
       capabilitySchema: {
@@ -1031,10 +1031,10 @@ export function registerGraphCommands(value89) {
       },
       returnSchema: { aliasFields: ['ids', 'sourceIds'] },
       validate(placement2 = {}, value105 = {}) {
-        const response3 = validateNodeIds(placement2, value105, { min: 0x1, allowSelection: !![] });
+        const response3 = validateNodeIds(placement2, value105, { min: 1, allowSelection: !![] });
         if (response3['ok'] === ![]) return response3;
-        const copies = Number(placement2['copies'] ?? 0x1);
-        if (!Number['isInteger'](copies) || copies < 0x1 || copies > 0xc)
+        const copies = Number(placement2['copies'] ?? 1);
+        if (!Number['isInteger'](copies) || copies < 1 || copies > 12)
           return {
             ok: ![],
             errorCode: 'INVALID_DUPLICATE_COPIES',
@@ -1051,9 +1051,9 @@ export function registerGraphCommands(value89) {
       execute(sourceNodes, store12) {
         const nodes4 = getState(store12),
           store13 = getStore(store12),
-          copies2 = Math['max'](0x1, Math['min'](0xc, Math['trunc'](Number(sourceNodes['copies'] || 0x1)))),
-          dx2 = toFiniteNumber(sourceNodes['dx'], 0x28),
-          dy2 = toFiniteNumber(sourceNodes['dy'], 0x28),
+          copies2 = Math['max'](1, Math['min'](12, Math['trunc'](Number(sourceNodes['copies'] || 1)))),
+          dx2 = toFiniteNumber(sourceNodes['dx'], 40),
+          dy2 = toFiniteNumber(sourceNodes['dy'], 40),
           value106 =
             sourceNodes['placement'] === 'spawn-preferences'
               ? createDuplicateSpawnOffsets({
@@ -1071,8 +1071,8 @@ export function registerGraphCommands(value89) {
           ids5 = [],
           edgeIds = [],
           handler2 = () => {
-            for (let value111 = 0x1; value111 <= copies2; value111 += 0x1) {
-              const value112 = value106[value111 - 0x1] || {
+            for (let value111 = 1; value111 <= copies2; value111 += 1) {
+              const value112 = value106[value111 - 1] || {
                   dx: dx2 * value111,
                   dy: dy2 * value111,
                 },
@@ -1108,7 +1108,7 @@ export function registerGraphCommands(value89) {
                 });
               }
             }
-            (edgeIds['length'] > 0x0 &&
+            (edgeIds['length'] > 0 &&
               (typeof store13?.['updateEdgesBatch'] === 'function'
                 ? store13['updateEdgesBatch']([], edgeIds)
                 : edgeIds['forEach']((value115) => store13?.['addEdge']?.(value115))),
@@ -1122,7 +1122,7 @@ export function registerGraphCommands(value89) {
             ids: ids5,
             sourceIds: sourceNodes['ids'],
             copies: copies2,
-            idMap: Object['fromEntries'](idMaps[0x0] || []),
+            idMap: Object['fromEntries'](idMaps[0] || []),
             idMaps: idMaps['map']((value116) => Object['fromEntries'](value116)),
             edgeIds: edgeIds['map']((value117) => value117['id']),
           }
@@ -1203,7 +1203,7 @@ export function registerGraphCommands(value89) {
         };
       },
       execute(id4, store14) {
-        const edgeId3 = findEdgesByEndpoints(store14, id4)[0x0];
+        const edgeId3 = findEdgesByEndpoints(store14, id4)[0];
         if (edgeId3) return { edgeId: edgeId3['id'], edge: edgeId3, reused: !![] };
         const edgeId4 = {
           id: id4['edgeId'],
@@ -1267,12 +1267,12 @@ export function registerGraphCommands(value89) {
               errorCode: 'MISSING_EDGE_SELECTOR',
               message: 'node.setInputSlot requires edgeId or sourceId/targetId.',
             };
-          edges2 = findEdgesByEndpoints(value121, edgeArgs)[0x0] || null;
+          edges2 = findEdgesByEndpoints(value121, edgeArgs)[0] || null;
           if (!edges2)
             return {
               ok: ![],
               errorCode: 'EDGE_NOT_FOUND',
-              message: 'No\x20canvas\x20edge\x20matched\x20node.setInputSlot.',
+              message: 'No canvas edge matched node.setInputSlot.',
             };
         }
         return { args: { edgeId: String(edges2['id'] || ''), refSlot: refSlot2 } };
@@ -1329,7 +1329,7 @@ export function registerGraphCommands(value89) {
             message: 'graph.disconnect requires edgeId or endpoint selectors.',
           };
         const edgeIds2 = findEdgesByEndpoints(value122, edgeArgs2);
-        if (edgeIds2['length'] === 0x0)
+        if (edgeIds2['length'] === 0)
           return {
             ok: ![],
             errorCode: 'EDGE_NOT_FOUND',

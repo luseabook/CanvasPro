@@ -3,7 +3,7 @@ const SKILL_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,63}$/;
 function createField({ className: className = '', multiline: multiline = ![] } = {}) {
   const field = createAgentElement(
       'label',
-      ('agent-custom-field\x20agent-skill-editor-field\x20' + className)['trim'](),
+      ('agent-custom-field agent-skill-editor-field ' + className)['trim'](),
     ),
     label = createAgentElement('span', 'agent-custom-label'),
     control = createAgentElement(
@@ -22,11 +22,11 @@ export function createAgentSkillEditor({ text: text } = {}) {
     field3 = createField({ multiline: !![], className: 'agent-skill-editor-description' }),
     field4 = createField({ className: 'agent-skill-editor-triggers' }),
     field5 = createField({ multiline: !![], className: 'agent-skill-editor-instructions' });
-  ((focus['control']['maxLength'] = 0x40),
-    (field2['control']['maxLength'] = 0x78),
-    (field3['control']['maxLength'] = 0x258),
-    (field4['control']['maxLength'] = 0x7d0),
-    (field5['control']['maxLength'] = 0x18 * 0x400));
+  ((focus['control']['maxLength'] = 64),
+    (field2['control']['maxLength'] = 120),
+    (field3['control']['maxLength'] = 600),
+    (field4['control']['maxLength'] = 2000),
+    (field5['control']['maxLength'] = 24 * 1024));
   const el2 = createAgentElement('div', 'agent-skill-editor-error');
   (el2['setAttribute']('role', 'alert'), (el2['hidden'] = !![]));
   const agentElement = createAgentElement('div', 'agent-skill-editor-actions'),
@@ -72,7 +72,7 @@ export function createAgentSkillEditor({ text: text } = {}) {
       (field2['control']['value'] = value?.['title'] || ''),
       (field3['control']['value'] = value?.['description'] || ''),
       (field4['control']['value'] = Array['isArray'](value?.['triggers'])
-        ? value['triggers']['join'](',\x20')
+        ? value['triggers']['join'](', ')
         : ''),
       (field5['control']['value'] = value?.['instructions'] || ''),
       setError(),

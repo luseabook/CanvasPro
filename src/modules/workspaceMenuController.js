@@ -25,8 +25,8 @@ function focusMenuOption(el3) {
   });
 }
 export function syncWorkspaceInlineMenuExpandedWidth(el4) {
-  const count = Math['ceil'](Number(el4?.['scrollWidth']) || 0x0);
-  if (count <= 0x0) return 0x0;
+  const count = Math['ceil'](Number(el4?.['scrollWidth']) || 0);
+  if (count <= 0) return 0;
   return (el4['style']?.['setProperty']?.('--workspace-inline-menu-expanded-width', count + 'px'), count);
 }
 export function createWorkspaceMenuController({
@@ -75,7 +75,7 @@ export function createWorkspaceMenuController({
         return (
           event['preventDefault']?.(),
           event['stopPropagation']?.(),
-          focusMenuOption(list[event['key'] === 'ArrowUp' ? list['length'] - 0x1 : 0x0]),
+          focusMenuOption(list[event['key'] === 'ArrowUp' ? list['length'] - 1 : 0]),
           !![]
         );
       }
@@ -93,15 +93,15 @@ export function createWorkspaceMenuController({
         );
       const list2 = getEnabledOptions(el13, optionSelector),
         count2 = list2['indexOf'](el12);
-      if (count2 < 0x0 || !list2['length']) return ![];
+      if (count2 < 0 || !list2['length']) return ![];
       let index = count2;
-      if (event['key'] === 'ArrowDown') index = (count2 + 0x1) % list2['length'];
+      if (event['key'] === 'ArrowDown') index = (count2 + 1) % list2['length'];
       else {
-        if (event['key'] === 'ArrowUp') index = (count2 - 0x1 + list2['length']) % list2['length'];
+        if (event['key'] === 'ArrowUp') index = (count2 - 1 + list2['length']) % list2['length'];
         else {
-          if (event['key'] === 'Home') index = 0x0;
+          if (event['key'] === 'Home') index = 0;
           else {
-            if (event['key'] === 'End') index = list2['length'] - 0x1;
+            if (event['key'] === 'End') index = list2['length'] - 1;
             else return ![];
           }
         }

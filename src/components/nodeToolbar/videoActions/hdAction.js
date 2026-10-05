@@ -178,7 +178,7 @@ export function bindVideoHdAction(index) {
           el2.removeEventListener('transitionend', entry);
           if (document.body.contains(el2)) el2.remove();
         };
-        (el2.addEventListener('transitionend', entry), window.setTimeout(entry, 0x118));
+        (el2.addEventListener('transitionend', entry), window.setTimeout(entry, 280));
       };
       el2.__v2HdClose = run3;
       const list2 = [
@@ -252,8 +252,8 @@ export function bindVideoHdAction(index) {
                   window.showToast?.(videoHdText('apiKeyMissing'), 'error');
                   return;
                 }
-                const payload = sourceNodeId.width || 0x12c,
-                  handle = sourceNodeId.height || 0x12c,
+                const payload = sourceNodeId.width || 300,
+                  handle = sourceNodeId.height || 300,
                   { width: width, height: height } = getAutoMediaSizeByShortSide(payload, handle),
                   { x: x, y: y } = calcSafeSpawnPosNearNode(
                     store.getState().nodes,

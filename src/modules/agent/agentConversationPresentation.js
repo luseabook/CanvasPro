@@ -6,7 +6,7 @@ import { scrollAgentMessageListToEnd } from './agentConversationScroll.js';
 import { createAgentRunStatusPresentation } from './agentRunStatusPresentation.js';
 import { createAgentConversationStreamingPresentation } from './agentConversationStreamingPresentation.js';
 import { createAgentMessageTime } from './agentMessageTime.js';
-export const AGENT_CONVERSATION_INPUT_REF_LIMIT = 0xc;
+export const AGENT_CONVERSATION_INPUT_REF_LIMIT = 12;
 export { formatAgentAssistantMarkdown };
 function getTaskResultEntryKey(response = {}) {
   const value = String(response['messageType'] || response['type'] || '')['trim']();
@@ -35,13 +35,13 @@ export function normalizeAgentRenderableMediaUrl(options) {
   const list = String(options || '')['trim']();
   if (!list) return '';
   if (/^https?:\/\//i['test'](list) || list['startsWith']('/')) return list;
-  if (/^data:image\//i['test'](list) && list['length'] <= 0xc350) return list;
+  if (/^data:image\//i['test'](list) && list['length'] <= 50000) return list;
   return localPathToUrl(list) || '';
 }
 function normalizeTaskImageMediaItems(options2 = {}) {
   const error = options2?.['media'];
   if (!error || error['kind'] !== 'image') return [];
-  const list2 = Array['isArray'](error['items']) && error['items']['length'] > 0x0 ? error['items'] : [error];
+  const list2 = Array['isArray'](error['items']) && error['items']['length'] > 0 ? error['items'] : [error];
   return list2['map']((error2) => {
     const url = normalizeAgentRenderableMediaUrl(error2?.['url'] || error2?.['thumbUrl']),
       thumbUrl = normalizeAgentRenderableMediaUrl(error2?.['thumbUrl'] || error2?.['url']);
@@ -57,7 +57,7 @@ function buildAgentMessageCopyText(target = '', source = null) {
   const list3 = [String(target || '')['trim']()]['filter'](Boolean),
     list4 =
       source?.['media']?.['kind'] === 'image'
-        ? Array['isArray'](source['media']['items']) && source['media']['items']['length'] > 0x0
+        ? Array['isArray'](source['media']['items']) && source['media']['items']['length'] > 0
           ? source['media']['items']
           : [source['media']]
         : [],
@@ -73,19 +73,19 @@ function buildAgentMessageCopyText(target = '', source = null) {
       list3['push'](
         '' +
           agentPanelText('copyMessageImageLabel') +
-          (list4['length'] > 0x1 ? current + 0x1 : '') +
+          (list4['length'] > 1 ? current + 1 : '') +
           agentPanelText('copyMessageSeparator') +
           enabled3,
       );
     }),
-    list3['join']('\x0a')
+    list3['join']('\n')
   );
 }
 function appendTaskImageMedia(el2, entry = {}, { onImagePreview: onImagePreview = null } = {}) {
   const list5 = normalizeTaskImageMediaItems(entry);
-  if (list5['length'] === 0x0) return;
+  if (list5['length'] === 0) return;
   const el3 = createEl('div', 'agent-message-media-grid');
-  (el3['classList']['toggle']('is-multiple', list5['length'] > 0x1),
+  (el3['classList']['toggle']('is-multiple', list5['length'] > 1),
     list5['forEach']((error3, record) => {
       const el4 = createEl('button', 'agent-message-media-card');
       ((el4['type'] = 'button'),
@@ -103,7 +103,7 @@ function appendTaskImageMedia(el2, entry = {}, { onImagePreview: onImagePreview 
             createEl(
               'span',
               'agent-message-media-name',
-              list5['length'] > 0x1 ? error3['name'] + '\x20' + (record + 0x1) : error3['name'],
+              list5['length'] > 1 ? error3['name'] + ' ' + (record + 1) : error3['name'],
             ),
           ),
         el4['addEventListener']('click', (event) => {
@@ -118,8 +118,8 @@ function appendTaskImageMedia(el2, entry = {}, { onImagePreview: onImagePreview 
 function appendMessageInputRefs(el6, payload = []) {
   const list6 = (Array['isArray'](payload) ? payload : [])
     ['filter']((handle) => String(handle?.['nodeId'] || handle?.['id'] || '')['trim']())
-    ['slice'](0x0, AGENT_CONVERSATION_INPUT_REF_LIMIT);
-  if (list6['length'] === 0x0) return;
+    ['slice'](0, AGENT_CONVERSATION_INPUT_REF_LIMIT);
+  if (list6['length'] === 0) return;
   const el7 = createEl('div', 'agent-message-input-refs');
   (el7['setAttribute']('role', 'list'),
     list6['forEach']((error4) => {
@@ -140,7 +140,7 @@ function appendMessageInputRefs(el6, payload = []) {
           'div',
           'agent-message-input-ref-fallback',
           String(error4['kind'] || 'node')
-            ['slice'](0x0, 0x3)
+            ['slice'](0, 3)
             ['toUpperCase'](),
         );
         (el10['setAttribute']('aria-hidden', 'true'), el8['appendChild'](el10));
@@ -165,13 +165,13 @@ function appendFailureDiagnostic(el11, code = null) {
     createEl(
       'span',
       'agent-diagnostic-meta-item',
-      formatAgentPanelText('diagnosticStep', { step: Math['max'](0x1, Number(code['step'] || 0x1)) }),
+      formatAgentPanelText('diagnosticStep', { step: Math['max'](1, Number(code['step'] || 1)) }),
     ),
     createEl(
       'span',
       'agent-diagnostic-meta-item',
       formatAgentPanelText('diagnosticCompleted', {
-        count: Math['max'](0x0, Number(code['completedSteps'] || 0x0)),
+        count: Math['max'](0, Number(code['completedSteps'] || 0)),
       }),
     ),
   );
@@ -222,7 +222,7 @@ function appendMessageToList(
     list7['push']('agent-message--' + messageClassSegment);
   const messageClassSegment2 = normalizeMessageClassSegment(status);
   if (messageClassSegment2) list7['push']('agent-message--status-' + messageClassSegment2);
-  const el19 = createEl('div', list7['join']('\x20')),
+  const el19 = createEl('div', list7['join'](' ')),
     value2 = String(input || '');
   (typeof HTMLElement === 'undefined' || !(el19 instanceof HTMLElement)) && (el19['textContent'] = value2);
   const el20 = createEl('div', 'agent-message-body');
@@ -266,8 +266,8 @@ function removeElement(el24) {
     return;
   }
   const el25 = el24['parentNode'],
-    count = el25['children']?.['indexOf']?.(el24) ?? -0x1;
-  if (count >= 0x0) el25['children']['splice'](count, 0x1);
+    count = el25['children']?.['indexOf']?.(el24) ?? -1;
+  if (count >= 0) el25['children']['splice'](count, 1);
   el24['parentNode'] = null;
 }
 export function createAgentConversationPresentation({
@@ -293,12 +293,12 @@ export function createAgentConversationPresentation({
       messagesEl: messagesEl,
       appendEntry: appendEntry,
       onSettled: () => {
-        ((enabled7 = ![]), (enabled6 = map['size'] > 0x0), run());
+        ((enabled7 = ![]), (enabled6 = map['size'] > 0), run());
       },
     }),
     value4 = sessionStore?.['subscribeAssistantStream']?.(agentConversationStreamingPresentation['handle']);
   function run() {
-    onMessagesChanged?.({ hasMessages: messagesEl['children']['length'] > 0x0 });
+    onMessagesChanged?.({ hasMessages: messagesEl['children']['length'] > 0 });
   }
   function appendMessage(value5, value6, onCopy2 = {}) {
     const list8 = appendMessageToList(messagesEl, value5, value6, {
@@ -352,7 +352,7 @@ export function createAgentConversationPresentation({
       return;
     }
     ((messagesEl['dataset']['sessionProjection'] = response4['ok'] === !![] ? 'matched' : 'mismatch'),
-      Array['isArray'](response4['mismatches']) && response4['mismatches']['length'] > 0x0
+      Array['isArray'](response4['mismatches']) && response4['mismatches']['length'] > 0
         ? (messagesEl['dataset']['sessionProjectionMismatches'] = response4['mismatches']['join'](','))
         : delete messagesEl['dataset']['sessionProjectionMismatches']);
   }
@@ -385,7 +385,7 @@ export function createAgentConversationPresentation({
       const taskResultEntryKey = getTaskResultEntryKey(value9);
       if (taskResultEntryKey) map['delete'](taskResultEntryKey);
     }),
-      (enabled6 = enabled7 || map['size'] > 0x0));
+      (enabled6 = enabled7 || map['size'] > 0));
   }
   let value10 = !![];
   const value11 = sessionStore?.['subscribe']?.((value12, value13 = {}) => {

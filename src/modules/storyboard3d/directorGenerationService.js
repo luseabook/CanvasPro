@@ -13,7 +13,7 @@ import { createStoryboard3DProject } from './projectModel.js';
 export function getDirectorPanoramaModels() {
   return projectPublicModelCatalog('image', {
     isEligible: (value) =>
-      (value['inputSlots']?.['minByKind']?.['image'] || 0x0) === 0x0 &&
+      (value['inputSlots']?.['minByKind']?.['image'] || 0) === 0 &&
       value['uiSchema']?.['fields']?.['some'](
         (item) => item['id'] === 'aspectRatio' && item['options']?.['some']((el) => el['value'] === '2:1'),
       ),
@@ -77,9 +77,9 @@ export function createDirectorGenerationService({
       const list = kind['files'] || [];
       if (
         !Array['isArray'](list) ||
-        list['length'] > 0x6 ||
+        list['length'] > 6 ||
         list['some'](
-          (enabled) => !enabled['type']?.['startsWith']('image/') || enabled['size'] > 0x20 * 0x400 * 0x400,
+          (enabled) => !enabled['type']?.['startsWith']('image/') || enabled['size'] > 32 * 1024 * 1024,
         )
       )
         throw new Error('最多使用 6 张图片，每张不超过 32 MB。');
@@ -136,10 +136,10 @@ export function createDirectorGenerationService({
           };
           if (
             inputImageUrls['length'] &&
-            (modelManifest['inputSlots']?.['maxByKind']?.['image'] || 0x0) > 0x0
+            (modelManifest['inputSlots']?.['maxByKind']?.['image'] || 0) > 0
           )
             output['inputImageUrls'] = inputImageUrls['slice'](
-              0x0,
+              0,
               modelManifest['inputSlots']['maxByKind']['image'],
             );
           const run3 = imageRequest || (await import('../../../api/aiImageApi.js'))['generateImage'],
@@ -147,7 +147,7 @@ export function createDirectorGenerationService({
               onTaskMeta: ({ taskId: taskId }) => run2({ taskId: taskId, message: '全景生成中…' }),
               onTaskId: (taskId2) => run2({ taskId: taskId2, message: '全景生成中…' }),
             }),
-            value3 = value2?.['images']?.[0x0] || value2;
+            value3 = value2?.['images']?.[0] || value2;
           if (value3?.['error']) throw new Error(value3['error']);
           const enabled2 = value3?.['imageUrl'] || value3?.['sourceUrl'];
           if (!enabled2) throw new Error('生成服务没有返回全景图片。');
@@ -166,7 +166,7 @@ export function createDirectorGenerationService({
               (value4) => {
                 let error = value4['scenes']['find']((value5) => value5['id'] === sceneId['id']);
                 !error &&
-                  ((error = createStoryboard3DProject()['scenes'][0x0]),
+                  ((error = createStoryboard3DProject()['scenes'][0]),
                   (error['name'] = '生成的全景'),
                   value4['scenes']['push'](error));
                 error['directorSettings'] = normalizeDirectorSceneSettings(error['directorSettings']);
@@ -177,7 +177,7 @@ export function createDirectorGenerationService({
                     assetId: assetId,
                     history: [
                       ...args['history'],
-                      { assetId: assetId, name: kind['prompt']['slice'](0x0, 0x3c) },
+                      { assetId: assetId, name: kind['prompt']['slice'](0, 60) },
                     ],
                   }),
                   value4
@@ -195,18 +195,18 @@ export function createDirectorGenerationService({
             projectId['id'],
             (value6) => {
               const enabled3 = value6['scenes']['find']((value7) => value7['id'] === sceneId['id']);
-              if (!enabled3) return (value6['scenes']['push'](generateDraft2['scenes'][0x0]), value6);
+              if (!enabled3) return (value6['scenes']['push'](generateDraft2['scenes'][0]), value6);
               const layerId =
                 kind['layerId'] && run(enabled3, kind['layerId']) === record ? kind['layerId'] : '';
               return (
-                applyDirectorGeneratedLayer(enabled3, generateDraft2['scenes'][0x0], {
+                applyDirectorGeneratedLayer(enabled3, generateDraft2['scenes'][0], {
                   layerId: layerId,
-                  name: kind['prompt']['slice'](0x0, 0x3c),
+                  name: kind['prompt']['slice'](0, 60),
                 }),
                 value6
               );
             },
-            { history: !![], label: '应用\x20AI\x20生成层' },
+            { history: !![], label: '应用 AI 生成层' },
           );
         }
         (run2({ status: 'completed', message: '生成完成，已保存到原项目。' }),

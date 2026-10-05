@@ -36,7 +36,7 @@ const zhCN = Object.freeze({
       nodeNames: Object.freeze({
         sourceText: '全局选中文本',
         aiText: '选中文本 · AI 文本',
-        aiImage: '选中文本\x20·\x20AI\x20图像',
+        aiImage: '选中文本 · AI 图像',
         aiVideo: '选中文本 · AI 视频',
       }),
     }),

@@ -7,7 +7,7 @@ export function element(value, item = '', key = '') {
   return el;
 }
 export function createShortcutCard(error, { preview: preview = ![] } = {}) {
-  const el2 = element(preview ? 'div' : 'button', 'canvas-shortcut-card\x20v2-menu-row\x20has-desc');
+  const el2 = element(preview ? 'div' : 'button', 'canvas-shortcut-card v2-menu-row has-desc');
   !preview &&
     ((el2['type'] = 'button'),
     (el2['dataset']['shortcutId'] = error['id']),

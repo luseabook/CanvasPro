@@ -118,7 +118,7 @@ import { __test__, buildGenerateVideoRequest, generateVideo, resumeAsyncVideoTas
           model: 'runninghub/2062515720147259393',
           apiKey: 'k_runninghub',
           prompt: 'text to video',
-          rhVideoResolution: 0x340,
+          rhVideoResolution: 832,
           rhBerniniAspectRatio: '16:9',
         })));
     } finally {
@@ -1343,7 +1343,7 @@ import { __test__, buildGenerateVideoRequest, generateVideo, resumeAsyncVideoTas
   }));
 function makeJsonResponse(value33, ok = 200) {
   return {
-    ok: ok >= 200 && ok < 0x12c,
+    ok: ok >= 200 && ok < 300,
     status: ok,
     headers: {
       get(value34) {
@@ -1356,7 +1356,7 @@ function makeJsonResponse(value33, ok = 200) {
 }
 function makeTextResponse(value35, ok2 = 200, value36 = 'text/plain') {
   return {
-    ok: ok2 >= 200 && ok2 < 0x12c,
+    ok: ok2 >= 200 && ok2 < 300,
     status: ok2,
     headers: {
       get(value37) {
@@ -1369,7 +1369,7 @@ function makeTextResponse(value35, ok2 = 200, value36 = 'text/plain') {
 }
 function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
   return {
-    ok: ok3 >= 200 && ok3 < 0x12c,
+    ok: ok3 >= 200 && ok3 < 300,
     status: ok3,
     headers: {
       get(value40) {
@@ -2716,7 +2716,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       list5 = [];
     try {
       globalThis.setTimeout = (value82, value83, ...args) =>
-        handler(value82, Number(value83) > 0x1388 ? Number(value83) : 0, ...args);
+        handler(value82, Number(value83) > 5000 ? Number(value83) : 0, ...args);
       const { clearApiConfig: clearApiConfig22 } = await import('./configApi.js');
       (clearApiConfig22(),
         (globalThis.fetch = async (value84, dom108 = {}) => {
@@ -2782,7 +2782,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       list7 = [];
     try {
       globalThis.setTimeout = (value89, value90, ...args2) =>
-        handler2(value89, Number(value90) > 0x1388 ? Number(value90) : 0, ...args2);
+        handler2(value89, Number(value90) > 5000 ? Number(value90) : 0, ...args2);
       const { clearApiConfig: clearApiConfig23 } = await import('./configApi.js');
       (clearApiConfig23(),
         (globalThis.fetch = async (value91, response = {}) => {
@@ -2840,7 +2840,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       handler3 = globalThis.setTimeout;
     try {
       globalThis.setTimeout = (value96, value97, ...args3) =>
-        handler3(value96, Number(value97) > 0x1388 ? Number(value97) : 0, ...args3);
+        handler3(value96, Number(value97) > 5000 ? Number(value97) : 0, ...args3);
       const { clearApiConfig: clearApiConfig24 } = await import('./configApi.js');
       (clearApiConfig24(),
         (globalThis.fetch = async (value98, response2 = {}) => {
@@ -2893,7 +2893,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
     let value101 = 0;
     try {
       globalThis.setTimeout = (value102, value103, ...args4) =>
-        handler4(value102, Number(value103) > 0x1388 ? Number(value103) : 0, ...args4);
+        handler4(value102, Number(value103) > 5000 ? Number(value103) : 0, ...args4);
       const { clearApiConfig: clearApiConfig25 } = await import('./configApi.js');
       (clearApiConfig25(),
         (globalThis.fetch = async (value104, response3 = {}) => {
@@ -2917,7 +2917,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
                   id: 'task-seedance-failed',
                   status: 'failed',
                   progress: 100,
-                  error: { code: 0x190, message: 'Seedance upstream failed', type: 'invalid_request' },
+                  error: { code: 400, message: 'Seedance upstream failed', type: 'invalid_request' },
                 },
               })
             );
@@ -2946,7 +2946,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       video = 'https://cdn.agnes-ai.com/api/video-content/agnes-task-1?token=ok';
     try {
       globalThis.setTimeout = (value107, value108, ...args5) =>
-        handler5(value107, Number(value108) > 0x1388 ? Number(value108) : 0, ...args5);
+        handler5(value107, Number(value108) > 5000 ? Number(value108) : 0, ...args5);
       const { clearApiConfig: clearApiConfig26 } = await import('./configApi.js');
       (clearApiConfig26(),
         (globalThis.fetch = async (value109, dom109 = {}) => {
@@ -2999,7 +2999,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
     let value113 = 0;
     try {
       globalThis.setTimeout = (value114, value115, ...args6) =>
-        handler6(value114, Number(value115) > 0x1388 ? Number(value115) : 0, ...args6);
+        handler6(value114, Number(value115) > 5000 ? Number(value115) : 0, ...args6);
       const { clearApiConfig: clearApiConfig27 } = await import('./configApi.js');
       (clearApiConfig27(),
         (globalThis.fetch = async (value116, response5 = {}) => {
@@ -3034,7 +3034,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       list11 = [];
     try {
       globalThis.setTimeout = (value119, value120, ...args7) =>
-        handler7(value119, Number(value120) > 0x1388 ? Number(value120) : 0, ...args7);
+        handler7(value119, Number(value120) > 5000 ? Number(value120) : 0, ...args7);
       const { clearApiConfig: clearApiConfig28 } = await import('./configApi.js');
       (clearApiConfig28(),
         (globalThis.fetch = async (value121, dom110 = {}) => {
@@ -3104,7 +3104,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       list13 = [];
     try {
       globalThis.setTimeout = (value124, value125, ...args8) =>
-        handler8(value124, Number(value125) > 0x1388 ? Number(value125) : 0, ...args8);
+        handler8(value124, Number(value125) > 5000 ? Number(value125) : 0, ...args8);
       const { clearApiConfig: clearApiConfig29 } = await import('./configApi.js');
       (clearApiConfig29(),
         (globalThis.fetch = async (value126, dom112 = {}) => {
@@ -3142,7 +3142,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
         audioUrl: 'https://www.runninghub.cn/mock-input-audio.mp3',
         rhLipSyncInputIndex: 1,
         rhVideoFrames: 20,
-        rhVideoResolution: 0x400,
+        rhVideoResolution: 1024,
       });
       (assert.equal(generateVideo7.videoUrl, '/output/rh-lipsync-fileurl.mp4'),
         assert.equal(generateVideo7.sourceUrl, 'https://cdn.example.com/rh-lipsync-fileurl?id=123'),
@@ -3163,7 +3163,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       fileUrl = 'https://cdn.example.com/口型结果.mp4?token=abc';
     try {
       globalThis.setTimeout = (value128, value129, ...args9) =>
-        handler9(value128, Number(value129) > 0x1388 ? Number(value129) : 0, ...args9);
+        handler9(value128, Number(value129) > 5000 ? Number(value129) : 0, ...args9);
       const { clearApiConfig: clearApiConfig30 } = await import('./configApi.js');
       (clearApiConfig30(),
         (globalThis.fetch = async (value130, dom114 = {}) => {
@@ -3191,7 +3191,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
           if (url3 === '/api/v2/save_output_from_url')
             return makeJsonResponse(
               { error: "Download failed: 'ascii' codec can't encode characters in position 45-47" },
-              0x1f6,
+              502,
             );
           if (url3 === fileUrl) return makeBlobResponse(new Blob([new Uint8Array([1, 2, 3])]));
           if (url3 === '/api/v2/save_output?ext=mp4')
@@ -3207,7 +3207,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
         audioUrl: 'https://www.runninghub.cn/mock-input-audio.mp3',
         rhLipSyncInputIndex: 1,
         rhVideoFrames: 20,
-        rhVideoResolution: 0x400,
+        rhVideoResolution: 1024,
       });
       (assert.equal(generateVideo8.videoUrl, '/output/rh-lipsync-fallback.mp4'),
         assert.equal(generateVideo8.sourceUrl, fileUrl),
@@ -3225,7 +3225,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       list17 = [];
     try {
       globalThis.setTimeout = (value132, value133, ...args10) =>
-        handler10(value132, Number(value133) > 0x1388 ? Number(value133) : 0, ...args10);
+        handler10(value132, Number(value133) > 5000 ? Number(value133) : 0, ...args10);
       const { clearApiConfig: clearApiConfig31 } = await import('./configApi.js');
       (clearApiConfig31(),
         (globalThis.fetch = async (value134, dom115 = {}) => {
@@ -3267,7 +3267,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
           audioUrl: 'https://www.runninghub.cn/mock-input-audio.mp3',
           rhLipSyncInputIndex: 1,
           rhVideoFrames: 20,
-          rhVideoResolution: 0x400,
+          rhVideoResolution: 1024,
         },
         { onTaskMeta: (value137) => list17.push(value137) },
       );
@@ -3286,7 +3286,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
       handler11 = globalThis.setTimeout;
     try {
       globalThis.setTimeout = (value139, value140, ...args11) =>
-        handler11(value139, Number(value140) > 0x1388 ? Number(value140) : 0, ...args11);
+        handler11(value139, Number(value140) > 5000 ? Number(value140) : 0, ...args11);
       const { clearApiConfig: clearApiConfig32 } = await import('./configApi.js');
       (clearApiConfig32(),
         (globalThis.fetch = async (value141, dom116 = {}) => {
@@ -3333,7 +3333,7 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
         audioUrl: 'https://www.runninghub.cn/mock-input-audio.mp3',
         rhLipSyncInputIndex: 1,
         rhVideoFrames: 20,
-        rhVideoResolution: 0x400,
+        rhVideoResolution: 1024,
       });
       (assert.equal(generateVideo10.videoUrl, '/output/rh-lipsync-sse.mp4'),
         assert.equal(generateVideo10.sourceUrl, 'https://cdn.example.com/rh-lipsync-sse.mp4'),

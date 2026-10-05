@@ -7,7 +7,7 @@ import {
 } from './directorClips.js';
 import { collectDirectorKeys, directorKeyIdentity } from './directorTimelineOperations.js';
 const escape = (value) =>
-  String(value)['replaceAll']('&', '&amp;')['replaceAll']('\x22', '&quot;')['replaceAll']('<', '&lt;');
+  String(value)['replaceAll']('&', '&amp;')['replaceAll']('"', '&quot;')['replaceAll']('<', '&lt;');
 export class DirectorClipTimeline {
   constructor(item) {
     ((this['timeline'] = item),
@@ -25,11 +25,11 @@ export class DirectorClipTimeline {
       ...args['actionClips']['map']((args2) => ({
         ...args2,
         kind: 'action',
-        label: '动作\x20·\x20' + args2['actionId'],
+        label: '动作 · ' + args2['actionId'],
       })),
     ];
     return (
-      '<div\x20class=\x22storyboard-3d-director-fields\x22><button\x20data-storyboard-3d-action=\x22timeline-clip-create\x22>选中关键帧组成片段</button><button\x20data-storyboard-3d-action=\x22timeline-clip-copy\x22>复制片段</button><button\x20data-storyboard-3d-action=\x22timeline-clip-paste\x22>粘贴片段到播放头</button><button\x20data-storyboard-3d-action=\x22timeline-clip-duplicate\x22>紧后复制片段</button><button\x20data-storyboard-3d-action=\x22timeline-clip-delete\x22>删除片段</button></div>\x0a\x20\x20\x20\x20' +
+      '<div class="storyboard-3d-director-fields"><button data-storyboard-3d-action="timeline-clip-create">选中关键帧组成片段</button><button data-storyboard-3d-action="timeline-clip-copy">复制片段</button><button data-storyboard-3d-action="timeline-clip-paste">粘贴片段到播放头</button><button data-storyboard-3d-action="timeline-clip-duplicate">紧后复制片段</button><button data-storyboard-3d-action="timeline-clip-delete">删除片段</button></div>\n    ' +
       list['map'](
         (index) =>
           '<div class="storyboard-3d-timeline-row"><div class="storyboard-3d-timeline-track-label">' +
@@ -41,13 +41,13 @@ export class DirectorClipTimeline {
           '" data-clip-id="' +
           escape(index['id']) +
           '" style="--clip-start:' +
-          (index['start'] / args['duration']) * 0x64 +
+          (index['start'] / args['duration']) * 100 +
           '%;--clip-width:' +
-          ((index['end'] - index['start']) / args['duration']) * 0x64 +
-          '%\x22><span\x20data-clip-edge=\x22start\x22\x20aria-label=\x22裁剪片段开始\x22></span><b>' +
-          index['start']['toFixed'](0x2) +
+          ((index['end'] - index['start']) / args['duration']) * 100 +
+          '%"><span data-clip-edge="start" aria-label="裁剪片段开始"></span><b>' +
+          index['start']['toFixed'](2) +
           '–' +
-          index['end']['toFixed'](0x2) +
+          index['end']['toFixed'](2) +
           's</b><span data-clip-edge="end" aria-label="裁剪片段结束"></span></div></div></div>',
       )['join']('')
     );
@@ -138,7 +138,7 @@ export class DirectorClipTimeline {
   }
   ['drag'](event) {
     const id2 = event['target']['closest']?.('.storyboard-3d-motion-clip');
-    if (!id2 || event['button'] !== 0x0) return;
+    if (!id2 || event['button'] !== 0) return;
     (event['preventDefault'](),
       event['stopImmediatePropagation'](),
       (this['selected'] = { id: id2['dataset']['clipId'], kind: id2['dataset']['clipKind'] }));
@@ -158,10 +158,10 @@ export class DirectorClipTimeline {
       end = input['end'];
     ((this['cancel'] = () => {
       (signal['abort'](),
-        id2['style']['setProperty']('--clip-start', (input['start'] / actionClips['duration']) * 0x64 + '%'),
+        id2['style']['setProperty']('--clip-start', (input['start'] / actionClips['duration']) * 100 + '%'),
         id2['style']['setProperty'](
           '--clip-width',
-          ((input['end'] - input['start']) / actionClips['duration']) * 0x64 + '%',
+          ((input['end'] - input['start']) / actionClips['duration']) * 100 + '%',
         ),
         (this['cancel'] = null));
     }),
@@ -191,10 +191,10 @@ export class DirectorClipTimeline {
             ) - value5),
             (start = enabled3 === 'end' ? input['start'] : input['start'] + value4),
             (end = enabled3 === 'start' ? input['end'] : input['end'] + value4),
-            id2['style']['setProperty']('--clip-start', (start / actionClips['duration']) * 0x64 + '%'),
+            id2['style']['setProperty']('--clip-start', (start / actionClips['duration']) * 100 + '%'),
             id2['style']['setProperty'](
               '--clip-width',
-              (Math['max'](0x0, end - start) / actionClips['duration']) * 0x64 + '%',
+              (Math['max'](0, end - start) / actionClips['duration']) * 100 + '%',
             ));
         },
         { signal: signal['signal'] },
@@ -242,7 +242,7 @@ export class DirectorClipTimeline {
             ? 'paste'
             : ['delete', 'backspace']['includes'](value11)
               ? 'delete'
-              : ['enter', '\x20']['includes'](value11)
+              : ['enter', ' ']['includes'](value11)
                 ? 'select'
                 : null;
     if (!enabled4) return ![];

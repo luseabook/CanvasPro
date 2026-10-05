@@ -4,7 +4,7 @@ function hasOwnManifestValue(value, item) {
 function isPresentManifestValue(list) {
   if (list === undefined || list === null) return ![];
   if (typeof list === 'string') return list['trim']() !== '';
-  if (Array['isArray'](list)) return list['length'] > 0x0;
+  if (Array['isArray'](list)) return list['length'] > 0;
   return !![];
 }
 export function getComfyUiPayloadPathValue(options = {}, key = '') {
@@ -126,18 +126,18 @@ function applyManifestInputTransform(value14, value15 = {}, value16 = {}) {
         : 'false';
     case 'integer': {
       const value17 = Number(value14),
-        value18 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
+        value18 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0),
         value19 = Number['isFinite'](value17)
           ? Math['trunc'](value17)
           : Number['isFinite'](value18)
             ? Math['trunc'](value18)
-            : 0x0;
+            : 0;
       return clampManifestNumber(value19, error);
     }
     case 'number': {
       const value20 = Number(value14),
-        value21 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
-        value22 = Number['isFinite'](value20) ? value20 : Number['isFinite'](value21) ? value21 : 0x0;
+        value21 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0),
+        value22 = Number['isFinite'](value20) ? value20 : Number['isFinite'](value21) ? value21 : 0;
       return clampManifestNumber(value22, error);
     }
     default:

@@ -18,14 +18,14 @@ export function resolveMediaClipReverseControlState({
   };
 }
 export function mirrorMediaClipRange({
-  startSec: startSec = 0x0,
-  endSec: endSec = 0x0,
-  durationSec: durationSec = 0x0,
+  startSec: startSec = 0,
+  endSec: endSec = 0,
+  durationSec: durationSec = 0,
 } = {}) {
-  const startSec2 = Math['max'](0x0, Number(durationSec) || 0x0);
-  if (!(startSec2 > 0x0)) return { startSec: 0x0, endSec: 0x0 };
-  const clamp2 = clamp(Number(startSec) || 0x0, 0x0, startSec2),
-    clamp3 = clamp(Number(endSec) || 0x0, clamp2, startSec2);
+  const startSec2 = Math['max'](0, Number(durationSec) || 0);
+  if (!(startSec2 > 0)) return { startSec: 0, endSec: 0 };
+  const clamp2 = clamp(Number(startSec) || 0, 0, startSec2),
+    clamp3 = clamp(Number(endSec) || 0, clamp2, startSec2);
   return { startSec: startSec2 - clamp3, endSec: startSec2 - clamp2 };
 }
 export function renderMediaClipReverseIcon({
@@ -33,7 +33,7 @@ export function renderMediaClipReverseIcon({
   strokeWidth: strokeWidth = 1.7,
 } = {}) {
   const index = String(className || '')['trim'](),
-    result = index ? '\x20class=\x22' + index + '\x22' : '';
+    result = index ? ' class="' + index + '"' : '';
   return (
     '<svg' +
     result +

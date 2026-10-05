@@ -73,17 +73,17 @@ import {
   WHITEBOARD_DEFAULT_TOOL,
   WHITEBOARD_DEFAULT_VIEW,
 } from '../modules/whiteboard/whiteboardNodeData.js';
-const WHITEBOARD_MIN_WIDTH = 0x168,
-  WHITEBOARD_MIN_HEIGHT = 0x104,
-  WHITEBOARD_SAVE_DEBOUNCE_MS = 0x1f4,
-  WHITEBOARD_TEXT_LIMIT = 0xc8,
+const WHITEBOARD_MIN_WIDTH = 360,
+  WHITEBOARD_MIN_HEIGHT = 260,
+  WHITEBOARD_SAVE_DEBOUNCE_MS = 500,
+  WHITEBOARD_TEXT_LIMIT = 200,
   WHITEBOARD_MIN_ZOOM = 0.1,
-  WHITEBOARD_MAX_ZOOM = 0x8,
+  WHITEBOARD_MAX_ZOOM = 8,
   WHITEBOARD_ZOOM_WHEEL_SPEED = 0.0015,
-  WHITEBOARD_ARROW_HANDLE_SCREEN_RADIUS = 0xa,
+  WHITEBOARD_ARROW_HANDLE_SCREEN_RADIUS = 10,
   WHITEBOARD_LAYER_ERASE_PREVIEW_OPACITY = 0.24,
-  WHITEBOARD_LAYER_ERASER_TRAIL_POINT_LIMIT = 0xa0,
-  WHITEBOARD_LAYER_ERASER_TRAIL_MAX_SCREEN_LENGTH = 0x8c,
+  WHITEBOARD_LAYER_ERASER_TRAIL_POINT_LIMIT = 160,
+  WHITEBOARD_LAYER_ERASER_TRAIL_MAX_SCREEN_LENGTH = 140,
   WHITEBOARD_ROTATE_CURSOR = createRotateCursor(),
   WHITEBOARD_ALLOWED_TOOLS = Object['freeze']([
     'select',
@@ -113,7 +113,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     brush:
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
     eraser:
-      '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.9\x22><path\x20d=\x22M20\x2020H7l-5-5a2\x202\x200\x200\x201\x200-2.83l9.17-9.17a2\x202\x200\x200\x201\x202.83\x200L22\x2010a2\x202\x200\x200\x201\x200\x202.83L14.83\x2020\x22/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M20 20H7l-5-5a2 2 0 0 1 0-2.83l9.17-9.17a2 2 0 0 1 2.83 0L22 10a2 2 0 0 1 0 2.83L14.83 20"/></svg>',
     arrow:
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M5 19 19 5"/><path d="M9 5h10v10"/></svg>',
     text: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 6h16"/><path d="M12 6v12"/><path d="M8 18h8"/></svg>',
@@ -121,14 +121,14 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     bucket:
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M19 11l-8-8-8.5 8.5a2.12 2.12 0 0 0 0 3l4 4a2.12 2.12 0 0 0 3 0L19 11z"/><path d="M12 18l-2 2"/><path d="M20 20l-2-2"/></svg>',
     'number-label':
-      '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.9\x22><circle\x20cx=\x2212\x22\x20cy=\x2212\x22\x20r=\x228\x22/><path\x20d=\x22M11\x209l2-1v8\x22/><path\x20d=\x22M10\x2016h5\x22/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><path d="M11 9l2-1v8"/><path d="M10 16h5"/></svg>',
     more: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="6" height="6" rx="1"/><circle cx="17" cy="7" r="3"/><path d="m7 14-3 6h6Z"/><path d="m17 13 4 4-4 4-4-4Z"/></svg>',
     undo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a6 6 0 1 1 0 12h-3"/></svg>',
     redo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M15 14l4-4-4-4"/><path d="M19 10H10a6 6 0 1 0 0 12h3"/></svg>',
     clear:
-      '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.9\x22><path\x20d=\x22M3\x206h18\x22/><path\x20d=\x22M8\x206V4h8v2\x22/><path\x20d=\x22M6\x206l1\x2016h10l1-16\x22/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 16h10l1-16"/></svg>',
     compose:
-      '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222.1\x22><path\x20d=\x22M12\x205v14\x22/><path\x20d=\x22M5\x2012h14\x22/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
     upload:
       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M5 14v5h14v-5"/></svg>',
   }),
@@ -224,7 +224,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
       key: 'arrow-left',
       tool: 'shape',
       label: '左箭头',
-      icon: '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22><path\x20d=\x22m10\x204-8\x208\x208\x208v-5h12V9H10Z\x22/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m10 4-8 8 8 8v-5h12V9H10Z"/></svg>',
     },
     {
       key: 'arrow-up',
@@ -236,7 +236,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
       key: 'arrow-down',
       tool: 'shape',
       label: '下箭头',
-      icon: '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22><path\x20d=\x22m4\x2014\x208\x208\x208-8h-5V2H9v12Z\x22/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 14 8 8 8-8h-5V2H9v12Z"/></svg>',
     },
     {
       key: 'arrow-right',
@@ -255,7 +255,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
       key: 'highlighter',
       tool: 'brush',
       label: '荧光笔',
-      style: { opacity: 0.35, size: 0x48 },
+      style: { opacity: 0.35, size: 72 },
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m15 3 6 6L9 21H3v-6Z"/><path d="m12 6 6 6M2 22h10"/></svg>',
     },
     {
@@ -267,16 +267,16 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     { key: 'number-label', tool: 'number-label', label: '编号', icon: WHITEBOARD_TOOL_ICONS['number-label'] },
   ]),
   WHITEBOARD_SIZE_PRESETS = Object['freeze']([
-    { key: 'S', value: 0xc, tooltipKey: 'whiteboardNode.style.sizes.small' },
-    { key: 'M', value: 0x28, tooltipKey: 'whiteboardNode.style.sizes.medium' },
-    { key: 'L', value: 0x48, tooltipKey: 'whiteboardNode.style.sizes.large' },
-    { key: 'XL', value: 0x6c, tooltipKey: 'whiteboardNode.style.sizes.extraLarge' },
+    { key: 'S', value: 12, tooltipKey: 'whiteboardNode.style.sizes.small' },
+    { key: 'M', value: 40, tooltipKey: 'whiteboardNode.style.sizes.medium' },
+    { key: 'L', value: 72, tooltipKey: 'whiteboardNode.style.sizes.large' },
+    { key: 'XL', value: 108, tooltipKey: 'whiteboardNode.style.sizes.extraLarge' },
   ]),
   WHITEBOARD_OPACITY_PRESETS = Object['freeze']([
     { key: '25', value: 0.25 },
     { key: '50', value: 0.5 },
     { key: '75', value: 0.75 },
-    { key: '100', value: 0x1 },
+    { key: '100', value: 1 },
   ]),
   WHITEBOARD_FILL_OPTIONS = Object['freeze']([
     { key: 'none', label: '○', tooltipKey: 'whiteboardNode.style.fill.none' },
@@ -301,7 +301,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     {
       value: 'arc',
       tooltipKey: 'whiteboardNode.style.arrowKind.arc',
-      icon: '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22><path\x20d=\x22M4\x2017c4-10\x2012-10\x2016\x200\x22/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17c4-10 12-10 16 0"/></svg>',
     },
     {
       value: 'elbow',
@@ -323,7 +323,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     {
       value: 'triangle',
       tooltipKey: 'whiteboardNode.style.arrowhead.triangle',
-      icon: '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22><path\x20d=\x22M3\x2012h7M20\x2012\x2010\x205v14Z\x22/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h7M20 12 10 5v14Z"/></svg>',
     },
     {
       value: 'square',
@@ -333,7 +333,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     {
       value: 'circle',
       tooltipKey: 'whiteboardNode.style.arrowhead.circle',
-      icon: '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22><path\x20d=\x22M10\x2012h11\x22/><circle\x20cx=\x227\x22\x20cy=\x2212\x22\x20r=\x225\x22/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 12h11"/><circle cx="7" cy="12" r="5"/></svg>',
     },
     {
       value: 'diamond',
@@ -343,7 +343,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     {
       value: 'inverted',
       tooltipKey: 'whiteboardNode.style.arrowhead.inverted',
-      icon: '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.8\x22><path\x20d=\x22M13\x2012h8M3\x205l10\x207-10\x207Z\x22/></svg>',
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 12h8M3 5l10 7-10 7Z"/></svg>',
     },
     {
       value: 'bar',
@@ -382,7 +382,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
   },
   clampWhiteboardZoom = (options) => {
     const count = Number(options);
-    if (!Number['isFinite'](count) || count <= 0x0) return WHITEBOARD_DEFAULT_VIEW['zoom'];
+    if (!Number['isFinite'](count) || count <= 0) return WHITEBOARD_DEFAULT_VIEW['zoom'];
     return Math['max'](WHITEBOARD_MIN_ZOOM, Math['min'](WHITEBOARD_MAX_ZOOM, count));
   },
   cloneWhiteboardView = (box = WHITEBOARD_DEFAULT_VIEW) => ({
@@ -393,7 +393,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
   clampOpacity = (target) => {
     const source = Number(target);
     if (!Number['isFinite'](source)) return WHITEBOARD_DEFAULT_STYLE['opacity'];
-    return Math['max'](0.1, Math['min'](0x1, source));
+    return Math['max'](0.1, Math['min'](1, source));
   },
   normalizeStyleValue = (next, current) => {
     if (next === 'size') return clampImageBrushSize(current);
@@ -423,7 +423,7 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
     arrowStart: normalizeStyleValue('arrowStart', args['arrowStart']),
     arrowEnd: normalizeStyleValue('arrowEnd', args['arrowEnd']),
   }),
-  getFiniteNumber = (entry, record = 0x0) => {
+  getFiniteNumber = (entry, record = 0) => {
     const payload = Number(entry);
     return Number['isFinite'](payload) ? payload : record;
   },
@@ -439,17 +439,17 @@ const WHITEBOARD_MIN_WIDTH = 0x168,
       }
     const list2 = list['filter'](hasFiniteClientPoint);
     if (hasFiniteClientPoint(event2)) {
-      const event3 = list2[list2['length'] - 0x1];
+      const event3 = list2[list2['length'] - 1];
       (!event3 ||
         Number(event3['clientX']) !== Number(event2['clientX']) ||
         Number(event3['clientY']) !== Number(event2['clientY'])) &&
         list2['push'](event2);
     }
-    return list2['length'] > 0x0 ? list2 : [event2];
+    return list2['length'] > 0 ? list2 : [event2];
   },
   requestWhiteboardFrame = (handle) => {
     if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(handle);
-    return setTimeout(handle, 0x0);
+    return setTimeout(handle, 0);
   },
   cancelWhiteboardFrame = (enabled2) => {
     if (!enabled2) return;
@@ -555,12 +555,12 @@ function createToolbarButton({
   ((el3['type'] = 'button'),
     (el3['className'] = ['ftb-btn', 'icon-only', 'whiteboard-toolbar-btn', className]
       ['filter'](Boolean)
-      ['join']('\x20')));
+      ['join'](' ')));
   if (tool) el3['dataset']['tool'] = tool;
   if (action) el3['dataset']['action'] = action;
   return (
     label &&
-      ((el3['dataset']['tooltip'] = shortcut ? label + '\x20(' + shortcut + ')' : label),
+      ((el3['dataset']['tooltip'] = shortcut ? label + ' (' + shortcut + ')' : label),
       el3['setAttribute']('aria-label', label)),
     appendIcon(el3, icon),
     el3
@@ -577,7 +577,7 @@ function createDivider() {
 function createToolbarGroup(value7) {
   const value8 = document['createElement']('div');
   return (
-    (value8['className'] = ['whiteboard-toolbar-group', value7]['filter'](Boolean)['join']('\x20')),
+    (value8['className'] = ['whiteboard-toolbar-group', value7]['filter'](Boolean)['join'](' ')),
     value8
   );
 }
@@ -613,7 +613,7 @@ function createWhiteboardToolbar({ hiddenActions: hiddenActions = [] } = {}) {
   handler2('compose') &&
     el7['appendChild'](
       createToolbarButton({
-        className: 'whiteboard-action-btn\x20act-compose',
+        className: 'whiteboard-action-btn act-compose',
         action: 'compose',
         label: '合成图像',
         icon: WHITEBOARD_TOOL_ICONS['compose'],
@@ -622,7 +622,7 @@ function createWhiteboardToolbar({ hiddenActions: hiddenActions = [] } = {}) {
   handler2('clear') &&
     el6['appendChild'](
       createToolbarButton({
-        className: 'whiteboard-action-btn\x20act-clear',
+        className: 'whiteboard-action-btn act-clear',
         action: 'clear',
         label: '清空',
         shortcut: 'R',
@@ -690,9 +690,9 @@ function createWhiteboardToolbar({ hiddenActions: hiddenActions = [] } = {}) {
   }
   return (
     [el8, el6, el7]
-      ['filter']((value11) => value11['childElementCount'] > 0x0)
+      ['filter']((value11) => value11['childElementCount'] > 0)
       ['forEach']((value12, count2) => {
-        if (count2 > 0x0) el5['appendChild'](createDivider());
+        if (count2 > 0) el5['appendChild'](createDivider());
         el5['appendChild'](value12);
       }),
     applyI18n(el5),
@@ -707,7 +707,7 @@ function createWhiteboardStylePanel() {
   const run = (value13, value14 = '') => {
       const el16 = document['createElement']('section');
       return (
-        (el16['className'] = ['whiteboard-style-section', value14]['filter'](Boolean)['join']('\x20')),
+        (el16['className'] = ['whiteboard-style-section', value14]['filter'](Boolean)['join'](' ')),
         (el16['dataset']['styleControl'] = value13),
         el16
       );
@@ -909,7 +909,7 @@ export class WhiteboardNode {
     ((this['_data'] = value28 && typeof value28 === 'object' ? value28 : {}),
       (this['id'] = this['_data']['id']),
       (this['el'] = document['createElement']('div')),
-      (this['el']['className'] = 'v2-node-component\x20whiteboard-node-component'));
+      (this['el']['className'] = 'v2-node-component whiteboard-node-component'));
     const tool4 = normalizeWhiteboardState(this['_data']['whiteboard']);
     ((this['_whiteboard'] = tool4),
       (this['_commands'] = cloneCommands(tool4['commands'])),
@@ -929,11 +929,11 @@ export class WhiteboardNode {
       (this['_resizeObserver'] = null),
       (this['_cleanup'] = []),
       (this['_cursorHover'] = ![]),
-      (this['_cursorLast'] = { x: 0x0, y: 0x0 }),
-      (this['_cursorWorldLast'] = { x: 0x0, y: 0x0 }),
-      (this['_cursorRaf'] = 0x0),
-      (this['_canvasSyncRaf'] = 0x0),
-      (this['_layerEraserPreviewRaf'] = 0x0),
+      (this['_cursorLast'] = { x: 0, y: 0 }),
+      (this['_cursorWorldLast'] = { x: 0, y: 0 }),
+      (this['_cursorRaf'] = 0),
+      (this['_canvasSyncRaf'] = 0),
+      (this['_layerEraserPreviewRaf'] = 0),
       (this['_pendingCanvasSyncAfterResize'] = ![]),
       (this['_pointerState'] = createPointerState()),
       (this['_modifierState'] = { space: ![], control: ![] }),
@@ -942,8 +942,8 @@ export class WhiteboardNode {
       (this['_editingTextCommandIndex'] = null),
       (this['_fillRegionCache'] = new Map()),
       (this['_checkerPattern'] = null),
-      (this['_canvasCssWidth'] = 0x1),
-      (this['_canvasCssHeight'] = 0x1),
+      (this['_canvasCssWidth'] = 1),
+      (this['_canvasCssHeight'] = 1),
       (this['_lastPersistedSignature'] = getWhiteboardSignature(tool4)),
       (this['_isEditing'] = ![]),
       (this['_isComposingImageNode'] = ![]),
@@ -951,7 +951,7 @@ export class WhiteboardNode {
       (this['_backgroundInput'] = null),
       (this['_backgroundInputSignature'] = ''),
       (this['_backgroundImage'] = null),
-      (this['_backgroundLoadToken'] = 0x0),
+      (this['_backgroundLoadToken'] = 0),
       (this['_backgroundObjectUrl'] = ''));
   }
   ['mount']() {
@@ -961,7 +961,7 @@ export class WhiteboardNode {
     const el48 = document['createElement']('div');
     el48['className'] = 'whiteboard-canvas-wrap';
     const value29 = document['createElement']('canvas');
-    ((value29['className'] = 'v2-annotate-canvas whiteboard-canvas'), (value29['tabIndex'] = 0x0));
+    ((value29['className'] = 'v2-annotate-canvas whiteboard-canvas'), (value29['tabIndex'] = 0));
     const el49 = document['createElement']('div');
     ((el49['className'] = 'v2-annotate-cursor whiteboard-cursor'),
       (el49['style']['display'] = 'none'));
@@ -973,11 +973,11 @@ export class WhiteboardNode {
       (el51['accept'] = 'image/*'),
       (el51['className'] = 'whiteboard-background-file-input'),
       (el51['hidden'] = !![]),
-      (el51['tabIndex'] = -0x1),
+      (el51['tabIndex'] = -1),
       el50['appendChild'](el51));
     const el52 = createWhiteboardStylePanel(),
       el53 = document['createElement']('div');
-    ((el53['className'] = 'group-resizer\x20whiteboard-resizer\x20v2-resize-move'),
+    ((el53['className'] = 'group-resizer whiteboard-resizer v2-resize-move'),
       el53['setAttribute']('aria-hidden', 'true'),
       el48['appendChild'](value29),
       el48['appendChild'](el49),
@@ -1022,7 +1022,7 @@ export class WhiteboardNode {
     return (
       (value31['lineCap'] = 'round'),
       (value31['lineJoin'] = 'round'),
-      (this['_checkerPattern'] = createEraseCheckerboardPattern(value31, 0x1)),
+      (this['_checkerPattern'] = createEraseCheckerboardPattern(value31, 1)),
       this['_bindSelection'](),
       this['_bindEventGuards'](),
       this['_bindCanvasEvents'](),
@@ -1055,11 +1055,11 @@ export class WhiteboardNode {
       (this['_resizeObserver'] = null),
       this['_removeTextInput'](![]),
       this['_saveTimer'] && (clearTimeout(this['_saveTimer']), (this['_saveTimer'] = null)),
-      this['_cursorRaf'] && (cancelWhiteboardFrame(this['_cursorRaf']), (this['_cursorRaf'] = 0x0)),
+      this['_cursorRaf'] && (cancelWhiteboardFrame(this['_cursorRaf']), (this['_cursorRaf'] = 0)),
       this['_canvasSyncRaf'] &&
-        (cancelWhiteboardFrame(this['_canvasSyncRaf']), (this['_canvasSyncRaf'] = 0x0)),
+        (cancelWhiteboardFrame(this['_canvasSyncRaf']), (this['_canvasSyncRaf'] = 0)),
       this['_cancelLayerEraserPreviewRender']?.(),
-      (this['_backgroundLoadToken'] += 0x1),
+      (this['_backgroundLoadToken'] += 1),
       (this['_backgroundImage'] = null),
       this['_releaseBackgroundObjectUrl']());
   }
@@ -1161,7 +1161,7 @@ export class WhiteboardNode {
         (this['_cursorWorldLast'] = this['_screenToWorld'](this['_cursorLast'])));
       if (this['_cursorRaf']) return;
       this['_cursorRaf'] = requestAnimationFrame(() => {
-        ((this['_cursorRaf'] = 0x0), this['_syncCursor']());
+        ((this['_cursorRaf'] = 0), this['_syncCursor']());
       });
     };
     (this['canvasEl']['addEventListener']('pointerdown', (event9) => {
@@ -1318,7 +1318,7 @@ export class WhiteboardNode {
       }),
       this['opacityRangeEl']?.['addEventListener']('input', (event27) => {
         if (!this['_isEditing']) return;
-        this['_setStyleValue']('opacity', Number(event27['target']['value']) / 0x64);
+        this['_setStyleValue']('opacity', Number(event27['target']['value']) / 100);
       }),
       this['sizePresetButtons']?.['forEach']((el60) => {
         el60['addEventListener']('click', (event28) => {
@@ -1394,7 +1394,7 @@ export class WhiteboardNode {
       this['backgroundFileInputEl']?.['addEventListener']('change', (event37) => {
         if (!this['_isEditing']) return;
         event37['stopPropagation']();
-        const enabled9 = event37['target']?.['files']?.[0x0] || null;
+        const enabled9 = event37['target']?.['files']?.[0] || null;
         event37['target']['value'] = '';
         if (!enabled9) return;
         void this['_uploadBackgroundImage'](enabled9);
@@ -1471,9 +1471,9 @@ export class WhiteboardNode {
     const value59 = globalThis['window']?.['v2Renderer'],
       value60 = [
         '.img-node-preview img.node-img',
-        '.img-node-preview\x20img.aigen-image-media',
-        '.img-node-preview\x20img.v2-media-preview',
-      ]['join'](',\x20');
+        '.img-node-preview img.aigen-image-media',
+        '.img-node-preview img.v2-media-preview',
+      ]['join'](', ');
     let box6 = null;
     try {
       box6 = value59?.['queryMountedNodeElement']?.(enabled11, value60) || null;
@@ -1482,9 +1482,9 @@ export class WhiteboardNode {
       try {
         box6 = value59?.['getMountedWrapper']?.(enabled11)?.['querySelector']?.(value60) || null;
       } catch {}
-    const count3 = Number(box6?.['naturalWidth'] || box6?.['width'] || 0x0),
-      count4 = Number(box6?.['naturalHeight'] || box6?.['height'] || 0x0);
-    if (!box6 || box6['complete'] === ![] || !(count3 > 0x0 && count4 > 0x0)) return null;
+    const count3 = Number(box6?.['naturalWidth'] || box6?.['width'] || 0),
+      count4 = Number(box6?.['naturalHeight'] || box6?.['height'] || 0);
+    if (!box6 || box6['complete'] === ![] || !(count3 > 0 && count4 > 0)) return null;
     return box6;
   }
   ['_syncBackgroundInputFromStore']({ force: force = ![] } = {}) {
@@ -1498,11 +1498,11 @@ export class WhiteboardNode {
     if (!force && whiteboardBackgroundInputSignature === this['_backgroundInputSignature']) return;
     ((this['_backgroundInputSignature'] = whiteboardBackgroundInputSignature),
       (this['_backgroundInput'] = imageWidth),
-      (this['_backgroundLoadToken'] += 0x1),
+      (this['_backgroundLoadToken'] += 1),
       (this['_backgroundImage'] = null),
       this['_releaseBackgroundObjectUrl']());
-    imageWidth?.['width'] > 0x0 &&
-      imageWidth?.['height'] > 0x0 &&
+    imageWidth?.['width'] > 0 &&
+      imageWidth?.['height'] > 0 &&
       this['_adaptWhiteboardSizeToBackground'](imageWidth, {
         imageWidth: imageWidth['width'],
         imageHeight: imageWidth['height'],
@@ -1574,7 +1574,7 @@ export class WhiteboardNode {
           }
           (globalThis['URL']?.['revokeObjectURL']?.(value62), (value62 = ''));
         } catch (value72) {
-          console['warn']('[WhiteboardNode]\x20load\x20background\x20thumbnail\x20failed:', value72);
+          console['warn']('[WhiteboardNode] load background thumbnail failed:', value72);
         }
       }
     imageWidth2 &&
@@ -1628,9 +1628,9 @@ export class WhiteboardNode {
     box7,
     { imageWidth: imageWidth4, imageHeight: imageHeight, commitHistory: commitHistory = ![] } = {},
   ) {
-    const imageWidth5 = Number(imageWidth4 || box7?.['width'] || 0x0),
-      imageHeight2 = Number(imageHeight || box7?.['height'] || 0x0);
-    if (!(imageWidth5 > 0x0 && imageHeight2 > 0x0)) return ![];
+    const imageWidth5 = Number(imageWidth4 || box7?.['width'] || 0),
+      imageHeight2 = Number(imageHeight || box7?.['height'] || 0);
+    if (!(imageWidth5 > 0 && imageHeight2 > 0)) return ![];
     const box8 = appStore['getStateRaw']?.()['nodes']?.[this['id']] || this['_data'] || {},
       whiteboardBackgroundFitKey = [
         box7?.['edgeId'] || 'pending',
@@ -1650,13 +1650,13 @@ export class WhiteboardNode {
         minHeight: WHITEBOARD_MIN_HEIGHT,
       });
     if (!width) return ![];
-    const x2 = Number(box8['x']) || 0x0,
-      y = Number(box8['y']) || 0x0,
+    const x2 = Number(box8['x']) || 0,
+      y = Number(box8['y']) || 0,
       args4 = {
         width: width['width'],
         height: width['height'],
-        x: x2 + (currentWidth - width['width']) / 0x2,
-        y: y + (currentHeight - width['height']) / 0x2,
+        x: x2 + (currentWidth - width['width']) / 2,
+        y: y + (currentHeight - width['height']) / 2,
         whiteboardBackgroundFitKey: whiteboardBackgroundFitKey,
       };
     return (
@@ -1668,7 +1668,7 @@ export class WhiteboardNode {
   }
   async ['_showPendingBackgroundPreview'](error) {
     if (!error) return ![];
-    const value77 = this['_backgroundLoadToken'] + 0x1;
+    const value77 = this['_backgroundLoadToken'] + 1;
     ((this['_backgroundLoadToken'] = value77), this['_releaseBackgroundObjectUrl']());
     let value78 = '',
       image3 = null,
@@ -1698,11 +1698,11 @@ export class WhiteboardNode {
     }
     return (
       (this['_backgroundInput'] = {
-        identity: 'pending-upload:' + (error['name'] || 'image') + ':' + (error['size'] || 0x0),
+        identity: 'pending-upload:' + (error['name'] || 'image') + ':' + (error['size'] || 0),
         sourceId: '',
         edgeId: '',
-        width: Number(box9?.['width'] || image3['naturalWidth'] || image3['width'] || 0x0),
-        height: Number(box9?.['height'] || image3['naturalHeight'] || image3['height'] || 0x0),
+        width: Number(box9?.['width'] || image3['naturalWidth'] || image3['width'] || 0),
+        height: Number(box9?.['height'] || image3['naturalHeight'] || image3['height'] || 0),
       }),
       (this['_backgroundImage'] = image3),
       (this['_backgroundObjectUrl'] = value78),
@@ -1729,14 +1729,14 @@ export class WhiteboardNode {
     if (force) this['_pendingCanvasSyncAfterResize'] = ![];
     if (this['_canvasSyncRaf']) return;
     this['_canvasSyncRaf'] = requestWhiteboardFrame(() => {
-      ((this['_canvasSyncRaf'] = 0x0), this['_syncCanvasSize'](), this['_render'](), this['_syncCursor']());
+      ((this['_canvasSyncRaf'] = 0), this['_syncCanvasSize'](), this['_render'](), this['_syncCursor']());
     });
   }
   ['_syncCanvasSize']() {
     if (!this['canvasEl'] || !this['_canvasWrapEl']) return;
-    const value84 = Math['max'](0x1, Math['round'](this['_canvasWrapEl']['clientWidth'] || 0x1)),
-      value85 = Math['max'](0x1, Math['round'](this['_canvasWrapEl']['clientHeight'] || 0x1)),
-      value86 = window['devicePixelRatio'] || 0x1,
+    const value84 = Math['max'](1, Math['round'](this['_canvasWrapEl']['clientWidth'] || 1)),
+      value85 = Math['max'](1, Math['round'](this['_canvasWrapEl']['clientHeight'] || 1)),
+      value86 = window['devicePixelRatio'] || 1,
       value87 = Math['round'](value84 * value86),
       value88 = Math['round'](value85 * value86);
     if (this['canvasEl']['width'] !== value87 || this['canvasEl']['height'] !== value88) {
@@ -1745,7 +1745,7 @@ export class WhiteboardNode {
         (this['canvasEl']['style']['width'] = value84 + 'px'),
         (this['canvasEl']['style']['height'] = value85 + 'px'));
       const value89 = this['canvasEl']['getContext']('2d');
-      (value89['setTransform'](value86, 0x0, 0x0, value86, 0x0, 0x0),
+      (value89['setTransform'](value86, 0, 0, value86, 0, 0),
         (value89['lineCap'] = 'round'),
         (value89['lineJoin'] = 'round'),
         this['_fillRegionCache']['clear']());
@@ -1757,7 +1757,7 @@ export class WhiteboardNode {
   }
   ['_getCanvasPointFromClient'](value90, value91) {
     const box10 = this['canvasEl']?.['getBoundingClientRect']?.();
-    if (!box10 || box10['width'] <= 0x0 || box10['height'] <= 0x0) return { x: 0x0, y: 0x0 };
+    if (!box10 || box10['width'] <= 0 || box10['height'] <= 0) return { x: 0, y: 0 };
     return {
       x: ((value90 - box10['left']) * this['_canvasCssWidth']) / box10['width'],
       y: ((value91 - box10['top']) * this['_canvasCssHeight']) / box10['height'],
@@ -1786,10 +1786,10 @@ export class WhiteboardNode {
       value97 = this['_getCanvasPointFromClient'](event39['clientX'], event39['clientY']),
       modifierTemporaryTool2 = resolveModifierTemporaryTool(this['_modifierState']),
       value98 = modifierTemporaryTool2 || this['_temporaryTool'] || this['_view']['tool'] || WHITEBOARD_DEFAULT_TOOL,
-      enabled12 = value98 === 'hand' || event39['button'] === 0x1,
+      enabled12 = value98 === 'hand' || event39['button'] === 1,
       enabled13 =
         !enabled12 &&
-        (event39['button'] === 0x2 ||
+        (event39['button'] === 2 ||
           event39['ctrlKey'] === !![] ||
           this['_modifierState']?.['control'] === !![]),
       type = enabled13 ? 'eraser' : value98,
@@ -1833,7 +1833,7 @@ export class WhiteboardNode {
         (event40['eraseLast'] = x3),
         (event40['eraseIndices'] = new Set()),
         (event40['eraseTrail'] = [{ x: x3['x'], y: x3['y'] }]),
-        this['_collectLayerEraseHits'](x3, x3, sizeWorld / 0x2),
+        this['_collectLayerEraseHits'](x3, x3, sizeWorld / 2),
         this['_capturePointer'](event39['pointerId']),
         this['_syncToolbarState'](),
         this['_syncCursor']('eraser', clampImageBrushSize2),
@@ -1972,8 +1972,8 @@ export class WhiteboardNode {
         type === 'shape'
           ? ((this['_draft']['shapeType'] = this['_view']['shapeType'] || WHITEBOARD_DEFAULT_SHAPE_TYPE),
             (this['_draft']['fill'] = opacity['fill']))
-          : ((this['_draft']['bend'] = 0x0),
-            (this['_draft']['elbowOffset'] = 0x0),
+          : ((this['_draft']['bend'] = 0),
+            (this['_draft']['elbowOffset'] = 0),
             (this['_draft']['arrowKind'] = opacity['arrowKind']),
             (this['_draft']['arrowStart'] = opacity['arrowStart']),
             (this['_draft']['arrowEnd'] = opacity['arrowEnd']));
@@ -2007,8 +2007,8 @@ export class WhiteboardNode {
       list6 = list5['map']((event41) =>
         this['_getLocalFromClient'](event41['clientX'], event41['clientY']),
       ),
-      event42 = list5[list5['length'] - 0x1] || snapAngle2,
-      value101 = list6[list6['length'] - 0x1],
+      event42 = list5[list5['length'] - 1] || snapAngle2,
+      value101 = list6[list6['length'] - 1],
       box11 = this['_getCanvasPointFromClient'](event42['clientX'], event42['clientY']);
     if (enabled15['down'] && enabled15['mode'] === 'pan') {
       const box12 = enabled15['panStart'] || box11,
@@ -2027,9 +2027,9 @@ export class WhiteboardNode {
       const clampImageBrushSize3 =
         clampImageBrushSize(this['_style']?.['size'] || this['_view']['brushSizePx']) /
         this['_getViewport']()['zoom'];
-      let value102 = enabled15['eraseLast'] || list6[0x0] || value101;
+      let value102 = enabled15['eraseLast'] || list6[0] || value101;
       (list6['forEach']((value103) => {
-        (this['_collectLayerEraseHits'](value102, value103, clampImageBrushSize3 / 0x2),
+        (this['_collectLayerEraseHits'](value102, value103, clampImageBrushSize3 / 2),
           this['_appendLayerEraseTrailPoint'](value103),
           (value102 = value103));
       }),
@@ -2069,22 +2069,22 @@ export class WhiteboardNode {
           this['_draft']['y2'] - this['_draft']['y1'],
         );
         this['_draft']['bend'] =
-          this['_draft']['arrowKind'] === 'arc' ? Math['max'](0xc, value105 * 0.18) : 0x0;
+          this['_draft']['arrowKind'] === 'arc' ? Math['max'](12, value105 * 0.18) : 0;
       }
     } else {
-      const value106 = this['_draft']['points'][this['_draft']['points']['length'] - 0x1];
+      const value106 = this['_draft']['points'][this['_draft']['points']['length'] - 1];
       if (this['_draft']['type'] === 'brush' && snapAngle2['shiftKey'] === !![]) {
-        const value107 = this['_draft']['points'][0x0] || value101;
+        const value107 = this['_draft']['points'][0] || value101;
         this['_draft']['points'] = [value107, snapWhiteboardPointToAngle(value107, value101)];
       } else
         list6['forEach']((box14) => {
-          const box15 = this['_draft']['points'][this['_draft']['points']['length'] - 0x1];
+          const box15 = this['_draft']['points'][this['_draft']['points']['length'] - 1];
           (!box15 || box14['x'] !== box15['x'] || box14['y'] !== box15['y']) &&
             this['_draft']['points']['push'](box14);
         });
       if (
         this['_draft']['type'] === 'eraser' &&
-        clampOpacity(this['_draft']['opacity']) >= 0x1 &&
+        clampOpacity(this['_draft']['opacity']) >= 1 &&
         value106 &&
         this['_drawEraserDraftSegment'](value106, value101)
       )
@@ -2135,7 +2135,7 @@ export class WhiteboardNode {
                 box19['y'] - centerPx['centerPx']['y'],
               ),
               count5 = value112 / centerPx['startDistance'],
-              value113 = Number['isFinite'](count5) && count5 > 0x0 ? count5 : 0x1,
+              value113 = Number['isFinite'](count5) && count5 > 0 ? count5 : 1,
               scaleX = clampTextScale(centerPx['baseScaleX'] * value113),
               scaleY = clampTextScale(centerPx['baseScaleY'] * value113),
               textAnchorForCenter = getTextAnchorForCenter({
@@ -2161,7 +2161,7 @@ export class WhiteboardNode {
               value114 = box22['x'] / centerPx['baseWidthPx'],
               value115 = box22['y'] / centerPx['baseHeightPx'],
               count6 = Math['max'](value114, value115),
-              value116 = Number['isFinite'](count6) && count6 > 0x0 ? count6 : 0x1;
+              value116 = Number['isFinite'](count6) && count6 > 0 ? count6 : 1;
             ((box18['scale'] = undefined),
               (box18['scaleX'] = clampTextScale(centerPx['baseScaleX'] * value116)),
               (box18['scaleY'] = clampTextScale(centerPx['baseScaleY'] * value116)));
@@ -2414,7 +2414,7 @@ export class WhiteboardNode {
     }
     (this['_commands']['push'](value132),
       value132['type'] === 'rect' || value132['type'] === 'arrow' || value132['type'] === 'shape'
-        ? ((this['_selectedCommandIndex'] = this['_commands']['length'] - 0x1),
+        ? ((this['_selectedCommandIndex'] = this['_commands']['length'] - 1),
           (this['_selectedTextCommandIndex'] = null))
         : ((this['_selectedCommandIndex'] = null), (this['_selectedTextCommandIndex'] = null)),
       (this['_redoStack'] = []),
@@ -2429,7 +2429,7 @@ export class WhiteboardNode {
     const x6 = this['_screenToWorld'](box30),
       box31 = this['_getViewport'](),
       zoom = clampWhiteboardZoom(
-        box31['zoom'] * Math['exp'](-(Number(event44['deltaY']) || 0x0) * WHITEBOARD_ZOOM_WHEEL_SPEED),
+        box31['zoom'] * Math['exp'](-(Number(event44['deltaY']) || 0) * WHITEBOARD_ZOOM_WHEEL_SPEED),
       );
     this['_setCamera']({
       x: x6['x'] - box30['x'] / zoom,
@@ -2481,7 +2481,7 @@ export class WhiteboardNode {
       return;
     }
     if (event45['altKey'] || event45['ctrlKey'] || event45['metaKey']) return;
-    if (event45['key'] === '\x20' || event45['code'] === 'Space') {
+    if (event45['key'] === ' ' || event45['code'] === 'Space') {
       (event45['preventDefault'](), event45['stopPropagation']());
       !event45['repeat'] &&
         !this['_pointerState']?.['down'] &&
@@ -2526,7 +2526,7 @@ export class WhiteboardNode {
         event46['key'] === 'Control' ||
         event46['code'] === 'ControlLeft' ||
         event46['code'] === 'ControlRight',
-      enabled18 = event46['key'] === '\x20' || event46['code'] === 'Space';
+      enabled18 = event46['key'] === ' ' || event46['code'] === 'Space';
     if (!enabled17 && !enabled18) return;
     if (enabled18) event46['preventDefault']();
     (event46['stopPropagation'](), (this['_modifierState'] ||= { space: ![], control: ![] }));
@@ -2623,7 +2623,7 @@ export class WhiteboardNode {
       visible: this['_cursorHover'],
       tool: tool5,
       allowedTools: ['brush', 'eraser', 'bucket', 'number-label'],
-      sizePx: Math['max'](0x2, value139),
+      sizePx: Math['max'](2, value139),
       cursorLast: this['_cursorLast'],
       isEraseBrush: tool5 === 'eraser',
     });
@@ -2683,7 +2683,7 @@ export class WhiteboardNode {
   }
   ['_getSelectedCommand']() {
     const count9 = this['_selectedCommandIndex'];
-    if (!Number['isInteger'](count9) || count9 < 0x0 || count9 >= this['_commands']['length'])
+    if (!Number['isInteger'](count9) || count9 < 0 || count9 >= this['_commands']['length'])
       return null;
     return this['_commands'][count9] || null;
   }
@@ -2728,17 +2728,17 @@ export class WhiteboardNode {
     }
     if (value154 === 'arrowKind') {
       enabled22['arrowKind'] = normalizeStyleValue('arrowKind', value155);
-      if (enabled22['arrowKind'] === 'straight') enabled22['bend'] = 0x0;
+      if (enabled22['arrowKind'] === 'straight') enabled22['bend'] = 0;
       enabled22['arrowKind'] === 'arc' &&
         Math['abs'](getFiniteNumber(enabled22['bend'])) < 0.1 &&
         (enabled22['bend'] = Math['max'](
-          0xc,
+          12,
           Math['hypot'](
             getFiniteNumber(enabled22['x2']) - getFiniteNumber(enabled22['x1']),
             getFiniteNumber(enabled22['y2']) - getFiniteNumber(enabled22['y1']),
           ) * 0.18,
         ));
-      if (enabled22['arrowKind'] === 'elbow') enabled22['elbowOffset'] = 0x0;
+      if (enabled22['arrowKind'] === 'elbow') enabled22['elbowOffset'] = 0;
       return !![];
     }
     return ((enabled22[value154] = normalizeStyleValue(value154, value155)), !![]);
@@ -2771,7 +2771,7 @@ export class WhiteboardNode {
       const value164 = el66['dataset']['arrowheadTarget'],
         value165 =
           WHITEBOARD_ARROWHEAD_OPTIONS['find']((el67) => el67['value'] === value163[value164]) ||
-          WHITEBOARD_ARROWHEAD_OPTIONS[0x0];
+          WHITEBOARD_ARROWHEAD_OPTIONS[0];
       (el66['replaceChildren'](),
         appendIcon(el66, value165['icon']),
         el66['classList']['toggle']('is-start', value164 === 'arrowStart'));
@@ -2842,13 +2842,13 @@ export class WhiteboardNode {
       value177 = Number(box33['x']),
       value178 = Number(box33['y']),
       value179 = Number(box33['height']),
-      value180 = Number(box32['width']) > 0x0 ? Number(box32['width']) : 0x12c,
-      value181 = Number(box32['height']) > 0x0 ? Number(box32['height']) : 0x12c;
+      value180 = Number(box32['width']) > 0 ? Number(box32['width']) : 300,
+      value181 = Number(box32['height']) > 0 ? Number(box32['height']) : 300;
     return {
-      x: (Number['isFinite'](value177) ? value177 : 0x0) - value180 - 0x30,
+      x: (Number['isFinite'](value177) ? value177 : 0) - value180 - 48,
       y:
-        (Number['isFinite'](value178) ? value178 : 0x0) +
-        ((Number['isFinite'](value179) ? value179 : value181) - value181) / 0x2,
+        (Number['isFinite'](value178) ? value178 : 0) +
+        ((Number['isFinite'](value179) ? value179 : value181) - value181) / 2,
     };
   }
   async ['_uploadBackgroundImage'](enabled24) {
@@ -2897,7 +2897,7 @@ export class WhiteboardNode {
       );
     } catch (value184) {
       return (
-        console['warn']('[WhiteboardNode]\x20upload\x20background\x20failed:', value184),
+        console['warn']('[WhiteboardNode] upload background failed:', value184),
         globalThis['window']?.['showToast']?.(t('whiteboardNode.background.uploadFailed'), 'error'),
         ![]
       );
@@ -2934,8 +2934,8 @@ export class WhiteboardNode {
     return (
       this['_syncCanvasSize'](),
       {
-        width: Math['max'](0x1, Math['round'](this['_canvasCssWidth'] || this['_data']['width'] || 0x1)),
-        height: Math['max'](0x1, Math['round'](this['_canvasCssHeight'] || this['_data']['height'] || 0x1)),
+        width: Math['max'](1, Math['round'](this['_canvasCssWidth'] || this['_data']['width'] || 1)),
+        height: Math['max'](1, Math['round'](this['_canvasCssHeight'] || this['_data']['height'] || 1)),
       }
     );
   }
@@ -2947,7 +2947,7 @@ export class WhiteboardNode {
             box36?.['width'] ||
             this['_backgroundInput']?.['width'] ||
             box37['width'],
-        ) || 0x0,
+        ) || 0,
       ),
       value187 = Math['round'](
         Number(
@@ -2955,9 +2955,9 @@ export class WhiteboardNode {
             box36?.['height'] ||
             this['_backgroundInput']?.['height'] ||
             box37['height'],
-        ) || 0x0,
+        ) || 0,
       );
-    return { width: Math['max'](0x1, value186), height: Math['max'](0x1, value187) };
+    return { width: Math['max'](1, value186), height: Math['max'](1, value187) };
   }
   async ['_loadOriginalBackgroundForComposition']() {
     const enabled26 = this['_backgroundInput'];
@@ -2988,10 +2988,10 @@ export class WhiteboardNode {
       value192 = Number(box39['y']),
       value193 = Number(box39['width']),
       x8 =
-        (Number['isFinite'](value191) ? value191 : 0x0) +
+        (Number['isFinite'](value191) ? value191 : 0) +
         (Number['isFinite'](value193) ? value193 : box38['width']) +
-        0x30,
-      y2 = Number['isFinite'](value192) ? value192 : 0x0;
+        48,
+      y2 = Number['isFinite'](value192) ? value192 : 0;
     return { x: x8, y: y2 };
   }
   ['_renderWhiteboardOutputCanvas'](
@@ -3004,8 +3004,8 @@ export class WhiteboardNode {
   ) {
     const canvasEl = document['createElement']('canvas');
     ((canvasEl['width'] = box40['width']), (canvasEl['height'] = box40['height']));
-    const value194 = Math['max'](0x1, Number(displaySize?.['width']) || 0x1),
-      value195 = Math['max'](0x1, Number(displaySize?.['height']) || 0x1);
+    const value194 = Math['max'](1, Number(displaySize?.['width']) || 1),
+      value195 = Math['max'](1, Number(displaySize?.['height']) || 1);
     ((canvasEl['style']['width'] = value194 + 'px'), (canvasEl['style']['height'] = value195 + 'px'));
     const ctx3 = canvasEl['getContext']('2d');
     if (!ctx3) return null;
@@ -3014,7 +3014,7 @@ export class WhiteboardNode {
     const numberLabelBackgroundColor = getCssVar('--canvas-white') || '#fff';
     return (
       (ctx3['fillStyle'] = numberLabelBackgroundColor),
-      ctx3['fillRect'](0x0, 0x0, value194, value195),
+      ctx3['fillRect'](0, 0, value194, value195),
       this['_drawBackgroundImage'](ctx3, this['_getViewport'](), {
         image: backgroundImage,
         input: backgroundInput,
@@ -3025,7 +3025,7 @@ export class WhiteboardNode {
         canvasEl: canvasEl,
         commands: this['_commands'],
         isDraft: ![],
-        eraseCheckerPattern: createEraseCheckerboardPattern(ctx3, 0x1),
+        eraseCheckerPattern: createEraseCheckerboardPattern(ctx3, 1),
         getColorCanvas: getColorCanvas,
         fillRegionCache: new Map(),
         numberLabelBackgroundColor: numberLabelBackgroundColor,
@@ -3048,7 +3048,7 @@ export class WhiteboardNode {
         });
       if (!enabled27) throw new Error('Failed to render whiteboard image.');
       const pngBlob = await canvasToPngBlob(enabled27);
-      if (!pngBlob) throw new Error('Failed\x20to\x20export\x20whiteboard\x20image.');
+      if (!pngBlob) throw new Error('Failed to export whiteboard image.');
       const value196 = 'whiteboard-' + Date['now']() + '.png',
         file = new File([pngBlob], value196, { type: 'image/png' }),
         x9 = this['_getWhiteboardOutputSpawnPoint'](displaySize2),
@@ -3102,7 +3102,7 @@ export class WhiteboardNode {
     const value200 = this['_getSelectedCommand'](),
       relevantWhiteboardStyleControls = getRelevantWhiteboardStyleControls(this['_view']['tool'], value200),
       map2 = new Set(relevantWhiteboardStyleControls),
-      enabled28 = map2['size'] === 0x0;
+      enabled28 = map2['size'] === 0;
     this['stylePanelEl'] &&
       (this['stylePanelEl']['classList']['toggle']('is-empty', enabled28),
       this['stylePanelEl']['classList']['toggle']('is-expanded', !enabled28),
@@ -3112,14 +3112,14 @@ export class WhiteboardNode {
       const value201 = el72['dataset']['styleControl'];
       el72['hidden'] = !map2['has'](value201);
     });
-    const value202 = Math['round'](clampOpacity(value199['opacity']) * 0x64);
+    const value202 = Math['round'](clampOpacity(value199['opacity']) * 100);
     if (this['opacityRangeEl']) this['opacityRangeEl']['value'] = String(value202);
     if (this['opacityValueEl']) this['opacityValueEl']['textContent'] = '' + value202;
     (this['styleOptionButtons']?.['forEach']((el73) => {
       const value203 = el73['dataset']['styleProp'],
         value204 = el73['dataset']['styleValue'];
       let value205 = ![];
-      if (value203 === 'opacity') value205 = Math['round'](Number(value204) * 0x64) === value202;
+      if (value203 === 'opacity') value205 = Math['round'](Number(value204) * 100) === value202;
       else
         value203 === 'arrowStart' || value203 === 'arrowEnd'
           ? (value205 = value199[value203] === 'arrow')
@@ -3134,7 +3134,7 @@ export class WhiteboardNode {
     const box41 = Number['isInteger'](commandIndex) ? this['_commands'][commandIndex] : null,
       cloneWhiteboardStyle3 = cloneWhiteboardStyle(this['_style']),
       box42 = box41
-        ? { x: Number(box41['x']) || 0x0, y: Number(box41['y']) || 0x0 }
+        ? { x: Number(box41['x']) || 0, y: Number(box41['y']) || 0 }
         : value206,
       value208 = Number(box41?.['sizeWorld']) || value207,
       value209 = COLOR_VAR_MAP[box41?.['colorName']] ? box41['colorName'] : cloneWhiteboardStyle3['color'],
@@ -3146,10 +3146,10 @@ export class WhiteboardNode {
       box43 = this['_worldToScreen'](box42),
       value213 = value212 === 'serif' ? 'serif' : value212 === 'mono' ? 'monospace' : 'sans-serif',
       el74 = document['createElement']('textarea');
-    ((el74['rows'] = 0x1),
+    ((el74['rows'] = 1),
       (el74['wrap'] = 'off'),
       (el74['maxLength'] = WHITEBOARD_TEXT_LIMIT),
-      (el74['className'] = 'v2-annotate-text-input\x20whiteboard-text-input'),
+      (el74['className'] = 'v2-annotate-text-input whiteboard-text-input'),
       el74['setAttribute']('aria-label', WHITEBOARD_TOOL_LABELS['text']),
       (el74['dataset']['localX'] = String(box42['x'])),
       (el74['dataset']['localY'] = String(box42['y'])),
@@ -3169,13 +3169,13 @@ export class WhiteboardNode {
       (el74['style']['textAlign'] = el74['dataset']['textAlign']));
     if (box41) {
       const { scaleX: scaleX3, scaleY: scaleY3 } = getTextScalePair(box41),
-        value214 = Number(box41['rotation']) || 0x0;
+        value214 = Number(box41['rotation']) || 0;
       el74['style']['transform'] =
-        'rotate(' + value214 + 'rad) scale(' + scaleX3 + ',\x20' + scaleY3 + ')';
+        'rotate(' + value214 + 'rad) scale(' + scaleX3 + ', ' + scaleY3 + ')';
     } else el74['classList']['add']('is-new');
     (el74['style']['setProperty'](
       '--annotate-text-input-size',
-      Math['max'](0x1, value208 * this['_getViewport']()['zoom']) + 'px',
+      Math['max'](1, value208 * this['_getViewport']()['zoom']) + 'px',
     ),
       el74['style']['setProperty'](
         '--annotate-text-input-color',
@@ -3215,11 +3215,11 @@ export class WhiteboardNode {
     if (!Number['isFinite'](sizeWorld2)) return;
     const box44 = this['_getTextLayout']({
       type: 'text',
-      text: text['value'] || '\x20',
+      text: text['value'] || ' ',
       sizeWorld: sizeWorld2,
       font: text['dataset']['font'],
-      x: Number(text['dataset']['localX']) || 0x0,
-      y: Number(text['dataset']['localY']) || 0x0,
+      x: Number(text['dataset']['localX']) || 0,
+      y: Number(text['dataset']['localY']) || 0,
     });
     if (!box44) return;
     ((text['style']['width'] = Math['ceil'](box44['width']) + 'px'),
@@ -3248,8 +3248,8 @@ export class WhiteboardNode {
     el75['dataset']['whiteboardTextFinished'] = 'true';
     const enabled30 = this['_textInputEl'] === el75,
       text2 = String(el75['value'] || '')
-        ['replace'](/\r\n?/g, '\x0a')
-        ['slice'](0x0, WHITEBOARD_TEXT_LIMIT),
+        ['replace'](/\r\n?/g, '\n')
+        ['slice'](0, WHITEBOARD_TEXT_LIMIT),
       x11 = Number(el75['dataset']['localX']),
       y3 = Number(el75['dataset']['localY']),
       sizeWorld3 = Number(el75['dataset']['sizeWorld']),
@@ -3276,7 +3276,7 @@ export class WhiteboardNode {
     }
     if (Number['isInteger'](value221) && this['_commands'][value221]?.['type'] === 'text') {
       !text2['trim']()
-        ? (this['_commands']['splice'](value221, 0x1),
+        ? (this['_commands']['splice'](value221, 1),
           (this['_selectedTextCommandIndex'] = null),
           (this['_selectedCommandIndex'] = null))
         : ((this['_commands'][value221] = {
@@ -3309,18 +3309,18 @@ export class WhiteboardNode {
         x: x11,
         y: y3,
         textAlign: textAlign,
-        scale: 0x1,
-        scaleX: 0x1,
-        scaleY: 0x1,
-        rotation: 0x0,
+        scale: 1,
+        scaleX: 1,
+        scaleY: 1,
+        rotation: 0,
       },
       box46 = this['_getTextLayout'](box45),
-      value222 = this['_getViewport']()['zoom'] || 0x1;
+      value222 = this['_getViewport']()['zoom'] || 1;
     (box46 &&
-      ((box45['x'] -= box46['width'] / (0x2 * value222)),
-      (box45['y'] -= box46['height'] / (0x2 * value222))),
+      ((box45['x'] -= box46['width'] / (2 * value222)),
+      (box45['y'] -= box46['height'] / (2 * value222))),
       this['_commands']['push'](box45),
-      (this['_selectedTextCommandIndex'] = this['_commands']['length'] - 0x1),
+      (this['_selectedTextCommandIndex'] = this['_commands']['length'] - 1),
       (this['_selectedCommandIndex'] = this['_selectedTextCommandIndex']),
       (this['_redoStack'] = []),
       this['_markDirty']());
@@ -3365,7 +3365,7 @@ export class WhiteboardNode {
     const value224 = Number(value223);
     if (!Number['isInteger'](value224) || this['_commands'][value224]?.['type'] !== 'text') return ![];
     return (
-      this['_commands']['splice'](value224, 0x1),
+      this['_commands']['splice'](value224, 1),
       (this['_selectedTextCommandIndex'] = null),
       (this['_selectedCommandIndex'] = null),
       (this['_redoStack'] = []),
@@ -3377,7 +3377,7 @@ export class WhiteboardNode {
     const value225 = this['_selectedCommandIndex'];
     if (!Number['isInteger'](value225) || !this['_commands'][value225]) return ![];
     return (
-      this['_commands']['splice'](value225, 0x1),
+      this['_commands']['splice'](value225, 1),
       (this['_selectedTextCommandIndex'] = null),
       (this['_selectedCommandIndex'] = null),
       (this['_redoStack'] = []),
@@ -3391,9 +3391,9 @@ export class WhiteboardNode {
     if (!Number['isInteger'](value227) || value228?.['type'] !== 'text') return ![];
     const copiedTextCommand = buildCopiedTextCommand(value228, this['_getViewport']());
     return (
-      this['_commands']['splice'](value227 + 0x1, 0x0, copiedTextCommand),
-      (this['_selectedTextCommandIndex'] = value227 + 0x1),
-      (this['_selectedCommandIndex'] = value227 + 0x1),
+      this['_commands']['splice'](value227 + 1, 0, copiedTextCommand),
+      (this['_selectedTextCommandIndex'] = value227 + 1),
+      (this['_selectedCommandIndex'] = value227 + 1),
       (this['_redoStack'] = []),
       this['_markDirty'](),
       !![]
@@ -3416,7 +3416,7 @@ export class WhiteboardNode {
       };
     return (
       this['_commands']['push'](value229),
-      (this['_selectedCommandIndex'] = this['_commands']['length'] - 0x1),
+      (this['_selectedCommandIndex'] = this['_commands']['length'] - 1),
       (this['_selectedTextCommandIndex'] = null),
       (this['_redoStack'] = []),
       this['_markDirty'](),
@@ -3427,8 +3427,8 @@ export class WhiteboardNode {
     const colorName3 = cloneWhiteboardStyle(this['_style']),
       value230 = {
         type: 'fill',
-        x: Number(box48?.['x']) || 0x0,
-        y: Number(box48?.['y']) || 0x0,
+        x: Number(box48?.['x']) || 0,
+        y: Number(box48?.['y']) || 0,
         color: getColorCanvas(colorName3['color'] || WHITEBOARD_DEFAULT_COLOR),
         colorName: colorName3['color'],
       };
@@ -3440,7 +3440,7 @@ export class WhiteboardNode {
   }
   ['_undo']() {
     this['_removeTextInput'](!![]);
-    if (this['_commands']['length'] === 0x0) return;
+    if (this['_commands']['length'] === 0) return;
     const value231 = this['_commands']['pop']();
     (this['_redoStack']['push'](value231),
       (this['_selectedTextCommandIndex'] = null),
@@ -3449,7 +3449,7 @@ export class WhiteboardNode {
   }
   ['_redo']() {
     this['_removeTextInput'](!![]);
-    if (this['_redoStack']['length'] === 0x0) return;
+    if (this['_redoStack']['length'] === 0) return;
     const value232 = this['_redoStack']['pop']();
     (this['_commands']['push'](value232),
       (this['_selectedTextCommandIndex'] = null),
@@ -3458,7 +3458,7 @@ export class WhiteboardNode {
   }
   ['_clear']() {
     this['_removeTextInput'](![]);
-    if (this['_commands']['length'] === 0x0 && this['_redoStack']['length'] === 0x0) return;
+    if (this['_commands']['length'] === 0 && this['_redoStack']['length'] === 0) return;
     ((this['_commands'] = []),
       (this['_redoStack'] = []),
       (this['_draft'] = null),
@@ -3469,8 +3469,8 @@ export class WhiteboardNode {
   ['_commandLayerHit'](value233, box49, box50, value234) {
     const x13 = this['_commands'][value233];
     if (!x13) return ![];
-    const value235 = Math['max'](0x0, getFiniteNumber(value234)),
-      value236 = Math['max'](0x0, getFiniteNumber(x13['sizeWorld'], 0x1) / 0x2),
+    const value235 = Math['max'](0, getFiniteNumber(value234)),
+      value236 = Math['max'](0, getFiniteNumber(x13['sizeWorld'], 1) / 2),
       value237 = value235 + value236;
     if (x13['type'] === 'brush' || x13['type'] === 'eraser')
       return doesSegmentHitPolyline(box49, box50, x13['points'], value237);
@@ -3499,8 +3499,8 @@ export class WhiteboardNode {
             ? {
                 x: x14['center']['x'] - x14['radius'],
                 y: x14['center']['y'] - x14['radius'],
-                width: x14['radius'] * 0x2,
-                height: x14['radius'] * 0x2,
+                width: x14['radius'] * 2,
+                height: x14['radius'] * 2,
               }
             : {
                 x: Math['min'](...args7),
@@ -3512,8 +3512,8 @@ export class WhiteboardNode {
       const finiteNumber3 = getFiniteNumber(box50?.['x']) - getFiniteNumber(box49?.['x']),
         finiteNumber4 = getFiniteNumber(box50?.['y']) - getFiniteNumber(box49?.['y']),
         value239 = Math['hypot'](finiteNumber3, finiteNumber4) * this['_getViewport']()['zoom'],
-        value240 = Math['max'](0x1, Math['min'](0x200, Math['ceil'](value239 / 0x4)));
-      for (let value241 = 0x0; value241 <= value240; value241 += 0x1) {
+        value240 = Math['max'](1, Math['min'](512, Math['ceil'](value239 / 4)));
+      for (let value241 = 0; value241 <= value240; value241 += 1) {
         const value242 = value241 / value240,
           value243 = {
             x: getFiniteNumber(box49?.['x']) + finiteNumber3 * value242,
@@ -3539,21 +3539,21 @@ export class WhiteboardNode {
         box49,
         box50,
         { x: x13['x'], y: x13['y'] },
-        value235 + Math['max'](value236, 0x9),
+        value235 + Math['max'](value236, 9),
       );
     if (x13['type'] === 'fill')
       return doesSegmentHitCircle(
         box49,
         box50,
         { x: x13['x'], y: x13['y'] },
-        Math['max'](value235, 0x6 / this['_getViewport']()['zoom']),
+        Math['max'](value235, 6 / this['_getViewport']()['zoom']),
       );
     return ![];
   }
   ['_collectLayerEraseHits'](value244, value245, value246) {
     const map3 = this['_pointerState']['eraseIndices'] || new Set();
     this['_pointerState']['eraseIndices'] = map3;
-    for (let value247 = 0x0; value247 < this['_commands']['length']; value247 += 0x1) {
+    for (let value247 = 0; value247 < this['_commands']['length']; value247 += 1) {
       if (map3['has'](value247)) continue;
       this['_commandLayerHit'](value247, value244, value245, value246) && map3['add'](value247);
     }
@@ -3563,23 +3563,23 @@ export class WhiteboardNode {
     const value248 = this['_pointerState'],
       list9 = Array['isArray'](value248['eraseTrail']) ? value248['eraseTrail'] : [],
       box55 = { x: getFiniteNumber(box54?.['x']), y: getFiniteNumber(box54?.['y']) },
-      box56 = list9[list9['length'] - 0x1],
+      box56 = list9[list9['length'] - 1],
       value249 = this['_getViewport']()['zoom'],
       count10 = box56
         ? Math['hypot'](box55['x'] - box56['x'], box55['y'] - box56['y']) * value249
         : Infinity;
-    if (count10 >= 0x1) list9['push'](box55);
+    if (count10 >= 1) list9['push'](box55);
     list9['length'] > WHITEBOARD_LAYER_ERASER_TRAIL_POINT_LIMIT &&
-      list9['splice'](0x0, list9['length'] - WHITEBOARD_LAYER_ERASER_TRAIL_POINT_LIMIT);
+      list9['splice'](0, list9['length'] - WHITEBOARD_LAYER_ERASER_TRAIL_POINT_LIMIT);
     const run7 = () =>
-      list9['slice'](0x1)['reduce']((value250, box57, value251) => {
+      list9['slice'](1)['reduce']((value250, box57, value251) => {
         const box58 = list9[value251];
         return (
           value250 +
           Math['hypot'](box57['x'] - box58['x'], box57['y'] - box58['y']) * value249
         );
-      }, 0x0);
-    while (list9['length'] > 0x2 && run7() > WHITEBOARD_LAYER_ERASER_TRAIL_MAX_SCREEN_LENGTH) {
+      }, 0);
+    while (list9['length'] > 2 && run7() > WHITEBOARD_LAYER_ERASER_TRAIL_MAX_SCREEN_LENGTH) {
       list9['shift']();
     }
     return ((value248['eraseTrail'] = list9), list9);
@@ -3587,19 +3587,19 @@ export class WhiteboardNode {
   ['_scheduleLayerEraserPreviewRender']() {
     if (this['_layerEraserPreviewRaf']) return;
     this['_layerEraserPreviewRaf'] = requestWhiteboardFrame(() => {
-      this['_layerEraserPreviewRaf'] = 0x0;
+      this['_layerEraserPreviewRaf'] = 0;
       if (this['_pointerState']?.['mode'] === 'erase-layers') this['_render']();
     });
   }
   ['_cancelLayerEraserPreviewRender']() {
     if (!this['_layerEraserPreviewRaf']) return;
-    (cancelWhiteboardFrame(this['_layerEraserPreviewRaf']), (this['_layerEraserPreviewRaf'] = 0x0));
+    (cancelWhiteboardFrame(this['_layerEraserPreviewRaf']), (this['_layerEraserPreviewRaf'] = 0));
   }
   ['_drawLayerEraserTrail'](ctx4, value252) {
     const list10 = this['_pointerState']?.['eraseTrail'];
-    if (!ctx4 || !Array['isArray'](list10) || list10['length'] < 0x2) return ![];
+    if (!ctx4 || !Array['isArray'](list10) || list10['length'] < 2) return ![];
     const list11 = list10['map']((value253) => getScreenPointFromWorld(value253, value252)),
-      value254 = Math['max'](0x3, Math['min'](0xe, clampImageBrushSize(this['_style']?.['size']) * 0.5));
+      value254 = Math['max'](3, Math['min'](14, clampImageBrushSize(this['_style']?.['size']) * 0.5));
     (ctx4['save'](),
       (ctx4['globalCompositeOperation'] = 'source-over'),
       (ctx4['strokeStyle'] = getColorCanvas(WHITEBOARD_DEFAULT_COLOR)),
@@ -3608,22 +3608,22 @@ export class WhiteboardNode {
       (ctx4['lineJoin'] = 'round'),
       (ctx4['globalAlpha'] = 0.14),
       ctx4['beginPath'](),
-      ctx4['moveTo'](list11[0x0]['x'], list11[0x0]['y']));
-    if (list11['length'] === 0x2 || typeof ctx4['quadraticCurveTo'] !== 'function')
-      list11['slice'](0x1)['forEach']((box59) => ctx4['lineTo'](box59['x'], box59['y']));
+      ctx4['moveTo'](list11[0]['x'], list11[0]['y']));
+    if (list11['length'] === 2 || typeof ctx4['quadraticCurveTo'] !== 'function')
+      list11['slice'](1)['forEach']((box59) => ctx4['lineTo'](box59['x'], box59['y']));
     else {
-      for (let value255 = 0x1; value255 < list11['length'] - 0x1; value255 += 0x1) {
+      for (let value255 = 1; value255 < list11['length'] - 1; value255 += 1) {
         const box60 = list11[value255],
-          box61 = list11[value255 + 0x1];
+          box61 = list11[value255 + 1];
         ctx4['quadraticCurveTo'](
           box60['x'],
           box60['y'],
-          (box60['x'] + box61['x']) / 0x2,
-          (box60['y'] + box61['y']) / 0x2,
+          (box60['x'] + box61['x']) / 2,
+          (box60['y'] + box61['y']) / 2,
         );
       }
-      const box62 = list11[list11['length'] - 0x2],
-        box63 = list11[list11['length'] - 0x1];
+      const box62 = list11[list11['length'] - 2],
+        box63 = list11[list11['length'] - 1];
       ctx4['quadraticCurveTo'](box62['x'], box62['y'], box63['x'], box63['y']);
     }
     return (ctx4['stroke'](), ctx4['restore'](), !![]);
@@ -3634,7 +3634,7 @@ export class WhiteboardNode {
     ((this['_pointerState']['eraseIndices'] = null),
       (this['_pointerState']['eraseLast'] = null),
       (this['_pointerState']['eraseTrail'] = null));
-    if (!(map4 instanceof Set) || map4['size'] === 0x0) return (this['_render'](), ![]);
+    if (!(map4 instanceof Set) || map4['size'] === 0) return (this['_render'](), ![]);
     return (
       (this['_commands'] = this['_commands']['filter'](
         (value256, value257) => !map4['has'](value257),
@@ -3648,8 +3648,8 @@ export class WhiteboardNode {
   }
   ['_findCommandHit'](box64) {
     const zoom2 = this['_getViewport'](),
-      value258 = Math['max'](0x6 / zoom2['zoom'], 0x2);
-    for (let index8 = this['_commands']['length'] - 0x1; index8 >= 0x0; index8 -= 0x1) {
+      value258 = Math['max'](6 / zoom2['zoom'], 2);
+    for (let index8 = this['_commands']['length'] - 1; index8 >= 0; index8 -= 1) {
       const box65 = this['_commands'][index8];
       if (!box65) continue;
       if (box65['type'] === 'text') {
@@ -3658,33 +3658,33 @@ export class WhiteboardNode {
         continue;
       }
       if (box65['type'] === 'brush' || box65['type'] === 'eraser') {
-        const value260 = value258 + Math['max'](0x0, getFiniteNumber(box65['sizeWorld'], 0x1) / 0x2);
+        const value260 = value258 + Math['max'](0, getFiniteNumber(box65['sizeWorld'], 1) / 2);
         if (doesSegmentHitPolyline(box64, box64, box65['points'], value260))
           return { index: index8 };
         continue;
       }
       if (box65['type'] === 'rect') {
-        const value261 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 0x1) / 0x2),
+        const value261 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 1) / 2),
           whiteboardLayerGeometry3 = getWhiteboardLayerGeometry(box65, { zoom: zoom2['zoom'] });
         if (whiteboardLayerGeometry3 && doesSegmentHitPolygon(box64, box64, whiteboardLayerGeometry3['corners'], value261))
           return { index: index8 };
         continue;
       }
       if (box65['type'] === 'shape') {
-        const value262 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 0x1) / 0x2),
+        const value262 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 1) / 2),
           whiteboardLayerGeometry4 = getWhiteboardLayerGeometry(box65, { zoom: zoom2['zoom'] });
         if (whiteboardLayerGeometry4 && doesSegmentHitPolygon(box64, box64, whiteboardLayerGeometry4['corners'], value262))
           return { index: index8 };
         continue;
       }
       if (box65['type'] === 'arrow') {
-        const value263 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 0x1) / 0x2),
+        const value263 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 1) / 2),
           arrowPath = getDistanceToArrowPath(box64, box65);
         if (arrowPath <= value263) return { index: index8 };
         continue;
       }
       if (box65['type'] === 'number-label') {
-        const value264 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 0x12) / 0x2);
+        const value264 = Math['max'](value258, getFiniteNumber(box65['sizeWorld'], 18) / 2);
         if (
           Math['hypot'](
             box64['x'] - getFiniteNumber(box65['x']),
@@ -3700,12 +3700,12 @@ export class WhiteboardNode {
     const enabled32 = this['_getSelectedCommand']();
     if (!ctx5 || !enabled32 || enabled32['type'] === 'text') return;
     const cssVar2 = getCssVar('--blue-border-focus') || getCssVar('--blue') || ctx5['strokeStyle'],
-      zoom3 = box66['zoom'] || 0x1;
+      zoom3 = box66['zoom'] || 1;
     (ctx5['save'](),
       (ctx5['strokeStyle'] = cssVar2),
       (ctx5['fillStyle'] = cssVar2),
       (ctx5['lineWidth'] = 1.5),
-      ctx5['setLineDash']([0x5, 0x4]));
+      ctx5['setLineDash']([5, 4]));
     if (enabled32['type'] === 'arrow') {
       if (this['_pointerState']?.['arrowTransform']?.['type'] === 'handle') {
         ctx5['restore']();
@@ -3730,7 +3730,7 @@ export class WhiteboardNode {
         );
       } else
         arrowGeometry['type'] === 'elbow'
-          ? arrowGeometry['points']['slice'](0x1)['forEach']((value265) => {
+          ? arrowGeometry['points']['slice'](1)['forEach']((value265) => {
               const box70 = getScreenPointFromWorld(value265, box66);
               ctx5['lineTo'](box70['x'], box70['y']);
             })
@@ -3740,13 +3740,13 @@ export class WhiteboardNode {
           (ctx5['beginPath'](),
             (ctx5['fillStyle'] = getCssVar('--canvas-white') || '#fff'),
             (ctx5['strokeStyle'] = cssVar2),
-            (ctx5['lineWidth'] = 0x2),
+            (ctx5['lineWidth'] = 2),
             ctx5['arc'](
               box71['x'],
               box71['y'],
-              count11 === 0x1 ? 4.5 : 0x6,
-              0x0,
-              Math['PI'] * 0x2,
+              count11 === 1 ? 4.5 : 6,
+              0,
+              Math['PI'] * 2,
             ),
             ctx5['fill'](),
             ctx5['stroke']());
@@ -3759,14 +3759,14 @@ export class WhiteboardNode {
         );
         Math['abs'](args9['rotation']) < 0.0001
           ? ctx5['strokeRect'](
-              list12[0x0]['x'],
-              list12[0x0]['y'],
-              list12[0x2]['x'] - list12[0x0]['x'],
-              list12[0x2]['y'] - list12[0x0]['y'],
+              list12[0]['x'],
+              list12[0]['y'],
+              list12[2]['x'] - list12[0]['x'],
+              list12[2]['y'] - list12[0]['y'],
             )
           : (ctx5['beginPath'](),
-            ctx5['moveTo'](list12[0x0]['x'], list12[0x0]['y']),
-            list12['slice'](0x1)['forEach']((box72) =>
+            ctx5['moveTo'](list12[0]['x'], list12[0]['y']),
+            list12['slice'](1)['forEach']((box72) =>
               ctx5['lineTo'](box72['x'], box72['y']),
             ),
             ctx5['closePath'](),
@@ -3790,8 +3790,8 @@ export class WhiteboardNode {
             (ctx5['beginPath'](),
               (ctx5['fillStyle'] = getCssVar('--canvas-white') || '#fff'),
               (ctx5['strokeStyle'] = cssVar2),
-              (ctx5['lineWidth'] = 0x2),
-              ctx5['arc'](box75['x'], box75['y'], 5.5, 0x0, Math['PI'] * 0x2),
+              (ctx5['lineWidth'] = 2),
+              ctx5['arc'](box75['x'], box75['y'], 5.5, 0, Math['PI'] * 2),
               ctx5['fill'](),
               ctx5['stroke']());
           });
@@ -3811,7 +3811,7 @@ export class WhiteboardNode {
           ? this['_pointerState']['eraseIndices']
           : null,
       value268 = this['_editingTextCommandIndex'];
-    (ctx6['clearRect'](0x0, 0x0, this['_canvasCssWidth'], this['_canvasCssHeight']),
+    (ctx6['clearRect'](0, 0, this['_canvasCssWidth'], this['_canvasCssHeight']),
       this['_drawBackgroundImage'](ctx6, viewport2),
       renderCommands({
         ctx: ctx6,
@@ -3831,8 +3831,8 @@ export class WhiteboardNode {
         getCommandOpacityMultiplier:
           Number['isInteger'](value268) || map5?.['size']
             ? (value270, value271) => {
-                if (value271 === value268) return 0x0;
-                return map5?.['has'](value271) ? WHITEBOARD_LAYER_ERASE_PREVIEW_OPACITY : 0x1;
+                if (value271 === value268) return 0;
+                return map5?.['has'](value271) ? WHITEBOARD_LAYER_ERASE_PREVIEW_OPACITY : 1;
               }
             : null,
         textSelectionVariant: 'whiteboard',

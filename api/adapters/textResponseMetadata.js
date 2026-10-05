@@ -9,7 +9,7 @@ export function extractTextResponseMetadata(value, images) {
           (index?.['type'] === 'message' || index?.['role'] === 'assistant') &&
           Array['isArray'](index?.['content']),
       )
-      ['at'](-0x1),
+      ['at'](-1),
     result = (Array['isArray'](key?.['content']) ? key['content'] : [])
       ['filter']((data) => data['type'] === 'output_text')
       ['flatMap']((options) => (Array['isArray'](options['annotations']) ? options['annotations'] : []))
@@ -22,7 +22,7 @@ export function extractTextResponseMetadata(value, images) {
       (key?.['content'] || [])
         ['filter']((current) => current['type'] === 'output_text')
         ['map']((response) => response['text'] || '')
-        ['join']('\x0a') ||
+        ['join']('\n') ||
       item?.['output_text'] ||
       '';
   return {

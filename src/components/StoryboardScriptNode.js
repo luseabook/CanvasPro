@@ -681,10 +681,10 @@ function focusStoryboardImageBatch(value39, value40) {
   appStore.setSelectedNodes(list23);
   const value41 = typeof window !== 'undefined' ? window : null;
   try {
-    if (typeof value41?.v2FocusOnNodes === 'function') value41.v2FocusOnNodes(list23, 80, 0x320);
+    if (typeof value41?.v2FocusOnNodes === 'function') value41.v2FocusOnNodes(list23, 80, 800);
     else
       typeof value41?.v2FocusOnNode === 'function' &&
-        value41.v2FocusOnNode(list23[list23.length - 1], 80, 0x320);
+        value41.v2FocusOnNode(list23[list23.length - 1], 80, 800);
   } catch (value42) {
     console.warn('[StoryboardScriptNode] focus created image batch failed', value42);
   }

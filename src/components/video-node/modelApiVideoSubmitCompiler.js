@@ -18,18 +18,18 @@ import { applyVideoNodeAdaptiveAspectRatio } from './videoNodeAdaptiveAspectRati
 export { buildSubmitRandomizedSeedPatch } from './modelApiVideoRandomSeedPolicy.js';
 const APIMART_KLING_V3_OMNI_MODEL_ID = 'apimart/kling-v3-omni',
   APIMART_KLING_O1_MODEL_ID = 'apimart/kling-video-o1',
-  HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS = 0xf,
-  WAN27_AUDIO_INPUT_MIN_SECONDS = 0x2,
-  WAN27_AUDIO_INPUT_MAX_SECONDS = 0x1e,
-  WAN27_AUDIO_INPUT_MAX_BYTES = 0xf * 0x400 * 0x400,
-  WAN27_VIDEO_EXTEND_MAX_SECONDS = 0xa,
-  WAN27_REFERENCE_VIDEO_MAX_SECONDS = 0x1e,
-  WAN27_EDIT_VIDEO_MIN_SECONDS = 0x2,
-  WAN27_EDIT_VIDEO_MAX_SECONDS = 0xa,
-  KLING_V3_OMNI_VIDEO_MIN_SECONDS = 0x3,
-  KLING_V3_OMNI_EDIT_VIDEO_MAX_SECONDS = 0xa,
-  KLING_O1_VIDEO_MIN_SECONDS = 0x3,
-  KLING_O1_VIDEO_MAX_SECONDS = 0xa;
+  HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS = 15,
+  WAN27_AUDIO_INPUT_MIN_SECONDS = 2,
+  WAN27_AUDIO_INPUT_MAX_SECONDS = 30,
+  WAN27_AUDIO_INPUT_MAX_BYTES = 15 * 1024 * 1024,
+  WAN27_VIDEO_EXTEND_MAX_SECONDS = 10,
+  WAN27_REFERENCE_VIDEO_MAX_SECONDS = 30,
+  WAN27_EDIT_VIDEO_MIN_SECONDS = 2,
+  WAN27_EDIT_VIDEO_MAX_SECONDS = 10,
+  KLING_V3_OMNI_VIDEO_MIN_SECONDS = 3,
+  KLING_V3_OMNI_EDIT_VIDEO_MAX_SECONDS = 10,
+  KLING_O1_VIDEO_MIN_SECONDS = 3,
+  KLING_O1_VIDEO_MAX_SECONDS = 10;
 function videoTaskText(value, item = {}) {
   return t('videoTask.' + value, item);
 }
@@ -38,7 +38,7 @@ function getPlainObject(key) {
 }
 function normalizePositiveNumber(index) {
   const count = Number(index);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function isCanonicalProviderModel(result, providerHint, data) {
   const modelExecution2 =
@@ -64,7 +64,7 @@ function buildVideoInputUrlsByFixedKindSlot({
     list = (fixedInputConfig?.['visibleSlots'] || [])
       ['map']((target) => String(target || '')['trim']())
       ['filter']((source) => source && String(fixedInputConfig?.['slotKindById']?.[source] || '') === kind2);
-  if (list['length'] === 0x0) return {};
+  if (list['length'] === 0) return {};
   const occupiedSlots = {},
     map = new Set(),
     handler = (next, current) => {
@@ -154,7 +154,7 @@ function buildHappyHorseMediaPayload({
   images: images = [],
   videos: videos = [],
   videoEntries: videoEntries = [],
-  assetVideoCount: assetVideoCount = 0x0,
+  assetVideoCount: assetVideoCount = 0,
   maxVideoSeconds: maxVideoSeconds = HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS,
   supportsEdit: supportsEdit = !![],
 } = {}) {
@@ -175,54 +175,54 @@ function buildHappyHorseMediaPayload({
       ),
     ),
     happyHorseMode = normalizeHappyHorseMode(mode),
-    enabled6 = images2['length'] > 0x0 || list3['length'] > 0x0,
+    enabled6 = images2['length'] > 0 || list3['length'] > 0,
     value5 = { ok: !![], images: [], videos: [], inputUrls: [], mode: 'auto' },
-    hint = assetVideoCount > 0x0 ? videoTaskText('validation.removePromptVideoRefs') : '';
+    hint = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '';
   if (happyHorseMode === 'auto') {
     if (enabled6) return { ok: ![], message: videoTaskText('validation.happyHorse.chooseMode') };
     return value5;
   }
   if (happyHorseMode === 'image') {
-    if (list3['length'] > 0x0)
+    if (list3['length'] > 0)
       return { ok: ![], message: videoTaskText('validation.imageModeRejectsVideo', { hint: hint }) };
-    if (!images2[0x0]) {
+    if (!images2[0]) {
       if (!enabled6) return value5;
       return { ok: ![], message: videoTaskText('validation.imageModeNeedsFirstFrame') };
     }
     return {
       ok: !![],
-      images: images2['slice'](0x0, 0x1),
+      images: images2['slice'](0, 1),
       videos: [],
-      inputUrls: images2['slice'](0x0, 0x1),
+      inputUrls: images2['slice'](0, 1),
       mode: 'image',
     };
   }
   if (happyHorseMode === 'reference') {
-    if (list3['length'] > 0x0)
+    if (list3['length'] > 0)
       return {
         ok: ![],
         message: videoTaskText('validation.referenceImageModeRejectsVideo', { hint: hint }),
       };
-    if (images2['length'] <= 0x0) {
+    if (images2['length'] <= 0) {
       if (!enabled6) return value5;
       return { ok: ![], message: videoTaskText('validation.referenceImageModeNeedsReference') };
     }
-    const images3 = images2['slice'](0x0, 0x9);
+    const images3 = images2['slice'](0, 9);
     return { ok: !![], images: images3, videos: [], inputUrls: images3, mode: 'reference' };
   }
   if (supportsEdit === ![])
     return { ok: ![], message: videoTaskText('validation.happyHorse.editUnsupported') };
-  if (!list3[0x0]) {
+  if (!list3[0]) {
     if (!enabled6) return value5;
     return { ok: ![], message: videoTaskText('validation.videoEditNeedsVideo') };
   }
-  const value6 = list3[0x0],
+  const value6 = list3[0],
     value7 =
       (Array['isArray'](videoEntries) ? videoEntries : [])['find'](
         (response2) => String(response2?.['url'] || '')['trim']() === value6,
       ) || {},
     seconds =
-      Number['isFinite'](Number(maxVideoSeconds)) && Number(maxVideoSeconds) > 0x0
+      Number['isFinite'](Number(maxVideoSeconds)) && Number(maxVideoSeconds) > 0
         ? Number(maxVideoSeconds)
         : HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS;
   if (normalizePositiveNumber(value7['duration']) > seconds)
@@ -232,9 +232,9 @@ function buildHappyHorseMediaPayload({
     };
   return {
     ok: !![],
-    images: images2['slice'](0x0, 0x5),
+    images: images2['slice'](0, 5),
     videos: [value6],
-    inputUrls: images2['slice'](0x0, 0x5),
+    inputUrls: images2['slice'](0, 5),
     mode: 'edit',
   };
 }
@@ -261,7 +261,7 @@ function buildWan27MediaPayload({
   audios: audios = [],
   videoEntries: videoEntries = [],
   audioEntries: audioEntries = [],
-  assetVideoCount: assetVideoCount = 0x0,
+  assetVideoCount: assetVideoCount = 0,
 } = {}) {
   const run = (value10) =>
       Array['from'](
@@ -275,7 +275,7 @@ function buildWan27MediaPayload({
     list5 = run(images),
     videos2 = run(videos),
     list6 = run(audios),
-    hint2 = assetVideoCount > 0x0 ? videoTaskText('validation.removePromptVideoRefs') : '',
+    hint2 = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '',
     handler5 = (value12, value13) =>
       (Array['isArray'](value12) ? value12 : [])['find'](
         (response3) => String(response3?.['url'] || '')['trim']() === value13,
@@ -285,7 +285,7 @@ function buildWan27MediaPayload({
       const value14 = handler5(audioEntries, enabled7),
         positiveNumber = normalizePositiveNumber(value14['duration']);
       if (
-        positiveNumber > 0x0 &&
+        positiveNumber > 0 &&
         (positiveNumber < WAN27_AUDIO_INPUT_MIN_SECONDS || positiveNumber > WAN27_AUDIO_INPUT_MAX_SECONDS)
       )
         return videoTaskText('validation.wan27.audioDuration');
@@ -295,26 +295,26 @@ function buildWan27MediaPayload({
     },
     handler7 = (value15) => normalizePositiveNumber(handler5(videoEntries, value15)['duration']);
   if (wan27Mode === 'video') {
-    if (list5['length'] > 0x0)
+    if (list5['length'] > 0)
       return { ok: ![], message: videoTaskText('validation.videoExtendRejectsImage', { hint: hint2 }) };
-    if (list6['length'] > 0x0)
+    if (list6['length'] > 0)
       return { ok: ![], message: videoTaskText('validation.videoExtendRejectsAudio') };
-    if (!videos2[0x0]) return { ok: !![], images: [], videos: [], audios: [], inputUrls: [] };
-    if (handler7(videos2[0x0]) > WAN27_VIDEO_EXTEND_MAX_SECONDS)
+    if (!videos2[0]) return { ok: !![], images: [], videos: [], audios: [], inputUrls: [] };
+    if (handler7(videos2[0]) > WAN27_VIDEO_EXTEND_MAX_SECONDS)
       return { ok: ![], message: videoTaskText('validation.wan27.extendMaxSeconds') };
-    return { ok: !![], images: [], videos: videos2['slice'](0x0, 0x1), audios: [], inputUrls: [] };
+    return { ok: !![], images: [], videos: videos2['slice'](0, 1), audios: [], inputUrls: [] };
   }
   if (wan27Mode === 'reference') {
-    const images4 = list5['slice'](0x0, 0x1),
-      videos3 = videos2['slice'](0x0, 0x1);
-    if (images4['length'] <= 0x0 && videos3['length'] <= 0x0)
+    const images4 = list5['slice'](0, 1),
+      videos3 = videos2['slice'](0, 1);
+    if (images4['length'] <= 0 && videos3['length'] <= 0)
       return { ok: ![], message: videoTaskText('validation.referenceVideoNeedsMedia') };
-    if (videos3[0x0] && handler7(videos3[0x0]) > WAN27_REFERENCE_VIDEO_MAX_SECONDS)
+    if (videos3[0] && handler7(videos3[0]) > WAN27_REFERENCE_VIDEO_MAX_SECONDS)
       return { ok: ![], message: videoTaskText('validation.wan27.referenceVideoMaxSeconds') };
-    const audios2 = list6[0x0] || '',
+    const audios2 = list6[0] || '',
       message = handler6(audios2);
     if (message) return { ok: ![], message: message };
-    if (audios2 && images4['length'] <= 0x0)
+    if (audios2 && images4['length'] <= 0)
       return { ok: ![], message: videoTaskText('validation.referenceAudioNeedsImage') };
     return {
       ok: !![],
@@ -325,21 +325,21 @@ function buildWan27MediaPayload({
     };
   }
   if (wan27Mode === 'edit') {
-    if (!videos2[0x0]) return { ok: ![], message: videoTaskText('validation.videoEditNeedsSourceVideo') };
-    if (list5['length'] > 0x0)
+    if (!videos2[0]) return { ok: ![], message: videoTaskText('validation.videoEditNeedsSourceVideo') };
+    if (list5['length'] > 0)
       return { ok: ![], message: videoTaskText('validation.videoEditRejectsImageUseReferenceVideo') };
-    if (list6['length'] > 0x0) return { ok: ![], message: videoTaskText('validation.videoEditRejectsAudio') };
-    const count2 = handler7(videos2[0x0]);
-    if (count2 > 0x0 && (count2 < WAN27_EDIT_VIDEO_MIN_SECONDS || count2 > WAN27_EDIT_VIDEO_MAX_SECONDS))
+    if (list6['length'] > 0) return { ok: ![], message: videoTaskText('validation.videoEditRejectsAudio') };
+    const count2 = handler7(videos2[0]);
+    if (count2 > 0 && (count2 < WAN27_EDIT_VIDEO_MIN_SECONDS || count2 > WAN27_EDIT_VIDEO_MAX_SECONDS))
       return { ok: ![], message: videoTaskText('validation.wan27.editVideoDuration') };
-    return { ok: !![], images: [], videos: videos2['slice'](0x0, 0x2), audios: [], inputUrls: [] };
+    return { ok: !![], images: [], videos: videos2['slice'](0, 2), audios: [], inputUrls: [] };
   }
-  if (videos2['length'] > 0x0)
+  if (videos2['length'] > 0)
     return { ok: ![], message: videoTaskText('validation.imageModeRejectsVideo', { hint: hint2 }) };
-  const audios3 = list6[0x0] || '',
+  const audios3 = list6[0] || '',
     message2 = handler6(audios3);
   if (message2) return { ok: ![], message: message2 };
-  const images5 = list5['slice'](0x0, 0x2);
+  const images5 = list5['slice'](0, 2);
   return {
     ok: !![],
     images: images5,
@@ -353,7 +353,7 @@ function buildKlingV3OmniMediaPayload({
   images: images = [],
   videos: videos = [],
   videoEntries: videoEntries = [],
-  assetVideoCount: assetVideoCount = 0x0,
+  assetVideoCount: assetVideoCount = 0,
 } = {}) {
   const run2 = (value16) =>
       Array['from'](
@@ -366,7 +366,7 @@ function buildKlingV3OmniMediaPayload({
     klingV3OmniMode = normalizeKlingV3OmniMode(mode),
     images6 = run2(images),
     videos4 = run2(videos),
-    hint3 = assetVideoCount > 0x0 ? videoTaskText('validation.removePromptVideoRefs') : '',
+    hint3 = assetVideoCount > 0 ? videoTaskText('validation.removePromptVideoRefs') : '',
     handler8 = (value18) =>
       normalizePositiveNumber(
         (Array['isArray'](videoEntries) ? videoEntries : [])['find'](
@@ -374,40 +374,40 @@ function buildKlingV3OmniMediaPayload({
         )?.['duration'],
       );
   if (klingV3OmniMode === 'reference') {
-    const images7 = images6['slice'](0x0, 0x1),
-      videos5 = videos4['slice'](0x0, 0x1);
-    if (images7['length'] <= 0x0 && videos5['length'] <= 0x0)
+    const images7 = images6['slice'](0, 1),
+      videos5 = videos4['slice'](0, 1);
+    if (images7['length'] <= 0 && videos5['length'] <= 0)
       return { ok: ![], message: videoTaskText('validation.referenceVideoNeedsMedia') };
     return { ok: !![], images: images7, videos: videos5, audios: [], inputUrls: images7 };
   }
   if (klingV3OmniMode === 'edit') {
-    if (!videos4[0x0]) return { ok: ![], message: videoTaskText('validation.videoEditNeedsSourceVideo') };
-    if (images6['length'] > 0x0)
+    if (!videos4[0]) return { ok: ![], message: videoTaskText('validation.videoEditNeedsSourceVideo') };
+    if (images6['length'] > 0)
       return { ok: ![], message: videoTaskText('validation.videoEditRejectsImage') };
-    const count3 = handler8(videos4[0x0]);
+    const count3 = handler8(videos4[0]);
     if (
-      count3 > 0x0 &&
+      count3 > 0 &&
       (count3 < KLING_V3_OMNI_VIDEO_MIN_SECONDS || count3 > KLING_V3_OMNI_EDIT_VIDEO_MAX_SECONDS)
     )
       return { ok: ![], message: videoTaskText('validation.klingV3Omni.editVideoDuration') };
-    return { ok: !![], images: [], videos: videos4['slice'](0x0, 0x1), audios: [], inputUrls: [] };
+    return { ok: !![], images: [], videos: videos4['slice'](0, 1), audios: [], inputUrls: [] };
   }
-  if (videos4['length'] > 0x0)
+  if (videos4['length'] > 0)
     return { ok: ![], message: videoTaskText('validation.imageModeRejectsVideo', { hint: hint3 }) };
   return {
     ok: !![],
-    images: images6['slice'](0x0, 0x2),
+    images: images6['slice'](0, 2),
     videos: [],
     audios: [],
-    inputUrls: images6['slice'](0x0, 0x2),
+    inputUrls: images6['slice'](0, 2),
   };
 }
 function replaceKlingO1PromptImageReferences(value19, value20) {
-  const count4 = Math['max'](0x0, Math['trunc'](Number(value20) || 0x0));
-  if (count4 <= 0x0) return String(value19 || '');
+  const count4 = Math['max'](0, Math['trunc'](Number(value20) || 0));
+  if (count4 <= 0) return String(value19 || '');
   return String(value19 || '')['replace'](/@?图片\s*([1-9]\d*)/g, (value21, value22) => {
-    const count5 = Number['parseInt'](String(value22 || ''), 0xa);
-    if (!Number['isFinite'](count5) || count5 < 0x1 || count5 > count4) return value21;
+    const count5 = Number['parseInt'](String(value22 || ''), 10);
+    if (!Number['isFinite'](count5) || count5 < 1 || count5 > count4) return value21;
     return '<<<image_' + count5 + '>>>';
   });
 }
@@ -439,27 +439,27 @@ function buildKlingO1MediaPayload({
       );
   if (hasEditVideo && hasFeatureVideo)
     return { ok: ![], message: videoTaskText('validation.klingO1.editAndFeatureExclusive') };
-  if (list8['length'] > 0x1) return { ok: ![], message: videoTaskText('validation.klingO1.onlyOneVideo') };
-  const value27 = list8[0x0] || '';
+  if (list8['length'] > 1) return { ok: ![], message: videoTaskText('validation.klingO1.onlyOneVideo') };
+  const value27 = list8[0] || '';
   if (value27) {
     const count6 = handler9(value27);
-    if (count6 > 0x0 && (count6 < KLING_O1_VIDEO_MIN_SECONDS || count6 > KLING_O1_VIDEO_MAX_SECONDS))
+    if (count6 > 0 && (count6 < KLING_O1_VIDEO_MIN_SECONDS || count6 > KLING_O1_VIDEO_MAX_SECONDS))
       return { ok: ![], message: videoTaskText('validation.klingO1.referenceVideoDuration') };
     if (value25 === 'base') {
-      if (list7['length'] > 0x0)
+      if (list7['length'] > 0)
         return { ok: ![], message: videoTaskText('validation.klingO1.editVideoRejectsImage') };
       return {
         ok: !![],
-        prompt: replaceKlingO1PromptImageReferences(prompt, 0x0),
+        prompt: replaceKlingO1PromptImageReferences(prompt, 0),
         images: [],
         videos: [value27],
         inputUrls: [],
         videoRole: 'base',
       };
     }
-    if (list7['length'] > 0x1)
+    if (list7['length'] > 1)
       return { ok: ![], message: videoTaskText('validation.klingO1.featureVideoMaxOneImage') };
-    const images8 = list7['slice'](0x0, 0x1);
+    const images8 = list7['slice'](0, 1);
     return {
       ok: !![],
       prompt: replaceKlingO1PromptImageReferences(prompt, images8['length']),
@@ -469,7 +469,7 @@ function buildKlingO1MediaPayload({
       videoRole: 'feature',
     };
   }
-  const images9 = list7['slice'](0x0, 0x2);
+  const images9 = list7['slice'](0, 2);
   return {
     ok: !![],
     prompt: replaceKlingO1PromptImageReferences(prompt, images9['length']),
@@ -502,7 +502,7 @@ export function compileModelApiVideoSubmit({
   modelExecution: modelExecution = null,
   inputMaterials: inputMaterials = {},
   assetInputRefs: assetInputRefs = [],
-  assetVideoCount: assetVideoCount = 0x0,
+  assetVideoCount: assetVideoCount = 0,
   inEdges: inEdges = [],
   nodes: nodes = {},
 } = {}) {
@@ -525,7 +525,7 @@ export function compileModelApiVideoSubmit({
     min = validateModelMediaInputLimits({
       inputSlots: modelManifest?.['inputSlots'] || null,
       outputDurationSeconds:
-        payload['generationParams']?.['duration'] ?? nodeData['generationParams']?.['duration'] ?? 0x0,
+        payload['generationParams']?.['duration'] ?? nodeData['generationParams']?.['duration'] ?? 0,
       images: images10,
       imageEntries: imageEntries,
       videos: videos6,
@@ -629,7 +629,7 @@ export function compileModelApiVideoSubmit({
         imageRefs: imageRefs,
         assetInputRefs: assetInputRefs,
       });
-      Object['keys'](videoInputUrlsByFixedImageSlot)['length'] > 0x0 &&
+      Object['keys'](videoInputUrlsByFixedImageSlot)['length'] > 0 &&
         (payload['inputUrlsBySlot'] = videoInputUrlsByFixedImageSlot);
     }
     return success(payload);
@@ -688,7 +688,7 @@ export function compileModelApiVideoSubmit({
       else
         videoInputUrlsByFixedImageSlot2['referenceImage'] &&
           (value36['referenceImage'] = videoInputUrlsByFixedImageSlot2['referenceImage']);
-      Object['keys'](value36)['length'] > 0x0 && (payload['inputUrlsBySlot'] = value36);
+      Object['keys'](value36)['length'] > 0 && (payload['inputUrlsBySlot'] = value36);
     }
     return success(payload);
   }
@@ -743,18 +743,18 @@ export function compileModelApiVideoSubmit({
     (payload['videos'] = videos6),
     (payload['audios'] = audios4),
     (payload['inputUrls'] = images10));
-  providerAssetRefs['length'] > 0x0 && (payload['providerAssetRefs'] = providerAssetRefs);
+  providerAssetRefs['length'] > 0 && (payload['providerAssetRefs'] = providerAssetRefs);
   const videoInputUrlsByFixedImageSlot4 = buildVideoInputUrlsByFixedImageSlot({
     fixedInputConfig: fixedInputConfig2,
     imageRefs: imageRefs,
     assetInputRefs: assetInputRefs,
   });
-  Object['keys'](videoInputUrlsByFixedImageSlot4)['length'] > 0x0 &&
+  Object['keys'](videoInputUrlsByFixedImageSlot4)['length'] > 0 &&
     (payload['inputUrlsBySlot'] = videoInputUrlsByFixedImageSlot4);
   const min2 = getMissingManifestInputRequirement({
     inputSlots: modelManifest?.['inputSlots'] || null,
     inputCounts: {
-      text: String(payload['prompt'] || '')['trim']() ? 0x1 : 0x0,
+      text: String(payload['prompt'] || '')['trim']() ? 1 : 0,
       image: payload['images']['length'],
       video: payload['videos']['length'],
       audio: payload['audios']['length'],

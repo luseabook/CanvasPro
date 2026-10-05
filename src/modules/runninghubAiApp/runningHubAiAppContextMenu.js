@@ -7,7 +7,7 @@ const EDITABLE_SELECTOR = 'select, ' + TEXT_CONTEXT_MENU_TARGET_SELECTOR,
     '[data-action="choose-preview-control-type"]',
     '[data-action="remove-preview-param"]',
     '[data-action="remove-preview-input"]',
-  ]['join'](',\x20'),
+  ]['join'](', '),
   DANGER_ACTIONS = new Set(['remove-preview-param', 'remove-preview-input']),
   ACTION_ICONS = Object['freeze']({
     'load-saved-app': 'folder-open',

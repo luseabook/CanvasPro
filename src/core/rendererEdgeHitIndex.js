@@ -1,9 +1,9 @@
-const DEFAULT_CELL_SIZE = 0x100,
-  DEFAULT_SUBDIVISION_FLATNESS = 0x8,
-  DEFAULT_MAX_SUBDIVISION_DEPTH = 0x8,
-  DEFAULT_DISTANCE_SAMPLES = 0x20,
-  DEFAULT_DISTANCE_REFINEMENTS = 0xe;
-function normalizeNumber(value, item = 0x0) {
+const DEFAULT_CELL_SIZE = 256,
+  DEFAULT_SUBDIVISION_FLATNESS = 8,
+  DEFAULT_MAX_SUBDIVISION_DEPTH = 8,
+  DEFAULT_DISTANCE_SAMPLES = 32,
+  DEFAULT_DISTANCE_REFINEMENTS = 14;
+function normalizeNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -27,26 +27,26 @@ function normalizeGeometry(enabled) {
     control2Y: normalizeNumber(enabled['control2Y']),
     endX: normalizeNumber(enabled['endX']),
     endY: normalizeNumber(enabled['endY']),
-    hitPoints: hitPoints && hitPoints['length'] >= 0x2 ? hitPoints : null,
+    hitPoints: hitPoints && hitPoints['length'] >= 2 ? hitPoints : null,
   };
 }
 export function evaluateCubicBezier(index, result) {
   const geometry = normalizeGeometry(index);
   if (!geometry) return null;
-  const data = Math['min'](0x1, Math['max'](0x0, normalizeNumber(result))),
-    options = 0x1 - data,
+  const data = Math['min'](1, Math['max'](0, normalizeNumber(result))),
+    options = 1 - data,
     x = options * options,
     target = data * data;
   return {
     x:
       x * options * geometry['startX'] +
-      0x3 * x * data * geometry['control1X'] +
-      0x3 * options * target * geometry['control2X'] +
+      3 * x * data * geometry['control1X'] +
+      3 * options * target * geometry['control2X'] +
       target * data * geometry['endX'],
     y:
       x * options * geometry['startY'] +
-      0x3 * x * data * geometry['control1Y'] +
-      0x3 * options * target * geometry['control2Y'] +
+      3 * x * data * geometry['control1Y'] +
+      3 * options * target * geometry['control2Y'] +
       target * data * geometry['endY'],
   };
 }
@@ -68,24 +68,24 @@ export function distanceToCubicBezierSquared(
 ) {
   const number = normalizeNumber(state),
     number2 = normalizeNumber(config),
-    scope = Math['max'](0x8, Math['floor'](normalizeNumber(samples, 0x20)));
-  let input = 0x0,
+    scope = Math['max'](8, Math['floor'](normalizeNumber(samples, 32)));
+  let input = 0,
     output = Number['POSITIVE_INFINITY'];
-  for (let value2 = 0x0; value2 <= scope; value2 += 0x1) {
+  for (let value2 = 0; value2 <= scope; value2 += 1) {
     const distanceSquaredAt2 = distanceSquaredAt(handle, number, number2, value2 / scope);
     distanceSquaredAt2 < output && ((output = distanceSquaredAt2), (input = value2));
   }
-  let value3 = Math['max'](0x0, (input - 0x1) / scope),
-    value4 = Math['min'](0x1, (input + 0x1) / scope);
-  const value5 = Math['max'](0x0, Math['floor'](normalizeNumber(refinements, DEFAULT_DISTANCE_REFINEMENTS)));
-  for (let value6 = 0x0; value6 < value5; value6 += 0x1) {
-    const value7 = value3 + (value4 - value3) / 0x3,
-      value8 = value4 - (value4 - value3) / 0x3;
+  let value3 = Math['max'](0, (input - 1) / scope),
+    value4 = Math['min'](1, (input + 1) / scope);
+  const value5 = Math['max'](0, Math['floor'](normalizeNumber(refinements, DEFAULT_DISTANCE_REFINEMENTS)));
+  for (let value6 = 0; value6 < value5; value6 += 1) {
+    const value7 = value3 + (value4 - value3) / 3,
+      value8 = value4 - (value4 - value3) / 3;
     distanceSquaredAt(handle, number, number2, value7) <= distanceSquaredAt(handle, number, number2, value8)
       ? (value4 = value8)
       : (value3 = value7);
   }
-  return Math['min'](output, distanceSquaredAt(handle, number, number2, (value3 + value4) / 0x2));
+  return Math['min'](output, distanceSquaredAt(handle, number, number2, (value3 + value4) / 2));
 }
 function pointLineDistanceSquared(value9, value10, value11, value12, value13, value14) {
   const value15 = value13 - value11,
@@ -109,8 +109,8 @@ function pointSegmentDistanceSquared(value21, value22, value23, value24, value25
     return value30 * value30 + value31 * value31;
   }
   const value32 = Math['max'](
-      0x0,
-      Math['min'](0x1, ((value21 - value23) * value27 + (value22 - value24) * value28) / value29),
+      0,
+      Math['min'](1, ((value21 - value23) * value27 + (value22 - value24) * value28) / value29),
     ),
     value33 = value23 + value32 * value27,
     value34 = value24 + value32 * value28,
@@ -119,12 +119,12 @@ function pointSegmentDistanceSquared(value21, value22, value23, value24, value25
   return value35 * value35 + value36 * value36;
 }
 export function distanceToPolylineSquared(list, value37, value38) {
-  if (!Array['isArray'](list) || list['length'] < 0x2) return Number['POSITIVE_INFINITY'];
+  if (!Array['isArray'](list) || list['length'] < 2) return Number['POSITIVE_INFINITY'];
   const number3 = normalizeNumber(value37),
     number4 = normalizeNumber(value38);
   let value39 = Number['POSITIVE_INFINITY'];
-  for (let value40 = 0x1; value40 < list['length']; value40 += 0x1) {
-    const box4 = list[value40 - 0x1],
+  for (let value40 = 1; value40 < list['length']; value40 += 1) {
+    const box4 = list[value40 - 1],
       box5 = list[value40];
     value39 = Math['min'](
       value39,
@@ -161,7 +161,7 @@ function getCurveFlatnessSquared(value41) {
   );
 }
 function midpoint(value42, value43) {
-  return (value42 + value43) / 0x2;
+  return (value42 + value43) / 2;
 }
 function subdivideCurve(startX) {
   const control1X = midpoint(startX['startX'], startX['control1X']),
@@ -199,7 +199,7 @@ function subdivideCurve(startX) {
     },
   ];
 }
-function collectCurveBounds(value44, list2, value45, value46, value47 = 0x0) {
+function collectCurveBounds(value44, list2, value45, value46, value47 = 0) {
   if (value47 >= value46 || getCurveFlatnessSquared(value44) <= value45) {
     list2['push']({
       minX: Math['min'](value44['startX'], value44['control1X'], value44['control2X'], value44['endX']),
@@ -210,8 +210,8 @@ function collectCurveBounds(value44, list2, value45, value46, value47 = 0x0) {
     return;
   }
   const [value48, value49] = subdivideCurve(value44);
-  (collectCurveBounds(value48, list2, value45, value46, value47 + 0x1),
-    collectCurveBounds(value49, list2, value45, value46, value47 + 0x1));
+  (collectCurveBounds(value48, list2, value45, value46, value47 + 1),
+    collectCurveBounds(value49, list2, value45, value46, value47 + 1));
 }
 function cellCoordinate(value50, value51) {
   return Math['floor'](value50 / value51);
@@ -224,9 +224,9 @@ export function createEdgeHitSpatialIndex({
   subdivisionFlatness: subdivisionFlatness = DEFAULT_SUBDIVISION_FLATNESS,
   maxSubdivisionDepth: maxSubdivisionDepth = DEFAULT_MAX_SUBDIVISION_DEPTH,
 } = {}) {
-  const value54 = Math['max'](0x20, normalizeNumber(cellSize, 0x100)),
-    value55 = Math['max'](0.5, normalizeNumber(subdivisionFlatness, 0x8)) ** 0x2,
-    value56 = Math['max'](0x1, Math['floor'](normalizeNumber(maxSubdivisionDepth, 0x8))),
+  const value54 = Math['max'](32, normalizeNumber(cellSize, 256)),
+    value55 = Math['max'](0.5, normalizeNumber(subdivisionFlatness, 8)) ** 2,
+    value56 = Math['max'](1, Math['floor'](normalizeNumber(maxSubdivisionDepth, 8))),
     cellCount = new Map(),
     edgeCount = new Map(),
     map = new Map();
@@ -236,11 +236,11 @@ export function createEdgeHitSpatialIndex({
       for (const value59 of value58) {
         const map2 = cellCount['get'](value59);
         map2?.['delete'](value57);
-        if (map2?.['size'] === 0x0) cellCount['delete'](value59);
+        if (map2?.['size'] === 0) cellCount['delete'](value59);
       }
     return (map['delete'](value57), edgeCount['delete'](value57));
   }
-  function upsert({ edgeId: edgeId, geometry: geometry2, order: order = 0x0 } = {}) {
+  function upsert({ edgeId: edgeId, geometry: geometry2, order: order = 0 } = {}) {
     const edgeId2 = String(edgeId || ''),
       geometry3 = normalizeGeometry(geometry2);
     if (!edgeId2 || !geometry3) return ![];
@@ -248,8 +248,8 @@ export function createEdgeHitSpatialIndex({
     const value60 = { edgeId: edgeId2, geometry: geometry3, order: normalizeNumber(order) },
       list3 = [];
     if (geometry3['hitPoints'])
-      for (let value61 = 0x1; value61 < geometry3['hitPoints']['length']; value61 += 0x1) {
-        const box6 = geometry3['hitPoints'][value61 - 0x1],
+      for (let value61 = 1; value61 < geometry3['hitPoints']['length']; value61 += 1) {
+        const box6 = geometry3['hitPoints'][value61 - 1],
           box7 = geometry3['hitPoints'][value61];
         list3['push']({
           minX: Math['min'](box6['x'], box7['x']),
@@ -265,8 +265,8 @@ export function createEdgeHitSpatialIndex({
         cellCoordinate3 = cellCoordinate(value63['minY'], value54),
         cellCoordinate4 = cellCoordinate(value63['maxX'], value54),
         cellCoordinate5 = cellCoordinate(value63['maxY'], value54);
-      for (let value64 = cellCoordinate2; value64 <= cellCoordinate4; value64 += 0x1) {
-        for (let value65 = cellCoordinate3; value65 <= cellCoordinate5; value65 += 0x1) {
+      for (let value64 = cellCoordinate2; value64 <= cellCoordinate4; value64 += 1) {
+        for (let value65 = cellCoordinate3; value65 <= cellCoordinate5; value65 += 1) {
           const cellKey2 = cellKey(value64, value65);
           let map3 = cellCount['get'](cellKey2);
           (!map3 && ((map3 = new Map()), cellCount['set'](cellKey2, map3)),
@@ -277,17 +277,17 @@ export function createEdgeHitSpatialIndex({
     }
     return (edgeCount['set'](edgeId2, value60), map['set'](edgeId2, value62), !![]);
   }
-  function queryCandidates(value66, value67, value68 = 0x0) {
+  function queryCandidates(value66, value67, value68 = 0) {
     const number5 = normalizeNumber(value66),
       number6 = normalizeNumber(value67),
-      value69 = Math['max'](0x0, normalizeNumber(value68)),
+      value69 = Math['max'](0, normalizeNumber(value68)),
       cellCoordinate6 = cellCoordinate(number5 - value69, value54),
       cellCoordinate7 = cellCoordinate(number6 - value69, value54),
       cellCoordinate8 = cellCoordinate(number5 + value69, value54),
       cellCoordinate9 = cellCoordinate(number6 + value69, value54),
       map4 = new Map();
-    for (let value70 = cellCoordinate6; value70 <= cellCoordinate8; value70 += 0x1) {
-      for (let value71 = cellCoordinate7; value71 <= cellCoordinate9; value71 += 0x1) {
+    for (let value70 = cellCoordinate6; value70 <= cellCoordinate8; value70 += 1) {
+      for (let value71 = cellCoordinate7; value71 <= cellCoordinate9; value71 += 1) {
         const enabled2 = cellCount['get'](cellKey(value70, value71));
         if (!enabled2) continue;
         for (const [value72, value73] of enabled2) {
@@ -301,7 +301,7 @@ export function createEdgeHitSpatialIndex({
     );
   }
   function hitTest(value76, value77, value78) {
-    const value79 = Math['max'](0x0, normalizeNumber(value78)) ** 0x2;
+    const value79 = Math['max'](0, normalizeNumber(value78)) ** 2;
     for (const value80 of queryCandidates(value76, value77, value78)) {
       const value81 = value80['geometry']['hitPoints']
         ? distanceToPolylineSquared(value80['geometry']['hitPoints'], value76, value77)
@@ -319,7 +319,7 @@ export function createEdgeHitSpatialIndex({
       cellCount: cellCount['size'],
       membershipCount: Array['from'](map['values']())['reduce'](
         (value82, value83) => value82 + value83['size'],
-        0x0,
+        0,
       ),
     };
   }

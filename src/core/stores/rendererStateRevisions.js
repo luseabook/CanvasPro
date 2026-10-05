@@ -18,7 +18,7 @@ function hasSourceVideoChange(previous, next) {
 }
 export function createRendererStateRevisionTracker(state) {
   function bump(key) {
-    state[key] = (state[key] || 0x0) + 0x1;
+    state[key] = (state[key] || 0) + 1;
   }
   function markRevisions({
     nodes: nodes = ![],
@@ -61,7 +61,7 @@ export function createRendererStateRevisionTracker(state) {
     },
     remove(ids) {
       const removed = (ids || [])['map']((id) => state['nodes']?.[id])['filter'](Boolean);
-      if (removed['length'] === 0x0) return;
+      if (removed['length'] === 0) return;
       markRevisions({
         nodes: !![],
         membership: !![],

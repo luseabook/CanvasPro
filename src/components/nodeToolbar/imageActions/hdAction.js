@@ -44,7 +44,7 @@ export function bindImageHdAction(value) {
             try {
               await _hdTaskMachine['cancel']();
             } catch (index) {
-              console['warn']('[ImageHD]\x20cancel\x20request\x20failed:', index);
+              console['warn']('[ImageHD] cancel request failed:', index);
             }
           return await cancelRunningHubResultTask(key, {
             name: imageHdText('cancelledName'),

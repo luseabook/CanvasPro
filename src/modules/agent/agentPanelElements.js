@@ -43,7 +43,7 @@ export function agentIconSvg(data) {
       skills:
         '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16H6.5A2.5 2.5 0 0 0 4 21.5Z"></path><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16h5.5a2.5 2.5 0 0 1 2.5 2.5Z"></path>',
       refresh:
-        '<path\x20d=\x22M20\x2011a8.1\x208.1\x200\x200\x200-15.5-2M4\x204v5h5\x22></path><path\x20d=\x22M4\x2013a8.1\x208.1\x200\x200\x200\x2015.5\x202M20\x2020v-5h-5\x22></path>',
+        '<path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 4v5h5"></path><path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 20v-5h-5"></path>',
       folder: '<path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3Z"></path>',
       edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>',
     };

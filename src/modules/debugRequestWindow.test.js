@@ -279,7 +279,7 @@ test('debugRequestWindow: renders content, copies, persists bounds, and closes',
 
   await handle.root.querySelector('footer button').trigger('click');
   assert.deepEqual(window.copied, ['hello']);
-  assert.equal(handle.root.querySelector('[role="status"]').textContent, '\u5df2\u590d\u5236');
+  assert.equal(handle.root.querySelector('[role="status"]').textContent, '已复制');
 
   await handle.root.querySelector('header button').trigger('click');
   assert.equal(handle.root.isConnected, false);

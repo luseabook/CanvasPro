@@ -8,11 +8,11 @@ export function createStoryboard3DProjectActions({
 } = {}) {
   function upsertStoryboard3DProject(item) {
     const enabled = String(item?.['id'] || '')['trim']();
-    if (!enabled) throw new Error('[store]\x20upsertStoryboard3DProject()\x20需要项目\x20id');
+    if (!enabled) throw new Error('[store] upsertStoryboard3DProject() 需要项目 id');
     const key = clone(item),
       list = Array['isArray'](readProjects()) ? [...readProjects()] : [],
       count = list['findIndex']((index) => String(index?.['id'] || '') === enabled);
-    if (count >= 0x0) list[count] = key;
+    if (count >= 0) list[count] = key;
     else list['unshift'](key);
     return (writeProjects(list), clone(key));
   }

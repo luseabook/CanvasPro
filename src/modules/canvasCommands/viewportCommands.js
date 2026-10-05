@@ -27,7 +27,7 @@ export function registerViewportCommands(result) {
         durationMs: { type: 'number' },
         options: { type: 'object' },
       },
-      defaults: { padding: 80, durationMs: 0x320 },
+      defaults: { padding: 80, durationMs: 800 },
       selectionFallback: true,
     },
     capabilitySchema: { reads: ['nodes', 'selection'], writes: ['viewport'], selectionFallback: true },
@@ -40,7 +40,7 @@ export function registerViewportCommands(result) {
           args: {
             ids: normalizeNodeIds(options, data, { min: 1, allowSelection: true }),
             padding: toFinitePositiveNumber(options.padding, 80),
-            durationMs: toFinitePositiveNumber(options.durationMs, 0x320),
+            durationMs: toFinitePositiveNumber(options.durationMs, 800),
             options: options.options || null,
           },
         };
@@ -69,7 +69,7 @@ export function registerViewportCommands(result) {
           durationMs: { type: 'number' },
           options: { type: 'object' },
         },
-        defaults: { padding: 80, durationMs: 0x320 },
+        defaults: { padding: 80, durationMs: 800 },
       },
       capabilitySchema: { reads: ['nodes'], writes: ['viewport'] },
       returnSchema: { aliasFields: ['ids', 'focused'] },
@@ -87,7 +87,7 @@ export function registerViewportCommands(result) {
           args: {
             ids: ids2,
             padding: toFinitePositiveNumber(options2.padding, 80),
-            durationMs: toFinitePositiveNumber(options2.durationMs, 0x320),
+            durationMs: toFinitePositiveNumber(options2.durationMs, 800),
             options: options2.options || null,
           },
         };

@@ -27,14 +27,14 @@ function firstText(...args) {
 function positiveTime(...args2) {
   for (const index of args2) {
     const count = Number(index);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 function normalizeStatus(result, data = 'pending') {
   return normalizeText(result || data) || data;
 }
-function normalizeNumber(options, target = 0x0) {
+function normalizeNumber(options, target = 0) {
   const source = Number(options);
   return Number['isFinite'](source) ? source : target;
 }
@@ -51,12 +51,12 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     startedAtField: 'rhTaskStartedAt',
     recoveringField: 'rhTaskRecovering',
     readTaskId: (options2 = {}, current = '') => firstText(current, options2['rhTaskId']),
-    readStartedAt: (options3 = {}, entry = 0x0) =>
+    readStartedAt: (options3 = {}, entry = 0) =>
       positiveTime(entry, options3['rhTaskStartedAt'], options3['generationStartTime']),
     buildPatch: ({
       taskId: taskId = '',
       status: status = 'pending',
-      startedAt: startedAt = 0x0,
+      startedAt: startedAt = 0,
       recovering: recovering = ![],
       useOpenapiQuery: useOpenapiQuery = ![],
     } = {}) => ({
@@ -76,7 +76,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     startedAtField: 'dreaminaTaskStartedAt',
     recoveringField: 'dreaminaTaskRecovering',
     readTaskId: (options4 = {}, record = '') => firstText(record, options4['dreaminaSubmitId']),
-    readStartedAt: (options5 = {}, payload = 0x0) =>
+    readStartedAt: (options5 = {}, payload = 0) =>
       positiveTime(payload, options5['dreaminaTaskStartedAt'], options5['generationStartTime']),
     buildPatch: ({
       taskId: taskId = '',
@@ -84,7 +84,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       status: status = 'pending',
       phase: phase = 'generating',
       label: label = '',
-      startedAt: startedAt = 0x0,
+      startedAt: startedAt = 0,
       lastCheckedAt: lastCheckedAt = Date['now'](),
       recovering: recovering = ![],
       raw: raw = {},
@@ -112,14 +112,14 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     startedAtField: 'asyncTaskStartedAt',
     recoveringField: 'asyncTaskRecovering',
     readTaskId: (options6 = {}, handle = '') => firstText(handle, options6['asyncTaskId']),
-    readStartedAt: (options7 = {}, state = 0x0) =>
+    readStartedAt: (options7 = {}, state = 0) =>
       positiveTime(state, options7['asyncTaskStartedAt'], options7['generationStartTime']),
     buildPatch: ({
       provider: provider = '',
       kind: kind = 'generation',
       taskId: taskId = '',
       status: status = 'pending',
-      startedAt: startedAt = 0x0,
+      startedAt: startedAt = 0,
       recovering: recovering = ![],
     } = {}) => ({
       asyncTaskProvider: normalizeText(provider),
@@ -175,6 +175,6 @@ export function listGenerationTaskProtocolAdapters() {
 export function buildGenerationTaskProtocolPatch(output, value2 = {}) {
   const generationTaskProtocolAdapter = getGenerationTaskProtocolAdapter(output);
   if (!generationTaskProtocolAdapter)
-    throw new Error('Unknown\x20generation\x20task\x20protocol:\x20' + normalizeText(output));
+    throw new Error('Unknown generation task protocol: ' + normalizeText(output));
   return generationTaskProtocolAdapter['buildPatch'](value2);
 }

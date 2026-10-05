@@ -17,7 +17,7 @@ function createInitialState() {
     readiness: 'idle',
     surface: 'poster',
     sourceKey: '',
-    sourceEpoch: 0x0,
+    sourceEpoch: 0,
   };
 }
 function normalizeSlotKey(value) {
@@ -48,9 +48,9 @@ function hasCurrentSourceToken(result, data) {
 function hasStrictPresentedFrameFacts(enabled2 = {}) {
   return !!(
     enabled2['domConnected'] === !![] &&
-    Number(enabled2['readyState'] || 0x0) >= 0x2 &&
-    Number(enabled2['videoWidth'] || 0x0) > 0x0 &&
-    Number(enabled2['videoHeight'] || 0x0) > 0x0 &&
+    Number(enabled2['readyState'] || 0) >= 2 &&
+    Number(enabled2['videoWidth'] || 0) > 0 &&
+    Number(enabled2['videoHeight'] || 0) > 0 &&
     !enabled2['error'] &&
     enabled2['rvfcObserved'] === !![] &&
     enabled2['cssDisplayVisible'] === !![] &&
@@ -90,7 +90,7 @@ export function createRendererMediaSlotLifecycle() {
       case 'visibility': {
         const record = String(entry['visibilityTier'] || '');
         if (!VALID_VISIBILITY_TIERS['has'](record))
-          throw new TypeError('invalid\x20renderer\x20media\x20visibility\x20tier:\x20' + record);
+          throw new TypeError('invalid renderer media visibility tier: ' + record);
         if (state2['visibilityTier'] === record) return buildResult(state2);
         state2['visibilityTier'] = record;
         const intents2 = [];
@@ -125,7 +125,7 @@ export function createRendererMediaSlotLifecycle() {
         if (state2['sourceKey'] === sourceKey && !enabled3) return buildResult(state2);
         return (
           (state2['sourceKey'] = sourceKey),
-          (state2['sourceEpoch'] += 0x1),
+          (state2['sourceEpoch'] += 1),
           (state2['readiness'] = 'idle'),
           (state2['surface'] = 'poster'),
           buildResult(state2, {

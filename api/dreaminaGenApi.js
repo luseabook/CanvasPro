@@ -14,12 +14,12 @@ import {
   validateDreaminaVideoRouteSelection,
 } from '../src/modules/dreaminaVideoModelHelper.js';
 import { localPathToUrl, normalizeLocalPath } from '../src/utils/localMediaPath.js';
-const DREAMINA_SUBMIT_TIMEOUT = 0xafc8,
-  DREAMINA_QUERY_TIMEOUT = 0xea60,
-  DREAMINA_POLL_INTERVAL = 0x7d0,
-  DREAMINA_MAX_WAIT = 10 * 60 * 0x3e8,
+const DREAMINA_SUBMIT_TIMEOUT = 45000,
+  DREAMINA_QUERY_TIMEOUT = 60000,
+  DREAMINA_POLL_INTERVAL = 2000,
+  DREAMINA_MAX_WAIT = 10 * 60 * 1000,
   DREAMINA_QUERY_RETRIES = 2,
-  DREAMINA_QUERY_RETRY_DELAY = 0x15e,
+  DREAMINA_QUERY_RETRY_DELAY = 350,
   DREAMINA_MAX_TRANSIENT_ERRORS = 12;
 export const DREAMINA_POLL_TIMEOUT_CODE = 'DREAMINA_POLL_TIMEOUT';
 const DREAMINA_QUEUE_HINTS = ['queue', 'queued', 'waiting', 'wait', 'pending'],
@@ -446,7 +446,7 @@ function isTransientDreaminaError(error2) {
     value39 === 'SERVICE_UNAVAILABLE'
   )
     return true;
-  if (count4 === 0x1ad || count4 >= 0x1f4) return true;
+  if (count4 === 429 || count4 >= 500) return true;
   return includesTransientHint(error2?.message || error2);
 }
 export function normalizeDreaminaTaskSnapshot(response3, value40 = {}) {
@@ -619,7 +619,7 @@ async function pollDreaminaUntilDoneOnce(submitId4, value55 = {}) {
   } catch (value60) {
     throw value60;
   }
-  const count6 = Number.isFinite(count5) && count5 > 0 ? Math.max(1, Math.ceil(count5 / 0xea60)) : 0,
+  const count6 = Number.isFinite(count5) && count5 > 0 ? Math.max(1, Math.ceil(count5 / 60000)) : 0,
     error8 = new Error(
       count6 > 0 ? '即梦任务处理超时（已等待约 ' + count6 + ' 分钟）' : '即梦任务处理超时，请稍后重试',
     );
@@ -873,10 +873,10 @@ export async function runDreaminaVideoGeneration(value69, args3 = {}) {
 }
 
 function normalizeDreaminaGenerateNum(options3 = {}) {
-  const value71 = options3?.['generateNum'] ?? options3?.['generate_num'] ?? options3?.['batchSize'] ?? 0x1,
-    value72 = Number['parseInt'](value71, 0xa);
-  if (!Number['isFinite'](value72)) return 0x1;
-  return Math['max'](0x1, Math['min'](0xa, value72));
+  const value71 = options3?.['generateNum'] ?? options3?.['generate_num'] ?? options3?.['batchSize'] ?? 1,
+    value72 = Number['parseInt'](value71, 10);
+  if (!Number['isFinite'](value72)) return 1;
+  return Math['max'](1, Math['min'](10, value72));
 }
 
 export async function submitDreaminaImageUpscale(value73) {

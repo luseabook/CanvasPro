@@ -20,7 +20,7 @@ const {
   resolveMinimumBrowserVersion,
 } = __chromeShellBrowserVersionForTest;
 const WINDOWS_BROWSER_PATH_ENV_NAME = 'AIC_CHROME_SHELL_BROWSER_PATH_BASE64';
-const VERSION_CHECK_TIMEOUT_MS = 0x1388;
+const VERSION_CHECK_TIMEOUT_MS = 5000;
 const CHROME_PATH = '/opt/google/chrome/chrome';
 const EDGE_PATH = '/opt/microsoft/msedge/msedge.exe';
 
@@ -67,10 +67,10 @@ test('parseVersionParts rejects version text without at least one dotted pair', 
 });
 
 test('compareBrowserVersions orders versions and returns null when either side is unparseable', () => {
-  assert.equal(compareBrowserVersions('148.0.7778.280', '148.0.0.0'), 0x1);
-  assert.equal(compareBrowserVersions('147.9.9.9', '148.0.0.0'), -0x1);
-  assert.equal(compareBrowserVersions('148.0.7778.280', '148.0.7778.280'), 0x0);
-  assert.equal(compareBrowserVersions('148.0', '148.0.0.0'), 0x0);
+  assert.equal(compareBrowserVersions('148.0.7778.280', '148.0.0.0'), 1);
+  assert.equal(compareBrowserVersions('147.9.9.9', '148.0.0.0'), -1);
+  assert.equal(compareBrowserVersions('148.0.7778.280', '148.0.7778.280'), 0);
+  assert.equal(compareBrowserVersions('148.0', '148.0.0.0'), 0);
   assert.equal(compareBrowserVersions('148.0.0.0', 'not-a-version'), null);
   assert.equal(compareBrowserVersions(null, '148.0.0.0'), null);
 });
@@ -94,7 +94,7 @@ test('identifyChromeShellBrowser is case-insensitive and defaults to unknown', (
 
 test('WINDOWS_VERSION_SCRIPT carries the base64 path handoff and six semicolon-joined lines', () => {
   assert.equal(typeof WINDOWS_VERSION_SCRIPT, 'string');
-  assert.equal(WINDOWS_VERSION_SCRIPT.split('; ').length, 0x6);
+  assert.equal(WINDOWS_VERSION_SCRIPT.split('; ').length, 6);
   assert.ok(WINDOWS_VERSION_SCRIPT.includes('$env:' + WINDOWS_BROWSER_PATH_ENV_NAME));
   assert.ok(WINDOWS_VERSION_SCRIPT.includes('[Convert]::FromBase64String($encodedTarget)'));
   assert.ok(WINDOWS_VERSION_SCRIPT.includes('if (-not $target) { exit 2 }'));
@@ -111,7 +111,7 @@ test('readBrowserExecutableVersion on win32 drives powershell with a base64 targ
     spawnProcess: spawnProcess,
   });
   assert.equal(version, '148.0.7778.280');
-  assert.equal(spawnProcess.calls.length, 0x1);
+  assert.equal(spawnProcess.calls.length, 1);
   const [call] = spawnProcess.calls;
   assert.equal(call.command, 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe');
   assert.deepEqual(call.args, [
@@ -156,11 +156,11 @@ test('readBrowserExecutableVersion returns an empty string for a blank path with
     '',
   );
   assert.equal(readBrowserExecutableVersion({ platform: 'linux', spawnProcess: spawnProcess }), '');
-  assert.equal(spawnProcess.calls.length, 0x0);
+  assert.equal(spawnProcess.calls.length, 0);
 });
 
 test('readBrowserExecutableVersion discards results with a non-zero status, error or signal', () => {
-  const failingStatus = createSpawnDouble(() => ({ status: 0x1, stdout: '148.0.7778.280', stderr: '' }));
+  const failingStatus = createSpawnDouble(() => ({ status: 1, stdout: '148.0.7778.280', stderr: '' }));
   assert.equal(
     readBrowserExecutableVersion({
       browserPath: CHROME_PATH,
@@ -170,7 +170,7 @@ test('readBrowserExecutableVersion discards results with a non-zero status, erro
     '',
   );
   const errorResult = createSpawnDouble(() => ({
-    status: 0x0,
+    status: 0,
     stdout: '148.0.7778.280',
     error: new Error('nope'),
   }));
@@ -179,7 +179,7 @@ test('readBrowserExecutableVersion discards results with a non-zero status, erro
     '',
   );
   const signalResult = createSpawnDouble(() => ({
-    status: 0x0,
+    status: 0,
     stdout: '148.0.7778.280',
     signal: 'SIGTERM',
   }));
@@ -233,11 +233,11 @@ test('inspectChromeShellBrowserVersion reports unsupported browsers without spaw
     outdated: true,
     reason: 'unsupported-browser',
   });
-  assert.equal(spawnProcess.calls.length, 0x0);
+  assert.equal(spawnProcess.calls.length, 0);
 });
 
 test('inspectChromeShellBrowserVersion reports version-unavailable when no version can be read', () => {
-  const spawnProcess = createSpawnDouble(() => ({ status: 0x1, stdout: '', stderr: '' }));
+  const spawnProcess = createSpawnDouble(() => ({ status: 1, stdout: '', stderr: '' }));
   const inspection = inspectChromeShellBrowserVersion({
     browserPath: CHROME_PATH,
     platform: 'linux',
@@ -409,7 +409,7 @@ test('checkChromeShellBrowserVersionBeforeLaunch skips a fallback that resolves 
 });
 
 test('checkChromeShellBrowserVersionBeforeLaunch flags an unverifiable browser as version-unavailable', async () => {
-  const spawnProcess = createSpawnDouble(() => ({ status: 0x1, stdout: '', stderr: '' }));
+  const spawnProcess = createSpawnDouble(() => ({ status: 1, stdout: '', stderr: '' }));
   const logEvent = createLogDouble();
   const result = await checkChromeShellBrowserVersionBeforeLaunch({
     browserPath: CHROME_PATH,

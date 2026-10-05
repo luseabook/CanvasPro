@@ -8,7 +8,7 @@ function normalizeSlotId(key = '') {
 }
 function toPositiveInteger(index) {
   const count = Number(index);
-  if (!Number['isFinite'](count) || count <= 0x0) return 0x0;
+  if (!Number['isFinite'](count) || count <= 0) return 0;
   return Math['trunc'](count);
 }
 function getVisibleFixedSlots(value2 = null) {
@@ -30,9 +30,9 @@ export function countManifestInputRecords(list = []) {
     (data, options) => {
       const kind = normalizeKind(options?.['kind']);
       if (!kind) return data;
-      return ((data[kind] = (data[kind] || 0x0) + 0x1), data);
+      return ((data[kind] = (data[kind] || 0) + 1), data);
     },
-    { text: 0x0, image: 0x0, video: 0x0, audio: 0x0 },
+    { text: 0, image: 0, video: 0, audio: 0 },
   );
 }
 export function buildFixedSlotOccupancy({
@@ -40,7 +40,7 @@ export function buildFixedSlotOccupancy({
   inputRecords: inputRecords = [],
 } = {}) {
   const list2 = getVisibleFixedSlots(fixedInputConfig);
-  if (list2['length'] === 0x0) return {};
+  if (list2['length'] === 0) return {};
   const map2 = new Map(list2['map']((target) => [target['id'], target])),
     map3 = list2['reduce']((map4, source) => {
       if (!map4['has'](source['kind'])) map4['set'](source['kind'], []);
@@ -80,7 +80,7 @@ export function getMissingManifestInputRequirement({
   const payload =
       inputCounts && typeof inputCounts === 'object'
         ? inputCounts
-        : { text: 0x0, image: 0x0, video: 0x0, audio: 0x0 },
+        : { text: 0, image: 0, video: 0, audio: 0 },
     handle = occupiedFixedSlots && typeof occupiedFixedSlots === 'object' ? occupiedFixedSlots : {},
     kind2 = getVisibleFixedSlots(fixedInputConfig)['find'](
       (state) => state['required'] === !![] && handle[state['id']] !== !![],
@@ -89,8 +89,8 @@ export function getMissingManifestInputRequirement({
     return {
       kind: kind2['kind'],
       slotId: kind2['id'],
-      required: 0x1,
-      actual: 0x0,
+      required: 1,
+      actual: 0,
       source: 'fixedSlot',
     };
   const config =
@@ -98,8 +98,8 @@ export function getMissingManifestInputRequirement({
   for (const [scope, input] of Object['entries'](config)) {
     const kind3 = normalizeKind(scope),
       required = toPositiveInteger(input);
-    if (!kind3 || required <= 0x0) continue;
-    const actual = Math['max'](0x0, Number(payload[kind3]) || 0x0);
+    if (!kind3 || required <= 0) continue;
+    const actual = Math['max'](0, Number(payload[kind3]) || 0);
     if (actual < required)
       return { kind: kind3, slotId: '', required: required, actual: actual, source: 'minByKind' };
   }

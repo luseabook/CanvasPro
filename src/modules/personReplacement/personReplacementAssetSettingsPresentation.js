@@ -32,8 +32,8 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&apos;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&apos;');
 }
 function normalizeMediaUrl(key) {
   const text = normalizeText(key);
@@ -61,8 +61,8 @@ function renderVoiceReferenceStatus(options2 = {}, index = '') {
   const result = Boolean(getCharacterVoiceUrl(options2));
   return (
     '<span class="person-replacement-target-voice-status' +
-    (index ? '\x20' + escapeHtml(index) : '') +
-    '\x20' +
+    (index ? ' ' + escapeHtml(index) : '') +
+    ' ' +
     (result ? 'has-reference' : 'is-missing') +
     '"><i aria-hidden="true"></i>' +
     (result ? '有声音参考' : '无声音参考') +
@@ -113,7 +113,7 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
     (allowDeleteAssetCard['assetSelectionMode'] = ![]));
   allowDeleteAssetCard['isBatchGenerating'] = footerHtml['assetBatchGenerationActive'] === !![];
   const entry =
-    allowDeleteAssetCard['assetSelectionMode'] && allowDeleteAssetCard['selectedAssetIds']['length'] > 0x1;
+    allowDeleteAssetCard['assetSelectionMode'] && allowDeleteAssetCard['selectedAssetIds']['length'] > 1;
   ((allowDeleteAssetCard['batchGenerationLabel'] = normalizeText(footerHtml['assetBatchGenerationLabel'])),
     (allowDeleteAssetCard['batchCancelRequested'] = footerHtml['assetBatchCancelRequested'] === !![]),
     (allowDeleteAssetCard['batchGeneratingAssetIds'] = Array['isArray'](
@@ -126,7 +126,7 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
     record = assets['find']((payload) => payload['id'] === allowDeleteAssetCard['selectedAssetId']) || null,
     list2 = getPersonReplacementSelectableAssets(next, activeTab),
     allSelected =
-      list2['length'] > 0x0 &&
+      list2['length'] > 0 &&
       list2['every']((handle) => allowDeleteAssetCard['selectedAssetIds']['includes'](handle['id'])),
     list3 = previewAppearance
       ? list2['filter']((state) => allowDeleteAssetCard['selectedAssetIds']['includes'](state['id']))
@@ -148,16 +148,16 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
         );
       return renderPersonReplacementAssetCard(allowDeleteAssetCard, imageUrl, {
         cardAttributes:
-          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 0x1
-            ? 'data-story-card-appearance-wheel="' + escapeHtml(imageUrl['id']) + '\x22'
+          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 1
+            ? 'data-story-card-appearance-wheel="' + escapeHtml(imageUrl['id']) + '"'
             : '',
         previewAppearance: previewAppearance
           ? { ...imageUrl, imageUrl: imageUrl['thumbnailUrl'] || imageUrl['imageUrl'] }
           : getWorkspaceAssetAppearances(imageUrl)[
-              allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0x0
+              allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0
             ],
         accessoryHtml:
-          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 0x1
+          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 1
             ? renderWorkspaceCardAppearanceNavigation({
                 attributes: { 'data-story-card-appearance-wheel': imageUrl['id'] },
                 previousAttributes: {
@@ -173,8 +173,8 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
         fallbackImageUrl: previewAppearance ? imageUrl['sourceUrl'] : '',
         workspaceAssetLibraryImage: previewAppearance,
         statusText: statusText
-          ? (allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0x0) +
-            0x1 +
+          ? (allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0) +
+            1 +
             ' / ' +
             input['total']
           : '',
@@ -193,17 +193,17 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
       : assets['map'](renderAsset)['join'](''),
     output =
       list3['length'] && list3['every']((value2) => value2['mediaKind'] === 'audio')
-        ? '<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x22\x20data-person-replacement-action=\x22add-library-assets-to-project\x22\x20data-person-replacement-library-target-kind=\x22audio\x22>加入到音频项目' +
-          (allowDeleteAssetCard['assetSelectionMode'] ? '\x20(' + config + ')' : '') +
+        ? '<button type="button" class="story-primary-button" data-person-replacement-action="add-library-assets-to-project" data-person-replacement-library-target-kind="audio">加入到音频项目' +
+          (allowDeleteAssetCard['assetSelectionMode'] ? ' (' + config + ')' : '') +
           '</button>'
-        : '<div\x20class=\x22story-asset-batch-menu-wrap\x20story-library-add-menu-wrap\x20person-replacement-library-add-menu-wrap\x22>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20story-asset-batch-trigger\x22\x20data-person-replacement-action=\x22toggle-library-add-targets\x22\x20aria-haspopup=\x22menu\x22\x20aria-expanded=\x22false\x22\x20' +
+        : '<div class="story-asset-batch-menu-wrap story-library-add-menu-wrap person-replacement-library-add-menu-wrap">\n    <button type="button" class="story-primary-button story-asset-batch-trigger" data-person-replacement-action="toggle-library-add-targets" aria-haspopup="menu" aria-expanded="false" ' +
           (config ? '' : 'disabled') +
           '><span class="story-asset-batch-trigger-label">加入到项目' +
-          (allowDeleteAssetCard['assetSelectionMode'] && config ? '\x20(' + config + ')' : '') +
+          (allowDeleteAssetCard['assetSelectionMode'] && config ? ' (' + config + ')' : '') +
           '</span></button>\n    <div class="story-asset-batch-menu story-library-add-menu" role="menu" aria-label="选择加入项目的素材分类" aria-hidden="true">\n      ' +
           PERSON_REPLACEMENT_LIBRARY_TARGETS['map'](
             ({ kind: kind, label: label }) =>
-              '<button\x20type=\x22button\x22\x20role=\x22menuitem\x22\x20data-person-replacement-action=\x22add-library-assets-to-project\x22\x20data-person-replacement-library-target-kind=\x22' +
+              '<button type="button" role="menuitem" data-person-replacement-action="add-library-assets-to-project" data-person-replacement-library-target-kind="' +
               kind +
               '"><span class="story-asset-batch-mode-icon">' +
               renderWorkspaceAssetTabIcon(kind) +
@@ -211,13 +211,13 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
               label +
               '</span></button>',
           )['join']('') +
-          '\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>',
+          '\n    </div>\n  </div>',
     primaryActionHtml = (value3, value4, value5) => {
       const value6 = map['has'](value3);
       return (
-        '<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-person-replacement-action=\x22' +
+        '<button type="button" class="story-secondary-button" data-person-replacement-action="' +
         value5 +
-        '\x22' +
+        '"' +
         (value6 ? ' aria-busy="true" disabled' : '') +
         '>' +
         (value6
@@ -263,10 +263,10 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
     calloutInHeading: !![],
     headingInListColumn: !![],
     calloutStatus: allowDeleteAssetCard['assetSelectionMode']
-      ? '已选择\x20' + allowDeleteAssetCard['selectedAssetIds']['length'] + '\x20项'
+      ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
       : '',
     activeTab: activeTab,
-    tabCount: 0x4,
+    tabCount: 4,
     tabsHtml: [
       ['character', '人物', characters['characters']['length']],
       ['scene', '场景', characters['scenes']['length']],
@@ -277,15 +277,15 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
         ([value7, value8, value9]) =>
           '<button type="button" class="' +
           (activeTab === value7 ? 'is-active' : '') +
-          '\x22\x20data-person-replacement-action=\x22select-character-asset-tab\x22\x20data-asset-tab=\x22' +
+          '" data-person-replacement-action="select-character-asset-tab" data-asset-tab="' +
           value7 +
           '" role="tab" aria-selected="' +
           (activeTab === value7) +
           '" tabindex="' +
           (activeTab === value7 ? '0' : '-1') +
-          '\x22>' +
+          '">' +
           renderWorkspaceAssetTabIcon(value7) +
-          '<span\x20class=\x22story-asset-tab-label\x22>' +
+          '<span class="story-asset-tab-label">' +
           value8 +
           '</span><span class="story-asset-tab-count">' +
           value9 +
@@ -313,10 +313,10 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
           : '单击素材可查看详情；点击加入到项目后，选择人物、场景或音频。'
         : readOnly
           ? allowDeleteAssetCard['assetSelectionMode']
-            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + '\x20项'
+            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
             : '从总素材加入的场景可在图像替换中作为画面参考。'
           : allowDeleteAssetCard['assetSelectionMode']
-            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + '\x20项'
+            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
             : '上传的第一张图片作为基础形象；后续生成会新增形象。',
     calloutActionsHtml: calloutActionsHtml,
     cardsHtml: cardsHtml,

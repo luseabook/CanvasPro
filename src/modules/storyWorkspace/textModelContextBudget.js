@@ -18,7 +18,7 @@
  */
 
 // 32k: integer, generous for older models, safe as a floor for anything unrecognised.
-export const DEFAULT_TEXT_MODEL_CONTEXT_TOKENS = 0x8000;
+export const DEFAULT_TEXT_MODEL_CONTEXT_TOKENS = 32768;
 
 // Families whose whole line-up is comfortably at or above 128k. Used as a floor, never a ceiling.
 export const TEXT_MODEL_CONTEXT_FAMILY_FLOOR_TOKENS = 0x20000;
@@ -55,7 +55,7 @@ const FAMILY_FLOORS = Object.freeze([
 
 // Characters per token. CJK is roughly one token per character; latin is far cheaper. Treating
 // every character as a token over-estimates mixed text, which is the safe direction here.
-export const TEXT_MODEL_CHARS_PER_TOKEN = 0x1;
+export const TEXT_MODEL_CHARS_PER_TOKEN = 1;
 
 // Leave a quarter of the window for the answer, then keep a further safety margin.
 export const TEXT_MODEL_OUTPUT_RESERVE_RATIO = 0.25;
@@ -99,14 +99,14 @@ export function resolveTextModelContextWindow(modelId, { manifest = null } = {})
 /** Conservative token estimate for a piece of text. */
 export function estimateTextTokens(text) {
   const value = String(text ?? '');
-  if (!value) return 0x0;
+  if (!value) return 0;
   return Math.ceil(value.length * TEXT_MODEL_CHARS_PER_TOKEN);
 }
 
 /** Inverse of {@link estimateTextTokens}: how much text fits in a token budget. */
 export function estimateCharactersForTokens(tokens) {
   const value = Number(tokens);
-  if (!Number.isFinite(value) || value <= 0x0) return 0x0;
+  if (!Number.isFinite(value) || value <= 0) return 0;
   return Math.floor(value / TEXT_MODEL_CHARS_PER_TOKEN);
 }
 
@@ -120,8 +120,8 @@ export function computeStoryInputBudget({
   modelId = '',
   manifest = null,
   contextTokens = null,
-  templateTokens = 0x0,
-  carriedTokens = 0x0,
+  templateTokens = 0,
+  carriedTokens = 0,
   outputReserveTokens = null,
   outputReserveRatio = TEXT_MODEL_OUTPUT_RESERVE_RATIO,
   safetyRatio = TEXT_MODEL_SAFETY_RATIO,
@@ -134,10 +134,10 @@ export function computeStoryInputBudget({
     ? Math.trunc(Number(outputReserveTokens))
     : Math.floor(resolved.tokens * outputReserveRatio);
 
-  const overhead = Math.max(0x0, Math.trunc(Number(templateTokens) || 0x0)) +
-    Math.max(0x0, Math.trunc(Number(carriedTokens) || 0x0));
+  const overhead = Math.max(0, Math.trunc(Number(templateTokens) || 0)) +
+    Math.max(0, Math.trunc(Number(carriedTokens) || 0));
 
-  const availableTokens = Math.max(0x0, resolved.tokens - reserve - overhead);
+  const availableTokens = Math.max(0, resolved.tokens - reserve - overhead);
   const usableTokens = Math.floor(availableTokens * safetyRatio);
 
   return Object.freeze({
@@ -145,8 +145,8 @@ export function computeStoryInputBudget({
     known: resolved.known,
     source: resolved.source,
     outputReserveTokens: reserve,
-    templateTokens: Math.max(0x0, Math.trunc(Number(templateTokens) || 0x0)),
-    carriedTokens: Math.max(0x0, Math.trunc(Number(carriedTokens) || 0x0)),
+    templateTokens: Math.max(0, Math.trunc(Number(templateTokens) || 0)),
+    carriedTokens: Math.max(0, Math.trunc(Number(carriedTokens) || 0)),
     availableTokens: availableTokens,
     usableTokens: usableTokens,
     usableCharacters: estimateCharactersForTokens(usableTokens),

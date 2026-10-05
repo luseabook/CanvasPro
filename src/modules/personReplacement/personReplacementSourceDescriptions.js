@@ -1,9 +1,9 @@
 const text = (value) => String(value ?? '')['trim']();
 export const usesSourceDescriptions = (item) =>
-  ['positioning', 'regular']['includes'](item['promptMode']) && item['bindings']?.['length'] > 0x0;
+  ['positioning', 'regular']['includes'](item['promptMode']) && item['bindings']?.['length'] > 0;
 export function sourceDescriptionIdentity(source) {
   return {
-    evidenceVersion: 0x2,
+    evidenceVersion: 2,
     source: source['referenceImages']?.['find']((key) => key['role'] === 'source-keyframe')?.['ref'],
     people: source['bindings']['map'](({ personId: personId, markerLabel: markerLabel, bbox: bbox }) => ({
       personId: personId,
@@ -33,7 +33,7 @@ export function buildSourceDescriptionRequest(index, imageRefs) {
           bbox: bbox2,
         })),
       ),
-    ]['join']('\x0a'),
+    ]['join']('\n'),
     structuredOutput: {
       name: 'person_replacement_source_descriptions',
       strict: !![],
@@ -53,7 +53,7 @@ export function buildSourceDescriptionRequest(index, imageRefs) {
               required: ['label', 'description', 'ambiguous'],
               properties: {
                 label: { type: 'string', enum: minItems },
-                description: { type: 'string', maxLength: 0x28 },
+                description: { type: 'string', maxLength: 40 },
                 ambiguous: { type: 'boolean' },
               },
             },
@@ -69,13 +69,13 @@ export function parseSourceDescriptions(options, target) {
     throw new Error('原人物识别不完整，请调整选框后重试');
   const people = target['bindings']['map']((personId2) => {
     const list2 = list['filter']((next) => next['label'] === personId2['markerLabel']),
-      current = list2[0x0],
+      current = list2[0],
       description = text(current?.['description']);
     if (
-      list2['length'] !== 0x1 ||
+      list2['length'] !== 1 ||
       current['ambiguous'] !== ![] ||
       !description ||
-      description['length'] > 0x28 ||
+      description['length'] > 40 ||
       /[\r\n]|图\s*\d|替换|忽略|指令|→/u['test'](description)
     )
       throw new Error('无法明确识别' + personId2['markerLabel'] + '框中的原人物，请调整选框后重试');
@@ -124,5 +124,5 @@ export function compileSourceDescriptions(entry, record) {
     entry['sceneReferenceSlot']
       ? '把图1的背景替换成图' + entry['sceneReferenceSlot'] + '的场景，保持人物光线与场景协调。'
       : '背景和光线保持不变。',
-  ]['join']('\x0a');
+  ]['join']('\n');
 }

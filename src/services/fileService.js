@@ -115,23 +115,23 @@ export function getNodeTypeByFile(error2) {
 }
 export function getNodeDefaultSize(next) {
   const current = {
-    'source-image': { width: 0x200, height: 0x120 },
-    'source-video': { width: 0x200, height: 0x120 },
+    'source-image': { width: 512, height: 288 },
+    'source-video': { width: 512, height: 288 },
     'web-preview': { ...WEB_PREVIEW_MIN_SIZE },
-    'web-reference-card': { width: 0x1a4, height: 0x168 },
-    'source-audio': { width: 0x140, height: 140 },
+    'web-reference-card': { width: 420, height: 360 },
+    'source-audio': { width: 320, height: 140 },
     'media-clip': { ...MEDIA_CLIP_COMPACT_SIZE },
-    collage: { width: 0x240, height: 0x240 },
+    collage: { width: 576, height: 576 },
     whiteboard: { ...WHITEBOARD_SIZE },
     'comfyui-workflow': { ...COMFY_NODE_SIZE },
     'story-workspace': { ...STORY_WORKSPACE_SIZE },
-    'source-text': { width: 0x200, height: 0x120 },
-    'comment-note': { width: 0x104, height: 120 },
-    'storyboard-script': { width: 0x400, height: 0x240 },
-    'panorama-scene': { width: 0x400, height: 0x240 },
-    'panorama-360': { width: 0x400, height: 0x240 },
+    'source-text': { width: 512, height: 288 },
+    'comment-note': { width: 260, height: 120 },
+    'storyboard-script': { width: 1024, height: 576 },
+    'panorama-scene': { width: 1024, height: 576 },
+    'panorama-360': { width: 1024, height: 576 },
   };
-  return current[next] || { width: 0x140, height: 180 };
+  return current[next] || { width: 320, height: 180 };
 }
 export function getAutoMediaSizeByShortSide(entry, record, payload = SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE) {
   const handle = Math.max(1, Number(entry) || 1),
@@ -845,7 +845,7 @@ async function readImageFileNaturalSize(enabled17) {
       if (setTimeout2) clearTimeout(setTimeout2);
       (revokeObjectUrl(value54), handler5(value56));
     };
-    ((setTimeout2 = setTimeout(() => run5(null), 0x7d0)),
+    ((setTimeout2 = setTimeout(() => run5(null), 2000)),
       (box5.onload = () =>
         run5(normalizeNaturalSize(box5.naturalWidth || box5.width, box5.naturalHeight || box5.height))),
       (box5.onerror = () => run5(null)),
@@ -877,7 +877,7 @@ async function readVideoFileNaturalSize(enabled18) {
       } catch {}
       (revokeObjectUrl(value58), handler6(value61));
     };
-    ((setTimeout3 = setTimeout(() => run6(null), 0x9c4)),
+    ((setTimeout3 = setTimeout(() => run6(null), 2500)),
       (value59.preload = 'metadata'),
       (value59.muted = true),
       (value59.onloadedmetadata = () => run6(normalizeNaturalSize(value59.videoWidth, value59.videoHeight))),
@@ -1398,16 +1398,16 @@ export function readJsonFile(value105) {
   });
 }
 
-export const CANVAS_VIDEO_IMPORT_MAX_BYTES = 0x12c * 0x400 * 0x400;
+export const CANVAS_VIDEO_IMPORT_MAX_BYTES = 300 * 1024 * 1024;
 
-export const CANVAS_VIDEO_IMPORT_MAX_MB = Math['round'](CANVAS_VIDEO_IMPORT_MAX_BYTES / 0x400 / 0x400);
+export const CANVAS_VIDEO_IMPORT_MAX_MB = Math['round'](CANVAS_VIDEO_IMPORT_MAX_BYTES / 1024 / 1024);
 
 const ASSET_MEDIA_TASK_STATUS_RANK = new Map([
-  ['waiting', 0x1],
-  ['processing', 0x2],
-  ['cancelled', 0x3],
-  ['failed', 0x3],
-  ['complete', 0x3],
+  ['waiting', 1],
+  ['processing', 2],
+  ['cancelled', 3],
+  ['failed', 3],
+  ['complete', 3],
 ]);
 
 function normalizeAssetUpdatedAt(value108) {
@@ -1419,13 +1419,13 @@ function normalizeAssetUpdatedAt(value108) {
 
 function normalizeAssetRevision(value110) {
   const count7 = Math['trunc'](Number(value110));
-  return Number['isFinite'](count7) && count7 > 0x0 ? count7 : 0x0;
+  return Number['isFinite'](count7) && count7 > 0 ? count7 : 0;
 }
 
 export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {}) {
   const assetRevision = normalizeAssetRevision(value111?.['assetRevision']),
     assetRevision2 = normalizeAssetRevision(options2?.['assetRevision']);
-  if (assetRevision > 0x0 && assetRevision2 > 0x0) return assetRevision > assetRevision2;
+  if (assetRevision > 0 && assetRevision2 > 0) return assetRevision > assetRevision2;
   const assetUpdatedAt = normalizeAssetUpdatedAt(value111?.['assetUpdatedAt'] || value111?.['updatedAt']),
     assetUpdatedAt2 = normalizeAssetUpdatedAt(options2?.['assetUpdatedAt']),
     value112 = assetUpdatedAt !== '' && assetUpdatedAt2 !== '';
@@ -1444,13 +1444,13 @@ export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {
             String(value113['status'] || '')
               ['trim']()
               ['toLowerCase'](),
-          ) || 0x0,
+          ) || 0,
         value115 =
           ASSET_MEDIA_TASK_STATUS_RANK['get'](
             String(options2?.['mediaTaskStatus'] || '')
               ['trim']()
               ['toLowerCase'](),
-          ) || 0x0;
+          ) || 0;
       if (value114 < value115) return ![];
     }
     return !![];
@@ -1460,7 +1460,7 @@ export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {
 
 function assignPositiveNumber(value116, value117, ...args8) {
   const value118 = args8['map']((value119) => Number(value119))['find'](
-    (count8) => Number['isFinite'](count8) && count8 > 0x0,
+    (count8) => Number['isFinite'](count8) && count8 > 0,
   );
   if (value118 !== undefined) value116[value117] = value118;
 }
@@ -1480,7 +1480,7 @@ export function buildElectronAssetNodePatch(response3 = {}) {
       mediaTaskId: response3?.['mediaTaskId'] || '',
       mediaTaskKind: response3?.['mediaTaskKind'] || '',
       mediaTaskStatus: response3?.['mediaTaskStatus'] || '',
-      mediaTaskProgress: Number(response3?.['mediaTaskProgress'] || 0x0) || 0x0,
+      mediaTaskProgress: Number(response3?.['mediaTaskProgress'] || 0) || 0,
       mediaTaskError: response3?.['mediaTaskError'] || '',
       videoProxyStatus: response3?.['videoProxyStatus'] || '',
       videoProxyVersion: response3?.['videoProxyVersion'] || '',
@@ -1488,7 +1488,7 @@ export function buildElectronAssetNodePatch(response3 = {}) {
     },
     value121 = String(response3?.['assetUpdatedAt'] || response3?.['updatedAt'] || '')['trim'](),
     assetRevision3 = normalizeAssetRevision(response3?.['assetRevision']);
-  if (assetRevision3 > 0x0) value120['assetRevision'] = assetRevision3;
+  if (assetRevision3 > 0) value120['assetRevision'] = assetRevision3;
   if (value121) value120['assetUpdatedAt'] = value121;
   (assignPositiveNumber(value120, 'videoWidth', response3?.['videoWidth'], response3?.['width']),
     assignPositiveNumber(value120, 'videoHeight', response3?.['videoHeight'], response3?.['height']),

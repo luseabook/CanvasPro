@@ -365,7 +365,7 @@ export function createSelectedTextCaptureController({
       hook = new SelectionHook();
       hook.on?.('error', () => {});
       hook.on?.('key-up', (payload) => {
-        if (destroyed || (platform === 'win32' && Number(payload?.flags) & 0x10)) return;
+        if (destroyed || (platform === 'win32' && Number(payload?.flags) & 16)) return;
         onKeyReleased(payload);
       });
       hook.setSelectionPassiveMode?.(true);

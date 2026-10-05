@@ -770,10 +770,10 @@ function buildRhVideoParamsLabel(value118, value119) {
     fieldById5 = getFieldById(value118, 'rhVideoFrames'),
     fieldById6 = getFieldById(value118, 'rhVideoSeconds'),
     value120 = fieldById3
-      ? normalizeNumberValue(getFieldValue(value119, fieldById3), Number(fieldById3.defaultValue ?? 0x340), {
-          min: 0x340,
+      ? normalizeNumberValue(getFieldValue(value119, fieldById3), Number(fieldById3.defaultValue ?? 832), {
+          min: 832,
         })
-      : 0x340;
+      : 832;
   if (fieldById6) {
     const value121 = fieldById4
         ? normalizeNumberValue(getFieldValue(value119, fieldById4), Number(fieldById4.defaultValue ?? 24))
@@ -781,7 +781,7 @@ function buildRhVideoParamsLabel(value118, value119) {
       numberValue = normalizeNumberValue(
         getFieldValue(value119, fieldById6),
         Number(fieldById6.defaultValue ?? 5),
-        { min: Number(fieldById6.min ?? 1), max: Number(fieldById6.max ?? 0x258) },
+        { min: Number(fieldById6.min ?? 1), max: Number(fieldById6.max ?? 600) },
       );
     return joinMetricLabels([
       ['秒数', numberValue],
@@ -832,8 +832,8 @@ function renderRhVideoParamsResolutionField(value127, value128, { buttonClass: b
   assertSupportedField(value127);
   const numberValue4 = normalizeNumberValue(
     getFieldValue(value128, value127),
-    Number(value127.defaultValue ?? 0x340),
-    { min: 0x340 },
+    Number(value127.defaultValue ?? 832),
+    { min: 832 },
   );
   return (
     '<div class="img-rp-quality-area" data-ui-schema-field="' +
@@ -850,7 +850,7 @@ function renderRhVideoParamsResolutionField(value127, value128, { buttonClass: b
         const value129 = Number(getOptionValue(item31)),
           value130 = Number(numberValue4) === Number(value129),
           value131 =
-            value127?.showHighResolutionOptions === true || Number(value129) <= 0x5a0 ? '' : ' dev-mode-only';
+            value127?.showHighResolutionOptions === true || Number(value129) <= 1440 ? '' : ' dev-mode-only';
         return (
           '<button type="button" class="img-rp-quality-item' +
           value131 +
@@ -922,7 +922,7 @@ function renderRhVideoParamsStepperRow(value137, value138, value139 = {}) {
   const value140 = String(value137?.id || '').trim(),
     value141 = value140 === 'rhVideoFrames',
     min2 = Number(value137?.min ?? (value141 ? 0 : 1)),
-    max2 = Number(value137?.max ?? (value141 ? 0xf423f : 0x258)),
+    max2 = Number(value137?.max ?? (value141 ? 0xf423f : 600)),
     value142 = Number(value137?.defaultValue ?? (value141 ? 77 : 5)),
     numberValue6 = normalizeNumberValue(getFieldValue(value138, value137), value142, {
       min: min2,
@@ -1614,7 +1614,7 @@ function normalizeRhV54SpecialMode(value267) {
 }
 function normalizeRhV54MaskExpand(value269, value270 = 25) {
   const value271 = Number(value269);
-  return Number.isFinite(value271) ? Math.max(-0x270f, Math.min(0x270f, Math.trunc(value271))) : value270;
+  return Number.isFinite(value271) ? Math.max(-9999, Math.min(9999, Math.trunc(value271))) : value270;
 }
 function getStepPrecision(value272) {
   const list38 = String(value272 ?? ''),
@@ -1832,9 +1832,9 @@ function renderRhV54MaskExpandField(value303, value304) {
     '" data-ui-schema-type="stepper" data-ui-schema-value-type="number" data-ui-schema-default="' +
     escapeHtmlAttr(value303?.defaultValue ?? '') +
     '" data-ui-schema-min="' +
-    escapeHtmlAttr(value303?.min ?? -0x270f) +
+    escapeHtmlAttr(value303?.min ?? -9999) +
     '" data-ui-schema-max="' +
-    escapeHtmlAttr(value303?.max ?? 0x270f) +
+    escapeHtmlAttr(value303?.max ?? 9999) +
     '" data-ui-schema-step="' +
     escapeHtmlAttr(value303?.step ?? 1) +
     '"' +
@@ -2138,7 +2138,7 @@ function bindUiSchemaControls(el33, { getNodeData: getNodeData, commitFieldValue
         value359 = (event) => {
           (event.preventDefault?.(), event.stopPropagation?.(), event.stopImmediatePropagation?.(), run4());
         };
-      return (el36.addEventListener('click', value359, true), (setTimeout2 = setTimeout(run4, 0x15e)), true);
+      return (el36.addEventListener('click', value359, true), (setTimeout2 = setTimeout(run4, 350)), true);
     },
     handler9 = (value360, value361) => {
       const value362 = Number(value360);
@@ -2260,8 +2260,8 @@ function bindUiSchemaControls(el33, { getNodeData: getNodeData, commitFieldValue
     },
     handler18 = (el47, value389) => {
       const value390 = handler9(el47?.dataset?.uiSchemaDefault, 25),
-        value391 = handler9(el47?.dataset?.uiSchemaMin, -0x270f),
-        value392 = handler9(el47?.dataset?.uiSchemaMax, 0x270f),
+        value391 = handler9(el47?.dataset?.uiSchemaMin, -9999),
+        value392 = handler9(el47?.dataset?.uiSchemaMax, 9999),
         rhV54MaskExpand2 = normalizeRhV54MaskExpand(value389, value390);
       return Math.max(value391, Math.min(value392, rhV54MaskExpand2));
     },
@@ -2861,12 +2861,12 @@ function syncRhVideoParamsComposite(el111, value455 = {}) {
         Number(value462),
         value463,
       ),
-    value464 = value457 ? handler24(value457, value457.defaultValue || 0x340, { min: 0x340 }) : 0x340;
+    value464 = value457 ? handler24(value457, value457.defaultValue || 832, { min: 832 }) : 832;
   if (el112 && value460) {
     const value465 = value458 ? handler24(value458, value458.defaultValue || 24) : 24,
       value466 = handler24(value460, value460.defaultValue || 5, {
         min: Number(value460.min || 1),
-        max: Number(value460.max || 0x258),
+        max: Number(value460.max || 600),
       });
     el112.textContent = joinMetricLabels([
       ['秒数', value466],
@@ -2907,7 +2907,7 @@ function syncRhVideoParamsComposite(el111, value455 = {}) {
   if (value460 && el114) {
     const value469 = handler24(value460, value460.defaultValue || 5, {
       min: Number(value460.min || 1),
-      max: Number(value460.max || 0x258),
+      max: Number(value460.max || 600),
     });
     ((el114.textContent = String(value469)), el114.setAttribute('aria-valuenow', String(value469)));
   }
@@ -2932,7 +2932,7 @@ function syncCompositeUiSchemaControls(el116, value471 = {}) {
       .forEach((item65) => syncRhVideoParamsComposite(item65, value471)));
 }
 
-const UI_SCHEMA_POPUP_EXIT_MS = 0xa0;
+const UI_SCHEMA_POPUP_EXIT_MS = 160;
 
 function getUiSchemaValueOptions(value472) {
   return Array['from'](value472?.['querySelectorAll']?.('[data-ui-schema-value]') || []);
@@ -3018,9 +3018,9 @@ function getVoiceCompositeCustomModeValue(options6 = {}, value486 = {}) {
 
 function renderVoiceQualityRatioField(value487, value488) {
   const value489 = (Array['isArray'](value487) ? value487 : [])['filter'](Boolean);
-  if (value489['length'] < 0x2) return '';
-  const value490 = value489[0x0],
-    value491 = value489[0x1];
+  if (value489['length'] < 2) return '';
+  const value490 = value489[0],
+    value491 = value489[1];
   (assertSupportedField(value490), assertSupportedField(value491));
   const voiceCompositeModeField = getVoiceCompositeModeField(value490, value491),
     voiceCompositeDefaultModeValue = getVoiceCompositeDefaultModeValue(value490, value491),
@@ -3054,16 +3054,16 @@ function renderVoiceQualityRatioField(value487, value488) {
         ) +
         '">!</span><a href="#" class="ui-schema-help-link img-rp-voice-help-link" data-ui-schema-field-help-url="' +
         escapeHtmlAttr(value499) +
-        '\x22\x20title=\x22打开火山音色库\x22\x20onclick=\x22return\x20false;\x22><svg\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><path\x20d=\x22M18\x2013v6a2\x202\x200\x200\x201-2\x202H5a2\x202\x200\x200\x201-2-2V8a2\x202\x200\x200\x201\x202-2h6\x22/><polyline\x20points=\x2215\x203\x2021\x203\x2021\x209\x22/><line\x20x1=\x2210\x22\x20y1=\x2214\x22\x20x2=\x2221\x22\x20y2=\x223\x22/></svg></a>'
+        '" title="打开火山音色库" onclick="return false;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>'
       : '',
     value501 =
       '<div class="img-rp-quality-area img-rp-voice-custom-area' +
       value496 +
       '" data-ui-schema-field="' +
       escapeHtmlAttr(value491['id']) +
-      '\x22\x20data-ui-schema-type=\x22text\x22\x20data-ui-schema-default=\x22' +
+      '" data-ui-schema-type="text" data-ui-schema-default="' +
       escapeHtmlAttr(value491?.['defaultValue'] ?? '') +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22img-rp-section-label\x22>' +
+      '">\n      <div class="img-rp-section-label">' +
       escapeHtmlAttr(manifestText25) +
       value500 +
       '</div>\n      <div class="img-rp-voice-input-wrap">\n        <input type="text" class="img-rp-voice-input" data-ui-schema-input="' +
@@ -3088,9 +3088,9 @@ function renderVoiceQualityRatioField(value487, value488) {
         (value504 ? 'active' : '') +
         '" data-label="' +
         escapeHtmlAttr(optionValue5) +
-        '\x22\x20data-ui-schema-value=\x22' +
+        '" data-ui-schema-value="' +
         escapeHtmlAttr(optionValue5) +
-        '\x22><span>' +
+        '"><span>' +
         escapeHtmlAttr(manifestText27) +
         '</span></button>'
       );
@@ -3112,11 +3112,11 @@ function renderVoiceQualityRatioField(value487, value488) {
     escapeHtmlAttr(value490['id']) +
     '" data-ui-schema-secondary-field="' +
     escapeHtmlAttr(value491['id']) +
-    '\x22\x20data-ui-schema-mode-field=\x22' +
+    '" data-ui-schema-mode-field="' +
     escapeHtmlAttr(voiceCompositeModeField) +
     '" data-ui-schema-default-mode-value="' +
     escapeHtmlAttr(voiceCompositeDefaultModeValue) +
-    '\x22\x20data-ui-schema-custom-mode-value=\x22' +
+    '" data-ui-schema-custom-mode-value="' +
     escapeHtmlAttr(voiceCompositeCustomModeValue) +
     '">\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="voiceQualityRatio">\n      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>\n      <span class="ui-schema-pill-label ui-schema-voice-quality-ratio-label">' +
     escapeHtmlAttr(value495) +
@@ -3134,10 +3134,10 @@ function renderDropdownControl(value506, value507, value508, value509 = {}) {
     value511 = value509?.['advanced'] ? ' ui-schema-advanced-dropdown' : '',
     value512 = String(value509?.['titleHtml'] || ''),
     value513 = value509?.['advanced']
-      ? '<svg\x20class=\x22ui-schema-dropdown-chevron\x22\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20aria-hidden=\x22true\x22><polyline\x20points=\x226\x209\x2012\x2015\x2018\x209\x22></polyline></svg>'
+      ? '<svg class="ui-schema-dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>'
       : '',
     fieldDisabled = resolveFieldDisabled(value506, value508)
-      ? '\x20disabled\x20aria-disabled=\x22true\x22\x20data-ui-schema-disabled=\x22true\x22'
+      ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
       : '';
   return (
     '<div class="ui-schema-pill-menu' +
@@ -3146,7 +3146,7 @@ function renderDropdownControl(value506, value507, value508, value509 = {}) {
     escapeHtmlAttr(value510) +
     '" aria-haspopup="listbox" aria-expanded="false"' +
     fieldDisabled +
-    '>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ui-schema-pill-label\x22>' +
+    '>\n      <span class="ui-schema-pill-label">' +
     escapeHtmlAttr(optionLabel4) +
     '</span>\n      ' +
     value513 +
@@ -3174,7 +3174,7 @@ function syncResolutionPillField(enabled41, value515) {
     return;
   }
   const value517 = enabled41['querySelector']('.rh-res-title')?.['textContent'] || 'Resolution';
-  if (value516) value516['textContent'] = value517 + '\x20' + value515;
+  if (value516) value516['textContent'] = value517 + ' ' + value515;
 }
 
 function formatRhAiAppFooterParamLabel(value518, value519) {
@@ -3238,12 +3238,12 @@ function renderRhAiAppFooterDirectNumberField({
     list62 = [];
   field?.['min'] !== undefined &&
     field?.['min'] !== null &&
-    list62['push']('\x20min=\x22' + escapeHtmlAttr(field['min']) + '\x22');
+    list62['push'](' min="' + escapeHtmlAttr(field['min']) + '"');
   field?.['max'] !== undefined &&
     field?.['max'] !== null &&
-    list62['push']('\x20max=\x22' + escapeHtmlAttr(field['max']) + '\x22');
+    list62['push'](' max="' + escapeHtmlAttr(field['max']) + '"');
   list62['push'](
-    '\x20step=\x22' + escapeHtmlAttr(field?.['step'] ?? (value532 === 'decimal' ? 'any' : 0x1)) + '\x22',
+    ' step="' + escapeHtmlAttr(field?.['step'] ?? (value532 === 'decimal' ? 'any' : 1)) + '"',
   );
   const fieldDisabled2 = resolveFieldDisabled(field, nodeData11)
     ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
@@ -3251,28 +3251,28 @@ function renderRhAiAppFooterDirectNumberField({
   return (
     '<div class="ui-schema-field ui-schema-rh-aiapp-footer-param ui-schema-rh-aiapp-footer-param--input" data-ui-schema-field="' +
     escapeHtmlAttr(id2) +
-    '\x22\x20data-ui-schema-type=\x22' +
+    '" data-ui-schema-type="' +
     escapeHtmlAttr(type) +
     '" data-ui-schema-default="' +
     escapeHtmlAttr(defaultValue) +
-    '\x22\x20data-ui-schema-footer-label=\x22' +
+    '" data-ui-schema-footer-label="' +
     escapeHtmlAttr(label8) +
-    '\x22' +
+    '"' +
     valueTypeAttr +
     renderStepperAttrs(field, type) +
-    '>\x0a\x20\x20\x20\x20<label\x20class=\x22ui-schema-rh-aiapp-footer-inline\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ui-schema-rh-aiapp-footer-inline-label\x22\x20data-tooltip=\x22' +
+    '>\n    <label class="ui-schema-rh-aiapp-footer-inline">\n      <span class="ui-schema-rh-aiapp-footer-inline-label" data-tooltip="' +
     escapeHtmlAttr(label8) +
-    '\x22>' +
+    '">' +
     escapeHtmlAttr(label8) +
     '</span>\n      <span class="ui-schema-rh-aiapp-footer-inline-separator">·</span>\n      <input class="ui-schema-rh-aiapp-footer-input" data-ui-schema-input="' +
     escapeHtmlAttr(id2) +
-    '\x22\x20type=\x22number\x22\x20inputmode=\x22' +
+    '" type="number" inputmode="' +
     escapeHtmlAttr(value532) +
     '" value="' +
     escapeHtmlAttr(value530) +
     '" aria-label="' +
     escapeHtmlAttr(label8) +
-    '\x22' +
+    '"' +
     list62['join']('') +
     fieldDisabled2 +
     '>\n    </label>\n  </div>'
@@ -3301,15 +3301,15 @@ function renderRhAiAppFooterToggleField({
     escapeHtmlAttr(type2) +
     '" data-ui-schema-default="' +
     escapeHtmlAttr(defaultValue2) +
-    '\x22\x20data-ui-schema-footer-label=\x22' +
+    '" data-ui-schema-footer-label="' +
     escapeHtmlAttr(label9) +
-    '\x22' +
+    '"' +
     valueTypeAttr2 +
     '>\n    <button type="button" class="img-pill-btn ui-schema-rh-aiapp-footer-toggle" data-ui-schema-rh-aiapp-footer-toggle="true" data-ui-schema-value="' +
     escapeHtmlAttr(isRhAiAppFooterToggleOn3 ? 'false' : 'true') +
-    '\x22\x20aria-pressed=\x22' +
+    '" aria-pressed="' +
     escapeHtmlAttr(isRhAiAppFooterToggleOn3) +
-    '\x22' +
+    '"' +
     fieldDisabled3 +
     '>\n      <span class="ui-schema-pill-label">' +
     escapeHtmlAttr(label9) +
@@ -3374,10 +3374,10 @@ function renderRhAiAppFooterParamField(value534, value535) {
     escapeHtmlAttr(value537) +
     '" data-ui-schema-footer-label="' +
     escapeHtmlAttr(manifestText28) +
-    '\x22' +
+    '"' +
     value538 +
     renderStepperAttrs(value534, controlType6) +
-    '>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22img-pill-btn\x20ui-schema-menu-trigger\x22\x20data-ui-schema-menu-trigger=\x22' +
+    '>\n    <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
     escapeHtmlAttr(value536) +
     '">\n      <span class="ui-schema-pill-label">' +
     escapeHtmlAttr(value540) +
@@ -3402,7 +3402,7 @@ export function hasVisibleModelUiSchema(value542, value543 = {}, value544 = {}) 
   const list63 = getUiSchemaFields(value542, value544);
   return (
     list63['forEach'](assertSupportedField),
-    filterVisibleUiSchemaFields(list63, value543)['length'] > 0x0
+    filterVisibleUiSchemaFields(list63, value543)['length'] > 0
   );
 }
 

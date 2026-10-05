@@ -6,8 +6,8 @@ export function addReplicationAssetFrameContract(value, enabled) {
     value['requirements']['push'](
       '每个场景、道具必须返回 sourceFrame：episodeId 为 sourceVideos 中的视频 id，eventId 为实际展示该素材的事件 id，timeSec 为该事件范围内的原片绝对秒数。选择描述中素材清晰可见的时刻，不能用对白提及代替画面出场；无法确定时返回 null，不得猜造时间或裁剪坐标。此时间用于截取原片作为替换前对比，不是生成的新图。',
     ));
-  if (value['outputSchema']?.['assets']?.[0x0])
-    value['outputSchema']['assets'][0x0]['sourceFrame'] = {
+  if (value['outputSchema']?.['assets']?.[0])
+    value['outputSchema']['assets'][0]['sourceFrame'] = {
       episodeId: '来源视频 id',
       eventId: '出场事件 id',
       timeSec: '代表画面的绝对秒数；无法确定返回 null',
@@ -29,7 +29,7 @@ export function addReplicationAssetFrameSchema(item, enabled2) {
           properties: {
             episodeId: { type: 'string' },
             eventId: { type: 'string' },
-            timeSec: { type: 'number', minimum: 0x0 },
+            timeSec: { type: 'number', minimum: 0 },
           },
         },
       ],
@@ -45,7 +45,7 @@ export function attachReplicationAssetFrames(index, result, enabled3) {
     const list = (strictJson['assets'] || [])['filter'](
         (data) => data['ref'] === name['ref'] && data['kind'] === name['kind'],
       ),
-      options = list['length'] === 0x1 ? list[0x0]['sourceFrame'] : undefined;
+      options = list['length'] === 1 ? list[0]['sourceFrame'] : undefined;
     if (options === undefined) throw new Error('场景或道具缺少原片代表画面信息，请重新提取素材。');
     if (options === null) {
       name['replicationSource'] = {
@@ -66,7 +66,7 @@ export function attachReplicationAssetFrames(index, result, enabled3) {
       !Number['isFinite'](representativeTimeSec) ||
       representativeTimeSec < eventId['startSec'] ||
       representativeTimeSec >= eventId['endSec'] ||
-      (episodeId['durationSec'] > 0x0 && representativeTimeSec >= episodeId['durationSec']) ||
+      (episodeId['durationSec'] > 0 && representativeTimeSec >= episodeId['durationSec']) ||
       !name['sourceChapterIds']['includes'](episodeId['episodeId'])
     )
       throw new Error('场景或道具的原片代表时间不属于其来源视频或出场片段，请重新提取素材。');

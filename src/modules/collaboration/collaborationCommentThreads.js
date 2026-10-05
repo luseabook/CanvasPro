@@ -68,7 +68,7 @@ export function renderCommentThreads({
       );
       (el5['addEventListener']('click', () => resolve(enabled, el5)), reviewElement4['append'](el5));
     }
-    (el['insertBefore'](reviewElement4, el['children'][0x1] || null), list['append'](el));
+    (el['insertBefore'](reviewElement4, el['children'][1] || null), list['append'](el));
   }
   if (!comments['length'])
     list['append'](reviewElement('p', 'collaboration-subtle', '还没有评论，写下你的建议吧'));

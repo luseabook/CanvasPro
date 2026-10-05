@@ -54,7 +54,7 @@ export function zoomOut(config = 0.1) {
   const _getCurrentViewportRect3 = _getCurrentViewportRect();
   zoomBy(_getCurrentViewportRect3.centerX, _getCurrentViewportRect3.centerY, -config);
 }
-export function fitToCanvas(padding2 = 120, scope = 0x320) {
+export function fitToCanvas(padding2 = 120, scope = 800) {
   const { nodes: nodes2, viewport: viewport3 } = _getStateSnapshot(),
     nodeIds2 = Object.keys(nodes2 || {});
   if (nodeIds2.length === 0) {
@@ -70,7 +70,7 @@ export function fitToCanvas(padding2 = 120, scope = 0x320) {
   if (!box) return;
   animateViewport(viewport3.x, viewport3.y, viewport3.zoom, box.x, box.y, box.zoom, scope);
 }
-export function focusOnNode(input, padding3 = 120, output = 0x320, value2) {
+export function focusOnNode(input, padding3 = 120, output = 800, value2) {
   const { nodes: nodes3, viewport: viewport4 } = _getStateSnapshot(),
     box2 = _resolveFocusTarget({
       nodes: nodes3,
@@ -89,7 +89,7 @@ export function focusOnNode(input, padding3 = 120, output = 0x320, value2) {
   }
   animateViewport(viewport4.x, viewport4.y, viewport4.zoom, box2.x, box2.y, box2.zoom, output);
 }
-export function focusOnNodeAtZoom(value3, value4 = 60, value5 = 0x320) {
+export function focusOnNodeAtZoom(value3, value4 = 60, value5 = 800) {
   const { nodes: nodes4, viewport: viewport5 } = _getStateSnapshot(),
     box3 = _resolveFocusTarget({
       nodes: nodes4,
@@ -100,7 +100,7 @@ export function focusOnNodeAtZoom(value3, value4 = 60, value5 = 0x320) {
   if (!box3) return;
   animateViewport(viewport5.x, viewport5.y, viewport5.zoom, box3.x, box3.y, box3.zoom, value5);
 }
-export function animateViewport(value6, value7, value8, value9, value10, value11, value12 = 0x320) {
+export function animateViewport(value6, value7, value8, value9, value10, value11, value12 = 800) {
   if (_isAnimating) return;
   _isAnimating = true;
   const value13 = performance.now(),

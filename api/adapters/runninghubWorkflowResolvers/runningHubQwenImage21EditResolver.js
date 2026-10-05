@@ -1,6 +1,6 @@
 const DEFAULT_IMAGE_SIZE = '1K',
   DEFAULT_ASPECT_RATIO = '1:1',
-  DEFAULT_LONG_SIDE_BY_IMAGE_SIZE = Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 });
+  DEFAULT_LONG_SIDE_BY_IMAGE_SIZE = Object['freeze']({ '1K': 1024, '1.5K': 1536, '2K': 1920 });
 function getPlainObject(value) {
   return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
@@ -40,12 +40,12 @@ function parseAspectRatio(record, payload) {
     [state, config] = handle['split'](':'),
     widthRatio = Number(state),
     heightRatio = Number(config);
-  if (widthRatio > 0x0 && heightRatio > 0x0) return { widthRatio: widthRatio, heightRatio: heightRatio };
+  if (widthRatio > 0 && heightRatio > 0) return { widthRatio: widthRatio, heightRatio: heightRatio };
   if (handle !== payload) return parseAspectRatio(payload, DEFAULT_ASPECT_RATIO);
-  return { widthRatio: 0x1, heightRatio: 0x1 };
+  return { widthRatio: 1, heightRatio: 1 };
 }
 function roundDimension(scope, input, output) {
-  return Math['max'](output, Math['round'](Number(scope || 0x0) / input) * input);
+  return Math['max'](output, Math['round'](Number(scope || 0) / input) * input);
 }
 export function resolveRunningHubQwenImage21Dimensions(options2 = {}, value2 = {}) {
   const plainObject2 = getPlainObject(value2['dimensionsNode']),
@@ -63,8 +63,8 @@ export function resolveRunningHubQwenImage21Dimensions(options2 = {}, value2 = {
       resolveAspectRatio(options2, plainObject2),
       value5,
     ),
-    value6 = Math['max'](0x1, Number(plainObject2['align']) || 0x20),
-    value7 = Math['max'](value6, Number(plainObject2['minDimension']) || 0x200),
+    value6 = Math['max'](1, Number(plainObject2['align']) || 32),
+    value7 = Math['max'](value6, Number(plainObject2['minDimension']) || 512),
     value8 = widthRatio2 >= heightRatio2,
     value9 = value8 ? value4 : (value4 * widthRatio2) / heightRatio2,
     value10 = value8 ? (value4 * heightRatio2) / widthRatio2 : value4;
@@ -85,8 +85,8 @@ export async function resolveRunningHubQwenImage21EditPayload({
     list = (Array['isArray'](finalUrls) ? finalUrls : [])
       ['map']((value11) => String(value11 || '')['trim']())
       ['filter'](Boolean),
-    value12 = Math['max'](0x0, Number(plainObject4['maxInputImages']) || 0x0);
-  if (list['length'] > value12) throw new Error('Qwen Image 2.1 最多支持 ' + value12 + '\x20张参考图');
+    value12 = Math['max'](0, Number(plainObject4['maxInputImages']) || 0);
+  if (list['length'] > value12) throw new Error('Qwen Image 2.1 最多支持 ' + value12 + ' 张参考图');
   const list2 = Array['isArray'](plainObject4['imageLoaderNodes']) ? plainObject4['imageLoaderNodes'] : [],
     list3 = Array['isArray'](plainObject4['conditioningImageNodes'])
       ? plainObject4['conditioningImageNodes']
@@ -97,7 +97,7 @@ export async function resolveRunningHubQwenImage21EditPayload({
   list['forEach']((value13, value14) => {
     helpers['pushManifestNode'](nodeInfoList, list2[value14], value13);
   });
-  for (let value15 = list['length']; value15 < value12; value15 += 0x1) {
+  for (let value15 = list['length']; value15 < value12; value15 += 1) {
     helpers['pushManifestNode'](nodeInfoList, list3[value15], null);
   }
   const value16 = String(finalPrompt || '')['replace'](/@(?:图片|图像)(\d+)/gu, '<image$1>');
@@ -117,7 +117,7 @@ export async function resolveRunningHubQwenImage21EditPayload({
         ![],
       ),
     ));
-  const enabled = list['length'] > 0x0;
+  const enabled = list['length'] > 0;
   return (
     helpers['pushManifestNode'](nodeInfoList, plainObject4['hasImageNode'], enabled),
     helpers['pushManifestNode'](nodeInfoList, plainObject4['latentSwitchNode'], !enabled),

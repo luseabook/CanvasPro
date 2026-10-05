@@ -5,7 +5,7 @@ export const STORYBOARD_SCRIPT_DEFAULT_VIEW_MODE = 'list';
 export const STORYBOARD_SCRIPT_DEFAULT_MEDIA_MODE = 'image';
 export const STORYBOARD_SCRIPT_TEXT_PROVIDER = 'volcengine';
 export const STORYBOARD_SCRIPT_TEXT_MODEL = 'volcengine/doubao-seed-2-0-pro-260215';
-export const STORYBOARD_SCRIPT_DEFAULT_SIZE = Object.freeze({ width: 0x400, height: 0x240 });
+export const STORYBOARD_SCRIPT_DEFAULT_SIZE = Object.freeze({ width: 1024, height: 576 });
 function storyboardScriptText(value, item = {}) {
   return t('storyboardScript.' + value, item);
 }
@@ -166,7 +166,7 @@ function parseClockDurationSeconds(value4) {
   const list4 = list3.map((item3) => Number(item3));
   if (list4.some((count3) => !Number.isFinite(count3) || count3 < 0)) return null;
   if (list4.length === 2) return list4[0] * 60 + list4[1];
-  return list4[0] * 0xe10 + list4[1] * 60 + list4[2];
+  return list4[0] * 3600 + list4[1] * 60 + list4[2];
 }
 function parseDurationSeconds(value5) {
   const finiteNumber = normalizeFiniteNumber(value5);

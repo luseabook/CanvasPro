@@ -25,7 +25,7 @@ const SAMPLE_RATE = audioSelect('sampleRate', '采样率', ['16000', '24000', '3
   DICTIONARY = audioTextarea(
     'pronunciationDict',
     '发音词典',
-    '每行一条，最多\x2020\x20条。例如：ASAP/As\x20soon\x20as\x20possible',
+    '每行一条，最多 20 条。例如：ASAP/As soon as possible',
   );
 export const runningHubMinimaxAudioEntries = Object['freeze']([
   ...[
@@ -37,10 +37,10 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     createRunningHubAudioCatalogEntry({
       id: 'minimax/speech-' + value,
       name:
-        'MiniMax 语音 ' + value['replace']('-', '\x20')['replace']('hd', 'HD')['replace']('turbo', 'Turbo'),
+        'MiniMax 语音 ' + value['replace']('-', ' ')['replace']('hd', 'HD')['replace']('turbo', 'Turbo'),
       endpoint: '/openapi/v2/rhart-audio/text-to-audio/speech-' + value,
       docId: docId,
-      order: 0xdc + item,
+      order: 220 + item,
       fields: [
         MINIMAX_VOICE_ID_FIELD,
         CUSTOM_VOICE,
@@ -60,7 +60,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
         ]),
       rules: {
         voiceOverride: { target: 'voice_id', custom: 'customVoiceId' },
-        maxLines: { pronunciationDict: 0x14 },
+        maxLines: { pronunciationDict: 20 },
       },
     }),
   ),
@@ -69,9 +69,9 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     name: 'MiniMax Music 2.5',
     endpoint: '/openapi/v2/rhart-audio/text-to-audio/music-2.5',
     docId: 0x1ab6bbe8,
-    order: 0xe6,
+    order: 230,
     promptField: 'lyrics',
-    promptPlaceholder: '输入歌词，支持\x20[Verse]、[Chorus]\x20等段落标记',
+    promptPlaceholder: '输入歌词，支持 [Verse]、[Chorus] 等段落标记',
     fields: [
       audioTextarea('stylePrompt', '音乐风格', '描述曲风、情绪、乐器和演唱方式。', {
         defaultValue: '流行，温暖，钢琴伴奏',
@@ -87,14 +87,14 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     name: 'MiniMax 声音克隆',
     endpoint: '/openapi/v2/rhart-audio/text-to-audio/voice-clone',
     docId: 0x1ab6bbea,
-    order: 0xe7,
+    order: 231,
     promptPlaceholder: '输入克隆后的试听文本',
     slots: [audioSlot('referenceVoice', '参考音色', !![])],
     fields: [
       audioText(
         'customVoiceId',
-        '新音色\x20ID',
-        '至少\x208\x20字符，以字母开头，包含字母和数字；每次创建须使用不同\x20ID。例如\x20RH-20260907-01。',
+        '新音色 ID',
+        '至少 8 字符，以字母开头，包含字母和数字；每次创建须使用不同 ID。例如 RH-20260907-01。',
       ),
       audioSelect(
         'previewModel',
@@ -111,7 +111,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
         ],
         'speech-02-hd',
       ),
-      audioSlider('accuracy', '克隆精度', 0x0, 0x1, 0.7, 0.1),
+      audioSlider('accuracy', '克隆精度', 0, 1, 0.7, 0.1),
       audioToggle('noiseReduction', '降噪'),
       audioToggle('volumeNormalization', '音量归一化'),
       audioSelect(
@@ -163,18 +163,18 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     name: 'MiniMax Music 翻唱',
     endpoint: '/openapi/v2/minimax/music-cover',
     docId: 0x1d7ef03e,
-    order: 0xe8,
+    order: 232,
     promptField: 'prompt',
-    promptMaxLength: 0x7d0,
+    promptMaxLength: 2000,
     promptPlaceholder: '描述翻唱后的音乐风格、情绪和配器',
     slots: [audioSlot('sourceAudio', '原曲（6秒–6分钟）', !![])],
     fields: [
-      audioTextarea('lyrics', '歌词', '可选，10–1000\x20字符；留空自动从原曲提取。', { maxLength: 0x3e8 }),
+      audioTextarea('lyrics', '歌词', '可选，10–1000 字符；留空自动从原曲提取。', { maxLength: 1000 }),
       audioToggle('preprocess', '先提取原曲特征', ![], {
         description: '先提取音频特征和歌词，再生成翻唱；会额外调用翻唱前处理接口。',
         showInfoTip: !![],
       }),
-      audioText('coverFeatureId', '已有翻唱特征\x20ID', '可复用 24 小时内的前处理结果；填写后必须提供歌词。'),
+      audioText('coverFeatureId', '已有翻唱特征 ID', '可复用 24 小时内的前处理结果；填写后必须提供歌词。'),
       SAMPLE_RATE,
       BITRATE,
       audioSelect('format', '音频格式', ['mp3', 'wav'], 'mp3'),
@@ -189,8 +189,8 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     ],
     rules: {
       audioExtensions: ['mp3', 'wav', 'flac'],
-      audioDuration: { min: 0x6, max: 0x168 },
-      minLengths: { lyrics: 0xa },
+      audioDuration: { min: 6, max: 360 },
+      minLengths: { lyrics: 10 },
       dependencies: [{ field: 'coverFeatureId', requires: 'lyrics' }],
     },
     preparations: [

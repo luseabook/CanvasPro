@@ -115,7 +115,7 @@ class El {
 }
 globalThis.document = {
   createElement: (tag) => new El(tag),
-  createTextNode: (text) => ({ nodeType: 0x3, textContent: String(text) }),
+  createTextNode: (text) => ({ nodeType: 3, textContent: String(text) }),
 };
 
 const {
@@ -171,7 +171,7 @@ const taskResult = (taskId, nodeId, status) => ({
 });
 
 test('导出面：常量 12、formatAgentAssistantMarkdown 为同一引用、工厂返回冻结的 10 键对象', () => {
-  assert.equal(AGENT_CONVERSATION_INPUT_REF_LIMIT, 0xc);
+  assert.equal(AGENT_CONVERSATION_INPUT_REF_LIMIT, 12);
   assert.equal(reexportedMarkdownFormatter, formatAgentAssistantMarkdown);
   const api = make();
   assert.equal(Object.isFrozen(api), true);
@@ -208,9 +208,9 @@ test('normalizeAgentRenderableMediaUrl：空串、http(s)、前导斜杠直通',
 });
 
 test('normalizeAgentRenderableMediaUrl：data:image 只在 50000 字符内直通，其余交给 localPathToUrl', () => {
-  const small = 'data:image/png;base64,' + 'A'.repeat(0x64);
+  const small = 'data:image/png;base64,' + 'A'.repeat(100);
   assert.equal(normalizeAgentRenderableMediaUrl(small), small);
-  const big = 'data:image/png;base64,' + 'A'.repeat(0xc351);
+  const big = 'data:image/png;base64,' + 'A'.repeat(50001);
   assert.notEqual(normalizeAgentRenderableMediaUrl(big), big);
   assert.equal(
     normalizeAgentRenderableMediaUrl('C:\\media\\a.png'),
@@ -333,7 +333,7 @@ test('onMessagesChanged：每次增删后带 hasMessages 上报', () => {
 
 test('输入引用：无 nodeId/id 的条目被丢弃、超过 12 条截断、role=list', () => {
   const api = make();
-  const refs = Array.from({ length: 0xf }, (_0, i) => ({ nodeId: 'n' + i, label: 'L' + i }));
+  const refs = Array.from({ length: 15 }, (_0, i) => ({ nodeId: 'n' + i, label: 'L' + i }));
   const el = api.appendMessage('user', 'a', { inputRefs: refs });
   const wrap = el.querySelector('.agent-message-input-refs');
   assert.equal(wrap.children.length, AGENT_CONVERSATION_INPUT_REF_LIMIT);
@@ -447,7 +447,7 @@ test('复制文本拼装：正文 + 节点名 + 逐张图片（多张时带序�
       media: { kind: 'image', items: [{ url: '/a.png' }, { url: '/b.png' }] },
     },
   });
-  const lines = el.agentMessageCopyText.split('\x0a');
+  const lines = el.agentMessageCopyText.split('\n');
   assert.equal(lines[0], '正文');
   assert.equal(
     lines[1],
@@ -465,7 +465,7 @@ test('复制文本拼装：正文 + 节点名 + 逐张图片（多张时带序�
   const single = api.appendMessage('user', '只一张', {
     task: { media: { kind: 'image', name: '命名', items: [{ url: '/c.png' }] } },
   });
-  const singleLines = single.agentMessageCopyText.split('\x0a');
+  const singleLines = single.agentMessageCopyText.split('\n');
   assert.equal(
     singleLines[2],
     agentPanelText('copyMessageImageLabel') + agentPanelText('copyMessageSeparator') + '/c.png',

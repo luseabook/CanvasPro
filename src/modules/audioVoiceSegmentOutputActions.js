@@ -39,7 +39,7 @@ export function resolveAudioVoiceSegmentOutput(options = {}, data = 'source') {
       kind3 ? options['convertedAudioUrl'] : options['sourceAudioUrl'],
       localPath,
     ),
-    target = Math['max'](0x0, (Number(options['endMs'] || 0x0) - Number(options['startMs'] || 0x0)) / 0x3e8),
+    target = Math['max'](0, (Number(options['endMs'] || 0) - Number(options['startMs'] || 0)) / 1000),
     audioDuration = kind3
       ? pickAudioDurationSec(options['convertedAudioDuration'], options['audioDuration'], target)
       : pickAudioDurationSec(target, options['sourceAudioDuration'], options['audioDuration']);
@@ -82,7 +82,7 @@ export async function saveAudioVoiceSegmentDownload({
       title: getText(text3, 'menu.download', {}, 'Download'),
     });
     if (result2?.['canceled']) return result2;
-    if (result2?.['success'] === ![]) throw new Error(result2['error'] || 'Audio\x20save\x20failed');
+    if (result2?.['success'] === ![]) throw new Error(result2['error'] || 'Audio save failed');
     return (
       showMediaSaveSuccessToast({ result: result2, kind: 'audio', showToast: showToast }),
       result2 || { success: !![], canceled: ![] }
@@ -160,7 +160,7 @@ export function addAudioVoiceSegmentAudioToCanvas({
       { success: !![], nodeId: id, node: node }
     );
   } catch (error2) {
-    const message2 = String(error2?.['message'] || error2 || 'Add\x20to\x20canvas\x20failed');
+    const message2 = String(error2?.['message'] || error2 || 'Add to canvas failed');
     return (
       showToast?.(
         getText(

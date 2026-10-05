@@ -33,7 +33,7 @@ function resolveDirectionClasses(index, entering = {}) {
 }
 export function createWorkspacePageTransitionController({
   windowObject: windowObject = globalThis,
-  fallbackMs: fallbackMs = 0x208,
+  fallbackMs: fallbackMs = 520,
   transitionProperty: transitionProperty = 'transform',
   disposePage: disposePage = (el4) => el4?.['remove']?.(),
   captureFocus: captureFocus = null,
@@ -172,8 +172,8 @@ export function createWorkspacePageTransitionController({
           focusContext: focusContext,
           committed: ![],
           settled: ![],
-          fallbackTimer: 0x0,
-          rafId: 0x0,
+          fallbackTimer: 0,
+          rafId: 0,
           onTransitionEnd: null,
           onBeforeCommit: onBeforeCommit,
           onAfterCommit: onAfterCommit,
@@ -220,8 +220,8 @@ export function createWorkspacePageTransitionController({
             () => {
               (handler(transition2), run(transition2, { commit: !![], notify: !![], reason: 'fallback' }));
             },
-            Math['max'](0x0, Number(fallbackMs) || 0x0),
-          ) || 0x0),
+            Math['max'](0, Number(fallbackMs) || 0),
+          ) || 0),
         {
           transition: transition2,
           committed: transition2['committedPromise'],

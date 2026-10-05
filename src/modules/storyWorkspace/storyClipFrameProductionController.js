@@ -55,8 +55,8 @@ export function createStoryClipFrameProductionController({
       { episode: episode, clip: clip } = getSelection();
     if (!wrapperEl || !videoEl || !episode || !clip) return (showToast('当前片段视频不可用。', 'warn'), ![]);
     const videoResultIndex = Math['max'](
-        0x0,
-        Math['trunc'](Number(el?.['dataset']?.['storyVideoResultIndex']) || 0x0),
+        0,
+        Math['trunc'](Number(el?.['dataset']?.['storyVideoResultIndex']) || 0),
       ),
       sourceData = Array['isArray'](clip?.['video']?.['results'])
         ? clip['video']['results'][videoResultIndex] || {}
@@ -94,9 +94,9 @@ export function createStoryClipFrameProductionController({
       sourceLocalPath: sourceLocalPath,
       sourceData: sourceData,
       posterUrl: posterUrl,
-      durationSec: Number(videoEl['duration']) || Number(sourceData['videoDuration']) || 0x0,
-      videoWidth: Number(videoEl['videoWidth']) || Number(sourceData['videoWidth']) || 0x0,
-      videoHeight: Number(videoEl['videoHeight']) || Number(sourceData['videoHeight']) || 0x0,
+      durationSec: Number(videoEl['duration']) || Number(sourceData['videoDuration']) || 0,
+      videoWidth: Number(videoEl['videoWidth']) || Number(sourceData['videoWidth']) || 0,
+      videoHeight: Number(videoEl['videoHeight']) || Number(sourceData['videoHeight']) || 0,
       dimMode: ![],
       onConfirm: ({
         startSec: startSec,
@@ -122,12 +122,12 @@ export function createStoryClipFrameProductionController({
               Number(result2?.['width']) ||
               Number(sourceData['videoWidth']) ||
               Number(videoEl['videoWidth']) ||
-              0x0,
+              0,
             videoHeight:
               Number(result2?.['height']) ||
               Number(sourceData['videoHeight']) ||
               Number(videoEl['videoHeight']) ||
-              0x0,
+              0,
           },
           episode: episode2,
           clip: clip2,
@@ -191,15 +191,15 @@ export function createStoryClipFrameProductionController({
       { episode: episode3, clip: clip3 } = getSelection();
     if (!videoEl2 || !episode3 || !clip3) return (showToast('当前片段视频不可用。', 'warn'), ![]);
     const videoResultIndex2 = Math['max'](
-        0x0,
-        Math['trunc'](Number(el3?.['dataset']?.['storyVideoResultIndex']) || 0x0),
+        0,
+        Math['trunc'](Number(el3?.['dataset']?.['storyVideoResultIndex']) || 0),
       ),
-      currentTimeSec = Math['max'](0x0, Number(videoEl2['currentTime']) || 0x0),
+      currentTimeSec = Math['max'](0, Number(videoEl2['currentTime']) || 0),
       current = [
         normalizeText(state['data']?.['project']?.['id']),
         normalizeText(clip3['id']),
         videoResultIndex2,
-        Math['round'](currentTimeSec * 0x3e8),
+        Math['round'](currentTimeSec * 1000),
       ]['join'](':');
     if (map['has'](current)) return ![];
     (map['add'](current), (el3['disabled'] = !![]), syncStoryAsyncButton(el3, !![], { spinnerOnly: !![] }));
@@ -351,7 +351,7 @@ export function createStoryClipFrameProductionController({
       );
     } catch (error2) {
       return (
-        console['warn']('[storyWorkspace]\x20capture\x20clip\x20frame\x20failed', error2),
+        console['warn']('[storyWorkspace] capture clip frame failed', error2),
         showToast(error2?.['message'] || '截取当前帧失败，请重试。', 'error'),
         ![]
       );

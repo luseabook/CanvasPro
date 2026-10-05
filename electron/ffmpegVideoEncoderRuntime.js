@@ -10,7 +10,7 @@ const SOFTWARE_H264_ENCODER_PROFILE = Object.freeze({ id: 'software', codec: 'li
     ]),
   }),
   SOFTWARE_ONLY_VIDEO_OPTIONS = new Set(['-crf', '-pix_fmt', '-preset', '-profile:v']),
-  DEFAULT_PROBE_TIMEOUT_MS = 0x3a98;
+  DEFAULT_PROBE_TIMEOUT_MS = 15000;
 function clampInteger(value, min, max, fallback) {
   const rounded = Math.round(Number(value));
   if (!Number.isFinite(rounded)) return fallback;
@@ -23,11 +23,11 @@ function normalizeSoftwarePreset(preset) {
   return normalized || 'fast';
 }
 function normalizeCrf(crf) {
-  return clampInteger(crf, 0x0, 0x33, 0x17);
+  return clampInteger(crf, 0, 0x33, 23);
 }
 function readOptionValue(args, flag, fallback = '') {
-  for (let index = args.length - 0x2; index >= 0x0; index -= 0x1) {
-    if (args[index] === flag) return String(args[index + 0x1] ?? fallback);
+  for (let index = args.length - 2; index >= 0; index -= 1) {
+    if (args[index] === flag) return String(args[index + 1] ?? fallback);
   }
   return fallback;
 }
@@ -62,11 +62,11 @@ function mapQsvPreset(preset) {
   return 'fast';
 }
 function mapVideoToolboxQuality(crf) {
-  return clampInteger(0x64 - normalizeCrf(crf) * 1.5, 0x1, 0x64, 0x41);
+  return clampInteger(100 - normalizeCrf(crf) * 1.5, 1, 100, 65);
 }
 export function buildHardwareH264EncoderArgs(
   profile,
-  { softwarePreset: softwarePreset = 'fast', crf: crf = 0x17 } = {},
+  { softwarePreset: softwarePreset = 'fast', crf: crf = 23 } = {},
 ) {
   const codec = String(profile?.codec || ''),
     normalizedCrf = normalizeCrf(crf);
@@ -140,7 +140,7 @@ export function buildHardwareH264EncoderArgs(
 }
 export function usesSoftwareH264Encoder(args = []) {
   return args.some(
-    (value, index) => value === '-c:v' && args[index + 0x1] === SOFTWARE_H264_ENCODER_PROFILE.codec,
+    (value, index) => value === '-c:v' && args[index + 1] === SOFTWARE_H264_ENCODER_PROFILE.codec,
   );
 }
 export function applyHardwareH264EncoderProfile(args = [], profile = {}) {
@@ -150,14 +150,14 @@ export function applyHardwareH264EncoderProfile(args = [], profile = {}) {
     crf = readOptionValue(source, '-crf', '23'),
     hardwareArgs = buildHardwareH264EncoderArgs(profile, { softwarePreset: softwarePreset, crf: crf }),
     output = [];
-  for (let index = 0x0; index < source.length; index += 0x1) {
+  for (let index = 0; index < source.length; index += 1) {
     const value = source[index];
-    if (value === '-c:v' && source[index + 0x1] === SOFTWARE_H264_ENCODER_PROFILE.codec) {
-      (output.push(...hardwareArgs), (index += 0x1));
+    if (value === '-c:v' && source[index + 1] === SOFTWARE_H264_ENCODER_PROFILE.codec) {
+      (output.push(...hardwareArgs), (index += 1));
       continue;
     }
     if (SOFTWARE_ONLY_VIDEO_OPTIONS.has(value)) {
-      index += 0x1;
+      index += 1;
       continue;
     }
     output.push(value);
@@ -175,7 +175,7 @@ function buildEncoderProbeArgs(profile) {
     'color=c=black:s=256x256:r=1',
     '-frames:v',
     '1',
-    ...buildHardwareH264EncoderArgs(profile, { softwarePreset: 'fast', crf: 0x17 }),
+    ...buildHardwareH264EncoderArgs(profile, { softwarePreset: 'fast', crf: 23 }),
     '-f',
     'null',
     '-',
@@ -279,7 +279,7 @@ export function createFfmpegVideoEncoderRuntime({
           ),
           queue.emitProgress?.(
             task,
-            task?.progress || 0x0,
+            task?.progress || 0,
             'Hardware encoder unavailable; retrying with CPU',
           ),
           queue.throwIfCancelled?.(task),

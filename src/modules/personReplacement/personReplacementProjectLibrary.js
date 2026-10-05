@@ -1,4 +1,4 @@
-export const PERSON_REPLACEMENT_LIBRARY_SCHEMA_VERSION = 0x2;
+export const PERSON_REPLACEMENT_LIBRARY_SCHEMA_VERSION = 2;
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
@@ -19,7 +19,7 @@ function getProjectId(key) {
 function getProjectUpdatedTime(index) {
   const result = index?.['updatedAt'] || index?.['project']?.['updatedAt'],
     data = Date['parse'](result || '');
-  return Number['isFinite'](data) ? data : 0x0;
+  return Number['isFinite'](data) ? data : 0;
 }
 function normalizeProjectEntry(enabled3) {
   if (!enabled3 || typeof enabled3 !== 'object' || Array['isArray'](enabled3)) return null;
@@ -51,7 +51,7 @@ export function normalizePersonReplacementProjectLibrary(options2 = {}) {
     ),
     currentProjectId = projects['some']((current) => current['id'] === text)
       ? text
-      : projects[0x0]?.['id'] || '';
+      : projects[0]?.['id'] || '';
   return {
     schemaVersion: PERSON_REPLACEMENT_LIBRARY_SCHEMA_VERSION,
     currentProjectId: currentProjectId,
@@ -79,7 +79,7 @@ export function removePersonReplacementProject(config, scope) {
     ...currentProjectId3,
     currentProjectId:
       currentProjectId3['currentProjectId'] === text2
-        ? projects2[0x0]?.['id'] || ''
+        ? projects2[0]?.['id'] || ''
         : currentProjectId3['currentProjectId'],
     projects: projects2,
   };

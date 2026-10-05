@@ -6,7 +6,7 @@ export async function captureDirectorShotFrame({
   project: project,
   sceneId: sceneId,
   shotId: shotId,
-  time: time = 0x0,
+  time: time = 0,
   width: width,
   height: height,
   importedModelResolver: importedModelResolver,
@@ -72,8 +72,8 @@ export async function renderStoryboard3DShotFrame({
     (sceneId3['activeShotId'] = enabled['id']),
     (enabled['camera'] = structuredClone(shot['camera'])),
     runtime['resize'](
-      Math['max'](0x40, Number(width2) || 0x780),
-      Math['max'](0x40, Number(height2) || 0x438),
+      Math['max'](64, Number(width2) || 1920),
+      Math['max'](64, Number(height2) || 1080),
     ),
     runtime['sync']({
       project: project3,
@@ -113,8 +113,8 @@ export async function renderStoryboard3DShotFrame({
       });
       const box2 = getHost()?.['getBoundingClientRect']?.();
       (runtime['resize'](
-        Math['max'](0x1, Math['round'](box2?.['width'] || 0x1)),
-        Math['max'](0x1, Math['round'](box2?.['height'] || 0x1)),
+        Math['max'](1, Math['round'](box2?.['width'] || 1)),
+        Math['max'](1, Math['round'](box2?.['height'] || 1)),
       ),
         runtime['renderNow']());
     }

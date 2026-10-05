@@ -15,7 +15,7 @@ function writeJsonFileSyncSafe(item, key) {
 }
 function normalizeDeviceIdentityValue(index) {
   const list = String(index || '').trim();
-  if (!list || list.length > 0x100) return '';
+  if (!list || list.length > 256) return '';
   return /^[A-Za-z0-9._:-]+$/.test(list) ? list : '';
 }
 function readDeviceIdFromFile(result) {

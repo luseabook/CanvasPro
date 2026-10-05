@@ -1,7 +1,7 @@
 import { getWorkspaceProjectTaskPresentation } from '../workspaceProjectHome.js';
 const ACTIVE_STATUSES = new Set(['queued', 'submitting', 'pending', 'running', 'recovering']),
   TERMINAL_STATUSES = new Set(['succeeded', 'failed', 'cancelled', 'interrupted']),
-  MAX_PERSISTED_TASKS = 0x3c;
+  MAX_PERSISTED_TASKS = 60;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -39,10 +39,10 @@ function normalizeBatch(next) {
   const id = normalizeText(args['id']),
     type = normalizeText(args['type']);
   if (!id || !type) return null;
-  const total = Math['max'](0x0, Math['trunc'](Number(args['total']) || 0x0)),
+  const total = Math['max'](0, Math['trunc'](Number(args['total']) || 0)),
     completed = Math['max'](
-      0x0,
-      Math['min'](total || Number['MAX_SAFE_INTEGER'], Math['trunc'](Number(args['completed']) || 0x0)),
+      0,
+      Math['min'](total || Number['MAX_SAFE_INTEGER'], Math['trunc'](Number(args['completed']) || 0)),
     );
   return {
     ...args,
@@ -63,9 +63,9 @@ function countLogicalTasks(list = []) {
 function pruneTasks(list2 = []) {
   const args2 = list2['filter']((response) => ACTIVE_STATUSES['has'](response['status'])),
     list3 = list2['filter']((response2) => !ACTIVE_STATUSES['has'](response2['status']))['sort'](
-      (entry, record) => Number(record['updatedAt'] || 0x0) - Number(entry['updatedAt'] || 0x0),
+      (entry, record) => Number(record['updatedAt'] || 0) - Number(entry['updatedAt'] || 0),
     );
-  return [...args2, ...list3['slice'](0x0, MAX_PERSISTED_TASKS)];
+  return [...args2, ...list3['slice'](0, MAX_PERSISTED_TASKS)];
 }
 export function buildStoryBackgroundTaskId(payload, handle = {}) {
   const text2 = normalizeText(payload) || 'task',
@@ -82,11 +82,11 @@ export function normalizeStoryBackgroundTask(options3 = {}) {
     scope2 = normalizeScope(resumable['scope']),
     id2 = normalizeText(resumable['id']) || buildStoryBackgroundTaskId(type2, scope2),
     status2 = normalizeStatus(resumable['status']),
-    startedAt = Math['max'](0x0, Number(resumable['startedAt'] || 0x0)) || Date['now'](),
-    updatedAt = Math['max'](startedAt, Number(resumable['updatedAt'] || 0x0) || startedAt),
+    startedAt = Math['max'](0, Number(resumable['startedAt'] || 0)) || Date['now'](),
+    updatedAt = Math['max'](startedAt, Number(resumable['updatedAt'] || 0) || startedAt),
     finishedAt = TERMINAL_STATUSES['has'](status2)
-      ? Math['max'](updatedAt, Number(resumable['finishedAt'] || 0x0) || updatedAt)
-      : 0x0;
+      ? Math['max'](updatedAt, Number(resumable['finishedAt'] || 0) || updatedAt)
+      : 0;
   return {
     id: id2,
     type: type2,
@@ -130,9 +130,9 @@ export function startStoryBackgroundTask(options6 = {}, response3 = {}) {
     storyBackgroundTask = normalizeStoryBackgroundTask({
       ...response3,
       status: normalizeStatus(response3['status'], 'running'),
-      startedAt: Number(response3['startedAt'] || 0x0) || updatedAt2,
+      startedAt: Number(response3['startedAt'] || 0) || updatedAt2,
       updatedAt: updatedAt2,
-      finishedAt: 0x0,
+      finishedAt: 0,
       error: '',
     }),
     args3 = getStoryBackgroundTasks(options6)['filter'](
@@ -145,7 +145,7 @@ export function updateStoryBackgroundTask(options7 = {}, value6 = '', response4 
   if (!id3) return null;
   const list4 = getStoryBackgroundTasks(options7),
     count = list4['findIndex']((value7) => value7['id'] === id3);
-  if (count < 0x0) return null;
+  if (count < 0) return null;
   const response5 = list4[count],
     status3 = response4['status']
       ? normalizeStatus(response4['status'], response5['status'])
@@ -154,15 +154,15 @@ export function updateStoryBackgroundTask(options7 = {}, value6 = '', response4 
     startedAt3 = TERMINAL_STATUSES['has'](response5['status']) && ACTIVE_STATUSES['has'](status3),
     storyBackgroundTask2 = normalizeStoryBackgroundTask({
       ...response5,
-      ...(startedAt3 ? { batch: null, error: '', startedAt: startedAt2, finishedAt: 0x0 } : {}),
+      ...(startedAt3 ? { batch: null, error: '', startedAt: startedAt2, finishedAt: 0 } : {}),
       ...response4,
       id: id3,
       status: status3,
-      startedAt: startedAt3 ? Number(response4['startedAt'] || 0x0) || startedAt2 : response5['startedAt'],
+      startedAt: startedAt3 ? Number(response4['startedAt'] || 0) || startedAt2 : response5['startedAt'],
       updatedAt: startedAt2,
       finishedAt: TERMINAL_STATUSES['has'](status3)
-        ? Number(response4['finishedAt'] || 0x0) || startedAt2
-        : 0x0,
+        ? Number(response4['finishedAt'] || 0) || startedAt2
+        : 0,
     });
   return (
     (list4[count] = storyBackgroundTask2),
@@ -173,15 +173,15 @@ export function updateStoryBackgroundTask(options7 = {}, value6 = '', response4 
 export function updateStoryBackgroundTaskBatch(options8 = {}, value8 = '', value9 = {}) {
   const id4 = normalizeText(value8),
     args4 = cloneSerializable(value9);
-  if (!id4 || !args4 || Array['isArray'](args4)) return 0x0;
+  if (!id4 || !args4 || Array['isArray'](args4)) return 0;
   const list5 = getStoryBackgroundTasks(options8);
-  let value10 = 0x0;
+  let value10 = 0;
   const updatedAt3 = Date['now'](),
     value11 = list5['map']((response6) => {
       if (!ACTIVE_STATUSES['has'](response6['status']) || response6['batch']?.['id'] !== id4)
         return response6;
       return (
-        (value10 += 0x1),
+        (value10 += 1),
         normalizeStoryBackgroundTask({
           ...response6,
           batch: { ...response6['batch'], ...args4, id: id4 },
@@ -216,12 +216,12 @@ export function interruptStoryBackgroundTasks(
   } = {},
 ) {
   const list6 = getStoryBackgroundTasks(options10);
-  let value13 = 0x0;
+  let value13 = 0;
   const value14 = list6['map']((response7) => {
     if (!ACTIVE_STATUSES['has'](response7['status'])) return response7;
     if (!includeResumable && response7['resumable'] && response7['remoteTaskId']) return response7;
     return (
-      (value13 += 0x1),
+      (value13 += 1),
       normalizeStoryBackgroundTask({
         ...response7,
         status: 'interrupted',

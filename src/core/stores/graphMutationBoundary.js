@@ -17,7 +17,7 @@ const MUTATIONS = new Set([
   REPLACEMENTS = new Set(['loadState', 'loadHistorySnapshot', 'hydrate', 'hydrateTrustedSnapshot']);
 export function withGraphMutationBoundary(args) {
   let value = null,
-    item = 0x0;
+    item = 0;
   const key = { ...args };
   for (const index of [...MUTATIONS, ...REPLACEMENTS]) {
     if (typeof args[index] !== 'function') continue;
@@ -51,11 +51,11 @@ export function withGraphMutationBoundary(args) {
     }),
     (key['getGraphMutationPolicy'] = () => value),
     (key['withGraphMutationBypass'] = (handler) => {
-      item += 0x1;
+      item += 1;
       try {
         return handler();
       } finally {
-        item -= 0x1;
+        item -= 1;
       }
     }),
     key

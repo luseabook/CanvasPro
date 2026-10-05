@@ -1,13 +1,13 @@
 export const CHROME_SHELL_STARTUP_READY_EVENT = 'renderer.chrome_shell_startup_ready';
 export const CHROME_SHELL_STARTUP_FAILED_EVENT = 'renderer.chrome_shell_startup_failed';
-export const DEFAULT_CHROME_SHELL_STARTUP_READY_DELAY_MS = 0x5dc;
+export const DEFAULT_CHROME_SHELL_STARTUP_READY_DELAY_MS = 1500;
 export const CHROME_SHELL_STARTUP_ATTEMPT_ID_PARAM = 'aicStartupAttemptId';
 export const CHROME_SHELL_STARTUP_READY_TIMEOUT_MS_PARAM = 'aicStartupReadyTimeoutMs';
-const MIN_STARTUP_ATTEMPT_ID_LENGTH = 0x10,
-  MAX_STARTUP_ATTEMPT_ID_LENGTH = 0x80,
-  MIN_STARTUP_READY_TIMEOUT_MS = 0x3e8,
-  MAX_STARTUP_READY_TIMEOUT_MS = 0x1d4c0,
-  MAX_PENDING_READY_REPORTS = 0x2,
+const MIN_STARTUP_ATTEMPT_ID_LENGTH = 16,
+  MAX_STARTUP_ATTEMPT_ID_LENGTH = 128,
+  MIN_STARTUP_READY_TIMEOUT_MS = 1000,
+  MAX_STARTUP_READY_TIMEOUT_MS = 120000,
+  MAX_PENDING_READY_REPORTS = 2,
   LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '::1']);
 export function isChromeShellRuntimeHref(value) {
   try {
@@ -41,7 +41,7 @@ function normalizeStartupReadyTimeoutMs(key) {
 function readNavigationElapsedMs(result) {
   try {
     const count = Number(result?.['performance']?.['now']?.());
-    return Number['isFinite'](count) && count >= 0x0 ? count : null;
+    return Number['isFinite'](count) && count >= 0 ? count : null;
   } catch {
     return null;
   }
@@ -78,7 +78,7 @@ export function scheduleChromeShellStartupReady({
   windowObject: windowObject = globalThis['window'],
   diagnostics: diagnostics,
   delayMs: delayMs = DEFAULT_CHROME_SHELL_STARTUP_READY_DELAY_MS,
-  retryDelayMs: retryDelayMs = 0x2ee,
+  retryDelayMs: retryDelayMs = 750,
   maxAttempts: maxAttempts,
   setTimeoutFn: setTimeoutFn = setTimeout,
 } = {}) {
@@ -86,22 +86,22 @@ export function scheduleChromeShellStartupReady({
     readyTimeoutMs3 = readChromeShellStartupMetadata(href);
   if (!readyTimeoutMs3) return null;
   if (typeof diagnostics?.['logEvent'] !== 'function') return null;
-  const source = Math['max'](0x64, Math['min'](0x1388, Number(retryDelayMs) || 0x0)),
-    next = Math['max'](0x0, Math['min'](0x2710, Number(delayMs) || 0x0)),
+  const source = Math['max'](100, Math['min'](5000, Number(retryDelayMs) || 0)),
+    next = Math['max'](0, Math['min'](10000, Number(delayMs) || 0)),
     navigationElapsedMs = Math['min'](
-      readyTimeoutMs3['readyTimeoutMs'] - 0x1,
-      Math['max'](0x0, readNavigationElapsedMs(windowObject) || 0x0),
+      readyTimeoutMs3['readyTimeoutMs'] - 1,
+      Math['max'](0, readNavigationElapsedMs(windowObject) || 0),
     ),
-    remainingTimeoutMs = Math['max'](0x1, readyTimeoutMs3['readyTimeoutMs'] - navigationElapsedMs),
-    current = Math['min'](next, Math['max'](0x0, remainingTimeoutMs - source)),
-    entry = Math['max'](0x1, Math['ceil']((remainingTimeoutMs - current) / source)),
+    remainingTimeoutMs = Math['max'](1, readyTimeoutMs3['readyTimeoutMs'] - navigationElapsedMs),
+    current = Math['min'](next, Math['max'](0, remainingTimeoutMs - source)),
+    entry = Math['max'](1, Math['ceil']((remainingTimeoutMs - current) / source)),
     record =
       maxAttempts == null
         ? entry
-        : Math['min'](entry, Math['max'](0x1, Math['round'](Number(maxAttempts) || 0x0)));
+        : Math['min'](entry, Math['max'](1, Math['round'](Number(maxAttempts) || 0)));
   let payload = ![],
-    handle = 0x0,
-    state = 0x0,
+    handle = 0,
+    state = 0,
     config = ![];
   windowObject?.['addEventListener']?.(
     'pagehide',
@@ -114,7 +114,7 @@ export function scheduleChromeShellStartupReady({
     if (scope >= entry || state >= record) return;
     void Promise['resolve']()['then'](() => {
       if (payload || config || state >= record) return;
-      setTimeoutFn(() => run2(scope + 0x1), source);
+      setTimeoutFn(() => run2(scope + 1), source);
     });
   }
   function run2(input) {
@@ -125,7 +125,7 @@ export function scheduleChromeShellStartupReady({
       run(input);
       return;
     }
-    const attempt = state + 0x1;
+    const attempt = state + 1;
     state = attempt;
     let output;
     try {
@@ -151,16 +151,16 @@ export function scheduleChromeShellStartupReady({
       payload = !![];
       return;
     }
-    ((handle += 0x1),
+    ((handle += 1),
       void Promise['resolve'](output)
         ['then']((value2) => {
           if (value2?.['startupReadyAccepted'] === !![]) payload = !![];
         })
         ['catch'](() => {})
         ['finally'](() => {
-          handle = Math['max'](0x0, handle - 0x1);
+          handle = Math['max'](0, handle - 1);
         }),
       run(input));
   }
-  return setTimeoutFn(() => run2(0x1), current);
+  return setTimeoutFn(() => run2(1), current);
 }

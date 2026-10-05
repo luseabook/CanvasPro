@@ -113,8 +113,8 @@ function resetStore() {
         thumbLocalPath: 'output/_derived/thumb/lazy.thumb.jpg',
         fixedSize: true,
         needsAutoResize: false,
-        imageWidth: 0x4b0,
-        imageHeight: 0x320,
+        imageWidth: 1200,
+        imageHeight: 800,
       },
       handle = new SourceImageNode(payload);
     (handle.mount(),
@@ -145,8 +145,8 @@ function resetStore() {
       constructor() {
         ((this.onload = null),
           (this.onerror = null),
-          (this.naturalWidth = 0x280),
-          (this.naturalHeight = 0x168));
+          (this.naturalWidth = 640),
+          (this.naturalHeight = 360));
       }
       set ['src'](input) {
         ((this._src = input), list.push({ resolve: () => this.onload?.() }));
@@ -402,11 +402,11 @@ function resetStore() {
     installDomStubs();
     const { buildSourceImageUploadSizePatch: buildSourceImageUploadSizePatch } =
       await import('./SourceImageNode.js');
-    assert.deepEqual(buildSourceImageUploadSizePatch({ width: 0x780, height: 0x438 }), {
-      width: 0x200,
-      height: 0x120,
-      imageWidth: 0x780,
-      imageHeight: 0x438,
+    assert.deepEqual(buildSourceImageUploadSizePatch({ width: 1920, height: 1080 }), {
+      width: 512,
+      height: 288,
+      imageWidth: 1920,
+      imageHeight: 1080,
       needsAutoResize: false,
     });
   }),
@@ -414,11 +414,11 @@ function resetStore() {
     installDomStubs();
     const { buildSourceImageUploadSizePatch: buildSourceImageUploadSizePatch2 } =
       await import('./SourceImageNode.js');
-    assert.deepEqual(buildSourceImageUploadSizePatch2({ width: 0x438, height: 0x780 }), {
-      width: 0x120,
-      height: 0x200,
-      imageWidth: 0x438,
-      imageHeight: 0x780,
+    assert.deepEqual(buildSourceImageUploadSizePatch2({ width: 1080, height: 1920 }), {
+      width: 288,
+      height: 512,
+      imageWidth: 1080,
+      imageHeight: 1920,
       needsAutoResize: false,
     });
   }),
@@ -506,7 +506,7 @@ function resetStore() {
       _rhResumeAbortController: null,
       _rhResumeTaskId: '',
       _rhResumePromise: null,
-      _computeGenerationDuration: () => 0x141,
+      _computeGenerationDuration: () => 321,
     }),
       (value16._resumeRunningHubTaskPoller = async () => {
         throw new Error('RunningHub 恢复失败');
@@ -517,7 +517,7 @@ function resetStore() {
     (assert.equal(value17.isGenerating, false),
       assert.equal(value17.jobStatus, 'error'),
       assert.equal(value17.jobError, 'RunningHub 恢复失败'),
-      assert.equal(value17.generationDuration, 0x141),
+      assert.equal(value17.generationDuration, 321),
       assert.equal(value17.rhTaskStatus, 'failed'),
       assert.equal(value17.rhTaskRecovering, false),
       assert.equal(value17.images?.[0]?.error, 'RunningHub 恢复失败'),
@@ -598,7 +598,7 @@ function resetStore() {
         dreaminaTaskPhase: 'syncing',
         dreaminaTaskLabel: '同步结果中',
         dreaminaTaskStartedAt: 123,
-        dreaminaTaskLastCheckedAt: 0x1c8,
+        dreaminaTaskLastCheckedAt: 456,
         isGenerating: false,
         jobStatus: 'success',
       };
@@ -610,7 +610,7 @@ function resetStore() {
       _dreaminaResumeAbortController: null,
       _dreaminaResumeSubmitId: '',
       _dreaminaResumePromise: null,
-      _computeGenerationDuration: () => 0x315,
+      _computeGenerationDuration: () => 789,
     });
     let run = null;
     const value20 = new Promise((handler) => {
@@ -632,7 +632,7 @@ function resetStore() {
     (assert.equal(value24.isGenerating, false),
       assert.equal(value24.jobStatus, 'error'),
       assert.equal(value24.jobError, 'generation failed: final generation failed'),
-      assert.equal(value24.generationDuration, 0x315),
+      assert.equal(value24.generationDuration, 789),
       assert.equal(value24.images?.[0]?.error, 'generation failed: final generation failed'),
       assert.equal(value24.mainImageIndex, 0),
       assert.equal(value24.dreaminaTaskStatus, 'failed'),
@@ -658,7 +658,7 @@ function resetStore() {
         dreaminaTaskPhase: 'generating',
         dreaminaTaskLabel: '生成中',
         dreaminaTaskStartedAt: 123,
-        dreaminaTaskLastCheckedAt: 0x1c8,
+        dreaminaTaskLastCheckedAt: 456,
         dreaminaTaskRecovering: true,
         isGenerating: true,
         jobStatus: 'running',
@@ -671,7 +671,7 @@ function resetStore() {
       _dreaminaResumeAbortController: null,
       _dreaminaResumeSubmitId: '',
       _dreaminaResumePromise: null,
-      _computeGenerationDuration: () => 0x315,
+      _computeGenerationDuration: () => 789,
     }),
       (value25._dreaminaResumePoller = async (value26) => {
         assert.equal(value26, 'dm-timeout');
@@ -722,7 +722,7 @@ function resetStore() {
       _asyncResumeAbortController: null,
       _asyncResumeTaskId: '',
       _asyncResumePromise: null,
-      _computeGenerationDuration: () => 0x28e,
+      _computeGenerationDuration: () => 654,
     }),
       (value28._resumeAsyncTaskPoller = async () => {
         throw new Error('异步恢复失败');
@@ -733,7 +733,7 @@ function resetStore() {
     (assert.equal(value29.isGenerating, false),
       assert.equal(value29.jobStatus, 'error'),
       assert.equal(value29.jobError, '异步恢复失败'),
-      assert.equal(value29.generationDuration, 0x28e),
+      assert.equal(value29.generationDuration, 654),
       assert.equal(value29.asyncTaskStatus, 'failed'),
       assert.equal(value29.asyncTaskRecovering, false),
       assert.equal(value29.images?.[0]?.error, '异步恢复失败'),
@@ -758,8 +758,8 @@ function resetStore() {
       constructor() {
         ((this.onload = null),
           (this.onerror = null),
-          (this.naturalWidth = 0x320),
-          (this.naturalHeight = 0x258));
+          (this.naturalWidth = 800),
+          (this.naturalHeight = 600));
       }
       set ['src'](value38) {
         ((this._src = value38),
@@ -874,8 +874,8 @@ function resetStore() {
       constructor() {
         ((this.onload = null),
           (this.onerror = null),
-          (this.naturalWidth = 0x384),
-          (this.naturalHeight = 0x258));
+          (this.naturalWidth = 900),
+          (this.naturalHeight = 600));
       }
       set ['src'](value51) {
         ((this._src = value51),
@@ -897,8 +897,8 @@ function resetStore() {
         height: 100,
         fixedSize: true,
         needsAutoResize: false,
-        imageWidth: 0x384,
-        imageHeight: 0x258,
+        imageWidth: 900,
+        imageHeight: 600,
       };
       appStore.addNode(id7);
       const _img2 = {
@@ -969,7 +969,7 @@ function resetStore() {
     let value59 = 0;
     class value60 {
       constructor() {
-        ((this.naturalWidth = 0x280), (this.naturalHeight = 0x168));
+        ((this.naturalWidth = 640), (this.naturalHeight = 360));
       }
       set ['src'](value61) {
         ((this._src = value61),
@@ -988,8 +988,8 @@ function resetStore() {
       const id8 = {
         id: 'keep-previous-image',
         type: 'source-image',
-        imageWidth: 0x280,
-        imageHeight: 0x168,
+        imageWidth: 640,
+        imageHeight: 360,
         needsAutoResize: false,
       };
       appStore.addNode(id8);

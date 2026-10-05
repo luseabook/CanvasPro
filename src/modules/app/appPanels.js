@@ -104,7 +104,7 @@ export function createAppPanels({
   ensureDeviceId: ensureDeviceId,
   modelCatalogService: modelCatalogService,
   refreshManifestModelNodeUis: refreshManifestModelNodeUis,
-  subscriptionIdentityTimeoutMs: subscriptionIdentityTimeoutMs = 0x3a98,
+  subscriptionIdentityTimeoutMs: subscriptionIdentityTimeoutMs = 15000,
 } = {}) {
   const key = 'https://api.ashuoai.com/static/contact/wechat.png',
     index = 'yumengashuo',
@@ -131,11 +131,11 @@ export function createAppPanels({
       options = document['getElementById']('subscriptionContactLink'),
       target = document['getElementById']('subscriptionContactReveal'),
       source = document['getElementById']('subscriptionContactWechat'),
-      retryScheduleMs = [0x0, 0x1f4, 0x4b0, 0x9c4, 0xfa0],
-      next = 0x2bc,
-      current = Math['max'](0x1, Number(subscriptionIdentityTimeoutMs) || 0x3a98);
-    let entry = 0x0,
-      count = 0x0,
+      retryScheduleMs = [0, 500, 1200, 2500, 4000],
+      next = 700,
+      current = Math['max'](1, Number(subscriptionIdentityTimeoutMs) || 15000);
+    let entry = 0,
+      count = 0,
       record = ![],
       enabled2 = ![];
     function run5(locale = '') {
@@ -159,9 +159,9 @@ export function createAppPanels({
             return '&lt;';
           case '>':
             return '&gt;';
-          case '\x22':
+          case '"':
             return '&quot;';
-          case '\x27':
+          case '\'':
             return '&#39;';
           default:
             return scope;
@@ -170,9 +170,9 @@ export function createAppPanels({
     }
     function run9(input) {
       const count2 = Number(input);
-      if (!Number['isFinite'](count2) || count2 <= 0x0) return '-';
+      if (!Number['isFinite'](count2) || count2 <= 0) return '-';
       try {
-        return new Date(count2 * 0x3e8)['toLocaleString']();
+        return new Date(count2 * 1000)['toLocaleString']();
       } catch {
         return '-';
       }
@@ -295,7 +295,7 @@ export function createAppPanels({
       if (typeof refreshManifestModelNodeUis !== 'function') return;
       const value10 = refreshManifestModelNodeUis();
       Array['isArray'](value10?.['remountedNodeIds']) &&
-        value10['remountedNodeIds']['length'] > 0x0 &&
+        value10['remountedNodeIds']['length'] > 0 &&
         store['invalidateUi']?.();
     }
     async function run20(value11) {
@@ -413,7 +413,7 @@ export function createAppPanels({
     async function run25(value22, value23 = {}) {
       const value24 = typeof value23?.['onProgress'] === 'function' ? value23['onProgress'] : null,
         total =
-          Array['isArray'](value23?.['retryScheduleMs']) && value23['retryScheduleMs']['length'] > 0x0
+          Array['isArray'](value23?.['retryScheduleMs']) && value23['retryScheduleMs']['length'] > 0
             ? value23['retryScheduleMs']
             : retryScheduleMs,
         enabled9 = String(value22 || '')['trim']();
@@ -424,13 +424,13 @@ export function createAppPanels({
       const value26 = await run21(() => run20(value25));
       let error3 = null,
         value27 = null;
-      for (let count3 = 0x0; count3 < 0x2; count3 += 0x1) {
+      for (let count3 = 0; count3 < 2; count3 += 1) {
         try {
           ((error3 = await submitCdkey(value25, enabled9, value26['deviceId'])), (value27 = null));
           break;
         } catch (value28) {
           value27 = value28;
-          if (count3 >= 0x1) break;
+          if (count3 >= 1) break;
           await new Promise((value29) => setTimeout(value29, next));
         }
       }
@@ -439,7 +439,7 @@ export function createAppPanels({
         const value30 = error3?.['message'] || t('settings.subscription.activationFailed');
         return (window['showToast']?.(value30, 'error'), ![]);
       }
-      entry += 0x1;
+      entry += 1;
       if (run17(error3))
         return (
           await run23(run16(), value26, { force: !![] }),
@@ -447,10 +447,10 @@ export function createAppPanels({
           !![]
         );
       window['showToast']?.(t('settings.subscription.submitted'));
-      for (let attempt = 0x0; attempt < total['length']; attempt += 0x1) {
+      for (let attempt = 0; attempt < total['length']; attempt += 1) {
         const count4 = total[attempt];
-        value24?.({ phase: 'checking', attempt: attempt + 0x1, total: total['length'] });
-        if (count4 > 0x0) await new Promise((value31) => setTimeout(value31, count4));
+        value24?.({ phase: 'checking', attempt: attempt + 1, total: total['length'] });
+        if (count4 > 0) await new Promise((value31) => setTimeout(value31, count4));
         const value32 = await run24({ syncModelCatalog: !![], forceModelCatalog: !![] });
         if (isSubscriptionActive(value32)) return (window['showToast']?.(t('settings.subscription.activated')), !![]);
       }
@@ -459,7 +459,7 @@ export function createAppPanels({
       return (
         value34
           ? window['showToast']?.(
-              t('settings.subscription.serverNotConfirmed') + '\x20(' + value34 + ')',
+              t('settings.subscription.serverNotConfirmed') + ' (' + value34 + ')',
               'warning',
             )
           : window['showToast']?.(t('settings.subscription.serverNotConfirmed'), 'warning'),
@@ -474,7 +474,7 @@ export function createAppPanels({
       el5 &&
         ((el5['disabled'] = !![]), (el5['textContent'] = t('settings.subscription.clearing')));
       try {
-        (await clearSubscriptionAuthorization(), (entry += 0x1));
+        (await clearSubscriptionAuthorization(), (entry += 1));
         const contactText = run16(),
           args6 = createDefaultSubscriptionState();
         return (
@@ -512,7 +512,7 @@ export function createAppPanels({
       ((root['id'] = 'subscriptionGateOverlay'), (root['className'] = 'subscription-gate-overlay'));
       const value39 = run16();
       ((root['innerHTML'] =
-        '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22subscription-gate-dialog\x22\x20role=\x22dialog\x22\x20aria-modal=\x22true\x22\x20aria-label=\x22' +
+        '\n        <div class="subscription-gate-dialog" role="dialog" aria-modal="true" aria-label="' +
         run8(t('settings.subscription.gate.aria')) +
         '">\n          <div class="subscription-gate-title">' +
         run8(t('settings.subscription.gate.title')) +
@@ -520,7 +520,7 @@ export function createAppPanels({
         run8(t('settings.subscription.gate.desc')) +
         '</div>\n          <label class="subscription-gate-label" for="gateCdkeyInput">' +
         run8(t('settings.subscription.inputLabel')) +
-        '</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20class=\x22settings-input\x22\x20id=\x22gateCdkeyInput\x22\x20placeholder=\x22' +
+        '</label>\n          <input type="text" class="settings-input" id="gateCdkeyInput" placeholder="' +
         run8(t('settings.subscription.gate.cdkeyPlaceholder')) +
         '">\n          <details class="subscription-gate-contact">\n            <summary id="gateContactLink"></summary>\n            <div class="subscription-gate-contact-body">\n              <div id="gateContactReveal" class="settings-contact-reveal"></div>\n              <div class="subscription-gate-contact-info">\n                <strong>' +
         run8(t('settings.subscription.gate.scanTitle')) +
@@ -530,7 +530,7 @@ export function createAppPanels({
         run8(t('textInputContextMenu.copy')) +
         '</button>\n              </div>\n            </div>\n          </details>\n          <div class="subscription-gate-actions">\n            <button type="button" class="subscription-gate-btn" id="gateCancelBtn">' +
         run8(t('settings.subscription.gate.cancel')) +
-        '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22subscription-gate-btn\x20is-primary\x22\x20id=\x22gateSubmitBtn\x22>' +
+        '</button>\n            <button type="button" class="subscription-gate-btn is-primary" id="gateSubmitBtn">' +
         run8(t('settings.subscription.gate.activate')) +
         '</button>\n          </div>\n        </div>\n      '),
         document['body']['appendChild'](root));
@@ -583,7 +583,7 @@ export function createAppPanels({
             onProgress: ({ attempt: attempt2, total: total2 }) => {
               if (!el20 || !el20['isConnected']) return;
               el20['textContent'] =
-                t('settings.subscription.checking') + '\x20' + attempt2 + '/' + total2;
+                t('settings.subscription.checking') + ' ' + attempt2 + '/' + total2;
             },
             retryScheduleMs: retryScheduleMs,
           });
@@ -651,7 +651,7 @@ export function createAppPanels({
           const value50 = await run25(el3?.['value'], {
             onProgress: ({ attempt: attempt3, total: total3 }) => {
               el4['textContent'] =
-                t('settings.subscription.checking') + '\x20' + attempt3 + '/' + total3;
+                t('settings.subscription.checking') + ' ' + attempt3 + '/' + total3;
             },
           });
           if (value50 && el3) el3['value'] = '';
@@ -674,7 +674,7 @@ export function createAppPanels({
       ));
     const run29 = () => {
       const value53 = Date['now']();
-      if (record || value53 - count < 0x3a98) return;
+      if (record || value53 - count < 15000) return;
       ((count = value53),
         (record = !![]),
         void run24({ syncModelCatalog: !![] })
@@ -688,7 +688,7 @@ export function createAppPanels({
     }),
       window['addEventListener']?.('focus', () => {
         if (!enabled2) return;
-        ((enabled2 = ![]), (count = 0x0), run29());
+        ((enabled2 = ![]), (count = 0), run29());
       }),
       window['addEventListener']?.('online', run29),
       void run24({ loadModelCatalogCache: !![], syncModelCatalog: !![] }));
@@ -724,13 +724,13 @@ export function createAppPanels({
       el26['addEventListener']('click', () => {
         ((el27['style']['opacity'] = '0'),
           (el27['style']['maxHeight'] = '0px'),
-          setTimeout(() => el27['remove'](), 0x140));
+          setTimeout(() => el27['remove'](), 320));
       });
     const el28 = document['getElementById']('aiTextarea');
     el28 &&
       el28['addEventListener']('input', () => {
         ((el28['style']['height'] = 'auto'),
-          (el28['style']['height'] = Math['min'](el28['scrollHeight'], 0x78) + 'px'));
+          (el28['style']['height'] = Math['min'](el28['scrollHeight'], 120) + 'px'));
       });
     const el29 = document['getElementById']('aiMessages'),
       el30 = document['getElementById']('aiStartBtn'),
@@ -761,7 +761,7 @@ export function createAppPanels({
     function run34(value58) {
       if (!el29) return;
       const el35 = document['createElement']('div');
-      el35['className'] = 'ai-msg\x20user';
+      el35['className'] = 'ai-msg user';
       const el36 = document['createElement']('div');
       ((el36['className'] = 'ai-msg-avatar'),
         (el36['style']['background'] = 'var(--indigo)'),
@@ -786,7 +786,7 @@ export function createAppPanels({
       ((el38['className'] = 'ai-msg-avatar'), (el38['textContent'] = 'A'));
       const el39 = document['createElement']('div');
       el39['className'] = 'ai-msg-bubble';
-      for (let count5 = 0x0; count5 < 0x3; count5 += 0x1) {
+      for (let count5 = 0; count5 < 3; count5 += 1) {
         const value60 = document['createElement']('span');
         ((value60['className'] = 'dot'), el39['appendChild'](value60));
       }
@@ -799,7 +799,7 @@ export function createAppPanels({
           const list = run32(),
             value61 = list[Math['floor'](Math['random']() * list['length'])];
           run33(value61);
-        }, 0x4b0));
+        }, 1200));
     }
     el30 &&
       el30['addEventListener']('click', () => {
@@ -857,7 +857,7 @@ export function createAppPanels({
       document['getElementById']('btnCheckForUpdates')?.['addEventListener']('click', (event6) => {
         (event6['stopPropagation'](), run40(), void showManualUpdateCheck());
       }),
-      document['querySelectorAll']('#btnGithubOfficial,\x20#btnFeatureFeedback')['forEach']((el44) => {
+      document['querySelectorAll']('#btnGithubOfficial, #btnFeatureFeedback')['forEach']((el44) => {
         el44['addEventListener']('click', () => {
           run40();
         });
@@ -866,12 +866,12 @@ export function createAppPanels({
       el40?.['addEventListener']('click', (event7) => {
         if (event7['target'] === el40) run39();
       }));
-    let count6 = 0x0,
+    let count6 = 0,
       setTimeout3 = null;
     el42?.['addEventListener']('click', () => {
       (count6++, clearTimeout(setTimeout3));
-      if (count6 >= 0x7)
-        ((count6 = 0x0),
+      if (count6 >= 7)
+        ((count6 = 0),
           (window['DEV_MODE'] = !window['DEV_MODE']),
           document['body']['classList']['toggle']('dev-mode', window['DEV_MODE']),
           window['dispatchEvent'](
@@ -882,18 +882,18 @@ export function createAppPanels({
             window['DEV_MODE'] ? t('appPanels.devMode.entered') : t('appPanels.devMode.exited'),
           ));
       else
-        count6 >= 0x4 &&
+        count6 >= 4 &&
           window['showToast']?.(
             t('appPanels.devMode.clickHint', {
-              count: 0x7 - count6,
+              count: 7 - count6,
               action: window['DEV_MODE']
                 ? t('appPanels.devMode.exitAction')
                 : t('appPanels.devMode.enterAction'),
             }),
           );
       setTimeout3 = setTimeout(() => {
-        count6 = 0x0;
-      }, 0x7d0);
+        count6 = 0;
+      }, 2000);
     });
   }
   function run41() {

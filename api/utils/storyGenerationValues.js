@@ -6,5 +6,5 @@ export function normalizeStringArray(list) {
 }
 export function normalizePositiveNumber(item) {
   const count = Number(item);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }

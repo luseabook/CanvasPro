@@ -1,8 +1,8 @@
-export const STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION = 0x1;
+export const STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION = 1;
 export const STORYBOARD_3D_BINARY_ASSET_DB_NAME = 'AICanvasStoryboard3DAssets';
 export const STORYBOARD_3D_BINARY_ASSET_STORE_NAME = 'assets';
-const DEFAULT_DESCRIPTOR_MAX_BYTES = 0x200 * 0x400,
-  DEFAULT_GET_MANY_LIMIT = 0x1f4;
+const DEFAULT_DESCRIPTOR_MAX_BYTES = 512 * 1024,
+  DEFAULT_GET_MANY_LIMIT = 500;
 function text(value) {
   return String(value ?? '')['trim']();
 }
@@ -27,7 +27,7 @@ function isBinaryValue(result) {
 }
 function normalizePath(data, options) {
   const text3 = text(data || options)
-    ['replaceAll']('\x5c', '/')
+    ['replaceAll']('\\', '/')
     ['split']('/')
     ['filter']((target) => target && target !== '.' && target !== '..')
     ['join']('/');
@@ -40,12 +40,12 @@ function jsonDescriptor(source, next) {
     entry = JSON['stringify'](current, (record, payload) => {
       if (isBinaryValue(payload)) throw new TypeError('descriptor must not contain binary data');
       if (['function', 'symbol', 'bigint']['includes'](typeof payload))
-        throw new TypeError('descriptor\x20must\x20contain\x20JSON-safe\x20values\x20only');
+        throw new TypeError('descriptor must contain JSON-safe values only');
       return payload;
     });
   } catch (cause) {
     throw new Storyboard3DBinaryAssetRepositoryError(
-      'Invalid\x20binary\x20asset\x20descriptor:\x20' + (cause?.['message'] || String(cause)),
+      'Invalid binary asset descriptor: ' + (cause?.['message'] || String(cause)),
       { code: 'BINARY_ASSET_INVALID_DESCRIPTOR', cause: cause },
     );
   }
@@ -68,13 +68,13 @@ function normalizeBinaryFile(error, state, config = null) {
     blob = toBlob(scope, text(error2['type'] || error?.['type']) || 'application/octet-stream');
   if (!blob)
     throw new Storyboard3DBinaryAssetRepositoryError(
-      state + '\x20must\x20contain\x20a\x20Blob\x20or\x20ArrayBuffer',
+      state + ' must contain a Blob or ArrayBuffer',
       { code: 'BINARY_ASSET_INVALID_BINARY' },
     );
-  const input = config == null ? 'asset.bin' : 'related-' + (config + 0x1) + '.bin',
+  const input = config == null ? 'asset.bin' : 'related-' + (config + 1) + '.bin',
     name = normalizePath(error2['name'] || error?.['name'], input)
       ['split']('/')
-      ['at'](-0x1),
+      ['at'](-1),
     relativePath = normalizePath(
       error2['relativePath'] || error2['path'] || error?.['webkitRelativePath'],
       name,
@@ -83,8 +83,8 @@ function normalizeBinaryFile(error, state, config = null) {
     name: name,
     relativePath: relativePath,
     type: text(error2['type'] || error?.['type'] || blob['type']) || 'application/octet-stream',
-    size: Math['max'](0x0, Number(blob['size']) || 0x0),
-    lastModified: Math['max'](0x0, Number(error2['lastModified'] || error?.['lastModified']) || 0x0),
+    size: Math['max'](0, Number(blob['size']) || 0),
+    lastModified: Math['max'](0, Number(error2['lastModified'] || error?.['lastModified']) || 0),
     blob: blob,
   };
 }
@@ -102,7 +102,7 @@ function validateRetrievedRecord(now2, descriptorMaxBytes2) {
   if (now2 == null) return null;
   if (Number(now2['schemaVersion']) !== STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION)
     throw new Storyboard3DBinaryAssetRepositoryError(
-      'Unsupported\x20stored\x203D\x20binary\x20asset\x20schema\x20version:\x20' + now2['schemaVersion'],
+      'Unsupported stored 3D binary asset schema version: ' + now2['schemaVersion'],
       { code: 'BINARY_ASSET_UNSUPPORTED_SCHEMA' },
     );
   return normalizeStoryboard3DBinaryAssetRecord(now2, {
@@ -116,7 +116,7 @@ export function normalizeStoryboard3DBinaryAssetRecord(
 ) {
   if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled))
     throw new Storyboard3DBinaryAssetRepositoryError(
-      'Binary\x20asset\x20record\x20must\x20be\x20an\x20object',
+      'Binary asset record must be an object',
       { code: 'BINARY_ASSET_INVALID_RECORD' },
     );
   const assetId2 = requiredText(enabled['assetId'], 'assetId'),
@@ -135,19 +135,19 @@ export function normalizeStoryboard3DBinaryAssetRecord(
       );
     map['add'](value4);
   }
-  const updatedAt = Math['max'](0x0, Number(now) || Date['now']());
+  const updatedAt = Math['max'](0, Number(now) || Date['now']());
   return {
     schemaVersion: STORYBOARD_3D_BINARY_ASSET_SCHEMA_VERSION,
     assetId: assetId2,
     kind: kind,
     descriptor: jsonDescriptor(
       enabled['descriptor'],
-      Math['max'](0x400, Number(descriptorMaxBytes) || DEFAULT_DESCRIPTOR_MAX_BYTES),
+      Math['max'](1024, Number(descriptorMaxBytes) || DEFAULT_DESCRIPTOR_MAX_BYTES),
     ),
     primaryFile: primaryFile,
     relatedFiles: relatedFiles2,
-    byteLength: [primaryFile, ...relatedFiles2]['reduce']((value5, value6) => value5 + value6['size'], 0x0),
-    createdAt: Math['max'](0x0, Number(enabled['createdAt']) || updatedAt),
+    byteLength: [primaryFile, ...relatedFiles2]['reduce']((value5, value6) => value5 + value6['size'], 0),
+    createdAt: Math['max'](0, Number(enabled['createdAt']) || updatedAt),
     updatedAt: updatedAt,
   };
 }
@@ -164,7 +164,7 @@ export function createStoryboard3DBinaryAssetReference(enabled2) {
   const assetId3 = requiredText(enabled2?.['assetId'], 'assetId'),
     kind2 = requiredText(enabled2?.['kind'], 'kind');
   if (!enabled2?.['primaryFile'])
-    throw new Storyboard3DBinaryAssetRepositoryError('primaryFile\x20is\x20required', {
+    throw new Storyboard3DBinaryAssetRepositoryError('primaryFile is required', {
       code: 'BINARY_ASSET_INVALID_RECORD',
     });
   return {
@@ -177,7 +177,7 @@ export function createStoryboard3DBinaryAssetReference(enabled2) {
       database: STORYBOARD_3D_BINARY_ASSET_DB_NAME,
       primaryFile: fileReference(enabled2['primaryFile']),
       relatedFiles: (enabled2['relatedFiles'] || [])['map'](fileReference),
-      byteLength: Math['max'](0x0, Number(enabled2['byteLength']) || 0x0),
+      byteLength: Math['max'](0, Number(enabled2['byteLength']) || 0),
     },
   };
 }
@@ -207,8 +207,8 @@ function storageError(operation2, cause3, assetId4 = '') {
       : 'Failed to ' +
           operation2 +
           ' 3D binary asset' +
-          (assetId4 ? '\x20' + assetId4 : '') +
-          ':\x20' +
+          (assetId4 ? ' ' + assetId4 : '') +
+          ': ' +
           (cause3?.['message'] || String(cause3)),
     {
       code: code2 ? 'BINARY_ASSET_QUOTA_EXCEEDED' : 'BINARY_ASSET_' + operation2['toUpperCase']() + '_FAILED',
@@ -347,7 +347,7 @@ export class Storyboard3DIndexedDBAssetDriver {
       requestResult4 = requestResult(map3['count'](value27)),
       requestResult5 = requestResult(map3['delete'](value27)),
       [value30] = await Promise['all']([requestResult4, requestResult5, transactionDone5]);
-    return Number(value30) > 0x0;
+    return Number(value30) > 0;
   }
   async ['close']() {
     if (!this['dbPromise']) return;
@@ -369,10 +369,10 @@ export class Storyboard3DBinaryAssetRepository {
     ((this['driver'] = driver),
       (this['now'] = now),
       (this['descriptorMaxBytes'] = Math['max'](
-        0x400,
+        1024,
         Number(descriptorMaxBytes) || DEFAULT_DESCRIPTOR_MAX_BYTES,
       )),
-      (this['getManyLimit'] = Math['max'](0x1, Number(getManyLimit) || DEFAULT_GET_MANY_LIMIT)));
+      (this['getManyLimit'] = Math['max'](1, Number(getManyLimit) || DEFAULT_GET_MANY_LIMIT)));
   }
   async ['put'](value33) {
     let storyboard3DBinaryAssetRecord;
@@ -401,7 +401,7 @@ export class Storyboard3DBinaryAssetRepository {
   }
   async ['getMany'](list4) {
     if (!Array['isArray'](list4))
-      throw new Storyboard3DBinaryAssetRepositoryError('assetIds\x20must\x20be\x20an\x20array', {
+      throw new Storyboard3DBinaryAssetRepositoryError('assetIds must be an array', {
         code: 'BINARY_ASSET_INVALID_QUERY',
         operation: 'getMany',
       });

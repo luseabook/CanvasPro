@@ -1,6 +1,6 @@
 import { getExecutionManifest, listModelManifests, resolveModelExecution } from '../../manifests/index.js';
 import { buildCanvasSummary } from '../canvasCommands/graphCommands.js';
-const DEFAULT_PROMPT_PREVIEW_LIMIT = 0x1f4,
+const DEFAULT_PROMPT_PREVIEW_LIMIT = 500,
   REFERENCE_PROMPT_PREVIEW_LIMIT = 180,
   DEFAULT_MODEL_LIMIT = 22,
   NO_INTENT_MODEL_LIMIT = 12,
@@ -148,7 +148,7 @@ function scoreSelectedInputCompatibility(
     input += manifestAllowsInputKind(scope, output) ? 180 : -120;
   }
   for (const value2 of getRequiredInputKinds(scope)) {
-    if (!selectedInputKinds.has(value2)) input -= 0x1a4;
+    if (!selectedInputKinds.has(value2)) input -= 420;
   }
   if (targetKind === 'video' && selectedInputKinds.has('image')) {
     const map2 = getManifestUiFieldIds(scope);
@@ -468,8 +468,8 @@ function scoreModel(
 ) {
   let value24 = 0;
   const kind2 = normalizeKind(value23?.kind);
-  if (targetKind && kind2 === targetKind) value24 += 0x3e8;
-  if (selectedModelIds.includes(value23?.modelId)) value24 += 0x1f4;
+  if (targetKind && kind2 === targetKind) value24 += 1000;
+  if (selectedModelIds.includes(value23?.modelId)) value24 += 500;
   if (selectedProviders.includes(value23?.provider)) value24 += 80;
   if (value23?.adapterType === 'workflow') value24 += 20;
   if (value23?.vip !== true) value24 += 4;

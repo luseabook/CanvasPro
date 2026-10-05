@@ -9,7 +9,7 @@ function _getWindowObject(value) {
 function _getRaf() {
   return typeof globalThis['requestAnimationFrame'] === 'function'
     ? globalThis['requestAnimationFrame']['bind'](globalThis)
-    : (handler) => setTimeout(() => handler(Date['now']()), 0x10);
+    : (handler) => setTimeout(() => handler(Date['now']()), 16);
 }
 function _getCaf() {
   return typeof globalThis['cancelAnimationFrame'] === 'function'
@@ -17,13 +17,13 @@ function _getCaf() {
     : (item) => clearTimeout(item);
 }
 function _getDefaultViewport() {
-  return { x: 0x0, y: 0x0, zoom: 0x1 };
+  return { x: 0, y: 0, zoom: 1 };
 }
 function _normalizeViewportRect(key, index, result, data) {
-  const left = Number['isFinite'](Number(key)) ? Number(key) : 0x0,
-    top = Number['isFinite'](Number(index)) ? Number(index) : 0x0,
-    width = Number['isFinite'](Number(result)) ? Number(result) : 0x0,
-    height = Number['isFinite'](Number(data)) ? Number(data) : 0x0;
+  const left = Number['isFinite'](Number(key)) ? Number(key) : 0,
+    top = Number['isFinite'](Number(index)) ? Number(index) : 0,
+    width = Number['isFinite'](Number(result)) ? Number(result) : 0,
+    height = Number['isFinite'](Number(data)) ? Number(data) : 0;
   return {
     left: left,
     top: top,
@@ -31,8 +31,8 @@ function _normalizeViewportRect(key, index, result, data) {
     height: height,
     right: left + width,
     bottom: top + height,
-    centerX: left + width / 0x2,
-    centerY: top + height / 0x2,
+    centerX: left + width / 2,
+    centerY: top + height / 2,
   };
 }
 export function getBrowserViewportRect({
@@ -46,18 +46,18 @@ export function getBrowserViewportRect({
     if (
       Number['isFinite'](Number(box?.['width'])) &&
       Number['isFinite'](Number(box?.['height'])) &&
-      Number(box['width']) > 0x0 &&
-      Number(box['height']) > 0x0
+      Number(box['width']) > 0 &&
+      Number(box['height']) > 0
     )
-      return _normalizeViewportRect(0x0, 0x0, box['width'], box['height']);
+      return _normalizeViewportRect(0, 0, box['width'], box['height']);
   }
   const box2 = _getWindowObject2?.['visualViewport'] || null;
   if (
     box2 &&
     Number['isFinite'](Number(box2['width'])) &&
     Number['isFinite'](Number(box2['height'])) &&
-    Number(box2['width']) > 0x0 &&
-    Number(box2['height']) > 0x0
+    Number(box2['width']) > 0 &&
+    Number(box2['height']) > 0
   )
     return _normalizeViewportRect(
       box2['offsetLeft'],
@@ -70,8 +70,8 @@ export function getBrowserViewportRect({
     if (
       Number['isFinite'](Number(box3?.['width'])) &&
       Number['isFinite'](Number(box3?.['height'])) &&
-      Number(box3['width']) > 0x0 &&
-      Number(box3['height']) > 0x0
+      Number(box3['width']) > 0 &&
+      Number(box3['height']) > 0
     )
       return _normalizeViewportRect(
         box3['left'],
@@ -81,10 +81,10 @@ export function getBrowserViewportRect({
       );
   }
   return _normalizeViewportRect(
-    0x0,
-    0x0,
-    Number(_getWindowObject2?.['innerWidth']) || 0x0,
-    Number(_getWindowObject2?.['innerHeight']) || 0x0,
+    0,
+    0,
+    Number(_getWindowObject2?.['innerWidth']) || 0,
+    Number(_getWindowObject2?.['innerHeight']) || 0,
   );
 }
 function _resolveMaxZoom(options, target) {
@@ -95,7 +95,7 @@ function _resolveMaxZoom(options, target) {
 }
 function _resolveViewportInset(source) {
   const next = Number(source);
-  return Number['isFinite'](next) ? Math['max'](0x0, next) : 0x0;
+  return Number['isFinite'](next) ? Math['max'](0, next) : 0;
 }
 function _applyViewportInsets(box4, box5) {
   if (!box5 || typeof box5 !== 'object') return box4;
@@ -106,8 +106,8 @@ function _applyViewportInsets(box4, box5) {
   return _normalizeViewportRect(
     box4['left'] + _resolveViewportInset5,
     box4['top'] + _resolveViewportInset2,
-    Math['max'](0x0, box4['width'] - _resolveViewportInset5 - _resolveViewportInset3),
-    Math['max'](0x0, box4['height'] - _resolveViewportInset2 - _resolveViewportInset4),
+    Math['max'](0, box4['width'] - _resolveViewportInset5 - _resolveViewportInset3),
+    Math['max'](0, box4['height'] - _resolveViewportInset2 - _resolveViewportInset4),
   );
 }
 export function createViewportFocusController({
@@ -224,7 +224,7 @@ export function createViewportFocusController({
       !![]
     );
   }
-  function focusNode(scope, padding = 0x78, durationMs = 0x5dc, options2 = null) {
+  function focusNode(scope, padding = 120, durationMs = 1500, options2 = null) {
     return run5({
       type: 'nodes-fit',
       nodeIds: [scope],
@@ -233,8 +233,8 @@ export function createViewportFocusController({
       options: options2,
     });
   }
-  function focusNodes(list, padding2 = 0x50, durationMs2 = 0x320, options3 = null) {
-    if (!Array['isArray'](list) || list['length'] === 0x0) return (clearTrackedFocus(), ![]);
+  function focusNodes(list, padding2 = 80, durationMs2 = 800, options3 = null) {
+    if (!Array['isArray'](list) || list['length'] === 0) return (clearTrackedFocus(), ![]);
     return run5({
       type: 'nodes-fit',
       nodeIds: [...list],
@@ -243,7 +243,7 @@ export function createViewportFocusController({
       options: options3,
     });
   }
-  function focusNodeAtZoomPercent(nodeId, zoomPercent = 0x3c, durationMs3 = 0x320) {
+  function focusNodeAtZoomPercent(nodeId, zoomPercent = 60, durationMs3 = 800) {
     return run5({
       type: 'node-zoom-percent',
       nodeId: nodeId,

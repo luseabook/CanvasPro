@@ -38,7 +38,7 @@ export function buildVideoReplicationSpeechPolicy(enabled) {
       voiceoverKinds: [...new Set(args['map']((source) => source['kind']))],
     };
   });
-  return { schemaVersion: 0x1, events: index };
+  return { schemaVersion: 1, events: index };
 }
 export function getVideoReplicationSpeechGuidance(next) {
   return next?.['replication']?.['sourceAnalysis'] ? REPLICATION_SPEECH_ROUTING_GUIDANCE : '';

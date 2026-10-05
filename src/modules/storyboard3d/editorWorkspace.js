@@ -181,8 +181,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function dispatchWorkspaceEvent(enabled, item, detail) {
   if (!enabled?.['dispatchEvent'] || typeof enabled['CustomEvent'] !== 'function') return;
@@ -197,7 +197,7 @@ function setStoryboard3DShotInitialCamera(enabled2, camera2, event) {
     target: [...event['target']],
   }),
     (camera2['animation'] = upsertStoryboard3DCameraKeyframe(camera2['animation'], {
-      time: 0x0,
+      time: 0,
       camera: camera2['camera'],
     })),
     syncStoryboard3DCameraObjectFromShot(enabled2, camera2));
@@ -208,7 +208,7 @@ function restoreStoryboard3DStoredFile(type2, key = globalThis['window']) {
   if (typeof run === 'function') {
     const index = new run([type2['blob']], type2['name'], {
       type: type2['type'] || type2['blob']['type'],
-      lastModified: type2['lastModified'] || 0x0,
+      lastModified: type2['lastModified'] || 0,
     });
     return (
       type2['relativePath'] &&
@@ -223,7 +223,7 @@ function restoreStoryboard3DStoredFile(type2, key = globalThis['window']) {
   const result = type2['blob'];
   for (const [data, value2] of Object['entries']({
     name: type2['name'],
-    lastModified: type2['lastModified'] || 0x0,
+    lastModified: type2['lastModified'] || 0,
     webkitRelativePath: type2['relativePath'] || type2['name'],
   })) {
     try {
@@ -238,9 +238,9 @@ function getSaveStatusLabel(options) {
   return t('storyboard3d.saveStatus.saved');
 }
 function renderObjectOutline(enabled3, list = [], { query: query = '', type: type = 'all' } = {}) {
-  if (!enabled3 || enabled3['objects']['length'] === 0x0)
+  if (!enabled3 || enabled3['objects']['length'] === 0)
     return (
-      '<div\x20class=\x22storyboard-3d-empty-state\x22>\x0a\x20\x20\x20\x20\x20\x20<strong>' +
+      '<div class="storyboard-3d-empty-state">\n      <strong>' +
       escapeHtml(t('storyboard3d.editor.emptyOutlineTitle')) +
       '</strong>\n      <span>' +
       escapeHtml(t('storyboard3d.editor.emptyOutlineDescription')) +
@@ -252,18 +252,18 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
     list2 = enabled3['objects']['filter']((error) => {
       if (type !== 'all' && error['type'] !== type) return ![];
       return (
-        !enabled4 || (error['name'] + '\x20' + error['type'])['toLocaleLowerCase']()['includes'](enabled4)
+        !enabled4 || (error['name'] + ' ' + error['type'])['toLocaleLowerCase']()['includes'](enabled4)
       );
     });
-  if (list2['length'] === 0x0)
+  if (list2['length'] === 0)
     return '<div class="storyboard-3d-empty-state"><strong>没有匹配对象</strong><span>调整名称或类型筛选。</span></div>';
   const map = new Map(enabled3['objects']['map']((target) => [target['id'], target])),
     handler = (source) => {
-      let count = 0x0,
+      let count = 0,
         next = source['parentId'];
       const map2 = new Set([source['id']]);
-      while (next && map['has'](next) && !map2['has'](next) && count < 0x4) {
-        (map2['add'](next), (count += 0x1), (next = map['get'](next)?.['parentId']));
+      while (next && map['has'](next) && !map2['has'](next) && count < 4) {
+        (map2['add'](next), (count += 1), (next = map['get'](next)?.['parentId']));
       }
       return count;
     };
@@ -274,7 +274,7 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
     return (
       '<div draggable="true" class="storyboard-3d-object-row is-depth-' +
       handler(error2) +
-      '\x20' +
+      ' ' +
       (list['includes'](error2['id']) ? 'is-active' : '') +
       '" data-object-type="' +
       escapeHtml(error2['type']) +
@@ -292,13 +292,13 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
       escapeHtml(error2['type']) +
       '</span>\n          </button>\n          <input type="text" class="storyboard-3d-object-row-name-input" value="' +
       escapeHtml2 +
-      '\x22\x20maxlength=\x22120\x22\x20draggable=\x22false\x22\x20data-storyboard-3d-action=\x22edit-object-name\x22\x20data-storyboard-3d-outline-name\x20data-storyboard-3d-object-name\x20data-object-id=\x22' +
+      '" maxlength="120" draggable="false" data-storyboard-3d-action="edit-object-name" data-storyboard-3d-outline-name data-storyboard-3d-object-name data-object-id="' +
       escapeHtml(error2['id']) +
       '" data-object-type="' +
       escapeHtml(error2['type']) +
       '" aria-label="重命名 ' +
       escapeHtml2 +
-      '\x22\x20title=\x22点击重命名\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-object-row-actions\x22\x20role=\x22group\x22\x20aria-label=\x22' +
+      '" title="点击重命名">\n          <span class="storyboard-3d-object-row-actions" role="group" aria-label="' +
       escapeHtml2 +
       ' 对象状态">\n            <button type="button" class="storyboard-3d-object-state-button ' +
       (current ? '' : 'is-off') +
@@ -308,25 +308,25 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
       current +
       '" aria-label="' +
       (current ? '隐藏' : '显示') +
-      '\x20' +
+      ' ' +
       escapeHtml2 +
       '" title="' +
       (current ? '隐藏对象' : '显示对象') +
-      '\x22>' +
+      '">' +
       renderStoryboard3DControlIcon(current ? 'eye' : 'eyeOff') +
-      '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-object-state-button\x20' +
+      '</button>\n            <button type="button" class="storyboard-3d-object-state-button ' +
       (entry ? 'is-locked' : '') +
       '" data-storyboard-3d-action="toggle-object-lock" data-object-id="' +
       escapeHtml(error2['id']) +
       '" aria-pressed="' +
       entry +
-      '\x22\x20aria-label=\x22' +
+      '" aria-label="' +
       (entry ? '解锁' : '锁定') +
-      '\x20' +
+      ' ' +
       escapeHtml2 +
       '" title="' +
       (entry ? '解锁对象' : '锁定对象') +
-      '\x22>' +
+      '">' +
       renderStoryboard3DControlIcon(entry ? 'lock' : 'unlock') +
       '</button>\n            <button type="button" class="storyboard-3d-object-state-button is-delete" data-storyboard-3d-action="delete-object" data-object-id="' +
       escapeHtml(error2['id']) +
@@ -343,9 +343,9 @@ function renderShotStrip(enabled5, { timelineOpen: timelineOpen = ![] } = {}) {
       escapeHtml(t('storyboard3d.editor.shots')) +
       '</strong>\n    <button type="button" class="storyboard-3d-shot-keyframe-trigger ' +
       (timelineOpen ? 'is-active' : '') +
-      '\x22\x20data-storyboard-3d-action=\x22timeline-toggle-drawer\x22\x20aria-expanded=\x22' +
+      '" data-storyboard-3d-action="timeline-toggle-drawer" aria-expanded="' +
       timelineOpen +
-      '\x22>关键帧</button>\x0a\x20\x20</div>',
+      '">关键帧</button>\n  </div>',
     payload = enabled5['shots']
       ['map'](
         (error3, index2) =>
@@ -357,17 +357,17 @@ function renderShotStrip(enabled5, { timelineOpen: timelineOpen = ![] } = {}) {
           (error3['id'] === enabled5['activeShotId']) +
           '">\n        <span class="storyboard-3d-shot-thumb">\n          ' +
           (error3['thumbnailUrl']
-            ? '<img\x20src=\x22' +
+            ? '<img src="' +
               escapeHtml(error3['thumbnailUrl']) +
               '" alt="' +
               escapeHtml(error3['name']) +
-              '\x22>'
+              '">'
             : '<span>' + escapeHtml(t('storyboard3d.editor.previewPending')) + '</span>') +
           '\n        </span>\n        <span class="storyboard-3d-shot-copy">\n          <small>' +
-          escapeHtml(t('storyboard3d.editor.shotNumber', { index: index2 + 0x1 })) +
+          escapeHtml(t('storyboard3d.editor.shotNumber', { index: index2 + 1 })) +
           '</small>\n          <strong>' +
           escapeHtml(error3['name']) +
-          '</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
+          '</strong>\n          <span>' +
           escapeHtml(formatFocalLength(error3['camera']['focalLength']) + 'mm · ' + error3['shotSize']) +
           '</span>\n        </span>\n      </button>',
       )
@@ -382,7 +382,7 @@ function renderShotStrip(enabled5, { timelineOpen: timelineOpen = ![] } = {}) {
     escapeHtml3 +
     '" title="' +
     escapeHtml4 +
-    '\x22>' +
+    '">' +
     renderStoryboard3DControlIcon('camera') +
     '<strong>' +
     escapeHtml3 +
@@ -394,7 +394,7 @@ function renderShotTimelineDrawerHandle(handle, state) {
   return (
     '<button type="button" class="storyboard-3d-timeline-drawer-handle ' +
     (handle ? 'is-open' : '') +
-    '\x22\x20data-storyboard-3d-action=\x22timeline-toggle-drawer\x22\x20data-storyboard-3d-timeline-resize-handle\x20role=\x22separator\x22\x20aria-orientation=\x22horizontal\x22\x20aria-valuemin=\x22120\x22\x20aria-valuemax=\x22720\x22\x20aria-valuenow=\x22' +
+    '" data-storyboard-3d-action="timeline-toggle-drawer" data-storyboard-3d-timeline-resize-handle role="separator" aria-orientation="horizontal" aria-valuemin="120" aria-valuemax="720" aria-valuenow="' +
     state +
     '" aria-expanded="' +
     handle +
@@ -406,24 +406,24 @@ function renderShotTimelineDrawerHandle(handle, state) {
 function formatFocalLength(scope) {
   const input = Number(scope);
   if (!Number['isFinite'](input)) return '35';
-  const output = Math['round'](input * 0xa) / 0xa;
-  return Number['isInteger'](output) ? String(output) : output['toFixed'](0x1);
+  const output = Math['round'](input * 10) / 10;
+  return Number['isInteger'](output) ? String(output) : output['toFixed'](1);
 }
 function resolveStoryboard3DFocalPresetIndex(value3) {
   const value4 = Number(value3);
-  if (!Number['isFinite'](value4)) return STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](0x23);
+  if (!Number['isFinite'](value4)) return STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](35);
   return STORYBOARD_3D_FOCAL_LENGTH_PRESETS['reduce'](
     (value5, value6, value7) =>
       Math['abs'](value6 - value4) < Math['abs'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS[value5] - value4)
         ? value7
         : value5,
-    0x0,
+    0,
   );
 }
 function getStoryboard3DFocalPreset(value8) {
   const value9 = Math['max'](
-    0x0,
-    Math['min'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 0x1, Math['round'](Number(value8) || 0x0)),
+    0,
+    Math['min'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 1, Math['round'](Number(value8) || 0)),
   );
   return STORYBOARD_3D_FOCAL_LENGTH_PRESETS[value9];
 }
@@ -439,7 +439,7 @@ function renderStoryboard3DFocalControl(enabled6, value10) {
       ['reverse']()
       ['map']((count2) => {
         const value15 = count2 === value11 ? ' is-active' : '';
-        return count2 === 0x23
+        return count2 === 35
           ? '<button type="button" class="storyboard-3d-focal-tick is-default' +
               value15 +
               '" data-storyboard-3d-action="reset-focal-length" data-focal-length="35" aria-label="恢复默认焦距 35mm"><span aria-hidden="true">35</span><small aria-hidden="true">默认</small></button>'
@@ -458,14 +458,14 @@ function renderStoryboard3DFocalControl(enabled6, value10) {
     '">\n    <span class="storyboard-3d-focal-value">焦距 <output data-storyboard-3d-focal-output>' +
     value11 +
     'mm</output></span>\n    <span class="storyboard-3d-focal-slider-wrap">\n      <input type="range" min="0" max="' +
-    (STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 0x1) +
+    (STORYBOARD_3D_FOCAL_LENGTH_PRESETS['length'] - 1) +
     '" step="1" value="' +
     storyboard3DFocalPresetIndex +
-    '\x22\x20data-storyboard-3d-focal-slider\x20aria-label=\x22镜头焦距\x22\x20aria-valuetext=\x22' +
+    '" data-storyboard-3d-focal-slider aria-label="镜头焦距" aria-valuetext="' +
     value11 +
     'mm" ' +
     (value12 ? 'disabled' : '') +
-    '>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-focal-ticks\x22>' +
+    '>\n      <span class="storyboard-3d-focal-ticks">' +
     value14 +
     '</span>\n    </span>\n  </div>'
   );
@@ -476,9 +476,9 @@ function createLocalId(value16) {
   return (
     value16 +
     '-' +
-    Date['now']()['toString'](0x24) +
+    Date['now']()['toString'](36) +
     '-' +
-    Math['random']()['toString'](0x24)['slice'](0x2, 0x9)
+    Math['random']()['toString'](36)['slice'](2, 9)
   );
 }
 function renderVectorInputs(value18, value19, value20 = []) {
@@ -491,11 +491,11 @@ function renderVectorInputs(value18, value19, value20 = []) {
         (value21 ? '°' : '') +
         '</span><input type="number" step="' +
         (value21 ? '1' : '0.01') +
-        '\x22\x20value=\x22' +
+        '" value="' +
         escapeHtml(
-          (value21 ? (Number(value20[value23] || 0x0) * 0xb4) / Math['PI'] : Number(value20[value23] || 0x0))[
+          (value21 ? (Number(value20[value23] || 0) * 180) / Math['PI'] : Number(value20[value23] || 0))[
             'toFixed'
-          ](value21 ? 0x1 : 0x2),
+          ](value21 ? 1 : 2),
         ) +
         '" data-storyboard-3d-transform-input data-object-id="' +
         escapeHtml(value18) +
@@ -521,11 +521,11 @@ function renderSelectedObjectInspector(error4, value24 = 'Head', value25 = null,
   const storyboard3DObjectTransformCapabilities = getStoryboard3DObjectTransformCapabilities(error4),
     value27 = { position: '位置', rotation: '旋转', scale: '缩放' },
     value28 =
-      storyboard3DObjectTransformCapabilities['fields']['length'] > 0x0
+      storyboard3DObjectTransformCapabilities['fields']['length'] > 0
         ? storyboard3DObjectTransformCapabilities['fields']
             ['map'](
               (value29) =>
-                '<div\x20class=\x22storyboard-3d-transform-group\x22><strong>' +
+                '<div class="storyboard-3d-transform-group"><strong>' +
                 value27[value29] +
                 '</strong><div>' +
                 renderVectorInputs(error4['id'], value29, error4['transform']?.[value29]) +
@@ -548,7 +548,7 @@ function renderSelectedObjectInspector(error4, value24 = 'Head', value25 = null,
         (error5) =>
           '<option value="' +
           escapeHtml(error5['id']) +
-          '\x22\x20' +
+          '" ' +
           (error4['parentId'] === error5['id'] ? 'selected' : '') +
           '>' +
           escapeHtml(error5['name']) +
@@ -575,13 +575,13 @@ function renderSelectedObjectInspector(error4, value24 = 'Head', value25 = null,
     escapeHtml(error4['id']) +
     '">复制</button>\n      <button type="button" data-storyboard-3d-action="delete-object" data-object-id="' +
     escapeHtml(error4['id']) +
-    '\x22>删除</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</section>'
+    '">删除</button>\n    </div>\n  </section>'
   );
 }
 function renderCameraControls(value31) {
   return (
     '<div class="storyboard-3d-character-controls storyboard-3d-camera-controls">\n    <label><span>焦距 mm</span><input type="number" min="1" max="200" step="1" value="' +
-    escapeHtml(value31['focalLength'] ?? 0x23) +
+    escapeHtml(value31['focalLength'] ?? 35) +
     '" data-storyboard-3d-camera-field="focalLength" data-object-id="' +
     escapeHtml(value31['id']) +
     '"></label>\n    <label><span>宽高比</span><input type="text" value="' +
@@ -590,10 +590,10 @@ function renderCameraControls(value31) {
     escapeHtml(value31['id']) +
     '"></label>\n    <label><span>近裁剪面</span><input type="number" min="0.001" step="0.01" value="' +
     escapeHtml(value31['near'] ?? 0.1) +
-    '\x22\x20data-storyboard-3d-camera-field=\x22near\x22\x20data-object-id=\x22' +
+    '" data-storyboard-3d-camera-field="near" data-object-id="' +
     escapeHtml(value31['id']) +
     '"></label>\n    <label><span>远裁剪面</span><input type="number" min="1" step="1" value="' +
-    escapeHtml(value31['far'] ?? 0x3e8) +
+    escapeHtml(value31['far'] ?? 1000) +
     '" data-storyboard-3d-camera-field="far" data-object-id="' +
     escapeHtml(value31['id']) +
     '"></label>\n    <p>该摄像机与对应 Shot 一对一绑定；移动、旋转和焦距修改会同步到镜头与摄像机关键帧。</p>\n  </div>'
@@ -612,15 +612,15 @@ function renderPropControls(value32, value33) {
       : '') +
     '\n    <label><span>色调覆盖</span><input type="color" value="' +
     escapeHtml(value32['tint'] || '#ffffff') +
-    '\x22\x20data-storyboard-3d-prop-field=\x22tint\x22\x20data-object-id=\x22' +
+    '" data-storyboard-3d-prop-field="tint" data-object-id="' +
     escapeHtml(value32['id']) +
     '"></label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-prop-field="castShadow" data-object-id="' +
     escapeHtml(value32['id']) +
-    '\x22\x20' +
+    '" ' +
     (value32['castShadow'] !== ![] ? 'checked' : '') +
     '>投射阴影</label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-prop-field="receiveShadow" data-object-id="' +
     escapeHtml(value32['id']) +
-    '\x22\x20' +
+    '" ' +
     (value32['receiveShadow'] !== ![] ? 'checked' : '') +
     '>接收阴影</label>\n  </div>'
   );
@@ -628,9 +628,9 @@ function renderPropControls(value32, value33) {
 function renderSelectOptions(list4, value35) {
   return list4['map'](
     (error6) =>
-      '<option\x20value=\x22' +
+      '<option value="' +
       escapeHtml(error6['id']) +
-      '\x22\x20' +
+      '" ' +
       (error6['id'] === value35 ? 'selected' : '') +
       '>' +
       escapeHtml(error6['name']) +
@@ -650,18 +650,18 @@ const STORYBOARD_3D_EDITABLE_BONES = Object['freeze']([
     ['calf_l', '左膝'],
     ['calf_r', '右膝'],
   ]),
-  STORYBOARD_3D_INSPECTOR_MIN_WIDTH = 0x118,
-  STORYBOARD_3D_INSPECTOR_MAX_WIDTH = 0x230,
-  STORYBOARD_3D_VIEWPORT_MIN_WIDTH = 0x1a4,
-  STORYBOARD_3D_INSPECTOR_SPLITTER_WIDTH = 0xe,
-  STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH = 0x168,
-  STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH = 0x708,
-  STORYBOARD_3D_RIGHT_SIDEBAR_VIEWPORT_MIN_WIDTH = 0x118,
-  STORYBOARD_3D_TIMELINE_MIN_HEIGHT = 0xdc,
-  STORYBOARD_3D_TIMELINE_MAX_HEIGHT = 0x2d0,
-  STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT = 0x154,
-  STORYBOARD_3D_VIEWPORT_MIN_HEIGHT = 0xa0;
-export function normalizeStoryboard3DInspectorWidth(value36, value37 = 0x4b0) {
+  STORYBOARD_3D_INSPECTOR_MIN_WIDTH = 280,
+  STORYBOARD_3D_INSPECTOR_MAX_WIDTH = 560,
+  STORYBOARD_3D_VIEWPORT_MIN_WIDTH = 420,
+  STORYBOARD_3D_INSPECTOR_SPLITTER_WIDTH = 14,
+  STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH = 360,
+  STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH = 1800,
+  STORYBOARD_3D_RIGHT_SIDEBAR_VIEWPORT_MIN_WIDTH = 280,
+  STORYBOARD_3D_TIMELINE_MIN_HEIGHT = 220,
+  STORYBOARD_3D_TIMELINE_MAX_HEIGHT = 720,
+  STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT = 340,
+  STORYBOARD_3D_VIEWPORT_MIN_HEIGHT = 160;
+export function normalizeStoryboard3DInspectorWidth(value36, value37 = 1200) {
   const value38 = Number(value37),
     value39 = Number['isFinite'](value38)
       ? value38 - STORYBOARD_3D_VIEWPORT_MIN_WIDTH - STORYBOARD_3D_INSPECTOR_SPLITTER_WIDTH
@@ -671,7 +671,7 @@ export function normalizeStoryboard3DInspectorWidth(value36, value37 = 0x4b0) {
       Math['min'](STORYBOARD_3D_INSPECTOR_MAX_WIDTH, value39),
     ),
     value41 = Number(value36),
-    value42 = Math['min'](0x168, value40);
+    value42 = Math['min'](360, value40);
   return Math['round'](
     Math['max'](
       STORYBOARD_3D_INSPECTOR_MIN_WIDTH,
@@ -681,11 +681,11 @@ export function normalizeStoryboard3DInspectorWidth(value36, value37 = 0x4b0) {
 }
 export function resolveStoryboard3DViewportCenterPosition(event2) {
   const box = event2?.['target'],
-    value43 = Array['isArray'](box) ? Number(box[0x0]) : Number(box?.['x']),
-    value44 = Array['isArray'](box) ? Number(box[0x2]) : Number(box?.['z']);
-  return [Number['isFinite'](value43) ? value43 : 0x0, 0x0, Number['isFinite'](value44) ? value44 : 0x0];
+    value43 = Array['isArray'](box) ? Number(box[0]) : Number(box?.['x']),
+    value44 = Array['isArray'](box) ? Number(box[2]) : Number(box?.['z']);
+  return [Number['isFinite'](value43) ? value43 : 0, 0, Number['isFinite'](value44) ? value44 : 0];
 }
-export function normalizeStoryboard3DRightSidebarWidth(value45, value46 = 0x5a0, value47 = 'assets') {
+export function normalizeStoryboard3DRightSidebarWidth(value45, value46 = 1440, value47 = 'assets') {
   const value48 = Number(value46),
     value49 = Number['isFinite'](value48)
       ? value48 - STORYBOARD_3D_RIGHT_SIDEBAR_VIEWPORT_MIN_WIDTH
@@ -697,10 +697,10 @@ export function normalizeStoryboard3DRightSidebarWidth(value45, value46 = 0x5a0,
     value51 = value45 == null ? Number['NaN'] : Number(value45),
     value52 = value47 !== 'assets',
     value53 = Math['min'](
-      value52 ? 0x1e0 : 0x3c0,
+      value52 ? 480 : 960,
       Math['max'](
         STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH,
-        Number['isFinite'](value48) ? value48 * (value52 ? 0.21 : 0.42) : value52 ? 0x168 : 0x2d0,
+        Number['isFinite'](value48) ? value48 * (value52 ? 0.21 : 0.42) : value52 ? 360 : 720,
       ),
     );
   return Math['round'](
@@ -710,12 +710,12 @@ export function normalizeStoryboard3DRightSidebarWidth(value45, value46 = 0x5a0,
     ),
   );
 }
-export function normalizeStoryboard3DTimelineHeight(value54, value55 = 0x384) {
+export function normalizeStoryboard3DTimelineHeight(value54, value55 = 900) {
   const value56 = Number(value55),
     value57 = Number['isFinite'](value56)
       ? Math['min'](
           STORYBOARD_3D_TIMELINE_MIN_HEIGHT,
-          Math['max'](0x78, value56 - STORYBOARD_3D_VIEWPORT_MIN_HEIGHT),
+          Math['max'](120, value56 - STORYBOARD_3D_VIEWPORT_MIN_HEIGHT),
         )
       : STORYBOARD_3D_TIMELINE_MIN_HEIGHT,
     value58 = Number['isFinite'](value56)
@@ -732,11 +732,11 @@ function getCharacterPoseStatusText(response = {}) {
   if (response['status'] === 'running') return '正在本地识别“' + (response['fileName'] || '参考图') + '”…';
   if (response['status'] === 'error') return response['error'] || '姿势识别失败。';
   if (response['status'] === 'success') {
-    const value62 = Math['round']((Number(response['confidence']) || 0x0) * 0x64),
-      value63 = response['warningCount'] > 0x0 ? ' · 部分遮挡关节已跳过' : '';
-    return '已应用 ' + (Number(response['boneCount']) || 0x0) + ' 个骨骼 · 置信度 ' + value62 + '%' + value63;
+    const value62 = Math['round']((Number(response['confidence']) || 0) * 100),
+      value63 = response['warningCount'] > 0 ? ' · 部分遮挡关节已跳过' : '';
+    return '已应用 ' + (Number(response['boneCount']) || 0) + ' 个骨骼 · 置信度 ' + value62 + '%' + value63;
   }
-  return '支持单人全身\x20JPG、PNG、WebP；图片仅在本机处理。';
+  return '支持单人全身 JPG、PNG、WebP；图片仅在本机处理。';
 }
 function reconcileCharacterPoseState(value64, response2) {
   if (
@@ -749,86 +749,86 @@ function reconcileCharacterPoseState(value64, response2) {
 function renderCharacterControls(value65, value66 = 'Head', value67 = null) {
   const value68 =
       STORYBOARD_3D_ACTIONS['find']((value69) => value69['id'] === value65['actionId']) ||
-      STORYBOARD_3D_ACTIONS[0x0],
+      STORYBOARD_3D_ACTIONS[0],
     storyboard3DEuler = quaternionToStoryboard3DEuler(value65['boneOverrides']?.[value66]),
     response3 = value67 || { status: 'idle' },
     enabled7 = response3['status'] === 'running',
-    enabled8 = Object['keys'](value65['boneOverrides'] || {})['length'] > 0x0;
+    enabled8 = Object['keys'](value65['boneOverrides'] || {})['length'] > 0;
   return (
     '<div class="storyboard-3d-character-controls">\n    <label><span>人偶外观</span><select data-storyboard-3d-character-field="characterStyle" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22><option\x20value=\x22articulated\x22\x20' +
+    '"><option value="articulated" ' +
     (value65['characterStyle'] !== 'anatomical' ? 'selected' : '') +
     '>关节预演人偶</option><option value="anatomical" ' +
     (value65['characterStyle'] === 'anatomical' ? 'selected' : '') +
     '>人体模型</option></select></label>\n    <label><span>体型</span><select data-storyboard-3d-character-field="bodyPresetId" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22>' +
+    '">' +
     renderSelectOptions(STORYBOARD_3D_BODY_PRESETS, value65['bodyPresetId']) +
     '</select></label>\n    <label><span>动作</span><select data-storyboard-3d-character-field="actionId" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22>' +
+    '">' +
     renderSelectOptions(STORYBOARD_3D_ACTIONS, value65['actionId']) +
     '</select></label>\n    <label><span>左手</span><select data-storyboard-3d-character-field="leftHandPoseId" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22>' +
+    '">' +
     renderSelectOptions(STORYBOARD_3D_HAND_POSES, value65['leftHandPoseId']) +
-    '</select></label>\x0a\x20\x20\x20\x20<label><span>右手</span><select\x20data-storyboard-3d-character-field=\x22rightHandPoseId\x22\x20data-object-id=\x22' +
+    '</select></label>\n    <label><span>右手</span><select data-storyboard-3d-character-field="rightHandPoseId" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22>' +
+    '">' +
     renderSelectOptions(STORYBOARD_3D_HAND_POSES, value65['rightHandPoseId']) +
     '</select></label>\n    <label><span>发型</span><input type="text" maxlength="80" value="' +
     escapeHtml(value65['hairId'] || '') +
-    '\x22\x20placeholder=\x22默认\x22\x20data-storyboard-3d-character-field=\x22hairId\x22\x20data-object-id=\x22' +
+    '" placeholder="默认" data-storyboard-3d-character-field="hairId" data-object-id="' +
     escapeHtml(value65['id']) +
     '"></label>\n    <label class="is-wide"><span>附件 ID（逗号分隔）</span><input type="text" maxlength="500" value="' +
-    escapeHtml((value65['attachmentIds'] || [])['join'](',\x20')) +
+    escapeHtml((value65['attachmentIds'] || [])['join'](', ')) +
     '" placeholder="hat-01, bag-02" data-storyboard-3d-character-attachments data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22></label>\x0a\x20\x20\x20\x20<label\x20class=\x22is-wide\x22><span>动作时间\x20' +
-    Number(value65['actionTime'] || 0x0)['toFixed'](0x2) +
+    '"></label>\n    <label class="is-wide"><span>动作时间 ' +
+    Number(value65['actionTime'] || 0)['toFixed'](2) +
     's</span><input type="range" min="0" max="' +
-    escapeHtml(value68['duration'] || 0x1) +
+    escapeHtml(value68['duration'] || 1) +
     '" step="0.01" value="' +
-    escapeHtml(value65['actionTime'] || 0x0) +
+    escapeHtml(value65['actionTime'] || 0) +
     '" data-storyboard-3d-character-time data-object-id="' +
     escapeHtml(value65['id']) +
     '"></label>\n    <button type="button" data-storyboard-3d-action="toggle-character-play" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22>' +
+    '">' +
     (value65['actionPlaying'] ? '暂停动作' : '播放动作') +
-    '</button>\x0a\x20\x20\x20\x20<section\x20class=\x22storyboard-3d-character-pose-from-image\x22\x20data-storyboard-3d-character-pose\x20data-object-id=\x22' +
+    '</button>\n    <section class="storyboard-3d-character-pose-from-image" data-storyboard-3d-character-pose data-object-id="' +
     escapeHtml(value65['id']) +
     '" data-pose-status="' +
     escapeHtml(response3['status'] || 'idle') +
     '" data-has-pose="' +
     enabled8 +
-    '\x22\x20aria-busy=\x22' +
+    '" aria-busy="' +
     enabled7 +
     '">\n      <div>\n        <strong>参考图姿势</strong>\n        <small>MediaPipe Heavy · 本地单人识别</small>\n      </div>\n      <div class="storyboard-3d-character-pose-actions">\n        <button type="button" class="is-primary" data-storyboard-3d-action="extract-character-pose" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22\x20' +
+    '" ' +
     (enabled7 ? 'disabled' : '') +
     '>' +
     (enabled7 ? '识别中…' : '从图片提取姿势') +
     '</button>\n        <button type="button" data-storyboard-3d-action="' +
     (enabled7 ? 'cancel-character-pose' : 'reset-character-pose') +
-    '\x22\x20data-object-id=\x22' +
+    '" data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22\x20' +
+    '" ' +
     (!enabled7 && !enabled8 ? 'disabled' : '') +
     '>' +
     (enabled7 ? '取消识别' : '重置骨骼') +
-    '</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<p\x20data-storyboard-3d-character-pose-status\x20role=\x22status\x22\x20aria-live=\x22polite\x22>' +
+    '</button>\n      </div>\n      <p data-storyboard-3d-character-pose-status role="status" aria-live="polite">' +
     escapeHtml(getCharacterPoseStatusText(response3)) +
-    '</p>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-bone-editor\x22>\x0a\x20\x20\x20\x20\x20\x20<label><span>骨骼微调</span><select\x20data-storyboard-3d-bone-select\x20data-object-id=\x22' +
+    '</p>\n    </section>\n    <div class="storyboard-3d-bone-editor">\n      <label><span>骨骼微调</span><select data-storyboard-3d-bone-select data-object-id="' +
     escapeHtml(value65['id']) +
-    '\x22>' +
+    '">' +
     STORYBOARD_3D_EDITABLE_BONES['map'](
       ([value70, value71]) =>
         '<option value="' +
         value70 +
-        '\x22\x20' +
+        '" ' +
         (value70 === value66 ? 'selected' : '') +
         '>' +
         value71 +
@@ -840,8 +840,8 @@ function renderCharacterControls(value65, value66 = 'Head', value67 = null) {
         (value72) =>
           '<label><span>' +
           value72['toUpperCase']() +
-          '°</span><input\x20type=\x22number\x22\x20min=\x22-180\x22\x20max=\x22180\x22\x20step=\x221\x22\x20value=\x22' +
-          escapeHtml(Math['round'](((storyboard3DEuler[value72] || 0x0) * 0xb4) / Math['PI'])) +
+          '°</span><input type="number" min="-180" max="180" step="1" value="' +
+          escapeHtml(Math['round'](((storyboard3DEuler[value72] || 0) * 180) / Math['PI'])) +
           '" data-storyboard-3d-bone-axis="' +
           value72 +
           '" data-bone-name="' +
@@ -856,44 +856,44 @@ function renderCharacterControls(value65, value66 = 'Head', value67 = null) {
 }
 function renderLightControls(value73) {
   return (
-    '<div\x20class=\x22storyboard-3d-character-controls\x20storyboard-3d-light-controls\x22>\x0a\x20\x20\x20\x20<label><span>类型</span><select\x20data-storyboard-3d-light-field=\x22lightType\x22\x20data-object-id=\x22' +
+    '<div class="storyboard-3d-character-controls storyboard-3d-light-controls">\n    <label><span>类型</span><select data-storyboard-3d-light-field="lightType" data-object-id="' +
     escapeHtml(value73['id']) +
     '">\n      ' +
     ['ambient', 'directional', 'point', 'spot']
       ['map'](
         (value74) =>
-          '<option\x20value=\x22' +
+          '<option value="' +
           value74 +
-          '\x22\x20' +
+          '" ' +
           (value73['lightType'] === value74 ? 'selected' : '') +
           '>' +
           value74 +
           '</option>',
       )
       ['join']('') +
-    '\x0a\x20\x20\x20\x20</select></label>\x0a\x20\x20\x20\x20<label><span>强度</span><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x22100\x22\x20step=\x220.1\x22\x20value=\x22' +
-    escapeHtml(value73['intensity'] ?? 0x1) +
+    '\n    </select></label>\n    <label><span>强度</span><input type="number" min="0" max="100" step="0.1" value="' +
+    escapeHtml(value73['intensity'] ?? 1) +
     '" data-storyboard-3d-light-field="intensity" data-object-id="' +
     escapeHtml(value73['id']) +
-    '\x22></label>\x0a\x20\x20\x20\x20<label><span>颜色</span><input\x20type=\x22color\x22\x20value=\x22' +
+    '"></label>\n    <label><span>颜色</span><input type="color" value="' +
     escapeHtml(value73['color'] || '#ffffff') +
     '" data-storyboard-3d-light-field="color" data-object-id="' +
     escapeHtml(value73['id']) +
     '"></label>\n    <label><span>衰减距离</span><input type="number" min="0" max="10000" step="0.1" value="' +
-    escapeHtml(value73['distance'] ?? 0x0) +
-    '\x22\x20data-storyboard-3d-light-field=\x22distance\x22\x20data-object-id=\x22' +
+    escapeHtml(value73['distance'] ?? 0) +
+    '" data-storyboard-3d-light-field="distance" data-object-id="' +
     escapeHtml(value73['id']) +
     '"></label>\n    <label><span>衰减系数</span><input type="number" min="0" max="10" step="0.1" value="' +
-    escapeHtml(value73['decay'] ?? 0x2) +
+    escapeHtml(value73['decay'] ?? 2) +
     '" data-storyboard-3d-light-field="decay" data-object-id="' +
     escapeHtml(value73['id']) +
     '"></label>\n    <label><span>聚光角度°</span><input type="number" min="1" max="179" step="1" value="' +
-    escapeHtml(Math['round'](((value73['angle'] ?? Math['PI'] / 0x6) * 0xb4) / Math['PI'])) +
+    escapeHtml(Math['round'](((value73['angle'] ?? Math['PI'] / 6) * 180) / Math['PI'])) +
     '" data-storyboard-3d-light-field="angleDegrees" data-object-id="' +
     escapeHtml(value73['id']) +
     '"></label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-light-field="castShadow" data-object-id="' +
     escapeHtml(value73['id']) +
-    '\x22\x20' +
+    '" ' +
     (value73['castShadow'] === !![] ? 'checked' : '') +
     '>投射阴影</label>\n  </div>'
   );
@@ -905,7 +905,7 @@ function renderBackgroundCalibrationGuide(value75) {
       storyboard3DBackgroundCalibration,
     ),
     [value76, value77] = storyboard3DBackgroundGuideGeometry['vanishingPoint'],
-    value78 = Math['round'](storyboard3DBackgroundCalibration['calibrationConfidence'] * 0x64);
+    value78 = Math['round'](storyboard3DBackgroundCalibration['calibrationConfidence'] * 100);
   return (
     '<div class="storyboard-3d-background-calibration-guide" aria-hidden="true">\n    <svg viewBox="0 0 1000 1000" preserveAspectRatio="none">\n      <polygon class="storyboard-3d-background-ground-region" data-storyboard-3d-background-ground-region points="' +
     storyboard3DBackgroundGuideGeometry['groundPoints'] +
@@ -925,17 +925,17 @@ function renderBackgroundCalibrationGuide(value75) {
     storyboard3DBackgroundGuideGeometry['leftY'] +
     '" x2="1000" y2="' +
     storyboard3DBackgroundGuideGeometry['rightY'] +
-    '\x22></line>\x0a\x20\x20\x20\x20\x20\x20<circle\x20class=\x22storyboard-3d-background-vanishing-point\x22\x20data-storyboard-3d-background-vanishing-point\x20cx=\x22' +
+    '"></line>\n      <circle class="storyboard-3d-background-vanishing-point" data-storyboard-3d-background-vanishing-point cx="' +
     value76 +
     '" cy="' +
     value77 +
     '" r="9"></circle>\n      <circle class="storyboard-3d-background-vanishing-point-hit" data-storyboard-3d-background-vanishing-point data-storyboard-3d-background-drag="vanishing-point" cx="' +
     value76 +
-    '\x22\x20cy=\x22' +
+    '" cy="' +
     value77 +
-    '\x22\x20r=\x2224\x22></circle>\x0a\x20\x20\x20\x20</svg>\x0a\x20\x20\x20\x20<span\x20data-storyboard-3d-background-guide-status>拖动青线或黄点调整\x20·\x20' +
+    '" r="24"></circle>\n    </svg>\n    <span data-storyboard-3d-background-guide-status>拖动青线或黄点调整 · ' +
     value78 +
-    '%</span>\x0a\x20\x20</div>'
+    '%</span>\n  </div>'
   );
 }
 function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
@@ -943,18 +943,18 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
       error7?.['background'],
     ),
     value82 = Math['max'](
-      0x0,
+      0,
       Math['min'](
-        0x1,
+        1,
         storyboard3DBackgroundCalibration2['horizonY'] +
           storyboard3DBackgroundCalibration2['horizonSlope'] *
-            (storyboard3DBackgroundCalibration2['vanishingPoint'][0x0] - 0.5),
+            (storyboard3DBackgroundCalibration2['vanishingPoint'][0] - 0.5),
       ),
     );
   return (
-    '<section\x20class=\x22storyboard-3d-inspector-card\x20storyboard-3d-scene-controls\x22>\x0a\x20\x20\x20\x20<small>场景设置</small>\x0a\x20\x20\x20\x20<input\x20class=\x22storyboard-3d-scene-name-input\x22\x20type=\x22text\x22\x20maxlength=\x22120\x22\x20value=\x22' +
+    '<section class="storyboard-3d-inspector-card storyboard-3d-scene-controls">\n    <small>场景设置</small>\n    <input class="storyboard-3d-scene-name-input" type="text" maxlength="120" value="' +
     escapeHtml(error7?.['name'] || '') +
-    '\x22\x20data-storyboard-3d-scene-name\x20data-scene-id=\x22' +
+    '" data-storyboard-3d-scene-name data-scene-id="' +
     escapeHtml(error7?.['id'] || '') +
     '" aria-label="场景名称">\n    <details class="storyboard-3d-scene-environment" data-storyboard-3d-scene-environment ' +
     (value81 ? 'open' : '') +
@@ -964,7 +964,7 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
         (value83) =>
           '<option value="' +
           value83 +
-          '\x22\x20' +
+          '" ' +
           (error7?.['environment']?.['type'] === value83 ? 'selected' : '') +
           '>' +
           value83 +
@@ -973,7 +973,7 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
       ['join']('') +
     '\n      </select></label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="showGrid" ' +
     (error7?.['environment']?.['showGrid'] !== ![] ? 'checked' : '') +
-    '>显示网格</label>\x0a\x20\x20\x20\x20\x20\x20<label\x20class=\x22is-check\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-scene-field=\x22showOutline\x22\x20' +
+    '>显示网格</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="showOutline" ' +
     (error7?.['environment']?.['showOutline'] !== ![] ? 'checked' : '') +
     '>选择描边</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="enableShadows" ' +
     (error7?.['environment']?.['enableShadows'] !== ![] ? 'checked' : '') +
@@ -982,28 +982,28 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
     '" placeholder="https://…" data-storyboard-3d-background-field="imageUrl"></label>\n      <label><span>水平 FOV</span><input type="number" min="10" max="170" step="1" value="' +
     storyboard3DBackgroundCalibration2['horizontalFov'] +
     '" data-storyboard-3d-background-field="horizontalFov"></label>\n      <label><span>垂直 FOV</span><input type="number" min="10" max="170" step="1" value="' +
-    (storyboard3DBackgroundCalibration2['verticalFov'] || 0x28) +
+    (storyboard3DBackgroundCalibration2['verticalFov'] || 40) +
     '" data-storyboard-3d-background-field="verticalFov"></label>\n      <label><span>地平线</span><input type="number" min="0" max="1" step="0.01" value="' +
     storyboard3DBackgroundCalibration2['horizonY'] +
     '" data-storyboard-3d-background-field="horizonY"></label>\n      <label><span>地平线倾斜</span><input type="number" min="-1" max="1" step="0.01" value="' +
     storyboard3DBackgroundCalibration2['horizonSlope'] +
     '" data-storyboard-3d-background-field="horizonSlope"></label>\n      <label><span>相机高度 m</span><input type="number" min="0.2" max="20" step="0.1" value="' +
     storyboard3DBackgroundCalibration2['cameraHeight'] +
-    '\x22\x20data-storyboard-3d-background-field=\x22cameraHeight\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>背景缩放</span><input\x20type=\x22number\x22\x20min=\x220.1\x22\x20max=\x2210\x22\x20step=\x220.1\x22\x20value=\x22' +
+    '" data-storyboard-3d-background-field="cameraHeight"></label>\n      <label><span>背景缩放</span><input type="number" min="0.1" max="10" step="0.1" value="' +
     storyboard3DBackgroundCalibration2['imageScale'] +
-    '\x22\x20data-storyboard-3d-background-field=\x22imageScale\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>消失点\x20X</span><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x221\x22\x20step=\x220.01\x22\x20value=\x22' +
-    storyboard3DBackgroundCalibration2['vanishingPoint'][0x0] +
-    '\x22\x20data-storyboard-3d-background-field=\x22vanishingPointX\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>消失点\x20Y（自动）</span><input\x20type=\x22number\x22\x20value=\x22' +
-    value82['toFixed'](0x3) +
+    '" data-storyboard-3d-background-field="imageScale"></label>\n      <label><span>消失点 X</span><input type="number" min="0" max="1" step="0.01" value="' +
+    storyboard3DBackgroundCalibration2['vanishingPoint'][0] +
+    '" data-storyboard-3d-background-field="vanishingPointX"></label>\n      <label><span>消失点 Y（自动）</span><input type="number" value="' +
+    value82['toFixed'](3) +
     '" disabled></label>\n      <label><span>背景偏移 X</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    storyboard3DBackgroundCalibration2['imageOffset'][0x0] +
+    storyboard3DBackgroundCalibration2['imageOffset'][0] +
     '" data-storyboard-3d-background-field="imageOffsetX"></label>\n      <label><span>背景偏移 Y</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    storyboard3DBackgroundCalibration2['imageOffset'][0x1] +
-    '\x22\x20data-storyboard-3d-background-field=\x22imageOffsetY\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label\x20class=\x22is-check\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-background-lock\x20' +
+    storyboard3DBackgroundCalibration2['imageOffset'][1] +
+    '" data-storyboard-3d-background-field="imageOffsetY"></label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-background-lock ' +
     (storyboard3DBackgroundCalibration2['lockedCamera'] ? 'checked' : '') +
-    '\x20' +
+    ' ' +
     (!storyboard3DBackgroundCalibration2['imageUrl'] ? 'disabled' : '') +
-    '>锁定背景机位</label>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</details>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-viewport-settings\x22>\x0a\x20\x20\x20\x20\x20\x20<label><span>变换空间</span><select\x20data-storyboard-3d-viewport-setting=\x22transformSpace\x22><option\x20value=\x22world\x22\x20' +
+    '>锁定背景机位</label>\n      </div>\n    </details>\n    <div class="storyboard-3d-viewport-settings">\n      <label><span>变换空间</span><select data-storyboard-3d-viewport-setting="transformSpace"><option value="world" ' +
     (value80['transformSpace'] !== 'local' ? 'selected' : '') +
     '>世界</option><option value="local" ' +
     (value80['transformSpace'] === 'local' ? 'selected' : '') +
@@ -1016,7 +1016,7 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
     '>启用吸附</label>\n      <label><span>移动步长</span><input type="number" min="0.01" max="10" step="0.01" value="' +
     escapeHtml(value80['translationSnap'] || 0.25) +
     '" data-storyboard-3d-viewport-setting="translationSnap"></label>\n      <label><span>旋转步长°</span><input type="number" min="1" max="180" step="1" value="' +
-    escapeHtml(Math['round'](((value80['rotationSnap'] || Math['PI'] / 0xc) * 0xb4) / Math['PI'])) +
+    escapeHtml(Math['round'](((value80['rotationSnap'] || Math['PI'] / 12) * 180) / Math['PI'])) +
     '" data-storyboard-3d-viewport-setting="rotationSnapDegrees"></label>\n      <label><span>缩放步长</span><input type="number" min="0.01" max="10" step="0.01" value="' +
     escapeHtml(value80['scaleSnap'] || 0.1) +
     '" data-storyboard-3d-viewport-setting="scaleSnap"></label>\n    </div>\n    <div class="storyboard-3d-scene-control-actions">\n      <button type="button" data-storyboard-3d-action="add-light">添加灯光</button>\n      <button type="button" data-storyboard-3d-action="upload-background">上传背景</button>\n      <button type="button" data-storyboard-3d-action="analyze-background" ' +
@@ -1028,7 +1028,7 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
       ? '已锁定 ' +
         escapeHtml(formatFocalLength(value79?.['camera']?.['focalLength']) + 'mm') +
         ' · 匹配度 ' +
-        Math['round'](storyboard3DBackgroundCalibration2['calibrationConfidence'] * 0x64) +
+        Math['round'](storyboard3DBackgroundCalibration2['calibrationConfidence'] * 100) +
         '%'
       : '调整地平线、消失点和相机高度后再锁定') +
     '</small>\n    </div>\n  </section>'
@@ -1047,22 +1047,22 @@ function renderNavigationSettings(
           (value87['id'] === value85['id'] ? 'is-active' : '') +
           '">\n      <input type="radio" name="storyboard-3d-navigation-preset" value="' +
           escapeHtml(value87['id']) +
-          '\x22\x20data-storyboard-3d-navigation-preset\x20' +
+          '" data-storyboard-3d-navigation-preset ' +
           (value87['id'] === value85['id'] ? 'checked' : '') +
           '>\n      <strong>' +
           escapeHtml(value87['label']) +
           '</strong>\n      <span>' +
           escapeHtml(value87['summary']) +
-          '</span>\x0a\x20\x20\x20\x20</label>',
+          '</span>\n    </label>',
       )
       ['join'](''),
     handler2 = (value88, value89) =>
       '<label class="storyboard-3d-navigation-slider">\n    <span>' +
       escapeHtml(value89) +
-      '\x20<output\x20data-storyboard-3d-navigation-output=\x22' +
+      ' <output data-storyboard-3d-navigation-output="' +
       value88 +
-      '\x22>' +
-      Number(value84[value88])['toFixed'](0x2) +
+      '">' +
+      Number(value84[value88])['toFixed'](2) +
       '×</output></span>\n    <input type="range" min="0.2" max="3" step="0.05" value="' +
       escapeHtml(value84[value88]) +
       '" data-storyboard-3d-navigation-setting="' +
@@ -1075,13 +1075,13 @@ function renderNavigationSettings(
     escapeHtml(value85['label']) +
     '</small></summary>\n    <section class="storyboard-3d-global-settings-panel" aria-label="3D 全局操作设置">\n      <header><div><strong>视口操作习惯</strong><span>每次只启用一套映射，设置会保存到本机。</span></div></header>\n      <div class="storyboard-3d-navigation-presets">' +
     value86 +
-    '</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-navigation-tuning\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</div>\n      <div class="storyboard-3d-navigation-tuning">\n        ' +
     handler2('orbitSensitivity', '环绕灵敏度') +
     '\n        ' +
     handler2('panSensitivity', '平移灵敏度') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n        ' +
     handler2('zoomSensitivity', '缩放灵敏度') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-navigation-setting=\x22invertOrbitX\x22\x20' +
+    '\n        <label><input type="checkbox" data-storyboard-3d-navigation-setting="invertOrbitX" ' +
     (value84['invertOrbitX'] ? 'checked' : '') +
     '>反向环绕 X</label>\n        <label><input type="checkbox" data-storyboard-3d-navigation-setting="invertOrbitY" ' +
     (value84['invertOrbitY'] ? 'checked' : '') +
@@ -1091,17 +1091,17 @@ function renderNavigationSettings(
     (viewportSettings['transformSpace'] !== 'local' ? 'selected' : '') +
     '>世界</option><option value="local" ' +
     (viewportSettings['transformSpace'] === 'local' ? 'selected' : '') +
-    '>本地</option></select></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label\x20class=\x22is-check\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-viewport-setting=\x22groundLock\x22\x20' +
+    '>本地</option></select></label>\n        <label class="is-check"><input type="checkbox" data-storyboard-3d-viewport-setting="groundLock" ' +
     (viewportSettings['groundLock'] ? 'checked' : '') +
     '>地面吸附</label>\n        <label class="is-check"><input type="checkbox" data-storyboard-3d-viewport-setting="uniformScale" ' +
     (viewportSettings['uniformScale'] ? 'checked' : '') +
-    '>均匀缩放</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label\x20class=\x22is-check\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-viewport-setting=\x22snapEnabled\x22\x20' +
+    '>均匀缩放</label>\n        <label class="is-check"><input type="checkbox" data-storyboard-3d-viewport-setting="snapEnabled" ' +
     (viewportSettings['snapEnabled'] ? 'checked' : '') +
     '>启用步进吸附</label>\n        <label><span>移动步长</span><input type="number" min="0.01" max="10" step="0.01" value="' +
     escapeHtml(viewportSettings['translationSnap'] || 0.25) +
     '" data-storyboard-3d-viewport-setting="translationSnap"></label>\n        <label><span>旋转步长°</span><input type="number" min="1" max="180" step="1" value="' +
-    escapeHtml(Math['round'](((viewportSettings['rotationSnap'] || Math['PI'] / 0xc) * 0xb4) / Math['PI'])) +
-    '\x22\x20data-storyboard-3d-viewport-setting=\x22rotationSnapDegrees\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>缩放步长</span><input\x20type=\x22number\x22\x20min=\x220.01\x22\x20max=\x2210\x22\x20step=\x220.01\x22\x20value=\x22' +
+    escapeHtml(Math['round'](((viewportSettings['rotationSnap'] || Math['PI'] / 12) * 180) / Math['PI'])) +
+    '" data-storyboard-3d-viewport-setting="rotationSnapDegrees"></label>\n        <label><span>缩放步长</span><input type="number" min="0.01" max="10" step="0.01" value="' +
     escapeHtml(viewportSettings['scaleSnap'] || 0.1) +
     '" data-storyboard-3d-viewport-setting="scaleSnap"></label>\n      </div>\n    </section>\n  </details>'
   );
@@ -1121,7 +1121,7 @@ function renderStoryboard3DControlIcon(value90) {
     scale:
       '<path d="M5 9V5h4M15 5h4v4M19 15v4h-4M9 19H5v-4"/><path d="m9 9-4-4m10 4 4-4m-4 10 4 4M9 15l-4 4"/>',
     camera:
-      '<rect\x20x=\x223\x22\x20y=\x227\x22\x20width=\x2214\x22\x20height=\x2211\x22\x20rx=\x222\x22/><path\x20d=\x22m17\x2010\x204-2v9l-4-2\x22/><circle\x20cx=\x2210\x22\x20cy=\x2212.5\x22\x20r=\x222.5\x22/>',
+      '<rect x="3" y="7" width="14" height="11" rx="2"/><path d="m17 10 4-2v9l-4-2"/><circle cx="10" cy="12.5" r="2.5"/>',
     eye: '<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/>',
     eyeOff:
       '<path d="M3 3l18 18M10.6 6.1A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.7 15.7 0 0 1-2.7 3.3M6.2 6.3C3.8 8 2.5 12 2.5 12s3.5 6 9.5 6c1.1 0 2.1-.2 3-.5M9.9 9.8a3 3 0 0 0 4.2 4.2"/>',
@@ -1135,7 +1135,7 @@ function renderStoryboard3DControlIcon(value90) {
     perspective: '<path d="m5 7 7-4 7 4v10l-7 4-7-4V7Z"/><path d="m5 7 7 4 7-4M12 11v10"/>',
     top: '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M8 8h8v8H8z"/>',
     front:
-      '<rect\x20x=\x224\x22\x20y=\x224\x22\x20width=\x2216\x22\x20height=\x2216\x22\x20rx=\x221.5\x22/><path\x20d=\x22M8\x208h8v8H8zM8\x2012h8\x22/>',
+      '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M8 8h8v8H8zM8 12h8"/>',
     right: '<rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M12 8v8M8 8h8v8H8z"/>',
     fit: '<path d="M8 4H4v4M16 4h4v4M20 16v4h-4M4 16v4h4"/><path d="m4 8 5-5m7 0 5 5m0 8-5 5M9 21l-5-5"/>',
     focus:
@@ -1148,7 +1148,7 @@ function renderStoryboard3DControlIcon(value90) {
       '<rect x="5" y="5" width="14" height="14"/><path d="M9 5V3m6 2V3M9 21v-2m6 2v-2M5 9H3m2 6H3m18-6h-2m2 6h-2"/>',
   };
   return (
-    '<svg\x20class=\x22storyboard-3d-control-icon\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20aria-hidden=\x22true\x22\x20focusable=\x22false\x22>' +
+    '<svg class="storyboard-3d-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' +
     (value91[value90] || '') +
     '</svg>'
   );
@@ -1170,31 +1170,31 @@ function renderStoryboard3DIconButton({
 }) {
   const value92 = ['storyboard-3d-icon-button', className, active === !![] ? 'is-active' : '']
       ['filter'](Boolean)
-      ['join']('\x20'),
-    value93 = dataTool ? '\x20data-tool=\x22' + escapeHtml(dataTool) + '\x22' : '',
-    value94 = dataView ? ' data-view="' + escapeHtml(dataView) + '\x22' : '',
+      ['join'](' '),
+    value93 = dataTool ? ' data-tool="' + escapeHtml(dataTool) + '"' : '',
+    value94 = dataView ? ' data-view="' + escapeHtml(dataView) + '"' : '',
     value95 = dataShortcutTool
-      ? '\x20data-storyboard-3d-tool-shortcut=\x22' + escapeHtml(dataShortcutTool) + '\x22'
+      ? ' data-storyboard-3d-tool-shortcut="' + escapeHtml(dataShortcutTool) + '"'
       : '',
     value96 = dataSetting
-      ? ' data-storyboard-3d-viewport-setting-toggle="' + escapeHtml(dataSetting) + '\x22'
+      ? ' data-storyboard-3d-viewport-setting-toggle="' + escapeHtml(dataSetting) + '"'
       : '',
-    value97 = active === null ? '' : ' aria-pressed="' + active + '\x22',
+    value97 = active === null ? '' : ' aria-pressed="' + active + '"',
     value98 = disabled ? ' disabled' : '',
-    value99 = hidden ? '\x20hidden' : '',
+    value99 = hidden ? ' hidden' : '',
     value100 = shortcut
-      ? '<span\x20class=\x22storyboard-3d-control-shortcut\x22\x20aria-hidden=\x22true\x22>' +
+      ? '<span class="storyboard-3d-control-shortcut" aria-hidden="true">' +
         escapeHtml(shortcut) +
         '</span>'
       : '',
-    value101 = shortcut ? ' aria-keyshortcuts="' + escapeHtml(shortcut) + '\x22' : '',
-    value102 = title || (shortcut ? label2 + '\x20(' + shortcut + ')' : label2);
+    value101 = shortcut ? ' aria-keyshortcuts="' + escapeHtml(shortcut) + '"' : '',
+    value102 = title || (shortcut ? label2 + ' (' + shortcut + ')' : label2);
   return (
     '<button type="button" class="' +
     value92 +
-    '\x22\x20data-storyboard-3d-action=\x22' +
+    '" data-storyboard-3d-action="' +
     escapeHtml(action) +
-    '\x22' +
+    '"' +
     value93 +
     value94 +
     value95 +
@@ -1203,11 +1203,11 @@ function renderStoryboard3DIconButton({
     value98 +
     value99 +
     value101 +
-    '\x20aria-label=\x22' +
+    ' aria-label="' +
     escapeHtml(label2) +
     '" title="' +
     escapeHtml(value102) +
-    '\x22>' +
+    '">' +
     renderStoryboard3DControlIcon(icon) +
     value100 +
     '</button>'
@@ -1246,16 +1246,16 @@ function renderShotInspector(enabled9, error8) {
   const count3 = enabled9['shots']['findIndex']((value104) => value104['id'] === error8['id']);
   return (
     '<section class="storyboard-3d-inspector-card storyboard-3d-shot-inspector">\n    <small>当前镜头 · ' +
-    (count3 + 0x1) +
+    (count3 + 1) +
     '/' +
     enabled9['shots']['length'] +
     '</small>\n    <input type="text" maxlength="120" value="' +
     escapeHtml(error8['name']) +
     '" data-storyboard-3d-shot-field="name" data-shot-id="' +
     escapeHtml(error8['id']) +
-    '\x22\x20aria-label=\x22镜头名称\x22>\x0a\x20\x20\x20\x20<textarea\x20rows=\x222\x22\x20maxlength=\x221000\x22\x20placeholder=\x22镜头说明\x22\x20data-storyboard-3d-shot-field=\x22description\x22\x20data-shot-id=\x22' +
+    '" aria-label="镜头名称">\n    <textarea rows="2" maxlength="1000" placeholder="镜头说明" data-storyboard-3d-shot-field="description" data-shot-id="' +
     escapeHtml(error8['id']) +
-    '\x22>' +
+    '">' +
     escapeHtml(error8['description'] || '') +
     '</textarea>\n    <div class="storyboard-3d-shot-inspector-meta"><span>' +
     escapeHtml(error8['shotSize']) +
@@ -1267,12 +1267,12 @@ function renderShotInspector(enabled9, error8) {
     escapeHtml(error8['id']) +
     '">更新当前镜头</button>\n      <button type="button" data-storyboard-3d-action="move-shot" data-direction="-1" data-shot-id="' +
     escapeHtml(error8['id']) +
-    '\x22\x20' +
-    (count3 <= 0x0 ? 'disabled' : '') +
+    '" ' +
+    (count3 <= 0 ? 'disabled' : '') +
     '>前移</button>\n      <button type="button" data-storyboard-3d-action="move-shot" data-direction="1" data-shot-id="' +
     escapeHtml(error8['id']) +
-    '\x22\x20' +
-    (count3 >= enabled9['shots']['length'] - 0x1 ? 'disabled' : '') +
+    '" ' +
+    (count3 >= enabled9['shots']['length'] - 1 ? 'disabled' : '') +
     '>后移</button>\n      <button type="button" data-storyboard-3d-action="duplicate-shot" data-shot-id="' +
     escapeHtml(error8['id']) +
     '">复制</button>\n      <button type="button" data-storyboard-3d-action="delete-shot" data-shot-id="' +
@@ -1300,9 +1300,9 @@ function renderAIAssistant(error9 = {}) {
     },
     list5 = error9['plan']?.['commands'] || [];
   return (
-    '<section\x20class=\x22storyboard-3d-inspector-card\x20storyboard-3d-ai-assistant\x22\x20data-storyboard-3d-ai-panel\x20data-status=\x22' +
+    '<section class="storyboard-3d-inspector-card storyboard-3d-ai-assistant" data-storyboard-3d-ai-panel data-status="' +
     escapeHtml(value105) +
-    '\x22>\x0a\x20\x20\x20\x20<small>AI\x20场景助手</small>\x0a\x20\x20\x20\x20<strong>用自然语言编辑当前场景</strong>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-ai-feed\x22\x20aria-live=\x22polite\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-ai-message\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span>场景助手</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p\x20data-storyboard-3d-ai-status>' +
+    '">\n    <small>AI 场景助手</small>\n    <strong>用自然语言编辑当前场景</strong>\n    <div class="storyboard-3d-ai-feed" aria-live="polite">\n      <div class="storyboard-3d-ai-message">\n        <span>场景助手</span>\n        <p data-storyboard-3d-ai-status>' +
     escapeHtml(value107[value105] || value105) +
     '</p>\n      </div>\n      ' +
     (list5['length']
@@ -1337,20 +1337,20 @@ function renderAIAssistant(error9 = {}) {
     (['starting', 'listening', 'transcribing', 'stopping']['includes'](value105) ? '停止语音' : '语音输入') +
     '</button>\n          <button type="button" class="is-primary" data-storyboard-3d-action="run-ai-command" ' +
     (value106 || !provider ? 'disabled' : '') +
-    '>执行指令</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '>执行指令</button>\n          ' +
     (error9['canUndoAI']
       ? '<button type="button" data-storyboard-3d-action="undo-ai-command">撤销本次 AI 修改</button>'
       : '') +
     '\n          ' +
     (value106
-      ? '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22cancel-ai-command\x22>取消</button>'
+      ? '<button type="button" data-storyboard-3d-action="cancel-ai-command">取消</button>'
       : '') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</section>'
+    '\n        </div>\n      </div>\n    </div>\n  </section>'
   );
 }
 function renderAIAssistantRightSidebar(options2 = {}, value109 = {}) {
   return (
-    '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-ai-sidebar\x22\x20id=\x22storyboard3DRightSidebar\x22\x20aria-labelledby=\x22storyboard3DAIAssistantTitle\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-right-sidebar-splitter\x20panel-resize-handle\x22\x20data-storyboard-3d-right-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整\x20AI\x20助手宽度\x22\x20aria-valuemin=\x22' +
+    '<aside class="storyboard-3d-right-sidebar storyboard-3d-ai-sidebar" id="storyboard3DRightSidebar" aria-labelledby="storyboard3DAIAssistantTitle">\n    <div class="storyboard-3d-right-sidebar-splitter panel-resize-handle" data-storyboard-3d-right-sidebar-splitter role="separator" aria-orientation="vertical" aria-label="调整 AI 助手宽度" aria-valuemin="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH +
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
@@ -1358,7 +1358,7 @@ function renderAIAssistantRightSidebar(options2 = {}, value109 = {}) {
     normalizeStoryboard3DRightSidebarWidth(value109['sidebarWidth'], value109['layoutWidth']) +
     '" tabindex="0"></div>\n    <section class="storyboard-3d-ai-sidebar-layout">\n      <header class="storyboard-3d-ai-sidebar-heading">\n        <div><small>场景编辑</small><h2 id="storyboard3DAIAssistantTitle">AI 助手</h2></div>\n      </header>\n      <div class="storyboard-3d-ai-sidebar-content">' +
     renderAIAssistant(options2) +
-    '</div>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</aside>'
+    '</div>\n    </section>\n  </aside>'
   );
 }
 function renderObjectPropertiesRightSidebar(
@@ -1373,7 +1373,7 @@ function renderObjectPropertiesRightSidebar(
 ) {
   if (!object) return '';
   return (
-    '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-object-properties-sidebar\x22\x20id=\x22storyboard3DRightSidebar\x22\x20data-object-id=\x22' +
+    '<aside class="storyboard-3d-right-sidebar storyboard-3d-object-properties-sidebar" id="storyboard3DRightSidebar" data-object-id="' +
     escapeHtml(object['id']) +
     '" aria-labelledby="storyboard3DObjectPropertiesTitle">\n    <div class="storyboard-3d-right-sidebar-splitter panel-resize-handle" data-storyboard-3d-right-sidebar-splitter role="separator" aria-orientation="vertical" aria-label="调整对象属性宽度" aria-valuemin="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH +
@@ -1385,7 +1385,7 @@ function renderObjectPropertiesRightSidebar(
     escapeHtml(object['type']) +
     ' · 对象属性</small><h2 id="storyboard3DObjectPropertiesTitle">' +
     escapeHtml(object['name']) +
-    '</h2></div>\x0a\x20\x20\x20\x20\x20\x20</header>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-ai-sidebar-content\x20storyboard-3d-object-properties-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</h2></div>\n      </header>\n      <div class="storyboard-3d-ai-sidebar-content storyboard-3d-object-properties-content">\n        ' +
     renderSelectedObjectInspector(
       object,
       selectedBoneName,
@@ -1407,25 +1407,25 @@ function renderBackgroundPerspectivePanel(value112, value113) {
       value112?.['background'],
     ),
     enabled10 = Boolean(storyboard3DBackgroundCalibration3['imageUrl']),
-    value114 = Math['round'](storyboard3DBackgroundCalibration3['calibrationConfidence'] * 0x64),
+    value114 = Math['round'](storyboard3DBackgroundCalibration3['calibrationConfidence'] * 100),
     value115 = Math['max'](
-      0x0,
+      0,
       Math['min'](
-        0x1,
+        1,
         storyboard3DBackgroundCalibration3['horizonY'] +
           storyboard3DBackgroundCalibration3['horizonSlope'] *
-            (storyboard3DBackgroundCalibration3['vanishingPoint'][0x0] - 0.5),
+            (storyboard3DBackgroundCalibration3['vanishingPoint'][0] - 0.5),
       ),
     ),
     value116 =
-      storyboard3DBackgroundCalibration3['imageWidth'] > 0x1 &&
-      storyboard3DBackgroundCalibration3['imageHeight'] > 0x1
+      storyboard3DBackgroundCalibration3['imageWidth'] > 1 &&
+      storyboard3DBackgroundCalibration3['imageHeight'] > 1
         ? storyboard3DBackgroundCalibration3['imageWidth'] +
           ' × ' +
           storyboard3DBackgroundCalibration3['imageHeight']
         : '尺寸未知';
   if (!enabled10)
-    return '<section\x20class=\x22storyboard-3d-perspective-panel\x22\x20data-storyboard-3d-perspective-panel>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-perspective-empty\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20aria-hidden=\x22true\x22>⌗</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<strong>用参考图匹配\x203D\x20透视</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<p>上传图片后自动检测地平线、消失点和地面区域，并将当前摄像机匹配到图片视角。</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22is-primary\x22\x20data-storyboard-3d-action=\x22upload-background\x22>选择图像并匹配</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<small>支持\x20PNG、JPG、WEBP；原图只保存在本地项目资源中。</small>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</section>';
+    return '<section class="storyboard-3d-perspective-panel" data-storyboard-3d-perspective-panel>\n      <div class="storyboard-3d-perspective-empty">\n        <span aria-hidden="true">⌗</span>\n        <strong>用参考图匹配 3D 透视</strong>\n        <p>上传图片后自动检测地平线、消失点和地面区域，并将当前摄像机匹配到图片视角。</p>\n        <button type="button" class="is-primary" data-storyboard-3d-action="upload-background">选择图像并匹配</button>\n        <small>支持 PNG、JPG、WEBP；原图只保存在本地项目资源中。</small>\n      </div>\n    </section>';
   return (
     '<section class="storyboard-3d-perspective-panel" data-storyboard-3d-perspective-panel>\n    <figure class="storyboard-3d-perspective-preview">\n      <img src="' +
     escapeHtml(storyboard3DBackgroundCalibration3['imageUrl']) +
@@ -1446,23 +1446,23 @@ function renderBackgroundPerspectivePanel(value112, value113) {
     '>重新匹配</button>\n      <button type="button" data-storyboard-3d-action="clear-background">清除</button>\n    </div>\n    <details class="storyboard-3d-perspective-settings" open>\n      <summary>匹配参数 <small>修改后即时更新摄像机</small></summary>\n      <div class="storyboard-3d-scene-control-grid">\n        <label><span>水平 FOV°</span><input type="number" min="10" max="170" step="0.1" value="' +
     storyboard3DBackgroundCalibration3['horizontalFov'] +
     '" data-storyboard-3d-background-field="horizontalFov"></label>\n        <label><span>垂直 FOV°</span><input type="number" min="10" max="170" step="0.1" value="' +
-    (storyboard3DBackgroundCalibration3['verticalFov'] || 0x28) +
-    '\x22\x20data-storyboard-3d-background-field=\x22verticalFov\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>地平线\x20Y</span><input\x20type=\x22number\x22\x20min=\x220\x22\x20max=\x221\x22\x20step=\x220.01\x22\x20value=\x22' +
+    (storyboard3DBackgroundCalibration3['verticalFov'] || 40) +
+    '" data-storyboard-3d-background-field="verticalFov"></label>\n        <label><span>地平线 Y</span><input type="number" min="0" max="1" step="0.01" value="' +
     storyboard3DBackgroundCalibration3['horizonY'] +
-    '\x22\x20data-storyboard-3d-background-field=\x22horizonY\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>地平线倾斜</span><input\x20type=\x22number\x22\x20min=\x22-1\x22\x20max=\x221\x22\x20step=\x220.01\x22\x20value=\x22' +
+    '" data-storyboard-3d-background-field="horizonY"></label>\n        <label><span>地平线倾斜</span><input type="number" min="-1" max="1" step="0.01" value="' +
     storyboard3DBackgroundCalibration3['horizonSlope'] +
     '" data-storyboard-3d-background-field="horizonSlope"></label>\n        <label><span>消失点 X</span><input type="number" min="0" max="1" step="0.01" value="' +
-    storyboard3DBackgroundCalibration3['vanishingPoint'][0x0] +
+    storyboard3DBackgroundCalibration3['vanishingPoint'][0] +
     '" data-storyboard-3d-background-field="vanishingPointX"></label>\n        <label><span>消失点 Y</span><input type="number" value="' +
-    value115['toFixed'](0x3) +
+    value115['toFixed'](3) +
     '" disabled></label>\n        <label><span>相机高度 m</span><input type="number" min="0.2" max="20" step="0.1" value="' +
     storyboard3DBackgroundCalibration3['cameraHeight'] +
-    '\x22\x20data-storyboard-3d-background-field=\x22cameraHeight\x22></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><span>背景缩放</span><input\x20type=\x22number\x22\x20min=\x220.1\x22\x20max=\x2210\x22\x20step=\x220.1\x22\x20value=\x22' +
+    '" data-storyboard-3d-background-field="cameraHeight"></label>\n        <label><span>背景缩放</span><input type="number" min="0.1" max="10" step="0.1" value="' +
     storyboard3DBackgroundCalibration3['imageScale'] +
     '" data-storyboard-3d-background-field="imageScale"></label>\n        <label><span>背景偏移 X</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    storyboard3DBackgroundCalibration3['imageOffset'][0x0] +
+    storyboard3DBackgroundCalibration3['imageOffset'][0] +
     '" data-storyboard-3d-background-field="imageOffsetX"></label>\n        <label><span>背景偏移 Y</span><input type="number" min="-2" max="2" step="0.01" value="' +
-    storyboard3DBackgroundCalibration3['imageOffset'][0x1] +
+    storyboard3DBackgroundCalibration3['imageOffset'][1] +
     '" data-storyboard-3d-background-field="imageOffsetY"></label>\n      </div>\n    </details>\n    <label class="storyboard-3d-perspective-lock">\n      <input type="checkbox" data-storyboard-3d-background-lock ' +
     (storyboard3DBackgroundCalibration3['lockedCamera'] ? 'checked' : '') +
     '>\n      <span><strong>锁定匹配机位</strong><small>锁定后禁止意外改变与参考图对应的摄像机视角</small></span>\n    </label>\n  </section>'
@@ -1473,7 +1473,7 @@ function renderBackgroundPerspectiveRightSidebar(
   value117 = {},
 ) {
   return (
-    '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-perspective-sidebar\x22\x20id=\x22storyboard3DRightSidebar\x22\x20aria-labelledby=\x22storyboard3DPerspectiveTitle\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-right-sidebar-splitter\x20panel-resize-handle\x22\x20data-storyboard-3d-right-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整图像透视匹配宽度\x22\x20aria-valuemin=\x22' +
+    '<aside class="storyboard-3d-right-sidebar storyboard-3d-perspective-sidebar" id="storyboard3DRightSidebar" aria-labelledby="storyboard3DPerspectiveTitle">\n    <div class="storyboard-3d-right-sidebar-splitter panel-resize-handle" data-storyboard-3d-right-sidebar-splitter role="separator" aria-orientation="vertical" aria-label="调整图像透视匹配宽度" aria-valuemin="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH +
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
@@ -1501,27 +1501,27 @@ function renderAssetLibrarySidebar({
     '" placeholder="输入模型名称" data-storyboard-3d-asset-query>\n      </label>\n      <nav class="storyboard-3d-asset-category-panel" aria-label="模型分类">\n        <span>模型分类</span>\n        <div class="storyboard-3d-asset-category-list">\n          ' +
     list6['map'](
       (value119) =>
-        '<button\x20type=\x22button\x22\x20class=\x22' +
+        '<button type="button" class="' +
         (value119['id'] === category ? 'is-active' : '') +
         '" data-storyboard-3d-action="select-asset-category" data-storyboard-3d-asset-category="' +
         escapeHtml(value119['id']) +
         '" aria-pressed="' +
         (value119['id'] === category) +
-        '\x22>' +
+        '">' +
         escapeHtml(value119['label']) +
         '</button>',
     )['join']('') +
     '\n        </div>\n      </nav>\n    </div>\n    <div class="storyboard-3d-asset-toolbar">\n      <strong>导入本地模型</strong>\n      <button type="button" data-storyboard-3d-action="import-model" ' +
     (value118 ? 'disabled' : '') +
-    '>导入模型</button>\x0a\x20\x20\x20\x20\x20\x20' +
+    '>导入模型</button>\n      ' +
     (value118 ? '<button type="button" data-storyboard-3d-action="cancel-model-import">取消</button>' : '') +
     '\n      <small>支持 GLB / GLTF / FBX / OBJ / STL</small>\n      <span data-storyboard-3d-import-status>' +
     (value118
       ? escapeHtml(importState['fileName'] || '模型') +
-        '\x20·\x20' +
+        ' · ' +
         importState['status'] +
         ' · ' +
-        Math['round']((importState['progress'] || 0x0) * 0x64) +
+        Math['round']((importState['progress'] || 0) * 100) +
         '%'
       : '') +
     '</span>\n    </div>\n  </aside>'
@@ -1534,55 +1534,55 @@ function renderAssetLibrary({
 } = {}) {
   return (
     '<section class="storyboard-3d-asset-results" aria-label="模型列表">\n      <div class="storyboard-3d-asset-grid">\n      ' +
-    (assets['length'] > 0x0
+    (assets['length'] > 0
       ? assets['map'](
           (error10) =>
             '<article><button type="button" data-storyboard-3d-action="add-asset" data-asset-id="' +
             escapeHtml(error10['id']) +
-            '\x22><span\x20class=\x22storyboard-3d-asset-thumb\x22\x20data-storyboard-3d-asset-thumbnail\x20data-asset-id=\x22' +
+            '"><span class="storyboard-3d-asset-thumb" data-storyboard-3d-asset-thumbnail data-asset-id="' +
             escapeHtml(error10['id']) +
-            '\x22\x20data-thumbnail-status=\x22' +
+            '" data-thumbnail-status="' +
             (error10['thumbnailUrl'] ? 'ready' : 'pending') +
-            '\x22>' +
+            '">' +
             (error10['thumbnailUrl']
               ? '<img src="' +
                 escapeHtml(error10['thumbnailUrl']) +
-                '\x22\x20alt=\x22' +
+                '" alt="' +
                 escapeHtml(error10['name'] + ' 模型预览') +
-                '\x22>'
-              : '<span\x20class=\x22storyboard-3d-asset-thumb-loading\x22\x20aria-label=\x22正在生成\x20' +
+                '">'
+              : '<span class="storyboard-3d-asset-thumb-loading" aria-label="正在生成 ' +
                 escapeHtml(error10['name']) +
                 ' 的模型预览"><i></i><small>生成预览</small></span>') +
             '</span><span>' +
             escapeHtml(getStoryboard3DAssetCategoryLabel(error10['category'])) +
             (error10['assetRecord']?.['sourceFormat']
-              ? '\x20·\x20' + escapeHtml(error10['assetRecord']['sourceFormat']['toUpperCase']())
+              ? ' · ' + escapeHtml(error10['assetRecord']['sourceFormat']['toUpperCase']())
               : '') +
             '</span><strong title="' +
             escapeHtml(error10['name']) +
-            '\x22>' +
+            '">' +
             escapeHtml(error10['name']) +
             '</strong></button><button type="button" class="storyboard-3d-asset-favorite ' +
             (favoriteIds['has'](error10['id']) ? 'is-active' : '') +
-            '\x22\x20data-storyboard-3d-action=\x22toggle-asset-favorite\x22\x20data-asset-id=\x22' +
+            '" data-storyboard-3d-action="toggle-asset-favorite" data-asset-id="' +
             escapeHtml(error10['id']) +
             '" aria-label="' +
             (favoriteIds['has'](error10['id']) ? '取消收藏' : '收藏') +
             '">★</button></article>',
         )['join']('')
-      : '<div\x20class=\x22storyboard-3d-empty-state\x22><strong>没有匹配的模型</strong><span>调整搜索词或分类后重试。</span></div>') +
+      : '<div class="storyboard-3d-empty-state"><strong>没有匹配的模型</strong><span>调整搜索词或分类后重试。</span></div>') +
     '\n      </div>\n      ' +
     (hasMore
-      ? '<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-assets-load-more\x22\x20data-storyboard-3d-action=\x22load-more-assets\x22>加载更多模型</button>'
+      ? '<button type="button" class="storyboard-3d-assets-load-more" data-storyboard-3d-action="load-more-assets">加载更多模型</button>'
       : '') +
     '\n    </section>'
   );
 }
 function renderAssetLibraryRightSidebar(options3 = {}) {
-  const value120 = Array['isArray'](options3['assets']) ? options3['assets']['length'] : 0x0,
-    value121 = Math['max'](value120, Number(options3['totalCount']) || 0x0);
+  const value120 = Array['isArray'](options3['assets']) ? options3['assets']['length'] : 0,
+    value121 = Math['max'](value120, Number(options3['totalCount']) || 0);
   return (
-    '<aside\x20class=\x22storyboard-3d-right-sidebar\x20storyboard-3d-asset-library-panel\x22\x20id=\x22storyboard3DRightSidebar\x22\x20aria-labelledby=\x22storyboard3DAssetLibraryTitle\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-right-sidebar-splitter\x20panel-resize-handle\x22\x20data-storyboard-3d-right-sidebar-splitter\x20role=\x22separator\x22\x20aria-orientation=\x22vertical\x22\x20aria-label=\x22调整模型库宽度\x22\x20aria-valuemin=\x22' +
+    '<aside class="storyboard-3d-right-sidebar storyboard-3d-asset-library-panel" id="storyboard3DRightSidebar" aria-labelledby="storyboard3DAssetLibraryTitle">\n    <div class="storyboard-3d-right-sidebar-splitter panel-resize-handle" data-storyboard-3d-right-sidebar-splitter role="separator" aria-orientation="vertical" aria-label="调整模型库宽度" aria-valuemin="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MIN_WIDTH +
     '" aria-valuemax="' +
     STORYBOARD_3D_RIGHT_SIDEBAR_MAX_WIDTH +
@@ -1597,26 +1597,26 @@ function renderAssetLibraryRightSidebar(options3 = {}) {
     '</div>\n      </div>\n    </section>\n  </aside>'
   );
 }
-function finiteMiniMapValue(value122, value123 = 0x0) {
+function finiteMiniMapValue(value122, value123 = 0) {
   const value124 = Number(value122);
   return Number['isFinite'](value124) ? value124 : value123;
 }
 function createStoryboard3DMiniMapCameraPose(value125, event3, value126) {
-  const value127 = value125?.['camera']?.['position'] || [0x0, 0x0, 0x0],
-    x2 = value125?.['camera']?.['target'] || [0x0, 0x0, -0x1],
+  const value127 = value125?.['camera']?.['position'] || [0, 0, 0],
+    x2 = value125?.['camera']?.['target'] || [0, 0, -1],
     event4 = event3 ? resolveSceneCameraPose(event3) : null,
     position2 = {
-      x: finiteMiniMapValue(event4?.['position']?.['x'], value126?.['position']?.['x'] ?? value127[0x0]),
-      y: finiteMiniMapValue(event4?.['position']?.['y'], value126?.['position']?.['y'] ?? value127[0x1]),
-      z: finiteMiniMapValue(event4?.['position']?.['z'], value126?.['position']?.['z'] ?? value127[0x2]),
+      x: finiteMiniMapValue(event4?.['position']?.['x'], value126?.['position']?.['x'] ?? value127[0]),
+      y: finiteMiniMapValue(event4?.['position']?.['y'], value126?.['position']?.['y'] ?? value127[1]),
+      z: finiteMiniMapValue(event4?.['position']?.['z'], value126?.['position']?.['z'] ?? value127[2]),
     },
-    box2 = event4?.['target'] || event3?.['target'] || { x: x2[0x0], y: x2[0x1], z: x2[0x2] };
+    box2 = event4?.['target'] || event3?.['target'] || { x: x2[0], y: x2[1], z: x2[2] };
   return {
     position: position2,
     target: {
-      x: finiteMiniMapValue(box2?.['x'], x2[0x0]),
-      y: finiteMiniMapValue(box2?.['y'], x2[0x1]),
-      z: finiteMiniMapValue(box2?.['z'], x2[0x2]),
+      x: finiteMiniMapValue(box2?.['x'], x2[0]),
+      y: finiteMiniMapValue(box2?.['y'], x2[1]),
+      z: finiteMiniMapValue(box2?.['z'], x2[2]),
     },
   };
 }
@@ -1625,7 +1625,7 @@ function renderMiniMap(
   value129,
   {
     expanded: expanded = ![],
-    zoom: zoom = 0x1,
+    zoom: zoom = 1,
     footprints: footprints = [],
     worldBounds: worldBounds = null,
     camera: camera = null,
@@ -1646,33 +1646,33 @@ function renderMiniMap(
     ),
     value132 = objects['map']((x3) => {
       const box3 = projectStoryboard3DWorldToMiniMapRatio(
-          { x: x3['transform']?.['position']?.[0x0], z: x3['transform']?.['position']?.[0x2] },
+          { x: x3['transform']?.['position']?.[0], z: x3['transform']?.['position']?.[2] },
           projection,
         ),
         box4 = projectStoryboard3DTopViewFootprint(map3['get'](x3['id'])?.['points'], projection);
       if (box4) {
         const value133 = box4['polygon']
-          ['map']((box5) => box5['x'] * 0x64 + '%\x20' + box5['y'] * 0x64 + '%')
+          ['map']((box5) => box5['x'] * 100 + '% ' + box5['y'] * 100 + '%')
           ['join'](',');
         return (
           '<button type="button" class="storyboard-3d-mini-map-marker has-top-view-footprint is-' +
           escapeHtml(x3['type']) +
-          '\x22\x20data-storyboard-3d-action=\x22select-object\x22\x20data-object-id=\x22' +
+          '" data-storyboard-3d-action="select-object" data-object-id="' +
           escapeHtml(x3['id']) +
           '" data-top-view-footprint="true" title="' +
           escapeHtml(x3['name']) +
           '" style="--mini-x:' +
-          box4['centerX'] * 0x64 +
+          box4['centerX'] * 100 +
           '%;--mini-y:' +
-          box4['centerY'] * 0x64 +
+          box4['centerY'] * 100 +
           '%;--mini-left:' +
-          box4['left'] * 0x64 +
+          box4['left'] * 100 +
           '%;--mini-top:' +
-          box4['top'] * 0x64 +
+          box4['top'] * 100 +
           '%;--mini-width:' +
-          box4['width'] * 0x64 +
+          box4['width'] * 100 +
           '%;--mini-height:' +
-          box4['height'] * 0x64 +
+          box4['height'] * 100 +
           '%;clip-path:polygon(' +
           value133 +
           ')"></button>'
@@ -1683,10 +1683,10 @@ function renderMiniMap(
         escapeHtml(x3['id']) +
         '" title="' +
         escapeHtml(x3['name']) +
-        '\x22\x20style=\x22--mini-x:' +
-        box3['x'] * 0x64 +
+        '" style="--mini-x:' +
+        box3['x'] * 100 +
         '%;--mini-y:' +
-        box3['y'] * 0x64 +
+        box3['y'] * 100 +
         '%"></button>'
       );
     })['join'](''),
@@ -1696,19 +1696,19 @@ function renderMiniMap(
     '<div class="storyboard-3d-mini-map-title"><span>Mini Map · 跟随视角</span><small>' +
     objects['length'] +
     ' 个对象 · ' +
-    Math['round'](zoom * 0x64) +
+    Math['round'](zoom * 100) +
     '%</small><button type="button" data-storyboard-3d-action="toggle-mini-map" aria-label="' +
     (expanded ? '折叠 Mini Map' : '展开 Mini Map') +
-    '\x22>' +
+    '">' +
     (expanded ? '−' : '+') +
-    '</button></div>\x0a\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-mini-map-canvas\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-mini-map-grid\x22\x20aria-hidden=\x22true\x22\x20style=\x22--mini-map-rotation:' +
+    '</button></div>\n    <div class="storyboard-3d-mini-map-canvas">\n      <span class="storyboard-3d-mini-map-grid" aria-hidden="true" style="--mini-map-rotation:' +
     projection['rotation'] +
     'rad"></span>\n      ' +
     value132 +
-    '\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-mini-map-camera\x22\x20data-storyboard-3d-mini-map-camera\x20style=\x22--mini-x:' +
-    box6['x'] * 0x64 +
+    '\n      <span class="storyboard-3d-mini-map-camera" data-storyboard-3d-mini-map-camera style="--mini-x:' +
+    box6['x'] * 100 +
     '%;--mini-y:' +
-    box6['y'] * 0x64 +
+    box6['y'] * 100 +
     '%;--mini-angle:' +
     storyboard3DMiniMapCameraMarker['angle'] +
     'rad"></span>\n    </div>'
@@ -1718,33 +1718,33 @@ function createMiniMapWorldBounds(value134, value135, value136 = []) {
   const list7 = Array['isArray'](value134?.['objects'])
       ? value134['objects']['filter']((value137) => value137['visible'] !== ![])
       : [],
-    list8 = list7['map']((value138) => value138['transform']?.['position'] || [0x0, 0x0, 0x0]),
+    list8 = list7['map']((value138) => value138['transform']?.['position'] || [0, 0, 0]),
     map4 = new Set(list7['map']((value139) => value139['id'])),
     list9 = (Array['isArray'](value136) ? value136 : [])
       ['filter']((value140) => map4['has'](value140?.['objectId']))
       ['flatMap']((value141) => (Array['isArray'](value141?.['points']) ? value141['points'] : [])),
-    value142 = value135?.['camera']?.['position'] || [0x0, 0x0, 0x0],
+    value142 = value135?.['camera']?.['position'] || [0, 0, 0],
     args = [
-      ...list8['map']((value143) => Number(value143[0x0]) || 0x0),
-      ...list9['map']((box7) => Number(box7['x']) || 0x0),
-      Number(value142[0x0]) || 0x0,
+      ...list8['map']((value143) => Number(value143[0]) || 0),
+      ...list9['map']((box7) => Number(box7['x']) || 0),
+      Number(value142[0]) || 0,
     ],
     args2 = [
-      ...list8['map']((value144) => Number(value144[0x2]) || 0x0),
-      ...list9['map']((value145) => Number(value145['z']) || 0x0),
-      Number(value142[0x2]) || 0x0,
+      ...list8['map']((value144) => Number(value144[2]) || 0),
+      ...list9['map']((value145) => Number(value145['z']) || 0),
+      Number(value142[2]) || 0,
     ],
-    minX = Math['min'](-0x5, ...args) - 0x2,
-    maxX = Math['max'](0x5, ...args) + 0x2,
-    minZ = Math['min'](-0x5, ...args2) - 0x2,
-    maxZ = Math['max'](0x5, ...args2) + 0x2;
+    minX = Math['min'](-5, ...args) - 2,
+    maxX = Math['max'](5, ...args) + 2,
+    minZ = Math['min'](-5, ...args2) - 2,
+    maxZ = Math['max'](5, ...args2) + 2;
   return { minX: minX, maxX: maxX, minZ: minZ, maxZ: maxZ };
 }
 function createMiniMapLayout(
   value146,
   value147,
-  width = { width: 0x8c, height: 0x69 },
-  value148 = 0x1,
+  width = { width: 140, height: 105 },
+  value148 = 1,
   value149 = [],
   value150 = null,
   value151 = null,
@@ -1753,12 +1753,12 @@ function createMiniMapLayout(
       ? value146['objects']['filter']((value152) => value152['visible'] !== ![])
       : [],
     value153 = value150 || createMiniMapWorldBounds(value146, value147, value149),
-    value154 = Math['max'](0.5, Math['min'](0x3, Number(value148) || 0x1)),
+    value154 = Math['max'](0.5, Math['min'](3, Number(value148) || 1)),
     event5 = value151 || createStoryboard3DMiniMapCameraPose(value147),
-    x4 = finiteMiniMapValue(event5['position']?.['x'], (value153['minX'] + value153['maxX']) / 0x2),
-    z2 = finiteMiniMapValue(event5['position']?.['z'], (value153['minZ'] + value153['maxZ']) / 0x2),
-    value155 = (value153['maxX'] - value153['minX']) / 0x2 / value154,
-    value156 = (value153['maxZ'] - value153['minZ']) / 0x2 / value154,
+    x4 = finiteMiniMapValue(event5['position']?.['x'], (value153['minX'] + value153['maxX']) / 2),
+    z2 = finiteMiniMapValue(event5['position']?.['z'], (value153['minZ'] + value153['maxZ']) / 2),
+    value155 = (value153['maxX'] - value153['minX']) / 2 / value154,
+    value156 = (value153['maxZ'] - value153['minZ']) / 2 / value154,
     minX2 = x4 - value155,
     maxX2 = x4 + value155,
     minZ2 = z2 - value156,
@@ -1766,13 +1766,13 @@ function createMiniMapLayout(
     finiteMiniMapValue2 = finiteMiniMapValue(event5['target']?.['x']) - x4,
     finiteMiniMapValue3 = finiteMiniMapValue(event5['target']?.['z']) - z2,
     rotation = Math['hypot'](finiteMiniMapValue2, finiteMiniMapValue3) > 0.000001,
-    value157 = rotation ? Math['atan2'](finiteMiniMapValue3, finiteMiniMapValue2) : 0x0,
+    value157 = rotation ? Math['atan2'](finiteMiniMapValue3, finiteMiniMapValue2) : 0,
     projection2 = createStoryboard3DMiniMapProjection({
       worldBounds: { minX: minX2, maxX: maxX2, minZ: minZ2, maxZ: maxZ2 },
-      viewport: { x: 0x0, y: 0x0, width: width['width'] || 0x8c, height: width['height'] || 0x69 },
-      padding: 0x8,
+      viewport: { x: 0, y: 0, width: width['width'] || 140, height: width['height'] || 105 },
+      padding: 8,
       center: { x: x4, z: z2 },
-      rotation: rotation ? -Math['PI'] / 0x2 - value157 : 0x0,
+      rotation: rotation ? -Math['PI'] / 2 - value157 : 0,
     });
   return { objects: objects2, projection: projection2 };
 }
@@ -1798,47 +1798,47 @@ function renderShotExplorePanel(list10 = [], value158 = 'all') {
         ([value160, value161]) =>
           '<button type="button" data-storyboard-3d-action="filter-explore" data-explore-filter="' +
           value160 +
-          '\x22\x20aria-pressed=\x22' +
+          '" aria-pressed="' +
           (value158 === value160) +
-          '\x22>' +
+          '">' +
           value161 +
           '</button>',
       )
       ['join']('') +
-    '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22regenerate-explore\x22>重新生成</button><button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22close-explore\x22\x20aria-label=\x22关闭\x22>×</button></div></header>\x0a\x20\x20\x20\x20' +
-    (list11['length'] > 0x0
+    '<button type="button" data-storyboard-3d-action="regenerate-explore">重新生成</button><button type="button" data-storyboard-3d-action="close-explore" aria-label="关闭">×</button></div></header>\n    ' +
+    (list11['length'] > 0
       ? '<div class="storyboard-3d-candidate-grid">' +
         list11['map'](
           ({ candidate: candidate3, index: index4 }) =>
-            '<article>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-candidate-preview\x22\x20data-candidate-preview=\x22' +
+            '<article>\n          <div class="storyboard-3d-candidate-preview" data-candidate-preview="' +
             index4 +
-            '\x22>' +
+            '">' +
             (candidate3['thumbnailUrl']
               ? '<img src="' +
                 escapeHtml(candidate3['thumbnailUrl']) +
                 '" alt="候选镜头 ' +
-                (index4 + 0x1) +
-                '\x22>'
-              : '<span>正在渲染候选\x20' + (index4 + 0x1) + '</span>') +
+                (index4 + 1) +
+                '">'
+              : '<span>正在渲染候选 ' + (index4 + 1) + '</span>') +
             '</div>\n          <div><strong>' +
-            escapeHtml(candidate3['shotSize'] + '\x20·\x20' + candidate3['shotAngle']) +
+            escapeHtml(candidate3['shotSize'] + ' · ' + candidate3['shotAngle']) +
             '</strong><small>' +
-            Math['round'](candidate3['score'] * 0x64) +
+            Math['round'](candidate3['score'] * 100) +
             ' 分 · ' +
             formatFocalLength(candidate3['camera']['focalLength']) +
-            'mm</small></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<footer><button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22preview-candidate\x22\x20data-candidate-index=\x22' +
+            'mm</small></div>\n          <footer><button type="button" data-storyboard-3d-action="preview-candidate" data-candidate-index="' +
             index4 +
             '">主视口预览</button><button type="button" data-storyboard-3d-action="replace-with-candidate" data-candidate-index="' +
             index4 +
             '">替换当前</button><button type="button" data-storyboard-3d-action="append-candidate" data-candidate-index="' +
             index4 +
-            '\x22>添加镜头</button></footer>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</article>',
+            '">添加镜头</button></footer>\n        </article>',
         )['join']('') +
         '</div>'
       : '<div class="storyboard-3d-explore-empty"><strong>' +
-        (list10['length'] > 0x0 ? '当前景别没有候选' : '需要至少一个可见主体') +
+        (list10['length'] > 0 ? '当前景别没有候选' : '需要至少一个可见主体') +
         '</strong><span>' +
-        (list10['length'] > 0x0
+        (list10['length'] > 0
           ? '切换筛选或重新生成一组机位。'
           : '从素材库添加人物或道具后，即可生成 9 个候选机位。') +
         '</span></div>') +
@@ -1878,20 +1878,20 @@ export class Storyboard3DEditorWorkspace {
       (this['_flyKeys'] = new Set()),
       (this['_flyBoost'] = ![]),
       (this['_flyFrame'] = null),
-      (this['_flyLastTime'] = 0x0),
+      (this['_flyLastTime'] = 0),
       (this['_flySceneView'] = null),
       (this['_miniMapDrag'] = null),
       (this['miniMapExpanded'] = ![]),
-      (this['miniMapZoom'] = 0x1),
-      (this['miniMapWindowOffset'] = { x: 0x0, y: 0x0 }),
+      (this['miniMapZoom'] = 1),
+      (this['miniMapWindowOffset'] = { x: 0, y: 0 }),
       (this['_miniMapFootprints'] = []),
       (this['_miniMapFrame'] = null),
       (this['_miniMapPreviewSceneView'] = null),
       (this['_miniMapRefreshFrame'] = null),
       (this['_miniMapWindowDrag'] = null),
-      (this['inspectorWidth'] = 0x168),
+      (this['inspectorWidth'] = 360),
       (this['_inspectorResize'] = null),
-      (this['rightSidebarMode'] = Number(this['window']?.['innerWidth']) <= 0x384 ? null : 'ai'),
+      (this['rightSidebarMode'] = Number(this['window']?.['innerWidth']) <= 900 ? null : 'ai'),
       (this['rightSidebarWidth'] = null),
       (this['_rightSidebarResize'] = null),
       (this['timelineHeight'] = STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT),
@@ -1905,7 +1905,7 @@ export class Storyboard3DEditorWorkspace {
       (this['assetLibrary'] = createStoryboard3DAssetLibrary()),
       (this['assetQuery'] = ''),
       (this['assetCategory'] = 'all'),
-      (this['assetVisibleLimit'] = 0x20),
+      (this['assetVisibleLimit'] = 32),
       (this['favoriteAssetIds'] = new Set()),
       (this['assetThumbnailRenderer'] = assetThumbnailRenderer),
       (this['_assetThumbnailObserver'] = null),
@@ -1942,9 +1942,9 @@ export class Storyboard3DEditorWorkspace {
       (this['backgroundImageControllers'] = new Map()),
       (this['exploreOpen'] = ![]),
       (this['exploreFilter'] = 'all'),
-      (this['exploreVariation'] = 0x0),
+      (this['exploreVariation'] = 0),
       (this['shotCandidates'] = []),
-      (this['_candidateRenderToken'] = 0x0),
+      (this['_candidateRenderToken'] = 0),
       (this['_shotThumbnailQueue'] = Promise['resolve']()));
     const storyboard3DTextModelSelection = resolveStoryboard3DTextModelSelection();
     ((this['aiModelId'] = storyboard3DTextModelSelection['modelId']),
@@ -2015,7 +2015,7 @@ export class Storyboard3DEditorWorkspace {
       (this['viewportFocalLength'] =
         Number(
           getActiveStoryboard3DShot(this['projectStore']['getSnapshot']())?.['camera']?.['focalLength'],
-        ) || 0x23),
+        ) || 35),
       (this['commandHistory'] = createCommandHistory({
         context: {
           getProject: () => this['projectStore']['getSnapshot'](),
@@ -2027,7 +2027,7 @@ export class Storyboard3DEditorWorkspace {
             return (this['_render'](this['_historyRenderOptions'] || undefined), value169);
           },
         },
-        limit: 0x64,
+        limit: 100,
         onChange: () => this['_syncHistoryButtons'](),
       })),
       (this['characterImagePoseController'] = createStoryboard3DCharacterImagePoseController({
@@ -2052,7 +2052,7 @@ export class Storyboard3DEditorWorkspace {
                   Object['entries'](boneOverrides)['map'](([value178, args4]) => [value178, [...args4]]),
                 )),
                   (value176['actionId'] = 'standing'),
-                  (value176['actionTime'] = 0x0),
+                  (value176['actionTime'] = 0),
                   (value176['actionPlaying'] = ![]));
                 break;
               }
@@ -2060,7 +2060,7 @@ export class Storyboard3DEditorWorkspace {
             },
           }),
             this['_setMessage'](
-              '已从参考图应用人物姿势（置信度\x20' + Math['round'](confidence * 0x64) + '%）。',
+              '已从参考图应用人物姿势（置信度 ' + Math['round'](confidence * 100) + '%）。',
             ));
         },
         onStateChange: (value179) => this['_syncCharacterImagePoseUI'](value179),
@@ -2092,7 +2092,7 @@ export class Storyboard3DEditorWorkspace {
           }),
         previewSample: (value182) => this['_previewShotTimelineSample'](value182),
         clearPreview: () => this['_clearShotTimelinePreview'](),
-        expandDirectorPanel: () => this['_applyTimelineHeight'](Math['max'](this['timelineHeight'], 0x1ae)),
+        expandDirectorPanel: () => this['_applyTimelineHeight'](Math['max'](this['timelineHeight'], 430)),
         commitMutation: (value183) => this['_executeMutation'](value183),
         requestRender: () => this['_render'](),
         setMessage: (value184) => this['_setMessage'](value184),
@@ -2152,7 +2152,7 @@ export class Storyboard3DEditorWorkspace {
       (root['dataset']['uiStop'] = '1'),
       root['setAttribute']('role', 'dialog'),
       root['setAttribute']('aria-modal', 'true'),
-      (root['tabIndex'] = -0x1),
+      (root['tabIndex'] = -1),
       root['setAttribute']('aria-label', t('storyboard3d.editor.ariaLabel')),
       (this['backgroundCalibrationInteraction'] = createStoryboard3DBackgroundCalibrationInteraction({
         root: root,
@@ -2219,14 +2219,14 @@ export class Storyboard3DEditorWorkspace {
     if (!this['root']) return;
     const el = this['document']?.['getElementById']?.('v2-server-disconnect-alert'),
       el2 = this['document']?.['querySelector']?.('.header');
-    let value197 = Math['max'](0x0, Math['ceil'](el2?.['getBoundingClientRect']?.()['bottom'] || 0x0));
+    let value197 = Math['max'](0, Math['ceil'](el2?.['getBoundingClientRect']?.()['bottom'] || 0));
     if (el) {
       const value198 = this['window']?.['getComputedStyle']?.(el);
       value198?.['display'] !== 'none' &&
         value198?.['visibility'] !== 'hidden' &&
         (value197 = Math['max'](
           value197,
-          Math['max'](0x0, Math['ceil'](el['getBoundingClientRect']?.()['bottom'] || 0x0)),
+          Math['max'](0, Math['ceil'](el['getBoundingClientRect']?.()['bottom'] || 0)),
         ));
     }
     this['root']['style']['setProperty']('--storyboard-3d-editor-top-offset', value197 + 'px');
@@ -2347,9 +2347,9 @@ export class Storyboard3DEditorWorkspace {
           },
           onContextStateChange: (value209, value210) => {
             if (value209['state'] === 'lost')
-              this['_setMessage']('WebGL\x20上下文已丢失，正在等待浏览器恢复。');
-            if (value209['state'] === 'ready' && value209['lossCount'] > 0x0)
-              this['_setMessage']('WebGL\x20上下文已恢复。');
+              this['_setMessage']('WebGL 上下文已丢失，正在等待浏览器恢复。');
+            if (value209['state'] === 'ready' && value209['lossCount'] > 0)
+              this['_setMessage']('WebGL 上下文已恢复。');
             value209['state'] === 'error' &&
               ((this['_runtimeError'] =
                 value210?.['error']?.['message'] || String(value210?.['error'] || 'WebGL 上下文恢复失败')),
@@ -2364,8 +2364,8 @@ export class Storyboard3DEditorWorkspace {
       const run5 = () => {
           const box8 = container['getBoundingClientRect']?.();
           (sceneRuntime['resize'](
-            Math['max'](0x1, Math['round'](box8?.['width'] || container['clientWidth'] || 0x1)),
-            Math['max'](0x1, Math['round'](box8?.['height'] || container['clientHeight'] || 0x1)),
+            Math['max'](1, Math['round'](box8?.['width'] || container['clientWidth'] || 1)),
+            Math['max'](1, Math['round'](box8?.['height'] || container['clientHeight'] || 1)),
           ),
             sceneRuntime['renderNow']());
         },
@@ -2379,12 +2379,12 @@ export class Storyboard3DEditorWorkspace {
         activeStoryboard3DScene?.['shots']?.['some']((enabled11) => !enabled11['thumbnailUrl']) &&
           this['window']?.['setTimeout']?.(() => {
             if (!this['_closed']) void this['_generateMissingShotThumbnails'](activeStoryboard3DScene['id']);
-          }, 0x0),
+          }, 0),
         !![]
       );
     } catch (error13) {
       ((this['_runtimeError'] = error13?.['message'] || String(error13)),
-        (this['_runtimeFailureTitle'] = '3D\x20视口初始化失败'));
+        (this['_runtimeFailureTitle'] = '3D 视口初始化失败'));
       if (this['sceneRuntime'] === sceneRuntime) this['_disposeSceneRuntime']();
       else sceneRuntime?.['dispose']?.();
       return (this['_showRuntimeFailure']('3D 视口初始化失败', this['_runtimeError']), ![]);
@@ -2395,7 +2395,7 @@ export class Storyboard3DEditorWorkspace {
     if (!enabled12) return;
     const value211 = ++this['_candidateRenderToken'],
       value212 = this['window']?.['URL'] || globalThis['URL'];
-    for (let value213 = 0x0; value213 < this['shotCandidates']['length']; value213 += 0x1) {
+    for (let value213 = 0; value213 < this['shotCandidates']['length']; value213 += 1) {
       const value214 = this['shotCandidates'][value213];
       if (value214['thumbnailUrl'] || value211 !== this['_candidateRenderToken']) continue;
       const project7 = structuredClone(project6),
@@ -2415,17 +2415,17 @@ export class Storyboard3DEditorWorkspace {
         if (value211 !== this['_candidateRenderToken']) return;
         if (value215 && typeof value212?.['createObjectURL'] === 'function') {
           value214['thumbnailUrl'] = value212['createObjectURL'](value215);
-          const el10 = this['root']?.['querySelector']?.('[data-candidate-preview="' + value213 + '\x22]');
+          const el10 = this['root']?.['querySelector']?.('[data-candidate-preview="' + value213 + '"]');
           el10 &&
             (el10['innerHTML'] =
               '<img src="' +
               escapeHtml(value214['thumbnailUrl']) +
               '" alt="候选镜头 ' +
-              (value213 + 0x1) +
-              '\x22>');
+              (value213 + 1) +
+              '">');
         }
       } catch (error14) {
-        const el11 = this['root']?.['querySelector']?.('[data-candidate-preview=\x22' + value213 + '\x22]');
+        const el11 = this['root']?.['querySelector']?.('[data-candidate-preview="' + value213 + '"]');
         if (el11) el11['textContent'] = error14?.['message'] || '候选预览失败';
       }
     }
@@ -2440,7 +2440,7 @@ export class Storyboard3DEditorWorkspace {
       enabled12['renderNow']());
   }
   ['_clearShotCandidates']() {
-    this['_candidateRenderToken'] += 0x1;
+    this['_candidateRenderToken'] += 1;
     const value216 = this['window']?.['URL'] || globalThis['URL'];
     (this['shotCandidates']['forEach']((value217) => {
       if (value217['thumbnailUrl']) value216?.['revokeObjectURL']?.(value217['thumbnailUrl']);
@@ -2475,12 +2475,12 @@ export class Storyboard3DEditorWorkspace {
     if (!enabled13) return ![];
     const storyboard3DShotThumbnailToken = createStoryboard3DShotThumbnailToken(sceneId2, enabled13);
     try {
-      const value224 = await this['_renderShotFrame'](enabled13, { width: 0x140, height: 0xb4 }),
+      const value224 = await this['_renderShotFrame'](enabled13, { width: 320, height: 180 }),
         box9 = this['document']?.['createElement']?.('canvas');
       if (!box9?.['getContext']) return ![];
-      ((box9['width'] = 0x140),
-        (box9['height'] = 0xb4),
-        box9['getContext']('2d')?.['drawImage']?.(value224?.['image'] || value224, 0x0, 0x0, 0x140, 0xb4));
+      ((box9['width'] = 320),
+        (box9['height'] = 180),
+        box9['getContext']('2d')?.['drawImage']?.(value224?.['image'] || value224, 0, 0, 320, 180));
       const previewUrl = box9['toDataURL']?.('image/jpeg', 0.78) || '';
       value224?.['close']?.();
       if (!previewUrl) return ![];
@@ -2535,14 +2535,14 @@ export class Storyboard3DEditorWorkspace {
         target: target2?.['target']
           ? [target2['target']['x'], target2['target']['y'], target2['target']['z']]
           : [
-              value231['position']['x'] + value231['forward']['x'] * 0xa,
-              value231['position']['y'] + value231['forward']['y'] * 0xa,
-              value231['position']['z'] + value231['forward']['z'] * 0xa,
+              value231['position']['x'] + value231['forward']['x'] * 10,
+              value231['position']['y'] + value231['forward']['y'] * 10,
+              value231['position']['z'] + value231['forward']['z'] * 10,
             ],
         focalLength:
-          Number['isFinite'](count4) && count4 > 0x0 ? count4 : Number(value231['focalLength']) || 0x23,
+          Number['isFinite'](count4) && count4 > 0 ? count4 : Number(value231['focalLength']) || 35,
         near: 0.1,
-        far: 0x3e8,
+        far: 1000,
         aspectRatio: '16:9',
       };
     }
@@ -2573,7 +2573,7 @@ export class Storyboard3DEditorWorkspace {
       ?.['forEach']?.((el16) => {
         el16['classList']['toggle']('is-active', Number(el16['dataset']['focalLength']) === focalLength);
       });
-    const el17 = this['root']?.['querySelector']?.('.storyboard-3d-viewport-hud\x20>\x20strong');
+    const el17 = this['root']?.['querySelector']?.('.storyboard-3d-viewport-hud > strong');
     if (el17) el17['textContent'] = focalLength + 'mm';
     return { camera: camera3, focalLength: focalLength, scene: scene2 };
   }
@@ -2606,7 +2606,7 @@ export class Storyboard3DEditorWorkspace {
         ...this['aiState'],
         modelId: this['aiModelId'],
         provider: this['aiProvider'],
-        canUndoAI: this['commandHistory']['getSnapshot']()['nextUndoLabel'] === 'AI\x20scene\x20transaction',
+        canUndoAI: this['commandHistory']['getSnapshot']()['nextUndoLabel'] === 'AI scene transaction',
       })),
       this['_bindAIAssistantModelSelector']());
   }
@@ -2645,7 +2645,7 @@ export class Storyboard3DEditorWorkspace {
       else {
         if (value237 === 'rotationSnapDegrees')
           el21['value'] = String(
-            Math['round']((this['viewportSettings']['rotationSnap'] * 0xb4) / Math['PI']),
+            Math['round']((this['viewportSettings']['rotationSnap'] * 180) / Math['PI']),
           );
         else {
           if (value237 in this['viewportSettings'])
@@ -2672,9 +2672,9 @@ export class Storyboard3DEditorWorkspace {
       if (el23['type'] === 'checkbox') el23['checked'] = this['navigationSettings'][value239] === !![];
       else el23['value'] = String(this['navigationSettings'][value239]);
       const el24 = this['root']?.['querySelector']?.(
-        '[data-storyboard-3d-navigation-output="' + value239 + '\x22]',
+        '[data-storyboard-3d-navigation-output="' + value239 + '"]',
       );
-      if (el24) el24['textContent'] = Number(this['navigationSettings'][value239])['toFixed'](0x2) + '×';
+      if (el24) el24['textContent'] = Number(this['navigationSettings'][value239])['toFixed'](2) + '×';
     }
     const el25 = this['root']?.['querySelector']?.('[data-storyboard-3d-navigation-current]');
     if (el25) el25['textContent'] = preset['label'];
@@ -2686,7 +2686,7 @@ export class Storyboard3DEditorWorkspace {
       const value241 = el26['getAttribute']('aria-label') || value240;
       el26['setAttribute'](
         'title',
-        storyboard3DToolShortcut ? value241 + '\x20(' + storyboard3DToolShortcut + ')' : value241,
+        storyboard3DToolShortcut ? value241 + ' (' + storyboard3DToolShortcut + ')' : value241,
       );
     }
     const el28 = this['root']?.['querySelector']?.('.storyboard-3d-navigation-status:not(.is-fly-mode)');
@@ -2715,10 +2715,10 @@ export class Storyboard3DEditorWorkspace {
       this['modelImportState'] &&
       (el29['textContent'] =
         (this['modelImportState']['fileName'] || '模型') +
-        '\x20·\x20' +
+        ' · ' +
         this['modelImportState']['status'] +
         ' · ' +
-        Math['round']((this['modelImportState']['progress'] || 0x0) * 0x64) +
+        Math['round']((this['modelImportState']['progress'] || 0) * 100) +
         '%');
   }
   ['_syncCharacterImagePoseUI'](response4) {
@@ -2732,7 +2732,7 @@ export class Storyboard3DEditorWorkspace {
         ['getSnapshot']()
         ['scenes']?.['flatMap']((value246) => value246['objects'] || [])
         ['find']((value247) => value247['id'] === value244 && value247['type'] === 'character'),
-      enabled21 = Object['keys'](value245?.['boneOverrides'] || {})['length'] > 0x0;
+      enabled21 = Object['keys'](value245?.['boneOverrides'] || {})['length'] > 0;
     ((el30['dataset']['poseStatus'] = response4['status'] || 'idle'),
       (el30['dataset']['hasPose'] = String(enabled21)),
       el30['setAttribute']('aria-busy', String(enabled20)));
@@ -2785,7 +2785,7 @@ export class Storyboard3DEditorWorkspace {
             horizonY: horizonY['horizonY'],
             vanishingPoint: [...horizonY['vanishingPoint']],
             calibrationMethod: 'manual',
-            calibrationConfidence: 0x1,
+            calibrationConfidence: 1,
           },
         );
         if (activeStoryboard3DShot3?.['camera']) {
@@ -2816,7 +2816,7 @@ export class Storyboard3DEditorWorkspace {
           ['filter'](Boolean),
       ),
     ];
-    if (type4['length'] === 0x0) return ![];
+    if (type4['length'] === 0) return ![];
     const value253 = this['projectStore']
         ['getSnapshot']()
         ['scenes']['find'](
@@ -2824,13 +2824,13 @@ export class Storyboard3DEditorWorkspace {
         ),
       value255 = value253 ? directorDeletionImpact(value253, type4) : '';
     (this['_executeMutation']({
-      type: type4['length'] === 0x1 ? 'delete-object' : 'delete-objects',
-      label: type4['length'] === 0x1 ? 'Delete object' : 'Delete objects',
+      type: type4['length'] === 1 ? 'delete-object' : 'delete-objects',
+      label: type4['length'] === 1 ? 'Delete object' : 'Delete objects',
       mutate: (value256) => {
         const count5 = value256['scenes']['findIndex'](
           (value257) => value257['id'] === value256['activeSceneId'],
         );
-        if (count5 < 0x0) return value256;
+        if (count5 < 0) return value256;
         let objects3 = value256['scenes'][count5];
         return (
           type4['forEach']((value258) => {
@@ -2907,7 +2907,7 @@ export class Storyboard3DEditorWorkspace {
           ] !== 'camera',
       ),
     );
-    Object['keys'](value272)['length'] > 0x0 &&
+    Object['keys'](value272)['length'] > 0 &&
       this['shotTimelineController']?.['recordObjectTransforms']?.(value272, value269);
   }
   ['_commitObjectTransforms']({
@@ -2932,7 +2932,7 @@ export class Storyboard3DEditorWorkspace {
       this['shotTimelineController']?.['isAutoKeyEnabled']?.() &&
       typeof this['commandHistory']['runTransaction'] === 'function'
     )
-      return this['commandHistory']['runTransaction'](label5 + '\x20+\x20Auto\x20Key', run6);
+      return this['commandHistory']['runTransaction'](label5 + ' + Auto Key', run6);
     return run6();
   }
   ['_applyDetectedBackgroundCalibration'](
@@ -2947,7 +2947,7 @@ export class Storyboard3DEditorWorkspace {
         const count6 = value277['scenes']['findIndex'](
           (value278) => value278['id'] === value277['activeSceneId'],
         );
-        if (count6 < 0x0) return value277;
+        if (count6 < 0) return value277;
         let scene3 = value277['scenes'][count6],
           enabled26 = scene3['shots']?.['find']((value279) => value279['id'] === scene3['activeShotId']);
         !enabled26 &&
@@ -3011,7 +3011,7 @@ export class Storyboard3DEditorWorkspace {
       }),
         this['_setMessage'](
           '背景透视已重新匹配并锁定，当前匹配度 ' +
-            Math['round'](analyzeStoryboard3DBackgroundImage2['calibrationConfidence'] * 0x64) +
+            Math['round'](analyzeStoryboard3DBackgroundImage2['calibrationConfidence'] * 100) +
             '%。',
         ));
     } catch (error16) {
@@ -3051,7 +3051,7 @@ export class Storyboard3DEditorWorkspace {
     const value291 =
       '[data-storyboard-3d-asset-thumbnail][data-asset-id="' +
       (globalThis['CSS']?.['escape']?.(value288) || value288) +
-      '\x22]';
+      '"]';
     this['root']?.['querySelectorAll']?.(value291)?.['forEach']((el35) => {
       el35['dataset']['thumbnailStatus'] = value290;
       if (value289) {
@@ -3136,10 +3136,10 @@ export class Storyboard3DEditorWorkspace {
         '[data-storyboard-3d-asset-thumbnail][data-thumbnail-status="pending"]',
       ) || []),
     ];
-    if (list12['length'] === 0x0) return;
+    if (list12['length'] === 0) return;
     const run7 = this['window']?.['IntersectionObserver'];
     if (typeof run7 !== 'function') {
-      list12['slice'](0x0, 0xc)['forEach']((el37) => {
+      list12['slice'](0, 12)['forEach']((el37) => {
         void this['_ensureAssetThumbnail'](el37['dataset']['assetId']);
       });
       return;
@@ -3204,7 +3204,7 @@ export class Storyboard3DEditorWorkspace {
       });
       if (this['_closed']) {
         disposeCancelledStoryboard3DModelImportResult(importStoryboard3DModelFile2);
-        throw new Error('3D\x20编辑器已关闭。');
+        throw new Error('3D 编辑器已关闭。');
       }
       return (
         this['_setImportedModelScene'](
@@ -3238,7 +3238,7 @@ export class Storyboard3DEditorWorkspace {
       list15 = list14['filter'](
         (value305) => this['assetLibrary']['find'](value305)?.['source']?.['kind'] === 'pack',
       );
-    if (list15['length'] === 0x0) return [];
+    if (list15['length'] === 0) return [];
     const list16 = await Promise['allSettled'](list15['map']((value306) => this['_loadPackAsset'](value306))),
       value307 = list16['find']((response5) => response5['status'] === 'rejected');
     if (value307) this['_setMessage'](value307['reason']?.['message'] || String(value307['reason']));
@@ -3276,11 +3276,11 @@ export class Storyboard3DEditorWorkspace {
         ),
       ],
       list19 = [...new Set([...args6, ...args7])];
-    if (list19['length'] === 0x0) return { restoredModels: 0x0, restoredBackgrounds: 0x0 };
+    if (list19['length'] === 0) return { restoredModels: 0, restoredBackgrounds: 0 };
     try {
       const list20 = await this['binaryAssetRepository']['getMany'](list19);
-      if (this['_closed']) return { restoredModels: 0x0, restoredBackgrounds: 0x0 };
-      let restoredModels = 0x0;
+      if (this['_closed']) return { restoredModels: 0, restoredBackgrounds: 0 };
+      let restoredModels = 0;
       const restoredBackgrounds = new Map();
       for (const value317 of list20['filter'](Boolean)) {
         const restoreStoryboard3DStoredFile3 = restoreStoryboard3DStoredFile(
@@ -3317,7 +3317,7 @@ export class Storyboard3DEditorWorkspace {
             importStoryboard3DModelFile3['parsed']['scene'],
             importStoryboard3DModelFile3['normalization'],
           ),
-            (restoredModels += 0x1));
+            (restoredModels += 1));
         } else
           value317['kind'] === 'background' &&
             value312['scenes']
@@ -3329,7 +3329,7 @@ export class Storyboard3DEditorWorkspace {
                 restoredBackgrounds['set'](value321['id'], value322['imageUrl']);
               });
       }
-      restoredBackgrounds['size'] > 0x0 &&
+      restoredBackgrounds['size'] > 0 &&
         this['projectStore']['updateProject']('restore-background-assets', (value323) => {
           value323['scenes']['forEach']((value324) => {
             value324['background'] &&
@@ -3337,12 +3337,12 @@ export class Storyboard3DEditorWorkspace {
               (value324['background']['imageUrl'] = restoredBackgrounds['get'](value324['id']));
           });
         });
-      if (restoredModels > 0x0 || restoredBackgrounds['size'] > 0x0) this['_render']();
+      if (restoredModels > 0 || restoredBackgrounds['size'] > 0) this['_render']();
       return { restoredModels: restoredModels, restoredBackgrounds: restoredBackgrounds['size'] };
     } catch (error22) {
       if (!this['_closed'])
         this['_setMessage']('本地 3D 资源恢复失败：' + (error22?.['message'] || String(error22)));
-      return { restoredModels: 0x0, restoredBackgrounds: 0x0, error: error22 };
+      return { restoredModels: 0, restoredBackgrounds: 0, error: error22 };
     }
   }
   ['_getObject'](value325, value326) {
@@ -3394,10 +3394,10 @@ export class Storyboard3DEditorWorkspace {
         this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
       return;
     }
-    if (startX['button'] !== 0x0) return;
+    if (startX['button'] !== 0) return;
     (startX['preventDefault'](), startX['stopPropagation']());
     const handleKey = this['sceneRuntime']['pickGizmoHandle'](startX['clientX'], startX['clientY']);
-    if (handleKey && flyMode['selectedObjectIds']['length'] > 0x0) {
+    if (handleKey && flyMode['selectedObjectIds']['length'] > 0) {
       const dragState = this['sceneRuntime']['beginGizmoDrag']({
         handleKey: handleKey['handleKey'],
         clientX: startX['clientX'],
@@ -3417,7 +3417,7 @@ export class Storyboard3DEditorWorkspace {
               this['shotTimelineController']?.['getPreviewTransform']?.(value332) || value333['transform'],
             ));
         });
-        if (Object['keys'](initialTransforms)['length'] > 0x0) {
+        if (Object['keys'](initialTransforms)['length'] > 0) {
           const event9 = createStoryboard3DTransformSession({
             sceneId: sceneId4['id'],
             activeTool: flyMode['activeTool'],
@@ -3439,7 +3439,7 @@ export class Storyboard3DEditorWorkspace {
             this['sceneRuntime']['setGizmoHoverHandle']?.(null),
             this['sceneRuntime']['setGizmoActiveHandle']?.(handleKey['handleKey']));
           if (event9['activeTool'] === 'move') {
-            const from2 = dragState['pivot'] || { x: 0x0, y: 0x0, z: 0x0 };
+            const from2 = dragState['pivot'] || { x: 0, y: 0, z: 0 };
             this['sceneRuntime']['setGizmoMoveGuideLine']?.({ from: from2, to: from2 });
           }
           startX['currentTarget']?.['classList']?.['add']?.('is-gizmo-dragging');
@@ -3478,7 +3478,7 @@ export class Storyboard3DEditorWorkspace {
     (this['_setSelectedObjects'](list22),
       this['_render'](),
       enabled32?.['storyboardObjectType'] === 'camera' &&
-        list22['length'] === 0x1 &&
+        list22['length'] === 1 &&
         this['_focusCameraObject'](enabled32['storyboardObjectId']));
   }
   ['_beginRuntimeSelectionBox'](pointerId, args8 = []) {
@@ -3551,7 +3551,7 @@ export class Storyboard3DEditorWorkspace {
     if (!this['sceneRuntime'] || this['_gizmoDrag'] || this['_selectionDrag'] || this['_cameraDrag']) return;
     const value336 = this['editorStore']['getSnapshot'](),
       value337 =
-        value336['selectedObjectIds']['length'] === 0x0
+        value336['selectedObjectIds']['length'] === 0
           ? null
           : this['sceneRuntime']['pickGizmoHandle'](event15['clientX'], event15['clientY']);
     (this['sceneRuntime']['setGizmoHoverHandle']?.(value337?.['handleKey'] || null),
@@ -3575,11 +3575,11 @@ export class Storyboard3DEditorWorkspace {
         value340 =
           value338 *
           this['navigationSettings']['orbitSensitivity'] *
-          (this['navigationSettings']['invertOrbitX'] ? -0x1 : 0x1),
+          (this['navigationSettings']['invertOrbitX'] ? -1 : 1),
         value341 =
           value339 *
           this['navigationSettings']['orbitSensitivity'] *
-          (this['navigationSettings']['invertOrbitY'] ? -0x1 : 0x1),
+          (this['navigationSettings']['invertOrbitY'] ? -1 : 1),
         value342 = value338 * this['navigationSettings']['panSensitivity'],
         value343 = value339 * this['navigationSettings']['panSensitivity'],
         value344 = value339 * this['navigationSettings']['zoomSensitivity'];
@@ -3623,8 +3623,8 @@ export class Storyboard3DEditorWorkspace {
       initialObjectIds['box'] &&
         box12 &&
         ((initialObjectIds['box']['hidden'] = !initialObjectIds['moved']),
-        (initialObjectIds['box']['style']['left'] = Math['max'](0x0, box11['left'] - box12['left']) + 'px'),
-        (initialObjectIds['box']['style']['top'] = Math['max'](0x0, box11['top'] - box12['top']) + 'px'),
+        (initialObjectIds['box']['style']['left'] = Math['max'](0, box11['left'] - box12['left']) + 'px'),
+        (initialObjectIds['box']['style']['top'] = Math['max'](0, box11['top'] - box12['top']) + 'px'),
         (initialObjectIds['box']['style']['width'] = box11['width'] + 'px'),
         (initialObjectIds['box']['style']['height'] = box11['height'] + 'px'));
       if (initialObjectIds['moved']) {
@@ -3659,25 +3659,25 @@ export class Storyboard3DEditorWorkspace {
       });
     this['sceneRuntime']['previewObjectTransforms']?.(updateStoryboard3DTransformSession2);
     if (event18['activeTool'] === 'move') {
-      const value349 = Object['keys'](updateStoryboard3DTransformSession2)[0x0],
+      const value349 = Object['keys'](updateStoryboard3DTransformSession2)[0],
         value350 = event18['initialTransforms'][value349],
         value351 = updateStoryboard3DTransformSession2[value349],
-        from3 = event18['dragState']['pivot'] || { x: 0x0, y: 0x0, z: 0x0 };
+        from3 = event18['dragState']['pivot'] || { x: 0, y: 0, z: 0 };
       this['sceneRuntime']['setGizmoMoveGuideLine']?.({
         from: from3,
         to: {
           x:
-            (from3['x'] || 0x0) +
-            (value351?.['position']?.[0x0] || 0x0) -
-            (value350?.['position']?.[0x0] || 0x0),
+            (from3['x'] || 0) +
+            (value351?.['position']?.[0] || 0) -
+            (value350?.['position']?.[0] || 0),
           y:
-            (from3['y'] || 0x0) +
-            (value351?.['position']?.[0x1] || 0x0) -
-            (value350?.['position']?.[0x1] || 0x0),
+            (from3['y'] || 0) +
+            (value351?.['position']?.[1] || 0) -
+            (value350?.['position']?.[1] || 0),
           z:
-            (from3['z'] || 0x0) +
-            (value351?.['position']?.[0x2] || 0x0) -
-            (value350?.['position']?.[0x2] || 0x0),
+            (from3['z'] || 0) +
+            (value351?.['position']?.[2] || 0) -
+            (value350?.['position']?.[2] || 0),
         },
       });
     }
@@ -3709,7 +3709,7 @@ export class Storyboard3DEditorWorkspace {
       const enabled34 = event20['mode'] === 'fly-look';
       enabled34
         ? ((this['_flySceneView'] = structuredClone(event20['latestSceneView'])),
-          this['_flyKeys']['size'] > 0x0
+          this['_flyKeys']['size'] > 0
             ? this['sceneRuntime']?.['previewSceneView']?.(this['_flySceneView'])
             : this['_finishFlyMovement']())
         : this['sceneRuntime']?.['commitSceneView']?.(event20['latestSceneView']);
@@ -3745,7 +3745,7 @@ export class Storyboard3DEditorWorkspace {
         sceneId: sceneId5['sceneId'],
         transforms: sceneId5['latestTransforms'],
         activeTool: sceneId5['activeTool'],
-        label: sceneId5['activeTool'] + '\x20objects',
+        label: sceneId5['activeTool'] + ' objects',
       }));
   }
   ['_cancelRuntimeTransform'](event21) {
@@ -3781,9 +3781,9 @@ export class Storyboard3DEditorWorkspace {
     if (!args11) return;
     (event23['preventDefault'](), event23['stopPropagation']());
     const box13 = event23['currentTarget']?.['getBoundingClientRect']?.(),
-      value354 = this['navigationSettings']['invertWheel'] ? -0x1 : 0x1,
+      value354 = this['navigationSettings']['invertWheel'] ? -1 : 1,
       wheelDelta =
-        normalizeWheelDelta(event23['deltaY'], event23['deltaMode'], box13?.['height'] || 0x320) *
+        normalizeWheelDelta(event23['deltaY'], event23['deltaMode'], box13?.['height'] || 800) *
         this['navigationSettings']['zoomSensitivity'] *
         value354,
       value355 = { ...args11, ...applySceneZoomDelta(args11, wheelDelta) };
@@ -3797,7 +3797,7 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_handleMiniMapPointerDown'](startX2) {
     const el38 = startX2['target']?.['closest']?.('.storyboard-3d-mini-map-title');
-    if (el38 && !startX2['target']['closest']('button') && startX2['button'] === 0x0) {
+    if (el38 && !startX2['target']['closest']('button') && startX2['button'] === 0) {
       const el39 = el38['closest']('.storyboard-3d-mini-map-placeholder'),
         el40 = el39?.['closest']?.('.storyboard-3d-viewport'),
         box14 = el39?.['getBoundingClientRect']?.(),
@@ -3809,8 +3809,8 @@ export class Storyboard3DEditorWorkspace {
           startX: startX2['clientX'],
           startY: startX2['clientY'],
           initial: { ...this['miniMapWindowOffset'] },
-          maxLeft: Math['max'](0x0, box15['width'] - box14['width'] - 0x1c),
-          maxDown: Math['max'](0x0, box15['height'] - box14['height'] - 0x1c),
+          maxLeft: Math['max'](0, box15['width'] - box14['width'] - 28),
+          maxDown: Math['max'](0, box15['height'] - box14['height'] - 28),
         }),
         this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], !![]),
         this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], !![]),
@@ -3818,7 +3818,7 @@ export class Storyboard3DEditorWorkspace {
       return;
     }
     const el41 = startX2['target']?.['closest']?.('.storyboard-3d-mini-map-canvas [data-object-id]');
-    if (!el41 || startX2['button'] !== 0x0) return;
+    if (!el41 || startX2['button'] !== 0) return;
     const value356 = this['projectStore']['getSnapshot'](),
       sceneId6 = getActiveStoryboard3DScene(value356),
       objectId2 = sceneId6?.['objects']?.['find'](
@@ -3869,11 +3869,11 @@ export class Storyboard3DEditorWorkspace {
         ...(this['root']?.['querySelectorAll']?.('.storyboard-3d-mini-map-canvas [data-object-id]') || []),
       ]['find']((el44) => el44['dataset']['objectId'] === x6['objectId']),
       box16 = projectStoryboard3DWorldToMiniMapRatio(
-        { x: x6['transform']['position'][0x0], z: x6['transform']['position'][0x2] },
+        { x: x6['transform']['position'][0], z: x6['transform']['position'][2] },
         x6['projection'],
       );
-    (el43?.['style']?.['setProperty']?.('--mini-x', box16['x'] * 0x64 + '%'),
-      el43?.['style']?.['setProperty']?.('--mini-y', box16['y'] * 0x64 + '%'));
+    (el43?.['style']?.['setProperty']?.('--mini-x', box16['x'] * 100 + '%'),
+      el43?.['style']?.['setProperty']?.('--mini-y', box16['y'] * 100 + '%'));
   }
   ['_scheduleMiniMapRefresh']() {
     if (this['_closed'] || !this['root'] || this['_miniMapRefreshFrame'] !== null) return;
@@ -3923,7 +3923,7 @@ export class Storyboard3DEditorWorkspace {
         ['sort'](),
       objectSignature = list23['join']('|'),
       hasGeometry = (value361 || [])['some'](
-        (value364) => Array['isArray'](value364?.['points']) && value364['points']['length'] >= 0x3,
+        (value364) => Array['isArray'](value364?.['points']) && value364['points']['length'] >= 3,
       );
     return (
       (!this['_miniMapFrame'] ||
@@ -3962,7 +3962,7 @@ export class Storyboard3DEditorWorkspace {
       event25['stopPropagation'](),
       (this['miniMapZoom'] = Math['max'](
         0.5,
-        Math['min'](0x3, this['miniMapZoom'] * Math['exp'](-(Number(event25['deltaY']) || 0x0) * 0.001)),
+        Math['min'](3, this['miniMapZoom'] * Math['exp'](-(Number(event25['deltaY']) || 0) * 0.001)),
       )),
       this['_render']());
   }
@@ -3974,10 +3974,10 @@ export class Storyboard3DEditorWorkspace {
       (this['miniMapWindowOffset'] = {
         x: Math['max'](
           -enabled35['maxLeft'],
-          Math['min'](0x0, enabled35['initial']['x'] + event26['clientX'] - enabled35['startX']),
+          Math['min'](0, enabled35['initial']['x'] + event26['clientX'] - enabled35['startX']),
         ),
         y: Math['max'](
-          0x0,
+          0,
           Math['min'](
             enabled35['maxDown'],
             enabled35['initial']['y'] + event26['clientY'] - enabled35['startY'],
@@ -4023,7 +4023,7 @@ export class Storyboard3DEditorWorkspace {
       event28['dataTransfer']['setData']('text/plain', el49['dataset']['objectId'] || ''));
   }
   ['_handleOutlineDragOver'](event29) {
-    if (event29['target']?.['closest']?.('.storyboard-3d-scene-item,\x20.storyboard-3d-shot-card')) {
+    if (event29['target']?.['closest']?.('.storyboard-3d-scene-item, .storyboard-3d-shot-card')) {
       event29['preventDefault']();
       if (event29['dataTransfer']) event29['dataTransfer']['dropEffect'] = 'move';
       return;
@@ -4098,7 +4098,7 @@ export class Storyboard3DEditorWorkspace {
             (value376) => value376['id'] === value375['activeSceneId'],
           );
           return (
-            count7 >= 0x0 &&
+            count7 >= 0 &&
               (value375['scenes'][count7] = setStoryboard3DObjectParent(
                 value375['scenes'][count7],
                 enabled36,
@@ -4116,17 +4116,17 @@ export class Storyboard3DEditorWorkspace {
   ['_render']({ preserveAssetLibrary: preserveAssetLibrary = ![] } = {}) {
     if (!this['root']) return;
     const captureTimelinePresentation2 = captureTimelinePresentation(this['root']),
-      value377 = this['root']['querySelector']('.storyboard-3d-outline-list')?.['scrollTop'] || 0x0,
+      value377 = this['root']['querySelector']('.storyboard-3d-outline-list')?.['scrollTop'] || 0,
       el54 = this['root']['querySelector']('.storyboard-3d-object-properties-sidebar'),
       value378 = el54?.['dataset']['objectId'] || '',
-      value379 = el54?.['querySelector']('.storyboard-3d-object-properties-content')?.['scrollTop'] || 0x0,
+      value379 = el54?.['querySelector']('.storyboard-3d-object-properties-content')?.['scrollTop'] || 0,
       open2 = this['root']['querySelector']('.storyboard-3d-global-settings')?.['open'] === !![];
     (this['_aiModelSelectorController']?.['destroy']?.(), (this['_aiModelSelectorController'] = null));
     const project8 = this['projectStore']['getSnapshot'](),
       active4 = this['editorStore']['getSnapshot'](),
       sceneGroups2 = getActiveStoryboard3DScene(project8),
       activeShot2 = getActiveStoryboard3DShot(project8),
-      value380 = active4['selectedObjectIds']['at'](-0x1),
+      value380 = active4['selectedObjectIds']['at'](-1),
       object2 = sceneGroups2?.['objects']?.['find']((value381) => value381['id'] === value380),
       active5 = active4['assetLibraryOpen']
         ? 'assets'
@@ -4136,7 +4136,7 @@ export class Storyboard3DEditorWorkspace {
             ? this['rightSidebarMode']
             : null;
     this['rightSidebarMode'] = active5;
-    const layoutWidth = this['window']?.['innerWidth'] || 0x5a0,
+    const layoutWidth = this['window']?.['innerWidth'] || 1440,
       sidebarWidth = normalizeStoryboard3DRightSidebarWidth(this['rightSidebarWidth'], layoutWidth, active5),
       el55 =
         preserveAssetLibrary && active5 === 'assets'
@@ -4149,7 +4149,7 @@ export class Storyboard3DEditorWorkspace {
     const active6 = this['viewportControls']?.['getSnapshot']?.()['viewMode'] || 'perspective',
       timelineOpen2 = this['shotTimelineController']?.['isDrawerOpen']?.() === !![],
       value382 =
-        this['root']['getBoundingClientRect']?.()['height'] || this['window']?.['innerHeight'] || 0x384,
+        this['root']['getBoundingClientRect']?.()['height'] || this['window']?.['innerHeight'] || 900,
       storyboard3DTimelineHeight = normalizeStoryboard3DTimelineHeight(this['timelineHeight'], value382);
     this['timelineHeight'] = storyboard3DTimelineHeight;
     const camera6 = this['_getMiniMapCamera'](activeShot2),
@@ -4164,14 +4164,14 @@ export class Storyboard3DEditorWorkspace {
             ['list']({
               query: this['assetQuery'],
               category: this['assetCategory'] === 'favorite' ? 'all' : this['assetCategory'],
-              limit: 0x640,
+              limit: 1600,
             })
             ['filter'](
               (value383) =>
                 this['assetCategory'] !== 'favorite' || this['favoriteAssetIds']['has'](value383['id']),
             )
         : [],
-      assets2 = totalCount['slice'](0x0, this['assetVisibleLimit'])['map']((thumbnailUrl) => ({
+      assets2 = totalCount['slice'](0, this['assetVisibleLimit'])['map']((thumbnailUrl) => ({
         ...thumbnailUrl,
         thumbnailUrl: thumbnailUrl['thumbnailUrl'] || storyboard3DAssetThumbnailCache['get'](thumbnailUrl),
       })),
@@ -4189,38 +4189,38 @@ export class Storyboard3DEditorWorkspace {
       escapeHtml(t('storyboard3d.editor.projectName')) +
       '">\n          </label>\n          <span class="storyboard-3d-save-status" data-storyboard-3d-save-status data-status="' +
       escapeHtml(this['projectStore']['getSaveStatus']()) +
-      '\x22>' +
+      '">' +
       escapeHtml(getSaveStatusLabel(this['projectStore']['getSaveStatus']())) +
       '</span>\n        </div>\n        <nav class="storyboard-3d-mode-switcher" aria-label="' +
       escapeHtml(t('storyboard3d.editor.modeAria')) +
       '">\n          <button type="button" class="is-active" aria-pressed="true">' +
       escapeHtml(t('storyboard3d.editor.editMode')) +
-      '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22open-explore\x22>' +
+      '</button>\n          <button type="button" data-storyboard-3d-action="open-explore">' +
       escapeHtml(t('storyboard3d.editor.exploreMode')) +
       '</button>\n        </nav>\n        <div class="storyboard-3d-topbar-actions">\n          <button type="button" class="storyboard-3d-asset-library-trigger ' +
       (active5 === 'assets' ? 'is-active' : '') +
       '" data-storyboard-3d-action="open-asset-library" aria-controls="storyboard3DRightSidebar" aria-expanded="' +
       (active5 === 'assets') +
-      '\x22><span\x20aria-hidden=\x22true\x22>◇</span>模型库</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '"><span aria-hidden="true">◇</span>模型库</button>\n          ' +
       renderNavigationSettings(this['navigationSettings'], {
         open: open2,
         viewportSettings: this['viewportSettings'],
       }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-ai-sidebar-trigger\x20' +
+      '\n          <button type="button" class="storyboard-3d-ai-sidebar-trigger ' +
       (active5 === 'ai' ? 'is-active' : '') +
       '" data-storyboard-3d-action="toggle-ai-sidebar" aria-controls="storyboard3DRightSidebar" aria-expanded="' +
       (active5 === 'ai') +
       '"><span aria-hidden="true">✦</span>AI 助手</button>\n          <button type="button" data-storyboard-3d-action="undo" title="Ctrl+Z">撤销</button>\n          <button type="button" data-storyboard-3d-action="redo" title="Ctrl+Shift+Z">重做</button>\n          <button type="button" class="storyboard-3d-export-trigger" data-storyboard-3d-action="export-storyboard">导出分镜</button>\n        </div>\n      </header>\n\n      <div class="storyboard-3d-editor-main" style="--storyboard-3d-right-sidebar-width:' +
       sidebarWidth +
-      'px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<main\x20class=\x22storyboard-3d-viewport-column\x20' +
+      'px">\n        <main class="storyboard-3d-viewport-column ' +
       (timelineOpen2 ? 'is-timeline-open' : 'is-timeline-collapsed') +
       '" style="--storyboard-3d-timeline-height:' +
       storyboard3DTimelineHeight +
       'px">\n          <section class="storyboard-3d-viewport" tabindex="0" aria-label="' +
       escapeHtml(t('storyboard3d.editor.viewport')) +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-tool-rail\x22\x20role=\x22toolbar\x22\x20aria-label=\x22' +
+      '">\n            <div class="storyboard-3d-tool-rail" role="toolbar" aria-label="' +
       escapeHtml(t('storyboard3d.editor.tools')) +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '">\n              ' +
       renderStoryboard3DIconButton({ action: 'add-light', icon: 'light', label: '添加灯光' }) +
       '\n              ' +
       renderStoryboard3DIconButton({
@@ -4230,7 +4230,7 @@ export class Storyboard3DEditorWorkspace {
         active: active5 === 'perspective',
         className: 'storyboard-3d-background-match-trigger',
       }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-view-controls\x22\x20role=\x22toolbar\x22\x20aria-label=\x22视图控制\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n            </div>\n            <div class="storyboard-3d-view-controls" role="toolbar" aria-label="视图控制">\n              ' +
       renderStoryboard3DIconButton({
         action: 'set-viewport-view',
         icon: 'perspective',
@@ -4276,14 +4276,14 @@ export class Storyboard3DEditorWorkspace {
           (value384) =>
             '<option value="' +
             value384 +
-            '\x22\x20' +
+            '" ' +
             (value384 === this['outlineType'] ? 'selected' : '') +
             '>' +
             (value384 === 'all' ? '全部类型' : value384) +
             '</option>',
         )
         ['join']('') +
-      '</select></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-outline-list\x22>' +
+      '</select></div>\n                <div class="storyboard-3d-outline-list">' +
       renderObjectOutline(sceneGroups2, active4['selectedObjectIds'], {
         query: this['outlineQuery'],
         type: this['outlineType'],
@@ -4296,7 +4296,7 @@ export class Storyboard3DEditorWorkspace {
         active4['activeTool'] === 'select',
         this['navigationSettings']['preset'],
       ) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n              ' +
       renderStoryboard3DToolButton(
         'move',
         active4['activeTool'] === 'move',
@@ -4311,13 +4311,13 @@ export class Storyboard3DEditorWorkspace {
         active: active4['flyMode'],
         className: 'storyboard-3d-fly-mode-button',
       }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n              ' +
       renderStoryboard3DIconButton({
         action: 'focus-selection',
         icon: 'focus',
         label: '聚焦选中',
         shortcut: 'F',
-        disabled: active4['selectedObjectIds']['length'] === 0x0,
+        disabled: active4['selectedObjectIds']['length'] === 0,
       }) +
       '\n              ' +
       renderStoryboard3DIconButton({
@@ -4327,7 +4327,7 @@ export class Storyboard3DEditorWorkspace {
         title: t('storyboard3d.editor.addShotDescription'),
         className: 'storyboard-3d-add-shot-control',
       }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-view-controls-separator\x22\x20aria-hidden=\x22true\x22></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n              <span class="storyboard-3d-view-controls-separator" aria-hidden="true"></span>\n              ' +
       renderStoryboard3DToolButton(
         'rotate',
         active4['activeTool'] === 'rotate',
@@ -4339,7 +4339,7 @@ export class Storyboard3DEditorWorkspace {
         active4['activeTool'] === 'scale',
         this['navigationSettings']['preset'],
       ) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-view-controls-separator\x22\x20aria-hidden=\x22true\x22></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n              <span class="storyboard-3d-view-controls-separator" aria-hidden="true"></span>\n              ' +
       renderStoryboard3DViewportSettingButton({
         field: 'transformSpace',
         icon: 'transformSpace',
@@ -4362,7 +4362,7 @@ export class Storyboard3DEditorWorkspace {
         active: this['viewportSettings']['groundLock'],
         hidden: !STORYBOARD_3D_SELECT_MOVE_TOOLS['has'](active4['activeTool']),
       }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n              ' +
       renderStoryboard3DViewportSettingButton({
         field: 'uniformScale',
         icon: 'uniform',
@@ -4370,7 +4370,7 @@ export class Storyboard3DEditorWorkspace {
         active: this['viewportSettings']['uniformScale'],
         hidden: active4['activeTool'] !== 'scale',
       }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n            </div>\n            ' +
       renderStoryboard3DIconButton({
         action: 'fit-all',
         icon: 'fit',
@@ -4380,20 +4380,20 @@ export class Storyboard3DEditorWorkspace {
       }) +
       '\n            ' +
       renderStoryboard3DFocalControl(sceneGroups2, this['viewportFocalLength']) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-viewport-hud\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-navigation-status\x20' +
+      '\n            <div class="storyboard-3d-viewport-hud">\n              <span class="storyboard-3d-navigation-status ' +
       (active4['flyMode'] ? 'is-fly-mode' : '') +
-      '\x22>' +
+      '">' +
       escapeHtml(
         getStoryboard3DNavigationHelpText({
           flyMode: active4['flyMode'],
           preset: this['navigationSettings']['preset'],
         }),
       ) +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
+      '</span>\n              <span>' +
       escapeHtml(activeShot2?.['shotSize'] || 'MED') +
       '</span>\n              <span>' +
       escapeHtml(activeShot2?.['shotAngle'] || 'eye') +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>' +
+      '</span>\n              <strong>' +
       escapeHtml(formatFocalLength(this['viewportFocalLength']) + 'mm') +
       '</strong>\n            </div>\n            <div class="storyboard-3d-mini-map-placeholder ' +
       (this['miniMapExpanded'] ? 'is-expanded' : '') +
@@ -4401,7 +4401,7 @@ export class Storyboard3DEditorWorkspace {
       this['miniMapWindowOffset']['x'] +
       'px;--mini-map-window-y:' +
       this['miniMapWindowOffset']['y'] +
-      'px\x22>' +
+      'px">' +
       renderMiniMap(sceneGroups2, activeShot2, {
         expanded: this['miniMapExpanded'],
         zoom: this['miniMapZoom'],
@@ -4413,13 +4413,13 @@ export class Storyboard3DEditorWorkspace {
       (timelineOpen2 ? 'is-timeline-open' : 'is-timeline-collapsed') +
       '" aria-label="' +
       escapeHtml(t('storyboard3d.editor.shots')) +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-shot-strip\x22>' +
+      '">\n            <div class="storyboard-3d-shot-strip">' +
       renderShotStrip(sceneGroups2, { timelineOpen: timelineOpen2 }) +
       '</div>\n            ' +
       renderShotTimelineDrawerHandle(timelineOpen2, storyboard3DTimelineHeight) +
       '\n            <div class="storyboard-3d-timeline-drawer-content" aria-hidden="' +
       !timelineOpen2 +
-      '\x22\x20' +
+      '" ' +
       (timelineOpen2 ? '' : 'inert') +
       '>\n              ' +
       (this['shotTimelineController']?.['render']?.() || '') +
@@ -4437,7 +4437,7 @@ export class Storyboard3DEditorWorkspace {
             layoutWidth: layoutWidth,
           })
         : '') +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '\n        ' +
       (active5 === 'object'
         ? renderObjectPropertiesRightSidebar(
             {
@@ -4521,11 +4521,11 @@ export class Storyboard3DEditorWorkspace {
       !this['sceneRuntime'] && !this['_runtimeError'] && this['_mountSceneRuntime'](project8, active4),
       this['_runtimeError'] &&
         this['_showRuntimeFailure'](
-          this['_runtimeFailureTitle'] || '3D\x20视口不可用',
+          this['_runtimeFailureTitle'] || '3D 视口不可用',
           this['_runtimeError'],
         ),
       this['exploreOpen'] &&
-        this['shotCandidates']['length'] > 0x0 &&
+        this['shotCandidates']['length'] > 0 &&
         void this['_renderShotCandidatePreviews'](project8, active4),
       this['_bindAIAssistantModelSelector'](),
       this['_observeVisibleAssetThumbnails'](),
@@ -4544,7 +4544,7 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_applyInspectorWidth'](value391, value392 = null) {
     const el60 = value392 || this['root']?.['querySelector']?.('.storyboard-3d-editor-main'),
-      value393 = el60?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 0x4b0;
+      value393 = el60?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 1200;
     return (
       (this['inspectorWidth'] = normalizeStoryboard3DInspectorWidth(value391, value393)),
       el60?.['style']?.['setProperty']?.('--storyboard-3d-inspector-width', this['inspectorWidth'] + 'px'),
@@ -4560,12 +4560,12 @@ export class Storyboard3DEditorWorkspace {
     if (
       !splitter ||
       event31['isPrimary'] === ![] ||
-      (Number['isFinite'](event31['button']) && event31['button'] !== 0x0)
+      (Number['isFinite'](event31['button']) && event31['button'] !== 0)
     )
       return;
     const layout = splitter['closest']?.('.storyboard-3d-editor-main'),
       bounds = layout?.['getBoundingClientRect']?.();
-    if (!bounds?.['width'] || bounds['width'] < 0x384) return;
+    if (!bounds?.['width'] || bounds['width'] < 900) return;
     (event31['preventDefault']?.(), event31['stopImmediatePropagation']?.());
     const pointerId2 = event31['pointerId'];
     try {
@@ -4618,7 +4618,7 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_applyRightSidebarWidth'](value394, value395 = null) {
     const el61 = value395 || this['root']?.['querySelector']?.('.storyboard-3d-editor-main'),
-      value396 = el61?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 0x5a0;
+      value396 = el61?.['getBoundingClientRect']?.()['width'] || this['window']?.['innerWidth'] || 1440;
     return (
       (this['rightSidebarWidth'] = normalizeStoryboard3DRightSidebarWidth(value394, value396)),
       el61?.['style']?.['setProperty']?.(
@@ -4637,7 +4637,7 @@ export class Storyboard3DEditorWorkspace {
     if (
       !splitter2 ||
       event36['isPrimary'] === ![] ||
-      (Number['isFinite'](event36['button']) && event36['button'] !== 0x0)
+      (Number['isFinite'](event36['button']) && event36['button'] !== 0)
     )
       return;
     const el62 = splitter2['closest']?.('.storyboard-3d-right-sidebar'),
@@ -4709,7 +4709,7 @@ export class Storyboard3DEditorWorkspace {
         el63?.['getBoundingClientRect']?.()['height'] ||
         this['root']?.['getBoundingClientRect']?.()['height'] ||
         this['window']?.['innerHeight'] ||
-        0x384;
+        900;
     return (
       (this['timelineHeight'] = normalizeStoryboard3DTimelineHeight(value397, value399)),
       el63?.['style']?.['setProperty']?.('--storyboard-3d-timeline-height', this['timelineHeight'] + 'px'),
@@ -4725,7 +4725,7 @@ export class Storyboard3DEditorWorkspace {
     if (
       !handle2 ||
       event41['isPrimary'] === ![] ||
-      (Number['isFinite'](event41['button']) && event41['button'] !== 0x0)
+      (Number['isFinite'](event41['button']) && event41['button'] !== 0)
     )
       return;
     const column = handle2['closest']?.('.storyboard-3d-viewport-column'),
@@ -4753,7 +4753,7 @@ export class Storyboard3DEditorWorkspace {
     if (!event43 || (event43['pointerId'] != null && event42['pointerId'] !== event43['pointerId'])) return;
     const value401 = Number(event42['clientY']);
     if (!Number['isFinite'](value401)) return;
-    if (!event43['moved'] && Math['abs'](value401 - event43['startY']) < 0x4) return;
+    if (!event43['moved'] && Math['abs'](value401 - event43['startY']) < 4) return;
     (event42['preventDefault']?.(),
       event42['stopImmediatePropagation']?.(),
       !event43['moved'] &&
@@ -4785,12 +4785,12 @@ export class Storyboard3DEditorWorkspace {
         this['_suppressTimelineToggleClick'] = ![];
       };
       typeof this['window']?.['setTimeout'] === 'function'
-        ? this['window']['setTimeout'](value402, 0x0)
-        : globalThis['setTimeout']?.(value402, 0x0);
+        ? this['window']['setTimeout'](value402, 0)
+        : globalThis['setTimeout']?.(value402, 0);
     }
   }
   ['_openAssetLibrary']() {
-    ((this['assetVisibleLimit'] = Math['max'](0x20, this['assetVisibleLimit'])),
+    ((this['assetVisibleLimit'] = Math['max'](32, this['assetVisibleLimit'])),
       (this['rightSidebarMode'] = 'assets'),
       this['editorStore']['setAssetLibraryOpen'](!![]),
       this['_render'](),
@@ -4805,14 +4805,14 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_setSelectedObjects'](value403, { openProperties: openProperties = !![] } = {}) {
     const value404 = this['editorStore']['setSelectedObjects'](value403);
-    if (openProperties && value404['selectedObjectIds']['length'] > 0x0) {
+    if (openProperties && value404['selectedObjectIds']['length'] > 0) {
       this['rightSidebarMode'] = 'object';
       if (value404['assetLibraryOpen']) this['editorStore']['setAssetLibraryOpen'](![]);
       (this['_assetThumbnailObserver']?.['disconnect']?.(), (this['_assetThumbnailObserver'] = null));
     } else
-      value404['selectedObjectIds']['length'] === 0x0 &&
+      value404['selectedObjectIds']['length'] === 0 &&
         this['rightSidebarMode'] === 'object' &&
-        (this['rightSidebarMode'] = Number(this['window']?.['innerWidth']) <= 0x384 ? null : 'ai');
+        (this['rightSidebarMode'] = Number(this['window']?.['innerWidth']) <= 900 ? null : 'ai');
     return value404['selectedObjectIds'];
   }
   ['_toggleAIAssistant']() {
@@ -4879,7 +4879,7 @@ export class Storyboard3DEditorWorkspace {
     );
   }
   ['_scheduleFlyMovement']() {
-    if (this['_flyFrame'] != null || this['_flyKeys']['size'] === 0x0) return;
+    if (this['_flyFrame'] != null || this['_flyKeys']['size'] === 0) return;
     const run9 =
       this['window']?.['requestAnimationFrame']?.['bind'](this['window']) ||
       globalThis['requestAnimationFrame']?.['bind'](globalThis);
@@ -4891,11 +4891,11 @@ export class Storyboard3DEditorWorkspace {
         if (
           !this['editorStore']['getSnapshot']()['flyMode'] ||
           !this['sceneRuntime'] ||
-          this['_flyKeys']['size'] === 0x0
+          this['_flyKeys']['size'] === 0
         )
           return;
         const value411 = Number(value410) || this['window']?.['performance']?.['now']?.() || Date['now'](),
-          value412 = Math['max'](0x0, Math['min'](0.1, (value411 - this['_flyLastTime']) / 0x3e8));
+          value412 = Math['max'](0, Math['min'](0.1, (value411 - this['_flyLastTime']) / 1000));
         this['_flyLastTime'] = value411;
         const args12 = this['_flySceneView'] || this['sceneRuntime']['getSceneView']?.();
         if (!args12) return;
@@ -4903,16 +4903,16 @@ export class Storyboard3DEditorWorkspace {
           args12,
           {
             forward:
-              (this['_flyKeys']['has']('forward') ? 0x1 : 0x0) -
-              (this['_flyKeys']['has']('backward') ? 0x1 : 0x0),
+              (this['_flyKeys']['has']('forward') ? 1 : 0) -
+              (this['_flyKeys']['has']('backward') ? 1 : 0),
             right:
-              (this['_flyKeys']['has']('right') ? 0x1 : 0x0) - (this['_flyKeys']['has']('left') ? 0x1 : 0x0),
+              (this['_flyKeys']['has']('right') ? 1 : 0) - (this['_flyKeys']['has']('left') ? 1 : 0),
             vertical:
-              (this['_flyKeys']['has']('up') ? 0x1 : 0x0) - (this['_flyKeys']['has']('down') ? 0x1 : 0x0),
+              (this['_flyKeys']['has']('up') ? 1 : 0) - (this['_flyKeys']['has']('down') ? 1 : 0),
             boost: this['_flyBoost'],
           },
           value412,
-          { speed: 0x4, boostMultiplier: 0x4 },
+          { speed: 4, boostMultiplier: 4 },
         );
         ((this['_flySceneView'] = { ...args12, ...args13 }),
           this['_cameraDrag']?.['mode'] === 'fly-look' &&
@@ -4931,7 +4931,7 @@ export class Storyboard3DEditorWorkspace {
       this['window']?.['cancelAnimationFrame']?.['bind'](this['window']) ||
       globalThis['cancelAnimationFrame']?.['bind'](globalThis);
     if (this['_flyFrame'] != null) value413?.(this['_flyFrame']);
-    ((this['_flyFrame'] = null), (this['_flyLastTime'] = 0x0));
+    ((this['_flyFrame'] = null), (this['_flyLastTime'] = 0));
   }
   ['_finishFlyMovement']({ clearKeys: clearKeys = ![] } = {}) {
     this['_stopFlyMovementFrame']();
@@ -4967,7 +4967,7 @@ export class Storyboard3DEditorWorkspace {
     (event46['preventDefault']?.(), event46['stopImmediatePropagation']?.());
     if (enabled38) this['_flyKeys']['delete'](enabled38);
     if (enabled39) this['_flyBoost'] = ![];
-    if (this['_flyKeys']['size'] === 0x0) {
+    if (this['_flyKeys']['size'] === 0) {
       if (this['_cameraDrag']?.['mode'] === 'fly-look') this['_stopFlyMovementFrame']();
       else this['_finishFlyMovement']();
     }
@@ -4991,7 +4991,7 @@ export class Storyboard3DEditorWorkspace {
     const el66 = event47['target']?.['closest']?.('[data-storyboard-3d-inspector-splitter]');
     if (el66 && ['ArrowLeft', 'ArrowRight']['includes'](event47['key'])) {
       (event47['preventDefault'](), event47['stopImmediatePropagation']());
-      const value416 = event47['shiftKey'] ? 0x30 : 0x10;
+      const value416 = event47['shiftKey'] ? 48 : 16;
       this['_applyInspectorWidth'](
         this['inspectorWidth'] + (event47['key'] === 'ArrowLeft' ? value416 : -value416),
         el66['closest']?.('.storyboard-3d-editor-main'),
@@ -5001,7 +5001,7 @@ export class Storyboard3DEditorWorkspace {
     const el67 = event47['target']?.['closest']?.('[data-storyboard-3d-right-sidebar-splitter]');
     if (el67 && ['ArrowLeft', 'ArrowRight']['includes'](event47['key'])) {
       (event47['preventDefault'](), event47['stopImmediatePropagation']());
-      const value417 = event47['shiftKey'] ? 0x30 : 0x10,
+      const value417 = event47['shiftKey'] ? 48 : 16,
         value418 = Number['isFinite'](this['rightSidebarWidth'])
           ? this['rightSidebarWidth']
           : el67['closest']?.('.storyboard-3d-right-sidebar')?.['getBoundingClientRect']?.()['width'];
@@ -5014,7 +5014,7 @@ export class Storyboard3DEditorWorkspace {
     const el68 = event47['target']?.['closest']?.('[data-storyboard-3d-timeline-resize-handle]');
     if (el68 && ['ArrowUp', 'ArrowDown']['includes'](event47['key'])) {
       (event47['preventDefault'](), event47['stopImmediatePropagation']());
-      const value419 = event47['shiftKey'] ? 0x40 : 0x18;
+      const value419 = event47['shiftKey'] ? 64 : 24;
       (this['shotTimelineController']?.['setDrawerOpen']?.(!![]),
         this['_applyTimelineHeight'](
           this['timelineHeight'] + (event47['key'] === 'ArrowUp' ? value419 : -value419),
@@ -5032,7 +5032,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (trapTabKey(event47, this['root'], this['document'])) return;
     const enabled41 = event47['target']?.['matches']?.(
-        'input,\x20textarea,\x20select,\x20[contenteditable=\x27true\x27]',
+        'input, textarea, select, [contenteditable=\'true\']',
       ),
       value421 =
         !enabled41 &&
@@ -5052,7 +5052,7 @@ export class Storyboard3DEditorWorkspace {
       !event47['ctrlKey'] &&
       !event47['metaKey'] &&
       !event47['shiftKey'] &&
-      (event47['code'] === 'Space' || event47['key'] === '\x20') &&
+      (event47['code'] === 'Space' || event47['key'] === ' ') &&
       !event47['target']?.['closest']?.("button, a, [role='button']");
     if (value422) {
       (event47['preventDefault'](), event47['stopImmediatePropagation']());
@@ -5096,7 +5096,7 @@ export class Storyboard3DEditorWorkspace {
         this['_setFlyMode'](![]);
         return;
       }
-      if (this['editorStore']['getSnapshot']()['selectedObjectIds']['length'] > 0x0) {
+      if (this['editorStore']['getSnapshot']()['selectedObjectIds']['length'] > 0) {
         (this['_setSelectedObjects']([]), this['_render']());
         return;
       }
@@ -5134,7 +5134,7 @@ export class Storyboard3DEditorWorkspace {
         event47['code'] === 'KeyD');
     if (!enabled41 && value426) {
       const list24 = this['editorStore']['getSnapshot']()['selectedObjectIds'];
-      if (list24['length'] > 0x0) {
+      if (list24['length'] > 0) {
         (event47['preventDefault'](), event47['stopImmediatePropagation'](), this['_deleteObjects'](list24));
         return;
       }
@@ -5143,11 +5143,11 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_addAssetToActiveScene'](name, { position: position = null } = {}) {
     let value427 = '';
-    const list25 = this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0x0),
+    const list25 = this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0),
       position3 = Array['isArray'](position)
-        ? position['slice'](0x0, 0x3)
+        ? position['slice'](0, 3)
         : Array['isArray'](list25)
-          ? list25['slice'](0x0, 0x3)
+          ? list25['slice'](0, 3)
           : resolveStoryboard3DViewportCenterPosition(this['sceneRuntime']?.['getSceneView']?.());
     (this['_executeMutation']({
       type: 'add-object',
@@ -5168,7 +5168,7 @@ export class Storyboard3DEditorWorkspace {
             name: name['name'],
             visible: !![],
             locked: ![],
-            transform: { position: position3, rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
+            transform: { position: position3, rotation: [0, 0, 0], scale: [1, 1, 1] },
             ...(type5
               ? {
                   bodyPresetId: bodyPresetId || 'adult-male',
@@ -5206,7 +5206,7 @@ export class Storyboard3DEditorWorkspace {
     if (this['shotTimelineController']?.['handleClick']?.(type6, el69, event48)) return;
     if (type6 === 'set-inspector-tab') {
       const value432 = this['root']?.['querySelector']?.('.storyboard-3d-inspector-dock');
-      if (value432) value432['scrollTop'] = 0x0;
+      if (value432) value432['scrollTop'] = 0;
       (this['editorStore']['setInspectorTab'](el69['dataset']['inspectorTab']), this['_render']());
       return;
     }
@@ -5238,7 +5238,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (type6 === 'select-asset-category') {
       ((this['assetCategory'] = String(el69['getAttribute']('data-storyboard-3d-asset-category') || 'all')),
-        (this['assetVisibleLimit'] = 0x20),
+        (this['assetVisibleLimit'] = 32),
         this['_render']());
       return;
     }
@@ -5255,7 +5255,7 @@ export class Storyboard3DEditorWorkspace {
       return;
     }
     if (type6 === 'reset-focal-length') {
-      this['_commitFocalLength'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](0x23));
+      this['_commitFocalLength'](STORYBOARD_3D_FOCAL_LENGTH_PRESETS['indexOf'](35));
       return;
     }
     if (type6 === 'set-viewport-view') {
@@ -5329,7 +5329,7 @@ export class Storyboard3DEditorWorkspace {
         value438 = type6 === 'toggle-object-visibility' ? 'visible' : 'locked';
       this['_executeMutation']({
         type: 'toggle-object-' + value438,
-        label: 'Toggle\x20object\x20' + value438,
+        label: 'Toggle object ' + value438,
         mutate: (value439) => {
           const value440 = value439['scenes']['find'](
               (value441) => value441['id'] === value439['activeSceneId'],
@@ -5361,8 +5361,8 @@ export class Storyboard3DEditorWorkspace {
         return;
       }
       const value448 =
-        args15['selectedObjectIds']['length'] === 0x1 &&
-        args15['selectedObjectIds'][0x0] === value444 &&
+        args15['selectedObjectIds']['length'] === 1 &&
+        args15['selectedObjectIds'][0] === value444 &&
         !args15['assetLibraryOpen'] &&
         this['rightSidebarMode'] === 'object';
       if (value448) return;
@@ -5391,7 +5391,7 @@ export class Storyboard3DEditorWorkspace {
       }
       (this['_setSelectedObjects'](list28), this['_render']());
       el69['dataset']['objectType'] === 'camera' &&
-        list28['length'] === 0x1 &&
+        list28['length'] === 1 &&
         this['_focusCameraObject'](enabled45);
       return;
     }
@@ -5399,10 +5399,10 @@ export class Storyboard3DEditorWorkspace {
       this['_clearShotCandidates']();
       const activeStoryboard3DScene10 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
       ((this['exploreFilter'] = 'all'),
-        (this['exploreVariation'] = 0x0),
+        (this['exploreVariation'] = 0),
         (this['shotCandidates'] = generateStoryboard3DShotCandidates(activeStoryboard3DScene10, {
-          count: 0x9,
-          variation: 0x0,
+          count: 9,
+          variation: 0,
         })),
         (this['exploreOpen'] = !![]),
         this['_render']());
@@ -5420,9 +5420,9 @@ export class Storyboard3DEditorWorkspace {
     if (type6 === 'regenerate-explore') {
       const activeStoryboard3DScene11 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']());
       (this['_clearShotCandidates'](),
-        (this['exploreVariation'] += 0x1),
+        (this['exploreVariation'] += 1),
         (this['shotCandidates'] = generateStoryboard3DShotCandidates(activeStoryboard3DScene11, {
-          count: 0x9,
+          count: 9,
           variation: this['exploreVariation'],
         })),
         this['_render']());
@@ -5451,7 +5451,7 @@ export class Storyboard3DEditorWorkspace {
         }),
         this['sceneRuntime']['renderNow'](),
         this['_setMessage'](
-          '正在预览\x20' + enabled46['shotSize'] + ' · ' + enabled46['shotAngle'] + ' 候选机位。',
+          '正在预览 ' + enabled46['shotSize'] + ' · ' + enabled46['shotAngle'] + ' 候选机位。',
         ));
       return;
     }
@@ -5465,7 +5465,7 @@ export class Storyboard3DEditorWorkspace {
           const count8 = value452['scenes']['findIndex'](
             (value453) => value453['id'] === value452['activeSceneId'],
           );
-          if (count8 < 0x0) return value452;
+          if (count8 < 0) return value452;
           const value454 = value452['scenes'][count8];
           return (
             (value452['scenes'][count8] =
@@ -5495,7 +5495,7 @@ export class Storyboard3DEditorWorkspace {
         error26 = this['assetLibrary']['find'](value457);
       if (!error26) return;
       const position4 =
-        this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0x0) ||
+        this['sceneRuntime']?.['resolveViewportGroundPosition']?.(0) ||
         resolveStoryboard3DViewportCenterPosition(this['sceneRuntime']?.['getSceneView']?.());
       if (error26['source']?.['kind'] === 'pack' && !this['importedModelScenes']['has'](error26['id'])) {
         (this['_setMessage']('正在加载模型包素材“' + error26['name'] + '”…'),
@@ -5519,14 +5519,14 @@ export class Storyboard3DEditorWorkspace {
       return;
     }
     if (type6 === 'load-more-assets') {
-      ((this['assetVisibleLimit'] = Math['min'](0x640, this['assetVisibleLimit'] + 0x20)), this['_render']());
+      ((this['assetVisibleLimit'] = Math['min'](1600, this['assetVisibleLimit'] + 32)), this['_render']());
       return;
     }
     if (type6 === 'toggle-character-play') {
       const value459 = el69['dataset']['objectId'];
       this['_executeMutation']({
         type: 'toggle-character-playback',
-        label: 'Toggle\x20character\x20playback',
+        label: 'Toggle character playback',
         mutate: (value460) => {
           const value461 = value460['scenes']['find'](
               (value462) => value462['id'] === value460['activeSceneId'],
@@ -5560,7 +5560,7 @@ export class Storyboard3DEditorWorkspace {
       (this['characterImagePoseController']['clear'](value465),
         this['_executeMutation']({
           type: 'reset-character-pose',
-          label: 'Reset\x20character\x20pose',
+          label: 'Reset character pose',
           mutate: (value466) => {
             for (const value467 of value466['scenes'] || []) {
               const value468 = value467['objects']?.['find']((value469) => value469['id'] === value465);
@@ -5587,10 +5587,10 @@ export class Storyboard3DEditorWorkspace {
     if (type6 === 'add-scene') {
       (this['_executeMutation']({
         type: 'add-scene',
-        label: 'Add\x20scene',
+        label: 'Add scene',
         mutate: (value470) => {
           const storyboard3DScene = createStoryboard3DScene({
-            name: '场景 ' + (value470['scenes']['length'] + 0x1),
+            name: '场景 ' + (value470['scenes']['length'] + 1),
             shotName: '镜头 1',
           });
           return (
@@ -5606,7 +5606,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (['duplicate-scene', 'delete-scene', 'move-scene']['includes'](type6)) {
       const value471 = el69['dataset']['sceneId'],
-        value472 = Number(el69['dataset']['direction']) || 0x0,
+        value472 = Number(el69['dataset']['direction']) || 0,
         value473 = this['projectStore']['getSnapshot'](),
         value474 = value473['scenes']['findIndex']((value475) => value475['id'] === value471);
       (this['_executeMutation']({
@@ -5654,7 +5654,7 @@ export class Storyboard3DEditorWorkspace {
             (value478) => value478['id'] === scene5['activeSceneId'],
           );
           return (
-            count9 >= 0x0 &&
+            count9 >= 0 &&
               (scene5['scenes'][count9] = appendShotFromCurrentView({
                 scene: scene5['scenes'][count9],
                 camera: camera7,
@@ -5704,7 +5704,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (type6 === 'group-selected') {
       const list29 = this['editorStore']['getSnapshot']()['selectedObjectIds'];
-      if (list29['length'] === 0x0) {
+      if (list29['length'] === 0) {
         this['_setMessage']('请先选择要分组的对象。');
         return;
       }
@@ -5716,7 +5716,7 @@ export class Storyboard3DEditorWorkspace {
           const count10 = value484['scenes']['findIndex'](
             (value485) => value485['id'] === value484['activeSceneId'],
           );
-          if (count10 < 0x0) return value484;
+          if (count10 < 0) return value484;
           const groupStoryboard3DSceneObjects2 = groupStoryboard3DSceneObjects(
             value484['scenes'][count10],
             list29,
@@ -5726,7 +5726,7 @@ export class Storyboard3DEditorWorkspace {
             },
           );
           return (
-            (value483 = groupStoryboard3DSceneObjects2['objects']['at'](-0x1)?.['id'] || ''),
+            (value483 = groupStoryboard3DSceneObjects2['objects']['at'](-1)?.['id'] || ''),
             (value484['scenes'][count10] = groupStoryboard3DSceneObjects2),
             value484
           );
@@ -5740,13 +5740,13 @@ export class Storyboard3DEditorWorkspace {
       const value486 = el69['dataset']['objectId'];
       (this['_executeMutation']({
         type: 'ungroup-objects',
-        label: 'Ungroup\x20objects',
+        label: 'Ungroup objects',
         mutate: (value487) => {
           const count11 = value487['scenes']['findIndex'](
             (value488) => value488['id'] === value487['activeSceneId'],
           );
           return (
-            count11 >= 0x0 &&
+            count11 >= 0 &&
               (value487['scenes'][count11] = ungroupStoryboard3DSceneGroup(
                 value487['scenes'][count11],
                 value486,
@@ -5764,7 +5764,7 @@ export class Storyboard3DEditorWorkspace {
       let value490 = '';
       this['_executeMutation']({
         type: 'duplicate-object',
-        label: 'Duplicate\x20object',
+        label: 'Duplicate object',
         mutate: (value491) => {
           const value492 = value491['scenes']['find'](
               (value493) => value493['id'] === value491['activeSceneId'],
@@ -5776,7 +5776,7 @@ export class Storyboard3DEditorWorkspace {
                 (value495) => value495['cameraId'] === error28['id'],
               ),
               count12 = value491['scenes']['findIndex']((value496) => value496['id'] === value492['id']);
-            if (!enabled49 || count12 < 0x0) return value491;
+            if (!enabled49 || count12 < 0) return value491;
             const duplicateStoryboard3DShot2 = duplicateStoryboard3DShot(value492, enabled49['id'], {
               idFactory: createLocalId,
             });
@@ -5793,8 +5793,8 @@ export class Storyboard3DEditorWorkspace {
           return (
             (error29['id'] = createLocalId(error28['type'] || 'object')),
             (error29['name'] = error28['name'] + ' 副本'),
-            (error29['transform']['position'][0x0] += 0.5),
-            (error29['transform']['position'][0x2] += 0.5),
+            (error29['transform']['position'][0] += 0.5),
+            (error29['transform']['position'][2] += 0.5),
             value492['objects']['push'](error29),
             (value490 = error29['id']),
             value491
@@ -5857,13 +5857,13 @@ export class Storyboard3DEditorWorkspace {
               type: 'light',
               name:
                 '灯光 ' +
-                (enabled50['objects']['filter']((value505) => value505['type'] === 'light')['length'] + 0x1),
+                (enabled50['objects']['filter']((value505) => value505['type'] === 'light')['length'] + 1),
               lightType: 'directional',
               color: '#ffffff',
-              intensity: 0x1,
+              intensity: 1,
               visible: !![],
               locked: ![],
-              transform: { position: [0x3, 0x5, 0x3], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
+              transform: { position: [3, 5, 3], rotation: [0, 0, 0], scale: [1, 1, 1] },
               castShadow: !![],
             }),
             value503
@@ -5875,7 +5875,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (['duplicate-shot', 'delete-shot', 'move-shot']['includes'](type6)) {
       const value506 = el69['dataset']['shotId'],
-        value507 = Number(el69['dataset']['direction']) || 0x0;
+        value507 = Number(el69['dataset']['direction']) || 0;
       this['_executeMutation']({
         type: type6,
         label: type6,
@@ -5883,7 +5883,7 @@ export class Storyboard3DEditorWorkspace {
           const count13 = value508['scenes']['findIndex'](
             (value509) => value509['id'] === value508['activeSceneId'],
           );
-          if (count13 < 0x0) return value508;
+          if (count13 < 0) return value508;
           const value510 = value508['scenes'][count13];
           if (type6 === 'duplicate-shot')
             value508['scenes'][count13] = duplicateStoryboard3DShot(value510, value506);
@@ -5895,7 +5895,7 @@ export class Storyboard3DEditorWorkspace {
               value508['scenes'][count13] = reorderStoryboard3DShot(
                 value510,
                 value506,
-                Math['max'](0x0, Math['min'](value510['shots']['length'] - 0x1, value511 + value507)),
+                Math['max'](0, Math['min'](value510['shots']['length'] - 1, value511 + value507)),
               );
             }
           }
@@ -5913,7 +5913,7 @@ export class Storyboard3DEditorWorkspace {
         (this['viewportFocalLength'] =
           Number(
             getActiveStoryboard3DShot(this['projectStore']['getSnapshot']())?.['camera']?.['focalLength'],
-          ) || 0x23),
+          ) || 35),
         this['_render']());
       return;
     }
@@ -5932,7 +5932,7 @@ export class Storyboard3DEditorWorkspace {
         return;
       }
       (this['projectStore']['selectShot'](el69['dataset']['shotId']),
-        (this['viewportFocalLength'] = Number(value514?.['camera']?.['focalLength']) || 0x23),
+        (this['viewportFocalLength'] = Number(value514?.['camera']?.['focalLength']) || 35),
         this['_render']());
       return;
     }
@@ -5952,7 +5952,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (this['shotTimelineController']?.['handleChange']?.(event50)) return;
     if (event50['target']?.['matches']?.('[data-storyboard-3d-pose-image-input]')) {
-      const file = event50['target']['files']?.[0x0],
+      const file = event50['target']['files']?.[0],
         objectId3 = String(event50['target']['dataset']['objectId'] || '');
       ((event50['target']['value'] = ''), delete event50['target']['dataset']['objectId']);
       if (!file || !objectId3) return;
@@ -5990,7 +5990,7 @@ export class Storyboard3DEditorWorkspace {
       const value518 = event50['target']['dataset']['objectId'],
         value519 = event50['target']['dataset']['boneName'],
         value520 = event50['target']['getAttribute']('data-storyboard-3d-bone-axis'),
-        value521 = Number(event50['target']['value']) || 0x0;
+        value521 = Number(event50['target']['value']) || 0;
       this['_executeMutation']({
         type: 'edit-character-bone',
         label: 'Edit character bone',
@@ -6002,7 +6002,7 @@ export class Storyboard3DEditorWorkspace {
           if (value525?.['type'] !== 'character' || !['x', 'y', 'z']['includes'](value520)) return value522;
           const storyboard3DEuler2 = quaternionToStoryboard3DEuler(value525['boneOverrides']?.[value519]);
           return (
-            (storyboard3DEuler2[value520] = (value521 * Math['PI']) / 0xb4),
+            (storyboard3DEuler2[value520] = (value521 * Math['PI']) / 180),
             (value525['boneOverrides'] = setStoryboard3DBoneOverride(
               value525['boneOverrides'],
               value519,
@@ -6016,7 +6016,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (event50['target']?.['matches']?.('[data-storyboard-3d-character-time]')) {
       const value527 = event50['target']['dataset']['objectId'],
-        value528 = Number(event50['target']['value']) || 0x0;
+        value528 = Number(event50['target']['value']) || 0;
       this['_executeMutation']({
         type: 'seek-character-action',
         label: 'Seek character action',
@@ -6033,7 +6033,7 @@ export class Storyboard3DEditorWorkspace {
       return;
     }
     if (event50['target']?.['matches']?.('[data-storyboard-3d-background-input]')) {
-      const fileName = event50['target']['files']?.[0x0];
+      const fileName = event50['target']['files']?.[0];
       event50['target']['value'] = '';
       if (!fileName) return;
       try {
@@ -6043,7 +6043,7 @@ export class Storyboard3DEditorWorkspace {
           renderer: this['sceneRuntime']?.['bridge']?.['renderer'],
         });
         if (!response6['ok'])
-          throw new Error(response6['errors']['map']((error31) => error31['message'])['join']('\x20'));
+          throw new Error(response6['errors']['map']((error31) => error31['message'])['join'](' '));
         let analyzeStoryboard3DBackgroundImage3 = null,
           error32 = null;
         try {
@@ -6071,7 +6071,7 @@ export class Storyboard3DEditorWorkspace {
             binaryAssetId: assetId,
             ...(analyzeStoryboard3DBackgroundImage3 || {
               calibrationMethod: 'unconfigured',
-              calibrationConfidence: 0x0,
+              calibrationConfidence: 0,
             }),
           };
         analyzeStoryboard3DBackgroundImage3
@@ -6082,7 +6082,7 @@ export class Storyboard3DEditorWorkspace {
             this['_setMessage'](
               imageUrl['fileName'] +
                 ' 已自动匹配地面透视并锁定，匹配度 ' +
-                Math['round'](analyzeStoryboard3DBackgroundImage3['calibrationConfidence'] * 0x64) +
+                Math['round'](analyzeStoryboard3DBackgroundImage3['calibrationConfidence'] * 100) +
                 '%。',
             ))
           : (this['_executeMutation']({
@@ -6118,7 +6118,7 @@ export class Storyboard3DEditorWorkspace {
         value540 = String(event50['target']['value'] || '')['trim']();
       this['_executeMutation']({
         type: 'rename-scene',
-        label: 'Rename\x20scene',
+        label: 'Rename scene',
         mutate: (value541) => renameStoryboard3DScene(value541, value539, value540, { now: Date['now']() }),
       });
       return;
@@ -6131,7 +6131,7 @@ export class Storyboard3DEditorWorkspace {
             : event50['target']['value'],
         args16 =
           value542 === 'rotationSnapDegrees'
-            ? { rotationSnap: (Math['max'](0x1, Number(value543) || 0xf) * Math['PI']) / 0xb4 }
+            ? { rotationSnap: (Math['max'](1, Number(value543) || 15) * Math['PI']) / 180 }
             : {
                 [value542]: ['translationSnap', 'scaleSnap']['includes'](value542)
                   ? Number(value543)
@@ -6158,7 +6158,7 @@ export class Storyboard3DEditorWorkspace {
     }
     if (event50['target']?.['matches']?.('[data-storyboard-3d-asset-query]')) {
       ((this['assetQuery'] = String(event50['target']['value'] || '')['trim']()),
-        (this['assetVisibleLimit'] = 0x20),
+        (this['assetVisibleLimit'] = 32),
         queueMicrotask(() => this['_render']()));
       return;
     }
@@ -6182,7 +6182,7 @@ export class Storyboard3DEditorWorkspace {
             const value554 = Number(value547);
             if (!Number['isFinite'](value554)) return value548;
             if (value546 === 'focalLength')
-              value551['focalLength'] = Math['max'](0x1, Math['min'](0xc8, value554));
+              value551['focalLength'] = Math['max'](1, Math['min'](200, value554));
             if (value546 === 'near') value551['near'] = Math['max'](0.001, value554);
             if (value546 === 'far') value551['far'] = Math['max'](value551['near'] + 0.001, value554);
           }
@@ -6210,16 +6210,16 @@ export class Storyboard3DEditorWorkspace {
             value561 = value559?.['objects']?.['find']((value562) => value562['id'] === value555);
           if (value561?.['type'] !== 'light') return value558;
           if (value556 === 'intensity')
-            value561['intensity'] = Math['max'](0x0, Number['isFinite'](value557) ? value557 : 0x1);
+            value561['intensity'] = Math['max'](0, Number['isFinite'](value557) ? value557 : 1);
           if (value556 === 'distance')
-            value561['distance'] = Math['max'](0x0, Number['isFinite'](value557) ? value557 : 0x0);
+            value561['distance'] = Math['max'](0, Number['isFinite'](value557) ? value557 : 0);
           if (value556 === 'decay')
-            value561['decay'] = Math['max'](0x0, Number['isFinite'](value557) ? value557 : 0x2);
+            value561['decay'] = Math['max'](0, Number['isFinite'](value557) ? value557 : 2);
           value556 === 'angleDegrees' &&
             (value561['angle'] =
-              (Math['max'](0x1, Math['min'](0xb3, Number['isFinite'](value557) ? value557 : 0x1e)) *
+              (Math['max'](1, Math['min'](179, Number['isFinite'](value557) ? value557 : 30)) *
                 Math['PI']) /
-              0xb4);
+              180);
           if (value556 === 'castShadow') value561['castShadow'] = value557 === !![];
           if (value556 === 'color' && /^#[0-9a-f]{6}$/i['test'](value557)) value561['color'] = value557;
           return (
@@ -6266,7 +6266,7 @@ export class Storyboard3DEditorWorkspace {
           const count14 = value574['scenes']['findIndex'](
             (value575) => value575['id'] === value574['activeSceneId'],
           );
-          if (count14 < 0x0) return value574;
+          if (count14 < 0) return value574;
           const value576 = value574['scenes'][count14];
           return (
             (value574['scenes'][count14] =
@@ -6335,13 +6335,13 @@ export class Storyboard3DEditorWorkspace {
             ),
             args17 =
               value581 === 'vanishingPointX'
-                ? { vanishingPoint: [value582, storyboard3DBackgroundCalibration4['vanishingPoint'][0x1]] }
+                ? { vanishingPoint: [value582, storyboard3DBackgroundCalibration4['vanishingPoint'][1]] }
                 : value581 === 'vanishingPointY'
-                  ? { vanishingPoint: [storyboard3DBackgroundCalibration4['vanishingPoint'][0x0], value582] }
+                  ? { vanishingPoint: [storyboard3DBackgroundCalibration4['vanishingPoint'][0], value582] }
                   : value581 === 'imageOffsetX'
-                    ? { imageOffset: [value582, storyboard3DBackgroundCalibration4['imageOffset'][0x1]] }
+                    ? { imageOffset: [value582, storyboard3DBackgroundCalibration4['imageOffset'][1]] }
                     : value581 === 'imageOffsetY'
-                      ? { imageOffset: [storyboard3DBackgroundCalibration4['imageOffset'][0x0], value582] }
+                      ? { imageOffset: [storyboard3DBackgroundCalibration4['imageOffset'][0], value582] }
                       : { [value581]: value582 },
             map5 = new Set([
               'horizontalFov',
@@ -6355,7 +6355,7 @@ export class Storyboard3DEditorWorkspace {
               enabled51['background'],
               {
                 ...args17,
-                ...(map5['has'](value581) ? { calibrationMethod: 'manual', calibrationConfidence: 0x1 } : {}),
+                ...(map5['has'](value581) ? { calibrationMethod: 'manual', calibrationConfidence: 1 } : {}),
               },
             );
           if (
@@ -6429,7 +6429,7 @@ export class Storyboard3DEditorWorkspace {
                 'includes'
               ](value594) &&
               ((value599[value594] = value595),
-              value594 === 'actionId' && ((value599['actionTime'] = 0x0), (value599['actionPlaying'] = ![]))),
+              value594 === 'actionId' && ((value599['actionTime'] = 0), (value599['actionPlaying'] = ![]))),
             value596
           );
         },
@@ -6445,10 +6445,10 @@ export class Storyboard3DEditorWorkspace {
               ['map']((value603) => value603['trim']())
               ['filter'](Boolean),
           ),
-        ]['slice'](0x0, 0x20);
+        ]['slice'](0, 32);
       this['_executeMutation']({
         type: 'update-character-attachments',
-        label: 'Update\x20character\x20attachments',
+        label: 'Update character attachments',
         mutate: (value604) => {
           const value605 = value604['scenes']['find'](
               (value606) => value606['id'] === value604['activeSceneId'],
@@ -6464,8 +6464,8 @@ export class Storyboard3DEditorWorkspace {
       const value609 = event50['target']['dataset']['objectId'],
         activeTool2 = event50['target']['dataset']['transformField'],
         value610 = Math['max'](
-          0x0,
-          Math['min'](0x2, Number(event50['target']['dataset']['transformAxis']) || 0x0),
+          0,
+          Math['min'](2, Number(event50['target']['dataset']['transformAxis']) || 0),
         ),
         value611 = this['projectStore']['getSnapshot'](),
         sceneId13 = getActiveStoryboard3DScene(value611),
@@ -6485,7 +6485,7 @@ export class Storyboard3DEditorWorkspace {
               Number['isFinite'](value613) ? value613 : structuredClone2[activeTool2][value610],
             )
           : activeTool2 === 'rotation' && Number['isFinite'](value613)
-            ? (value613 * Math['PI']) / 0xb4
+            ? (value613 * Math['PI']) / 180
             : Number['isFinite'](value613)
               ? value613
               : structuredClone2[activeTool2][value610]),
@@ -6502,7 +6502,7 @@ export class Storyboard3DEditorWorkspace {
         value615 = String(event50['target']['value'] || '')['trim']();
       this['_executeMutation']({
         type: 'rename-object',
-        label: 'Rename\x20object',
+        label: 'Rename object',
         mutate: (value616) => {
           const value617 = value616['scenes']['find'](
               (value618) => value618['id'] === value616['activeSceneId'],
@@ -6534,7 +6534,7 @@ export class Storyboard3DEditorWorkspace {
               (value624) => value624['id'] === value623['activeSceneId'],
             );
             return (
-              count15 >= 0x0 &&
+              count15 >= 0 &&
                 (value623['scenes'][count15] = setStoryboard3DObjectParent(
                   value623['scenes'][count15],
                   value621,
@@ -6622,7 +6622,7 @@ export class Storyboard3DEditorWorkspace {
               format: format['format'],
               fileName: file2['name'],
               byteLength: file2['size'],
-              fingerprint: file2['name'] + ':' + file2['size'] + ':' + (file2['lastModified'] || 0x0),
+              fingerprint: file2['name'] + ':' + file2['size'] + ':' + (file2['lastModified'] || 0),
             },
             normalization: format['normalization'],
             assetRecord: assetRecord,
@@ -6639,7 +6639,7 @@ export class Storyboard3DEditorWorkspace {
         let id3 = '';
         (this['_executeMutation']({
           type: 'import-model',
-          label: 'Import\x20' + format['format']['toUpperCase']() + ' model',
+          label: 'Import ' + format['format']['toUpperCase']() + ' model',
           mutate: (value636) => {
             const enabled53 = value636['scenes']['find'](
               (value637) => value637['id'] === value636['activeSceneId'],
@@ -6654,7 +6654,7 @@ export class Storyboard3DEditorWorkspace {
                 assetId: id2,
                 visible: !![],
                 locked: ![],
-                transform: { position: [0x0, 0x0, 0x0], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] },
+                transform: { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
                 castShadow: !![],
                 receiveShadow: !![],
               }),
@@ -6665,7 +6665,7 @@ export class Storyboard3DEditorWorkspace {
           this['assetLibrary']['markUsed'](id2));
         if (id3) this['_setSelectedObjects']([id3], { openProperties: ![] });
         const value638 =
-          storyboard3DTexturePolicy['optimized']['length'] > 0x0
+          storyboard3DTexturePolicy['optimized']['length'] > 0
             ? '，已优化 ' + storyboard3DTexturePolicy['optimized']['length'] + ' 张超限纹理'
             : '';
         (this['_setMessage'](file2['name'] + ' 已解析并加入当前场景' + value638 + '。'),
@@ -6698,7 +6698,7 @@ export class Storyboard3DEditorWorkspace {
   async ['renderShot']() {
     const activeStoryboard3DShot9 = getActiveStoryboard3DShot(this['projectStore']['getSnapshot']());
     if (!activeStoryboard3DShot9) throw new Error('当前场景没有可渲染镜头。');
-    return this['_renderShotFrame'](activeStoryboard3DShot9, { width: 0x780, height: 0x438 });
+    return this['_renderShotFrame'](activeStoryboard3DShot9, { width: 1920, height: 1080 });
   }
   async ['exportStoryboard']() {
     return this['exportController']['open']();

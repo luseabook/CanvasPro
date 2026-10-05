@@ -5,7 +5,7 @@ import { commit } from '../../modules/history.js';
 import { saveOutputBlob } from '../../modules/project.js';
 import { drawStoryboardComposeAsset } from '../../modules/storyboard/storyboardComposeDraw.js';
 import { buildSourceMediaNodePayload, getAutoMediaSizeByShortSide } from '../../services/fileService.js';
-const COMPOSE_CANVAS_WIDTH = 0x800;
+const COMPOSE_CANVAS_WIDTH = 2048;
 function getStoryboardCells(value) {
   return Array.isArray(value?.cells) ? value.cells : [];
 }

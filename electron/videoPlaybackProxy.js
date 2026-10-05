@@ -1,12 +1,12 @@
-export const VIDEO_PLAYBACK_PROXY_MAX_LONG_EDGE = 0x500;
+export const VIDEO_PLAYBACK_PROXY_MAX_LONG_EDGE = 1280;
 export const VIDEO_PLAYBACK_PROXY_VERSION = 'v2-1280';
-const VIDEO_PLAYBACK_PROXY_MIN_TIMEOUT_MS = 0x5 * 0x3c * 0x3e8,
-  VIDEO_PLAYBACK_PROXY_MAX_TIMEOUT_MS = 0x6 * 0x3c * 0x3c * 0x3e8;
+const VIDEO_PLAYBACK_PROXY_MIN_TIMEOUT_MS = 5 * 60 * 1000,
+  VIDEO_PLAYBACK_PROXY_MAX_TIMEOUT_MS = 6 * 60 * 60 * 1000;
 export function resolveVideoPlaybackProxyTimeoutMs(durationSec) {
-  const durationMs = Math.max(0, Number(durationSec || 0)) * 0x3e8;
+  const durationMs = Math.max(0, Number(durationSec || 0)) * 1000;
   return Math.min(
     VIDEO_PLAYBACK_PROXY_MAX_TIMEOUT_MS,
-    Math.max(VIDEO_PLAYBACK_PROXY_MIN_TIMEOUT_MS, durationMs * 0xc),
+    Math.max(VIDEO_PLAYBACK_PROXY_MIN_TIMEOUT_MS, durationMs * 12),
   );
 }
 export function createVideoPlaybackProxyWorkDeduper() {

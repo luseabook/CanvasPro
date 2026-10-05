@@ -1,125 +1,125 @@
 import { ApiError, ErrorType } from '../ApiError.js';
 const MODEL_ERROR_CODE_MAP = {
-    0x3e8: { type: ErrorType.SERVER_ERROR, message: '未知错误，请联系技术支持排查。', retryable: false },
-    0x3e9: {
+    1000: { type: ErrorType.SERVER_ERROR, message: '未知错误，请联系技术支持排查。', retryable: false },
+    1001: {
       type: ErrorType.INVALID_PARAMS,
       message: '请求链接无效，请检查调用的 API Endpoint 是否正确。',
       retryable: false,
     },
-    0x3ea: {
+    1002: {
       type: ErrorType.AUTH_ERROR,
       message: 'API Key 无效，请检查 API Key 是否配置正确或已被禁用。',
       retryable: false,
     },
-    0x3eb: { type: ErrorType.RATE_LIMIT, message: '请求频率超限，请降低并发请求频率。', retryable: true },
-    0x3ec: {
+    1003: { type: ErrorType.RATE_LIMIT, message: '请求频率超限，请降低并发请求频率。', retryable: true },
+    1004: {
       type: ErrorType.TASK_FAILED,
       message: '任务不存在或已过期，请确认任务 ID 是否正确。',
       retryable: false,
     },
-    0x3ed: { type: ErrorType.SERVER_ERROR, message: '系统内部错误，请稍后重试。', retryable: true },
-    0x3ee: { type: ErrorType.TASK_TIMEOUT, message: '任务执行超时，请尝试重新提交。', retryable: true },
-    0x3ef: {
+    1005: { type: ErrorType.SERVER_ERROR, message: '系统内部错误，请稍后重试。', retryable: true },
+    1006: { type: ErrorType.TASK_TIMEOUT, message: '任务执行超时，请尝试重新提交。', retryable: true },
+    1007: {
       type: ErrorType.INVALID_PARAMS,
       message: '请求参数校验失败，请检查参数格式、类型或文件有效性。',
       retryable: false,
     },
-    0x3f0: {
+    1008: {
       type: ErrorType.INVALID_PARAMS,
       message: '文件大小超出限制，请参考文档中的文件大小上限。',
       retryable: false,
     },
-    0x3f1: {
+    1009: {
       type: ErrorType.INVALID_PARAMS,
       message: '请求方法不支持，请确认请求方式是否正确。',
       retryable: false,
     },
-    0x3f2: {
+    1010: {
       type: ErrorType.SERVICE_UNAVAILABLE,
       message: '服务暂不可用，系统维护或临时故障，请稍后重试。',
       retryable: true,
     },
-    0x3f3: { type: ErrorType.RATE_LIMIT, message: '模型负载较高，请稍后重试。', retryable: true },
-    0x3f4: { type: ErrorType.SERVER_ERROR, message: '模型响应异常，请重试。', retryable: true },
-    0x3f5: {
+    1011: { type: ErrorType.RATE_LIMIT, message: '模型负载较高，请稍后重试。', retryable: true },
+    1012: { type: ErrorType.SERVER_ERROR, message: '模型响应异常，请重试。', retryable: true },
+    1013: {
       type: ErrorType.SERVER_ERROR,
       message: '文件处理失败，请检查输入文件链接或文件完整性。',
       retryable: true,
     },
-    0x3f6: {
+    1014: {
       type: ErrorType.FORBIDDEN,
       message: '权限不足，标准模型 API 仅限企业级共享 API Key 调用。',
       retryable: false,
     },
-    0x3f7: {
+    1015: {
       type: ErrorType.TASK_FAILED,
       message: '生成失败，任务处理过程中出现异常，请尝试重新提交。',
       retryable: true,
     },
-    0x5dd: {
+    1501: {
       type: ErrorType.CONTENT_FILTERED,
       message: '内容安全审查未通过，请修改提示词或图片。',
       retryable: false,
     },
-    0x5e0: { type: ErrorType.TIMEOUT, message: '模型响应超时，请稍后重试。', retryable: true },
-    0x5e1: {
+    1504: { type: ErrorType.TIMEOUT, message: '模型响应超时，请稍后重试。', retryable: true },
+    1505: {
       type: ErrorType.CONTENT_FILTERED,
       message: '不支持真人图像处理，请修改提示词或参考图。',
       retryable: false,
     },
-    0x5e2: {
+    1506: {
       type: ErrorType.INVALID_PARAMS,
       message: '音频克隆 ID 重复，请更换唯一的 voiceId。',
       retryable: false,
     },
-    0x5ec: {
+    1516: {
       type: ErrorType.INVALID_PARAMS,
       message: '外部文件下载失败，请检查 URL 是否可访问后重试。',
       retryable: true,
     },
-    0x5ed: { type: ErrorType.SERVER_ERROR, message: '文件上传失败，请重试。', retryable: true },
-    0x5ee: {
+    1517: { type: ErrorType.SERVER_ERROR, message: '文件上传失败，请重试。', retryable: true },
+    1518: {
       type: ErrorType.INVALID_PARAMS,
       message: 'Base64 解码失败，请检查 Base64 字符串格式。',
       retryable: false,
     },
-    0x5ef: {
+    1519: {
       type: ErrorType.SERVER_ERROR,
       message: '内容处理异常，处理输入内容时出现非预期错误，请重试。',
       retryable: true,
     },
-    0x5f0: {
+    1520: {
       type: ErrorType.RATE_LIMIT,
       message: '账号并发达到上限，请等待已有任务完成后再发起新请求。',
       retryable: true,
     },
   },
   MESSAGE_HINT_TO_CODE = {
-    'UNKNOWN ERROR': 0x3e8,
-    'INVALID URL': 0x3e9,
-    'INVALID API KEY': 0x3ea,
-    'RATE LIMIT EXCEEDED': 0x3eb,
-    'TASK NOT FOUND': 0x3ec,
-    'INTERNAL SERVER ERROR': 0x3ed,
-    'TASK EXECUTION TIMED OUT': 0x3ee,
-    'INVALID PARAMETERS': 0x3ef,
-    'FILE SIZE LIMIT EXCEEDED': 0x3f0,
-    'HTTP METHOD NOT SUPPORTED': 0x3f1,
-    'SERVICE UNAVAILABLE': 0x3f2,
-    'MODEL IS CURRENTLY BUSY': 0x3f3,
-    'MODEL RESPONSE EXCEPTION': 0x3f4,
-    'FILE PROCESSING FAILED': 0x3f5,
-    'ACCESS DENIED': 0x3f6,
-    'GENERATION FAILED': 0x3f7,
-    'CONTENT SECURITY AUDIT FAILED': 0x5dd,
-    'MODEL TIMED OUT': 0x5e0,
-    'REAL PEOPLE PROHIBITED': 0x5e1,
-    'VOICE ID DUPLICATE': 0x5e2,
-    'EXTERNAL DOWNLOAD FAILED': 0x5ec,
-    'UPLOAD FAILED': 0x5ed,
-    'BASE64 DECODE FAILED': 0x5ee,
-    'CONTENT PROCESSING EXCEPTION': 0x5ef,
-    'CONCURRENCY LIMIT REACHED': 0x5f0,
+    'UNKNOWN ERROR': 1000,
+    'INVALID URL': 1001,
+    'INVALID API KEY': 1002,
+    'RATE LIMIT EXCEEDED': 1003,
+    'TASK NOT FOUND': 1004,
+    'INTERNAL SERVER ERROR': 1005,
+    'TASK EXECUTION TIMED OUT': 1006,
+    'INVALID PARAMETERS': 1007,
+    'FILE SIZE LIMIT EXCEEDED': 1008,
+    'HTTP METHOD NOT SUPPORTED': 1009,
+    'SERVICE UNAVAILABLE': 1010,
+    'MODEL IS CURRENTLY BUSY': 1011,
+    'MODEL RESPONSE EXCEPTION': 1012,
+    'FILE PROCESSING FAILED': 1013,
+    'ACCESS DENIED': 1014,
+    'GENERATION FAILED': 1015,
+    'CONTENT SECURITY AUDIT FAILED': 1501,
+    'MODEL TIMED OUT': 1504,
+    'REAL PEOPLE PROHIBITED': 1505,
+    'VOICE ID DUPLICATE': 1506,
+    'EXTERNAL DOWNLOAD FAILED': 1516,
+    'UPLOAD FAILED': 1517,
+    'BASE64 DECODE FAILED': 1518,
+    'CONTENT PROCESSING EXCEPTION': 1519,
+    'CONCURRENCY LIMIT REACHED': 1520,
   };
 function toNumberCode(value) {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -197,7 +197,7 @@ export function parseError(enabled2, count) {
     if (mappedError) return mappedError;
   }
   const extractMessage2 = extractMessage(enabled2);
-  if (count >= 0x190) return ApiError.fromHttpStatus(count, 'runninghub', extractMessage2);
+  if (count >= 400) return ApiError.fromHttpStatus(count, 'runninghub', extractMessage2);
   return null;
 }
 export function parseTaskError(enabled3) {

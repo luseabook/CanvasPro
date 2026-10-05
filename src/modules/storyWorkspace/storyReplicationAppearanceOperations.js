@@ -7,7 +7,7 @@ export function removeStoryReplicationCharacterAppearance(args, enabled, value) 
     return ![];
   const list = getStoryAssetAppearances(enabled),
     count = list['findIndex']((item) => item['id'] === value);
-  if (count < 0x0 || (list['length'] === 0x1 && !list[count]['imageUrl'])) return ![];
+  if (count < 0 || (list['length'] === 1 && !list[count]['imageUrl'])) return ![];
   const key = list[count];
   return (
     (enabled['appearances'] = list['filter']((index) => index !== key)),
@@ -23,10 +23,10 @@ export function removeStoryReplicationCharacterAppearance(args, enabled, value) 
         ),
       ),
     !enabled['appearances']['some']((result) => result['id'] === enabled['baseAppearanceId']) &&
-      (enabled['baseAppearanceId'] = enabled['appearances'][0x0]['id']),
+      (enabled['baseAppearanceId'] = enabled['appearances'][0]['id']),
     (args['assetAppearanceIndexes'] = {
       ...args['assetAppearanceIndexes'],
-      [enabled['id']]: Math['min'](count, enabled['appearances']['length'] - 0x1),
+      [enabled['id']]: Math['min'](count, enabled['appearances']['length'] - 1),
     }),
     (args['pendingDeleteAssetAppearanceKey'] = ''),
     !![]

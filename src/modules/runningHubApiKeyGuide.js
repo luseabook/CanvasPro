@@ -26,7 +26,7 @@ function createEl(item, key = '', index = '') {
   return el;
 }
 function iconSvg() {
-  return '<svg\x20width=\x2218\x22\x20height=\x2218\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M4\x2019.5A2.5\x202.5\x200\x200\x201\x206.5\x2017H20\x22></path><path\x20d=\x22M4\x204.5A2.5\x202.5\x200\x200\x201\x206.5\x202H20v20H6.5A2.5\x202.5\x200\x200\x201\x204\x2019.5z\x22></path></svg>';
+  return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"></path></svg>';
 }
 export function closeRunningHubApiKeyGuide() {
   (document['getElementById'](GUIDE_BACKDROP_ID)?.['remove']?.(),
@@ -92,8 +92,8 @@ export function showRunningHubApiKeyGuide(next = 'runninghub') {
     box = createEl('img', 'audio-voice-api-key-guide-image');
   ((box['src'] = RUNNINGHUB_API_KEY_GUIDE_IMAGE),
     (box['alt'] = guideText('guideAlt')),
-    (box['width'] = 0x3c0),
-    (box['height'] = 0x834),
+    (box['width'] = 960),
+    (box['height'] = 2100),
     (box['decoding'] = 'async'),
     (box['loading'] = 'eager'),
     (box['fetchPriority'] = 'high'));
@@ -127,7 +127,7 @@ export function showRunningHubApiKeyGuide(next = 'runninghub') {
   ((el17['type'] = 'button'), (el17['dataset']['runninghubApiKeyGuideAction'] = 'open-settings'));
   const el18 = createEl(
     'button',
-    'audio-voice-api-key-guide-btn\x20audio-voice-api-key-guide-btn-primary',
+    'audio-voice-api-key-guide-btn audio-voice-api-key-guide-btn-primary',
     guideText('openConsole'),
   );
   ((el18['type'] = 'button'),

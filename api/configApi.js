@@ -7,8 +7,8 @@ let apiConfig = null,
   lastPersistedApiConfig = null,
   apiConfigLoadPromise = null,
   apiConfigSaveQueue = Promise['resolve'](),
-  apiConfigSavePendingCount = 0x0,
-  apiConfigSaveRevision = 0x0;
+  apiConfigSavePendingCount = 0,
+  apiConfigSaveRevision = 0;
 export const API_CONFIG_CHANGED_EVENT = 'aicanvas:api-config-changed';
 const SECURE_PROVIDER_FIELDS = ['apiKey', 'modelApiKey'],
   SECURE_OBJECT_STORAGE_FIELDS = ['accessKeyId', 'secretAccessKey', 'sessionToken'],
@@ -29,7 +29,7 @@ export function clearApiConfig() {
   ((apiConfig = null),
     (lastPersistedApiConfig = null),
     (apiConfigLoadPromise = null),
-    (apiConfigSaveRevision += 0x1));
+    (apiConfigSaveRevision += 1));
 }
 export function isApiConfigLoaded() {
   return apiConfig !== null;
@@ -226,8 +226,8 @@ function mergeSecureValuesIntoConfig(options7 = {}, value17 = {}) {
       if (value20) {
         const enabled6 = String(value19 || '');
         if (!enabled6) return;
-        const value21 = value20[0x1],
-          value22 = value20[0x2];
+        const value21 = value20[1],
+          value22 = value20[2];
         if (!isPlainObject(stripSensitiveConfigValues2['objectStorage']))
           stripSensitiveConfigValues2['objectStorage'] = {};
         !isPlainObject(stripSensitiveConfigValues2['objectStorage']['profiles']) &&
@@ -245,15 +245,15 @@ function mergeSecureValuesIntoConfig(options7 = {}, value17 = {}) {
         if (!enabled7) return;
         if (!isPlainObject(stripSensitiveConfigValues2['objectStorage']))
           stripSensitiveConfigValues2['objectStorage'] = {};
-        stripSensitiveConfigValues2['objectStorage'][value23[0x1]] = enabled7;
+        stripSensitiveConfigValues2['objectStorage'][value23[1]] = enabled7;
         return;
       }
       const enabled8 = String(value18 || '')['match'](
         /^apiConfig\.providers\.([A-Za-z0-9_-]+)\.(apiKey|modelApiKey)$/,
       );
       if (!enabled8) return;
-      const value24 = enabled8[0x1],
-        value25 = enabled8[0x2],
+      const value24 = enabled8[1],
+        value25 = enabled8[2],
         enabled9 = String(value19 || '');
       if (!enabled9) return;
       if (!isPlainObject(stripSensitiveConfigValues2['providers']))
@@ -319,7 +319,7 @@ async function hydrateConfigFromSecureStorage(options10 = {}) {
     { available: available, values: values } = await readSecureValues(options10);
   if (!available) return options10;
   let value30 = { ...values };
-  if (list3['size'] > 0x0) {
+  if (list3['size'] > 0) {
     const writeSecureValues2 = await writeSecureValues(list3);
     if (writeSecureValues2['available'] && !writeSecureValues2['failed']) {
       list3['forEach']((value31, value32) => {
@@ -390,7 +390,7 @@ export function saveApiConfigToServer(value42) {
   ((apiConfig = cloneConfig(providers2)),
     _syncLegacyWindowApiKeys({ providers: providers2?.['providers'] || {} }),
     notifyApiConfigChanged('save-pending'),
-    (apiConfigSavePendingCount += 0x1));
+    (apiConfigSavePendingCount += 1));
   const value44 = apiConfigSaveQueue['catch'](() => {})
     ['then'](() => persistApiConfigToServer(providers2, value43))
     ['catch']((value45) => {
@@ -401,12 +401,12 @@ export function saveApiConfigToServer(value42) {
       throw value45;
     })
     ['finally'](() => {
-      apiConfigSavePendingCount = Math['max'](0x0, apiConfigSavePendingCount - 0x1);
+      apiConfigSavePendingCount = Math['max'](0, apiConfigSavePendingCount - 1);
     });
   return ((apiConfigSaveQueue = value44), value44);
 }
 export async function ensureConfig() {
-  apiConfigSavePendingCount > 0x0 && (await apiConfigSaveQueue['catch'](() => {}));
+  apiConfigSavePendingCount > 0 && (await apiConfigSaveQueue['catch'](() => {}));
   if (apiConfig) return;
   await fetchApiConfigFromServer();
 }

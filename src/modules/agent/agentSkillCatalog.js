@@ -103,18 +103,18 @@ export function listAgentSkills() {
 }
 
 const workflowOrganizeSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'workflow-organize',
   title: 'Workflow organize',
   riskLevel: 'safe',
   appliesWhen: ['user wants to summarize, label, connect, or tidy the current canvas workflow'],
-  requiredInputs: ['current\x20canvas', 'organize intent'],
+  requiredInputs: ['current canvas', 'organize intent'],
   missingInputQuestions: [
     'Which part of the canvas should be organized?',
-    'Should\x20I\x20summarize,\x20rename,\x20connect,\x20or\x20arrange\x20the\x20workflow?',
+    'Should I summarize, rename, connect, or arrange the workflow?',
   ],
   recommendedModelKind: '',
-  defaultParams: { gap: 0x3c },
+  defaultParams: { gap: 60 },
   commands: [
     'graph.getCanvasSummary',
     'graph.getSelection',
@@ -128,7 +128,7 @@ const workflowOrganizeSkill = {
   ],
 };
 const mediaProcessingSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'media-processing',
   title: 'Media processing',
   riskLevel: 'confirm',
@@ -142,7 +142,7 @@ const mediaProcessingSkill = {
     'For image grid splitting, how many columns and rows should be created?',
   ],
   recommendedModelKind: '',
-  defaultParams: { cols: 0x2, rows: 0x2 },
+  defaultParams: { cols: 2, rows: 2 },
   commands: [
     'video.reverse',
     'video.extractKeyframes',
@@ -157,12 +157,12 @@ const mediaProcessingSkill = {
   category: 'canvas',
 };
 const storyboardAssemblySkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'storyboard-assembly',
-  title: 'Storyboard\x20assembly',
+  title: 'Storyboard assembly',
   riskLevel: 'safe',
   appliesWhen: [
-    'user\x20wants\x20to\x20turn\x20existing\x20images\x20or\x20extracted\x20keyframes\x20into\x20a\x20storyboard',
+    'user wants to turn existing images or extracted keyframes into a storyboard',
     'user asks to arrange frames, shots, thumbnails, or keyframes into a storyboard node',
   ],
   requiredInputs: ['selected image nodes or keyframe node ids'],
@@ -176,7 +176,7 @@ const storyboardAssemblySkill = {
   category: 'canvas',
 };
 const taskManagementSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'task-management',
   title: 'Task management',
   riskLevel: 'confirm',
@@ -184,13 +184,13 @@ const taskManagementSkill = {
     'user wants to focus a generation task result on the canvas',
     'user asks to retry a failed generation task or continue from a task result',
   ],
-  requiredInputs: ['task\x20id\x20or\x20target\x20canvas\x20node\x20id'],
+  requiredInputs: ['task id or target canvas node id'],
   missingInputQuestions: [
     'Which task or result node should be focused?',
     'Which generation node should be retried?',
   ],
   recommendedModelKind: '',
-  defaultParams: { padding: 0x50, durationMs: 0x320 },
+  defaultParams: { padding: 80, durationMs: 800 },
   commands: [
     'task.focusResult',
     'task.retry',
@@ -201,21 +201,21 @@ const taskManagementSkill = {
   category: 'canvas',
 };
 const sceneDirectorSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'scene-director',
   title: '3D scene director',
   riskLevel: 'safe',
   appliesWhen: [
-    'user\x20asks\x20to\x20build,\x20arrange,\x20or\x20edit\x20a\x203D\x20Stage\x20scene',
+    'user asks to build, arrange, or edit a 3D Stage scene',
     'user describes people, poses, buildings, furniture, props, or camera motion in a scene',
     'user asks for dancing characters or camera keyframes',
   ],
   requiredInputs: [
     'a selected 3D Stage node or permission to create one',
-    'scene\x20subject\x20and\x20approximate\x20character\x20count',
+    'scene subject and approximate character count',
   ],
   missingInputQuestions: [
-    'Should\x20the\x20Agent\x20replace\x20the\x20current\x203D\x20Stage\x20contents\x20or\x20add\x20to\x20them?',
+    'Should the Agent replace the current 3D Stage contents or add to them?',
   ],
   recommendedModelKind: '',
   defaultParams: { replaceExisting: ![], environmentMode: 'night' },
@@ -232,7 +232,7 @@ const sceneDirectorSkill = {
   category: 'canvas',
 };
 const storyWritingSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'story-writing',
   title: '故事创作',
   description: '故事、小说、人物与剧情创作，支持续写、改写及互动剧情选择。',
@@ -244,7 +244,7 @@ const storyWritingSkill = {
     '根据用户要求直接创作故事、人物设定、大纲、章节或对白。信息足够时采用合理默认值，不把简单创作变成长问卷。保持已有角色姓名、关系、视角、时间线、关键线索与用户选定的剧情方向；续写从最近一稿的结尾承接。只有用户要求互动叙事或方向确实需要选择时，给出两到三个有实质差异的走向，使用系统定义的对话选项协议，并允许自由输入。用户说你决定时自行选择并继续。改写只调整用户指定的内容，保留其余设定。输出适合阅读的自然文字，不自行创建画布节点。',
 };
 const mpDiagnoseSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-diagnose',
   title: 'Diagnose（诊断）',
   riskLevel: 'confirm',
@@ -266,7 +266,7 @@ const mpDiagnoseSkill = {
   commands: ['graph.getCanvasSummary', 'node.getSummary', 'graph.getSelection'],
 };
 const mpGrillWithDocsSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-grill-with-docs',
   title: 'Grill with Docs（带文档拷问）',
   riskLevel: 'safe',
@@ -279,9 +279,9 @@ const mpGrillWithDocsSkill = {
   commands: ['graph.getCanvasSummary'],
 };
 const mpImproveArchitectureSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-improve-codebase-architecture',
-  title: 'Improve\x20Architecture（架构改进）',
+  title: 'Improve Architecture（架构改进）',
   riskLevel: 'confirm',
   category: 'engineering',
   appliesWhen: ['架构改进', '代码重构', 'deepen modules', '减少耦合', '架构优化', 'ball of mud', '软件熵'],
@@ -292,7 +292,7 @@ const mpImproveArchitectureSkill = {
   commands: ['graph.getCanvasSummary', 'node.getSummary'],
 };
 const mpPrototypeSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-prototype',
   title: 'Prototype（原型验证）',
   riskLevel: 'confirm',
@@ -305,13 +305,13 @@ const mpPrototypeSkill = {
   commands: ['node.create', 'node.setPrompt', 'node.setParams', 'generation.run'],
 };
 const mpSetupSkillsSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-setup-matt-pocock-skills',
   title: 'Setup Matt Pocock Skills（技能配置）',
   riskLevel: 'safe',
   category: 'engineering',
   appliesWhen: [
-    '配置\x20skills',
+    '配置 skills',
     '初始化 agent',
     'issue tracker 配置',
     'triage labels',
@@ -325,22 +325,22 @@ const mpSetupSkillsSkill = {
   commands: [],
 };
 const mpTddSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-tdd',
   title: 'TDD（测试驱动开发）',
   riskLevel: 'confirm',
   category: 'engineering',
-  appliesWhen: ['TDD', '测试驱动开发', 'red-green-refactor', 'test-first', 'vertical\x20slices', '集成测试'],
+  appliesWhen: ['TDD', '测试驱动开发', 'red-green-refactor', 'test-first', 'vertical slices', '集成测试'],
   requiredInputs: ['要开发的功能或 bug'],
-  missingInputQuestions: ['你想开发什么功能或修复什么\x20bug？'],
+  missingInputQuestions: ['你想开发什么功能或修复什么 bug？'],
   recommendedModelKind: '',
   defaultParams: {},
   commands: ['graph.getCanvasSummary', 'node.getSummary'],
 };
 const mpToIssuesSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-to-issues',
-  title: 'To\x20Issues（拆分为任务）',
+  title: 'To Issues（拆分为任务）',
   riskLevel: 'confirm',
   category: 'engineering',
   appliesWhen: ['拆分任务', '创建 issues', 'vertical slices', '任务分解', 'PRD 拆分', 'issue tracker'],
@@ -351,9 +351,9 @@ const mpToIssuesSkill = {
   commands: ['graph.getCanvasSummary'],
 };
 const mpToPrdSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-to-prd',
-  title: 'To\x20PRD（生成产品需求文档）',
+  title: 'To PRD（生成产品需求文档）',
   riskLevel: 'safe',
   category: 'engineering',
   appliesWhen: ['生成 PRD', '产品需求文档', '整理需求', '需求文档', 'PRD 模板', '发布需求'],
@@ -364,7 +364,7 @@ const mpToPrdSkill = {
   commands: [],
 };
 const mpTriageSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-triage',
   title: 'Triage（任务分诊）',
   riskLevel: 'confirm',
@@ -377,7 +377,7 @@ const mpTriageSkill = {
   commands: [],
 };
 const mpZoomOutSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-zoom-out',
   title: 'Zoom Out（宏观视角）',
   riskLevel: 'safe',
@@ -390,12 +390,12 @@ const mpZoomOutSkill = {
   commands: ['graph.getCanvasSummary', 'viewport.fitAll'],
 };
 const mpCavemanSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-caveman',
   title: 'Caveman（极简沟通）',
   riskLevel: 'safe',
   category: 'productivity',
-  appliesWhen: ['极简回复', '节省 token', 'caveman\x20mode', '精简沟通', '高效回复', '不要废话'],
+  appliesWhen: ['极简回复', '节省 token', 'caveman mode', '精简沟通', '高效回复', '不要废话'],
   requiredInputs: [],
   missingInputQuestions: [],
   recommendedModelKind: '',
@@ -403,12 +403,12 @@ const mpCavemanSkill = {
   commands: [],
 };
 const mpGrillMeSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-grill-me',
   title: 'Grill Me（深度拷问）',
   riskLevel: 'safe',
   category: 'productivity',
-  appliesWhen: ['深度讨论', '提问引导', '理清思路', 'interview', '决策树', 'grill\x20me'],
+  appliesWhen: ['深度讨论', '提问引导', '理清思路', 'interview', '决策树', 'grill me'],
   requiredInputs: ['要讨论的话题'],
   missingInputQuestions: ['你想深入讨论什么话题？'],
   recommendedModelKind: '',
@@ -416,7 +416,7 @@ const mpGrillMeSkill = {
   commands: [],
 };
 const mpHandoffSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-handoff',
   title: 'Handoff（交接文档）',
   riskLevel: 'safe',
@@ -429,7 +429,7 @@ const mpHandoffSkill = {
   commands: ['graph.getCanvasSummary', 'graph.getSelection'],
 };
 const mpTeachSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-teach',
   title: 'Teach（教学模式）',
   riskLevel: 'safe',
@@ -442,17 +442,17 @@ const mpTeachSkill = {
   commands: [],
 };
 const mpWriteASkillSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-write-a-skill',
   title: 'Write a Skill（创建技能）',
   riskLevel: 'safe',
   category: 'productivity',
   appliesWhen: [
     '创建 skill',
-    '编写\x20SKILL.md',
+    '编写 SKILL.md',
     'agent skill',
     '新技能',
-    'progressive\x20disclosure',
+    'progressive disclosure',
     'bundled resources',
   ],
   requiredInputs: ['新 skill 的想法'],
@@ -462,16 +462,16 @@ const mpWriteASkillSkill = {
   commands: [],
 };
 const mpGitGuardrailsSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-git-guardrails',
   title: 'Git Guardrails（Git 安全防护）',
   riskLevel: 'confirm',
   category: 'misc',
   appliesWhen: [
-    'git\x20安全',
+    'git 安全',
     'git hooks',
     '危险操作防护',
-    'git\x20guardrails',
+    'git guardrails',
     '防止误操作',
     'reset --hard',
   ],
@@ -482,13 +482,13 @@ const mpGitGuardrailsSkill = {
   commands: [],
 };
 const mpMigrateToShoehornSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-migrate-to-shoehorn',
   title: 'Migrate to Shoehorn（类型迁移）',
   riskLevel: 'confirm',
   category: 'misc',
   appliesWhen: [
-    'shoehorn\x20迁移',
+    'shoehorn 迁移',
     '类型断言迁移',
     '测试类型安全',
     '@total-typescript/shoehorn',
@@ -501,7 +501,7 @@ const mpMigrateToShoehornSkill = {
   commands: [],
 };
 const mpScaffoldExercisesSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-scaffold-exercises',
   title: 'Scaffold Exercises（练习脚手架）',
   riskLevel: 'safe',
@@ -511,7 +511,7 @@ const mpScaffoldExercisesSkill = {
     'exercise structure',
     'problems solutions',
     '教程结构',
-    'scaffold\x20exercises',
+    'scaffold exercises',
   ],
   requiredInputs: ['练习主题'],
   missingInputQuestions: ['练习的主题是什么？'],
@@ -520,7 +520,7 @@ const mpScaffoldExercisesSkill = {
   commands: [],
 };
 const mpSetupPreCommitSkill = {
-  schemaVersion: 0x1,
+  schemaVersion: 1,
   id: 'mp-setup-pre-commit',
   title: 'Setup Pre-commit（预提交配置）',
   riskLevel: 'confirm',
@@ -626,7 +626,7 @@ function containsSkillReference(index, result, { prefixed: prefixed = ![] } = {}
   const escapeSkillReference2 = escapeSkillReference(enabled2),
     data = prefixed
       ? '[$/]' + escapeSkillReference2 + '(?=$|[^\\p{L}\\p{N}_-])'
-      : '(?:^|[^\x5cp{L}\x5cp{N}_-])' + escapeSkillReference2 + '(?=$|[^\\p{L}\\p{N}_-])';
+      : '(?:^|[^\\p{L}\\p{N}_-])' + escapeSkillReference2 + '(?=$|[^\\p{L}\\p{N}_-])';
   return new RegExp(data, 'iu')['test'](enabled);
 }
 
@@ -650,31 +650,31 @@ function scoreSkill(
 ) {
   const entry = String(userMessage || '')['trim'](),
     isExplicitSkillRequest2 = isExplicitSkillRequest(entry, current);
-  if (current['id']['startsWith']('mp-') && !isExplicitSkillRequest2) return 0x0;
-  let count = isExplicitSkillRequest2 ? 0x3e8 : 0x0;
+  if (current['id']['startsWith']('mp-') && !isExplicitSkillRequest2) return 0;
+  let count = isExplicitSkillRequest2 ? 1000 : 0;
   for (const record of SKILL_PATTERNS[current['id']] || []) {
-    if (record['test'](entry)) count += 0xc8;
+    if (record['test'](entry)) count += 200;
   }
-  count > 0x0 && targetKind && current['recommendedModelKind'] === targetKind && (count += 0x28);
+  count > 0 && targetKind && current['recommendedModelKind'] === targetKind && (count += 40);
   const map = new Set(
     (Array['isArray'](selectedInputKinds) ? selectedInputKinds : [])
       ['map']((payload) => String(payload || '')['trim']())
       ['filter'](Boolean),
   );
   return (
-    count > 0x0 &&
+    count > 0 &&
       current['id'] === 'image-to-video' &&
       targetKind === 'video' &&
       map['has']('image') &&
-      (count += 0x104),
-    current['id'] === 'text-to-video' && targetKind === 'video' && map['has']('image') && (count -= 0x78),
+      (count += 260),
+    current['id'] === 'text-to-video' && targetKind === 'video' && map['has']('image') && (count -= 120),
     current['id'] === 'text-to-video' &&
       !isExplicitSkillRequest2 &&
       /(?:\bimage\b.{0,24}\bvideo\b|\bvideo\b.{0,24}\bimage\b|图生视频|图片.{0,16}视频|图像.{0,16}视频)/i[
         'test'
       ](entry) &&
-      (count = 0x0),
-    Math['max'](0x0, count)
+      (count = 0),
+    Math['max'](0, count)
   );
 }
 
@@ -685,7 +685,7 @@ export function createAgentSkillRegistry({ packages: packages = [] } = {}) {
   });
   return (
     Array['isArray'](packages) &&
-      packages['length'] > 0x0 &&
+      packages['length'] > 0 &&
       agentSkillRegistryCore['replaceInstalledPackages'](packages),
     agentSkillRegistryCore
   );
@@ -702,11 +702,11 @@ export function selectAgentSkills({
   targetKind: targetKind = '',
   selectedInputKinds: selectedInputKinds = [],
   selectedSkillIds: selectedSkillIds = [],
-  maxSkills: maxSkills = 0x2,
+  maxSkills: maxSkills = 2,
   registry: registry = defaultAgentSkillRegistry,
 } = {}) {
   const handle = Number(maxSkills),
-    state = Math['max'](0x0, Number['isFinite'](handle) ? Math['trunc'](handle) : 0x2),
+    state = Math['max'](0, Number['isFinite'](handle) ? Math['trunc'](handle) : 2),
     config = [
       ...new Set(
         (Array['isArray'](selectedSkillIds) ? selectedSkillIds : [])
@@ -721,15 +721,15 @@ export function selectAgentSkills({
     list = (registry['listSkills']?.() || [])
       ['filter']((input) => input['enabled'] !== ![] && config['includes'](input['id']))
       ['sort']((output, value2) => config['indexOf'](output['id']) - config['indexOf'](value2['id']))
-      ['slice'](0x0, state),
+      ['slice'](0, state),
     enabled3 = new Set(list['map']((value3) => value3['id'])),
     args = registry['select']({
       userMessage: userMessage,
       targetKind: targetKind,
       selectedInputKinds: selectedInputKinds,
-      maxSkills: Math['max'](0x0, state - list['length']),
+      maxSkills: Math['max'](0, state - list['length']),
     });
-  return [...list, ...args['filter']((value4) => !enabled3['has'](value4['id']))]['slice'](0x0, state);
+  return [...list, ...args['filter']((value4) => !enabled3['has'](value4['id']))]['slice'](0, state);
 }
 
 export const agentSkillCatalogInternals = Object['freeze']({

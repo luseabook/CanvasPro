@@ -9,7 +9,7 @@ function createMaterialMenuRow(key, index, result, handler) {
   const el = document['createElement']('div');
   ((el['className'] = 'v2-menu-row'),
     el['setAttribute']('role', 'menuitem'),
-    (el['tabIndex'] = -0x1),
+    (el['tabIndex'] = -1),
     (el['dataset']['shortcutAction'] = result));
   const el2 = document['createElement']('span');
   ((el2['className'] = 'v2-menu-leading-icon'), el2['setAttribute']('aria-hidden', 'true'));
@@ -25,7 +25,7 @@ function createMaterialMenuRow(key, index, result, handler) {
   return (
     (el['__contextMenuShortcutActivate'] = handler),
     el['addEventListener']('pointerdown', (event) => {
-      if (event['button'] !== 0x0) return;
+      if (event['button'] !== 0) return;
       (stopPointer(event), handler(event));
     }),
     el
@@ -34,7 +34,7 @@ function createMaterialMenuRow(key, index, result, handler) {
 export function renderMediaClipMaterialMenu(data) {
   const options = data['_materialMenu'] || {},
     el5 = document['createElement']('div');
-  ((el5['className'] = 'v2-canvas-ctx-menu\x20media-clip-material-menu'),
+  ((el5['className'] = 'v2-canvas-ctx-menu media-clip-material-menu'),
     el5['setAttribute']('role', 'menu'),
     (el5['dataset']['uiStop'] = 'true'),
     el5['appendChild'](
@@ -53,7 +53,7 @@ export function renderMediaClipMaterialMenu(data) {
   const el6 =
     options['kind'] === 'audio'
       ? data['_audioTimelineClips'](data['_mediaClip']['tracks']?.['audio'])[
-          Math['max'](0x0, Math['trunc'](toNumber(options['clipIndex'], 0x0)))
+          Math['max'](0, Math['trunc'](toNumber(options['clipIndex'], 0)))
         ] || null
       : null;
   return (

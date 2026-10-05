@@ -14,21 +14,21 @@ export async function promptForMissingChromeShellBrowser({
     const response = await dialogApi['showMessageBox']({
       type: 'warning',
       title: appName + ' 启动提示',
-      message: '未检测到\x20Chrome\x20浏览器内核',
+      message: '未检测到 Chrome 浏览器内核',
       detail: [
-        '缺少\x20Chrome\x20浏览器内核，部分功能将无法正常使用。',
+        '缺少 Chrome 浏览器内核，部分功能将无法正常使用。',
         '请重新下载安装最新版 Google Chrome 浏览器，然后重新启动 ' + appName + '。',
         '',
         '也可以暂时进入兼容模式。',
         '兼容模式下部分功能不可用，包括部分视频截帧和关键帧功能。',
-      ]['join']('\x0a'),
+      ]['join']('\n'),
       buttons: ['重新下载 Chrome', '进入兼容模式', '退出'],
-      defaultId: 0x0,
-      cancelId: 0x2,
+      defaultId: 0,
+      cancelId: 2,
       noLink: true,
     });
-    if (Number(response?.['response']) === 0x0) return (await openChromeDownload(shellApi), 'download');
-    return Number(response?.['response']) === 0x1 ? 'electron' : 'quit';
+    if (Number(response?.['response']) === 0) return (await openChromeDownload(shellApi), 'download');
+    return Number(response?.['response']) === 1 ? 'electron' : 'quit';
   } catch {
     return 'quit';
   }
@@ -61,13 +61,13 @@ export async function promptForChromeShellStartupFailure({
             '若仍然失败，请进入兼容模式并导出诊断包，不要删除配置目录。',
             '',
             '兼容模式下部分功能不可用，包括部分视频截帧和关键帧功能。',
-          ]['join']('\x0a'),
+          ]['join']('\n'),
           buttons: ['进入兼容模式', '退出'],
-          defaultId: 0x0,
-          cancelId: 0x1,
+          defaultId: 0,
+          cancelId: 1,
           noLink: true,
         });
-      return Number(timeoutResponse?.['response']) === 0x0 ? 'electron' : 'quit';
+      return Number(timeoutResponse?.['response']) === 0 ? 'electron' : 'quit';
     }
     const failureResponse = await dialogApi['showMessageBox']({
       type: 'error',
@@ -87,13 +87,13 @@ export async function promptForChromeShellStartupFailure({
         '',
         '也可以暂时进入兼容模式。',
         '兼容模式下部分功能不可用，包括部分视频截帧和关键帧功能。',
-      ]['join']('\x0a'),
+      ]['join']('\n'),
       buttons: ['进入兼容模式', '退出'],
-      defaultId: 0x0,
-      cancelId: 0x1,
+      defaultId: 0,
+      cancelId: 1,
       noLink: true,
     });
-    return Number(failureResponse?.['response']) === 0x0 ? 'electron' : 'quit';
+    return Number(failureResponse?.['response']) === 0 ? 'electron' : 'quit';
   } catch {
     return 'quit';
   }

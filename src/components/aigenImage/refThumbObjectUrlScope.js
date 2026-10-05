@@ -26,7 +26,7 @@ export function scheduleCurrentRefThumbObjectUrl(
 ) {
   if (!objectUrls['_refThumbObjectUrlLoads']) objectUrls['_refThumbObjectUrlLoads'] = new Map();
   const thumbId = String(record || '')['trim'](),
-    payload = Number(objectUrls['_imageObjectUrlLifecycleEpoch']) || 0x0;
+    payload = Number(objectUrls['_imageObjectUrlLifecycleEpoch']) || 0;
   scheduleStoredThumbObjectUrl({
     thumbId: thumbId,
     objectUrls: objectUrls['_refThumbObjectUrls'],
@@ -37,7 +37,7 @@ export function scheduleCurrentRefThumbObjectUrl(
     isCurrent: () => {
       if (
         objectUrls['_imageObjectUrlsDisposed'] === !![] ||
-        (Number(objectUrls['_imageObjectUrlLifecycleEpoch']) || 0x0) !== payload
+        (Number(objectUrls['_imageObjectUrlLifecycleEpoch']) || 0) !== payload
       )
         return ![];
       const handle = objectUrls['_getStoreStateForRead']();

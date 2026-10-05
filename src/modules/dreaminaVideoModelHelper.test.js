@@ -178,8 +178,8 @@ const DREAMINA_ADAPTIVE_RATIO = '自适应';
     }
   }),
   test('dreamina helper: 自适应比例会贴近即梦支持比例', () => {
-    (assert.equal(pickClosestDreaminaVideoAdaptiveRatio(0x780, 0x438)?.label, '16:9'),
-      assert.equal(pickClosestDreaminaVideoAdaptiveRatio(0x438, 0x780)?.label, '9:16'),
+    (assert.equal(pickClosestDreaminaVideoAdaptiveRatio(1920, 1080)?.label, '16:9'),
+      assert.equal(pickClosestDreaminaVideoAdaptiveRatio(1080, 1920)?.label, '9:16'),
       assert.equal(pickClosestDreaminaVideoAdaptiveRatio(0, 0)?.label, '1:1'));
   }),
   test('dreamina helper: 节点归一化阶段保留自适应', () => {

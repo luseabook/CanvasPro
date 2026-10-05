@@ -38,12 +38,12 @@ export function removeStoryAddedAssetAppearance(options2 = {}, item = '') {
     text = normalizeText(item),
     removedIndex = list['findIndex']((key) => normalizeText(key?.['id']) === text),
     removedAppearance = list[removedIndex] || null;
-  if (list['length'] <= 0x1 || removedIndex < 0x0 || !isStoryAddedAssetAppearance(removedAppearance))
+  if (list['length'] <= 1 || removedIndex < 0 || !isStoryAddedAssetAppearance(removedAppearance))
     return {
       removed: ![],
       removedAppearance: null,
-      removedIndex: -0x1,
-      nextIndex: Math['max'](0x0, Math['min'](list['length'] - 0x1, removedIndex)),
+      removedIndex: -1,
+      nextIndex: Math['max'](0, Math['min'](list['length'] - 1, removedIndex)),
     };
   return (
     (options2['appearances'] = list['filter']((index, result) => result !== removedIndex)),
@@ -53,7 +53,7 @@ export function removeStoryAddedAssetAppearance(options2 = {}, item = '') {
       removed: !![],
       removedAppearance: removedAppearance,
       removedIndex: removedIndex,
-      nextIndex: Math['max'](0x0, Math['min'](options2['appearances']['length'] - 0x1, removedIndex)),
+      nextIndex: Math['max'](0, Math['min'](options2['appearances']['length'] - 1, removedIndex)),
     }
   );
 }
@@ -67,7 +67,7 @@ export function clearStoryAssetAppearanceImage(options3 = {}, data = '') {
     (enabled['imageUrl'] = ''),
     (enabled['generatedImage'] = null),
     (enabled['generatedImages'] = []),
-    (enabled['activeIndex'] = 0x0),
+    (enabled['activeIndex'] = 0),
     (enabled['error'] = ''),
     { removed: !![], nextIndex: nextIndex }
   );
@@ -93,7 +93,7 @@ export function buildMissingStoryAssetImageWarning(list6 = []) {
       const entry = (Array['isArray'](list6) ? list6 : [])['filter'](
         (record) => record?.['kind'] === current,
       )['length'];
-      return entry ? next[current] + '\x20' + entry + '\x20张' : '';
+      return entry ? next[current] + ' ' + entry + ' 张' : '';
     })['filter'](Boolean);
   if (!list7['length']) return '';
   return (
@@ -111,7 +111,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
 } = {}) {
   if (!projection || !presentation)
     throw new TypeError(
-      'Story\x20asset\x20settings\x20workspace\x20requires\x20projection\x20and\x20presentation\x20owners.',
+      'Story asset settings workspace requires projection and presentation owners.',
     );
   const getVisibleAssets = (handle) => {
       if (handle['assetFilter'] === 'audio') return getStoryProjectAudioAssets(handle['data']);
@@ -134,11 +134,11 @@ export function createStoryAssetSettingsWorkspacePresentation({
         ['filter']((output) => map['has'](output));
     },
     getSelectedAsset = (value2, list8) =>
-      list8['find']((value3) => value3['id'] === value2['selectedAssetId']) || list8[0x0] || null,
+      list8['find']((value3) => value3['id'] === value2['selectedAssetId']) || list8[0] || null,
     getSelectedAppearanceIndex = (value4, value5) => {
       const value6 = Number(value4['assetAppearanceIndexes']?.[value5?.['id']]),
-        value7 = Math['max'](0x0, getStoryAssetAppearances(value5)['length'] - 0x1);
-      return Math['max'](0x0, Math['min'](value7, Number['isFinite'](value6) ? Math['trunc'](value6) : 0x0));
+        value7 = Math['max'](0, getStoryAssetAppearances(value5)['length'] - 1);
+      return Math['max'](0, Math['min'](value7, Number['isFinite'](value6) ? Math['trunc'](value6) : 0));
     },
     getSelectedAppearance = (value8, value9) =>
       value9?.['isLibraryAsset']
@@ -230,7 +230,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
         }),
       }),
     renderLibraryAddToProjectControl = ({
-      selectedCount: selectedCount = 0x0,
+      selectedCount: selectedCount = 0,
       projectAssets: projectAssets = [],
       showCount: showCount = !![],
     } = {}) => {
@@ -247,7 +247,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
     },
     renderLibrarySelectionActions = ({
       selectionMode: selectionMode = ![],
-      selectedCount: selectedCount = 0x0,
+      selectedCount: selectedCount = 0,
       allSelected: allSelected = ![],
       projectAssets: projectAssets = [],
     } = {}) =>
@@ -324,7 +324,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
             ? assets['filter']((value20) => isLibraryImageAsset(value20) || isStoryAudioAsset(value20))
             : assets,
         allSelected2 =
-          list10['length'] > 0x0 &&
+          list10['length'] > 0 &&
           list10['every']((value21) => cardMediaHtml2['selectedAssetIds']['includes'](value21['id'])),
         value22 = getSelectedAsset(cardMediaHtml2, assets);
       value22 &&
@@ -390,10 +390,10 @@ export function createStoryAssetSettingsWorkspacePresentation({
         headingInListColumn: calloutInHeading,
         calloutStatus:
           calloutInHeading && cardMediaHtml2['assetSelectionMode']
-            ? '已选择\x20' + cardMediaHtml2['selectedAssetIds']['length'] + '\x20项'
+            ? '已选择 ' + cardMediaHtml2['selectedAssetIds']['length'] + ' 项'
             : '',
         activeTab: cardMediaHtml2['assetFilter'],
-        tabCount: 0x5,
+        tabCount: 5,
         tabsHtml: [
           ['character', value23],
           ['scene', value25],
@@ -411,7 +411,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
               (cardMediaHtml2['assetFilter'] === value29) +
               '" tabindex="' +
               (cardMediaHtml2['assetFilter'] === value29 ? '0' : '-1') +
-              '\x22>' +
+              '">' +
               renderTabIcon(value29) +
               '<span class="story-asset-tab-label">' +
               getTabLabel(value29) +
@@ -440,7 +440,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
                   : '点击素材进行多选，或拖动鼠标框选。'
                 : '选中素材后加入项目；支持框选多选。'
               : cardMediaHtml2['assetSelectionMode']
-                ? '已选择 ' + cardMediaHtml2['selectedAssetIds']['length'] + '\x20项'
+                ? '已选择 ' + cardMediaHtml2['selectedAssetIds']['length'] + ' 项'
                 : cardMediaHtml2['assetFilter'] === 'character'
                   ? '多形象角色会先确定基础形象，再以其作为参考生成其他形象。'
                   : '每项素材保留一张可复用的设定图。',
@@ -474,11 +474,11 @@ export function createStoryAssetSettingsWorkspacePresentation({
                     projectAssets: cardMediaHtml2['data']['assets'],
                   })
               : (cardMediaHtml2['assetSelectionMode'] &&
-                    cardMediaHtml2['selectedAssetIds']['length'] > 0x1) ||
+                    cardMediaHtml2['selectedAssetIds']['length'] > 1) ||
                   cardMediaHtml2['isBatchGenerating']
-                ? '<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-story-action=\x22toggle-all-assets\x22\x20aria-pressed=\x22' +
+                ? '<button type="button" class="story-secondary-button" data-story-action="toggle-all-assets" aria-pressed="' +
                   allSelected2 +
-                  '\x22\x20' +
+                  '" ' +
                   (assets['length'] ? '' : 'disabled') +
                   '>' +
                   (allSelected2 ? '取消全选' : '全选') +
@@ -497,8 +497,8 @@ export function createStoryAssetSettingsWorkspacePresentation({
         footerHtml: renderPageFooter(cardMediaHtml2, {
           nextLabel:
             cardMediaHtml2['data']?.['project']?.['sourceMode'] === 'video-replication'
-              ? cardMediaHtml2['data']['episodes']['length'] === 0x1
-                ? cardMediaHtml2['data']['episodes'][0x0]['clips']?.['length']
+              ? cardMediaHtml2['data']['episodes']['length'] === 1
+                ? cardMediaHtml2['data']['episodes'][0]['clips']?.['length']
                   ? '进入视频制作'
                   : '生成分段提示词'
                 : '下一步：视频列表'

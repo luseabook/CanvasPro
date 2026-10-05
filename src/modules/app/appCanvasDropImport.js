@@ -14,8 +14,8 @@ export function openAppCanvasFilePicker({
   projectId: projectId2,
   handleFileDrop: handleFileDrop2,
   commit: commit2,
-  clientX: clientX = 0x0,
-  clientY: clientY = 0x0,
+  clientX: clientX = 0,
+  clientY: clientY = 0,
   onUnsupported: onUnsupported,
   onError: onError,
 } = {}) {
@@ -43,11 +43,11 @@ export function openAppCanvasFilePicker({
       (event2) => {
         const files = Array['from'](event2?.['target']?.['files'] || []);
         run();
-        if (files['length'] === 0x0) return;
+        if (files['length'] === 0) return;
         const event3 = {
           dataTransfer: { files: files },
-          clientX: Number['isFinite'](Number(clientX)) ? Number(clientX) : 0x0,
-          clientY: Number['isFinite'](Number(clientY)) ? Number(clientY) : 0x0,
+          clientX: Number['isFinite'](Number(clientX)) ? Number(clientX) : 0,
+          clientY: Number['isFinite'](Number(clientY)) ? Number(clientY) : 0,
           preventDefault() {},
           stopPropagation() {},
         };

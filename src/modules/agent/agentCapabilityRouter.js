@@ -1,5 +1,5 @@
-const SMALL_REGISTRY_FULL_DISCLOSURE_LIMIT = 0xc,
-  DEFAULT_COMMAND_LIMIT = 0x12,
+const SMALL_REGISTRY_FULL_DISCLOSURE_LIMIT = 12,
+  DEFAULT_COMMAND_LIMIT = 18,
   ALWAYS_AVAILABLE_COMMANDS = Object['freeze']([
     'agent.capabilities.search',
     'agent.command.describe',
@@ -214,11 +214,11 @@ function normalizeCommands(list = []) {
 function matchesAny(item, list2 = []) {
   return list2['some']((key) => key['test'](item));
 }
-function addCommandPriority(map, index = [], result = 0x0) {
+function addCommandPriority(map, index = [], result = 0) {
   for (const data of index) {
     const enabled = String(data || '')['trim']();
     if (!enabled) continue;
-    map['set'](enabled, Math['max'](map['get'](enabled) || 0x0, result));
+    map['set'](enabled, Math['max'](map['get'](enabled) || 0, result));
   }
 }
 function findExplicitCommandIds(options, list3 = []) {
@@ -249,7 +249,7 @@ function inferNamespaces({
           ['toLowerCase'](),
       )
       ['filter'](Boolean),
-    entry = [String(userMessage || '')['trim'](), ...list5]['join']('\x20'),
+    entry = [String(userMessage || '')['trim'](), ...list5]['join'](' '),
     list6 = [];
   for (const [record, payload] of Object['entries'](NAMESPACE_PATTERNS)) {
     (list5['includes'](record) || matchesAny(entry, payload)) && list6['push'](record);
@@ -293,21 +293,21 @@ export function routeAgentCapabilities({
         deferredCommandIds: [],
         namespaces: Object['keys'](COMMAND_NAMESPACES)
           ['map']((scope) => summarizeNamespace(scope, map3))
-          ['filter']((input) => input['commandIds']['length'] > 0x0),
+          ['filter']((input) => input['commandIds']['length'] > 0),
         totalAvailable: commands2['length'],
       },
     };
   const map4 = new Map();
-  (addCommandPriority(map4, ALWAYS_AVAILABLE_COMMANDS, 0x15e),
-    addCommandPriority(map4, requiredCommandIds, 0x2bc),
+  (addCommandPriority(map4, ALWAYS_AVAILABLE_COMMANDS, 350),
+    addCommandPriority(map4, requiredCommandIds, 700),
     selectedNamespaces['forEach']((output, value2) => {
-      addCommandPriority(map4, COMMAND_NAMESPACES[output], 0xc8 - value2);
+      addCommandPriority(map4, COMMAND_NAMESPACES[output], 200 - value2);
     }));
   for (const value3 of Array['isArray'](skills) ? skills : []) {
-    addCommandPriority(map4, value3?.['commands'], 0x190);
+    addCommandPriority(map4, value3?.['commands'], 400);
   }
-  (addCommandPriority(map4, findIntentCommandIds(userMessage), 0x1f4),
-    addCommandPriority(map4, findExplicitCommandIds(userMessage, includedCommandIds), 0x258));
+  (addCommandPriority(map4, findIntentCommandIds(userMessage), 500),
+    addCommandPriority(map4, findExplicitCommandIds(userMessage, includedCommandIds), 600));
   const value4 = Number(maxCommands),
     value5 = Math['max'](
       ALWAYS_AVAILABLE_COMMANDS['length'],
@@ -317,10 +317,10 @@ export function routeAgentCapabilities({
     value8 = Array['from'](map4['entries']())
       ['filter'](([value9]) => map3['has'](value9))
       ['sort']((value10, value11) => {
-        if (value11[0x1] !== value10[0x1]) return value11[0x1] - value10[0x1];
-        return map5['get'](value10[0x0]) - map5['get'](value11[0x0]);
+        if (value11[1] !== value10[1]) return value11[1] - value10[1];
+        return map5['get'](value10[0]) - map5['get'](value11[0]);
       })
-      ['slice'](0x0, value5)
+      ['slice'](0, value5)
       ['map'](([value12]) => value12),
     map6 = new Set(value8),
     commands3 = commands2['filter']((value13) => map6['has'](value13['id']));
@@ -333,7 +333,7 @@ export function routeAgentCapabilities({
       deferredCommandIds: includedCommandIds['filter']((value15) => !map6['has'](value15)),
       namespaces: Object['keys'](COMMAND_NAMESPACES)
         ['map']((value16) => summarizeNamespace(value16, map3))
-        ['filter']((value17) => value17['commandIds']['length'] > 0x0),
+        ['filter']((value17) => value17['commandIds']['length'] > 0),
       totalAvailable: commands2['length'],
     },
   };

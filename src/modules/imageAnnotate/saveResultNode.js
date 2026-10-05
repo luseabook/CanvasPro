@@ -48,8 +48,8 @@ export const saveAnnotateExportResult = async ({
     src = localPathToUrl(localPath) || String(fileName.url || '').trim(),
     target = appStore.getState().nodes?.[sourceNodeId],
     box = target || baseNode || {},
-    width = box.width || 0x104,
-    height = box.height || 0x104,
+    width = box.width || 260,
+    height = box.height || 260,
     x = calcSafeSpawnPosNearNode(appStore.getState().nodes, box, width, height),
     id = generateId('source-image');
   return (
@@ -88,8 +88,8 @@ function resolveAnnotateResultBaseNode(current, entry) {
 
 function resolveAnnotateResultLayout(record, payload, handle) {
   const annotateResultBaseNode = resolveAnnotateResultBaseNode(record, payload),
-    state = handle?.['width'] || annotateResultBaseNode['width'] || 0x104,
-    config = handle?.['height'] || annotateResultBaseNode['height'] || 0x104,
+    state = handle?.['width'] || annotateResultBaseNode['width'] || 260,
+    config = handle?.['height'] || annotateResultBaseNode['height'] || 260,
     box2 = calcSafeSpawnPosNearNode(appStore['getState']()['nodes'], annotateResultBaseNode, state, config);
   return { baseNode: annotateResultBaseNode, width: state, height: config, x: box2['x'], y: box2['y'] };
 }
@@ -128,7 +128,7 @@ function buildSavedAnnotateResultPatch({
   baseNode: baseNode3,
   saveResult: saveResult,
   fileName: fileName2,
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
 }) {
   const resultLocalPath = pickResultLocalPath(saveResult),
     args = buildCanvasLocalImageFields(
@@ -180,7 +180,7 @@ function buildSavedAnnotateResultPatch({
 export const markAnnotateExportNodeFailed = ({
   targetNodeId: targetNodeId,
   error: error2,
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
 } = {}) => {
   const enabled = String(targetNodeId || '')['trim']();
   if (!enabled) return ![];

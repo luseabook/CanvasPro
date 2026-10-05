@@ -189,30 +189,30 @@ function resolveNodeSize(options5 = {}, box = {}) {
   const count = Number(options5.originalWidth || options5.imageWidth || box.imageWidth || 0) || 0,
     count2 = Number(options5.originalHeight || options5.imageHeight || box.imageHeight || 0) || 0;
   if (count > 0 && count2 > 0) {
-    const payload = 0x104,
+    const payload = 260,
       handle = payload / Math.min(count, count2);
     return {
       width: Math.max(120, Math.round(count * handle)),
       height: Math.max(120, Math.round(count2 * handle)),
     };
   }
-  return { width: Number(box.width || 0) || 0x104, height: Number(box.height || 0) || 0x104 };
+  return { width: Number(box.width || 0) || 260, height: Number(box.height || 0) || 260 };
 }
 function resolveVideoNodeSize(box2 = {}, box3 = {}) {
   const count3 = Number(box2.videoWidth || box2.width || box3.videoWidth || 0) || 0,
     count4 = Number(box2.videoHeight || box2.height || box3.videoHeight || 0) || 0;
   if (count3 > 0 && count4 > 0) {
-    const state = 0x104,
+    const state = 260,
       config = state / Math.min(count3, count4);
     return {
       width: Math.max(160, Math.round(count3 * config)),
       height: Math.max(120, Math.round(count4 * config)),
     };
   }
-  return { width: Number(box3.width || 0) || 0x200, height: Number(box3.height || 0) || 0x120 };
+  return { width: Number(box3.width || 0) || 512, height: Number(box3.height || 0) || 288 };
 }
 function resolveAudioNodeSize(box4 = {}) {
-  return { width: Number(box4.width || 0) || 0x140, height: Number(box4.height || 0) || 140 };
+  return { width: Number(box4.width || 0) || 320, height: Number(box4.height || 0) || 140 };
 }
 export function buildGenerationHistoryFingerprint(options6 = {}) {
   const localPath = pickImageLocalPath(options6),

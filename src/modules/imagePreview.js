@@ -22,7 +22,7 @@ import {
 export async function resolveNodeImageOriginalSource(enabled) {
   if (!enabled) return null;
   const value = Array['isArray'](enabled['images']) ? enabled['images'] : [],
-    item = enabled['mainImageIndex'] || 0x0,
+    item = enabled['mainImageIndex'] || 0,
     key = value[item] || null,
     nonEmpty = firstNonEmpty(key?.['sourceId'], enabled['sourceId']);
   if (nonEmpty)
@@ -41,7 +41,7 @@ export async function resolveNodeImagePreviewSource(result) {
   const response = await resolveNodeImageOriginalSource(result);
   if (response?.['url']) return response;
   const data = Array['isArray'](result?.['images']) ? result['images'] : [],
-    options = result?.['mainImageIndex'] || 0x0,
+    options = result?.['mainImageIndex'] || 0,
     target = data[options] || null,
     url2 = firstNonEmpty(
       resolveCanvasImagePreviewUrl(target),
@@ -71,8 +71,8 @@ function collectUniquePreviewUrls(list = []) {
 }
 function resolveImmediateNodeImagePreviewUrls(entry, record = '') {
   const payload = Array['isArray'](entry?.['images']) ? entry['images'] : [],
-    handle = Math['max'](0x0, Number(entry?.['mainImageIndex']) || 0x0),
-    state = payload[handle] || payload[0x0] || null;
+    handle = Math['max'](0, Number(entry?.['mainImageIndex']) || 0),
+    state = payload[handle] || payload[0] || null;
   return collectUniquePreviewUrls([
     record,
     resolveCanvasImageDisplayUrl(state),
@@ -84,11 +84,11 @@ function resolveImmediateNodeImagePreviewUrls(entry, record = '') {
   ]);
 }
 const IMAGE_PREVIEW_MIN_SCALE = 0.25,
-  IMAGE_PREVIEW_MAX_SCALE = 0x6,
+  IMAGE_PREVIEW_MAX_SCALE = 6,
   IMAGE_PREVIEW_WHEEL_INTENSITY = 0.0015;
 let activeImagePreviewClose = null,
   activeVideoPreviewClose = null,
-  videoPreviewOwnerSequence = 0x0;
+  videoPreviewOwnerSequence = 0;
 export function closeActiveImagePreview() {
   if (typeof activeImagePreviewClose !== 'function') return ![];
   const run = activeImagePreviewClose;
@@ -111,10 +111,10 @@ function getOverlayCenterPoint(el2) {
   const x = el2['getBoundingClientRect']?.();
   if (!x)
     return {
-      x: (globalThis['window']?.['innerWidth'] || 0x0) / 0x2,
-      y: (globalThis['window']?.['innerHeight'] || 0x0) / 0x2,
+      x: (globalThis['window']?.['innerWidth'] || 0) / 2,
+      y: (globalThis['window']?.['innerHeight'] || 0) / 2,
     };
-  return { x: x['left'] + x['width'] / 0x2, y: x['top'] + x['height'] / 0x2 };
+  return { x: x['left'] + x['width'] / 2, y: x['top'] + x['height'] / 2 };
 }
 function isPointerInsideElementBounds(el3, event2) {
   if (!el3 || !event2) return ![];
@@ -128,10 +128,10 @@ function isPointerInsideElementBounds(el3, event2) {
     value5 = Number(box['top']),
     value6 = Number['isFinite'](Number(box['right']))
       ? Number(box['right'])
-      : value4 + Number(box['width'] || 0x0),
+      : value4 + Number(box['width'] || 0),
     value7 = Number['isFinite'](Number(box['bottom']))
       ? Number(box['bottom'])
-      : value5 + Number(box['height'] || 0x0);
+      : value5 + Number(box['height'] || 0);
   if (
     !Number['isFinite'](value4) ||
     !Number['isFinite'](value5) ||
@@ -146,15 +146,15 @@ function isPointerInsideElementBounds(el3, event2) {
 function applyImagePreviewTransform(el4, el5, box2) {
   (el4['style']['setProperty'](
     '--image-preview-offset-x',
-    Math['round'](box2['offsetX'] * 0x64) / 0x64 + 'px',
+    Math['round'](box2['offsetX'] * 100) / 100 + 'px',
   ),
     el4['style']['setProperty'](
       '--image-preview-offset-y',
-      Math['round'](box2['offsetY'] * 0x64) / 0x64 + 'px',
+      Math['round'](box2['offsetY'] * 100) / 100 + 'px',
     ),
     el5['style']['setProperty'](
       '--image-preview-scale',
-      String(Math['round'](box2['scale'] * 0x3e8) / 0x3e8),
+      String(Math['round'](box2['scale'] * 1000) / 1000),
     ));
 }
 export function openImagePreview(enabled3, value8 = {}) {
@@ -167,7 +167,7 @@ export function openImagePreview(enabled3, value8 = {}) {
   ]);
   const value9 = new Set();
   if (value8['revokeUrlOnClose'] && enabled3) value9['add'](enabled3);
-  const offsetX = { scale: 0x1, offsetX: 0x0, offsetY: 0x0 };
+  const offsetX = { scale: 1, offsetX: 0, offsetY: 0 };
   let event3 = null,
     enabled5 = ![];
   const el6 = document['createElement']('div');
@@ -180,7 +180,7 @@ export function openImagePreview(enabled3, value8 = {}) {
   ((el8['className'] = 'v2-image-preview-media'),
     (el8['alt'] = value8['alt'] || 'Image preview'),
     (el8['draggable'] = ![]));
-  let value10 = 0x0;
+  let value10 = 0;
   const run3 = (value11) => {
       if (!list3[value11]) return ![];
       return (
@@ -203,7 +203,7 @@ export function openImagePreview(enabled3, value8 = {}) {
     },
     value13 = () => {
       value8['loadDiagnostics']?.['mark']('error');
-      const value14 = value10 + 0x1;
+      const value14 = value10 + 1;
       if (value14 < list3['length']) {
         run3(value14);
         return;
@@ -211,7 +211,7 @@ export function openImagePreview(enabled3, value8 = {}) {
       (el6['classList']['remove']('is-loading'), el6['classList']['add']('is-error'));
     };
   (el8['addEventListener']('load', value12), el8['addEventListener']('error', value13));
-  if (!run3(0x0)) el6['classList']['add']('is-loading');
+  if (!run3(0)) el6['classList']['add']('is-loading');
   applyImagePreviewTransform(el7, el8, offsetX);
   const run4 = () => {
       (globalThis['window']?.['removeEventListener']?.('pointermove', run5, !![]),
@@ -244,12 +244,12 @@ export function openImagePreview(enabled3, value8 = {}) {
     value18 = (event5) => {
       stopPreviewEvent(event5);
       const value19 = offsetX['scale'],
-        value20 = Math['exp'](-Number(event5['deltaY'] || 0x0) * IMAGE_PREVIEW_WHEEL_INTENSITY),
+        value20 = Math['exp'](-Number(event5['deltaY'] || 0) * IMAGE_PREVIEW_WHEEL_INTENSITY),
         clampNumber2 = clampNumber(value19 * value20, IMAGE_PREVIEW_MIN_SCALE, IMAGE_PREVIEW_MAX_SCALE);
       if (clampNumber2 === value19) return;
       const box3 = getOverlayCenterPoint(el6),
-        value21 = Number(event5['clientX'] || 0x0) - box3['x'],
-        value22 = Number(event5['clientY'] || 0x0) - box3['y'],
+        value21 = Number(event5['clientX'] || 0) - box3['x'],
+        value22 = Number(event5['clientY'] || 0) - box3['y'],
         value23 = clampNumber2 / value19;
       ((offsetX['offsetX'] = value21 - (value21 - offsetX['offsetX']) * value23),
         (offsetX['offsetY'] = value22 - (value22 - offsetX['offsetY']) * value23),
@@ -257,16 +257,16 @@ export function openImagePreview(enabled3, value8 = {}) {
         applyImagePreviewTransform(el7, el8, offsetX));
     },
     value24 = (pointerId) => {
-      const count = Number(pointerId?.['button'] ?? 0x0),
-        enabled6 = count === 0x1;
-      if (!enabled6 && count !== 0x0) return;
+      const count = Number(pointerId?.['button'] ?? 0),
+        enabled6 = count === 1;
+      if (!enabled6 && count !== 0) return;
       if (!enabled6 && !isPointerInsideElementBounds(el8, pointerId)) return;
       (stopPreviewEvent(pointerId),
         handler(),
         (event3 = {
           pointerId: pointerId['pointerId'],
-          startX: Number(pointerId['clientX'] || 0x0),
-          startY: Number(pointerId['clientY'] || 0x0),
+          startX: Number(pointerId['clientX'] || 0),
+          startY: Number(pointerId['clientY'] || 0),
           offsetX: offsetX['offsetX'],
           offsetY: offsetX['offsetY'],
         }),
@@ -286,9 +286,9 @@ export function openImagePreview(enabled3, value8 = {}) {
       return;
     (stopPreviewEvent(event6),
       (offsetX['offsetX'] =
-        event3['offsetX'] + Number(event6['clientX'] || 0x0) - event3['startX']),
+        event3['offsetX'] + Number(event6['clientX'] || 0) - event3['startX']),
       (offsetX['offsetY'] =
-        event3['offsetY'] + Number(event6['clientY'] || 0x0) - event3['startY']),
+        event3['offsetY'] + Number(event6['clientY'] || 0) - event3['startY']),
       applyImagePreviewTransform(el7, el8, offsetX));
   }
   function run6(event7) {
@@ -316,7 +316,7 @@ export function openImagePreview(enabled3, value8 = {}) {
     el6['addEventListener']('wheel', value18, { passive: ![] }),
     el6['addEventListener']('pointerdown', value24),
     el6['addEventListener']('auxclick', (event9) => {
-      if (event9['button'] === 0x1) stopPreviewEvent(event9);
+      if (event9['button'] === 1) stopPreviewEvent(event9);
     }),
     el8['addEventListener']('dragstart', stopPreviewEvent),
     el7['appendChild'](el8),
@@ -327,7 +327,7 @@ export function openImagePreview(enabled3, value8 = {}) {
     (handler2['setSources'] = (value26, value27 = {}) => {
       if (enabled5) return ![];
       const list4 = collectUniquePreviewUrls(value26);
-      if (list4['length'] === 0x0)
+      if (list4['length'] === 0)
         return (
           el6['classList']['remove']('is-loading'),
           el6['classList']['add']('is-error'),
@@ -336,7 +336,7 @@ export function openImagePreview(enabled3, value8 = {}) {
       return (
         (list3 = list4),
         value27['revokeUrlOnClose'] && list4['forEach']((value28) => value9['add'](value28)),
-        run3(0x0)
+        run3(0)
       );
     }),
     (handler2['setError'] = () => {
@@ -371,7 +371,7 @@ export function openVideoPreview(value29, enabled7 = {}) {
   let enabled9 = ![],
     value31 = ![],
     value32 = ![],
-    value33 = 0x0,
+    value33 = 0,
     value34 = '';
   const el9 = document['createElement']('div');
   el9['className'] = 'v2-image-preview-overlay v2-video-preview-overlay is-loading';
@@ -383,7 +383,7 @@ export function openVideoPreview(value29, enabled7 = {}) {
   (markSidebarSubmenuOwner(el9, enabled7['sidebarSubmenuOwner']),
     el9['setAttribute']?.('role', 'dialog'),
     el9['setAttribute']?.('aria-modal', 'true'),
-    el9['setAttribute']?.('aria-label', enabled7['ariaLabel'] || 'Video\x20preview'));
+    el9['setAttribute']?.('aria-label', enabled7['ariaLabel'] || 'Video preview'));
   const el10 = document['createElement']('video');
   ((el10['className'] = 'v2-video-preview-media'),
     (el10['controls'] = !![]),
@@ -424,9 +424,9 @@ export function openVideoPreview(value29, enabled7 = {}) {
         !claimVideoPlaybackOwnership(el10, {
           label: label,
           minBufferAhead: 0.5,
-          readyTimeoutMs: 0x15e,
-          recoveryDebounceMs: 0x96,
-          recoveryCooldownMs: 0x1f4,
+          readyTimeoutMs: 350,
+          recoveryDebounceMs: 150,
+          recoveryCooldownMs: 500,
           shouldRecover: () => !enabled9 && el10['isConnected'] !== ![] && !el10['paused'],
         })
       )
@@ -502,7 +502,7 @@ export function openVideoPreview(value29, enabled7 = {}) {
     handler11 = () => {
       if (enabled9) return;
       ((enabled9 = !![]),
-        (value33 += 0x1),
+        (value33 += 1),
         document['removeEventListener']('keydown', value49, !![]),
         el10['removeEventListener']?.('loadeddata', value47),
         el10['removeEventListener']?.('canplay', value47),
@@ -542,12 +542,12 @@ export function openVideoPreview(value29, enabled7 = {}) {
 export async function openNodeImagePreview(value53, args = {}) {
   const loadDiagnostics = createImageLoadDiagnostics('node-image-preview'),
     fallbackUrls = resolveImmediateNodeImagePreviewUrls(value53, args['currentSrc']),
-    enabled13 = fallbackUrls['length'] > 0x0,
+    enabled13 = fallbackUrls['length'] > 0,
     value54 = enabled13
-      ? openImagePreview(fallbackUrls[0x0], {
+      ? openImagePreview(fallbackUrls[0], {
           ...args,
           loadDiagnostics: loadDiagnostics,
-          fallbackUrls: fallbackUrls['slice'](0x1),
+          fallbackUrls: fallbackUrls['slice'](1),
           revokeUrlOnClose: ![],
         })
       : openImagePreview('', {

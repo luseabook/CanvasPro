@@ -27,7 +27,7 @@ function operationsOverlap(options2 = {}, key = {}) {
 }
 export function createAudioVoiceSegmentEditSession() {
   const map2 = new Map();
-  let result = 0x0;
+  let result = 0;
   function begin(payload = {}) {
     const key2 = buildOperationKey(payload);
     if (map2['has'](key2)) return null;

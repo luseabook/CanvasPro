@@ -51,7 +51,7 @@ function parseSize(item) {
     const ctx2 = createCtx(),
       index = ['1K', '2K', '3K', '4K'],
       result = ['1:1', '9:16', '16:9', '3:4', '4:3', '3:2', '2:3', '5:4', '4:5', '21:9'],
-      data = 0xa00 * 0x5a0,
+      data = 2560 * 1440,
       options = 0x9ec290,
       target = 1 / 16,
       source = 16;

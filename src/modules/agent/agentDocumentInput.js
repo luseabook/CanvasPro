@@ -1,5 +1,5 @@
 export const AGENT_EXTERNAL_DOCUMENT_TOOL_ID = 'document.read_file';
-export const AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT = 0x3;
+export const AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT = 3;
 const DOCUMENT_CONTENT_TYPES = Object['freeze']({
   txt: 'text/plain',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -19,11 +19,11 @@ export function validateAgentDocumentFile(item, handler = null) {
 export function createAgentDocumentSource(truncated = {}, error = null) {
   const displayName = String(truncated['fileName'] || error?.['name'] || 'document')
       ['trim']()
-      ['slice'](0x0, 0xff),
+      ['slice'](0, 0xff),
     extension = String(truncated['extension'] || displayName['split']('.')['pop']() || '')
       ['trim']()
       ['toLowerCase']()
-      ['slice'](0x0, 0xc);
+      ['slice'](0, 12);
   return {
     sourceKind: 'document',
     displayName: displayName,
@@ -41,7 +41,7 @@ export function createAgentDocumentSource(truncated = {}, error = null) {
       ? truncated['warnings']
           ['map']((key) => String(key || '')['trim']())
           ['filter'](Boolean)
-          ['slice'](0x0, 0x8)
+          ['slice'](0, 8)
       : [],
     truncated: truncated['truncated'] === !![],
   };

@@ -116,10 +116,10 @@ export function createScreenshotOverlayController({
         height: Math.round(bounds.height),
       };
     const fallback = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())?.bounds;
-    return fallback || { x: 0, y: 0, width: 0x500, height: 0x2d0 };
+    return fallback || { x: 0, y: 0, width: 1280, height: 720 };
   }
   function offscreenBounds() {
-    return { x: -0x7d00, y: -0x7d00, width: 1, height: 1 };
+    return { x: -32000, y: -32000, width: 1, height: 1 };
   }
   async function ensureOverlayWindow(payload = null) {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
@@ -508,7 +508,7 @@ export function createScreenshotOverlayController({
           level: 'warn',
           source: 'main',
           message: 'Native screenshot helper stderr',
-          context: { text: String(chunk || '').slice(0, 0x3e8) },
+          context: { text: String(chunk || '').slice(0, 1000) },
         });
       }),
       nativeHelper.on('exit', (code, signal) => {

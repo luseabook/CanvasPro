@@ -44,7 +44,7 @@ export function resolveAsrRuntimeStatePath(userDataRoot = '') {
 }
 export function normalizeAsrRuntimeVersion(version = '') {
   const text = String(version || '').trim();
-  return text.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 0x50) || 'unknown';
+  return text.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80) || 'unknown';
 }
 export function resolveAsrRuntimeInstallDir({ userDataRoot: userDataRoot = '', version: version = '' } = {}) {
   const baseDir = resolveAsrRuntimeBaseDir(userDataRoot);

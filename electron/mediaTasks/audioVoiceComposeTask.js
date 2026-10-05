@@ -1,11 +1,11 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
-function toNumber(value, fallback = 0x0) {
+function toNumber(value, fallback = 0) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : fallback;
 }
-function normalizeNonNegative(value, fallback = 0x0) {
-  return Math.max(0x0, toNumber(value, fallback));
+function normalizeNonNegative(value, fallback = 0) {
+  return Math.max(0, toNumber(value, fallback));
 }
 function normalizeSourceKind(value = '') {
   return String(value || '').trim() === 'audio' ? 'audio' : 'video';
@@ -16,8 +16,8 @@ function normalizeOutputKind(value = '', fallback = 'video') {
 }
 function normalizeExplicitClipDurationMs(clip = {}) {
   return (
-    Math.max(0x0, Math.round(Number(clip.durationMs) || 0x0)) ||
-    Math.max(0x0, Math.round(Number(clip.durationSec) * 0x3e8 || 0x0))
+    Math.max(0, Math.round(Number(clip.durationMs) || 0)) ||
+    Math.max(0, Math.round(Number(clip.durationSec) * 1000 || 0))
   );
 }
 export function normalizeAudioVoiceClips(clips = []) {
@@ -28,22 +28,22 @@ export function normalizeAudioVoiceClips(clips = []) {
       const src = String(clip.src ?? clip.localPath ?? clip.path ?? clip.audioUrl ?? '').trim();
       if (!src) return null;
       const startMs = Math.max(
-          0x0,
-          Math.round(Number(clip.startMs ?? clip.timelineStartMs ?? 0x0) || 0x0),
+          0,
+          Math.round(Number(clip.startMs ?? clip.timelineStartMs ?? 0) || 0),
         ),
         endMs = Math.max(
           startMs,
           Math.round(Number(clip.endMs ?? clip.timelineEndMs ?? startMs) || startMs),
         ),
         explicitDurationMs = normalizeExplicitClipDurationMs(clip),
-        spanMs = endMs > startMs ? endMs - startMs : 0x0,
+        spanMs = endMs > startMs ? endMs - startMs : 0,
         durationMs = explicitDurationMs || spanMs;
-      if (durationMs <= 0x0) return null;
+      if (durationMs <= 0) return null;
       return {
         src: src,
-        startSec: startMs / 0x3e8,
-        durationSec: durationMs / 0x3e8,
-        hasExplicitDuration: explicitDurationMs > 0x0,
+        startSec: startMs / 1000,
+        durationSec: durationMs / 1000,
+        hasExplicitDuration: explicitDurationMs > 0,
       };
     })
     .filter(Boolean);
@@ -64,14 +64,14 @@ async function ffprobeMediaDuration(queue, task, getRuntimeToolOrFallback, sourc
       'json',
       sourceAbs,
     ]);
-    return Number(payload?.format?.duration || 0x0) || 0x0;
+    return Number(payload?.format?.duration || 0) || 0;
   } catch {
-    return 0x0;
+    return 0;
   }
 }
 async function resolveAudioVoiceClipDurations(clips, clipAbs, queue, task, getRuntimeToolOrFallback) {
   const resolved = [];
-  for (let index = 0x0; index < clips.length; index += 0x1) {
+  for (let index = 0; index < clips.length; index += 1) {
     const clip = clips[index];
     if (clip.hasExplicitDuration) {
       resolved.push(clip);
@@ -83,14 +83,14 @@ async function resolveAudioVoiceClipDurations(clips, clipAbs, queue, task, getRu
       getRuntimeToolOrFallback,
       clipAbs[index],
     );
-    resolved.push(probedDurationSec > 0x0 ? { ...clip, durationSec: probedDurationSec } : clip);
+    resolved.push(probedDurationSec > 0 ? { ...clip, durationSec: probedDurationSec } : clip);
   }
   return resolved;
 }
-function buildTimelineAudioFilterParts(clips = [], leadingInputs = 0x0, totalDurationSec = 0x0) {
+function buildTimelineAudioFilterParts(clips = [], leadingInputs = 0, totalDurationSec = 0) {
   const parts = clips.map((clip, index) => {
       const inputIndex = leadingInputs + index,
-        delayMs = Math.max(0x0, Math.round(clip.startSec * 0x3e8));
+        delayMs = Math.max(0, Math.round(clip.startSec * 1000));
       return (
         '[' +
         inputIndex +
@@ -107,7 +107,7 @@ function buildTimelineAudioFilterParts(clips = [], leadingInputs = 0x0, totalDur
     }),
     labels = clips.map((clip, index) => '[av' + index + ']').join(''),
     mix =
-      clips.length === 0x1
+      clips.length === 1
         ? '[av0]apad'
         : labels + 'amix=inputs=' + clips.length + ':duration=longest:normalize=0,apad';
   return (parts.push(mix + ',atrim=0:' + totalDurationSec + '[a]'), parts);
@@ -118,10 +118,10 @@ export function buildAudioVoiceComposeFfmpegArgs({
   sourceAbs: sourceAbs = '',
   clipAbs: clipAbs = [],
   clips: clips = [],
-  durationSec: durationSec = 0x0,
+  durationSec: durationSec = 0,
   outAbs: outAbs = '',
 } = {}) {
-  if (!outAbs || !durationSec || clips.length <= 0x0)
+  if (!outAbs || !durationSec || clips.length <= 0)
     throw new Error('Invalid audio voice compose payload');
   const source = normalizeSourceKind(sourceKind),
     output = normalizeOutputKind(outputKind, source),
@@ -131,7 +131,7 @@ export function buildAudioVoiceComposeFfmpegArgs({
   (clipAbs.forEach((clip) => args.push('-i', clip)),
     args.push(
       '-filter_complex',
-      buildTimelineAudioFilterParts(clips, keepSourceVideo ? 0x1 : 0x0, durationSec).join(';'),
+      buildTimelineAudioFilterParts(clips, keepSourceVideo ? 1 : 0, durationSec).join(';'),
     ));
   if (keepSourceVideo)
     return (
@@ -233,7 +233,7 @@ export function createAudioVoiceComposeMediaTaskHandler({
       outputKind = normalizeOutputKind(args.outputKind ?? payload.outputKind, sourceKind),
       sourceAbs = resolveMediaTaskSource(payload.src || args.src),
       clips = normalizeAudioVoiceClips(args.clips || payload.clips);
-    if (clips.length <= 0x0) throw new Error('Invalid audio voice compose clips');
+    if (clips.length <= 0) throw new Error('Invalid audio voice compose clips');
     const clipAbs = clips.map((clip) => resolveMediaTaskSource(clip.src)),
       clipDurations = await resolveAudioVoiceClipDurations(
         clips,
@@ -244,21 +244,21 @@ export function createAudioVoiceComposeMediaTaskHandler({
       ),
       clipTimelineEndSec = Math.max(
         ...clipDurations.map((clip) => clip.startSec + clip.durationSec),
-        0x0,
+        0,
       ),
       videoMeta = sourceKind === 'video' ? await ffprobeVideoMeta(queue, task, sourceAbs) : null;
     if (sourceKind === 'video' && (!videoMeta?.width || !videoMeta?.height))
       throw new Error('Source video has no video stream');
     const sourceDurationSec =
         sourceKind === 'video'
-          ? Number(videoMeta?.duration || 0x0) || 0x0
+          ? Number(videoMeta?.duration || 0) || 0
           : await ffprobeMediaDuration(queue, task, getRuntimeToolOrFallback, sourceAbs),
       durationSec =
-        normalizeNonNegative(args.durationSec ?? payload.durationSec, 0x0) ||
-        normalizeNonNegative((args.durationMs ?? payload.durationMs) / 0x3e8, 0x0) ||
+        normalizeNonNegative(args.durationSec ?? payload.durationSec, 0) ||
+        normalizeNonNegative((args.durationMs ?? payload.durationMs) / 1000, 0) ||
         sourceDurationSec ||
         clipTimelineEndSec;
-    if (!(durationSec > 0x0)) throw new Error('Invalid audio voice compose duration');
+    if (!(durationSec > 0)) throw new Error('Invalid audio voice compose duration');
     const outputVideo = outputKind === 'video',
       outputFolder = outputVideo ? 'AudioVoiceVideo' : 'AudioVoiceAudio',
       outputDir = path.join(getOutputDir(), outputFolder);
@@ -306,9 +306,9 @@ export function createAudioVoiceComposeMediaTaskHandler({
       ...(outputVideo
         ? {
             videoDuration: durationSec,
-            videoWidth: videoMeta?.width || 0x0,
-            videoHeight: videoMeta?.height || 0x0,
-            fps: videoMeta?.fps || 0x0,
+            videoWidth: videoMeta?.width || 0,
+            videoHeight: videoMeta?.height || 0,
+            fps: videoMeta?.fps || 0,
             ...posterFields,
           }
         : {}),

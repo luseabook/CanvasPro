@@ -87,7 +87,7 @@ export function createCollaborationCanvasBinding({
             (!list || list['includes'](enabled['roomId'])) &&
             ((enabled['canvasId'] === input && (!enabled['projectId'] || enabled['projectId'] === output)) ||
               (output && enabled['projectId'] === output)),
-        )?.[0x1]?.['roomId'];
+        )?.[1]?.['roomId'];
     },
     async activate(value3) {
       const enabled2 = run2()[actorId() + ':' + value3];

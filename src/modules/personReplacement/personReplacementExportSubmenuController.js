@@ -64,7 +64,7 @@ export function createPersonReplacementExportSubmenuController({ root: root } = 
       const key = event6?.['target']?.['closest']?.(TRIGGER_SELECTOR),
         el6 = handler2(event6?.['target']);
       if (!el6) return ![];
-      if (key && ['ArrowRight', 'Enter', '\x20']['includes'](event6['key']))
+      if (key && ['ArrowRight', 'Enter', ' ']['includes'](event6['key']))
         return (
           event6['preventDefault']?.(),
           event6['stopPropagation']?.(),
@@ -88,15 +88,15 @@ export function createPersonReplacementExportSubmenuController({ root: root } = 
           focusElement(el6['querySelector']?.(TRIGGER_SELECTOR)),
           !![]
         );
-      if (count < 0x0 || !list['length']) return ![];
+      if (count < 0 || !list['length']) return ![];
       let result = count;
-      if (event6['key'] === 'ArrowDown') result = (count + 0x1) % list['length'];
+      if (event6['key'] === 'ArrowDown') result = (count + 1) % list['length'];
       else {
-        if (event6['key'] === 'ArrowUp') result = (count - 0x1 + list['length']) % list['length'];
+        if (event6['key'] === 'ArrowUp') result = (count - 1 + list['length']) % list['length'];
         else {
-          if (event6['key'] === 'Home') result = 0x0;
+          if (event6['key'] === 'Home') result = 0;
           else {
-            if (event6['key'] === 'End') result = list['length'] - 0x1;
+            if (event6['key'] === 'End') result = list['length'] - 1;
             else return ![];
           }
         }

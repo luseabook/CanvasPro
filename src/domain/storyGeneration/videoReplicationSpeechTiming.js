@@ -9,14 +9,14 @@ export function resolveReplicationSpeechTiming({
   durationSec: durationSec,
 }) {
   const value = parts['map']((item) => item['text'])['join'](''),
-    key = Number(clip['sourceStartSec'] || 0x0),
+    key = Number(clip['sourceStartSec'] || 0),
     index =
-      parts['length'] === 0x1
+      parts['length'] === 1
         ? findReplicationAsrSpeechRange(clip['replicationSpeechEvents'] || [], kind, value)
         : null;
   if (index)
     return {
-      startSec: Math['max'](0x0, index['startSec'] - key),
+      startSec: Math['max'](0, index['startSec'] - key),
       endSec: Math['min'](durationSec, index['endSec'] - key),
     };
   const result = (clip['replicationSpeechEvents'] || [])['flatMap']((data) => {
@@ -29,7 +29,7 @@ export function resolveReplicationSpeechTiming({
             return [
               {
                 event: data,
-                refs: list['slice'](target, next + 0x1)['map'](
+                refs: list['slice'](target, next + 1)['map'](
                   (current, entry) => kind + ':' + (target + entry),
                 ),
               },
@@ -39,7 +39,7 @@ export function resolveReplicationSpeechTiming({
         return [];
       });
     }),
-    record = result['length'] === 0x1 ? result[0x0] : null,
+    record = result['length'] === 1 ? result[0] : null,
     enabled = record?.['event'],
     handler = (payload) =>
       payload &&
@@ -50,10 +50,10 @@ export function resolveReplicationSpeechTiming({
       payload['endSec'] > payload['startSec'] &&
       payload['endSec'] <= durationSec,
     handle = new Set(record?.['refs'] || []),
-    args = record?.['refs']['map']((state) => enabled[kind][Number(state['split'](':')[0x1])]) || [];
+    args = record?.['refs']['map']((state) => enabled[kind][Number(state['split'](':')[1])]) || [];
   if (args['length'] && args['every']((config) => config['timingSource'] === 'asr'))
     return {
-      startSec: Math['max'](0x0, Math['min'](...args['map']((scope) => scope['startSec'])) - key),
+      startSec: Math['max'](0, Math['min'](...args['map']((scope) => scope['startSec'])) - key),
       endSec: Math['min'](durationSec, Math['max'](...args['map']((input) => input['endSec'])) - key),
     };
   const args2 = (enabled?.['shots'] || [])['filter']((output) =>
@@ -74,7 +74,7 @@ export function resolveReplicationSpeechTiming({
     args3 =
       kind === 'voiceover' &&
       String(shot['audio'] || '')['match'](/画外音时间[：:]\s*(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)秒?/u),
-    value7 = args3 && { startSec: Number(args3[0x1]), endSec: Number(args3[0x2]) };
+    value7 = args3 && { startSec: Number(args3[1]), endSec: Number(args3[2]) };
   if (handler(value4))
     return handler(value7) && value7['startSec'] >= value4['startSec'] && value7['endSec'] <= value4['endSec']
       ? value7
@@ -91,7 +91,7 @@ export function inspectReplicationSpeechTiming({ clips: clips = [] } = {}, value
     const value9 = value8['replication']?.['segmentPlan']?.['find'](
       (value10) => value10['ref'] === args4['ref'],
     )?.['events'];
-    let value11 = 0x0;
+    let value11 = 0;
     const value12 = (args4['shots'] || [])['map']((args5) => ({
       ...args5,
       startSec: value11,

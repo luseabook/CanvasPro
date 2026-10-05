@@ -23,8 +23,8 @@ export function createDropTargetSpatialQuery() {
             const minX = Math['min'](...frames['map']((frame) => frame['x'])),
               minY = Math['min'](...frames['map']((frame) => frame['y']));
             return {
-              x: (Number(node['x']) || 0x0) + minX,
-              y: (Number(node['y']) || 0x0) + minY,
+              x: (Number(node['x']) || 0) + minX,
+              y: (Number(node['y']) || 0) + minY,
               width: Math['max'](...frames['map']((frame) => frame['x'] + frame['width'])) - minX,
               height: Math['max'](...frames['map']((frame) => frame['y'] + frame['height'])) - minY,
             };

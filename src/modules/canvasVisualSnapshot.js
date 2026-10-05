@@ -1,11 +1,11 @@
 const SNAPSHOT_SCHEMA_VERSION = 1,
-  SNAPSHOT_MAX_WIDTH = 0x640,
-  SNAPSHOT_MAX_HEIGHT = 0x3e8,
+  SNAPSHOT_MAX_WIDTH = 1600,
+  SNAPSHOT_MAX_HEIGHT = 1000,
   SNAPSHOT_MIN_NODE_COUNT = 8,
   SNAPSHOT_JPEG_QUALITY = 0.68,
-  SNAPSHOT_MIN_HOLD_MS = 0x384,
-  SNAPSHOT_MAX_HOLD_MS = 0xaf0,
-  SNAPSHOT_READY_POLL_MS = 0x1c2,
+  SNAPSHOT_MIN_HOLD_MS = 900,
+  SNAPSHOT_MAX_HOLD_MS = 2800,
+  SNAPSHOT_READY_POLL_MS = 450,
   SNAPSHOT_NODE_READY_RATIO = 0.95,
   SNAPSHOT_MEDIA_READY_RATIO = 0.94,
   SNAPSHOT_MEDIA_READY_TARGET = 36;
@@ -35,7 +35,7 @@ function normalizeViewport(box) {
     zoom: Number.isFinite(Number(box?.zoom)) && Number(box.zoom) > 0 ? Number(box.zoom) : 1,
   };
 }
-function getElementSize(el, key = 0x640, index = 0x384) {
+function getElementSize(el, key = 1600, index = 900) {
   return {
     width: Math.max(1, Math.round(Number(el?.clientWidth) || key)),
     height: Math.max(1, Math.round(Number(el?.clientHeight) || index)),

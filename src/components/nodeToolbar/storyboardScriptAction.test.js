@@ -34,7 +34,7 @@ function createFakeStore(nodes) {
         type: 'source-text',
         x: 10,
         y: 20,
-        width: 0x104,
+        width: 260,
         height: 120,
         content: 'story',
       },
@@ -45,7 +45,7 @@ function createFakeStore(nodes) {
     sourceNodeId: 'source-text-1',
     storeInstance: storeInstance,
     generateId: () => 'storyboard-script-1',
-    calcSafeSpawnPosNearNode: () => ({ x: 0x190, y: 20 }),
+    calcSafeSpawnPosNearNode: () => ({ x: 400, y: 20 }),
     isValidConnectionFn: () => true,
     addEdgeWithPolicies: ({ sourceId: sourceId, targetId: targetId }) => {
       return (storeInstance.edges.push({ sourceId: sourceId, targetId: targetId }), true);
@@ -68,7 +68,7 @@ function createFakeStore(nodes) {
           type: 'source-video',
           x: 0,
           y: 0,
-          width: 0x12c,
+          width: 300,
           height: 180,
         },
       },
@@ -77,7 +77,7 @@ function createFakeStore(nodes) {
         sourceNodeId: 'source-video-1',
         storeInstance: storeInstance2,
         generateId: () => 'storyboard-script-2',
-        calcSafeSpawnPosNearNode: () => ({ x: 0x1a4, y: 0 }),
+        calcSafeSpawnPosNearNode: () => ({ x: 420, y: 0 }),
         isValidConnectionFn: () => false,
         addEdgeWithPolicies: () => {
           throw new Error('should not connect');
@@ -96,7 +96,7 @@ function createFakeStore(nodes) {
           type: 'source-video',
           x: 0,
           y: 0,
-          width: 0x12c,
+          width: 300,
           height: 180,
           localPath: 'outputs/video.mp4',
         },
@@ -106,7 +106,7 @@ function createFakeStore(nodes) {
         sourceNodeId: 'source-video-1',
         storeInstance: storeInstance3,
         generateId: () => 'storyboard-script-video',
-        calcSafeSpawnPosNearNode: () => ({ x: 0x1a4, y: 0 }),
+        calcSafeSpawnPosNearNode: () => ({ x: 420, y: 0 }),
         isValidConnectionFn: () => true,
         addEdgeWithPolicies: ({ sourceId: sourceId2, targetId: targetId2 }) => {
           return (storeInstance3.edges.push({ sourceId: sourceId2, targetId: targetId2 }), true);

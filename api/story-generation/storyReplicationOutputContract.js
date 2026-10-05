@@ -35,7 +35,7 @@ export function createReplicationSplitOutput({
       ...replicationVisualSchema(),
       assetUsages: {
         type: 'array',
-        ...(items['length'] ? {} : { maxItems: 0x0 }),
+        ...(items['length'] ? {} : { maxItems: 0 }),
         items: items['length'] ? { anyOf: items } : object({ assetRef: string, appearanceRef: string }),
       },
     });
@@ -47,7 +47,7 @@ export function createReplicationSplitOutput({
       contentType: { type: 'string', enum: REPLICATION_CONTENT_TYPES },
       clips: {
         type: 'array',
-        minItems: segmentPlan['length'] || 0x1,
+        minItems: segmentPlan['length'] || 1,
         ...(segmentPlan['length'] ? { maxItems: segmentPlan['length'] } : {}),
         items: object({
           ref: segmentPlan['length']
@@ -55,7 +55,7 @@ export function createReplicationSplitOutput({
             : string,
           s: string,
           durationSec: d,
-          shots: { type: 'array', minItems: 0x1, items: items2 },
+          shots: { type: 'array', minItems: 1, items: items2 },
         }),
       },
     }),

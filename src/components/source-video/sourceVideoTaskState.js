@@ -23,14 +23,14 @@ export function getVideoMattingModelId() {
 }
 export function buildSourceVideoRecoveryFailurePatch(
   value,
-  { error: error = '', startedAt: startedAt = 0x0, duration: duration = null } = {},
+  { error: error = '', startedAt: startedAt = 0, duration: duration = null } = {},
 ) {
   const message =
       String(error?.['message'] || error || sourceVideoText('recovery.taskFailed'))['trim']() ||
       sourceVideoText('recovery.taskFailed'),
     item = String(value?.['outputText'] || '')['trim'](),
     outputText = item
-      ? item + '\x0a' + sourceVideoText('recovery.failedWithMessage', { message: message })
+      ? item + '\n' + sourceVideoText('recovery.failedWithMessage', { message: message })
       : sourceVideoText('recovery.failedWithMessage', { message: message });
   return {
     ...buildVideoGenerationFailurePatch({
@@ -151,13 +151,13 @@ export function buildRunningHubVideoTerminalStatePatch(value10, value11, value12
   const runningHubVideoStatusName = resolveRunningHubVideoStatusName(value10, rhTaskStatus);
   if (runningHubVideoStatusName) error4['name'] = runningHubVideoStatusName;
   const changedPatch = buildChangedPatch(value10, error4);
-  return Object['keys'](changedPatch)['length'] > 0x0 ? changedPatch : null;
+  return Object['keys'](changedPatch)['length'] > 0 ? changedPatch : null;
 }
 export function resolveSourceVideoGenerationFailureMessage(options2 = {}) {
   if (!isTaskFailed(options2)) return '';
   const value13 = Array['isArray'](options2?.['videos']) ? options2['videos'] : [],
-    value14 = Math['max'](0x0, Number(options2?.['mainVideoIndex']) || 0x0),
-    value15 = value13[value14] || value13[0x0] || null;
+    value14 = Math['max'](0, Number(options2?.['mainVideoIndex']) || 0),
+    value15 = value13[value14] || value13[0] || null;
   return (
     String(value15?.['error'] || '')['trim']() ||
     getTaskMessage(options2) ||

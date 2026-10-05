@@ -3,10 +3,10 @@ import { waitForGlobalCaptureNodeMounted } from './globalTextPresetBridge.js';
 function createBlobFromBase64(value, type = 'image/png') {
   const list = atob(String(value || '')),
     list2 = [];
-  for (let item = 0x0; item < list['length']; item += 0x2000) {
-    const list3 = list['slice'](item, item + 0x2000),
+  for (let item = 0; item < list['length']; item += 8192) {
+    const list3 = list['slice'](item, item + 8192),
       uint8Array = new Uint8Array(list3['length']);
-    for (let key = 0x0; key < list3['length']; key += 0x1) {
+    for (let key = 0; key < list3['length']; key += 1) {
       uint8Array[key] = list3['charCodeAt'](key);
     }
     list2['push'](uint8Array);

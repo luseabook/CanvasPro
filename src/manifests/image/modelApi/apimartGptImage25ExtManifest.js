@@ -28,11 +28,11 @@ export const apimartGptImage25ExtModelManifest = createImageModelApiManifest({
     imageFunctionMenu: Object['freeze']({ enabled: !![] }),
     imageMenu: Object['freeze']({
       group: 'apimart',
-      order: 0x2a,
-      title: 'GPT\x20image\x202.5\x20Ext',
+      order: 42,
+      title: 'GPT image 2.5 Ext',
       subtitle: 'Flare / Sunburst，最高 4K，最多 16 张参考图',
       iconKind: 'apimartBadge',
-      gap: 0xa,
+      gap: 10,
     }),
   }),
 });
@@ -54,7 +54,7 @@ export const apimartGptImage25ExtExecutionManifest = createModelApiExecutionMani
       path: 'n',
       from: 'param',
       field: 'generationParams.batchSize',
-      defaultValue: 0x1,
+      defaultValue: 1,
       transform: 'apimartImageCount',
     }),
     Object['freeze']({
@@ -83,5 +83,5 @@ export const apimartGptImage25ExtExecutionManifest = createModelApiExecutionMani
     taskIdPath: Object['freeze'](['data[].task_id', 'data.id']),
   }),
   taskPolling: apimartGptImage25ExecutionManifest['extensions']['taskPolling'],
-  extensions: Object['freeze']({ batchSubmitMode: 'providerN', maxBatchSize: 0x4 }),
+  extensions: Object['freeze']({ batchSubmitMode: 'providerN', maxBatchSize: 4 }),
 });

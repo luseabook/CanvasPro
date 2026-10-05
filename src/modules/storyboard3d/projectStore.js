@@ -26,7 +26,7 @@ export function createStoryboard3DProjectStore(
   const emitter = createEmitter();
   let migrateStoryboard3DProject2 = migrateStoryboard3DProject(index, { now: now(), idFactory: idFactory }),
     result = 'saved',
-    data = 0x0;
+    data = 0;
   function run() {
     return cloneStoryboard3DProject(migrateStoryboard3DProject2);
   }

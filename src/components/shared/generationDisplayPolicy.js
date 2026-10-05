@@ -4,7 +4,7 @@ import {
   pickGenerationRatioSourceEdge,
 } from '../../modules/generationRatioSource.js';
 import { getModelManifest, resolveModelExecution, resolveModelProvider } from '../../manifests/index.js';
-export const AI_IMAGE_MIN_SIZE = 0x96;
+export const AI_IMAGE_MIN_SIZE = 150;
 export const GENERATION_MANUAL_DISPLAY_SIZE_FIELD = 'manualDisplaySize';
 function isAdaptiveImageRatio(value) {
   const enabled = String(value || '')['trim'](),
@@ -101,7 +101,7 @@ export function buildGenerationModelSelectionDisplayPatch({
       mediaSelector: mediaSelector2,
     });
   if (
-    Object['keys'](args2)['length'] === 0x0 &&
+    Object['keys'](args2)['length'] === 0 &&
     String(nodeData?.['aspectRatio'] || '')['trim']() === ratioValue3
   )
     return {};
@@ -128,7 +128,7 @@ export function buildGenerationModelSelectionPayload({
       generationParams2 !== undefined
         ? getPlainObject(generationParams2)
         : getPlainObject(payload2['generationParams'] || nodeData?.['generationParams']);
-  if (!modelId2 || Object['keys'](generationParams3)['length'] === 0x0)
+  if (!modelId2 || Object['keys'](generationParams3)['length'] === 0)
     return { payload: payload2, displayPatch: {} };
   const displayPatch = buildGenerationModelSelectionDisplayPatch({
     store: store3,
@@ -154,10 +154,10 @@ export function parseImageDisplayAspectRatio(next) {
       ['replace'](/\s+/g, ''),
     enabled2 = current['match'](/^(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)$/);
   if (!enabled2) return null;
-  const width2 = Number['parseFloat'](enabled2[0x1]),
-    height2 = Number['parseFloat'](enabled2[0x2]);
+  const width2 = Number['parseFloat'](enabled2[1]),
+    height2 = Number['parseFloat'](enabled2[2]);
   if (!Number['isFinite'](width2) || !Number['isFinite'](height2)) return null;
-  if (width2 <= 0x0 || height2 <= 0x0) return null;
+  if (width2 <= 0 || height2 <= 0) return null;
   return { width: width2, height: height2, label: width2 + ':' + height2 };
 }
 export function buildImageDisplayRatioResizePatch({
@@ -167,11 +167,11 @@ export function buildImageDisplayRatioResizePatch({
 } = {}) {
   const box = parseImageDisplayAspectRatio(ratioValue);
   if (!box) return {};
-  const entry = Math['max'](0x1, Math['round'](Number(minSide) || AI_GENERATION_NODE_SHORT_SIDE)),
-    record = Math['max'](0x1, Math['round'](Number(nodeData?.['width']) || entry)),
-    handle = Math['max'](0x1, Math['round'](Number(nodeData?.['height']) || entry)),
-    state = Number['isFinite'](Number(nodeData?.['x'])) ? Number(nodeData['x']) : 0x0,
-    config = Number['isFinite'](Number(nodeData?.['y'])) ? Number(nodeData['y']) : 0x0;
+  const entry = Math['max'](1, Math['round'](Number(minSide) || AI_GENERATION_NODE_SHORT_SIDE)),
+    record = Math['max'](1, Math['round'](Number(nodeData?.['width']) || entry)),
+    handle = Math['max'](1, Math['round'](Number(nodeData?.['height']) || entry)),
+    state = Number['isFinite'](Number(nodeData?.['x'])) ? Number(nodeData['x']) : 0,
+    config = Number['isFinite'](Number(nodeData?.['y'])) ? Number(nodeData['y']) : 0;
   let width3, height3;
   box['width'] >= box['height']
     ? ((height3 = entry), (width3 = Math['round']((box['width'] / box['height']) * entry)))
@@ -182,14 +182,14 @@ export function buildImageDisplayRatioResizePatch({
   return {
     width: width3,
     height: height3,
-    x: Math['round'](state - scope / 0x2),
+    x: Math['round'](state - scope / 2),
     y: Math['round'](config - input),
   };
 }
 function buildExactRatioLabelForDisplay(output, value2) {
-  const count = Number(output) || 0x0,
-    count2 = Number(value2) || 0x0;
-  if (count <= 0x0 || count2 <= 0x0) return null;
+  const count = Number(output) || 0,
+    count2 = Number(value2) || 0;
+  if (count <= 0 || count2 <= 0) return null;
   return count + ':' + count2;
 }
 function getMediaSizeForRatioDisplay(nodeId2, nodeData3, edge = null, mediaSelector4 = 'img, video') {
@@ -200,7 +200,7 @@ function getMediaSizeForRatioDisplay(nodeId2, nodeData3, edge = null, mediaSelec
       edge: edge,
       mediaSelector: mediaSelector4,
       includeNodeFrame: !![],
-    }) || { width: 0x0, height: 0x0 }
+    }) || { width: 0, height: 0 }
   );
 }
 function isAcceptedRatioInputKind(value3, value4, map, handler) {
@@ -246,7 +246,7 @@ export function resolveImageSchemaAdaptiveRatioDisplayValue({
     list4 = list3['filter']((value13) =>
       isAcceptedRatioInputKind(value13, value10, value11, getRefKindByNodeType3),
     );
-  if (list4['length'] > 0x0) {
+  if (list4['length'] > 0) {
     const generationRatioSourceEdge = pickGenerationRatioSourceEdge(list4, box2),
       value14 = value10?.[generationRatioSourceEdge?.['sourceId']],
       box3 = getMediaSizeForRatioDisplay(
@@ -259,19 +259,19 @@ export function resolveImageSchemaAdaptiveRatioDisplayValue({
   }
   const value15 = resultFields['some']((value16) => {
     const list5 = box2?.[value16];
-    return Array['isArray'](list5) ? list5['length'] > 0x0 : Boolean(list5);
+    return Array['isArray'](list5) ? list5['length'] > 0 : Boolean(list5);
   });
   if (value15) {
     const value17 =
         resultMediaElement?.['naturalWidth'] ||
         resultMediaElement?.['videoWidth'] ||
         Number(box2?.['width']) ||
-        0x0,
+        0,
       value18 =
         resultMediaElement?.['naturalHeight'] ||
         resultMediaElement?.['videoHeight'] ||
         Number(box2?.['height']) ||
-        0x0;
+        0;
     return buildExactRatioLabelForDisplay(value17, value18) || '1:1';
   }
   return '1:1';
@@ -311,7 +311,7 @@ export function buildImageSchemaAspectRatioDisplayPatch({
     minSide: minSide,
   });
 }
-export const GENERATION_RATIO_RESIZE_ANIMATION_MS = 0x118;
+export const GENERATION_RATIO_RESIZE_ANIMATION_MS = 280;
 export function armImageSchemaRatioResizeAnimation(
   enabled3,
   value19,
@@ -331,7 +331,7 @@ export function armImageSchemaRatioResizeAnimation(
     (el['classList']['remove']('is-ratio-animating'),
       (enabled3['_ratioAnimTimer'] = null),
       enabled3['_ratioAnimWrapperEl'] === el && (enabled3['_ratioAnimWrapperEl'] = null));
-  }, value20 + 0x50);
+  }, value20 + 80);
   enabled3['_ratioAnimTimer'] = setTimeout2;
 }
 function clearRatioResizePreviewTransform(el3) {
@@ -356,15 +356,15 @@ export function animateImageSchemaRatioResizeFlip(
   } = {},
 ) {
   if (!enabled4 || !previewEl || typeof previewEl['animate'] !== 'function') return;
-  const value22 = Math['max'](0x1, Number(nodeData7?.['width']) || Number(patch?.['width']) || 0x1),
-    value23 = Math['max'](0x1, Number(nodeData7?.['height']) || Number(patch?.['height']) || 0x1),
-    value24 = Math['max'](0x1, Number(patch?.['width']) || value22),
-    value25 = Math['max'](0x1, Number(patch?.['height']) || value23);
+  const value22 = Math['max'](1, Number(nodeData7?.['width']) || Number(patch?.['width']) || 1),
+    value23 = Math['max'](1, Number(nodeData7?.['height']) || Number(patch?.['height']) || 1),
+    value24 = Math['max'](1, Number(patch?.['width']) || value22),
+    value25 = Math['max'](1, Number(patch?.['height']) || value23);
   if (value22 === value24 && value23 === value25) return;
   const value26 = value22 / value24,
     value27 = value23 / value25,
-    transform = 'scaleX(' + value26 + ')\x20scaleY(' + value27 + ')',
-    value28 = (Number(enabled4['_ratioFlipGeneration']) || 0x0) + 0x1,
+    transform = 'scaleX(' + value26 + ') scaleY(' + value27 + ')',
+    value28 = (Number(enabled4['_ratioFlipGeneration']) || 0) + 1,
     value29 = enabled4['_ratioFlipPreviewEl'];
   ((enabled4['_ratioFlipGeneration'] = value28), cancelPendingRatioResizeFlipStart(enabled4));
   const value30 = enabled4['_ratioFlipAnim'];
@@ -395,7 +395,7 @@ export function animateImageSchemaRatioResizeFlip(
     }
     ((value31 = previewEl['animate']([{ transform: transform }, { transform: 'none' }], {
       duration: ms,
-      easing: 'cubic-bezier(0.25,\x200.46,\x200.45,\x200.94)',
+      easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
       fill: 'forwards',
     })),
       (enabled4['_ratioFlipAnim'] = value31),
@@ -413,7 +413,7 @@ export function animateImageSchemaRatioResizeFlip(
     };
     return;
   }
-  const setTimeout3 = setTimeout(run3, 0x0);
+  const setTimeout3 = setTimeout(run3, 0);
   enabled4['_ratioFlipStartCancel'] = () => clearTimeout(setTimeout3);
 }
 export function disposeImageSchemaRatioResizeAnimation(
@@ -421,7 +421,7 @@ export function disposeImageSchemaRatioResizeAnimation(
   { nodeId: nodeId6, previewEl: previewEl2 } = {},
 ) {
   if (!enabled5) return;
-  ((enabled5['_ratioFlipGeneration'] = (Number(enabled5['_ratioFlipGeneration']) || 0x0) + 0x1),
+  ((enabled5['_ratioFlipGeneration'] = (Number(enabled5['_ratioFlipGeneration']) || 0) + 1),
     cancelPendingRatioResizeFlipStart(enabled5));
   const value32 = enabled5['_ratioFlipAnim'];
   ((enabled5['_ratioFlipAnim'] = null), value32?.['cancel']?.());
@@ -450,7 +450,7 @@ export function applyImageSchemaRatioResizeAnimation(
     ms: ms = GENERATION_RATIO_RESIZE_ANIMATION_MS,
   } = {},
 ) {
-  if (!patch2 || Object['keys'](patch2)['length'] === 0x0) return;
+  if (!patch2 || Object['keys'](patch2)['length'] === 0) return;
   (armImageSchemaRatioResizeAnimation(value34, nodeId7, ms),
     animateImageSchemaRatioResizeFlip(value34, {
       nodeId: nodeId7,

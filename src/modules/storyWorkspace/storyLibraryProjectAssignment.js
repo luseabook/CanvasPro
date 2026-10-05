@@ -4,7 +4,7 @@ function normalizeText(value) {
 }
 function getLibraryAssetSourceKey(options = {}) {
   const text = normalizeText(options['sourceAssetId'] || options['assetId']),
-    item = Math['max'](0x0, Math['trunc'](Number(options['sourceItemIndex'] ?? options['itemIndex']) || 0x0));
+    item = Math['max'](0, Math['trunc'](Number(options['sourceItemIndex'] ?? options['itemIndex']) || 0));
   return text + ':' + item;
 }
 function getLibraryAssetImage(options2 = {}) {
@@ -15,8 +15,8 @@ function getLibraryAssetImage(options2 = {}) {
     imageUrl: imageUrl,
     sourceAssetId: normalizeText(options2['sourceAssetId'] || options2['assetId']),
     sourceItemIndex: Math['max'](
-      0x0,
-      Math['trunc'](Number(options2['sourceItemIndex'] ?? options2['itemIndex']) || 0x0),
+      0,
+      Math['trunc'](Number(options2['sourceItemIndex'] ?? options2['itemIndex']) || 0),
     ),
   };
 }
@@ -26,14 +26,14 @@ function createLibraryAppearanceId(options3 = {}, key = '', map = new Set()) {
         ['replace'](/[^\p{L}\p{N}_-]+/gu, '-')
         ['replace'](/^-+|-+$/gu, '') || 'asset',
     index = Math['max'](
-      0x0,
-      Math['trunc'](Number(options3['sourceItemIndex'] ?? options3['itemIndex']) || 0x0),
+      0,
+      Math['trunc'](Number(options3['sourceItemIndex'] ?? options3['itemIndex']) || 0),
     ),
-    result = (normalizeText(key) || 'story-asset') + '-appearance-' + text3 + '-' + (index + 0x1);
+    result = (normalizeText(key) || 'story-asset') + '-appearance-' + text3 + '-' + (index + 1);
   let data = result,
-    target = 0x2;
+    target = 2;
   while (map['has'](data)) {
-    ((data = result + '-' + target), (target += 0x1));
+    ((data = result + '-' + target), (target += 1));
   }
   return (map['add'](data), data);
 }
@@ -96,7 +96,7 @@ export function addStoryLibraryAssetsToProject(
   const assets2 = Array['isArray'](list) ? list : [],
     targetAssetId2 = normalizeText(handle),
     count = assets2['findIndex']((state) => normalizeText(state?.['id']) === targetAssetId2);
-  if (count < 0x0) return createEmptyResult(assets2, payload);
+  if (count < 0) return createEmptyResult(assets2, payload);
   const args2 = assets2[count],
     map2 = new Set((Array['isArray'](payload) ? payload : [])['map'](normalizeText)['filter'](Boolean)),
     list2 = (Array['isArray'](record) ? record : [])['filter']((config) =>
@@ -110,9 +110,9 @@ export function addStoryLibraryAssetsToProject(
     text4 = normalizeText(targetAppearanceId);
   if (text4) {
     const count2 = list4['findIndex']((output) => normalizeText(output?.['id']) === text4);
-    if (count2 < 0x0 || list3['length'] !== 0x1) return createEmptyResult(assets2, payload, targetAssetId2);
+    if (count2 < 0 || list3['length'] !== 1) return createEmptyResult(assets2, payload, targetAssetId2);
     const appearances = [...list4];
-    appearances[count2] = replaceLibraryAppearance(appearances[count2], list3[0x0]);
+    appearances[count2] = replaceLibraryAppearance(appearances[count2], list3[0]);
     const storyAsset = normalizeStoryAsset({ ...args2, appearances: appearances }, count);
     return {
       assets: assets2['map']((value2, value3) => (value3 === count ? storyAsset : value2)),

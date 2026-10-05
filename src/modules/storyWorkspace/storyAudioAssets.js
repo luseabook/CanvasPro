@@ -31,7 +31,7 @@ export function addStoryAudioAssets(target, source) {
         audioUrl: storyAudioUrl,
         localPath: text(entry['localPath']),
         sourceAssetId: text(entry['sourceAssetId']),
-        sourceItemIndex: entry['sourceItemIndex'] || 0x0,
+        sourceItemIndex: entry['sourceItemIndex'] || 0,
         waveformUrl: text(entry['waveformUrl']),
         description: text(entry['description']),
       }),

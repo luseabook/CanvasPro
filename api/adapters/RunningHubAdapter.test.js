@@ -25,7 +25,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         {
           model: 'runninghub/2041177685895946242',
           inputUrls: ['local_target', 'local_source'],
-          rhResolution: 0x640,
+          rhResolution: 1600,
           rhInstanceType: 'plus',
         },
         'a prompt',
@@ -108,7 +108,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         {
           model: 'runninghub/2050313968069165058',
           inputUrls: ['local_target', 'local_source'],
-          rhResolution: 0x640,
+          rhResolution: 1600,
           rhInstanceType: 'plus',
         },
         'a prompt',
@@ -146,7 +146,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         {
           model: 'runninghub/1994718111704158209',
           inputUrls: ['local_ref'],
-          rhAnimeRealResolution: 0x640,
+          rhAnimeRealResolution: 1600,
           rhInstanceType: 'plus',
         },
         'realistic portrait',
@@ -268,7 +268,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           model: 'runninghub/2041177685895946242',
           inputUrls: ['local_target', 'local_source'],
           inputMaskUrls: ['m_target', 'm_source'],
-          rhResolution: 0x5a0,
+          rhResolution: 1440,
           rhInstanceType: 'default',
         },
         'p',
@@ -293,7 +293,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         {
           model: 'runninghub/2041177685895946242',
           inputUrls: ['local_target', 'local_source'],
-          rhResolution: 0x5a0,
+          rhResolution: 1440,
           rhInstanceType: 'default',
         },
         '   ',
@@ -320,7 +320,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           model: 'runninghub/2050313968069165058',
           inputUrls: ['local_target', 'local_source'],
           inputMaskUrls: ['m_target', 'm_source'],
-          rhResolution: 0x5a0,
+          rhResolution: 1440,
           rhInstanceType: 'default',
         },
         '   ',
@@ -348,7 +348,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
             ? ['', '']
             : ['u_target', 'u_source'],
       };
-      for (const rhResolution of [0x5a0, 0x640, 0x780]) {
+      for (const rhResolution of [1440, 1600, 1920]) {
         const dom10 = await buildImageRequest(
             {
               model: 'runninghub/2050313968069165058',
@@ -536,7 +536,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           model: 'runninghub/2039336644536442882',
           inputUrls: ['local_img'],
           audioUrl: 'https://www.runninghub.cn/test.mp3',
-          rhVideoResolution: 0x400,
+          rhVideoResolution: 1024,
           rhVideoFps: 24,
           rhVideoSeconds: 6,
           rhInstanceType: 'default',
@@ -589,7 +589,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           inputUrls: ['local_img'],
           audioUrl: 'https://www.runninghub.cn/song.mp3',
           generationParams: {
-            rhVideoResolution: 0x500,
+            rhVideoResolution: 1280,
             rhDigitalHumanMotionAmplitude: '2',
             rhDigitalHumanSceneMotionAmplitude: '1',
           },
@@ -643,7 +643,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           videoUrl: 'https://www.runninghub.cn/source.mp4',
           inputUrls: ['local_ref'],
           rhVideoFps: 16,
-          rhVideoResolution: 0x400,
+          rhVideoResolution: 1024,
           rhVideoFrames: 90,
           rhEnableMask: true,
         },
@@ -694,7 +694,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           maskImageDataUrl: '/data/mask/manual-mask.png',
           rhVideoFrames: 12,
           rhVideoFps: 30,
-          rhVideoResolution: 0x3c0,
+          rhVideoResolution: 960,
         },
         '',
         value41,
@@ -765,7 +765,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           videoUrl: 'https://www.runninghub.cn/source.mp4',
           audioUrl: 'https://www.runninghub.cn/audio.mp3',
           rhVideoFrames: 120,
-          rhVideoResolution: 0x200,
+          rhVideoResolution: 512,
           rhInstanceType: 'plus',
           rhLipSyncInputIndex: 1,
           prompt: 'lip sync prompt',
@@ -805,7 +805,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           inputUrls: ['local-ref'],
           audioUrl: 'https://www.runninghub.cn/audio.mp3',
           rhVideoFrames: 20,
-          rhVideoResolution: 0x400,
+          rhVideoResolution: 1024,
           rhLipSyncInputIndex: 0,
           prompt: 'lip sync from image',
         },
@@ -887,7 +887,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           maskRect: true,
           frameRate: 30,
           frameCount: 88,
-          rhVideoResolution: 0x500,
+          rhVideoResolution: 1280,
           specialMode: 'cameraMove',
           rhInstanceType: 'plus',
         },
@@ -935,7 +935,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           controlMode: 'efficiency',
           frameRate: 24,
           frameCount: 77,
-          rhVideoResolution: 0x340,
+          rhVideoResolution: 832,
           specialMode: 'longVideoOverlay',
           rhBreastJiggle: 0.35,
         },
@@ -962,7 +962,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
           subtractSubject: false,
           frameRate: 24,
           frameCount: 77,
-          rhVideoResolution: 0x340,
+          rhVideoResolution: 832,
         },
         '   ',
         value65,
@@ -1020,9 +1020,9 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
               String(value69?.[0] || '') === 'ref_local' ? ['u_ref'] : [],
           },
           generationParams = {
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhVideoFps: 24,
-            rhVideoFrames: 0x12c,
+            rhVideoFrames: 300,
             rhScail2PersonCount: 2,
             rhScailDetectPrompt: 'person, face',
             rhScail2ReplaceSubject: true,
@@ -1129,7 +1129,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
       ((globalThis.fetch = async (value82) => {
         const value83 = String(value82 || '');
         if (value83 === 'https://video.example/fail.mp4')
-          return new Response('network timeout', { status: 0x1f8 });
+          return new Response('network timeout', { status: 504 });
         throw new Error('unexpected fetch url: ' + value83);
       }),
         await assert.rejects(
@@ -1142,7 +1142,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
                 subtractSubject: false,
                 frameRate: 24,
                 frameCount: 77,
-                rhVideoResolution: 0x340,
+                rhVideoResolution: 832,
               },
               'a prompt',
               value81,
@@ -1168,7 +1168,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
         buildVideoRequest(
           {
             model: 'runninghub/2062515720147259393',
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             rhBerniniAspectRatio: '16:9',
             rhInstanceType: 'plus',
             ...args,
@@ -1249,7 +1249,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
             videoUrl: 'https://www.runninghub.cn/source.mp4',
             frameRate: 24,
             frameCount: 77,
-            rhVideoResolution: 0x340,
+            rhVideoResolution: 832,
             controlMode: 'efficiency',
           },
           'legacy prompt',
@@ -1648,7 +1648,7 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
     (assert.equal(dom42.body.apiUrl, 'https://www.runninghub.cn/openapi/v2/youchuan/text-to-image-v81'),
       assert.equal(dom42.body.imageUrl, 'https://example.com/main.png'),
       assert.equal(dom42.body.sref, undefined),
-      assert.equal(dom42.body.sw, 0x3e7),
+      assert.equal(dom42.body.sw, 999),
       assert.equal(dom42.body.iw, 3),
       assert.equal(dom42.body.quality, '4'),
       assert.equal(dom42.body.hd, true),
@@ -1829,8 +1829,8 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
       );
       (assert.equal(dom52.body.aspectRatio, undefined, 'model=' + model),
         assert.equal(dom52.body.resolution, undefined, 'model=' + model),
-        assert.equal(dom52.body.width, 0xaa8, 'model=' + model),
-        assert.equal(dom52.body.height, 0x600, 'model=' + model));
+        assert.equal(dom52.body.width, 2728, 'model=' + model),
+        assert.equal(dom52.body.height, 1536, 'model=' + model));
     }
   }),
   test('RunningHubAdapter 模型 API 在默认 1:1 比例下不透传 aspectRatio', async () => {
@@ -1845,8 +1845,8 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
       );
     (assert.equal(dom53.body.aspectRatio, undefined),
       assert.equal(dom53.body.resolution, undefined),
-      assert.equal(dom53.body.width, 0x800),
-      assert.equal(dom53.body.height, 0x800));
+      assert.equal(dom53.body.width, 2048),
+      assert.equal(dom53.body.height, 2048));
   }),
   test('RunningHubAdapter seedream 宽高满足官方约束：8倍数且在512-8192', async () => {
     const value135 = {
@@ -1864,6 +1864,6 @@ import { resolveModelExecution } from '../../src/manifests/index.js';
       assert.ok(Number.isInteger(dom54.body.height)),
       assert.equal(dom54.body.width % 8, 0),
       assert.equal(dom54.body.height % 8, 0),
-      assert.ok(dom54.body.width >= 0x200 && dom54.body.width <= 0x2000),
-      assert.ok(dom54.body.height >= 0x200 && dom54.body.height <= 0x2000));
+      assert.ok(dom54.body.width >= 512 && dom54.body.width <= 8192),
+      assert.ok(dom54.body.height >= 512 && dom54.body.height <= 8192));
   }));

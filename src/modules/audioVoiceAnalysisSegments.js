@@ -10,8 +10,8 @@ function normalizeSharedAnalyzeSegment(args2 = {}) {
   return {
     ...args2,
     id: String(args2['id'] || ''),
-    startMs: Number(args2['startMs'] || 0x0),
-    endMs: Number(args2['endMs'] || 0x0),
+    startMs: Number(args2['startMs'] || 0),
+    endMs: Number(args2['endMs'] || 0),
     sourceText: String(args2['sourceText'] || ''),
     targetText: '',
     speakerId: String(args2['speakerId'] || ''),
@@ -47,7 +47,7 @@ export function normalizeAudioVoiceAnalyzeSegments(options = {}, key = {}) {
         speakerId,
       );
     return handler({
-      id: id?.['id'] || 'audio-voice-segment-' + (index + 0x1),
+      id: id?.['id'] || 'audio-voice-segment-' + (index + 1),
       startMs: id?.['startMs'],
       endMs: id?.['endMs'],
       sourceText: id?.['sourceText'] || '',

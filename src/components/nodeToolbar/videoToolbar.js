@@ -94,7 +94,7 @@ function getToolbarActionFromButton(el) {
 export function bindVideoToolbarEvents(toolbarEl, nodeData) {
   if (!toolbarEl) return;
   const VIDEO_TOOLBAR_FOCUS_PADDING = 120,
-    VIDEO_TOOLBAR_FOCUS_DURATION_MS = 0x320,
+    VIDEO_TOOLBAR_FOCUS_DURATION_MS = 800,
     VIDEO_TOOLBAR_FOCUS_MAX_ZOOM = 2;
   (toolbarEl.addEventListener('pointerdown', (event) => event.stopPropagation()),
     toolbarEl.addEventListener('dblclick', (event2) => {
@@ -225,7 +225,7 @@ export function bindVideoToolbarEvents(toolbarEl, nodeData) {
             if (value5) return;
             ((value5 = true), window.clearTimeout(value7), run(), handler8(value6));
           },
-          value7 = window.setTimeout(() => handler9(0), 0x2ee0);
+          value7 = window.setTimeout(() => handler9(0), 12000);
         ((value4.preload = 'metadata'),
           (value4.muted = true),
           (value4.playsInline = true),
@@ -259,7 +259,7 @@ export function bindVideoToolbarEvents(toolbarEl, nodeData) {
           window.showToast?.(
             videoToolbarText('durationLimit', { seconds: VIDEO_HD_STANDARD_MAX_SECONDS }),
             'warn',
-            0x1450,
+            5200,
           ),
           false
         );
@@ -346,7 +346,7 @@ export function bindVideoToolbarEvents(toolbarEl, nodeData) {
       if (!(value25.startsWith('http://') || value25.startsWith('https://')))
         throw new Error(videoToolbarText('saveInvalidUrl'));
       const signal = new AbortController(),
-        setTimeout2 = setTimeout(() => signal.abort(), 0x1d4c0);
+        setTimeout2 = setTimeout(() => signal.abort(), 120000);
       let fetchRemoteBlob2 = null;
       try {
         fetchRemoteBlob2 = await fetchRemoteBlob(value25, { signal: signal.signal });

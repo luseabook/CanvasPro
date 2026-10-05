@@ -28,18 +28,18 @@ function renderResults(el7) {
   if (!enabled) return;
   const query = el7['querySelector']('.panorama-asset-browser__search')?.['value'] || '',
     category = el7['querySelector']('.panorama-asset-browser__category')?.['value'] || 'all',
-    list = searchSceneAssets({ query: query, category: category, limit: 0x78 });
+    list = searchSceneAssets({ query: query, category: category, limit: 120 });
   enabled['replaceChildren'](
     ...list['map']((error) => {
       const el8 = document['createElement']('button');
       ((el8['type'] = 'button'),
         (el8['className'] = 'panorama-asset-browser__item'),
         (el8['dataset']['assetId'] = error['id']),
-        (el8['dataset']['assetPrimitive'] = error['parts'][0x0]?.['primitive'] || 'box'),
+        (el8['dataset']['assetPrimitive'] = error['parts'][0]?.['primitive'] || 'box'),
         (el8['title'] = error['name']));
       const el9 = document['createElement']('span');
       ((el9['className'] = 'panorama-asset-browser__preview'),
-        (el9['dataset']['assetPrimitive'] = error['parts'][0x0]?.['primitive'] || 'box'));
+        (el9['dataset']['assetPrimitive'] = error['parts'][0]?.['primitive'] || 'box'));
       const el10 = document['createElement']('span');
       return (
         (el10['className'] = 'panorama-asset-browser__label'),
@@ -50,7 +50,7 @@ function renderResults(el7) {
     }),
   );
   const el11 = el7['querySelector']('.panorama-asset-browser__empty');
-  if (el11) el11['hidden'] = list['length'] > 0x0;
+  if (el11) el11['hidden'] = list['length'] > 0;
 }
 export function createSceneAssetBrowser({ onSelect: onSelect } = {}) {
   const el12 = document['createElement']('div');

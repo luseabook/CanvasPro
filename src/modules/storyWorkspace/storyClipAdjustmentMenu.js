@@ -35,8 +35,8 @@ export function syncStoryClipAdjustmentMenu({
   updateSelection: updateSelection = ![],
 }) {
   const el = root?.['querySelector']('[data-story-clip-adjustment-bar]'),
-    data = el?.['querySelector']('[data-story-adjustment-kind=\x22' + kind + '\x22]'),
-    el2 = data?.['querySelector']('[data-story-action=\x22toggle-clip-adjustment-mode\x22]'),
+    data = el?.['querySelector']('[data-story-adjustment-kind="' + kind + '"]'),
+    el2 = data?.['querySelector']('[data-story-action="toggle-clip-adjustment-mode"]'),
     enabled2 = data?.['querySelector']('[role="listbox"]');
   if (!el || !el2 || !enabled2) return ![];
   const options = kind === 'language',

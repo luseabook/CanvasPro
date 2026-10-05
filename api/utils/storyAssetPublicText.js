@@ -13,15 +13,15 @@ export function stripStoryAssetInternalEvidenceMetadata(item) {
     ['replace'](/证据原文：/gu, '')
     ['replace'](STORY_ASSET_INTERNAL_EVIDENCE_PATTERN, '')
     ['replace'](STORY_ASSET_FALLBACK_DIAGNOSTIC_PATTERN, '')
-    ['replace'](/[ \t]+\n/gu, '\x0a')
-    ['replace'](/\n{3,}/gu, '\x0a\x0a')
+    ['replace'](/[ \t]+\n/gu, '\n')
+    ['replace'](/\n{3,}/gu, '\n\n')
     ['trim']();
 }
 export function sanitizeStoryAssetPublicDescriptionText(key) {
   return stripStoryAssetInternalEvidenceMetadata(key)
     ['replace'](STORY_ASSET_INTERNAL_EVIDENCE_PATTERN, '')
     ['replace'](/(^|[\r\n])(?:剧本事实|视觉补全)：\s*(?=$|[\r\n])/gu, '$1')
-    ['replace'](/\n{3,}/gu, '\x0a\x0a')
+    ['replace'](/\n{3,}/gu, '\n\n')
     ['trim']();
 }
 export function sanitizeStoryAssetPublicPromptText(index) {
@@ -33,15 +33,15 @@ export function sanitizeStoryAssetPublicPromptText(index) {
     )
     ['replace'](STORY_ASSET_INTERNAL_EVIDENCE_PATTERN, '')
     ['replace'](/PP-UIE\s*本地候选：[^\r\n]*/giu, '')
-    ['replace'](/(?:^|[\r\n])\s*(?:candidateAssets|候选资产|召回候选|召回线索)\s*[：:][^\r\n]*/giu, '\x0a')
-    ['replace'](/(?:^|[\r\n])\s*证据原文：[^\r\n]*/gu, '\x0a')
+    ['replace'](/(?:^|[\r\n])\s*(?:candidateAssets|候选资产|召回候选|召回线索)\s*[：:][^\r\n]*/giu, '\n')
+    ['replace'](/(?:^|[\r\n])\s*证据原文：[^\r\n]*/gu, '\n')
     ['replace'](/证据原文：[^\r\n]*/gu, '')
     ['replace'](STORY_ASSET_FALLBACK_DIAGNOSTIC_PATTERN, '')
     ['replace'](STORY_ASSET_CLIENT_INSTRUCTION_PATTERN, '')
     ['replace'](/(^|[\r\n，；])(?:剧本事实|视觉补全)：\s*/gu, '$1')
     ['replace'](/[，；]\s*([，；。])/gu, '$1')
     ['replace'](/[，,；;]\s*([。.!！]|$)/gu, '$1')
-    ['replace'](/[ \t]+\n/gu, '\x0a')
-    ['replace'](/\n{2,}/gu, '\x0a')
+    ['replace'](/[ \t]+\n/gu, '\n')
+    ['replace'](/\n{2,}/gu, '\n')
     ['trim']();
 }

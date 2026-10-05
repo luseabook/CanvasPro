@@ -45,9 +45,9 @@ export function createVideoNodeResultRenderModule(index) {
         label: this._getPreviewVideoRecoveryLabel(el2, source),
         ensureSrc: () => this._ensureVideoSrcFor(el2, { forPlayback: true }),
         minBufferAhead: minBufferAhead ? 0.5 : undefined,
-        readyTimeoutMs: minBufferAhead ? 0x15e : undefined,
+        readyTimeoutMs: minBufferAhead ? 350 : undefined,
         recoveryDebounceMs: minBufferAhead ? 150 : undefined,
-        recoveryCooldownMs: minBufferAhead ? 0x1f4 : undefined,
+        recoveryCooldownMs: minBufferAhead ? 500 : undefined,
         shouldRecover: () =>
           el2.isConnected !== false && (this._isHovered || this._isManualControl || !el2.paused),
       });
@@ -68,9 +68,9 @@ export function createVideoNodeResultRenderModule(index) {
           label: this._getPreviewVideoRecoveryLabel(el3, minBufferAhead2),
           ensureSrc: () => this._ensureVideoSrcFor(el3, { forPlayback: true }),
           minBufferAhead: minBufferAhead2 === 'hover' ? 0.5 : undefined,
-          readyTimeoutMs: minBufferAhead2 === 'hover' ? 0x15e : undefined,
+          readyTimeoutMs: minBufferAhead2 === 'hover' ? 350 : undefined,
           recoveryDebounceMs: minBufferAhead2 === 'hover' ? 150 : undefined,
-          recoveryCooldownMs: minBufferAhead2 === 'hover' ? 0x1f4 : undefined,
+          recoveryCooldownMs: minBufferAhead2 === 'hover' ? 500 : undefined,
           shouldRecover: () =>
             el3.isConnected !== false && (this._isHovered || this._isManualControl || !el3.paused),
           shouldContinue: typeof entry.shouldContinue === 'function' ? entry.shouldContinue : undefined,
@@ -486,7 +486,7 @@ export function createVideoNodeResultRenderModule(index) {
       );
     }
     ['_formatDreaminaElapsed'](value45) {
-      const value46 = Math.max(0, Math.floor(Number(value45 || 0) / 0x3e8)),
+      const value46 = Math.max(0, Math.floor(Number(value45 || 0) / 1000)),
         minutes = Math.floor(value46 / 60),
         seconds = value46 % 60;
       if (minutes > 0)
@@ -736,7 +736,7 @@ export function createVideoNodeResultRenderModule(index) {
             }),
               setTimeout(() => {
                 (store.updateNodeData(this.nodeId, handler2()), (this._isExpandedPickClosing = false));
-              }, 0x15e));
+              }, 350));
           } else (store.updateNodeData(this.nodeId, handler2()), (this._isExpandedPickClosing = false));
         },
         handler3 = (el14, value87) => {
@@ -948,7 +948,7 @@ export function createVideoNodeResultRenderModule(index) {
             position: 'absolute',
             top: '8px',
             right: '8px',
-            zIndex: 0x3ed,
+            zIndex: 1005,
             padding: '6px 12px',
             borderRadius: '6px',
             display: 'flex',
@@ -982,7 +982,7 @@ export function createVideoNodeResultRenderModule(index) {
                 }),
                   setTimeout(() => {
                     store.updateNodeData(this.nodeId, { isVideosExpanded: false });
-                  }, 0x15e));
+                  }, 350));
               } else store.updateNodeData(this.nodeId, { isVideosExpanded: false });
             } else store.updateNodeData(this.nodeId, { isVideosExpanded: true });
           }),
@@ -1177,7 +1177,7 @@ export function createVideoNodeResultRenderModule(index) {
             filter: 'blur(8px)',
             transformOrigin: 'bottom left',
             transition: 'all 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.27), filter 0.4s ease-out',
-            zIndex: String(0x2ee0 - value132),
+            zIndex: String(12000 - value132),
           }),
             (el21.style.pointerEvents = 'auto'),
             requestAnimationFrame(() => {
@@ -1300,9 +1300,9 @@ export function createVideoNodeResultRenderModule(index) {
           attachVideoPlaybackRecovery(controls, {
             label: 'ai-video:' + this.nodeId + ':fullscreen',
             minBufferAhead: 0.5,
-            readyTimeoutMs: 0x15e,
+            readyTimeoutMs: 350,
             recoveryDebounceMs: 150,
-            recoveryCooldownMs: 0x1f4,
+            recoveryCooldownMs: 500,
             shouldRecover: () => controls.isConnected !== false && !controls.paused,
           }));
         let value144 = false;
@@ -1345,9 +1345,9 @@ export function createVideoNodeResultRenderModule(index) {
           void playVideoWithRecovery(controls, {
             label: 'ai-video:' + this.nodeId + ':fullscreen',
             minBufferAhead: 0.5,
-            readyTimeoutMs: 0x15e,
+            readyTimeoutMs: 350,
             recoveryDebounceMs: 150,
-            recoveryCooldownMs: 0x1f4,
+            recoveryCooldownMs: 500,
             shouldRecover: () => controls.isConnected !== false && !controls.paused,
           }));
         return;
@@ -1386,18 +1386,18 @@ export function createVideoNodeResultRenderModule(index) {
               void playVideoWithRecovery(el25, {
                 label: 'ai-video:' + this.nodeId + ':fullscreen',
                 minBufferAhead: 0.5,
-                readyTimeoutMs: 0x15e,
+                readyTimeoutMs: 350,
                 recoveryDebounceMs: 150,
-                recoveryCooldownMs: 0x1f4,
+                recoveryCooldownMs: 500,
                 shouldRecover: () => el25.isConnected !== false && !el25.paused,
               }));
           });
       (attachVideoPlaybackRecovery(el25, {
         label: 'ai-video:' + this.nodeId + ':fullscreen',
         minBufferAhead: 0.5,
-        readyTimeoutMs: 0x15e,
+        readyTimeoutMs: 350,
         recoveryDebounceMs: 150,
-        recoveryCooldownMs: 0x1f4,
+        recoveryCooldownMs: 500,
         shouldRecover: () => el25.isConnected !== false && !el25.paused,
       }),
         (el25.preload = 'auto'),
@@ -1432,9 +1432,9 @@ export function createVideoNodeResultRenderModule(index) {
           void playVideoWithRecovery(el25, {
             label: 'ai-video:' + this.nodeId + ':fullscreen',
             minBufferAhead: 0.5,
-            readyTimeoutMs: 0x15e,
+            readyTimeoutMs: 350,
             recoveryDebounceMs: 150,
-            recoveryCooldownMs: 0x1f4,
+            recoveryCooldownMs: 500,
             shouldRecover: () => el25.isConnected !== false && !el25.paused,
           }));
     }

@@ -14,7 +14,7 @@ function cloneJson(item) {
 }
 function requireFunctions(key, index) {
   for (const [result, data] of Object['entries'](index)) {
-    if (typeof data !== 'function') throw new TypeError(key + '\x20requires\x20' + result + '.');
+    if (typeof data !== 'function') throw new TypeError(key + ' requires ' + result + '.');
   }
 }
 export function createPersonReplacementVoiceCloneInteractionController({
@@ -28,7 +28,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'] || globalThis,
 } = {}) {
-  const options = 'Person\x20replacement\x20voice-clone\x20interaction';
+  const options = 'Person replacement voice-clone interaction';
   requireFunctions(options, {
     commitProject: commitProject,
     getProject: getProject,
@@ -65,7 +65,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
     value4 = null;
     if (audioEl)
       try {
-        (audioEl['pause']?.(), (audioEl['currentTime'] = 0x0));
+        (audioEl['pause']?.(), (audioEl['currentTime'] = 0));
       } catch {}
     ((audioEl = null), (assetId = ''), (target = ''), syncPreviewUi());
   }
@@ -101,7 +101,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
   function mount() {
     unmount();
     const sourceId2 = handler();
-    if (sourceId2['workspace']?.['step'] !== 0x4) return ![];
+    if (sourceId2['workspace']?.['step'] !== 4) return ![];
     const enabled2 = run()?.['querySelector']?.('[data-person-replacement-voice-studio-host]');
     if (!enabled2) return ![];
     const run3 = mountStudio(enabled2, {
@@ -170,7 +170,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
       (target = enabled3),
       run2(audioEl));
     const output = audioEl;
-    if (output['ended']) output['currentTime'] = 0x0;
+    if (output['ended']) output['currentTime'] = 0;
     syncPreviewUi();
     let value6 = null;
     ((value6 = (async () => {
@@ -245,7 +245,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
     remountVoiceStudio: remountVoiceStudio = ![],
   } = {}) {
     const value12 = handler();
-    if (isDestroyed() || value12['workspace']?.['step'] !== 0x4) return ![];
+    if (isDestroyed() || value12['workspace']?.['step'] !== 4) return ![];
     const el8 = run()?.['querySelector']?.('.person-replacement-voice-source-list');
     if (!el8) return ![];
     const text4 = normalizeText(sourceId),

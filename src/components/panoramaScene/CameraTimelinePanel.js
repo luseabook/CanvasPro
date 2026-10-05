@@ -4,7 +4,7 @@ function sceneText(value, item = {}) {
   return t('panoramaSceneNode.cameraTimeline.' + value, item);
 }
 function formatTime(key) {
-  return Math['max'](0x0, Number(key) || 0x0)['toFixed'](0x2) + 's';
+  return Math['max'](0, Number(key) || 0)['toFixed'](2) + 's';
 }
 function syncStaticText(el, { isPlaying: isPlaying = ![] } = {}) {
   const el2 = el['querySelector']('.panorama-camera-timeline__play');
@@ -38,10 +38,10 @@ export function createCameraTimelinePanel({
   ((el8['className'] = 'panorama-camera-timeline'), (el8['dataset']['uiStop'] = '1'));
   const el9 = document['createElement']('button');
   ((el9['type'] = 'button'),
-    (el9['className'] = 'panorama-camera-timeline__icon\x20panorama-camera-timeline__play'));
+    (el9['className'] = 'panorama-camera-timeline__icon panorama-camera-timeline__play'));
   const el10 = document['createElement']('button');
   ((el10['type'] = 'button'),
-    (el10['className'] = 'panorama-camera-timeline__icon\x20panorama-camera-timeline__add'),
+    (el10['className'] = 'panorama-camera-timeline__icon panorama-camera-timeline__add'),
     (el10['textContent'] = '+'));
   const el11 = document['createElement']('output');
   ((el11['className'] = 'panorama-camera-timeline__time'), (el11['textContent'] = '0.00s'));
@@ -65,7 +65,7 @@ export function createCameraTimelinePanel({
     (el14['value'] = '6'));
   const el15 = document['createElement']('select');
   ((el15['className'] = 'panorama-camera-timeline__fps'),
-    [0xc, 0x18, 0x19, 0x1e, 0x32, 0x3c]['forEach']((result) => {
+    [12, 24, 25, 30, 50, 60]['forEach']((result) => {
       const el16 = document['createElement']('option');
       ((el16['value'] = String(result)), (el16['textContent'] = result + ' FPS'), el15['appendChild'](el16));
     }));
@@ -79,17 +79,17 @@ export function createCameraTimelinePanel({
     data['append'](loop, options),
     el8['append'](el9, el10, el11, index, el14, el15, data),
     el9['addEventListener']('click', () => onPlayToggle?.()),
-    el10['addEventListener']('click', () => onAddKeyframe?.(Number(el12['value']) || 0x0)),
+    el10['addEventListener']('click', () => onAddKeyframe?.(Number(el12['value']) || 0)),
     el12['addEventListener']('input', () => {
-      const target = Number(el12['value']) || 0x0;
+      const target = Number(el12['value']) || 0;
       ((el11['textContent'] = formatTime(target)), onScrub?.(target));
     }),
-    el12['addEventListener']('change', () => onScrubCommit?.(Number(el12['value']) || 0x0)),
+    el12['addEventListener']('change', () => onScrubCommit?.(Number(el12['value']) || 0)),
     el14['addEventListener']('change', () => {
-      onSettingsChange?.({ duration: Number(el14['value']) || 0x6 });
+      onSettingsChange?.({ duration: Number(el14['value']) || 6 });
     }),
     el15['addEventListener']('change', () => {
-      onSettingsChange?.({ fps: Number(el15['value']) || 0x18 });
+      onSettingsChange?.({ fps: Number(el15['value']) || 24 });
     }),
     loop['addEventListener']('change', () => {
       onSettingsChange?.({ loop: loop['checked'] });
@@ -101,7 +101,7 @@ export function createCameraTimelinePanel({
         onDeleteKeyframe?.(el17['dataset']['keyframeId']);
         return;
       }
-      const source = Number(el17['dataset']['keyframeTime']) || 0x0;
+      const source = Number(el17['dataset']['keyframeTime']) || 0;
       ((el12['value'] = String(source)), (el11['textContent'] = formatTime(source)), onScrub?.(source));
     }),
     el13['addEventListener']('contextmenu', (event2) => {
@@ -121,13 +121,13 @@ export function renderCameraTimelinePanel(
   if (!el19) return;
   const args = normalizeCameraTimeline(next),
     current = Math['max'](
-      0x0,
+      0,
       Math['min'](args['duration'], Number['isFinite'](currentTime) ? currentTime : args['currentTime']),
     ),
     el20 = el19['querySelector']('.panorama-camera-timeline__track');
   el20 &&
     ((el20['max'] = String(args['duration'])),
-    (el20['step'] = String(0x1 / args['fps'])),
+    (el20['step'] = String(1 / args['fps'])),
     (el20['value'] = String(current)));
   const el21 = el19['querySelector']('.panorama-camera-timeline__time');
   if (el21) el21['textContent'] = formatTime(current);
@@ -148,7 +148,7 @@ export function renderCameraTimelinePanel(
           (el24['dataset']['keyframeId'] = payload['id']),
           (el24['dataset']['keyframeTime'] = String(payload['time'])));
         const frame = Math['round'](payload['time'] * args['fps']),
-          handle = args['duration'] > 0x0 ? (payload['time'] / args['duration']) * 0x64 : 0x0;
+          handle = args['duration'] > 0 ? (payload['time'] / args['duration']) * 100 : 0;
         return (
           el24['style']['setProperty']('--panorama-keyframe-position', handle + '%'),
           (el24['title'] = sceneText('keyframeTitle', {

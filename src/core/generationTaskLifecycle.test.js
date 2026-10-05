@@ -14,7 +14,7 @@ import {
   test('generationTaskLifecycle: explicit duration is preserved', () => {
     (assert.equal(buildGenerationSuccessPatch({ duration: 0 }).generationDuration, 0),
       assert.equal(buildGenerationFailurePatch({ error: 'failed', duration: 123 }).generationDuration, 123),
-      assert.equal(buildGenerationCancelledPatch({ duration: 0x1c8 }).generationDuration, 0x1c8));
+      assert.equal(buildGenerationCancelledPatch({ duration: 456 }).generationDuration, 456));
   }),
   test('generationTaskLifecycle: missing duration and startedAt omits duration', () => {
     const generationFailurePatch = buildGenerationFailurePatch({ error: 'failed' });

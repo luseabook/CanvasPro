@@ -17,7 +17,7 @@ function canEdit(enabled) {
 }
 function commitSourceEdit(value, sourceAnalysis) {
   ((sourceAnalysis['replication']['sourceAnalysis']['revision'] =
-    (sourceAnalysis['replication']['sourceAnalysis']['revision'] || 0x0) + 0x1),
+    (sourceAnalysis['replication']['sourceAnalysis']['revision'] || 0) + 1),
     applyStoryVideoReplicationAnalysis(sourceAnalysis, {
       sourceAnalysis: sourceAnalysis['replication']['sourceAnalysis'],
     }),
@@ -91,7 +91,7 @@ export function mergeStoryReplicationCharacters(next, current, entry, record) {
   }
   ((enabled6['identityNotes'] = [enabled6['identityNotes'], enabled5['identityNotes']]
     ['filter'](Boolean)
-    ['join']('\x0a')),
+    ['join']('\n')),
     (payload['characters'] = payload['characters']['filter']((input) => input !== enabled5)));
   if (next['project']['replication']?.['characterBindings'])
     delete next['project']['replication']['characterBindings'][current['id'] + ':' + entry];
@@ -108,8 +108,8 @@ export function addStoryReplicationCharacter(
       (value5) => Number(timeSec) >= value5['startSec'] && Number(timeSec) < value5['endSec'],
     );
   if (!enabled7) return null;
-  let value6 = 0x1;
-  while (value4['characters']['some']((value7) => value7['id'] === 'person-' + value6)) value6 += 0x1;
+  let value6 = 1;
+  while (value4['characters']['some']((value7) => value7['id'] === 'person-' + value6)) value6 += 1;
   const value8 = {
     id: 'person-' + value6,
     name: String(name)['trim']() || '新人物',
@@ -162,7 +162,7 @@ export function setStoryReplicationCharacterPresence(
     !present &&
       enabled9['representativeTimeSec'] >= args3['startSec'] &&
       enabled9['representativeTimeSec'] < args3['endSec'] &&
-      ((enabled9['representativeTimeSec'] = list[0x0]['startSec']),
+      ((enabled9['representativeTimeSec'] = list[0]['startSec']),
       delete enabled9['frame'],
       delete enabled9['portrait']),
     commitSourceEdit(value16, value17),

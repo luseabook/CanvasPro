@@ -20,43 +20,43 @@ import {
   normalizeInputUrlsBySlot as normalizeInputUrlsBySlot_2,
   stripPrefix,
 } from './sharedResolverUtils.js';
-const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
+const PPIO_MIN_PIXELS = 2560 * 1440,
   PPIO_MAX_PIXELS = 0x9ec290,
-  PPIO_MIN_RATIO = 0x1 / 0x10,
-  PPIO_MAX_RATIO = 0x10,
-  PPIO_ALIGN_STEP = 0x40,
+  PPIO_MIN_RATIO = 1 / 16,
+  PPIO_MAX_RATIO = 16,
+  PPIO_ALIGN_STEP = 64,
   PPIO_DEFAULT_SIZE = '2048x2048',
   PPIO_DEFAULT_QUALITY = '2K',
   PPIO_DEFAULT_RATIO = '1:1',
   PPIO_QUALITY_PIXEL_MAP = Object['freeze']({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   PPIO_RATIO_OPTIONS = Object['freeze']([
-    Object['freeze']({ label: '1:1', w: 0x1, h: 0x1 }),
-    Object['freeze']({ label: '9:16', w: 0x9, h: 0x10 }),
-    Object['freeze']({ label: '16:9', w: 0x10, h: 0x9 }),
-    Object['freeze']({ label: '3:4', w: 0x3, h: 0x4 }),
-    Object['freeze']({ label: '4:3', w: 0x4, h: 0x3 }),
-    Object['freeze']({ label: '3:2', w: 0x3, h: 0x2 }),
-    Object['freeze']({ label: '2:3', w: 0x2, h: 0x3 }),
-    Object['freeze']({ label: '5:4', w: 0x5, h: 0x4 }),
-    Object['freeze']({ label: '4:5', w: 0x4, h: 0x5 }),
-    Object['freeze']({ label: '21:9', w: 0x15, h: 0x9 }),
+    Object['freeze']({ label: '1:1', w: 1, h: 1 }),
+    Object['freeze']({ label: '9:16', w: 9, h: 16 }),
+    Object['freeze']({ label: '16:9', w: 16, h: 9 }),
+    Object['freeze']({ label: '3:4', w: 3, h: 4 }),
+    Object['freeze']({ label: '4:3', w: 4, h: 3 }),
+    Object['freeze']({ label: '3:2', w: 3, h: 2 }),
+    Object['freeze']({ label: '2:3', w: 2, h: 3 }),
+    Object['freeze']({ label: '5:4', w: 5, h: 4 }),
+    Object['freeze']({ label: '4:5', w: 4, h: 5 }),
+    Object['freeze']({ label: '21:9', w: 21, h: 9 }),
   ]),
   PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS['map']((item) => item['label'])),
-  RUNNINGHUB_MODEL_DIMENSION_MIN = 0x200,
-  RUNNINGHUB_MODEL_DIMENSION_MAX = 0x2000,
-  RUNNINGHUB_MODEL_DIMENSION_ALIGN = 0x8,
+  RUNNINGHUB_MODEL_DIMENSION_MIN = 512,
+  RUNNINGHUB_MODEL_DIMENSION_MAX = 8192,
+  RUNNINGHUB_MODEL_DIMENSION_ALIGN = 8,
   RUNNINGHUB_MODEL_DEFAULT_QUALITY = '2K',
   RUNNINGHUB_MODEL_DEFAULT_RATIO = '1:1',
   RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP = Object['freeze']({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   RUNNINGHUB_MODEL_RATIO_LIST = Object['freeze']([
     '1:1',
@@ -95,7 +95,7 @@ function hasApimartGrokImagineImageInput(list = []) {
   return Array['isArray'](list) && list['some']((options) => String(options || '')['trim']());
 }
 export function apimartGrokImagineImage({ currentBody: currentBody = {}, finalUrls: finalUrls = [] }) {
-  const model = Array['isArray'](finalUrls) ? String(finalUrls[0x0] || '')['trim']() : '',
+  const model = Array['isArray'](finalUrls) ? String(finalUrls[0] || '')['trim']() : '',
     target = {
       ...currentBody,
       model: model ? 'grok-imagine-1.5-edit-apimart' : 'grok-imagine-1.5-apimart',
@@ -194,10 +194,10 @@ const APIMART_MIDJOURNEY_MODEL_OPTIONS = Object['freeze']({
   5.1: Object['freeze']({ version: '5.1', niji: ![] }),
   niji7: Object['freeze']({ version: '7', niji: !![] }),
   'niji-7': Object['freeze']({ version: '7', niji: !![] }),
-  'niji\x207': Object['freeze']({ version: '7', niji: !![] }),
+  'niji 7': Object['freeze']({ version: '7', niji: !![] }),
   niji6: Object['freeze']({ version: '6', niji: !![] }),
   'niji-6': Object['freeze']({ version: '6', niji: !![] }),
-  'niji\x206': Object['freeze']({ version: '6', niji: !![] }),
+  'niji 6': Object['freeze']({ version: '6', niji: !![] }),
 });
 function resolveApimartMidjourneyModel(options2 = {}) {
   const scope =
@@ -250,7 +250,7 @@ export function apimartMidjourneyImage({
 }) {
   const version = resolveApimartMidjourneyModel(payload),
     inputUrlsBySlot = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    enabled5 = Object['keys'](inputUrlsBySlot)['length'] > 0x0,
+    enabled5 = Object['keys'](inputUrlsBySlot)['length'] > 0,
     list2 = [];
   if (inputUrlsBySlot['imageUrl']) list2['push'](inputUrlsBySlot['imageUrl']);
   else
@@ -273,7 +273,7 @@ export function apimartMidjourneyImage({
   (value16 === 'relax' || value16 === 'fast' || value16 === 'turbo') && (value15['speed'] = value16);
   const value17 = String(currentBody['quality'] || payload['quality'] || '1')['trim']();
   if (value17) value15['quality'] = value17;
-  if (list2['length'] > 0x0) value15['image_urls'] = list2;
+  if (list2['length'] > 0) value15['image_urls'] = list2;
   if (inputUrlsBySlot['cref']) value15['cref'] = inputUrlsBySlot['cref'];
   if (inputUrlsBySlot['sref']) value15['sref'] = inputUrlsBySlot['sref'];
   if (inputUrlsBySlot['dref']) value15['dref'] = inputUrlsBySlot['dref'];
@@ -283,7 +283,7 @@ export function apimartMidjourneyImage({
   (assignApimartMidjourneyNumber(value15, 'stylize', currentBody['stylize'], { integer: !![] }),
     assignApimartMidjourneyNumber(value15, 'chaos', currentBody['chaos'], { integer: !![] }),
     assignApimartMidjourneyNumber(value15, 'weird', currentBody['weird'], { integer: !![] }));
-  list2['length'] > 0x0 && assignApimartMidjourneyNumber(value15, 'iw', currentBody['iw']);
+  list2['length'] > 0 && assignApimartMidjourneyNumber(value15, 'iw', currentBody['iw']);
   inputUrlsBySlot['cref'] &&
     assignApimartMidjourneyNumber(value15, 'cw', currentBody['cw'], { integer: !![] });
   inputUrlsBySlot['sref'] &&
@@ -304,8 +304,8 @@ export function apimartMidjourneyImage({
   return value15;
 }
 function pickClosestPpioRatio(value19, value20) {
-  const value21 = Number(value19 || 0x1) / Number(value20 || 0x1);
-  let value22 = PPIO_RATIO_OPTIONS[0x0],
+  const value21 = Number(value19 || 1) / Number(value20 || 1);
+  let value22 = PPIO_RATIO_OPTIONS[0],
     value23 = Number['POSITIVE_INFINITY'];
   for (const value24 of PPIO_RATIO_OPTIONS) {
     const value25 = Math['abs'](value24['w'] / value24['h'] - value21);
@@ -330,14 +330,14 @@ function normalizePpioAspectRatioLabel(value28) {
   const [value30, value31] = list3['split'](':'),
     count = Number['parseFloat'](value30),
     count2 = Number['parseFloat'](value31);
-  if (!(count > 0x0 && count2 > 0x0)) return PPIO_DEFAULT_RATIO;
+  if (!(count > 0 && count2 > 0)) return PPIO_DEFAULT_RATIO;
   const closestPpioRatio = pickClosestPpioRatio(count, count2);
   return PPIO_RATIO_LABEL_SET['has'](closestPpioRatio) ? closestPpioRatio : PPIO_DEFAULT_RATIO;
 }
 function calculatePpioSizeFromTargetPixels(value32, value33) {
   const [value34, value35] = String(value33 || PPIO_DEFAULT_RATIO)['split'](':'),
-    value36 = Number['parseFloat'](value34) || 0x1,
-    value37 = Number['parseFloat'](value35) || 0x1,
+    value36 = Number['parseFloat'](value34) || 1,
+    value37 = Number['parseFloat'](value35) || 1,
     value38 = Math['max'](PPIO_MIN_RATIO, Math['min'](PPIO_MAX_RATIO, value36 / value37)),
     value39 = Math['max'](
       PPIO_MIN_PIXELS,
@@ -379,9 +379,9 @@ export function ppioImageSize({
       (value46['optimize_prompt_options'] = { ...args2['optimizePromptOptions'] }),
     args2['batchSizeField'] &&
       payload3['batchSize'] &&
-      payload3['batchSize'] > 0x1 &&
+      payload3['batchSize'] > 1 &&
       (value46[args2['batchSizeField']] = payload3['batchSize']),
-    finalUrls2['length'] > 0x0 && (value46[args2['imageInputField'] || 'image'] = finalUrls2),
+    finalUrls2['length'] > 0 && (value46[args2['imageInputField'] || 'image'] = finalUrls2),
     value46
   );
 }
@@ -477,14 +477,14 @@ function normalizePixelSize(value67) {
     ['trim']()
     ['match'](/^(\d{2,5})\s*[xX]\s*(\d{2,5})$/);
   if (!enabled8) return '';
-  return enabled8[0x1] + 'x' + enabled8[0x2];
+  return enabled8[1] + 'x' + enabled8[2];
 }
 function getGrsaiGptImage2RatioOptionsForSize(value68, value69) {
   const grsaiGptImage2PixelSizesByRatio = getGrsaiGptImage2PixelSizesByRatio(value69);
   return Object['keys'](grsaiGptImage2PixelSizesByRatio)
     ['filter']((value70) => grsaiGptImage2PixelSizesByRatio[value70]?.[value68])
     ['map']((label2) => {
-      const value71 = parseRatioLabel(label2) || { w: 0x1, h: 0x1 };
+      const value71 = parseRatioLabel(label2) || { w: 1, h: 1 };
       return Object['freeze']({ label: label2, value: value71['w'] / value71['h'] });
     });
 }
@@ -493,9 +493,9 @@ function getDefaultGrsaiGptImage2PixelSize(value72, value73) {
 }
 function pickClosestGrsaiGptImage2RatioLabel(value74, value75, value76) {
   const ratioLabel2 = parseRatioLabel(value74),
-    value77 = ratioLabel2 ? ratioLabel2['w'] / ratioLabel2['h'] : 0x1,
+    value77 = ratioLabel2 ? ratioLabel2['w'] / ratioLabel2['h'] : 1,
     grsaiGptImage2RatioOptionsForSize = getGrsaiGptImage2RatioOptionsForSize(value75, value76);
-  let value78 = grsaiGptImage2RatioOptionsForSize[0x0] || { label: '1:1', value: 0x1 },
+  let value78 = grsaiGptImage2RatioOptionsForSize[0] || { label: '1:1', value: 1 },
     value79 = Number['POSITIVE_INFINITY'];
   for (const el of grsaiGptImage2RatioOptionsForSize) {
     const value80 = Math['abs'](value77 - el['value']);
@@ -671,7 +671,7 @@ function normalizeRunningHubBodyParamValue(value104, value105) {
     return Boolean(value104);
   }
   if (value106 === 'integer') {
-    const value108 = Number['parseInt'](String(value104 ?? '')['trim'](), 0xa);
+    const value108 = Number['parseInt'](String(value104 ?? '')['trim'](), 10);
     return Number['isFinite'](value108) ? value108 : null;
   }
   if (value106 === 'number') {
@@ -685,7 +685,7 @@ function normalizeRunningHubAspectRatioValueMap(value110) {
 }
 function hasRunningHubAspectRatioValueMap(value111) {
   return (
-    Object['keys'](normalizeRunningHubAspectRatioValueMap(value111?.['aspectRatioValueMap']))['length'] > 0x0
+    Object['keys'](normalizeRunningHubAspectRatioValueMap(value111?.['aspectRatioValueMap']))['length'] > 0
   );
 }
 function resolveRunningHubMappedAspectRatio(value112, value113) {
@@ -697,13 +697,13 @@ function resolveRunningHubMappedAspectRatio(value112, value113) {
     list4 = Object['entries'](runningHubAspectRatioValueMap)
       ['map'](([value114, value115]) => [normalizeRatioLabelText(value114), String(value115 || '')['trim']()])
       ['filter'](([value116, value117]) => value116 && value117);
-  if (list4['length'] === 0x0) return enabled9;
+  if (list4['length'] === 0) return enabled9;
   const ratioLabelText3 = normalizeRatioLabelText(enabled9),
     value118 = list4['find'](([value119]) => value119 === ratioLabelText3);
-  if (value118) return value118[0x1];
+  if (value118) return value118[1];
   const value120 = ratioLabelText3['toLowerCase'](),
     value121 = list4['find'](([, value122]) => value122['toLowerCase']() === value120);
-  if (value121) return value121[0x1];
+  if (value121) return value121[1];
   const ratioLabel4 = parseRatioLabel(ratioLabelText3);
   if (!ratioLabel4) return enabled9;
   const value123 = ratioLabel4['w'] / ratioLabel4['h'];
@@ -829,13 +829,13 @@ function normalizeRunningHubModelRatio(value158) {
   const [value160, value161] = list5['split'](':'),
     count3 = Number['parseFloat'](value160),
     count4 = Number['parseFloat'](value161);
-  if (!(count3 > 0x0 && count4 > 0x0)) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
+  if (!(count3 > 0 && count4 > 0)) return RUNNINGHUB_MODEL_DEFAULT_RATIO;
   const value162 = count3 + ':' + count4;
   return RUNNINGHUB_MODEL_RATIO_SET['has'](value162) ? value162 : RUNNINGHUB_MODEL_DEFAULT_RATIO;
 }
 function alignRunningHubDimension(value163) {
   const value164 =
-    Math['round'](Number(value163 || 0x0) / RUNNINGHUB_MODEL_DIMENSION_ALIGN) *
+    Math['round'](Number(value163 || 0) / RUNNINGHUB_MODEL_DIMENSION_ALIGN) *
     RUNNINGHUB_MODEL_DIMENSION_ALIGN;
   return Math['max'](RUNNINGHUB_MODEL_DIMENSION_MIN, Math['min'](RUNNINGHUB_MODEL_DIMENSION_MAX, value164));
 }
@@ -843,8 +843,8 @@ function resolveRunningHubModelDimensions(value165, value166) {
   const runningHubModelQuality = normalizeRunningHubModelQuality(value165),
     runningHubModelRatio = normalizeRunningHubModelRatio(value166),
     [value167, value168] = runningHubModelRatio['split'](':'),
-    value169 = Number['parseFloat'](value167) || 0x1,
-    value170 = Number['parseFloat'](value168) || 0x1,
+    value169 = Number['parseFloat'](value167) || 1,
+    value170 = Number['parseFloat'](value168) || 1,
     value171 =
       RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[runningHubModelQuality] ||
       RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP[RUNNINGHUB_MODEL_DEFAULT_QUALITY],
@@ -915,15 +915,15 @@ export function runninghubImage({
     width = value181
       ? providerRatioPayload?.['ratioCapability'] === 'dimensions'
         ? {
-            width: Number(providerRatioPayload?.['params']?.['width']) || 0x800,
-            height: Number(providerRatioPayload?.['params']?.['height']) || 0x800,
+            width: Number(providerRatioPayload?.['params']?.['width']) || 2048,
+            height: Number(providerRatioPayload?.['params']?.['height']) || 2048,
           }
         : resolveRunningHubModelDimensions(imageSize3, payload7['aspectRatio'])
       : null,
     enabled18 =
       value181 ||
       quality['omitAspectRatio'] === !![] ||
-      (quality['omitAspectRatioWhenInput'] === !![] && finalUrls5['length'] > 0x0) ||
+      (quality['omitAspectRatioWhenInput'] === !![] && finalUrls5['length'] > 0) ||
       payload7['suppressAspectRatio'] ||
       isAdaptiveRatioInput(value179) ||
       !aspectRatio4 ||
@@ -934,7 +934,7 @@ export function runninghubImage({
     value182 = {
       prompt: finalPrompt5 || '',
       ...(value181
-        ? { width: width?.['width'] || 0x800, height: width?.['height'] || 0x800 }
+        ? { width: width?.['width'] || 2048, height: width?.['height'] || 2048 }
         : !enabled17
           ? { resolution: resolution }
           : {}),
@@ -946,9 +946,9 @@ export function runninghubImage({
     assignRunningHubInputSlotFields2 = assignRunningHubInputSlotFields(value182, quality, finalUrlsBySlot);
   return (
     assignRunningHubPolicyParams(value182, payload7, quality, assignRunningHubInputSlotFields2, {
-      hasInputImages: finalUrls5['length'] > 0x0,
+      hasInputImages: finalUrls5['length'] > 0,
     }),
-    finalUrls5['length'] > 0x0 && !quality['inputSlotBodyFields'] && (value182['imageUrls'] = finalUrls5),
+    finalUrls5['length'] > 0 && !quality['inputSlotBodyFields'] && (value182['imageUrls'] = finalUrls5),
     value182
   );
 }
@@ -961,7 +961,7 @@ export function runninghubImageEndpoint({
 }) {
   const runningHubModelId2 = normalizeRunningHubModelId(modelToken6),
     runningHubModelEndpoint = resolveRunningHubModelEndpoint({
-      hasInputImages: finalUrls6['length'] > 0x0,
+      hasInputImages: finalUrls6['length'] > 0,
       executionManifest: executionManifest8,
       modelManifest: modelManifest5,
       payload: payload8,

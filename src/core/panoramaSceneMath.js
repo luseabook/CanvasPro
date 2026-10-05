@@ -551,52 +551,52 @@ export function computeUniformScaleFactor({
 }
 const SCENE_ORBIT_POLE_MARGIN = 0.01;
 
-export const SCENE_NAVIGATION_REFERENCE_FOCAL_LENGTH_MM = 0x23;
+export const SCENE_NAVIGATION_REFERENCE_FOCAL_LENGTH_MM = 35;
 
 const SCENE_PAN_SCREEN_GAIN = 0.9,
   SCENE_CLOSE_PAN_SCREEN_GAIN = 0.82,
-  WHEEL_LINE_HEIGHT_PX = 0x10,
-  WHEEL_DELTA_LIMIT_PX = 0xf0;
+  WHEEL_LINE_HEIGHT_PX = 16,
+  WHEEL_DELTA_LIMIT_PX = 240;
 
 export function computePerspectiveFrameDistance({
   radius: radius,
-  fov: fov = 0x3a,
-  aspect: aspect = 0x1,
+  fov: fov = 58,
+  aspect: aspect = 1,
   padding: padding = 1.18,
   minDistance: minDistance = SCENE_ORBIT_DISTANCE_MIN,
   maxDistance: maxDistance = SCENE_ORBIT_DISTANCE_MAX,
 } = {}) {
   const value116 = Math.max(0.01, Number(radius) || 0.5),
-    value117 = (clamp(Number(fov) || 0x3a, 0x1, 0xb3) * Math.PI) / 0x168,
-    value118 = Math.max(0.1, Number(aspect) || 0x1),
+    value117 = (clamp(Number(fov) || 58, 1, 179) * Math.PI) / 360,
+    value118 = Math.max(0.1, Number(aspect) || 1),
     value119 = Math.atan(Math.tan(value117) * value118),
     value120 = Math.max(0.01, Math.min(value117, value119)),
-    value121 = (value116 / Math.sin(value120)) * Math.max(0x1, Number(padding) || 0x1);
+    value121 = (value116 / Math.sin(value120)) * Math.max(1, Number(padding) || 1);
   return clamp(value121, minDistance, maxDistance);
 }
 
 export function resolveAdaptiveCameraClipPlanes({
   focusDistance: focusDistance,
-  sceneExtent: sceneExtent = 0x0,
-  sceneDistance: sceneDistance = 0x0,
+  sceneExtent: sceneExtent = 0,
+  sceneDistance: sceneDistance = 0,
 } = {}) {
-  const value122 = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(focusDistance) || 0x8),
-    value123 = Math.max(0x0, Number(sceneExtent) || 0x0),
-    value124 = Math.max(0x0, Number(sceneDistance) || 0x0),
-    far = clamp(Math.max(0xfa, value122 * 0x20, value123 * 0x4, value124 * 1.25), 0xfa, 0x1388);
-  return { near: clamp(Math.max(value122 * 0.01, far / 0xc350), 0.015, 0.25), far: far };
+  const value122 = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(focusDistance) || 8),
+    value123 = Math.max(0, Number(sceneExtent) || 0),
+    value124 = Math.max(0, Number(sceneDistance) || 0),
+    far = clamp(Math.max(250, value122 * 32, value123 * 4, value124 * 1.25), 250, 5000);
+  return { near: clamp(Math.max(value122 * 0.01, far / 50000), 0.015, 0.25), far: far };
 }
 
 function resolveSceneOrbitProjectionGain(value125) {
   const fov2 = focalLengthToFov(SCENE_NAVIGATION_REFERENCE_FOCAL_LENGTH_MM),
-    clamp8 = clamp(Number(value125) || fov2, 0x1, 0xb3);
-  return Math.tan((clamp8 * Math.PI) / 0x168) / Math.tan((fov2 * Math.PI) / 0x168);
+    clamp8 = clamp(Number(value125) || fov2, 1, 179);
+  return Math.tan((clamp8 * Math.PI) / 360) / Math.tan((fov2 * Math.PI) / 360);
 }
 
 export function applySceneFlyLookDelta(value126, value127, value128, value129, value130 = {}) {
   const x16 = resolveSceneCameraPose(value126),
     args5 = applyOrbitDelta(value126, value127, value128, value129, value130),
-    x17 = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(value126?.['orbitDistance']) || x16['distance'] || 0x8),
+    x17 = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(value126?.['orbitDistance']) || x16['distance'] || 8),
     value131 = Math.cos(args5['orbitPitch']),
     box27 = {
       x: x17 * Math.sin(args5['orbitYaw']) * value131,
@@ -616,27 +616,27 @@ export function applySceneFlyLookDelta(value126, value127, value128, value129, v
 export function applySceneFlyMovement(
   event4,
   box28 = {},
-  value132 = 0x0,
-  { speed: speed = 0x4, boostMultiplier: boostMultiplier = 0x4, minimumCameraY: minimumCameraY = 0.2 } = {},
+  value132 = 0,
+  { speed: speed = 4, boostMultiplier: boostMultiplier = 4, minimumCameraY: minimumCameraY = 0.2 } = {},
 ) {
   const sceneCameraPose = resolveSceneCameraPose(event4),
-    x18 = normalizeVector3(event4?.['target'], { x: 0x0, y: 1.2, z: 0x0 }),
-    x19 = normalize3(subtract(x18, sceneCameraPose['position']), { x: 0x0, y: 0x0, z: -0x1 }),
-    value133 = { x: 0x0, y: 0x1, z: 0x0 },
-    box29 = normalize3(cross(x19, value133), { x: 0x1, y: 0x0, z: 0x0 }),
+    x18 = normalizeVector3(event4?.['target'], { x: 0, y: 1.2, z: 0 }),
+    x19 = normalize3(subtract(x18, sceneCameraPose['position']), { x: 0, y: 0, z: -1 }),
+    value133 = { x: 0, y: 1, z: 0 },
+    box29 = normalize3(cross(x19, value133), { x: 1, y: 0, z: 0 }),
     value134 = {
-      x: x19['x'] * (Number(box28['forward']) || 0x0) + box29['x'] * (Number(box28['right']) || 0x0),
+      x: x19['x'] * (Number(box28['forward']) || 0) + box29['x'] * (Number(box28['right']) || 0),
       y:
-        x19['y'] * (Number(box28['forward']) || 0x0) +
-        box29['y'] * (Number(box28['right']) || 0x0) +
-        (Number(box28['vertical']) || 0x0),
-      z: x19['z'] * (Number(box28['forward']) || 0x0) + box29['z'] * (Number(box28['right']) || 0x0),
+        x19['y'] * (Number(box28['forward']) || 0) +
+        box29['y'] * (Number(box28['right']) || 0) +
+        (Number(box28['vertical']) || 0),
+      z: x19['z'] * (Number(box28['forward']) || 0) + box29['z'] * (Number(box28['right']) || 0),
     },
     length33 = length3(value134),
-    value135 = length33 > 0x1 ? normalize3(value134) : value134,
-    value136 = box28['boost'] === !![] ? Math.max(0x1, Number(boostMultiplier) || 0x1) : 0x1,
+    value135 = length33 > 1 ? normalize3(value134) : value134,
+    value136 = box28['boost'] === !![] ? Math.max(1, Number(boostMultiplier) || 1) : 1,
     value137 =
-      Math.max(0x0, Math.min(0.1, Number(value132) || 0x0)) * Math.max(0.01, Number(speed) || 0x4) * value136,
+      Math.max(0, Math.min(0.1, Number(value132) || 0)) * Math.max(0.01, Number(speed) || 4) * value136,
     box30 = scale(value135, value137),
     value138 = sceneCameraPose['position']['y'] + box30['y'];
   return (
@@ -659,14 +659,14 @@ function hasFiniteVector3(box31) {
   );
 }
 
-export function normalizeWheelDelta(value139, value140 = 0x0, value141 = 0x320) {
-  const value142 = Number(value139) || 0x0,
-    count3 = Number(value140) || 0x0,
+export function normalizeWheelDelta(value139, value140 = 0, value141 = 800) {
+  const value142 = Number(value139) || 0,
+    count3 = Number(value140) || 0,
     value143 =
-      count3 === 0x1
+      count3 === 1
         ? WHEEL_LINE_HEIGHT_PX
-        : count3 === 0x2
-          ? Math.max(0x78, Number(value141) || 0x320)
-          : 0x1;
+        : count3 === 2
+          ? Math.max(120, Number(value141) || 800)
+          : 1;
   return clamp(value142 * value143, -WHEEL_DELTA_LIMIT_PX, WHEEL_DELTA_LIMIT_PX);
 }

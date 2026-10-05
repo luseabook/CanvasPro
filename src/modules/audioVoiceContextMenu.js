@@ -134,7 +134,7 @@ export function buildAudioVoiceSegmentContextMenuItems({
 function createAudioVoiceInlineMenuItem(el, result, data = '') {
   const el2 = createEl(
     'button',
-    ['audio-voice-menu-item', data]['filter'](Boolean)['join']('\x20'),
+    ['audio-voice-menu-item', data]['filter'](Boolean)['join'](' '),
     el['label'],
   );
   el2['type'] = 'button';
@@ -217,7 +217,7 @@ export function createAudioVoiceSegmentContextMenuController({
       if (
         event['defaultPrevented'] ||
         event['target']?.['closest']?.(
-          TEXT_CONTEXT_MENU_TARGET_SELECTOR + ',\x20.audio-voice-more-menu,\x20.audio-voice-model-submenu',
+          TEXT_CONTEXT_MENU_TARGET_SELECTOR + ', .audio-voice-more-menu, .audio-voice-model-submenu',
         )
       )
         return;
@@ -233,8 +233,8 @@ export function createAudioVoiceSegmentContextMenuController({
         closeInlineMenus?.(),
         close(),
         (showContextMenu2 = showContextMenu(
-          Number(event['clientX']) || 0x0,
-          Number(event['clientY']) || 0x0,
+          Number(event['clientX']) || 0,
+          Number(event['clientY']) || 0,
           config,
           {
             className: 'v2-canvas-ctx-menu audio-voice-segment-context-menu',

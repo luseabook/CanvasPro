@@ -15,13 +15,13 @@ function normalizeMode(item) {
   return PERSON_REPLACEMENT_EXPORT_MODES['CURRENT_CLIP'];
 }
 function formatSequence(key) {
-  return String(key + 0x1)['padStart'](0x2, '0');
+  return String(key + 1)['padStart'](2, '0');
 }
 function resolveMediaExtension(index, result) {
   const text2 = normalizeText(index)
     ['replace'](/[?#].*$/, '')
     ['match'](/\.([a-z0-9]{2,10})$/i);
-  return normalizeText(text2?.[0x1])['toLowerCase']() || result;
+  return normalizeText(text2?.[1])['toLowerCase']() || result;
 }
 function buildMediaFile({ ref: ref, kind: kind, filename: filename }) {
   const text3 = normalizeText(ref);
@@ -93,7 +93,7 @@ export function buildPersonReplacementExportPlan({
     if (mode2 === PERSON_REPLACEMENT_EXPORT_MODES['CURRENT_CLIP']) {
       const text4 = normalizeText(project['workspace']?.['selectedShotId']),
         count = list['findIndex']((payload) => normalizeText(payload?.['id']) === text4);
-      if (count < 0x0) throw new Error('请先选择要导出的镜头片段。');
+      if (count < 0) throw new Error('请先选择要导出的镜头片段。');
       const replacementVideoFile = buildReplacementVideoFile(list[count], count);
       if (!replacementVideoFile) throw new Error('当前片段还没有可导出的替换视频。');
       files['push'](replacementVideoFile);
@@ -138,7 +138,7 @@ export async function exportPersonReplacementMedia({
     exportedCount =
       title2['mode'] === PERSON_REPLACEMENT_EXPORT_MODES['FINAL_VIDEO'] ||
       title2['mode'] === PERSON_REPLACEMENT_EXPORT_MODES['CURRENT_CLIP']
-        ? await saveMedia({ ...title2['files'][0x0], title: title2['title'] })
+        ? await saveMedia({ ...title2['files'][0], title: title2['title'] })
         : await saveMediaFiles({ title: title2['title'], files: title2['files'] });
   return {
     ...exportedCount,

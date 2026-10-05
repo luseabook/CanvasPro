@@ -83,8 +83,8 @@ export function renderVideoPromptEditorMarkup({
   return (
     '<div class="prompt-input-wrapper is-resizable"><div class="prompt-textarea custom-textarea" contenteditable="true" spellcheck="false" data-placeholder="' +
     escapeHtmlAttr(placeholder) +
-    '\x22' +
-    (payload ? '\x20' + payload : '') +
+    '"' +
+    (payload ? ' ' + payload : '') +
     '>' +
     sanitizePromptHtml2 +
     '</div></div>'
@@ -115,15 +115,15 @@ function createReferenceDeleteButtonMarkup(
         escapeHtmlAttr(output) +
         '" data-ref-remove-value="' +
         escapeHtmlAttr(value) +
-        '\x22'
+        '"'
       : '',
-    value3 = showTitle ? ' title="' + escapeHtmlAttr(referenceInputText('removeReference')) + '\x22' : '';
+    value3 = showTitle ? ' title="' + escapeHtmlAttr(referenceInputText('removeReference')) + '"' : '';
   return (
     '<button type="button" class="ref-thumb-delete"' +
     value2 +
     value3 +
     ' aria-label="' +
-    escapeHtmlAttr(referenceInputText('removeReference') + '\x20' + scope) +
+    escapeHtmlAttr(referenceInputText('removeReference') + ' ' + scope) +
     '">&times;</button>'
   );
 }
@@ -137,13 +137,13 @@ export function renderVideoFixedInputSlotMarkup({
   const value4 = String(slot || '')['trim'](),
     value5 = String(fixedInputConfig2?.['slotKindById']?.[value4] || '')['trim'](),
     videoFixedInputSlotLabelText = getVideoFixedInputSlotLabelText(fixedInputConfig2, value4),
-    value6 = showTitle ? ' title="' + escapeHtmlAttr(videoFixedInputSlotLabelText) + '\x22' : '',
+    value6 = showTitle ? ' title="' + escapeHtmlAttr(videoFixedInputSlotLabelText) + '"' : '',
     value7 =
-      'data-slot="' + escapeHtmlAttr(value4) + '" data-kind="' + escapeHtmlAttr(value5) + '\x22' + value6;
+      'data-slot="' + escapeHtmlAttr(value4) + '" data-kind="' + escapeHtmlAttr(value5) + '"' + value6;
   if (!input || !normalizeInputUrl(input)) {
     if (readOnly)
       return (
-        '<div\x20class=\x22ref-thumb-wrap\x20ref-upload-slot\x20rh-v5-ref-box\x20ref-thumb-wrap--readonly\x20is-empty\x22\x20' +
+        '<div class="ref-thumb-wrap ref-upload-slot rh-v5-ref-box ref-thumb-wrap--readonly is-empty" ' +
         value7 +
         ' role="img" aria-label="' +
         escapeHtmlAttr(videoFixedInputSlotLabelText) +
@@ -202,10 +202,10 @@ export function renderVideoFixedInputSlotsMarkup({
 }
 function renderGenericReferenceItem(error, value11, { showTitle: showTitle = !![] } = {}) {
   const value12 = String(error?.['kind'] || 'image')['trim'](),
-    value13 = String(error?.['name'] || error?.['label'] || value12 + '\x20' + (value11 + 0x1))['trim'](),
-    value14 = String(error?.['slotId'] || value12 + '-' + (value11 + 0x1))['trim']();
+    value13 = String(error?.['name'] || error?.['label'] || value12 + ' ' + (value11 + 1))['trim'](),
+    value14 = String(error?.['slotId'] || value12 + '-' + (value11 + 1))['trim']();
   return (
-    '<div\x20class=\x22ref-thumb-wrap\x22\x20data-slot=\x22' +
+    '<div class="ref-thumb-wrap" data-slot="' +
     escapeHtmlAttr(value14) +
     '" data-kind="' +
     escapeHtmlAttr(value12) +
@@ -217,7 +217,7 @@ function renderGenericReferenceItem(error, value11, { showTitle: showTitle = !![
 }
 function renderReadOnlyReferenceItem(response2, value15) {
   const value16 = String(response2?.['kind'] || response2?.['type'] || 'image')['trim'](),
-    value17 = String(response2?.['name'] || response2?.['label'] || value16 + '\x20' + (value15 + 0x1))[
+    value17 = String(response2?.['name'] || response2?.['label'] || value16 + ' ' + (value15 + 1))[
       'trim'
     ](),
     value18 = String(response2?.['slotId'] || response2?.['slot'] || '')['trim'](),
@@ -225,19 +225,19 @@ function renderReadOnlyReferenceItem(response2, value15) {
     value20 = String(response2?.['removeValue'] || ''),
     value21 = response2?.['showTitle'] !== ![],
     value22 = value16 + ':' + String(response2?.['url'] || normalizeInputUrl(response2))['trim'](),
-    value23 = value21 ? '\x20title=\x22' + escapeHtmlAttr(value17) + '\x22' : '';
+    value23 = value21 ? ' title="' + escapeHtmlAttr(value17) + '"' : '';
   return (
     '<div class="ref-thumb-wrap ref-thumb-wrap--readonly"' +
-    (value18 ? ' data-slot="' + escapeHtmlAttr(value18) + '\x22' : '') +
+    (value18 ? ' data-slot="' + escapeHtmlAttr(value18) + '"' : '') +
     ' data-kind="' +
     escapeHtmlAttr(value16) +
     '" data-ref-origin="asset" data-ref-readonly-key="' +
     escapeHtmlAttr(value22) +
     '" role="' +
     (value19 ? 'group' : 'img') +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     escapeHtmlAttr(value17) +
-    '\x22' +
+    '"' +
     value23 +
     '>' +
     createReferenceMediaMarkup(value16, response2) +
@@ -251,7 +251,7 @@ function renderReadOnlyReferenceInputsMarkup(list = [], { showTitles: showTitles
   const enabled = Array['isArray'](list) ? list['filter']((value24) => normalizeInputUrl(value24)) : [];
   if (!enabled['length']) return '';
   return (
-    '<div\x20class=\x22ref-thumb-container\x20ref-thumb-container--readonly\x22>' +
+    '<div class="ref-thumb-container ref-thumb-container--readonly">' +
     enabled['map']((args, value25) =>
       renderReadOnlyReferenceItem({ ...args, showTitle: showTitles && args?.['showTitle'] !== ![] }, value25),
     )['join']('') +
@@ -282,7 +282,7 @@ export function renderVideoReferenceBarContentMarkup({
       attachmentButtonHtml +
       ' <div class="ref-thumb-container rh-v5-ref-container" aria-label="' +
       escapeHtmlAttr(referenceInputText('fixedInputsAria', { label: value26 })) +
-      '\x22>' +
+      '">' +
       renderVideoFixedInputSlotsMarkup({
         fixedInputConfig: fixedInputConfig,
         inputsBySlot: inputsBySlot,
@@ -298,7 +298,7 @@ export function renderVideoReferenceBarContentMarkup({
   if (!enabled2['length']) return '' + attachmentButtonHtml + renderReadOnlyReferenceInputsMarkup2;
   return (
     attachmentButtonHtml +
-    '\x20<div\x20class=\x22ref-thumb-container\x22>' +
+    ' <div class="ref-thumb-container">' +
     enabled2['map']((value28, value29) =>
       renderGenericReferenceItem(value28, value29, { showTitle: showItemTitles }),
     )['join']('') +
@@ -319,5 +319,5 @@ export function renderVideoReferenceBarMarkup(options2 = {}) {
       : value31 || value33
         ? 'node-ref-bar active'
         : 'node-ref-bar';
-  return '<div class="' + value35 + '\x22>' + renderVideoReferenceBarContentMarkup(options2) + '</div>';
+  return '<div class="' + value35 + '">' + renderVideoReferenceBarContentMarkup(options2) + '</div>';
 }

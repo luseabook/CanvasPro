@@ -3,9 +3,9 @@ import { t } from '../../i18n/index.js';
 import { calcWorkflowBounds } from './workflowCanvas.js';
 export const DEFAULT_WORKFLOW_COVER_ID = '__workflow_default_cover__';
 export const WORKFLOW_SNAPSHOT_COVER_ID = '__workflow_snapshot_cover__';
-const SNAPSHOT_WIDTH = 0x280,
-  SNAPSHOT_HEIGHT = 0x168,
-  SNAPSHOT_FRAME = { x: 42, y: 74, width: 0x22c, height: 244, padding: 28 },
+const SNAPSHOT_WIDTH = 640,
+  SNAPSHOT_HEIGHT = 360,
+  SNAPSHOT_FRAME = { x: 42, y: 74, width: 556, height: 244, padding: 28 },
   SNAPSHOT_MAX_NODES = 24,
   CSS_CUSTOM_PROPERTY_RE = /^var\(\s*(--[\w-]+)(?:\s*,\s*(.+))?\s*\)$/,
   CSS_TOKEN_OPACITY_RE = /^(--[\w-]+)-(\d{2})$/,

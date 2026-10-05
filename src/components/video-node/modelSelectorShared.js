@@ -50,7 +50,7 @@ export function buildVideoModelMenuHTML({
     ],
     activeModel2 = allowedModelIds2['includes'](String(activeModel || '')['trim']())
       ? String(activeModel || '')['trim']()
-      : allowedModelIds2[0x0] ||
+      : allowedModelIds2[0] ||
         String(activeModel || '')['trim']() ||
         getDefaultRunningHubVideoWorkflowModelId(),
     itemsHtml = buildBinghuoVideoMenuItemsHtml(activeModel2);
@@ -101,7 +101,7 @@ export function buildVideoModelMenuHTML({
                   toggleAttr: 'data-apimart-video-toggle',
                   label: 'APIMart',
                   subtitle: '视频生成模型',
-                  iconHtml: buildApimartVideoLogoHTML(0x14),
+                  iconHtml: buildApimartVideoLogoHTML(20),
                   itemsHtml: itemsHtml2,
                 },
               ]
@@ -196,7 +196,7 @@ export function buildVideoModelMenuHTML({
         toggleAttr: 'data-minimax-video-toggle',
         label: 'MiniMAX官方',
         subtitle: '视频生成模型',
-        iconHtml: buildMinimaxVideoLogoHTML(0x14),
+        iconHtml: buildMinimaxVideoLogoHTML(20),
         itemsHtml: buildMinimaxVideoMenuItemsHtml(activeModel2),
       },
       {
@@ -206,7 +206,7 @@ export function buildVideoModelMenuHTML({
         toggleAttr: 'data-apimart-video-toggle',
         label: 'APIMart',
         subtitle: '视频生成模型',
-        iconHtml: buildApimartVideoLogoHTML(0x14),
+        iconHtml: buildApimartVideoLogoHTML(20),
         itemsHtml: buildApimartVideoMenuItemsHtml(activeModel2, provider),
       },
       {
@@ -214,9 +214,9 @@ export function buildVideoModelMenuHTML({
         headerClass: 'agnes-video-group-header',
         submenuClass: 'agnes-video-submenu',
         toggleAttr: 'data-agnes-video-toggle',
-        label: 'Agnes\x20AI',
-        subtitle: 'Video\x20model\x20API',
-        iconHtml: buildAgnesVideoLogoHTML(0x14),
+        label: 'Agnes AI',
+        subtitle: 'Video model API',
+        iconHtml: buildAgnesVideoLogoHTML(20),
         itemsHtml: buildAgnesVideoMenuItemsHtml(activeModel2),
       },
       ...(isBinghuoVideoChannelVisible(subscriptionState) && itemsHtml
@@ -228,7 +228,7 @@ export function buildVideoModelMenuHTML({
               toggleAttr: 'data-binghuo-video-toggle',
               label: '便宜渠道bh',
               subtitle: '授权用户专属视频模型',
-              iconHtml: buildBinghuoVideoLogoHTML(0x14),
+              iconHtml: buildBinghuoVideoLogoHTML(20),
               itemsHtml: itemsHtml,
             },
           ]
@@ -238,7 +238,7 @@ export function buildVideoModelMenuHTML({
             {
               id: 'rh-ai-app',
               label: 'RH AI应用',
-              subtitle: '自定义\x20RunningHub\x20AI\x20App',
+              subtitle: '自定义 RunningHub AI App',
               icon: 'images/RH.png',
               iconAlt: 'runninghub',
               itemsHtml: itemsHtml4,
@@ -262,7 +262,7 @@ export function buildVideoModelMenuHTML({
       {
         id: 'runninghub-model',
         label: 'RunningHub模型',
-        subtitle: '标准模型\x20API',
+        subtitle: '标准模型 API',
         icon: 'images/RH.png',
         iconAlt: 'runninghub',
         itemsHtml: buildRunningHubVideoModelApiMenuItems(activeModel2),
@@ -285,7 +285,7 @@ export function bindLazyVideoModelMenu({
       if (
         menu['dataset']['lazyMounted'] === '1' &&
         menu['dataset']['lazyModelId'] === next &&
-        menu['childElementCount'] > 0x0
+        menu['childElementCount'] > 0
       )
         return menu;
       const el = documentObject?.['createElement']?.('template');
@@ -330,27 +330,27 @@ export function renderVideoModelTriggerIconHTML({
 } = {}) {
   const execution = resolveExecution(model, provider),
     providerId = resolveProviderId(model, provider, execution);
-  if (providerId === 'minimax') return buildMinimaxVideoLogoHTML(0xc);
-  if (providerId === 'apimart') return buildApimartVideoLogoHTML(0xc);
-  if (providerId === 'binghuo') return buildBinghuoVideoLogoHTML(0xc);
-  if (providerId === 'volcengine') return buildVolcengineVideoLogoHTML(0xc);
+  if (providerId === 'minimax') return buildMinimaxVideoLogoHTML(12);
+  if (providerId === 'apimart') return buildApimartVideoLogoHTML(12);
+  if (providerId === 'binghuo') return buildBinghuoVideoLogoHTML(12);
+  if (providerId === 'volcengine') return buildVolcengineVideoLogoHTML(12);
   if (providerId === 'dreamina' || execution?.['modelManifest']?.['extensions']?.['dreaminaStyleVideo'])
-    return buildDreaminaVideoLogoHTML(0xc);
+    return buildDreaminaVideoLogoHTML(12);
   if (providerId === 'comfyui')
     return getComfyUiVideoWorkflowIconHtml(
       execution?.['modelManifest']?.['extensions']?.['videoMenu'] || {},
-      0xc,
+      12,
     );
   if (providerId && /^custom_[a-z0-9_-]+$/i['test'](providerId))
-    return buildCustomProviderVideoLogoHTML(execution?.['modelManifest'] || {}, 0xc);
+    return buildCustomProviderVideoLogoHTML(execution?.['modelManifest'] || {}, 12);
   const state = providerId ? providersMeta?.[providerId]?.['logoPath'] : null;
   if (state)
     return (
       '<img src="' +
       state +
-      '\x22\x20class=\x22node-menu-icon-small\x22\x20alt=\x22' +
+      '" class="node-menu-icon-small" alt="' +
       providerId +
       '" loading="eager" decoding="async" fetchpriority="high" draggable="false">'
     );
-  return '<div\x20class=\x22node-menu-icon-small\x20node-menu-icon-badge\x20video-model-fallback-icon\x22>VM</div>';
+  return '<div class="node-menu-icon-small node-menu-icon-badge video-model-fallback-icon">VM</div>';
 }

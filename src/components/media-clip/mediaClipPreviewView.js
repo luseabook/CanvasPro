@@ -27,10 +27,10 @@ export function getPreviewLayoutTokens() {
 }
 export function getPreviewVideoLayoutClasses(options = {}) {
   const box = resolveMediaClipDimensions(options),
-    data = Math['max'](0x1, toNumber(box['width'], 0x1)),
-    target = Math['max'](0x1, toNumber(box['height'], 0x1)),
+    data = Math['max'](1, toNumber(box['width'], 1)),
+    target = Math['max'](1, toNumber(box['height'], 1)),
     count = data / target;
-  if (count < 0x1) return count <= 0.65 ? ['is-portrait', 'is-tall-portrait'] : ['is-portrait'];
+  if (count < 1) return count <= 0.65 ? ['is-portrait', 'is-tall-portrait'] : ['is-portrait'];
   return ['is-landscape'];
 }
 export function syncPreviewPanelLayout(source, el3, el4) {
@@ -47,8 +47,8 @@ export function syncPreviewPanelLayout(source, el3, el4) {
 export function applyPreviewVideoLayout(record, el5, payload = {}) {
   if (!el5?.['classList']) return;
   const box2 = resolveMediaClipDimensions(payload),
-    handle = Math['max'](0x1, toNumber(box2['width'], 0x1)),
-    state = Math['max'](0x1, toNumber(box2['height'], 0x1));
+    handle = Math['max'](1, toNumber(box2['width'], 1)),
+    state = Math['max'](1, toNumber(box2['height'], 1));
   (record['_previewLayoutTokens']()['forEach']((config) => {
     el5['classList']['remove'](config);
   }),
@@ -62,9 +62,9 @@ export function applyPreviewVideoLayout(record, el5, payload = {}) {
     ));
 }
 export function syncPreviewVideoLayoutFromElement(input, output = input['_videoPreview']) {
-  const width = toNumber(output?.['videoWidth'], 0x0),
-    height = toNumber(output?.['videoHeight'], 0x0);
-  if (!(width > 0x0 && height > 0x0)) return;
+  const width = toNumber(output?.['videoWidth'], 0),
+    height = toNumber(output?.['videoHeight'], 0);
+  if (!(width > 0 && height > 0)) return;
   input['_applyPreviewVideoLayout'](output['parentElement'], { width: width, height: height });
 }
 export function showPreviewImage(value2, value3 = {}, value4 = '') {
@@ -164,7 +164,7 @@ export function ensurePreviewAudioElement(value12) {
     el11['removeAttribute']('controls'),
     (el11['preload'] = 'metadata'),
     el11['addEventListener']('loadedmetadata', () => {
-      const value13 = value12['_audioSourceSecForPlayhead'](value12['_playheadSec'] || 0x0);
+      const value13 = value12['_audioSourceSecForPlayhead'](value12['_playheadSec'] || 0);
       value12['_syncPreviewTime']('audio', value13, { immediate: !![] });
     }),
     (value12['_audioPreview'] = el11),
@@ -196,7 +196,7 @@ export function renderPreview(value18) {
   const value19 = value18['_mediaClip']['tracks']['video'],
     value20 = value18['_mediaClip']['tracks']['audio'];
   if (value19) {
-    const response = value18['_getVideoPreviewContextAtTimelineSec'](value18['_playheadSec'] || 0x0),
+    const response = value18['_getVideoPreviewContextAtTimelineSec'](value18['_playheadSec'] || 0),
       enabled = response['url'],
       value21 = response['posterUrl'];
     value18['_applyPreviewVideoLayout'](el13, response['source']);
@@ -215,7 +215,7 @@ export function renderPreview(value18) {
       (setMediaElementSource(value22, enabled) && value18['_resetPreviewSeekState']('video'),
       (value18['_previewVideoSrc'] = enabled));
     const response2 = value20
-        ? value18['_getAudioClipContextAtTimelineSec'](value18['_playheadSec'] || 0x0)
+        ? value18['_getAudioClipContextAtTimelineSec'](value18['_playheadSec'] || 0)
         : null,
       value24 = response2?.['url'] || '';
     if (value20) {
@@ -238,7 +238,7 @@ export function renderPreview(value18) {
     ((el14['className'] = 'media-clip-audio-preview'),
       (el14['textContent'] = mediaClipText('preview.audioClip')));
     const value26 = value18['_ensurePreviewAudioElement'](),
-      response3 = value18['_getAudioClipContextAtTimelineSec'](value18['_playheadSec'] || 0x0),
+      response3 = value18['_getAudioClipContextAtTimelineSec'](value18['_playheadSec'] || 0),
       value27 = response3?.['url'] || resolveMediaClipAudioUrl(value18['_sources']['audio']);
     (setMediaElementSource(value26, value27) && value18['_resetPreviewSeekState']('audio'),
       (value18['_previewAudioSrc'] = value27),
@@ -247,7 +247,7 @@ export function renderPreview(value18) {
       value20 &&
         value18['_syncPreviewTime'](
           'audio',
-          value18['_audioSourceSecForPlayhead'](value18['_playheadSec'] || 0x0),
+          value18['_audioSourceSecForPlayhead'](value18['_playheadSec'] || 0),
           { immediate: !![] },
         ),
       el13['appendChild'](value18['_renderPreviewControls']()));

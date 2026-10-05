@@ -58,8 +58,8 @@ function syncVideoPlaybackButtonPresentation(el5, data = {}) {
     el5['setAttribute']('aria-label', t2));
   if (el5['hasAttribute']?.('title')) el5['setAttribute']('title', t2);
   ((el5['dataset']['tooltip'] = t2), (el5['dataset']['syncPlaybackState'] = target));
-  const el6 = el5['querySelector']('[data-sync-video-icon=\x22play\x22]'),
-    el7 = el5['querySelector']('[data-sync-video-icon=\x22pause\x22]');
+  const el6 = el5['querySelector']('[data-sync-video-icon="play"]'),
+    el7 = el5['querySelector']('[data-sync-video-icon="pause"]');
   if (el6?.['style']) el6['style']['display'] = options ? 'none' : '';
   if (el7?.['style']) el7['style']['display'] = options ? '' : 'none';
   return options;
@@ -76,7 +76,7 @@ function createMultiSelectBoxEl() {
   const el12 = createIconButton('ms-sync-video-play', t('coreUi.renderer.multiSelect.syncVideoPlay'), el10),
     el13 = createSvg('2.5');
   el13['dataset']['syncVideoIcon'] = 'pause';
-  for (const source of [0x6, 0xe]) {
+  for (const source of [6, 14]) {
     const el14 = document['createElementNS'](SVG_NS, 'rect');
     (el14['setAttribute']('x', String(source)),
       el14['setAttribute']('y', '4'),
@@ -101,7 +101,7 @@ function createMultiSelectBoxEl() {
   (el16['setAttribute']('points', '12 2 20 12 16 12 16 22 8 22 8 12 4 12 12 2'), el15['appendChild'](el16));
   const iconButton2 = createIconButton('ms-asset', t('coreUi.renderer.multiSelect.createAsset'), el15),
     svg2 = createSvg('2');
-  ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7\x2010l5\x205\x205-5', 'M12 15V3']['forEach']((current) =>
+  ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3']['forEach']((current) =>
     appendPath(svg2, current),
   );
   const iconButton3 = createIconButton(
@@ -111,10 +111,10 @@ function createMultiSelectBoxEl() {
     ),
     el17 = createSvg('2');
   for (const [entry, record] of [
-    [0x3, 0x3],
-    [0xe, 0x3],
-    [0xe, 0xe],
-    [0x3, 0xe],
+    [3, 3],
+    [14, 3],
+    [14, 14],
+    [3, 14],
   ]) {
     const el18 = document['createElementNS'](SVG_NS, 'rect');
     (el18['setAttribute']('x', String(entry)),
@@ -127,7 +127,7 @@ function createMultiSelectBoxEl() {
     el19 = createSvg('2');
   (appendPath(el19, 'M3 12a9 9 0 0 1 15.36-6.36'), appendPath(el19, 'M21 12a9 9 0 0 1-15.36 6.36'));
   const el20 = document['createElementNS'](SVG_NS, 'polyline');
-  el20['setAttribute']('points', '21\x203\x2021\x209\x2015\x209');
+  el20['setAttribute']('points', '21 3 21 9 15 9');
   const el21 = document['createElementNS'](SVG_NS, 'polyline');
   (el21['setAttribute']('points', '3 21 3 15 9 15'), el19['appendChild'](el20), el19['appendChild'](el21));
   const el22 = createIconButton(
@@ -166,9 +166,9 @@ function createMultiSelectBoxEl() {
   el28['style']['display'] = 'none';
   const svg3 = createSvg('2');
   [
-    'M5\x204h14a2\x202\x200\x200\x201\x202\x202v12a2\x202\x200\x200\x201-2\x202H5a2\x202\x200\x200\x201-2-2V6a2\x202\x200\x200\x201\x202-2z',
+    'M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z',
     'M3 10h18',
-    'M12\x2010v10',
+    'M12 10v10',
   ]['forEach']((payload) => appendPath(svg3, payload));
   const el29 = createIconButton('ms-create-collage', t('coreUi.renderer.multiSelect.createCollage'), svg3);
   el29['style']['display'] = 'none';
@@ -199,14 +199,14 @@ function createAlignCenterPanelEl() {
     (el31['style']['display'] = 'none'));
   const handle = {
       'ms-align-left': ['M4 4v16', 'M8 7h10', 'M8 12h7', 'M8 17h9'],
-      'ms-align-h-center': ['M12 4v16', 'M7\x207h10', 'M9\x2012h6', 'M8 17h8'],
-      'ms-align-right': ['M20 4v16', 'M6 7h10', 'M9\x2012h7', 'M7\x2017h9'],
-      'ms-align-top': ['M4 4h16', 'M7 8v10', 'M12\x208v7', 'M17 8v9'],
+      'ms-align-h-center': ['M12 4v16', 'M7 7h10', 'M9 12h6', 'M8 17h8'],
+      'ms-align-right': ['M20 4v16', 'M6 7h10', 'M9 12h7', 'M7 17h9'],
+      'ms-align-top': ['M4 4h16', 'M7 8v10', 'M12 8v7', 'M17 8v9'],
       'ms-align-v-center': ['M4 12h16', 'M7 7v10', 'M12 9v6', 'M17 8v8'],
       'ms-align-bottom': ['M4 20h16', 'M7 6v10', 'M12 9v7', 'M17 7v9'],
-      'ms-distribute-h': ['M3 20h18', 'M5 8h3v8H5z', 'M11\x205h3v11h-3z', 'M17\x2010h3v6h-3z'],
-      'ms-distribute-v': ['M20\x203v18', 'M8\x205h8v3H8z', 'M5 11h11v3H5z', 'M10\x2017h6v3h-6z'],
-      'ms-arrange-grid': ['M4 4h5v5H4z', 'M15\x204h5v5h-5z', 'M4 15h5v5H4z', 'M15\x2015h5v5h-5z'],
+      'ms-distribute-h': ['M3 20h18', 'M5 8h3v8H5z', 'M11 5h3v11h-3z', 'M17 10h3v6h-3z'],
+      'ms-distribute-v': ['M20 3v18', 'M8 5h8v3H8z', 'M5 11h11v3H5z', 'M10 17h6v3h-6z'],
+      'ms-arrange-grid': ['M4 4h5v5H4z', 'M15 4h5v5h-5z', 'M4 15h5v5H4z', 'M15 15h5v5h-5z'],
     },
     state = [
       { action: 'ms-align-left', tooltip: t('coreUi.renderer.align.left'), slot: 'slot-1' },
@@ -296,7 +296,7 @@ export function createRendererSelectionOverlay({
     },
     handler4 = (list, value6, value7) => {
       if (!el42) return;
-      const enabled2 = Array['isArray'](list) && list['length'] >= 0x2;
+      const enabled2 = Array['isArray'](list) && list['length'] >= 2;
       if (!enabled2) handler3();
       else {
         const map = new Set(list),
@@ -328,7 +328,7 @@ export function createRendererSelectionOverlay({
         el50 = el42['querySelector']('.v2-multi-select-tab button[data-ui-action="ms-create-collage"]'),
         el51 = el42['querySelector']('.v2-multi-select-tab button[data-ui-action="ms-material-comparison"]');
       el45 &&
-        ((el45['style']['display'] = getSelectedSyncPlayableVideoCount(value6, list) >= 0x2 ? '' : 'none'),
+        ((el45['style']['display'] = getSelectedSyncPlayableVideoCount(value6, list) >= 2 ? '' : 'none'),
         syncVideoPlaybackButtonPresentation(el45, input));
       if (el46) {
         el46['style']['display'] = '';
@@ -368,7 +368,7 @@ export function createRendererSelectionOverlay({
         const count = list['filter']((value17) =>
           isNodeType(value6[value17], ['source-image', 'ai-image', 'storyboard']),
         )['length'];
-        el50['style']['display'] = count >= 0x2 ? '' : 'none';
+        el50['style']['display'] = count >= 2 ? '' : 'none';
       }
       if (el51) {
         const value18 = list['map']((value19) => value6[value19])['filter'](Boolean);
@@ -391,38 +391,38 @@ export function createRendererSelectionOverlay({
         value22 = Infinity,
         value23 = -Infinity,
         value24 = -Infinity,
-        count2 = 0x0;
+        count2 = 0;
       for (const value25 of list) {
         const box = value6[value25];
         if (!box) continue;
-        count2 += 0x1;
-        const value26 = box['width'] || 0x104,
-          value27 = box['height'] || 0x64,
-          value28 = box['type'] === 'group' ? box['y'] : box['y'] - 0x1e;
+        count2 += 1;
+        const value26 = box['width'] || 260,
+          value27 = box['height'] || 100,
+          value28 = box['type'] === 'group' ? box['y'] : box['y'] - 30;
         ((value21 = Math['min'](value21, box['x'])),
           (value22 = Math['min'](value22, value28)),
           (value23 = Math['max'](value23, box['x'] + value26)),
           (value24 = Math['max'](value24, box['y'] + value27)));
       }
-      if (count2 < 0x2) {
+      if (count2 < 2) {
         if (el42['style']['display'] !== 'none') el42['style']['display'] = 'none';
         value3['geometrySig'] = '';
         return;
       }
       if (el42['style']['display'] !== 'block') el42['style']['display'] = 'block';
-      const value29 = 0x12,
+      const value29 = 18,
         value30 = value21 - value29,
         value31 = value22 - value29,
-        value32 = value23 - value21 + value29 * 0x2,
-        value33 = value24 - value22 + value29 * 0x2,
+        value32 = value23 - value21 + value29 * 2,
+        value33 = value24 - value22 + value29 * 2,
         value34 =
-          value30['toFixed'](0x2) +
+          value30['toFixed'](2) +
           '|' +
-          value31['toFixed'](0x2) +
+          value31['toFixed'](2) +
           '|' +
-          value32['toFixed'](0x2) +
+          value32['toFixed'](2) +
           '|' +
-          value33['toFixed'](0x2);
+          value33['toFixed'](2);
       value3['geometrySig'] !== value34 &&
         ((value3['geometrySig'] = value34),
         (el42['style']['left'] = value30 + 'px'),
@@ -439,8 +439,8 @@ export function createRendererSelectionOverlay({
         enabled6 =
           value39 &&
           value37?.['alignPanelVisible'] === !![] &&
-          list2['length'] >= 0x2 &&
-          list3['length'] >= 0x2;
+          list2['length'] >= 2 &&
+          list3['length'] >= 2;
       if (!enabled6) {
         if (el43['style']['display'] !== 'none') el43['style']['display'] = 'none';
         ((value4['centerSig'] = ''), (value4['buttonStateSig'] = ''));
@@ -457,12 +457,12 @@ export function createRendererSelectionOverlay({
       const value40 = enabled7 ? Number(box2['x']) : enabled8['centerX'],
         value41 = enabled7 ? Number(box2['y']) : enabled8['centerY'];
       if (el43['style']['display'] !== 'block') el43['style']['display'] = 'block';
-      const value42 = value40['toFixed'](0x2) + '|' + value41['toFixed'](0x2);
+      const value42 = value40['toFixed'](2) + '|' + value41['toFixed'](2);
       value4['centerSig'] !== value42 &&
         ((value4['centerSig'] = value42),
         (el43['style']['left'] = value40 + 'px'),
         (el43['style']['top'] = value41 + 'px'));
-      const enabled9 = list3['length'] >= 0x2,
+      const enabled9 = list3['length'] >= 2,
         value43 = enabled9 ? '1' : '0';
       if (value4['buttonStateSig'] !== value43) {
         value4['buttonStateSig'] = value43;

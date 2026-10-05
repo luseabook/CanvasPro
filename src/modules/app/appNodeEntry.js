@@ -100,8 +100,8 @@ function isDevOnlyNodeType(value) {
 function resolveNodeSize(item, handler, { forDrop: forDrop = false } = {}) {
   let { width: width3, height: height3 } = handler(item);
   return (
-    forDrop && item === 'test-video' && ((width3 = 0x12c), (height3 = 0x12c)),
-    forDrop && item === 'scene-detection' && ((width3 = 0x190), (height3 = 0x1f4)),
+    forDrop && item === 'test-video' && ((width3 = 300), (height3 = 300)),
+    forDrop && item === 'scene-detection' && ((width3 = 400), (height3 = 500)),
     { width: width3, height: height3 }
   );
 }

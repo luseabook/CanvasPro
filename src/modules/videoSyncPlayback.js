@@ -256,7 +256,7 @@ function pauseOutsideTargetVideos(value14, list3) {
     safePause(item5);
   });
 }
-function waitForMetadata(el5, value15 = 0x1f4) {
+function waitForMetadata(el5, value15 = 500) {
   if (!el5 || Number(el5.readyState || 0) >= 1) return Promise.resolve(true);
   return new Promise((handler) => {
     let value16 = false;
@@ -402,7 +402,7 @@ export function syncPlayGroupVideos({
   });
 }
 let activeSyncVideoPlaybackSession = null,
-  syncVideoPlaybackSessionSequence = 0x0;
+  syncVideoPlaybackSessionSequence = 0;
 
 const syncVideoPlaybackStateListeners = new Set();
 
@@ -452,7 +452,7 @@ export function resolveCanvasNodePlayableVideoEntry(node2) {
   return source5
     ? {
         nodeId: normalizeText(node2['id']),
-        videoIndex: 0x0,
+        videoIndex: 0,
         source: source5,
         node: node2,
         record: node2,
@@ -465,16 +465,16 @@ export function findCanvasVideoElementForEntry(value31, value32) {
   if (!enabled9 || typeof enabled9['getElementById'] !== 'function') return null;
   const el6 = enabled9['getElementById'](normalizeText(value32?.['nodeId']));
   if (!el6 || typeof el6['querySelector'] !== 'function') return null;
-  const value33 = Math['max'](0x0, Math['trunc'](Number(value32?.['videoIndex']) || 0x0));
+  const value33 = Math['max'](0, Math['trunc'](Number(value32?.['videoIndex']) || 0));
   return (
-    el6['querySelector']('video[data-idx="' + value33 + '\x22]') ||
+    el6['querySelector']('video[data-idx="' + value33 + '"]') ||
     el6['querySelector']('.video-player') ||
     el6['querySelector']('video')
   );
 }
 
 function isSpaceInteraction(event) {
-  return event?.['code'] === 'Space' || event?.['key'] === '\x20' || event?.['key'] === 'Space';
+  return event?.['code'] === 'Space' || event?.['key'] === ' ' || event?.['key'] === 'Space';
 }
 
 function beginSyncVideoPlaybackSession({
@@ -493,7 +493,7 @@ function beginSyncVideoPlaybackSession({
     handler4 = (value36) => {
       const list8 = map5['get'](value36) || [];
       map5['delete'](value36);
-      while (list8['length'] > 0x0) list8['pop']()?.();
+      while (list8['length'] > 0) list8['pop']()?.();
     },
     handler5 = (value37, { pause: pause = ![] } = {}) => {
       (handler4(value37),
@@ -535,7 +535,7 @@ function beginSyncVideoPlaybackSession({
           if (map6['has'](value47)) continue;
           handler5(value47, { pause: !![] });
         }
-        const value48 = loop2 ? 0x2 : 0x1;
+        const value48 = loop2 ? 2 : 1;
         if (list7['length'] < value48) return ![];
         value34 = 'active';
         for (const value49 of list7) {
@@ -546,7 +546,7 @@ function beginSyncVideoPlaybackSession({
                 return;
               }
               handler5(value49);
-              if (list7['length'] === 0x0) handler6({ pauseTargets: ![] });
+              if (list7['length'] === 0) handler6({ pauseTargets: ![] });
             },
             value51 = loop2 ? ['pause', 'error'] : ['pause', 'ended', 'error'];
           for (const value52 of value51) {
@@ -556,9 +556,9 @@ function beginSyncVideoPlaybackSession({
         const list10 = list7['filter'](
           (value53) => value53['videoEl']?.['paused'] === !![] || value53['videoEl']?.['isConnected'] === ![],
         );
-        if (loop2 && list10['length'] > 0x0) return (enabled11['stop'](), ![]);
+        if (loop2 && list10['length'] > 0) return (enabled11['stop'](), ![]);
         for (const value54 of list10) handler5(value54);
-        if (list7['length'] === 0x0) return (handler6({ pauseTargets: ![] }), ![]);
+        if (list7['length'] === 0) return (handler6({ pauseTargets: ![] }), ![]);
         return enabled11['isCurrent']();
       },
       stop() {

@@ -25,13 +25,13 @@ export function buildRunningHubAudioBody({
         value = {
           text: prompt || '',
           voice_id: String(params?.['customVoiceId'] || params?.['voice_id'] || 'Wise_Woman')['trim'](),
-          speed: Number(params?.['speed']) || 0x1,
-          volume: Number(params?.['volume']) || 0x1,
-          pitch: Number['isInteger'](Number(params?.['pitch'])) ? Number(params['pitch']) : 0x0,
+          speed: Number(params?.['speed']) || 1,
+          volume: Number(params?.['volume']) || 1,
+          pitch: Number['isInteger'](Number(params?.['pitch'])) ? Number(params['pitch']) : 0,
           emotion: String(params?.['emotion'] || 'happy')['trim'](),
           enable_base64_output: ![],
           english_normalization: ![],
-          ...(Array['isArray'](params?.['pronunciation_dict']) && params['pronunciation_dict']['length'] > 0x0
+          ...(Array['isArray'](params?.['pronunciation_dict']) && params['pronunciation_dict']['length'] > 0
             ? { pronunciation_dict: params['pronunciation_dict'] }
             : {}),
         };

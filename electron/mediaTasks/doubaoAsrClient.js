@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 export const DOUBAO_ASR_RESOURCE_ID = 'volc.seedasr.auc';
 export const DOUBAO_ASR_DEFAULT_BASE_URL = 'https://openspeech.bytedance.com/api/v3/auc/bigmodel';
-const DOUBAO_ASR_DEFAULT_POLL_INTERVAL_MS = 0x7d0,
-  DOUBAO_ASR_DEFAULT_TIMEOUT_MS = 0xa * 0x3c * 0x3e8,
+const DOUBAO_ASR_DEFAULT_POLL_INTERVAL_MS = 2000,
+  DOUBAO_ASR_DEFAULT_TIMEOUT_MS = 10 * 60 * 1000,
   DOUBAO_ASR_INVALID_KEY_MESSAGE =
     '火山语音 ASR Key 无效或无权限。请在设置 > API Key > 火山语音填写语音服务的 X-Api-Key，不要使用火山方舟 Key，并确认已开通录音文件识别。',
   DOUBAO_ASR_PERMISSION_MESSAGE =
@@ -25,15 +25,15 @@ function normalizeBaseUrl(value = '') {
 }
 function normalizePositiveMs(value, fallback) {
   const numeric = Number(value);
-  if (!Number['isFinite'](numeric) || numeric <= 0x0) return fallback;
-  return Math['max'](0x1, Math['round'](numeric));
+  if (!Number['isFinite'](numeric) || numeric <= 0) return fallback;
+  return Math['max'](1, Math['round'](numeric));
 }
-function normalizeAsrTimeMs(value, durationMs = 0x0) {
+function normalizeAsrTimeMs(value, durationMs = 0) {
   const numeric = Number(value);
-  if (!Number['isFinite'](numeric) || numeric < 0x0) return 0x0;
-  if (durationMs > 0x0 && numeric <= durationMs / 0x3e8 + 0x5)
-    return Math['max'](0x0, Math['round'](numeric * 0x3e8));
-  return Math['max'](0x0, Math['round'](numeric));
+  if (!Number['isFinite'](numeric) || numeric < 0) return 0;
+  if (durationMs > 0 && numeric <= durationMs / 1000 + 5)
+    return Math['max'](0, Math['round'](numeric * 1000));
+  return Math['max'](0, Math['round'](numeric));
 }
 function normalizeSpeakerLabel(value) {
   if (value == null) return '';
@@ -105,7 +105,7 @@ function buildAuthHeaders(credentials = {}) {
 export function buildDoubaoAsrSubmitBody({ audioBase64: audioBase64 = '', uid: uid = 'ai-canvas' } = {}) {
   return {
     user: { uid: String(uid || 'ai-canvas') },
-    audio: { data: String(audioBase64 || ''), format: 'mp3', codec: 'mp3', rate: 0x3e80 },
+    audio: { data: String(audioBase64 || ''), format: 'mp3', codec: 'mp3', rate: 16000 },
     request: {
       model_name: 'bigmodel',
       show_utterances: true,
@@ -134,13 +134,13 @@ async function postDoubaoJson({
   body: body = {},
   fetchImpl: fetchImpl,
   headers: headers = {},
-  timeoutMs: timeoutMs = 0x7530,
+  timeoutMs: timeoutMs = 30000,
   url: url = '',
 } = {}) {
   if (typeof fetchImpl !== 'function') throw new Error('fetch is unavailable');
   const controller = typeof AbortController === 'function' ? new AbortController() : null,
     timeoutTimer = controller
-      ? setTimeout(() => controller['abort'](), normalizePositiveMs(timeoutMs, 0x7530))
+      ? setTimeout(() => controller['abort'](), normalizePositiveMs(timeoutMs, 30000))
       : null;
   try {
     const response = await fetchImpl(url, {
@@ -169,7 +169,7 @@ async function postDoubaoJson({
         sanitizeErrorMessage(apiMessage || 'Doubao ASR HTTP ' + (response?.['status'] || 'error')),
       );
     if (isFailureStatus(apiStatus)) throw new Error(sanitizeErrorMessage(apiMessage || apiStatus));
-    if (payload && typeof payload === 'object' && payload['code'] && Number(payload['code']) !== 0x0)
+    if (payload && typeof payload === 'object' && payload['code'] && Number(payload['code']) !== 0)
       throw new Error(sanitizeErrorMessage(apiMessage || payload['message'] || payload['code']));
     return { apiMessage: apiMessage, apiStatus: apiStatus, data: payload };
   } catch (error) {
@@ -188,8 +188,8 @@ function getWordsText(words = []) {
     ['filter'](Boolean)
     ['join']('');
 }
-export function normalizeDoubaoAsrSegments(payload = {}, durationSec = 0x0) {
-  const durationMs = Math['max'](0x0, Math['round'](Number(durationSec || 0x0) * 0x3e8)),
+export function normalizeDoubaoAsrSegments(payload = {}, durationSec = 0) {
+  const durationMs = Math['max'](0, Math['round'](Number(durationSec || 0) * 1000)),
     resultPayload = extractResultPayload(payload),
     rawSegments = Array['isArray'](resultPayload?.['utterances'])
       ? resultPayload['utterances']
@@ -231,15 +231,15 @@ export function normalizeDoubaoAsrSegments(payload = {}, durationSec = 0x0) {
   if (!segments['length']) {
     const fallbackText = firstText(resultPayload?.['text'], payload?.['text']);
     fallbackText &&
-      durationMs > 0x0 &&
-      segments['push']({ startMs: 0x0, endMs: durationMs, sourceText: fallbackText });
+      durationMs > 0 &&
+      segments['push']({ startMs: 0, endMs: durationMs, sourceText: fallbackText });
   }
   return segments['sort']((left, right) => left['startMs'] - right['startMs']);
 }
 export async function runDoubaoAsrTranscription({
   audioAbs: audioAbs = '',
   credentials: credentials = {},
-  durationSec: durationSec = 0x0,
+  durationSec: durationSec = 0,
   fetchImpl: fetchImpl = globalThis['fetch'],
   pollIntervalMs: pollIntervalMs = DOUBAO_ASR_DEFAULT_POLL_INTERVAL_MS,
   queue: queue,
@@ -268,7 +268,7 @@ export async function runDoubaoAsrTranscription({
     body: buildDoubaoAsrSubmitBody({ audioBase64: audioBase64 }),
     fetchImpl: fetchImpl,
     headers: headers,
-    timeoutMs: 0xea60,
+    timeoutMs: 60000,
     url: baseUrl + '/submit',
   });
   if (isSuccessPayload(submitResult['data']) || String(submitResult['apiStatus'])['toLowerCase']() === 'success') {
@@ -287,7 +287,7 @@ export async function runDoubaoAsrTranscription({
       body: {},
       fetchImpl: fetchImpl,
       headers: headers,
-      timeoutMs: 0x7530,
+      timeoutMs: 30000,
       url: baseUrl + '/query',
     });
     if (

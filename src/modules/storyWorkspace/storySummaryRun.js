@@ -1,8 +1,8 @@
 const RUN_KIND = 'story-summary-run',
-  RUN_VERSION = 0x1,
-  MAX_INVOCATIONS = 0x8,
-  MAX_RAW_RESPONSE_CHARACTERS = 0x1d4c0;
-let sequence = 0x0;
+  RUN_VERSION = 1,
+  MAX_INVOCATIONS = 8,
+  MAX_RAW_RESPONSE_CHARACTERS = 120000;
+let sequence = 0;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -26,10 +26,10 @@ function stableSerialize(list) {
 function fingerprint(index) {
   const list2 = stableSerialize(index);
   let result = 0x811c9dc5;
-  for (let data = 0x0; data < list2['length']; data += 0x1) {
+  for (let data = 0; data < list2['length']; data += 1) {
     ((result ^= list2['charCodeAt'](data)), (result = Math['imul'](result, 0x1000193)));
   }
-  return 'fnv1a-' + (result >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'fnv1a-' + (result >>> 0)['toString'](16)['padStart'](8, '0');
 }
 function createInput({ project: project = {}, request: request = {} } = {}) {
   return {
@@ -57,14 +57,14 @@ function normalizeInvocation(options = {}) {
   return {
     id: normalizeText(options['id']),
     stepId: normalizeText(options['stepId']),
-    attempt: Math['max'](0x1, Math['trunc'](Number(options['attempt']) || 0x1)),
+    attempt: Math['max'](1, Math['trunc'](Number(options['attempt']) || 1)),
     state: normalizeText(options['state']),
     requestFingerprint: normalizeText(options['requestFingerprint']),
-    rawResponse: String(options['rawResponse'] || '')['slice'](0x0, MAX_RAW_RESPONSE_CHARACTERS),
+    rawResponse: String(options['rawResponse'] || '')['slice'](0, MAX_RAW_RESPONSE_CHARACTERS),
     error: normalizeText(options['error']),
-    preparedAt: Math['max'](0x0, Number(options['preparedAt'] || 0x0)),
-    completedAt: Math['max'](0x0, Number(options['completedAt'] || 0x0)),
-    retryAuthorizedAt: Math['max'](0x0, Number(options['retryAuthorizedAt'] || 0x0)),
+    preparedAt: Math['max'](0, Number(options['preparedAt'] || 0)),
+    completedAt: Math['max'](0, Number(options['completedAt'] || 0)),
+    retryAuthorizedAt: Math['max'](0, Number(options['retryAuthorizedAt'] || 0)),
   };
 }
 export function normalizeStorySummaryRun(target) {
@@ -83,15 +83,15 @@ export function normalizeStorySummaryRun(target) {
       ['slice'](-MAX_INVOCATIONS),
     candidateArtifact: cloneJson(response['candidateArtifact'] || null),
     error: normalizeText(response['error']),
-    createdAt: Math['max'](0x0, Number(response['createdAt'] || 0x0)) || Date['now'](),
-    updatedAt: Math['max'](0x0, Number(response['updatedAt'] || 0x0)) || Date['now'](),
+    createdAt: Math['max'](0, Number(response['createdAt'] || 0)) || Date['now'](),
+    updatedAt: Math['max'](0, Number(response['updatedAt'] || 0)) || Date['now'](),
   };
 }
 function createRun(next) {
   const input = createInput(next),
     createdAt = Date['now']();
   return (
-    (sequence += 0x1),
+    (sequence += 1),
     {
       kind: RUN_KIND,
       version: RUN_VERSION,
@@ -175,7 +175,7 @@ export function createStorySummaryRunRecorder({
     async onInvocation(stepId = {}) {
       const preparedAt = Date['now']();
       if (stepId['state'] === 'prepared')
-        ((sequence += 0x1),
+        ((sequence += 1),
           id['invocations']['push'](
             normalizeInvocation({
               id: id['id'] + ':' + normalizeText(stepId['stepId']) + ':' + stepId['attempt'] + ':' + sequence,
@@ -196,13 +196,13 @@ export function createStorySummaryRunRecorder({
           ['find'](
             (entry) =>
               entry['stepId'] === normalizeText(stepId['stepId']) &&
-              entry['attempt'] === Math['max'](0x1, Math['trunc'](Number(stepId['attempt']) || 0x1)) &&
+              entry['attempt'] === Math['max'](1, Math['trunc'](Number(stepId['attempt']) || 1)) &&
               entry['state'] === 'prepared',
           );
         current &&
           ((current['state'] = normalizeText(stepId['state'])),
           (current['rawResponse'] = String(stepId['rawResponse'] || '')['slice'](
-            0x0,
+            0,
             MAX_RAW_RESPONSE_CHARACTERS,
           )),
           (current['error'] = normalizeText(stepId['error'])),

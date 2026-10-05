@@ -1,13 +1,13 @@
-const APP_VERSION_MAX_LENGTH = 0x40;
+const APP_VERSION_MAX_LENGTH = 64;
 function normalizeAppVersion(value) {
   return String(value || '')
     ['trim']()
-    ['slice'](0x0, APP_VERSION_MAX_LENGTH);
+    ['slice'](0, APP_VERSION_MAX_LENGTH);
 }
 export function detectClientOperatingSystem(item = globalThis['navigator']) {
   const key = String(item?.['userAgentData']?.['platform'] || item?.['platform'] || '')['toLowerCase'](),
     index = String(item?.['userAgent'] || '')['toLowerCase'](),
-    result = key + '\x20' + index;
+    result = key + ' ' + index;
   if (/windows|win32|win64/['test'](result)) return 'windows';
   if (/macintosh|macintel|mac os|darwin/['test'](result)) return 'macos';
   if (/cros|chrome os/['test'](result)) return 'chromeos';

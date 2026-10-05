@@ -13,17 +13,17 @@ import {
 } from '../panoramaSceneNode/sceneAssetCatalog.js';
 import { findMannequinPosePreset, listMannequinPosePresets } from '../panoramaSceneNode/poseCatalog.js';
 import { normalizeCameraTimeline } from '../panoramaSceneNode/cameraTimeline.js';
-const MAX_SEMANTIC_PEOPLE = 0x64,
+const MAX_SEMANTIC_PEOPLE = 100,
   DEFAULT_CHARACTER_SPACING = 1.5,
   CHARACTER_COLOR_CYCLE = Object['freeze'](['blue', 'purple', 'red', 'green', 'yellow', 'cyan']);
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function clamp(index, result, data) {
   return Math['max'](result, Math['min'](data, index));
 }
-function normalizePoint(box, box2 = { x: 0x0, y: 0x0, z: 0x0 }) {
+function normalizePoint(box, box2 = { x: 0, y: 0, z: 0 }) {
   return {
     x: finiteNumber(box?.['x'], box2['x']),
     y: finiteNumber(box?.['y'], box2['y']),
@@ -50,7 +50,7 @@ function resolveSceneNodeId(options2 = {}, source = {}) {
   if (!enabled)
     throw createCanvasCommandError(
       'PANORAMA_SCENE_NOT_FOUND',
-      'A\x20panorama-scene\x20nodeId\x20or\x20selected\x203D\x20Stage\x20node\x20is\x20required.',
+      'A panorama-scene nodeId or selected 3D Stage node is required.',
     );
   return enabled;
 }
@@ -75,7 +75,7 @@ function summarizeAsset(id) {
     kind: id['kind'],
   };
 }
-function normalizeSemanticAssetEntry(query, record = 0x0) {
+function normalizeSemanticAssetEntry(query, record = 0) {
   const category = typeof query === 'string' ? { query: query } : query || {},
     payload = String(category['assetId'] || category['id'] || '')['trim']();
   let y = payload ? findSceneAsset(payload) : null;
@@ -84,22 +84,22 @@ function normalizeSemanticAssetEntry(query, record = 0x0) {
     const list2 = searchSceneAssets({
         query: query2,
         category: category['category'] || 'all',
-        limit: 0x78,
+        limit: 120,
       }),
-      handle = Math['max'](0x0, Math['trunc'](finiteNumber(category['variantIndex'], record)));
-    y = list2['length'] > 0x0 ? list2[handle % list2['length']] : null;
+      handle = Math['max'](0, Math['trunc'](finiteNumber(category['variantIndex'], record)));
+    y = list2['length'] > 0 ? list2[handle % list2['length']] : null;
   }
   if (!y) return null;
   let position = category['position'];
   if (!position && y['familyId'] === 'building')
-    position = { x: 0x0, y: 0x0, z: -(estimateSceneAssetBoundingRadius(y) + 1.5) };
+    position = { x: 0, y: 0, z: -(estimateSceneAssetBoundingRadius(y) + 1.5) };
   else
     !position &&
       (y['familyId'] === 'dance-floor' || y['familyId'] === 'stage') &&
-      (position = { x: 0x0, y: y['familyId'] === 'dance-floor' ? 0.02 : 0x0, z: 0x0 });
+      (position = { x: 0, y: y['familyId'] === 'dance-floor' ? 0.02 : 0, z: 0 });
   return { ...category, assetId: y['id'], ...(position ? { position: position } : null) };
 }
-function normalizeSemanticMannequinEntry(poseQuery, config = 0x0) {
+function normalizeSemanticMannequinEntry(poseQuery, config = 0) {
   const args2 = typeof poseQuery === 'string' ? { poseQuery: poseQuery } : poseQuery || {};
   if (args2['bonePose'] && typeof args2['bonePose'] === 'object') return args2;
   const enabled2 = String(args2['poseId'] || '')['trim']();
@@ -108,7 +108,7 @@ function normalizeSemanticMannequinEntry(poseQuery, config = 0x0) {
     category2 = String(args2['poseCategory'] || args2['category'] || 'all')['trim']() || 'all';
   if (!poseId && (query3 || category2 !== 'all')) {
     const list3 = listMannequinPosePresets({ query: query3, category: category2 });
-    poseId = list3['length'] > 0x0 ? list3[config % list3['length']] : null;
+    poseId = list3['length'] > 0 ? list3[config % list3['length']] : null;
   }
   !poseId && !enabled2 && !query3 && (poseId = findMannequinPosePreset('neutral'));
   if (!poseId) return null;
@@ -116,53 +116,53 @@ function normalizeSemanticMannequinEntry(poseQuery, config = 0x0) {
 }
 function expandSemanticPeople(options3 = {}) {
   const scale = options3 && typeof options3 === 'object' ? options3 : {},
-    length = clamp(Math['trunc'](finiteNumber(scale['count'], 0x0)), 0x0, MAX_SEMANTIC_PEOPLE);
-  if (length <= 0x0) return [];
-  const x = normalizePoint(scale['center'], { x: 0x0, y: 0x0, z: 0x0 }),
-    clamp2 = clamp(finiteNumber(scale['spacing'], DEFAULT_CHARACTER_SPACING), 0.25, 0x14),
+    length = clamp(Math['trunc'](finiteNumber(scale['count'], 0)), 0, MAX_SEMANTIC_PEOPLE);
+  if (length <= 0) return [];
+  const x = normalizePoint(scale['center'], { x: 0, y: 0, z: 0 }),
+    clamp2 = clamp(finiteNumber(scale['spacing'], DEFAULT_CHARACTER_SPACING), 0.25, 20),
     poseQuery2 = String(scale['activity'] || scale['poseQuery'] || 'neutral')['trim']() || 'neutral',
     scope = String(scale['genderPattern'] || 'alternate')
       ['trim']()
       ['toLowerCase'](),
     colorKey =
-      Array['isArray'](scale['colorKeys']) && scale['colorKeys']['length'] > 0x0
+      Array['isArray'](scale['colorKeys']) && scale['colorKeys']['length'] > 0
         ? scale['colorKeys']['map']((input) => String(input || '')['trim']())['filter'](Boolean)
         : CHARACTER_COLOR_CYCLE,
-    output = length <= 0x8 ? length : Math['ceil'](Math['sqrt'](length)),
+    output = length <= 8 ? length : Math['ceil'](Math['sqrt'](length)),
     value2 = Math['ceil'](length / output);
   return Array['from']({ length: length }, (value3, value4) => {
     const value5 = value4 % output,
       value6 = Math['floor'](value4 / output),
       gender =
-        scope === 'female' ? 'female' : scope === 'male' ? 'male' : value4 % 0x2 === 0x0 ? 'female' : 'male';
+        scope === 'female' ? 'female' : scope === 'male' ? 'male' : value4 % 2 === 0 ? 'female' : 'male';
     return {
       gender: gender,
       colorKey: colorKey[value4 % colorKey['length']] || 'blue',
       poseQuery: poseQuery2,
       position: {
-        x: x['x'] + (value5 - (output - 0x1) / 0x2) * clamp2,
+        x: x['x'] + (value5 - (output - 1) / 2) * clamp2,
         y: x['y'],
-        z: x['z'] + (value6 - (value2 - 0x1) / 0x2) * clamp2,
+        z: x['z'] + (value6 - (value2 - 1) / 2) * clamp2,
       },
-      rotation: normalizePoint(scale['rotation'], { x: 0x0, y: Math['PI'], z: 0x0 }),
-      scale: scale['scale'] ?? 0x1,
+      rotation: normalizePoint(scale['rotation'], { x: 0, y: Math['PI'], z: 0 }),
+      scale: scale['scale'] ?? 1,
     };
   });
 }
 function resolveCompositionTarget(event, list4, value7) {
-  if (event?.['target']) return normalizePoint(event['target'], { x: 0x0, y: 1.4, z: 0x0 });
-  const list5 = list4['length'] > 0x0 ? list4 : value7,
+  if (event?.['target']) return normalizePoint(event['target'], { x: 0, y: 1.4, z: 0 });
+  const list5 = list4['length'] > 0 ? list4 : value7,
     list6 = list5['map']((value8) => value8?.['position'])['filter'](
       (value9) => value9 && typeof value9 === 'object',
     );
-  if (list6['length'] === 0x0) return { x: 0x0, y: 1.4, z: 0x0 };
+  if (list6['length'] === 0) return { x: 0, y: 1.4, z: 0 };
   const x2 = list6['reduce'](
     (x3, box3) => ({
       x: x3['x'] + finiteNumber(box3['x']),
       y: x3['y'] + finiteNumber(box3['y']),
       z: x3['z'] + finiteNumber(box3['z']),
     }),
-    { x: 0x0, y: 0x0, z: 0x0 },
+    { x: 0, y: 0, z: 0 },
   );
   return {
     x: x2['x'] / list6['length'],
@@ -176,13 +176,13 @@ function buildSemanticCameraTimeline(preset, value10, value11) {
     value12 = String(loop?.['preset'] || 'orbit')
       ['trim']()
       ['toLowerCase'](),
-    duration = clamp(finiteNumber(loop?.['duration'], 0x6), 0.1, 0xe10),
-    fps = clamp(Math['round'](finiteNumber(loop?.['fps'], 0x18)), 0x1, 0x78),
-    z = clamp(finiteNumber(loop?.['distance'], 0x8), 0x1, 0x64),
-    y2 = clamp(finiteNumber(loop?.['height'], 2.2), 0.1, 0x64),
+    duration = clamp(finiteNumber(loop?.['duration'], 6), 0.1, 3600),
+    fps = clamp(Math['round'](finiteNumber(loop?.['fps'], 24)), 1, 120),
+    z = clamp(finiteNumber(loop?.['distance'], 8), 1, 100),
+    y2 = clamp(finiteNumber(loop?.['height'], 2.2), 0.1, 100),
     x4 = resolveCompositionTarget(loop, value10, value11),
     easing = String(loop?.['easing'] || 'ease-in-out'),
-    clamp3 = clamp(finiteNumber(loop?.['fov'], 0x30), 0xa, 0x78),
+    clamp3 = clamp(finiteNumber(loop?.['fov'], 48), 10, 120),
     handler = (id2, time, box4, fov = clamp3) => ({
       id: id2,
       time: time,
@@ -198,30 +198,30 @@ function buildSemanticCameraTimeline(preset, value10, value11) {
   let keyframes;
   if (value12 === 'dolly-in')
     keyframes = [
-      handler('dolly-wide', 0x0, { x: 0x0, y: y2, z: z * 1.35 }, clamp3 + 0x8),
-      handler('dolly-close', duration, { x: 0x0, y: y2 * 0.75, z: z * 0.55 }, clamp3 - 0x8),
+      handler('dolly-wide', 0, { x: 0, y: y2, z: z * 1.35 }, clamp3 + 8),
+      handler('dolly-close', duration, { x: 0, y: y2 * 0.75, z: z * 0.55 }, clamp3 - 8),
     ];
   else {
     if (value12 === 'pan-left' || value12 === 'pan-right') {
-      const value13 = value12 === 'pan-left' ? 0x1 : -0x1;
+      const value13 = value12 === 'pan-left' ? 1 : -1;
       keyframes = [
-        handler('pan-start', 0x0, { x: -z * 0.7 * value13, y: y2, z: z * 0.8 }),
+        handler('pan-start', 0, { x: -z * 0.7 * value13, y: y2, z: z * 0.8 }),
         handler('pan-end', duration, { x: z * 0.7 * value13, y: y2, z: z * 0.8 }),
       ];
     } else {
       if (value12 === 'crane-up')
         keyframes = [
-          handler('crane-low', 0x0, { x: 0x0, y: y2 * 0.45, z: z * 0.8 }),
-          handler('crane-high', duration, { x: 0x0, y: y2 * 2.2, z: z * 0.65 }),
+          handler('crane-low', 0, { x: 0, y: y2 * 0.45, z: z * 0.8 }),
+          handler('crane-high', duration, { x: 0, y: y2 * 2.2, z: z * 0.65 }),
         ];
       else
         value12 === 'static'
-          ? (keyframes = [handler('static', 0x0, { x: 0x0, y: y2, z: z })])
+          ? (keyframes = [handler('static', 0, { x: 0, y: y2, z: z })])
           : (keyframes = [
-              handler('orbit-front', 0x0, { x: 0x0, y: y2, z: z }),
-              handler('orbit-right', duration / 0x3, { x: z, y: y2, z: 0x0 }),
-              handler('orbit-back', (duration * 0x2) / 0x3, { x: 0x0, y: y2, z: -z }),
-              handler('orbit-return', duration, { x: 0x0, y: y2, z: z }),
+              handler('orbit-front', 0, { x: 0, y: y2, z: z }),
+              handler('orbit-right', duration / 3, { x: z, y: y2, z: 0 }),
+              handler('orbit-back', (duration * 2) / 3, { x: 0, y: y2, z: -z }),
+              handler('orbit-return', duration, { x: 0, y: y2, z: z }),
             ]);
     }
   }
@@ -243,7 +243,7 @@ export function registerPanoramaSceneCommands(value14) {
         category: { type: 'string', enum: ['all', ...getSceneAssetCategories()] },
         limit: { type: 'number' },
       },
-      defaults: { category: 'all', limit: 0x1e },
+      defaults: { category: 'all', limit: 30 },
     },
     capabilitySchema: { reads: ['sceneAssetCatalog'], writes: [] },
     execute(query4) {
@@ -319,7 +319,7 @@ export function registerPanoramaSceneCommands(value14) {
           people: {
             type: 'object',
             description:
-              'Shorthand\x20for\x20a\x20posed\x20character\x20group\x20when\x20mannequins\x20is\x20omitted.',
+              'Shorthand for a posed character group when mannequins is omitted.',
             properties: {
               count: { type: 'number' },
               activity: { type: 'string' },
@@ -355,7 +355,7 @@ export function registerPanoramaSceneCommands(value14) {
           },
           cameraMotion: {
             type: 'object',
-            description: 'Camera-motion\x20shorthand\x20converted\x20to\x20editable\x20keyframes.',
+            description: 'Camera-motion shorthand converted to editable keyframes.',
             properties: {
               preset: {
                 type: 'string',
@@ -384,7 +384,7 @@ export function registerPanoramaSceneCommands(value14) {
         if (response['ok'] === ![]) return response;
         const list7 = Array['isArray'](args3['assets']) ? args3['assets'] : [],
           assets2 = [];
-        for (let value17 = 0x0; value17 < list7['length']; value17 += 0x1) {
+        for (let value17 = 0; value17 < list7['length']; value17 += 1) {
           const value18 = list7[value17],
             semanticAssetEntry = normalizeSemanticAssetEntry(value18, value17);
           if (!semanticAssetEntry) {
@@ -401,9 +401,9 @@ export function registerPanoramaSceneCommands(value14) {
           assets2['push'](semanticAssetEntry);
         }
         const list8 = Array['isArray'](args3['mannequins']) ? args3['mannequins'] : [],
-          list9 = list8['length'] > 0x0 ? list8 : expandSemanticPeople(args3['people']),
+          list9 = list8['length'] > 0 ? list8 : expandSemanticPeople(args3['people']),
           mannequins = [];
-        for (let value20 = 0x0; value20 < list9['length']; value20 += 0x1) {
+        for (let value20 = 0; value20 < list9['length']; value20 += 1) {
           const value21 = list9[value20],
             semanticMannequinEntry = normalizeSemanticMannequinEntry(value21, value20);
           if (!semanticMannequinEntry) {
@@ -439,7 +439,7 @@ export function registerPanoramaSceneCommands(value14) {
     value14['register']({
       id: 'scene.mannequin.setPose',
       description:
-        'Apply\x20a\x20built-in\x20or\x20custom\x20bone\x20pose\x20to\x20a\x20mannequin\x20in\x20a\x203D\x20Stage.',
+        'Apply a built-in or custom bone pose to a mannequin in a 3D Stage.',
       riskLevel: 'safe',
       argsSchema: {
         required: ['mannequinId'],
@@ -456,7 +456,7 @@ export function registerPanoramaSceneCommands(value14) {
         const response2 = validateSceneNode(args5, value24);
         if (response2['ok'] === ![]) return response2;
         if (!String(args5['mannequinId'] || '')['trim']())
-          return { ok: ![], errorCode: 'MANNEQUIN_ID_REQUIRED', message: 'mannequinId\x20is\x20required.' };
+          return { ok: ![], errorCode: 'MANNEQUIN_ID_REQUIRED', message: 'mannequinId is required.' };
         return { args: { ...args5, ...response2['args'] } };
       },
       execute(nodeId, value25) {
@@ -486,7 +486,7 @@ export function registerPanoramaSceneCommands(value14) {
     value14['register']({
       id: 'scene.camera.updateTimeline',
       description:
-        'Update\x20duration,\x20FPS,\x20loop,\x20current\x20time,\x20or\x20all\x20camera\x20keyframes.',
+        'Update duration, FPS, loop, current time, or all camera keyframes.',
       riskLevel: 'safe',
       argsSchema: {
         properties: { nodeId: { type: 'string' }, timeline: { type: 'object' }, patch: { type: 'object' } },

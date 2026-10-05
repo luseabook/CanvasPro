@@ -2,8 +2,8 @@ import { get, post } from './apiBase.js';
 export const CLI_COMPONENT_CHANGED = 'aicanvas:cli-component-changed';
 const pending = new Map();
 function unwrap(response) {
-  if (response['status'] === 0x194) throw new Error('组件接口不可用，请完全退出并重新启动应用后重试');
-  if (!response['success']) throw new Error(response['error'] || 'CLI\x20组件操作失败');
+  if (response['status'] === 404) throw new Error('组件接口不可用，请完全退出并重新启动应用后重试');
+  if (!response['success']) throw new Error(response['error'] || 'CLI 组件操作失败');
   if (!response['data'] || typeof response['data'] !== 'object' || Array['isArray'](response['data']))
     throw new Error('组件接口返回异常，请重新启动应用后重试');
   return response['data'];
@@ -79,7 +79,7 @@ export function ensureCliComponent(provider, { update: update = ![], repair: rep
     )),
       (args = notify2));
     while (notify2['phase'] === 'downloading') {
-      (await new Promise((target) => setTimeout(target, 0x3e8)),
+      (await new Promise((target) => setTimeout(target, 1000)),
         (notify2 = (await fetchCliComponents())['components']?.[provider]));
       if (!notify2) throw new Error('无法读取组件下载状态，请重试');
       (notify(notify2), (args = notify2));

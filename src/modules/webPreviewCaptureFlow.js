@@ -14,7 +14,7 @@ const MAX_BATCH_CREATE_COUNT = 60,
   MAX_VIDEO_CREATE_COUNT = 12,
   MIN_EXTRACT_IMAGE_WIDTH = 96,
   MIN_EXTRACT_IMAGE_HEIGHT = 96,
-  MIN_EXTRACT_IMAGE_AREA = 0x2ee0,
+  MIN_EXTRACT_IMAGE_AREA = 12000,
   STREAM_MEDIA_URL_EXTENSION_RE = /\.(?:m3u8|mpd|m4s)(?:[?#].*)?$/i,
   WEB_PREVIEW_REVERSE_IMAGE_PROMPT_NODE_NAME = '反推提示词-创建';
 function webPreviewCaptureText(value, item = {}) {
@@ -134,8 +134,8 @@ function normalizeVideoCandidates(list3 = []) {
 }
 function getViewportCenterTopLeft(box4, record = appStore) {
   const graphState2 = getGraphState(record),
-    handle = (globalThis.window?.innerWidth || 0x500) / 2,
-    state = (globalThis.window?.innerHeight || 0x2d0) / 2,
+    handle = (globalThis.window?.innerWidth || 1280) / 2,
+    state = (globalThis.window?.innerHeight || 720) / 2,
     x = screenToWorld(handle, state, graphState2.viewport || {});
   return { x: x.x - box4.width / 2, y: x.y - box4.height / 2 };
 }
@@ -558,7 +558,7 @@ export function createWebReferenceCardNode({
       .slice(0, 160),
     webSelectedText = String(payload?.selectedText || payload?.text || '')
       .trim()
-      .slice(0, 0x1388),
+      .slice(0, 5000),
     webScreenshotUrl = String(payload?.screenshotDataUrl || payload?.screenshot || ''),
     webCapturedAt = String(payload?.capturedAt || new Date().toISOString()).trim(),
     width3 = getNodeDefaultSize('web-reference-card'),

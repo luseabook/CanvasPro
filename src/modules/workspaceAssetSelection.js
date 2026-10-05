@@ -12,7 +12,7 @@ export function toggleWorkspaceAssetSelectAll(list = [], key = []) {
       ['map']((index) => normalizeText(index?.['id']))
       ['filter'](Boolean),
     map = new Set((Array['isArray'](key) ? key : [])['map'](normalizeText)['filter'](Boolean)),
-    result = list2['length'] > 0x0 && list2['every']((data) => map['has'](data));
+    result = list2['length'] > 0 && list2['every']((data) => map['has'](data));
   return result ? [] : list2;
 }
 export function toggleWorkspaceAssetSelection(list3 = [], options = '', enabled2 = ![]) {
@@ -41,12 +41,12 @@ export function resolveWorkspaceCardMultiSelection({
       count = list5['indexOf'](normalizeText(activeItemId)),
       count2 = list5['indexOf'](text2),
       selectionMode2 =
-        shiftKey && count >= 0x0 && count2 >= 0x0
-          ? list5['slice'](Math['min'](count, count2), Math['max'](count, count2) + 0x1)
+        shiftKey && count >= 0 && count2 >= 0
+          ? list5['slice'](Math['min'](count, count2), Math['max'](count, count2) + 1)
           : toggleKey
             ? toggleWorkspaceAssetSelection(selectedIds2, text2, !![])
             : [text2];
-    return { handled: !![], selectionMode: selectionMode2['length'] > 0x0, selectedIds: selectionMode2 };
+    return { handled: !![], selectionMode: selectionMode2['length'] > 0, selectedIds: selectionMode2 };
   }
   const enabled3 = enabled === !![] && Boolean(text2) && (selectionMode === !![] || shiftKey === !![]);
   if (!enabled3) return { handled: ![], selectionMode: selectionMode === !![], selectedIds: selectedIds2 };
@@ -64,7 +64,7 @@ export function resolveWorkspaceCardMultiSelection({
 }
 export function renderWorkspaceAssetSelectionActions({
   selectionMode: selectionMode = ![],
-  selectedCount: selectedCount = 0x0,
+  selectedCount: selectedCount = 0,
   allSelected: allSelected = ![],
   primaryActionHtml: primaryActionHtml = '',
   enterSelectionLabel: enterSelectionLabel = '多选',
@@ -72,11 +72,11 @@ export function renderWorkspaceAssetSelectionActions({
   clearSelectionLabel: clearSelectionLabel = '取消全选',
   compactTrigger: compactTrigger = !![],
 } = {}) {
-  const source = Math['max'](0x0, Math['trunc'](Number(selectedCount) || 0x0));
+  const source = Math['max'](0, Math['trunc'](Number(selectedCount) || 0));
   return (
     '<button type="button" class="story-secondary-button" data-workspace-action="toggle-all-assets" data-story-action="toggle-all-assets" aria-pressed="' +
     allSelected +
-    '\x22>' +
+    '">' +
     (allSelected ? clearSelectionLabel : selectAllLabel) +
     '</button>' +
     (source || primaryActionHtml ? primaryActionHtml : '')

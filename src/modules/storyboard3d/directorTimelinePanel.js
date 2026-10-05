@@ -19,7 +19,7 @@ import { DirectorMobileCamera } from './directorMobileCamera.js';
 const escapeHtml = (value) =>
     String(value ?? '')
       ['replaceAll']('&', '&amp;')
-      ['replaceAll']('\x22', '&quot;')
+      ['replaceAll']('"', '&quot;')
       ['replaceAll']('<', '&lt;')
       ['replaceAll']('>', '&gt;'),
   options = (list, item) =>
@@ -27,7 +27,7 @@ const escapeHtml = (value) =>
       ([key, index]) =>
         '<option value="' +
         escapeHtml(key) +
-        '\x22\x20' +
+        '" ' +
         (key === item ? 'selected' : '') +
         '>' +
         escapeHtml(index) +
@@ -36,11 +36,11 @@ const escapeHtml = (value) =>
   input = (result, data, target, source = '') =>
     '<label>' +
     result +
-    '<input\x20type=\x22number\x22\x20step=\x220.1\x22\x20value=\x22' +
+    '<input type="number" step="0.1" value="' +
     target +
-    '\x22\x20data-director-field=\x22' +
+    '" data-director-field="' +
     data +
-    '\x22\x20' +
+    '" ' +
     source +
     '></label>';
 export class DirectorTimelinePanel {
@@ -60,23 +60,23 @@ export class DirectorTimelinePanel {
       this['drafts']['set'](record, {
         preset: 'push',
         cameraPreset: 'front-medium',
-        duration: 0x3,
-        amount: 0x3,
+        duration: 3,
+        amount: 3,
         append: ![],
-        start: 0x0,
+        start: 0,
         actionId: 'walking-left',
-        speed: 0x1,
+        speed: 1,
         orient: !![],
         points: [],
-        span: 0xc,
-        pathDuration: 0x3,
+        span: 12,
+        pathDuration: 3,
       });
     return this['drafts']['get'](record);
   }
   ['context']() {
     const args = this['timeline']['_context'](),
       object = args['scene']?.['objects']['find'](
-        (payload) => payload['id'] === args['editorState']['selectedObjectIds']?.['at'](-0x1),
+        (payload) => payload['id'] === args['editorState']['selectedObjectIds']?.['at'](-1),
       );
     return {
       ...args,
@@ -96,13 +96,13 @@ export class DirectorTimelinePanel {
           ['filter']((scope) => !['camera', 'group', 'light']['includes'](scope['type']))
           ['map']((error) => [error['id'], error['name']]),
       ],
-      output = object2?.['transform']['position'] || [0x0, 0x0, 0x0],
+      output = object2?.['transform']['position'] || [0, 0, 0],
       list2 = handle['points']['map'](
         (value2) =>
-          0x32 +
-          ((value2[0x0] - output[0x0]) / handle['span']) * 0x64 +
+          50 +
+          ((value2[0] - output[0]) / handle['span']) * 100 +
           ',' +
-          (0x32 + ((value2[0x2] - output[0x2]) / handle['span']) * 0x64),
+          (50 + ((value2[2] - output[2]) / handle['span']) * 100),
       ),
       list3 = storyboard3DShotAnimation['actionClips']['filter'](
         (value3) => value3['objectId'] === object2?.['id'],
@@ -110,13 +110,13 @@ export class DirectorTimelinePanel {
     return (
       '<div class="storyboard-3d-director-panel" data-director-panel>\n      ' +
       this['timeline']['cameraPath']['render'](storyboard3DShotAnimation) +
-      '\x0a\x20\x20\x20\x20\x20\x20' +
+      '\n      ' +
       this['characters']['render']() +
       '\n      ' +
       this['scenePanel']['render']() +
       '\n      ' +
       this['delivery']['render']() +
-      '\x0a\x20\x20\x20\x20\x20\x20' +
+      '\n      ' +
       this['generation']['render']() +
       '\n      ' +
       this['mobile']['render']() +
@@ -125,10 +125,10 @@ export class DirectorTimelinePanel {
         DIRECTOR_CAMERA_PRESETS['map']((error2) => [error2['id'], error2['name']]),
         handle['cameraPreset'],
       ) +
-      '</select></label><button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22timeline-director-camera-preset\x22>应用到当前帧</button>\x0a\x20\x20\x20\x20\x20\x20</div><div\x20class=\x22storyboard-3d-director-fields\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label>预设<select\x20data-director-field=\x22preset\x22>' +
+      '</select></label><button type="button" data-storyboard-3d-action="timeline-director-camera-preset">应用到当前帧</button>\n      </div><div class="storyboard-3d-director-fields">\n        <label>预设<select data-director-field="preset">' +
       options(DIRECTOR_CAMERA_MOTIONS, handle['preset']) +
       '</select></label>\n        ' +
-      input('时长\x20/\x20秒', 'duration', handle['duration'], 'min="0.1" max="3600"') +
+      input('时长 / 秒', 'duration', handle['duration'], 'min="0.1" max="3600"') +
       input('移动距离 / 米', 'amount', handle['amount'], 'min="0.1" max="100"') +
       '\n        <label><input type="checkbox" data-director-field="append" ' +
       (handle['append'] ? 'checked' : '') +
@@ -136,38 +136,38 @@ export class DirectorTimelinePanel {
       options(config, state['followObjectId']) +
       '</select></label>\n        <label>注视目标<select data-director-constraint="lookAtObjectId">' +
       options(config, state['lookAtObjectId']) +
-      '</select></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><input\x20type=\x22checkbox\x22\x20data-director-constraint=\x22followHeading\x22\x20' +
+      '</select></label>\n        <label><input type="checkbox" data-director-constraint="followHeading" ' +
       (state['followHeading'] ? 'checked' : '') +
       '>跟随朝向</label>\n        <label>注视高度 / 米<input type="number" step="0.1" value="' +
-      state['lookAtOffset'][0x1] +
+      state['lookAtOffset'][1] +
       '" data-director-constraint="lookAtHeight"></label>\n      </div>' +
       renderDirectorFollowPanel(storyboard3DShotAnimation, config) +
       '</fieldset>\n      <fieldset><legend>' +
       escapeHtml(object2?.['name'] || '选择角色或物体后编排走位与动作') +
       '</legend>\n        <div class="storyboard-3d-director-fields">' +
-      input('开始 / 秒', 'start', handle['start'], 'min=\x220\x22\x20max=\x223599.9\x22') +
+      input('开始 / 秒', 'start', handle['start'], 'min="0" max="3599.9"') +
       input('走位 / 动作时长', 'pathDuration', handle['pathDuration'], 'min="0.1" max="3600"') +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
-      input('地图范围 / 米', 'span', handle['span'], 'min=\x222\x22\x20max=\x22200\x22') +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<label><input\x20type=\x22checkbox\x22\x20data-director-field=\x22orient\x22\x20' +
+      '\n          ' +
+      input('地图范围 / 米', 'span', handle['span'], 'min="2" max="200"') +
+      '\n          <label><input type="checkbox" data-director-field="orient" ' +
       (handle['orient'] ? 'checked' : '') +
       '>朝向路径</label>\n        </div>\n        <div class="storyboard-3d-director-path-row"><button type="button" class="storyboard-3d-director-path-map" data-storyboard-3d-action="timeline-director-point" aria-label="俯视走位图，点击添加路径点" ' +
       (object2 ? '' : 'disabled') +
       '>\n          <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 0V100 M0 50H100"/><polyline points="' +
-      list2['join']('\x20') +
+      list2['join'](' ') +
       '"/>' +
       list2['map'](
         (value4, value5) =>
           '<circle cx="' +
-          value4['split'](',')[0x0] +
+          value4['split'](',')[0] +
           '" cy="' +
-          value4['split'](',')[0x1] +
-          '\x22\x20r=\x221.8\x22/><text\x20x=\x22' +
-          (Number(value4['split'](',')[0x0]) + 0x2) +
+          value4['split'](',')[1] +
+          '" r="1.8"/><text x="' +
+          (Number(value4['split'](',')[0]) + 2) +
           '" y="' +
-          (Number(value4['split'](',')[0x1]) - 0x2) +
-          '\x22>' +
-          (value5 + 0x1) +
+          (Number(value4['split'](',')[1]) - 2) +
+          '">' +
+          (value5 + 1) +
           '</text>',
       )['join']('') +
       '<text x="52" y="8">−Z</text><text x="89" y="48">+X</text></svg>\n        </button><div class="storyboard-3d-director-path-points">\n          ' +
@@ -175,46 +175,46 @@ export class DirectorTimelinePanel {
         ['map'](
           (list4, value6) =>
             '<div><b>' +
-            (value6 + 0x1) +
+            (value6 + 1) +
             '</b>' +
             list4['map'](
               (value7, value8) =>
                 '<input aria-label="路径点 ' +
-                (value6 + 0x1) +
-                '\x20' +
+                (value6 + 1) +
+                ' ' +
                 ['X', 'Y', 'Z'][value8] +
                 '" type="number" step="0.1" value="' +
-                value7['toFixed'](0x2) +
+                value7['toFixed'](2) +
                 '" data-director-point="' +
                 value6 +
-                '\x22\x20data-axis=\x22' +
+                '" data-axis="' +
                 value8 +
-                '\x22>',
+                '">',
             )['join']('') +
             '<button type="button" data-storyboard-3d-action="timeline-director-remove-point" data-index="' +
             value6 +
             '" aria-label="删除路径点 ' +
-            (value6 + 0x1) +
+            (value6 + 1) +
             '">×</button></div>',
         )
         ['join']('') || '点击俯视图设置走位；首点自动使用物体当前位置。') +
       '\n        </div></div><div class="storyboard-3d-director-fields"><button type="button" data-storyboard-3d-action="timeline-director-path" ' +
-      (object2 && handle['points']['length'] > 0x1 ? '' : 'disabled') +
-      '>生成走位关键帧</button><button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22timeline-director-clear-path\x22>清空路径草稿</button></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      (object2 && handle['points']['length'] > 1 ? '' : 'disabled') +
+      '>生成走位关键帧</button><button type="button" data-storyboard-3d-action="timeline-director-clear-path">清空路径草稿</button></div>\n        ' +
       (object2?.['type'] === 'character'
-        ? '<div\x20class=\x22storyboard-3d-director-fields\x22><label>动作<select\x20data-director-field=\x22actionId\x22>' +
+        ? '<div class="storyboard-3d-director-fields"><label>动作<select data-director-field="actionId">' +
           options(
             STORYBOARD_3D_ACTIONS['map']((error3) => [error3['id'], error3['name']]),
             handle['actionId'],
           ) +
           '</select></label>' +
           input('播放倍速', 'speed', handle['speed'], 'min="0.1" max="4"') +
-          '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22timeline-director-add-clip\x22>添加动作片段</button></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-director-clips\x22>' +
+          '<button type="button" data-storyboard-3d-action="timeline-director-add-clip">添加动作片段</button></div>\n        <div class="storyboard-3d-director-clips">' +
           list3['map'](
             (value9) =>
               '<div data-director-clip="' +
               escapeHtml(value9['id']) +
-              '\x22><strong>' +
+              '"><strong>' +
               escapeHtml(
                 STORYBOARD_3D_ACTIONS['find']((value10) => value10['id'] === value9['actionId'])?.['name'],
               ) +
@@ -231,11 +231,11 @@ export class DirectorTimelinePanel {
                     '"></label>',
                 )
                 ['join']('') +
-              '<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22timeline-director-copy-clip\x22\x20data-clip-id=\x22' +
+              '<button type="button" data-storyboard-3d-action="timeline-director-copy-clip" data-clip-id="' +
               escapeHtml(value9['id']) +
               '">复制到末尾</button><button type="button" data-storyboard-3d-action="timeline-director-delete-clip" data-clip-id="' +
               escapeHtml(value9['id']) +
-              '\x22>删除</button></div>',
+              '">删除</button></div>',
           )['join']('') +
           '</div>'
         : '') +
@@ -292,19 +292,19 @@ export class DirectorTimelinePanel {
           );
           break;
         case 'timeline-director-point': {
-          if (!object3 || !event || preset['points']['length'] >= 0x64) break;
+          if (!object3 || !event || preset['points']['length'] >= 100) break;
           const box = el['getBoundingClientRect']();
           if (!preset['points']['length']) preset['points']['push']([...object3['transform']['position']]);
           const value15 = object3['transform']['position'];
           preset['points']['push']([
-            value15[0x0] + ((event['clientX'] - box['left']) / box['width'] - 0.5) * preset['span'],
-            value15[0x1],
-            value15[0x2] + ((event['clientY'] - box['top']) / box['height'] - 0.5) * preset['span'],
+            value15[0] + ((event['clientX'] - box['left']) / box['width'] - 0.5) * preset['span'],
+            value15[1],
+            value15[2] + ((event['clientY'] - box['top']) / box['height'] - 0.5) * preset['span'],
           ]);
           break;
         }
         case 'timeline-director-remove-point':
-          preset['points']['splice'](Number(el['dataset']['index']), 0x1);
+          preset['points']['splice'](Number(el['dataset']['index']), 1);
           break;
         case 'timeline-director-clear-path':
           preset['points'] = [];
@@ -356,7 +356,7 @@ export class DirectorTimelinePanel {
                 ['filter']((value19) => value19['objectId'] === args4['objectId'])
                 ['map']((value20) => value20['end']),
             );
-            if (start2 + args4['end'] - args4['start'] > 0xe10) throw new Error('动作片段超过时长上限。');
+            if (start2 + args4['end'] - args4['start'] > 3600) throw new Error('动作片段超过时长上限。');
             return normalizeStoryboard3DShotAnimation({
               ...args3,
               actionClips: [
@@ -398,7 +398,7 @@ export class DirectorTimelinePanel {
             ? Number(el2['value'])
             : el2['value'];
       if (value22 === 'span')
-        value21['span'] = Math['max'](0x2, Math['min'](0xc8, Number(value21['span']) || 0xc));
+        value21['span'] = Math['max'](2, Math['min'](200, Number(value21['span']) || 12));
       if (value22 === 'span') this['refreshMap']();
       return !![];
     }
@@ -413,7 +413,7 @@ export class DirectorTimelinePanel {
       return (
         this['mutate']('修改摄像机跟随与注视', (value26) => {
           if (value25 === 'lookAtHeight')
-            value26['cameraConstraint']['lookAtOffset'][0x1] = Number(el2['value']) || 0x0;
+            value26['cameraConstraint']['lookAtOffset'][1] = Number(el2['value']) || 0;
           else
             value26['cameraConstraint'][value25] = el2['type'] === 'checkbox' ? el2['checked'] : el2['value'];
           return normalizeStoryboard3DShotAnimation(value26);

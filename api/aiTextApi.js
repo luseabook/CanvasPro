@@ -9,16 +9,16 @@ import { uploadInputsToVolcengineFiles } from './volcengineFileApi.js';
 import { get } from './requester.js';
 import { isModelApiModel, normalizeProviderId, resolveModelExecution } from '../src/manifests/index.js';
 import { ApiError, parseError, parseNetworkError } from './errors/index.js';
-const GENERATION_TIMEOUT = 5 * 60 * 0x3e8,
+const GENERATION_TIMEOUT = 5 * 60 * 1000,
   IMAGE_MENTION_RE = /@图片\d+/g,
   VIDEO_MENTION_RE = /@视频\d+/g,
   GPT_TEXT_VIDEO_MEDIA_RE = /\.(?:mp4|mov|m4v|webm|mkv|avi|mpeg|mpg|3gp)(?:[?#].*)?$/i,
   GPT_TEXT_AUDIO_MEDIA_RE = /\.(?:mp3|wav|m4a|aac|flac|ogg|opus|wma)(?:[?#].*)?$/i,
   GPT_TEXT_UNSUPPORTED_MEDIA_RE =
     /\.(?:mp4|mov|m4v|webm|mkv|avi|mpeg|mpg|3gp|mp3|wav|m4a|aac|flac|ogg|opus|wma)(?:[?#].*)?$/i,
-  RUNNINGHUB_CONTACT_SHEET_MAX_SIDE_PX = 0x800,
+  RUNNINGHUB_CONTACT_SHEET_MAX_SIDE_PX = 2048,
   RUNNINGHUB_CONTACT_SHEET_GAP_PX = 24,
-  RUNNINGHUB_CONTACT_SHEET_MIN_CELL_PX = 0x100,
+  RUNNINGHUB_CONTACT_SHEET_MIN_CELL_PX = 256,
   RUNNINGHUB_CONTACT_SHEET_COLOR_TOKENS = Object.freeze({
     background: '--canvas-contact-sheet-bg',
     cellBackground: '--canvas-contact-sheet-cell-bg',
@@ -109,7 +109,7 @@ function resolveChatCompletionInputUrls({
   }
   return inputImageUrls2.length > 0 ? inputImageUrls2 : inputUrls2;
 }
-const RUNNINGHUB_POLL_INTERVAL_MS = 0xbb8;
+const RUNNINGHUB_POLL_INTERVAL_MS = 3000;
 function sleep(target) {
   return new Promise((source) => setTimeout(source, target));
 }
@@ -745,7 +745,7 @@ export async function buildGenerateTextRequest(content2) {
   await ensureConfig();
   const list26 = applyCameraAngleToPrompt(content2.prompt, content2.cameraAngle),
     count2 = list26.length;
-  if (count2 > 0xc350)
+  if (count2 > 50000)
     throw new Error(
       '提示词过长（' +
         count2 +
@@ -859,8 +859,8 @@ export async function buildGenerateTextRequest(content2) {
 function parseTextResponse(list28, status) {
   const value89 = '',
     value90 = list28.length,
-    value91 = list28.slice(0, 0x190),
-    value92 = list28.slice(Math.max(0, value90 - 0x190)),
+    value91 = list28.slice(0, 400),
+    value92 = list28.slice(Math.max(0, value90 - 400)),
     value93 = /<!doctype\s+html|<html[\s>]/i.test(value91),
     list29 = list28.replace(/^\uFEFF/, '').trim();
   let enabled17;
@@ -987,7 +987,7 @@ async function pollRunningHubTextTask(taskId, apiKey2, value101) {
           taskId: taskId,
         }),
       },
-      0x7530,
+      30000,
     );
     if (!response6.ok) {
       const error5 = await response6.text().catch(() => '');
@@ -1002,7 +1002,7 @@ async function pollRunningHubTextTask(taskId, apiKey2, value101) {
     const runningHubResponseData = parseRunningHubResponseData(await response6.text()),
       count3 = Number(runningHubResponseData?.code);
     if (Number.isFinite(count3)) {
-      if (count3 === 0x324 || count3 === 0x32d) continue;
+      if (count3 === 804 || count3 === 813) continue;
       if (count3 !== 0)
         throw new Error(getRunningHubTextErrorMessage(runningHubResponseData, '文本任务轮询失败'));
     }

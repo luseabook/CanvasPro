@@ -660,11 +660,11 @@ test('createPackage writes a redacted diagnostics archive with a manifest and su
       promptsIncluded: false,
     });
     assert.deepEqual(manifest.limits, {
-      desktopTailBytes: 2 * 0x400 * 0x400,
-      rotatedDesktopTailBytes: 2 * 0x400 * 0x400,
-      serverTailBytes: 0x400 * 0x400,
+      desktopTailBytes: 2 * 1024 * 1024,
+      rotatedDesktopTailBytes: 2 * 1024 * 1024,
+      serverTailBytes: 1024 * 1024,
       recentProblems: 30,
-      incidentTailBytesPerFile: 2 * 0x400 * 0x400,
+      incidentTailBytesPerFile: 2 * 1024 * 1024,
       precedingEventsPerIncident: 8,
     });
     assert.ok(entries.get('README.txt').toString('utf8').includes('package-manifest.json'));

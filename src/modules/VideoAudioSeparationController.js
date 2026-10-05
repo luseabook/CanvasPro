@@ -49,12 +49,12 @@ function _getSpawnLayout(box) {
   const { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
     audio = direction === 'down' ? 'down' : 'right',
     next = Math.max(24, Math.min(80, Math.round(Number(spacing || 0) / 2))),
-    width = getAutoMediaSizeByShortSide(Number(box?.width) || 0x200, Number(box?.height) || 0x120),
+    width = getAutoMediaSizeByShortSide(Number(box?.width) || 512, Number(box?.height) || 288),
     width2 = getNodeDefaultSize('source-audio'),
     current = Number(box?.x) || 0,
     entry = Number(box?.y) || 0,
-    record = Number(box?.width) || 0x200,
-    payload = Number(box?.height) || 0x120;
+    record = Number(box?.width) || 512,
+    payload = Number(box?.height) || 288;
   let x =
       audio === 'right'
         ? current + record + spacing

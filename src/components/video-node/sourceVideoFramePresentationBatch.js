@@ -68,7 +68,7 @@ export function reportSourceVideoMediaSlotFrameOnce(
     return !![];
   const reported =
     globalThis['window']?.['v2Renderer']?.['reportMediaSlotFrame']?.(node['id'], {
-      slotIndex: 0x0,
+      slotIndex: 0,
       sourceKey: normalizedSourceKey,
       sourceEpoch: sourceEpoch,
       facts: presentationFacts || node['_getRendererVideoPresentationFacts'](),

@@ -25,7 +25,7 @@ function getStoreState(store) {
 function createWorkspaceItemId(value = 'item', item = globalThis['window']) {
   const key = item?.['crypto']?.['randomUUID']?.() || globalThis['crypto']?.['randomUUID']?.();
   if (key) return value + '_' + key;
-  return value + '_' + Date['now']() + '_' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa);
+  return value + '_' + Date['now']() + '_' + Math['random']()['toString'](36)['slice'](2, 10);
 }
 function enqueueMicrotask(index, result) {
   if (typeof index?.['queueMicrotask'] === 'function') {
@@ -137,7 +137,7 @@ export function createStoryboard3DWorkspaceController({
       const projects = getProjects(getStoreState(storeInstance))['length'],
         translate2 = translate('storyboard3d.defaults.projectName'),
         output = String(project?.['name'] || '')['trim'](),
-        name = output || (projects > 0x0 ? translate2 + '\x20' + (projects + 0x1) : translate2),
+        name = output || (projects > 0 ? translate2 + ' ' + (projects + 1) : translate2),
         value2 = project
           ? migrateProjectModel({ ...project, name: name })
           : createProjectModel({ name: name });

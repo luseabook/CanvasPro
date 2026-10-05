@@ -59,7 +59,7 @@ export function getRenderedOptionDisableWhen(el) {
       ['split'](',')
       ['map']((entry) => entry['trim']())
       ['filter'](Boolean);
-  return field && values['length'] > 0x0 ? { field: field, values: values } : null;
+  return field && values['length'] > 0 ? { field: field, values: values } : null;
 }
 export function optionDisableWhenMatches(el2, record = {}) {
   if (Array['isArray'](el2)) return el2['some']((payload) => optionDisableWhenMatches(payload, record));
@@ -99,13 +99,13 @@ function resolveMatchingOptionDisableRepair(el3, value3 = {}) {
       uiSchemaRepairPatches = mergeUiSchemaRepairPatches(uiSchemaRepairPatches, matchingOptionDisableRepair);
       if (!uiSchemaRepairPatches) return null;
     }
-    return Object['keys'](uiSchemaRepairPatches)['length'] > 0x0 ? uiSchemaRepairPatches : null;
+    return Object['keys'](uiSchemaRepairPatches)['length'] > 0 ? uiSchemaRepairPatches : null;
   }
   if (Array['isArray'](el3?.['all'])) {
     for (const value6 of el3['all']) {
       if (!optionDisableWhenMatches(value6, value3)) continue;
       const matchingOptionDisableRepair2 = resolveMatchingOptionDisableRepair(value6, value3);
-      if (matchingOptionDisableRepair2 && Object['keys'](matchingOptionDisableRepair2)['length'] > 0x0)
+      if (matchingOptionDisableRepair2 && Object['keys'](matchingOptionDisableRepair2)['length'] > 0)
         return matchingOptionDisableRepair2;
     }
     return null;
@@ -114,7 +114,7 @@ function resolveMatchingOptionDisableRepair(el3, value3 = {}) {
   const enabled4 = String(el3['field'] || el3['param'] || '')['trim'](),
     value7 = el3['values'] !== undefined ? el3['values'] : el3['value'],
     list3 = Array['isArray'](value7) ? value7 : [value7];
-  if (!enabled4 || list3['length'] === 0x0) return null;
+  if (!enabled4 || list3['length'] === 0) return null;
   const nodeFieldValue = getNodeFieldValue(value3, enabled4, ''),
     value8 = list3['find'](
       (value9) => normalizeCompareValue(value9) !== normalizeCompareValue(nodeFieldValue),
@@ -231,21 +231,21 @@ export function evaluateUiSchemaNumberExpression(value33) {
   if (typeof value33 === 'number') return Number['isFinite'](value33) ? value33 : NaN;
   const list7 = String(value33 ?? '')['trim']();
   if (!list7) return NaN;
-  let value34 = 0x0;
+  let value34 = 0;
   const run = () => {
-      while (/\s/['test'](list7[value34] || '')) value34 += 0x1;
+      while (/\s/['test'](list7[value34] || '')) value34 += 1;
     },
     handler = () => {
       run();
       const value35 = value34;
       let enabled8 = ![];
       while (/\d/['test'](list7[value34] || '')) {
-        ((enabled8 = !![]), (value34 += 0x1));
+        ((enabled8 = !![]), (value34 += 1));
       }
       if (list7[value34] === '.') {
-        value34 += 0x1;
+        value34 += 1;
         while (/\d/['test'](list7[value34] || '')) {
-          ((enabled8 = !![]), (value34 += 0x1));
+          ((enabled8 = !![]), (value34 += 1));
         }
       }
       if (!enabled8) return NaN;
@@ -255,16 +255,16 @@ export function evaluateUiSchemaNumberExpression(value33) {
       run();
       const value36 = list7[value34];
       if (value36 === '+' || value36 === '-') {
-        value34 += 0x1;
+        value34 += 1;
         const value37 = handler2();
         return value36 === '-' ? -value37 : value37;
       }
       if (list7[value34] === '(') {
-        value34 += 0x1;
+        value34 += 1;
         const value38 = run2();
         run();
         if (list7[value34] !== ')') return NaN;
-        return ((value34 += 0x1), value38);
+        return ((value34 += 1), value38);
       }
       return handler();
     },
@@ -274,10 +274,10 @@ export function evaluateUiSchemaNumberExpression(value33) {
         run();
         const value40 = list7[value34];
         if (value40 !== '*' && value40 !== '/') return value39;
-        value34 += 0x1;
+        value34 += 1;
         const count = handler2();
         if (!Number['isFinite'](value39) || !Number['isFinite'](count)) return NaN;
-        if (value40 === '/' && count === 0x0) return NaN;
+        if (value40 === '/' && count === 0) return NaN;
         value39 = value40 === '*' ? value39 * count : value39 / count;
       }
     };
@@ -287,7 +287,7 @@ export function evaluateUiSchemaNumberExpression(value33) {
       run();
       const value42 = list7[value34];
       if (value42 !== '+' && value42 !== '-') return value41;
-      value34 += 0x1;
+      value34 += 1;
       const value43 = handler3();
       if (!Number['isFinite'](value41) || !Number['isFinite'](value43)) return NaN;
       value41 = value42 === '+' ? value41 + value43 : value41 - value43;
@@ -371,10 +371,10 @@ export function createUiSchemaStateOwner({
         value56 = normalizeRhV54SinglePreset(
           getNodeFieldValue(value50, 'rhSingleControlPreset', 'efficiency'),
         );
-      (el9['querySelectorAll']('[data-key=\x22rhSingleControlPreset\x22]')['forEach']((el10) =>
+      (el9['querySelectorAll']('[data-key="rhSingleControlPreset"]')['forEach']((el10) =>
         el10['classList']['toggle']('active', value55 !== 'multi' && el10['dataset']['value'] === value56),
       ),
-        el9['querySelectorAll']('[data-key=\x22rhControlMode\x22]')['forEach']((el11) =>
+        el9['querySelectorAll']('[data-key="rhControlMode"]')['forEach']((el11) =>
           el11['classList']['toggle']('active', value55 === 'multi' && el11['dataset']['value'] === 'multi'),
         ),
         el9['querySelector']('.rh-adv-single-group')?.['classList']['toggle']('active', value55 !== 'multi'),
@@ -382,8 +382,8 @@ export function createUiSchemaStateOwner({
     }
     if (el9['classList']?.['contains']('ui-schema-rh-v54-mask-expand')) {
       const value57 = normalizeRhV54MaskExpand(
-          getNodeFieldValue(value50, 'rhMaskExpand', el9['dataset']['uiSchemaDefault'] || 0x19),
-          Number(el9['dataset']['uiSchemaDefault'] || 0x19),
+          getNodeFieldValue(value50, 'rhMaskExpand', el9['dataset']['uiSchemaDefault'] || 25),
+          Number(el9['dataset']['uiSchemaDefault'] || 25),
         ),
         el12 = el9['querySelector']('.rh-stepper-value');
       el12 &&
@@ -391,7 +391,7 @@ export function createUiSchemaStateOwner({
     }
     if (el9['classList']?.['contains']('ui-schema-rh-v54-breast-jiggle')) {
       const value58 = formatRhV54BreastJiggle(
-          getNodeFieldValue(value50, value51, el9['dataset']['uiSchemaDefault'] || 0x0),
+          getNodeFieldValue(value50, value51, el9['dataset']['uiSchemaDefault'] || 0),
           getRhV54BreastJiggleRangeFromFieldEl(el9),
         ),
         el13 = el9['querySelector']('.rh-breast-jiggle-slider');
@@ -437,7 +437,7 @@ export function createUiSchemaStateOwner({
   }
   function run9(el20, value67 = {}) {
     const enabled12 =
-        el20?.['querySelector']?.('[data-ui-schema-field=\x22aspectRatio\x22]') ||
+        el20?.['querySelector']?.('[data-ui-schema-field="aspectRatio"]') ||
         el20?.['querySelector']?.('[data-ui-schema-display-role="aspectRatio"]'),
       value68 =
         el20?.['querySelector']?.('[data-ui-schema-field="imageSize"]') ||
@@ -448,25 +448,25 @@ export function createUiSchemaStateOwner({
       list8 = Array['from'](el20?.['querySelectorAll']?.('[data-ui-schema-field]') || [])['filter'](
         (value69) => value69 !== enabled12,
       );
-    list8['length'] === 0x0 && value68 && list8['push'](value68);
+    list8['length'] === 0 && value68 && list8['push'](value68);
     const el21 = el20?.['querySelector']?.('.ui-schema-quality-ratio-label');
     if (!list8['length'] || !enabled12 || !el21) return;
     const value70 = run7(enabled12, value67),
       list9 = list8['map']((value71) => run8(value71, run7(value71, value67))),
       value72 = run8(enabled12, value70, { adaptive: !![] });
     el21['textContent'] =
-      list9['length'] > 0x1
-        ? [...list9, value72]['join']('\x20·\x20')
+      list9['length'] > 1
+        ? [...list9, value72]['join'](' · ')
         : String(el20?.['dataset']?.['uiSchemaLabelOrder'] || '')['trim']() === 'fieldFirst'
-          ? (list9[0x0] || '') + ' · ' + value72
-          : value72 + '\x20·\x20' + (list9[0x0] || '');
+          ? (list9[0] || '') + ' · ' + value72
+          : value72 + ' · ' + (list9[0] || '');
   }
   function run10(el22, value73 = {}) {
     const list10 = Array['from'](el22?.['querySelectorAll']?.('[data-ui-schema-field]') || []),
       el23 = el22?.['querySelector']?.('.ui-schema-section-pair-label');
-    if (list10['length'] < 0x2 || !el23) return;
+    if (list10['length'] < 2 || !el23) return;
     const list11 = list10['map']((value74) => run8(value74, run7(value74, value73)))['filter'](Boolean);
-    list11['length'] >= 0x2 && (el23['textContent'] = list11['join'](' · '));
+    list11['length'] >= 2 && (el23['textContent'] = list11['join'](' · '));
   }
   function run11(el24, value75 = {}) {
     const enabled13 =
@@ -475,7 +475,7 @@ export function createUiSchemaStateOwner({
       el25 = el24?.['querySelector']?.('.ui-schema-video-resolution-label');
     if (!enabled13 || !el25) return;
     const enabled14 = el24['querySelector']('[data-ui-schema-field="rhVideoFps"]'),
-      enabled15 = el24['querySelector']('[data-ui-schema-field=\x22rhVideoFrames\x22]'),
+      enabled15 = el24['querySelector']('[data-ui-schema-field="rhVideoFrames"]'),
       value76 = run7(enabled13, value75);
     if (!enabled14 || !enabled15) {
       el25['textContent'] = formatMetricLabel('分辨率', value76);
@@ -483,7 +483,7 @@ export function createUiSchemaStateOwner({
     }
     const value77 = run7(enabled14, value75),
       value78 = run7(enabled15, value75),
-      value79 = Number(value78) === 0x0 ? t('aigenImage.uiSchema.fullLength') : String(value78 || '');
+      value79 = Number(value78) === 0 ? t('aigenImage.uiSchema.fullLength') : String(value78 || '');
     el25['textContent'] = joinMetricLabels([
       ['帧数', value79],
       ['帧率', value77],
@@ -509,12 +509,12 @@ export function createUiSchemaStateOwner({
           Number(value88),
           value89,
         ),
-      value90 = value83 ? handler5(value83, value83['defaultValue'] || 0x340, { min: 0x340 }) : 0x340;
+      value90 = value83 ? handler5(value83, value83['defaultValue'] || 832, { min: 832 }) : 832;
     if (el27 && value86) {
-      const value91 = value84 ? handler5(value84, value84['defaultValue'] || 0x18) : 0x18,
-        value92 = handler5(value86, value86['defaultValue'] || 0x5, {
-          min: Number(value86['min'] || 0x1),
-          max: Number(value86['max'] || 0x258),
+      const value91 = value84 ? handler5(value84, value84['defaultValue'] || 24) : 24,
+        value92 = handler5(value86, value86['defaultValue'] || 5, {
+          min: Number(value86['min'] || 1),
+          max: Number(value86['max'] || 600),
         });
       el27['textContent'] = joinMetricLabels([
         ['秒数', value92],
@@ -523,13 +523,13 @@ export function createUiSchemaStateOwner({
       ]);
     } else {
       if (el27 && value85) {
-        const count2 = handler5(value85, value85['defaultValue'] || 0x4d, {
-            min: Number(value85['min'] || 0x0),
+        const count2 = handler5(value85, value85['defaultValue'] || 77, {
+            min: Number(value85['min'] || 0),
             max: Number(value85['max'] || 0xf423f),
           }),
-          value93 = count2 === 0x0 ? t('aigenImage.uiSchema.fullLength') : String(count2);
+          value93 = count2 === 0 ? t('aigenImage.uiSchema.fullLength') : String(count2);
         if (value84) {
-          const value94 = handler5(value84, value84['defaultValue'] || 0x18);
+          const value94 = handler5(value84, value84['defaultValue'] || 24);
           el27['textContent'] = joinMetricLabels([
             ['帧数', value93],
             ['帧率', value94],
@@ -544,24 +544,24 @@ export function createUiSchemaStateOwner({
     }
     const el28 = el26?.['querySelector']?.('[data-ui-schema-field="rhVideoFrames"] .rh-stepper-value');
     if (value85 && el28) {
-      const count3 = handler5(value85, value85['defaultValue'] || 0x4d, {
-        min: Number(value85['min'] || 0x0),
+      const count3 = handler5(value85, value85['defaultValue'] || 77, {
+        min: Number(value85['min'] || 0),
         max: Number(value85['max'] || 0xf423f),
       });
-      ((el28['textContent'] = count3 === 0x0 ? t('aigenImage.uiSchema.fullLength') : String(count3)),
+      ((el28['textContent'] = count3 === 0 ? t('aigenImage.uiSchema.fullLength') : String(count3)),
         el28['setAttribute']('aria-valuenow', String(count3)));
     }
     const el29 = el26?.['querySelector']?.('[data-ui-schema-field="rhVideoSeconds"] .rh-stepper-value');
     if (value86 && el29) {
-      const value95 = handler5(value86, value86['defaultValue'] || 0x5, {
-        min: Number(value86['min'] || 0x1),
-        max: Number(value86['max'] || 0x258),
+      const value95 = handler5(value86, value86['defaultValue'] || 5, {
+        min: Number(value86['min'] || 1),
+        max: Number(value86['max'] || 600),
       });
       ((el29['textContent'] = String(value95)), el29['setAttribute']('aria-valuenow', String(value95)));
     }
     const el30 = el26?.['querySelector']?.('.rh-v5-source-framecount');
     if (el30) {
-      const value96 = Number(value80?.['rhVideoSourceFrameCount'] || 0x0);
+      const value96 = Number(value80?.['rhVideoSourceFrameCount'] || 0);
       el30['textContent'] = value96 ? String(value96) : '—';
     }
   }
@@ -677,7 +677,7 @@ export function createUiSchemaStateOwner({
           if (!enabled17) {
             const list14 = parseRangeValuesFromFieldEl(el37),
               value114 = findRangeValueIndex(list14, value108);
-            el44['value'] = list14?.['length'] ? String(Math['max'](0x0, value114)) : String(value108);
+            el44['value'] = list14?.['length'] ? String(Math['max'](0, value114)) : String(value108);
           }
           const el45 = el37['querySelector']('.ui-schema-value');
           if (el45) el45['textContent'] = String(value108);

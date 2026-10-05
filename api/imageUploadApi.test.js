@@ -196,7 +196,7 @@ function isTelegraphProxyUpload(current) {
         async (value6) => {
           const value7 = String(value6 || '');
           if (value7.startsWith('/api/v2/proxy/upload?'))
-            return createResponse(JSON.stringify({ code: 0x191, errorMessage: 'invalid model api key' }));
+            return createResponse(JSON.stringify({ code: 401, errorMessage: 'invalid model api key' }));
           throw new Error('unexpected fetch: ' + value7);
         },
         async () => {
@@ -219,7 +219,7 @@ function isTelegraphProxyUpload(current) {
           const uploadMarker4 = await readUploadMarker(dom5.body);
           if (uploadMarker4 === 'b')
             return createResponse('upload failed', {
-              status: 0x1f4,
+              status: 500,
               headers: { 'Content-Type': 'text/plain' },
             });
           return createResponse(JSON.stringify([{ src: '/' + uploadMarker4 + '.png' }]));

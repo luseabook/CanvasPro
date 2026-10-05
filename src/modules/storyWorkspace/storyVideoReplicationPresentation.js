@@ -3,21 +3,21 @@ import { formatStoryClockDuration } from './storyPlanningData.js';
 import { getVideoReplicationDialogueSummary } from '../../domain/storyGeneration/videoReplicationSourceAnalysis.js';
 function getSourceDurationLabel(value) {
   const count = Number(value['sourceVideo']?.['durationSec']);
-  return Number['isFinite'](count) && count > 0x0 ? formatStoryClockDuration(count) : '--:--';
+  return Number['isFinite'](count) && count > 0 ? formatStoryClockDuration(count) : '--:--';
 }
 function escapeHtml(item) {
   return String(item ?? '')
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 export function renderStoryVideoReplicationEpisodeRail(list = [], key = '') {
   return renderWorkspaceEpisodeRail({
     items: (Array['isArray'](list) ? list : [])['map']((args) => ({
       ...args,
-      meta: String(args?.['clips']?.['length'] || 0x0),
+      meta: String(args?.['clips']?.['length'] || 0),
     })),
     selectedId: key,
     listData: { 'data-story-replication-episode-rail-list': !![] },
@@ -33,7 +33,7 @@ function getEvidenceSummary(result) {
     enabled['characters']['length'] +
     ' 个角色' +
     (data ? ' · ' + data + ' 位主角' : '') +
-    '\x0a' +
+    '\n' +
     getVideoReplicationDialogueSummary(enabled)['label']
   );
 }
@@ -85,7 +85,7 @@ export function syncStoryReplicationSelection(current, entry) {
       ((el3['hidden'] = value4 ? !enabled6 : enabled6),
         (el3['disabled'] = config || !(value4 ? handle : list2['length'])),
         el3['setAttribute']('aria-busy', String(config)));
-      if (value4) el3['textContent'] = '分析选中' + (handle ? '\x20(' + handle + ')' : '');
+      if (value4) el3['textContent'] = '分析选中' + (handle ? ' (' + handle + ')' : '');
     }));
 }
 function getStatusView(options2 = {}) {
@@ -102,10 +102,10 @@ function getLoadingLabel(value6, value7) {
   return (
     (value8 === 'uploading' ? '正在上传' : value8 === 'queued' ? '等待解析' : '正在解析') +
     '视频 ' +
-    (value7 + 0x1)
+    (value7 + 1)
   );
 }
-function renderVideoCard(options3 = {}, value9 = 0x0, enabled7 = ![]) {
+function renderVideoCard(options3 = {}, value9 = 0, enabled7 = ![]) {
   const enabled8 = options3['sourceVideo'] || {},
     statusView = getStatusView(options3),
     value10 = String(enabled8['posterUrl'] || options3['coverUrl'] || '')['trim'](),
@@ -122,43 +122,43 @@ function renderVideoCard(options3 = {}, value9 = 0x0, enabled7 = ![]) {
     escapeHtml(options3['id']) +
     '" draggable="false" aria-busy="' +
     statusView['busy'] +
-    '\x22>\x0a\x20\x20\x20\x20<span\x20class=\x22story-replication-drag-handle\x22\x20data-story-replication-drag-handle\x20draggable=\x22true\x22\x20role=\x22button\x22\x20tabindex=\x220\x22\x20aria-label=\x22拖动调整第\x20' +
-    (value9 + 0x1) +
+    '">\n    <span class="story-replication-drag-handle" data-story-replication-drag-handle draggable="true" role="button" tabindex="0" aria-label="拖动调整第 ' +
+    (value9 + 1) +
     ' 条视频顺序" title="拖动调整顺序"><span></span><span></span><span></span><span></span><span></span><span></span></span>\n    <button type="button" class="story-replication-preview" data-story-action="preview-replication-video" data-story-replication-episode-id="' +
     escapeHtml(options3['id']) +
     '" aria-label="播放第 ' +
-    (value9 + 0x1) +
+    (value9 + 1) +
     ' 条原视频" ' +
     (enabled8['videoRef'] ? '' : 'disabled') +
     '>\n      <img' +
-    (value10 ? ' src="' + escapeHtml(value10) + '\x22' : '') +
+    (value10 ? ' src="' + escapeHtml(value10) + '"' : '') +
     ' alt="第 ' +
-    (value9 + 0x1) +
-    '\x20条视频首帧\x22\x20draggable=\x22false\x22\x20' +
+    (value9 + 1) +
+    ' 条视频首帧" draggable="false" ' +
     (value10 ? '' : 'hidden') +
-    '>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-replication-poster-placeholder\x22\x20' +
+    '>\n      <span class="story-replication-poster-placeholder" ' +
     (value10 ? 'hidden' : '') +
     ' aria-hidden="true">▶</span>\n      <span class="story-replication-play" aria-hidden="true">▶</span>\n      <span class="story-replication-number" data-story-replication-number>' +
-    String(value9 + 0x1)['padStart'](0x2, '0') +
+    String(value9 + 1)['padStart'](2, '0') +
     '</span>\n      <span class="story-replication-status" data-story-replication-status>' +
     escapeHtml(statusView['label']) +
     '</span>\n      <span class="story-replication-duration" data-story-replication-duration>' +
     escapeHtml(getSourceDurationLabel(options3)) +
-    '</span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-episode-copy\x20story-replication-copy\x22\x20data-replication-card-action=\x22' +
+    '</span>\n    </button>\n    <button type="button" class="story-episode-copy story-replication-copy" data-replication-card-action="' +
     escapeHtml(options3['id']) +
-    '\x22\x20' +
+    '" ' +
     (!enabled7 && options3['replication']?.['sourceAnalysis']
-      ? 'data-replication-open="' + escapeHtml(options3['id']) + '\x22'
+      ? 'data-replication-open="' + escapeHtml(options3['id']) + '"'
       : '') +
-    '\x20' +
-    (enabled7 ? 'aria-pressed=\x22' + Boolean(value11) + '\x22' : '') +
-    '\x20' +
+    ' ' +
+    (enabled7 ? 'aria-pressed="' + Boolean(value11) + '"' : '') +
+    ' ' +
     (statusView['busy'] || (enabled7 && !enabled9) || value12 ? 'disabled' : '') +
     '>\n      <span class="story-episode-title" data-story-replication-title>' +
     escapeHtml(options3['title'] || enabled8['fileName'] || '未命名视频') +
     '</span>\n      <span class="story-replication-meta" data-story-replication-synopsis>' +
     escapeHtml(getEvidenceSummary(options3)) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-episode-enter\x22\x20data-replication-action-label\x20' +
+    '</span>\n      <span class="story-episode-enter" data-replication-action-label ' +
     (enabled7 ? 'hidden' : '') +
     '>' +
     (statusView['busy']
@@ -172,13 +172,13 @@ function renderVideoCard(options3 = {}, value9 = 0x0, enabled7 = ![]) {
           : '') +
     '</span>\n    </button>\n      <div class="story-replication-card-actions" data-story-replication-card-actions ' +
     (value12 ? '' : 'hidden') +
-    '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20data-story-action=\x22reupload-replication-video\x22\x20data-story-replication-episode-id=\x22' +
+    '>\n        <button type="button" data-story-action="reupload-replication-video" data-story-replication-episode-id="' +
     escapeHtml(options3['id']) +
     '">重新上传该视频</button>\n      </div>\n    <div class="story-episode-loading storyboard-script-loading-overlay" data-replication-loading role="status" aria-live="polite" ' +
     (statusView['busy'] ? '' : 'hidden') +
     '>\n      <div class="storyboard-script-loading-spinner" aria-hidden="true"></div>\n      <div class="storyboard-script-loading-label">' +
     escapeHtml(getLoadingLabel(options3, value9)) +
-    '</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-script-loading-bar\x22><div\x20class=\x22storyboard-script-loading-bar-fill\x22></div></div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</article>'
+    '</div>\n      <div class="storyboard-script-loading-bar"><div class="storyboard-script-loading-bar-fill"></div></div>\n    </div>\n  </article>'
   );
 }
 export function renderStoryVideoReplicationPage({
@@ -202,22 +202,22 @@ export function renderStoryVideoReplicationPage({
     (enabled11 && enabled11 === enabled10['length'] ? '取消全选' : '全选') +
     '</button>\n        <button type="button" class="story-primary-button story-main-action-button" data-replication-analyze="selected" ' +
     (selectionMode ? '' : 'hidden') +
-    '\x20' +
+    ' ' +
     (value13 || !enabled11 ? 'disabled' : '') +
     '>分析选中' +
-    (enabled11 ? '\x20(' + enabled11 + ')' : '') +
-    '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20story-main-action-button\x22\x20data-replication-analyze=\x22all\x22\x20' +
+    (enabled11 ? ' (' + enabled11 + ')' : '') +
+    '</button>\n        <button type="button" class="story-primary-button story-main-action-button" data-replication-analyze="all" ' +
     (selectionMode ? 'hidden' : '') +
-    '\x20' +
+    ' ' +
     (value13 || !enabled10['length'] ? 'disabled' : '') +
     '>批量分析</button>\n      </div>\n    </header>\n    <div class="story-episode-grid story-replication-grid" data-story-replication-grid>\n      ' +
     episodes['map']((value17, value18) => renderVideoCard(value17, value18, selectionMode))['join']('') +
-    '\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<div\x20data-replication-review-host\x20hidden></div>\x0a\x20\x20\x20\x20' +
+    '\n    </div>\n    <div data-replication-review-host hidden></div>\n    ' +
     footerMarkup +
     '\n  </section>'
   );
 }
-export function syncStoryVideoReplicationCardElement(el4, enabled12 = {}, value19 = 0x0) {
+export function syncStoryVideoReplicationCardElement(el4, enabled12 = {}, value19 = 0) {
   if (!el4 || !enabled12) return ![];
   const value20 = enabled12['sourceVideo'] || {},
     statusView2 = getStatusView(enabled12),
@@ -244,8 +244,8 @@ export function syncStoryVideoReplicationCardElement(el4, enabled12 = {}, value1
     el8 = el7?.['querySelector']?.('img'),
     value28 = el7?.['querySelector']?.('.story-replication-poster-placeholder'),
     enabled13 = String(value20['posterUrl'] || enabled12['coverUrl'] || '')['trim']();
-  if (value24) value24['textContent'] = String(value19 + 0x1)['padStart'](0x2, '0');
-  if (value25) value25['textContent'] = enabled12['title'] || '视频\x20' + (value19 + 0x1);
+  if (value24) value24['textContent'] = String(value19 + 1)['padStart'](2, '0');
+  if (value25) value25['textContent'] = enabled12['title'] || '视频 ' + (value19 + 1);
   if (el5) el5['textContent'] = getSourceDurationLabel(enabled12);
   if (value26) value26['textContent'] = statusView2['label'];
   const value29 = el4['querySelector']?.('[data-replication-select-analysis]');
@@ -260,12 +260,12 @@ export function syncStoryVideoReplicationCardElement(el4, enabled12 = {}, value1
   el7 &&
     ((el7['disabled'] = !String(value20['videoRef'] || '')['trim']()),
     (el7['dataset']['storyReplicationEpisodeId'] = enabled12['id']),
-    el7['setAttribute']('aria-label', '播放第\x20' + (value19 + 0x1) + ' 条原视频'));
+    el7['setAttribute']('aria-label', '播放第 ' + (value19 + 1) + ' 条原视频'));
   if (el8) {
     if (enabled13 && el8['getAttribute']('src') !== enabled13) el8['setAttribute']('src', enabled13);
-    ((el8['hidden'] = !enabled13), (el8['alt'] = '第\x20' + (value19 + 0x1) + ' 条视频首帧'));
+    ((el8['hidden'] = !enabled13), (el8['alt'] = '第 ' + (value19 + 1) + ' 条视频首帧'));
   }
   if (value28) value28['hidden'] = Boolean(enabled13);
   const el9 = el4['querySelector']?.('[data-story-replication-drag-handle]');
-  return (el9 && el9['setAttribute']('aria-label', '拖动调整第 ' + (value19 + 0x1) + '\x20条视频顺序'), !![]);
+  return (el9 && el9['setAttribute']('aria-label', '拖动调整第 ' + (value19 + 1) + ' 条视频顺序'), !![]);
 }

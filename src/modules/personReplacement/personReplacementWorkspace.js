@@ -239,7 +239,7 @@ const PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE = 'application/x-person-replaceme
     'audio',
     'canvas',
     "[contenteditable='true']",
-    '[role=\x27button\x27]',
+    '[role=\'button\']',
     "[role='option']",
     "[role='menuitem']",
     "[role='slider']",
@@ -250,8 +250,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#039;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#039;');
 }
 function normalizeText(item, key = '') {
   const index = String(item ?? '')['trim']();
@@ -302,7 +302,7 @@ function getCharacterAppearance(payload, handle = '') {
   return (
     list2['find']((state) => state['id'] === handle) ||
     getWorkspaceAssetBaseAppearance(payload) ||
-    list2[0x0] ||
+    list2[0] ||
     null
   );
 }
@@ -314,33 +314,33 @@ function getCharacterVoiceUrl(options2 = {}) {
   );
 }
 function formatClock(config) {
-  const scope = Math['max'](0x0, Number(config) || 0x0),
-    input = Math['floor'](scope / 0x3c),
-    output = Math['floor'](scope % 0x3c);
-  return String(input)['padStart'](0x2, '0') + ':' + String(output)['padStart'](0x2, '0');
+  const scope = Math['max'](0, Number(config) || 0),
+    input = Math['floor'](scope / 60),
+    output = Math['floor'](scope % 60);
+  return String(input)['padStart'](2, '0') + ':' + String(output)['padStart'](2, '0');
 }
 function renderIcon(value4) {
   const value5 = {
     upload:
       '<path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M5 13v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/>',
     video:
-      '<rect\x20x=\x223\x22\x20y=\x225\x22\x20width=\x2214\x22\x20height=\x2214\x22\x20rx=\x223\x22/><path\x20d=\x22m17\x2010\x204-2v8l-4-2\x22/>',
-    close: '<path\x20d=\x22m6\x206\x2012\x2012M18\x206\x206\x2018\x22/>',
+      '<rect x="3" y="5" width="14" height="14" rx="3"/><path d="m17 10 4-2v8l-4-2"/>',
+    close: '<path d="m6 6 12 12M18 6 6 18"/>',
     person: '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
     undo: '<path d="M9 14l-4-4 4-4"/><path d="M5 10h9a6 6 0 1 1 0 12h-3"/>',
     reset: '<path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>',
     soundOff:
-      '<path\x20d=\x22M11\x205\x206\x209H3v6h3l5\x204z\x22/><path\x20d=\x22m16\x209\x205\x205m0-5-5\x205\x22/>',
+      '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 5m0-5-5 5"/>',
     soundOn:
       '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 9.5a3.5 3.5 0 0 1 0 5"/><path d="M18 7a7 7 0 0 1 0 10"/>',
     smartDetect:
-      '<path\x20d=\x22m12\x203\x201.2\x203.3L16.5\x207.5l-3.3\x201.2L12\x2012l-1.2-3.3-3.3-1.2\x203.3-1.2z\x22/><path\x20d=\x22m18\x2013\x20.8\x202.2L21\x2016l-2.2.8L18\x2019l-.8-2.2L15\x2016l2.2-.8z\x22/><path\x20d=\x22M5\x2014v5h5\x22/>',
+      '<path d="m12 3 1.2 3.3L16.5 7.5l-3.3 1.2L12 12l-1.2-3.3-3.3-1.2 3.3-1.2z"/><path d="m18 13 .8 2.2L21 16l-2.2.8L18 19l-.8-2.2L15 16l2.2-.8z"/><path d="M5 14v5h5"/>',
     reverse: MEDIA_CLIP_REVERSE_ICON_PATHS,
     merge:
       '<path d="M4 6h6v5H4zM14 13h6v5h-6z"/><path d="M10 8.5h2a2 2 0 0 1 2 2v5"/><path d="m11.5 13 2.5 2.5 2.5-2.5"/>',
   };
   return (
-    '<svg\x20class=\x22person-replacement-icon\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20aria-hidden=\x22true\x22>' +
+    '<svg class="person-replacement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
     (value5[value4] || '') +
     '</svg>'
   );
@@ -389,11 +389,11 @@ function renderCompositeComposeAction(value21, value22 = {}) {
         ? '重新合成全部视频'
         : '合成全部视频';
   return (
-    '<button\x20type=\x22button\x22\x20class=\x22story-workbench-action-button\x20story-main-action-button\x20person-replacement-compose-output' +
+    '<button type="button" class="story-workbench-action-button story-main-action-button person-replacement-compose-output' +
     (value24 ? ' is-loading' : '') +
     '" data-person-replacement-action="compose-output" aria-busy="' +
     value24 +
-    '\x22' +
+    '"' +
     (value24 || !enabled ? ' disabled' : '') +
     '>' +
     (value24
@@ -435,11 +435,11 @@ function renderCompositePreview(value28, composeOutputPending = {}) {
 }
 function renderProject(value29, smartDetecting = {}) {
   const value30 = {
-      0x1: renderAssetSettings,
-      0x2: (value31, value32) => personReplacementImagePresentation['render'](value31, value32),
-      0x3: (value33, value34) => personReplacementVideoPresentation['render'](value33, value34),
-      0x4: renderVoiceClone,
-      0x5: renderCompositePreview,
+      1: renderAssetSettings,
+      2: (value31, value32) => personReplacementImagePresentation['render'](value31, value32),
+      3: (value33, value34) => personReplacementVideoPresentation['render'](value33, value34),
+      4: renderVoiceClone,
+      5: renderCompositePreview,
     },
     value35 = smartDetecting['cutEditorSmartDetectOpen']
       ? personReplacementSmartDetectPresentation['renderPanel'](value29, {
@@ -462,7 +462,7 @@ function renderProject(value29, smartDetecting = {}) {
   );
 }
 function renderHiddenInputs() {
-  return '<div\x20class=\x22story-asset-hover-preview\x22\x20data-story-asset-hover-preview\x20role=\x22tooltip\x22\x20aria-hidden=\x22true\x22></div><input\x20type=\x22file\x22\x20accept=\x22video/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22source-videos\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22new-character-images\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22new-scene-images\x22><input\x20type=\x22file\x22\x20accept=\x22audio/*\x22\x20multiple\x20hidden\x20data-person-replacement-input=\x22new-audio-files\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20hidden\x20data-person-replacement-input=\x22appearance-image\x22><input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20hidden\x20data-person-replacement-input=\x22replacement-image\x22><input\x20type=\x22file\x22\x20accept=\x22video/*\x22\x20hidden\x20data-person-replacement-input=\x22replacement-video-result\x22><input\x20type=\x22file\x22\x20accept=\x22image/*,video/*\x22\x20hidden\x20data-person-replacement-input=\x22replacement-video-slot\x22><input\x20type=\x22file\x22\x20accept=\x22audio/*\x22\x20hidden\x20data-person-replacement-input=\x22character-voice\x22>';
+  return '<div class="story-asset-hover-preview" data-story-asset-hover-preview role="tooltip" aria-hidden="true"></div><input type="file" accept="video/*" multiple hidden data-person-replacement-input="source-videos"><input type="file" accept="image/*" multiple hidden data-person-replacement-input="new-character-images"><input type="file" accept="image/*" multiple hidden data-person-replacement-input="new-scene-images"><input type="file" accept="audio/*" multiple hidden data-person-replacement-input="new-audio-files"><input type="file" accept="image/*" hidden data-person-replacement-input="appearance-image"><input type="file" accept="image/*" hidden data-person-replacement-input="replacement-image"><input type="file" accept="video/*" hidden data-person-replacement-input="replacement-video-result"><input type="file" accept="image/*,video/*" hidden data-person-replacement-input="replacement-video-slot"><input type="file" accept="audio/*" hidden data-person-replacement-input="character-voice">';
 }
 export function renderPersonReplacementWorkspace(options3 = {}, value37 = {}) {
   const personReplacementWorkspaceProject = normalizePersonReplacementWorkspaceProject(options3),
@@ -475,14 +475,14 @@ export function renderPersonReplacementWorkspace(options3 = {}, value37 = {}) {
     personReplacementWorkspaceProject['workspace']['view'] +
     '" data-person-replacement-step="' +
     personReplacementWorkspaceProject['workspace']['step'] +
-    '\x22>' +
+    '">' +
     value38 +
     renderHiddenInputs() +
     '</section>'
   );
 }
 function resolveMountTarget(el, value39) {
-  if (value39?.['nodeType'] === 0x1) return value39;
+  if (value39?.['nodeType'] === 1) return value39;
   return el?.['querySelector']?.(value39) || el?.['body'] || null;
 }
 export function createReplacementStudioWorkspace({
@@ -698,11 +698,11 @@ export function createReplacementStudioWorkspace({
     value68 = 'page',
     value69 = '',
     handler14 = () => ![];
-  const value70 = { accumulator: 0x0, lockedUntil: 0x0 },
-    value71 = { accumulator: 0x0, lockedUntil: 0x0 },
-    value72 = { accumulator: 0x0, lockedUntil: 0x0 },
-    value73 = { accumulator: 0x0, lockedUntil: 0x0 },
-    value74 = { accumulator: 0x0, lockedUntil: 0x0 },
+  const value70 = { accumulator: 0, lockedUntil: 0 },
+    value71 = { accumulator: 0, lockedUntil: 0 },
+    value72 = { accumulator: 0, lockedUntil: 0 },
+    value73 = { accumulator: 0, lockedUntil: 0 },
+    value74 = { accumulator: 0, lockedUntil: 0 },
     map3 = new Map(),
     map4 = new Map(),
     workspaceMenuController = createWorkspaceMenuController({
@@ -769,7 +769,7 @@ export function createReplacementStudioWorkspace({
       return cloneJson(initialProject2);
     },
     handler23 = () => isPersonReplacementSourceProcessing(initialProject2),
-    handler24 = (reason3, requestedStep = 0x0) => {
+    handler24 = (reason3, requestedStep = 0) => {
       promptEnhancementModel(downloadImageIntent['REPORT_STEP_NAVIGATION_BLOCKED'], {
         reason: reason3,
         currentStep: initialProject2['workspace']['step'],
@@ -780,8 +780,8 @@ export function createReplacementStudioWorkspace({
     handler25 = (value83 = initialProject2) => {
       const value84 = value83?.['workspace'] || {};
       if (value84['view'] !== 'project') return normalizeText(value84['view']) || 'home';
-      const count = Math['trunc'](Number(value84['step']) || 0x1);
-      return count === 0x1
+      const count = Math['trunc'](Number(value84['step']) || 1);
+      return count === 1
         ? 'project:' +
             count +
             ':asset:' +
@@ -796,13 +796,13 @@ export function createReplacementStudioWorkspace({
       const value88 = value86?.['workspace'] || {},
         value89 = value87?.['workspace'] || {};
       if (value88['view'] !== 'project' || value89['view'] !== 'project') return;
-      const value90 = Math['trunc'](Number(value88['step']) || 0x1),
-        count2 = Math['trunc'](Number(value89['step']) || 0x1);
+      const value90 = Math['trunc'](Number(value88['step']) || 1),
+        count2 = Math['trunc'](Number(value89['step']) || 1);
       if (value90 !== count2) {
         ((value67 = count2 > value90 ? 'forward' : 'backward'), (value68 = 'page'));
         return;
       }
-      if (count2 !== 0x1) return;
+      if (count2 !== 1) return;
       const workspaceTabTransitionDirection = resolveWorkspaceTabTransitionDirection(
         value88['characterAssetTab'],
         value89['characterAssetTab'],
@@ -943,7 +943,7 @@ export function createReplacementStudioWorkspace({
       });
     },
     handler37 = (el10, enabled5) => {
-      const el11 = el10?.['querySelector']?.('[data-story-action=\x22toggle-character-voice-menu\x22]'),
+      const el11 = el10?.['querySelector']?.('[data-story-action="toggle-character-voice-menu"]'),
         el12 = el10?.['querySelector']?.('.person-replacement-add-voice-menu');
       if (!el10 || !el11 || !el12) return ![];
       return (
@@ -1088,9 +1088,9 @@ export function createReplacementStudioWorkspace({
         return (windowObject?.['showToast']?.('当前视频片段正在处理倒放，请稍后再裁剪。', 'info'), ![]);
       videoEl['pause']?.();
       const durationSec =
-          Number(videoEl['duration']) > 0x0
+          Number(videoEl['duration']) > 0
             ? Number(videoEl['duration'])
-            : Math['max'](0x0, Number(selectedShot['durationSec']) || 0x0),
+            : Math['max'](0, Number(selectedShot['durationSec']) || 0),
         value124 = videoClipController?.['initForSource']?.(
           createPersonReplacementVideoCropOptions({
             projectId: initialProject2['id'],
@@ -1137,7 +1137,7 @@ export function createReplacementStudioWorkspace({
     { begin: begin, stop: stop } = personReplacementLayoutResizeController,
     requestRender = () => {
       if (value43 || !workspacePresentationLifecycle['isActive']()) return;
-      if (initialProject2['workspace']['step'] !== 0x2 || !handler43()) run();
+      if (initialProject2['workspace']['step'] !== 2 || !handler43()) run();
     },
     handler44 = (value127, value128) => {
       const promise3 = runIntent(
@@ -1189,11 +1189,11 @@ export function createReplacementStudioWorkspace({
       initialProject2['characters']['find']((value133) => value133['id'] === value132) || null,
     handler13 = (value134 = characterId()) => {
       const value135 = Math['trunc'](
-        Number(initialProject2['workspace']['assetAppearanceIndexes']?.[value134?.['id']]) || 0x0,
+        Number(initialProject2['workspace']['assetAppearanceIndexes']?.[value134?.['id']]) || 0,
       );
       return (
         getWorkspaceAssetAppearances(value134)[value135] ||
-        getWorkspaceAssetAppearances(value134)[0x0] ||
+        getWorkspaceAssetAppearances(value134)[0] ||
         null
       );
     },
@@ -1236,7 +1236,7 @@ export function createReplacementStudioWorkspace({
     }),
     handler47 = (value139, value140 = '未命名人物') =>
       String(value139 ?? '')
-        ['replace'](/\s+/gu, '\x20')
+        ['replace'](/\s+/gu, ' ')
         ['trim']() || value140,
     handler48 = (el14) => {
       const text5 = normalizeText(el14?.['dataset']?.['storyAssetNameId']),
@@ -1361,7 +1361,7 @@ export function createReplacementStudioWorkspace({
       bindAIGenVideoModelSelector2 = null;
       const value152 = floatingMenuHost?.['querySelector']?.('[data-aigen-image-model-selector]');
       if (value152) {
-        const generationParamsByModel = initialProject2['workspace']['step'] === 0x1,
+        const generationParamsByModel = initialProject2['workspace']['step'] === 1,
           modelId = generationParamsByModel
             ? initialProject2['settings']['characterImageModelId']
             : initialProject2['settings']['replacementImageModelId'],
@@ -1497,7 +1497,7 @@ export function createReplacementStudioWorkspace({
           list3['push'](bindAIGenVideoModelSelector2));
       }
       const panel =
-        initialProject2['workspace']['step'] === 0x1
+        initialProject2['workspace']['step'] === 1
           ? {
               panel: floatingMenuHost?.['querySelector']?.(
                 '.story-asset-detail-panel .story-asset-prompt-field',
@@ -1507,7 +1507,7 @@ export function createReplacementStudioWorkspace({
               profileSetting: 'characterImageProviderProfileId',
               memorySetting: 'characterImageProviderProfileIdByModel',
             }
-          : initialProject2['workspace']['step'] === 0x2
+          : initialProject2['workspace']['step'] === 2
             ? {
                 panel: floatingMenuHost?.['querySelector']?.(
                   '.person-replacement-image-generation-panel .person-replacement-prompt-input-wrapper',
@@ -1517,7 +1517,7 @@ export function createReplacementStudioWorkspace({
                 profileSetting: 'replacementImageProviderProfileId',
                 memorySetting: 'replacementImageProviderProfileIdByModel',
               }
-            : initialProject2['workspace']['step'] === 0x3
+            : initialProject2['workspace']['step'] === 3
               ? {
                   panel: floatingMenuHost?.['querySelector']?.(
                     '.person-replacement-video-generation-panel .person-replacement-prompt-input-wrapper',
@@ -1610,10 +1610,10 @@ export function createReplacementStudioWorkspace({
     },
     handler55 = () => {
       (value47?.(), (value47 = null));
-      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 0x2)
+      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 2)
         return;
       const value159 = floatingMenuHost?.['querySelector']?.(
-          '[data-person-replacement-field=\x22image-prompt\x22][contenteditable=\x22true\x22]',
+          '[data-person-replacement-field="image-prompt"][contenteditable="true"]',
         ),
         enabled7 = handler54(value159);
       if (!enabled7) return;
@@ -1622,17 +1622,17 @@ export function createReplacementStudioWorkspace({
     },
     handler56 = () => {
       (value50?.(), (value50 = null));
-      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 0x2)
+      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 2)
         return;
       const el18 =
         floatingMenuHost?.['querySelector']?.(
           '.person-replacement-middle-preview-slide:not(' +
             '.person-replacement-middle-preview-slide--outgoing) ' +
-            '[data-person-replacement-keyframe-stage]\x20>\x20img',
+            '[data-person-replacement-keyframe-stage] > img',
         ) || floatingMenuHost?.['querySelector']?.('[data-person-replacement-keyframe-stage] > img');
       if (!el18) return;
       const run3 = () => syncPersonReplacementImageStageFrame(el18);
-      if (el18['complete'] && Number(el18['naturalWidth']) > 0x0) run3();
+      if (el18['complete'] && Number(el18['naturalWidth']) > 0) run3();
       else el18['addEventListener']?.('load', run3, { once: !![] });
       const value160 = el18['closest']?.('[data-person-replacement-keyframe-stage]')?.['parentElement'],
         handler57 = windowObject?.['ResizeObserver'],
@@ -1713,8 +1713,8 @@ export function createReplacementStudioWorkspace({
       const el19 = floatingMenuHost?.['querySelector']?.('#person-replacement-shot-cut-smart-detect-panel');
       if (!el19?.['style']) return ![];
       const count3 =
-        Number(windowObject?.['innerWidth'] || documentObject?.['documentElement']?.['clientWidth']) || 0x0;
-      if (count3 <= 0x2d0)
+        Number(windowObject?.['innerWidth'] || documentObject?.['documentElement']?.['clientWidth']) || 0;
+      if (count3 <= 720)
         return (
           ['top', 'right', 'bottom', 'left']['forEach']((value164) => {
             el19['style']['removeProperty']?.(value164);
@@ -1729,9 +1729,9 @@ export function createReplacementStudioWorkspace({
       if (!box || !box2) return ![];
       const value165 =
           Number(windowObject?.['innerHeight'] || documentObject?.['documentElement']?.['clientHeight']) ||
-          0x0,
-        value166 = 0x10,
-        value167 = 0x8,
+          0,
+        value166 = 16,
+        value167 = 8,
         value168 = Math['max'](
           value166,
           Math['min'](count3 - box2['width'] - value166, box['right'] - box2['width']),
@@ -1869,12 +1869,12 @@ export function createReplacementStudioWorkspace({
     },
     handler67 = () => {
       const manualSelectionSurfaceActive =
-        initialProject2['workspace']['step'] === 0x2 && !selectedIds['isOpen'];
+        initialProject2['workspace']['step'] === 2 && !selectedIds['isOpen'];
       syncAfterRender({ manualSelectionSurfaceActive: manualSelectionSurfaceActive });
     },
     handler68 = (el28) => {
-      const value180 = Number(el28?.['scrollLeft']) || 0x0,
-        value181 = Number(el28?.['scrollTop']) || 0x0,
+      const value180 = Number(el28?.['scrollLeft']) || 0,
+        value181 = Number(el28?.['scrollTop']) || 0,
         value182 = el28?.['style']?.['overflowAnchor'] || '';
       el28?.['style']?.['setProperty']?.('overflow-anchor', 'none');
       const run4 = () => {
@@ -1920,11 +1920,11 @@ export function createReplacementStudioWorkspace({
     handler53 = () => {
       if (
         initialProject2['workspace']['view'] !== 'project' ||
-        ![0x2, 0x3]['includes'](initialProject2['workspace']['step']) ||
+        ![2, 3]['includes'](initialProject2['workspace']['step']) ||
         selectedIds['isOpen']
       )
         return ![];
-      const mode = initialProject2['workspace']['step'] === 0x3,
+      const mode = initialProject2['workspace']['step'] === 3,
         isBatchGenerating2 = getShotRenderState();
       syncPersonReplacementPromptModeControl(
         floatingMenuHost,
@@ -1947,7 +1947,7 @@ export function createReplacementStudioWorkspace({
         enabled8 = floatingMenuHost?.['querySelector']?.(
           mode
             ? '[data-person-replacement-action="generate-replacement-video"]'
-            : '[data-person-replacement-action=\x22generate-replacement-image\x22]',
+            : '[data-person-replacement-action="generate-replacement-image"]',
         ),
         args19 = handler22(),
         presentation = mode
@@ -1992,7 +1992,7 @@ export function createReplacementStudioWorkspace({
     handler70 = () => {
       if (
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x5 ||
+        initialProject2['workspace']['step'] !== 5 ||
         selectedIds['isOpen']
       )
         return ![];
@@ -2028,7 +2028,7 @@ export function createReplacementStudioWorkspace({
     handler71 = () => {
       if (
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x5 ||
+        initialProject2['workspace']['step'] !== 5 ||
         selectedIds['isOpen']
       )
         return ![];
@@ -2065,12 +2065,12 @@ export function createReplacementStudioWorkspace({
     } = {}) => {
       if (
         initialProject2['workspace']['view'] !== 'project' ||
-        ![0x2, 0x3]['includes'](initialProject2['workspace']['step']) ||
+        ![2, 3]['includes'](initialProject2['workspace']['step']) ||
         selectedIds['isOpen']
       )
         return ![];
       const currentPage = floatingMenuHost?.['querySelector']?.('.person-replacement-production-page'),
-        value184 = initialProject2['workspace']['step'] === 0x3,
+        value184 = initialProject2['workspace']['step'] === 3,
         args20 = handler22(),
         nextPage = handler59(
           value184
@@ -2104,7 +2104,7 @@ export function createReplacementStudioWorkspace({
     handler42 = () => {
       if (
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x3 ||
+        initialProject2['workspace']['step'] !== 3 ||
         selectedIds['isOpen'] ||
         personReplacementVideoPlaybackController['isClipActive']()
       )
@@ -2134,7 +2134,7 @@ export function createReplacementStudioWorkspace({
           '[data-person-replacement-field="video-prompt"][contenteditable="true"]',
         ),
         value188 = el41?.['querySelector']?.('[data-person-replacement-video-playback-stage="result"]'),
-        value189 = el42?.['querySelector']?.('[data-person-replacement-video-playback-stage=\x22result\x22]'),
+        value189 = el42?.['querySelector']?.('[data-person-replacement-video-playback-stage="result"]'),
         shouldReusePersonReplacementVideoPlaybackStage3 =
           shouldReusePersonReplacementVideoPlaybackStage(value188, value189) &&
           typeof value189?.['replaceWith'] === 'function',
@@ -2209,7 +2209,7 @@ export function createReplacementStudioWorkspace({
   ) => {
     const text11 = normalizeText(value194);
     if (
-      initialProject2['workspace']['step'] === 0x1 &&
+      initialProject2['workspace']['step'] === 1 &&
       [
         'asset-selection-mode',
         'asset-selection-cancel',
@@ -2223,7 +2223,7 @@ export function createReplacementStudioWorkspace({
         renderAssetSettings(initialProject2, handler22()),
       );
     if (
-      initialProject2['workspace']['step'] === 0x2 &&
+      initialProject2['workspace']['step'] === 2 &&
       [
         'replacement-target-asset-select',
         'replacement-scene-asset-select',
@@ -2239,7 +2239,7 @@ export function createReplacementStudioWorkspace({
         { targetRail: !![] },
       );
     if (
-      initialProject2['workspace']['step'] === 0x2 &&
+      initialProject2['workspace']['step'] === 2 &&
       [
         'person-mapping',
         'person-mapping-current-shot',
@@ -2249,7 +2249,7 @@ export function createReplacementStudioWorkspace({
     )
       return handler43();
     if (text11 === 'shot-marquee' || text11['startsWith']('shot-selection'))
-      return initialProject2['workspace']['step'] === 0x5 ? handler70() : handler53();
+      return initialProject2['workspace']['step'] === 5 ? handler70() : handler53();
     if (
       text11 === 'video-input-mode' ||
       text11 === 'video-reference-change' ||
@@ -2257,17 +2257,17 @@ export function createReplacementStudioWorkspace({
       text11 === 'replacement-video-reference' ||
       text11 === 'delete-replacement-video-result' ||
       ((text11 === 'replacement-image-result' || text11 === 'delete-replacement-image-result') &&
-        initialProject2['workspace']['step'] === 0x3)
+        initialProject2['workspace']['step'] === 3)
     )
       return handler42();
     if (
       (text11 === 'replacement-image-result' || text11 === 'delete-replacement-image-result') &&
-      initialProject2['workspace']['step'] === 0x2
+      initialProject2['workspace']['step'] === 2
     )
       return handler43({ refreshTimelineCard: !![], timelineShotId: timelineShotId });
     if (text11 === 'shot-select')
-      return initialProject2['workspace']['step'] === 0x5 ? handler71() : handler43();
-    if (text11 === 'replacement-image-reference' && initialProject2['workspace']['step'] === 0x2)
+      return initialProject2['workspace']['step'] === 5 ? handler71() : handler43();
+    if (text11 === 'replacement-image-reference' && initialProject2['workspace']['step'] === 2)
       return handler43({ refreshTimelineCard: !![] });
     if (text11 === 'composite-full-video-select') return handler71();
     return ![];
@@ -2310,7 +2310,7 @@ export function createReplacementStudioWorkspace({
       syncPreviewUi());
   };
   const navigate = (value196) => {
-      const step = Math['trunc'](clamp(value196, 0x1, 0x5, initialProject2['workspace']['step']));
+      const step = Math['trunc'](clamp(value196, 1, 5, initialProject2['workspace']['step']));
       if (step > initialProject2['workspace']['step'] && handler23())
         return (handler24('step-change', step), cloneJson(initialProject2));
       const personReplacementStepGate = getPersonReplacementStepGate(initialProject2, step);
@@ -2346,12 +2346,12 @@ export function createReplacementStudioWorkspace({
               )
             : characterId(),
         list8 = getWorkspaceAssetAppearances(value199);
-      if (list8['length'] < 0x2) return;
+      if (list8['length'] < 2) return;
       const value202 = Math['trunc'](
-          Number(initialProject2['workspace']['assetAppearanceIndexes']?.[value199['id']]) || 0x0,
+          Number(initialProject2['workspace']['assetAppearanceIndexes']?.[value199['id']]) || 0,
         ),
         value203 = (value202 + count4 + list8['length']) % list8['length'],
-        value204 = count4 > 0x0 ? 'next' : 'previous',
+        value204 = count4 > 0 ? 'next' : 'previous',
         enabled24 =
           value199['id'] ===
           (initialProject2['workspace']['characterAssetTab'] === 'scene'
@@ -2387,7 +2387,7 @@ export function createReplacementStudioWorkspace({
           enabled25['after']?.(el43));
         const value205 = () => el43['remove']?.();
         (el43['addEventListener']?.('animationend', value205, { once: !![] }),
-          windowObject?.['setTimeout']?.(value205, 0x1cc));
+          windowObject?.['setTimeout']?.(value205, 460));
       }
       (void el44['offsetWidth'], el44['classList']['add']('is-sliding-' + value204));
     },
@@ -2399,9 +2399,9 @@ export function createReplacementStudioWorkspace({
           initialProject2,
           personReplacementProjectAudioAssets,
         );
-      if (selectedCharacterId['length'] < 0x2) return;
+      if (selectedCharacterId['length'] < 2) return;
       const value208 = Math['max'](
-          0x0,
+          0,
           selectedCharacterId['findIndex'](
             (value209) => value209['id'] === initialProject2['workspace']['selectedCharacterId'],
           ),
@@ -2437,7 +2437,7 @@ export function createReplacementStudioWorkspace({
         count6 = initialProject2['shots']['findIndex'](
           (value214) => value214['id'] === normalizeText(value212),
         );
-      if (count5 < 0x0 || count6 < 0x0 || count5 === count6) return '';
+      if (count5 < 0 || count6 < 0 || count5 === count6) return '';
       return count6 > count5 ? 'next' : 'previous';
     },
     captureImagePreviewSlide = () =>
@@ -2449,13 +2449,13 @@ export function createReplacementStudioWorkspace({
     captureMiddlePreviewSlide = () =>
       floatingMenuHost?.['querySelector']?.(
         '.person-replacement-middle-layout ' +
-          '>\x20.person-replacement-middle-preview-slide:not(' +
+          '> .person-replacement-middle-preview-slide:not(' +
           '.person-replacement-middle-preview-slide--outgoing)',
       )?.['cloneNode']?.(!![]) || null,
     handler75 = (el46) => {
       return (
         el46?.['querySelectorAll']?.(
-          '.person-replacement-detection-empty,\x20' +
+          '.person-replacement-detection-empty, ' +
             '.person-replacement-keyframe-tools, ' +
             '.person-replacement-shot-navigation-arrow',
         )?.['forEach']?.((el47) => el47['remove']?.()),
@@ -2467,7 +2467,7 @@ export function createReplacementStudioWorkspace({
     },
     captureVideoResultSlide = () =>
       floatingMenuHost?.['querySelector']?.(
-        '.person-replacement-video-generation-panel\x20' +
+        '.person-replacement-video-generation-panel ' +
           '.person-replacement-video-result-slide:not(' +
           '.person-replacement-video-result-slide--outgoing)',
       ) || null,
@@ -2516,7 +2516,7 @@ export function createReplacementStudioWorkspace({
       };
       return (
         startPersonReplacementSlideTransition2['finished']['then'](value218),
-        windowObject?.['setTimeout']?.(value218, startPersonReplacementSlideTransition2['duration'] + 0x50),
+        windowObject?.['setTimeout']?.(value218, startPersonReplacementSlideTransition2['duration'] + 80),
         !![]
       );
     },
@@ -2558,7 +2558,7 @@ export function createReplacementStudioWorkspace({
       };
       return (
         startPersonReplacementSlideTransition3['finished']['then'](value221),
-        windowObject?.['setTimeout']?.(value221, startPersonReplacementSlideTransition3['duration'] + 0x50),
+        windowObject?.['setTimeout']?.(value221, startPersonReplacementSlideTransition3['duration'] + 80),
         !![]
       );
     },
@@ -2607,12 +2607,12 @@ export function createReplacementStudioWorkspace({
       };
       return (
         startPersonReplacementSlideTransition4['finished']['then'](value224),
-        windowObject?.['setTimeout']?.(value224, startPersonReplacementSlideTransition4['duration'] + 0x50),
+        windowObject?.['setTimeout']?.(value224, startPersonReplacementSlideTransition4['duration'] + 80),
         !![]
       );
     },
     handler76 = (value225) => {
-      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 0x5)
+      if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 5)
         return ![];
       const el54 = floatingMenuHost?.['querySelector']?.('.person-replacement-compare-grid');
       if (!el54) return ![];
@@ -2629,7 +2629,7 @@ export function createReplacementStudioWorkspace({
       const selectedShotId = normalizeText(value227),
         enabled26 = initialProject2['shots']['find']((value228) => value228['id'] === selectedShotId),
         enabled27 =
-          initialProject2['workspace']['step'] === 0x5 &&
+          initialProject2['workspace']['step'] === 5 &&
           buildPersonReplacementCompositePreviewSnapshot(initialProject2)['previewMode'] === 'full';
       if (!enabled26 || (selectedShotId === initialProject2['workspace']['selectedShotId'] && !enabled27))
         return ![];
@@ -2643,7 +2643,7 @@ export function createReplacementStudioWorkspace({
           workspace: {
             ...initialProject2['workspace'],
             selectedShotId: selectedShotId,
-            ...(initialProject2['workspace']['step'] === 0x5 ? { compositePreviewMode: 'shot' } : {}),
+            ...(initialProject2['workspace']['step'] === 5 ? { compositePreviewMode: 'shot' } : {}),
           },
         },
         'shot-select',
@@ -2665,16 +2665,16 @@ export function createReplacementStudioWorkspace({
     },
     handler77 = (value233) => {
       const list9 = Array['isArray'](initialProject2['shots']) ? initialProject2['shots'] : [];
-      if (list9['length'] < 0x2) return ![];
+      if (list9['length'] < 2) return ![];
       const value234 = Math['max'](
-          0x0,
+          0,
           list9['findIndex']((value235) => value235['id'] === initialProject2['workspace']['selectedShotId']),
         ),
-        value236 = (value234 + Math['sign'](Number(value233) || 0x0) + list9['length']) % list9['length'],
+        value236 = (value234 + Math['sign'](Number(value233) || 0) + list9['length']) % list9['length'],
         enabled28 = list9[value236];
       if (!enabled28 || enabled28['id'] === initialProject2['workspace']['selectedShotId']) return ![];
       return handler51(enabled28['id'], {
-        direction: Math['sign'](Number(value233) || 0x0) < 0x0 ? 'previous' : 'next',
+        direction: Math['sign'](Number(value233) || 0) < 0 ? 'previous' : 'next',
         ensureVisible: !![],
       });
     },
@@ -2712,18 +2712,18 @@ export function createReplacementStudioWorkspace({
       if (
         !currentResultIndex ||
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x3
+        initialProject2['workspace']['step'] !== 3
       )
         return ![];
       event['preventDefault']();
       const sourceShotId = normalizeText(
           currentResultIndex['dataset']['personReplacementVideoReferenceSourceShotId'],
         ),
-        value237 = map4['get'](sourceShotId) || { accumulator: 0x0, lockedUntil: 0x0 };
+        value237 = map4['get'](sourceShotId) || { accumulator: 0, lockedUntil: 0 };
       map4['set'](sourceShotId, value237);
       const delta = consumeWorkspaceWheelDirection(event, value237, {
-        threshold: 0x4,
-        lockDuration: 0xa0,
+        threshold: 4,
+        lockDuration: 160,
       });
       return (
         delta &&
@@ -2741,22 +2741,22 @@ export function createReplacementStudioWorkspace({
         ),
         list10 = getWorkspaceAssetAppearances(enabled29),
         list11 = list10['filter']((value241) => value241['imageUrl']);
-      if (!enabled29 || list11['length'] < 0x2) return ![];
+      if (!enabled29 || list11['length'] < 2) return ![];
       const value242 = Math['max'](
-          0x0,
+          0,
           Math['min'](
-            list10['length'] - 0x1,
+            list10['length'] - 1,
             Math['trunc'](
-              Number(initialProject2['workspace']['assetAppearanceIndexes']?.[enabled29['id']]) || 0x0,
+              Number(initialProject2['workspace']['assetAppearanceIndexes']?.[enabled29['id']]) || 0,
             ),
           ),
         ),
         value243 = list10[value242]?.['id'],
         value244 = Math['max'](
-          0x0,
+          0,
           list11['findIndex']((value245) => value245['id'] === value243),
         ),
-        value246 = (value244 + Math['sign'](Number(value239) || 0x0) + list11['length']) % list11['length'];
+        value246 = (value244 + Math['sign'](Number(value239) || 0) + list11['length']) % list11['length'];
       if (value246 === value244) return ![];
       const value247 = list11[value246]?.['id'],
         value248 = list10['findIndex']((value249) => value249['id'] === value247),
@@ -2766,7 +2766,7 @@ export function createReplacementStudioWorkspace({
             ...initialProject2['workspace'],
             assetAppearanceIndexes: {
               ...initialProject2['workspace']['assetAppearanceIndexes'],
-              [enabled29['id']]: Math['max'](0x0, value248),
+              [enabled29['id']]: Math['max'](0, value248),
             },
           },
         };
@@ -2779,16 +2779,16 @@ export function createReplacementStudioWorkspace({
       if (
         !el56 ||
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x2
+        initialProject2['workspace']['step'] !== 2
       )
         return ![];
       event2['preventDefault']();
       const text12 = normalizeText(el56['dataset']['personReplacementTargetCharacterId']),
-        value251 = map3['get'](text12) || { accumulator: 0x0, lockedUntil: 0x0 };
+        value251 = map3['get'](text12) || { accumulator: 0, lockedUntil: 0 };
       map3['set'](text12, value251);
       const consumeWorkspaceWheelDirection2 = consumeWorkspaceWheelDirection(event2, value251, {
-        threshold: 0x4,
-        lockDuration: 0xa0,
+        threshold: 4,
+        lockDuration: 160,
       });
       if (consumeWorkspaceWheelDirection2) handler79(text12, consumeWorkspaceWheelDirection2);
       return !![];
@@ -2800,7 +2800,7 @@ export function createReplacementStudioWorkspace({
       if (
         !boundaryRoot ||
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x1 ||
+        initialProject2['workspace']['step'] !== 1 ||
         initialProject2['workspace']['characterAssetTab'] === 'library'
       )
         return ![];
@@ -2816,7 +2816,7 @@ export function createReplacementStudioWorkspace({
       if (
         !enabled30 ||
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x1 ||
+        initialProject2['workspace']['step'] !== 1 ||
         initialProject2['workspace']['characterAssetTab'] !== 'audio'
       )
         return ![];
@@ -2830,8 +2830,8 @@ export function createReplacementStudioWorkspace({
       if (
         !enabled31 ||
         initialProject2['workspace']['view'] !== 'project' ||
-        ![0x2, 0x3, 0x5]['includes'](initialProject2['workspace']['step']) ||
-        (initialProject2['workspace']['step'] === 0x2 && selectedIds['isOpen'])
+        ![2, 3, 5]['includes'](initialProject2['workspace']['step']) ||
+        (initialProject2['workspace']['step'] === 2 && selectedIds['isOpen'])
       )
         return ![];
       event5['preventDefault']();
@@ -2841,12 +2841,12 @@ export function createReplacementStudioWorkspace({
     },
     handler84 = (event6) => {
       const value252 = event6['target']?.['closest']?.(
-        '[data-person-replacement-video-result-wheel=\x22true\x22]',
+        '[data-person-replacement-video-result-wheel="true"]',
       );
       if (
         value252 &&
         initialProject2['workspace']['view'] === 'project' &&
-        initialProject2['workspace']['step'] === 0x3
+        initialProject2['workspace']['step'] === 3
       ) {
         event6['preventDefault']();
         const consumeWorkspaceWheelDirection6 = consumeWorkspaceWheelDirection(event6, value74);
@@ -2859,7 +2859,7 @@ export function createReplacementStudioWorkspace({
       if (
         !enabled32 ||
         initialProject2['workspace']['view'] !== 'project' ||
-        initialProject2['workspace']['step'] !== 0x2
+        initialProject2['workspace']['step'] !== 2
       )
         return ![];
       event6['preventDefault']();
@@ -2872,24 +2872,24 @@ export function createReplacementStudioWorkspace({
         enabled33 = clientX2['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
       if (!selectedIds['isOpen'] || !el57 || !enabled33 || !floatingMenuHost?.['contains']?.(el57))
         return ![];
-      const value253 = Number(clientX2['deltaX']) || 0x0,
-        value254 = Number(clientX2['deltaY']) || 0x0,
+      const value253 = Number(clientX2['deltaX']) || 0,
+        value254 = Number(clientX2['deltaY']) || 0,
         enabled34 = Math['abs'](value253) > Math['abs'](value254) ? value253 : value254;
       if (!enabled34) return ![];
       if (clientX2['ctrlKey'] || clientX2['metaKey'])
         return (
           clientX2['preventDefault']?.(),
           clientX2['stopPropagation']?.(),
-          applyTimelineZoom(enabled34 > 0x0 ? 'out' : 'in', { clientX: clientX2['clientX'] }),
+          applyTimelineZoom(enabled34 > 0 ? 'out' : 'in', { clientX: clientX2['clientX'] }),
           !![]
         );
-      const count7 = Math['max'](0x0, Number(el57['scrollWidth']) - Number(el57['clientWidth']));
-      if (!(count7 > 0x0)) return ![];
+      const count7 = Math['max'](0, Number(el57['scrollWidth']) - Number(el57['clientWidth']));
+      if (!(count7 > 0)) return ![];
       const clamp2 = clamp(
         Number(el57['scrollLeft']) + enabled34,
-        0x0,
+        0,
         count7,
-        Number(el57['scrollLeft']) || 0x0,
+        Number(el57['scrollLeft']) || 0,
       );
       if (clamp2 === Number(el57['scrollLeft'])) return ![];
       return (
@@ -2935,7 +2935,7 @@ export function createReplacementStudioWorkspace({
       if (el59 && ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
         (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
         const value258 = el59['closest']?.('.person-replacement-preview-workbench'),
-          value259 = cancelled2['key'] === 'ArrowLeft' ? -0x10 : 0x10;
+          value259 = cancelled2['key'] === 'ArrowLeft' ? -16 : 16;
         ((initialProject2['workspace']['compositeSidebarWidth'] =
           applyPersonReplacementCompositeSidebarWidthToLayout(
             value258,
@@ -2952,7 +2952,7 @@ export function createReplacementStudioWorkspace({
         if (['assets', 'sources']['includes'](text13)) {
           const value260 = el60['closest']?.('[data-person-replacement-voice-layout]'),
             assetsEnd = normalizePersonReplacementVoiceLayout(initialProject2['workspace']['voiceLayout']),
-            value261 = cancelled2['key'] === 'ArrowLeft' ? -0x2 : 0x2;
+            value261 = cancelled2['key'] === 'ArrowLeft' ? -2 : 2;
           ((initialProject2['workspace']['voiceLayout'] = applyPersonReplacementVoiceLayoutToElement(
             value260,
             {
@@ -2970,7 +2970,7 @@ export function createReplacementStudioWorkspace({
         const el61 = floatingMenuHost?.['querySelector']?.('.person-replacement-add-voice-menu-wrap.is-open');
         if (el61) {
           (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
-          const el62 = el61['querySelector']?.('[data-story-action=\x22toggle-character-voice-menu\x22]');
+          const el62 = el61['querySelector']?.('[data-story-action="toggle-character-voice-menu"]');
           (handler37(el61, ![]), el62?.['focus']?.());
           return;
         }
@@ -3000,13 +3000,13 @@ export function createReplacementStudioWorkspace({
       }
       const el67 = cancelled2['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]');
       if (el67 && selectedIds['isOpen'] && ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
-        const enabled35 = cancelled2['shiftKey'] ? 0x5 : cancelled2['ctrlKey'] ? 0x1 : 0x0;
+        const enabled35 = cancelled2['shiftKey'] ? 5 : cancelled2['ctrlKey'] ? 1 : 0;
         if (!enabled35) return;
         (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
         const active = Math['trunc'](Number(el67['dataset']['personReplacementCutBoundaryIndex'])),
-          value262 = selectedIds['draft'][active - 0x1],
+          value262 = selectedIds['draft'][active - 1],
           value263 = selectedIds['draft'][active],
-          value264 = cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1,
+          value264 = cancelled2['key'] === 'ArrowRight' ? 1 : -1,
           personReplacementShotCutFrameSec =
             getPersonReplacementShotCutFrameSec(value262, value263) * enabled35;
         applyBoundaryTime(
@@ -3027,7 +3027,7 @@ export function createReplacementStudioWorkspace({
         handleSelectionKeyDown(cancelled2, {
           deletionEnabled:
             initialProject2['workspace']['view'] === 'project' &&
-            initialProject2['workspace']['step'] === 0x2 &&
+            initialProject2['workspace']['step'] === 2 &&
             !selectedIds['isOpen'],
           isEditableTarget: isEditableTarget,
         })
@@ -3038,7 +3038,7 @@ export function createReplacementStudioWorkspace({
         selectedIds['isOpen'] &&
         !isBusy() &&
         !isEditableTarget &&
-        (cancelled2['key'] === '\x20' || cancelled2['code'] === 'Space')
+        (cancelled2['key'] === ' ' || cancelled2['code'] === 'Space')
       ) {
         (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
         const el69 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-shot-cut-editor]');
@@ -3100,7 +3100,7 @@ export function createReplacementStudioWorkspace({
         if (['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) {
           (cancelled2['preventDefault'](),
             cancelled2['stopPropagation'](),
-            stepTimeline(cancelled2['key'] === 'ArrowLeft' ? -0x1 : 0x1, cancelled2['shiftKey'] ? 0x5 : 0x1));
+            stepTimeline(cancelled2['key'] === 'ArrowLeft' ? -1 : 1, cancelled2['shiftKey'] ? 5 : 1));
           return;
         }
         if (['Home', 'End']['includes'](cancelled2['key'])) {
@@ -3108,7 +3108,7 @@ export function createReplacementStudioWorkspace({
             cancelled2['stopPropagation'](),
             seekTimeline(
               cancelled2['key'] === 'Home'
-                ? 0x0
+                ? 0
                 : getPersonReplacementShotCutTotalDuration(selectedIds['draft']),
             ));
           return;
@@ -3164,7 +3164,7 @@ export function createReplacementStudioWorkspace({
               },
               'shot-selection-cancel',
             ),
-          initialProject2['workspace']['step'] === 0x1 &&
+          initialProject2['workspace']['step'] === 1 &&
             initialProject2['workspace']['selectedAssetIds']['length'] &&
             updateProject(
               {
@@ -3179,26 +3179,26 @@ export function createReplacementStudioWorkspace({
       );
       if (
         el70 &&
-        initialProject2['workspace']['step'] === 0x2 &&
+        initialProject2['workspace']['step'] === 2 &&
         ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])
       ) {
         (cancelled2['preventDefault'](),
           cancelled2['stopPropagation'](),
           handler79(
             el70['dataset']['personReplacementTargetCharacterId'],
-            cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1,
+            cancelled2['key'] === 'ArrowRight' ? 1 : -1,
           ));
         return;
       }
       const value267 = cancelled2['target']?.['closest']?.('[data-person-replacement-shot-wheel="true"]');
       if (
         value267 &&
-        initialProject2['workspace']['step'] === 0x2 &&
+        initialProject2['workspace']['step'] === 2 &&
         ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])
       ) {
         (cancelled2['preventDefault'](),
           cancelled2['stopPropagation'](),
-          handler77(cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1));
+          handler77(cancelled2['key'] === 'ArrowRight' ? 1 : -1));
         return;
       }
       const value268 = cancelled2['target']?.['closest']?.(
@@ -3206,20 +3206,20 @@ export function createReplacementStudioWorkspace({
       );
       if (
         value268 &&
-        initialProject2['workspace']['step'] === 0x1 &&
+        initialProject2['workspace']['step'] === 1 &&
         initialProject2['workspace']['characterAssetTab'] === 'audio' &&
         ['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])
       ) {
         (cancelled2['preventDefault'](),
           cancelled2['stopPropagation'](),
-          handler74(cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1));
+          handler74(cancelled2['key'] === 'ArrowRight' ? 1 : -1));
         return;
       }
       const enabled37 = cancelled2['target']?.['closest']?.('[data-story-appearance-wheel="true"]');
       if (!enabled37 || !['ArrowLeft', 'ArrowRight']['includes'](cancelled2['key'])) return;
       (cancelled2['preventDefault'](),
         cancelled2['stopPropagation'](),
-        handler73(cancelled2['key'] === 'ArrowRight' ? 0x1 : -0x1));
+        handler73(cancelled2['key'] === 'ArrowRight' ? 1 : -1));
     },
     value269 = (event7) => {
       event7['stopPropagation']();
@@ -3457,11 +3457,11 @@ export function createReplacementStudioWorkspace({
       const el91 = event8?.['target'],
         value283 = el91?.['closest']?.('[data-story-marquee-surface="shots"]'),
         enabled42 =
-          initialProject2['workspace']['step'] === 0x1 &&
+          initialProject2['workspace']['step'] === 1 &&
           initialProject2['workspace']['assetSelectionMode'] &&
           el91?.['closest']?.('.person-replacement-assets-page'),
         enabled43 =
-          [0x2, 0x3, 0x5]['includes'](initialProject2['workspace']['step']) &&
+          [2, 3, 5]['includes'](initialProject2['workspace']['step']) &&
           (initialProject2['workspace']['shotSelectionMode'] ||
             initialProject2['workspace']['selectedShotIds']['length']) &&
           value283,
@@ -3585,7 +3585,7 @@ export function createReplacementStudioWorkspace({
                                 );
                                 handler79(
                                   el95?.['dataset']?.['personReplacementTargetControls'],
-                                  archived === 'target-next-appearance' ? 0x1 : -0x1,
+                                  archived === 'target-next-appearance' ? 1 : -1,
                                 );
                               } else {
                                 if (
@@ -3602,7 +3602,7 @@ export function createReplacementStudioWorkspace({
                                       sourceShotId2?.['dataset']?.[
                                         'personReplacementVideoReferenceResultIndex'
                                       ],
-                                    delta: archived === 'video-reference-next-result' ? 0x1 : -0x1,
+                                    delta: archived === 'video-reference-next-result' ? 1 : -1,
                                   });
                                 } else {
                                   if (archived === 'cancel-asset-selection')
@@ -3628,7 +3628,7 @@ export function createReplacementStudioWorkspace({
                                               initialProject2['workspace']['characterAssetTab'],
                                             ),
                                             selectedAssetIds =
-                                              list13['length'] > 0x0 &&
+                                              list13['length'] > 0 &&
                                               list13['every']((value287) =>
                                                 initialProject2['workspace']['selectedAssetIds']['includes'](
                                                   value287['id'],
@@ -3643,7 +3643,7 @@ export function createReplacementStudioWorkspace({
                                                   ? []
                                                   : list13['map']((value288) => value288['id']),
                                                 assetSelectionMode:
-                                                  !selectedAssetIds && list13['length'] > 0x0,
+                                                  !selectedAssetIds && list13['length'] > 0,
                                               },
                                             },
                                             'asset-selection-all',
@@ -3673,36 +3673,36 @@ export function createReplacementStudioWorkspace({
                                             );
                                           } else {
                                             if (archived === 'previous-appearance')
-                                              handler73(-0x1, projectId['dataset']['storyCardAppearanceId']);
+                                              handler73(-1, projectId['dataset']['storyCardAppearanceId']);
                                             else {
                                               if (archived === 'next-appearance')
-                                                handler73(0x1, projectId['dataset']['storyCardAppearanceId']);
+                                                handler73(1, projectId['dataset']['storyCardAppearanceId']);
                                               else {
                                                 if (archived === 'previous-audio-bound-character')
-                                                  handler74(-0x1);
+                                                  handler74(-1);
                                                 else {
                                                   if (archived === 'next-audio-bound-character')
-                                                    handler74(0x1);
+                                                    handler74(1);
                                                   else {
-                                                    if (archived === 'previous-shot') handler77(-0x1);
+                                                    if (archived === 'previous-shot') handler77(-1);
                                                     else {
-                                                      if (archived === 'next-shot') handler77(0x1);
+                                                      if (archived === 'next-shot') handler77(1);
                                                       else {
                                                         if (archived === 'previous-replacement-image-result')
-                                                          switchImageResult(-0x1);
+                                                          switchImageResult(-1);
                                                         else {
                                                           if (archived === 'next-replacement-image-result')
-                                                            switchImageResult(0x1);
+                                                            switchImageResult(1);
                                                           else {
                                                             if (
                                                               archived === 'previous-replacement-video-result'
                                                             )
-                                                              switchVideoResult(-0x1);
+                                                              switchVideoResult(-1);
                                                             else {
                                                               if (
                                                                 archived === 'next-replacement-video-result'
                                                               )
-                                                                switchVideoResult(0x1);
+                                                                switchVideoResult(1);
                                                               else {
                                                                 if (
                                                                   archived === 'select-video-shot-reference'
@@ -4013,7 +4013,7 @@ export function createReplacementStudioWorkspace({
                                                                                                     floatingMenuHost[
                                                                                                       'querySelector'
                                                                                                     ](
-                                                                                                      '[data-person-replacement-input=\x27character-voice\x27]',
+                                                                                                      '[data-person-replacement-input=\'character-voice\']',
                                                                                                     )?.[
                                                                                                       'click'
                                                                                                     ]?.());
@@ -4084,7 +4084,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                 selectedAudioAssetId?.[
                                                                                                                   'id'
                                                                                                                 ] ||
-                                                                                                                list14[0x0]?.[
+                                                                                                                list14[0]?.[
                                                                                                                   'id'
                                                                                                                 ] ||
                                                                                                                 '',
@@ -4217,7 +4217,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                     [enabled47[
                                                                                                                       'id'
                                                                                                                     ]]:
-                                                                                                                      0x0,
+                                                                                                                      0,
                                                                                                                   },
                                                                                                               },
                                                                                                           },
@@ -4421,7 +4421,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                           ]?.[
                                                                                                                             'replacementPromptEnhancementEnabled'
                                                                                                                           ]
-                                                                                                                            ? '已开启\x20AI\x20提示词增强；此处显示增强前输入。增强结果需要调用模型后才能确定，调试不会发起该调用。'
+                                                                                                                            ? '已开启 AI 提示词增强；此处显示增强前输入。增强结果需要调用模型后才能确定，调试不会发起该调用。'
                                                                                                                             : '',
                                                                                                                       },
                                                                                                                     ),
@@ -4507,8 +4507,8 @@ export function createReplacementStudioWorkspace({
                                                                                                                 archived ===
                                                                                                                   'batch-generate-assets' &&
                                                                                                                 [
-                                                                                                                  0x2,
-                                                                                                                  0x3,
+                                                                                                                  2,
+                                                                                                                  3,
                                                                                                                 ][
                                                                                                                   'includes'
                                                                                                                 ](
@@ -4525,7 +4525,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                   ][
                                                                                                                     'step'
                                                                                                                   ] ===
-                                                                                                                    0x3
+                                                                                                                    3
                                                                                                                     ? 'video'
                                                                                                                     : 'image',
                                                                                                                 );
@@ -4643,21 +4643,21 @@ export function createReplacementStudioWorkspace({
         box4 = personBox['getBoundingClientRect']?.(),
         box5 = el98['getBoundingClientRect']?.();
       if (box3 && box4 && box5) {
-        const value302 = box5['width'] || 0x104,
+        const value302 = box5['width'] || 260,
           value303 = box5['height'] || 0xaa,
           value304 = Number['isFinite'](Number(clientX3)) ? Number(clientX3) : box4['right'],
           value305 = Number['isFinite'](Number(clientY2)) ? Number(clientY2) : box4['top'],
-          clamp3 = clamp(value304 - box3['left'] - value302 / 0x2, 0xc, box3['width'] - value302 - 0xc, 0xc),
-          value306 = value305 - box3['top'] + 0xa,
+          clamp3 = clamp(value304 - box3['left'] - value302 / 2, 12, box3['width'] - value302 - 12, 12),
+          value306 = value305 - box3['top'] + 10,
           value307 =
-            value306 + value303 <= box3['height'] - 0xc
+            value306 + value303 <= box3['height'] - 12
               ? value306
-              : clamp(value305 - box3['top'] - value303 - 0xa, 0xc, box3['height'] - value303 - 0xc, 0xc);
+              : clamp(value305 - box3['top'] - value303 - 10, 12, box3['height'] - value303 - 12, 12);
         (el98['style']?.['setProperty']?.('--person-replacement-mapping-scope-left', clamp3 + 'px'),
           el98['style']?.['setProperty']?.('--person-replacement-mapping-scope-top', value307 + 'px'));
       }
       return (
-        el98['querySelector']?.('[data-person-replacement-mapping-scope=\x27current\x27]')?.['focus']?.(),
+        el98['querySelector']?.('[data-person-replacement-mapping-scope=\'current\']')?.['focus']?.(),
         !![]
       );
     },
@@ -4693,7 +4693,7 @@ export function createReplacementStudioWorkspace({
       if (
         selectedIds['isOpen'] &&
         value310 &&
-        Number(shiftKey['detail']) > 0x0 &&
+        Number(shiftKey['detail']) > 0 &&
         !shiftKey['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]')
       ) {
         (shiftKey['preventDefault']?.(), seekTimeline(getTimelineSecFromPointer(shiftKey, value310)));
@@ -4772,7 +4772,7 @@ export function createReplacementStudioWorkspace({
         return;
       }
       const slotId2 = shiftKey['target']?.['closest']?.(
-        '[data-person-replacement-video-reference-inputs]\x20.ref-upload-slot[data-slot]',
+        '[data-person-replacement-video-reference-inputs] .ref-upload-slot[data-slot]',
       );
       if (slotId2 && floatingMenuHost['contains'](slotId2)) {
         const kind2 = normalizeText(slotId2['dataset']['kind']);
@@ -4783,7 +4783,7 @@ export function createReplacementStudioWorkspace({
           modelId: initialProject2['settings']['replacementModelId'],
         };
         const el104 = floatingMenuHost['querySelector']?.(
-          '[data-person-replacement-input=\x27replacement-video-slot\x27]',
+          '[data-person-replacement-input=\'replacement-video-slot\']',
         );
         el104 && ((el104['accept'] = kind2 === 'image' ? 'image/*' : 'video/*'), el104['click']?.());
         return;
@@ -4818,7 +4818,7 @@ export function createReplacementStudioWorkspace({
             !shiftKey['shiftKey'] && !shiftKey['ctrlKey'] && !shiftKey['metaKey'] && handler51(itemId));
         } else {
           if (
-            initialProject2['workspace']['step'] === 0x2 &&
+            initialProject2['workspace']['step'] === 2 &&
             el105['dataset']['personReplacementReplacementAssetKind'] === 'scene'
           ) {
             if (initialProject2['workspace']['selectedSceneId'] === itemId) return;
@@ -4828,7 +4828,7 @@ export function createReplacementStudioWorkspace({
             );
           } else {
             if (
-              initialProject2['workspace']['step'] === 0x2 &&
+              initialProject2['workspace']['step'] === 2 &&
               el105['dataset']['personReplacementTargetCharacterId']
             ) {
               if (initialProject2['workspace']['selectedCharacterId'] === itemId) return;
@@ -5023,9 +5023,9 @@ export function createReplacementStudioWorkspace({
             else {
               if (mode2 === 'select-step') navigate(sourceId['dataset']['personReplacementStep']);
               else {
-                if (mode2 === 'previous-step') navigate(initialProject2['workspace']['step'] - 0x1);
+                if (mode2 === 'previous-step') navigate(initialProject2['workspace']['step'] - 1);
                 else {
-                  if (mode2 === 'next-step') navigate(initialProject2['workspace']['step'] + 0x1);
+                  if (mode2 === 'next-step') navigate(initialProject2['workspace']['step'] + 1);
                   else {
                     if (mode2 === 'set-video-input-mode') {
                       const inputMode =
@@ -5285,7 +5285,7 @@ export function createReplacementStudioWorkspace({
                                                                 args26['workspace']['selectedAudioAssetId'],
                                                             )
                                                             ? args26['workspace']['selectedAudioAssetId']
-                                                            : list15[0x0]?.['id'] || ''
+                                                            : list15[0]?.['id'] || ''
                                                           : args26['workspace']['selectedAudioAssetId'];
                                                     if (characterAssetTab !== 'audio')
                                                       voiceLibraryTargetCharacterId = '';
@@ -5823,7 +5823,7 @@ export function createReplacementStudioWorkspace({
                                                                                             enabled54['gate'][
                                                                                               'unresolvedOrientationPersonIds'
                                                                                             ]['length'] +
-                                                                                            '\x20个人物未确认朝向，请先选择朝向。',
+                                                                                            ' 个人物未确认朝向，请先选择朝向。',
                                                                                           'warn',
                                                                                         );
                                                                                         return;
@@ -6059,10 +6059,10 @@ export function createReplacementStudioWorkspace({
                                                                                                           'hasOwn'
                                                                                                         ](
                                                                                                           {
-                                                                                                            'export-final-video': 0x1,
-                                                                                                            'export-all-clips-and-images': 0x1,
-                                                                                                            'export-premiere-xml': 0x1,
-                                                                                                            'export-jianying-draft': 0x1,
+                                                                                                            'export-final-video': 1,
+                                                                                                            'export-all-clips-and-images': 1,
+                                                                                                            'export-premiere-xml': 1,
+                                                                                                            'export-jianying-draft': 1,
                                                                                                           },
                                                                                                           mode2,
                                                                                                         ) &&
@@ -6233,7 +6233,7 @@ export function createReplacementStudioWorkspace({
       if (selectedVoiceSourceId['target']['matches']?.('[data-person-replacement-audio-character]')) {
         const el120 = selectedVoiceSourceId['target']
           ['closest']('[data-workspace-audio-asset-id]')
-          ?.['querySelector']('[data-person-replacement-action=\x22bind-project-audio\x22]');
+          ?.['querySelector']('[data-person-replacement-action="bind-project-audio"]');
         if (el120)
           el120['disabled'] = !initialProject2['characters']['some'](
             (value340) => value340['id'] === selectedVoiceSourceId['target']['value'],
@@ -6259,22 +6259,22 @@ export function createReplacementStudioWorkspace({
                 list20['length'] &&
                   handler33('audio', () => runIntent(downloadImageIntent['SELECT_NEW_AUDIO_FILES'], list20));
               } else {
-                if (value341 === 'appearance-image' && list17[0x0])
-                  runIntent(downloadImageIntent['SELECT_CHARACTER_REFERENCE'], list17[0x0], value45 || {});
+                if (value341 === 'appearance-image' && list17[0])
+                  runIntent(downloadImageIntent['SELECT_CHARACTER_REFERENCE'], list17[0], value45 || {});
                 else {
-                  if (value341 === 'replacement-image' && list17[0x0])
-                    runIntent(downloadImageIntent['SELECT_REPLACEMENT_IMAGE'], list17[0x0], value45 || {}, {
+                  if (value341 === 'replacement-image' && list17[0])
+                    runIntent(downloadImageIntent['SELECT_REPLACEMENT_IMAGE'], list17[0], value45 || {}, {
                       applyCallbackResult: ![],
                     });
                   else {
-                    if (value341 === 'replacement-video-result' && list17[0x0]) {
+                    if (value341 === 'replacement-video-result' && list17[0]) {
                       const value342 = value46,
                         value343 = value45 || {};
                       void runWorkspaceVideoDownloadAction(value342, () =>
                         Promise['resolve'](
                           runIntent(
                             downloadImageIntent['SELECT_REPLACEMENT_VIDEO_RESULT'],
-                            list17[0x0],
+                            list17[0],
                             value343,
                             {
                               applyCallbackResult: ![],
@@ -6283,18 +6283,18 @@ export function createReplacementStudioWorkspace({
                         ),
                       )['catch'](() => {});
                     } else {
-                      if (value341 === 'replacement-video-slot' && list17[0x0])
+                      if (value341 === 'replacement-video-slot' && list17[0])
                         runIntent(
                           downloadImageIntent['SELECT_REPLACEMENT_VIDEO_INPUT'],
-                          list17[0x0],
+                          list17[0],
                           value45 || {},
                           { applyCallbackResult: ![] },
                         );
                       else {
-                        if (value341 === 'character-voice' && list17[0x0])
+                        if (value341 === 'character-voice' && list17[0])
                           runIntent(
                             downloadImageIntent['SELECT_CHARACTER_VOICE'],
-                            list17[0x0],
+                            list17[0],
                             value45 || {},
                           );
                       }
@@ -6426,14 +6426,14 @@ export function createReplacementStudioWorkspace({
         text31 = normalizeText(el124?.['currentSrc'] || el124?.['src'] || el124?.['getAttribute']?.('src'));
       if (!el124 || !text31 || !documentObject?.['createElement']) return null;
       const box6 = el124['getBoundingClientRect']?.() || el123['getBoundingClientRect']?.() || {},
-        value348 = Math['max'](0x1, Number(box6['width']) || 0x80),
-        value349 = Math['max'](0x1, Number(box6['height']) || value348),
-        value350 = Math['min'](0xa0, Math['max'](0x60, value348)),
-        value351 = Math['max'](0x36, Math['round']((value350 * value349) / value348)),
+        value348 = Math['max'](1, Number(box6['width']) || 128),
+        value349 = Math['max'](1, Number(box6['height']) || value348),
+        value350 = Math['min'](160, Math['max'](96, value348)),
+        value351 = Math['max'](54, Math['round']((value350 * value349) / value348)),
         el125 = documentObject['createElement']('div'),
         value352 = documentObject['createElement']('img');
       return (
-        (el125['className'] = 'story-asset-drag-preview\x20person-replacement-target-asset-drag-preview'),
+        (el125['className'] = 'story-asset-drag-preview person-replacement-target-asset-drag-preview'),
         el125['setAttribute']('aria-hidden', 'true'),
         (el125['style']['width'] = Math['round'](value350) + 'px'),
         (el125['style']['height'] = Math['round'](value351) + 'px'),
@@ -6447,20 +6447,20 @@ export function createReplacementStudioWorkspace({
     },
     handler108 = (el126, event11) => {
       if (!el126) return;
-      const value353 = Number(event11?.['clientX']) || 0x0,
-        value354 = Number(event11?.['clientY']) || 0x0,
+      const value353 = Number(event11?.['clientX']) || 0,
+        value354 = Number(event11?.['clientY']) || 0,
         box7 = el126['getBoundingClientRect']?.() || {},
         value355 = Math['max'](
-          0x1,
-          Number(box7['width']) || Number['parseFloat'](el126['style']['width']) || 0x1,
+          1,
+          Number(box7['width']) || Number['parseFloat'](el126['style']['width']) || 1,
         ),
         value356 = Math['max'](
-          0x1,
-          Number(box7['height']) || Number['parseFloat'](el126['style']['height']) || 0x1,
+          1,
+          Number(box7['height']) || Number['parseFloat'](el126['style']['height']) || 1,
         ),
         value357 = Number(windowObject?.['innerWidth']) || Number['POSITIVE_INFINITY'],
         value358 = Number(windowObject?.['innerHeight']) || Number['POSITIVE_INFINITY'],
-        value359 = 0x8;
+        value359 = 8;
       let value360 = value353 + WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP,
         value361 = value354 + WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP;
       (value360 + value355 > value357 - value359 &&
@@ -6472,20 +6472,20 @@ export function createReplacementStudioWorkspace({
           Math['max'](value359, value360) +
           'px, ' +
           Math['max'](value359, value361) +
-          'px,\x200)'));
+          'px, 0)'));
     },
     handler109 = (event12) => {
       const el127 = documentObject?.['elementFromPoint']?.(
-          Number(event12?.['clientX']) || 0x0,
-          Number(event12?.['clientY']) || 0x0,
+          Number(event12?.['clientX']) || 0,
+          Number(event12?.['clientY']) || 0,
         ),
         value362 = el127?.['closest']?.('[data-person-replacement-person-drop]');
       return value362 && floatingMenuHost?.['contains']?.(value362) ? value362 : null;
     },
     handler110 = (event13) => {
       const el128 = documentObject?.['elementFromPoint']?.(
-          Number(event13?.['clientX']) || 0x0,
-          Number(event13?.['clientY']) || 0x0,
+          Number(event13?.['clientX']) || 0,
+          Number(event13?.['clientY']) || 0,
         ),
         value363 = el128?.['closest']?.('[data-person-replacement-keyframe-stage]');
       return value363 && floatingMenuHost?.['contains']?.(value363) ? value363 : null;
@@ -6499,8 +6499,8 @@ export function createReplacementStudioWorkspace({
     handler112 = ({
       personBox: personBox2,
       target: target2,
-      clientX: clientX = 0x0,
-      clientY: clientY = 0x0,
+      clientX: clientX = 0,
+      clientY: clientY = 0,
     } = {}) => {
       if (
         !personBox2 ||
@@ -6570,7 +6570,7 @@ export function createReplacementStudioWorkspace({
       if (
         !element ||
         !floatingMenuHost?.['contains']?.(element) ||
-        pointerId['button'] !== 0x0 ||
+        pointerId['button'] !== 0 ||
         pointerId['target']?.['closest']?.('.story-appearance-arrow, .at-mention-variant-arrow')
       )
         return ![];
@@ -6590,8 +6590,8 @@ export function createReplacementStudioWorkspace({
           appearanceId: appearanceId5,
           element: element,
           pointerId: pointerId['pointerId'],
-          startX: Number(pointerId['clientX']) || 0x0,
-          startY: Number(pointerId['clientY']) || 0x0,
+          startX: Number(pointerId['clientX']) || 0,
+          startY: Number(pointerId['clientY']) || 0,
           originalDraggable: element['getAttribute']?.('draggable'),
           active: ![],
           preview: null,
@@ -6605,9 +6605,9 @@ export function createReplacementStudioWorkspace({
       const event16 = value48;
       if (!event16 || event16['pointerId'] !== event15['pointerId']) return ![];
       if (!event16['active']) {
-        const value372 = (Number(event15['clientX']) || 0x0) - event16['startX'],
-          value373 = (Number(event15['clientY']) || 0x0) - event16['startY'];
-        if (Math['hypot'](value372, value373) < 0x8) return ![];
+        const value372 = (Number(event15['clientX']) || 0) - event16['startX'],
+          value373 = (Number(event15['clientY']) || 0) - event16['startY'];
+        if (Math['hypot'](value372, value373) < 8) return ![];
         ((event16['active'] = !![]),
           (enabled2 = !![]),
           event16['element']['classList']?.['add']?.('is-story-asset-dragging'),
@@ -6803,7 +6803,7 @@ export function createReplacementStudioWorkspace({
       if (initialProject2['workspace']['view'] === 'home')
         handler17(list22['filter'](isPersonReplacementVideoFile));
       else {
-        if (initialProject2['workspace']['step'] === 0x1)
+        if (initialProject2['workspace']['step'] === 1)
           handler18(list22['filter'](isPersonReplacementImageFile));
       }
     };
@@ -6851,7 +6851,7 @@ export function createReplacementStudioWorkspace({
         value389 &&
         floatingMenuHost['contains'](value389) &&
         !event19['target']?.['closest']?.(
-          '.person-replacement-detection-label,\x20.person-replacement-mapping-badge,\x20[data-person-replacement-action]',
+          '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action]',
         ) &&
         beginBoxEdit(event19, value389)
       )
@@ -6886,7 +6886,7 @@ export function createReplacementStudioWorkspace({
           onRatio: (value392) => {
             const value393 = Number(layout?.['getBoundingClientRect']?.()?.['width']),
               value394 = Number['isFinite'](value393)
-                ? (value393 * value392) / 0x64
+                ? (value393 * value392) / 100
                 : initialProject2['workspace']['compositeSidebarWidth'];
             initialProject2['workspace']['compositeSidebarWidth'] =
               applyPersonReplacementCompositeSidebarWidthToLayout(layout, splitter, value394);
@@ -6921,10 +6921,10 @@ export function createReplacementStudioWorkspace({
                   ...args32,
                   ...(text34 === 'assets'
                     ? {
-                        assetsEnd: clamp(value396, 0x10, args32['sourcesEnd'] - 0x10, args32['assetsEnd']),
+                        assetsEnd: clamp(value396, 16, args32['sourcesEnd'] - 16, args32['assetsEnd']),
                       }
                     : {
-                        sourcesEnd: clamp(value396, args32['assetsEnd'] + 0x10, 0x3c, args32['sourcesEnd']),
+                        sourcesEnd: clamp(value396, args32['assetsEnd'] + 16, 60, args32['sourcesEnd']),
                       }),
                 });
               initialProject2['workspace']['voiceLayout'] = applyPersonReplacementVoiceLayoutToElement(
@@ -7110,10 +7110,10 @@ export function createReplacementStudioWorkspace({
         const value423 =
           el135['ownerDocument']?.['defaultView']?.['getComputedStyle']?.(el135)?.['overflowY'];
         if (!['auto', 'scroll', 'overlay']['includes'](value423)) return ![];
-        const count8 = Number(event21['deltaY']) || 0x0,
-          value424 = Math['max'](0x0, el135['scrollHeight'] - el135['clientHeight']);
-        if (count8 < 0x0) return el135['scrollTop'] > 0x0;
-        if (count8 > 0x0) return el135['scrollTop'] < value424;
+        const count8 = Number(event21['deltaY']) || 0,
+          value424 = Math['max'](0, el135['scrollHeight'] - el135['clientHeight']);
+        if (count8 < 0) return el135['scrollTop'] > 0;
+        if (count8 > 0) return el135['scrollTop'] < value424;
         return ![];
       };
       (floatingMenuHost['addEventListener'](
@@ -7196,7 +7196,7 @@ export function createReplacementStudioWorkspace({
             if (
               enabled68?.['dataset']?.['storyMarqueeSurface'] === 'shot-cuts' &&
               initialProject2['workspace']['view'] === 'project' &&
-              initialProject2['workspace']['step'] === 0x2 &&
+              initialProject2['workspace']['step'] === 2 &&
               selectedIds['isOpen']
             )
               return {
@@ -7213,7 +7213,7 @@ export function createReplacementStudioWorkspace({
             if (
               enabled68?.['dataset']?.['storyMarqueeSurface'] === 'people' &&
               initialProject2['workspace']['view'] === 'project' &&
-              initialProject2['workspace']['step'] === 0x2 &&
+              initialProject2['workspace']['step'] === 2 &&
               !selectedIds['isOpen']
             )
               return {
@@ -7233,7 +7233,7 @@ export function createReplacementStudioWorkspace({
             if (
               enabled68?.['dataset']?.['storyMarqueeSurface'] === 'shots' &&
               initialProject2['workspace']['view'] === 'project' &&
-              [0x2, 0x3, 0x5]['includes'](initialProject2['workspace']['step']) &&
+              [2, 3, 5]['includes'](initialProject2['workspace']['step']) &&
               !selectedIds['isOpen']
             )
               return {
@@ -7257,7 +7257,7 @@ export function createReplacementStudioWorkspace({
               enabled:
                 enabled68?.['dataset']?.['storyMarqueeSurface'] === 'assets' &&
                 initialProject2['workspace']['view'] === 'project' &&
-                initialProject2['workspace']['step'] === 0x1 &&
+                initialProject2['workspace']['step'] === 1 &&
                 ['character', 'scene', 'audio', 'library']['includes'](
                   initialProject2['workspace']['characterAssetTab'],
                 ),
@@ -7275,7 +7275,7 @@ export function createReplacementStudioWorkspace({
                     ...initialProject2,
                     workspace: {
                       ...initialProject2['workspace'],
-                      assetSelectionMode: assetSelectionMode5['length'] > 0x0,
+                      assetSelectionMode: assetSelectionMode5['length'] > 0,
                       selectedAssetIds: assetSelectionMode5,
                       ...(assetSelectionMode5['length']
                         ? {
@@ -7285,14 +7285,14 @@ export function createReplacementStudioWorkspace({
                               audio: 'selectedAudioAssetId',
                               library: 'selectedLibraryAssetId',
                             }[initialProject2['workspace']['characterAssetTab']]]:
-                              assetSelectionMode5['at'](-0x1),
+                              assetSelectionMode5['at'](-1),
                           }
                         : {}),
                     },
                   },
                   'asset-marquee',
                 ),
-                  focusWorkspaceAssetCard(floatingMenuHost, assetSelectionMode5['at'](-0x1)));
+                  focusWorkspaceAssetCard(floatingMenuHost, assetSelectionMode5['at'](-1)));
               },
             };
           },
@@ -7345,7 +7345,7 @@ export function createReplacementStudioWorkspace({
     (el139?.['remove']?.(), currentToolbar?.['remove']?.());
     const value436 =
       initialProject2['workspace']['view'] === 'project' &&
-      initialProject2['workspace']['step'] === 0x2 &&
+      initialProject2['workspace']['step'] === 2 &&
       !selectedIds['isOpen'];
     (setManualSelectionActive(value436),
       handler125(),
@@ -7443,7 +7443,7 @@ export function createReplacementStudioWorkspace({
         (value442 ||
           ((selectedIds['isOpen'] || selectedIds['isOpening']) &&
             (initialProject2['workspace']['view'] !== 'project' ||
-              initialProject2['workspace']['step'] !== 0x2 ||
+              initialProject2['workspace']['step'] !== 2 ||
               selectedIds['draft']['some']((value444) => !map7['has'](value444['shotId']))))) &&
           reset(),
         run(),
@@ -7463,9 +7463,9 @@ export function createReplacementStudioWorkspace({
           floatingMenuHost &&
           normalizeText(personReplacementWorkspaceProject3['id']) === normalizeText(initialProject2['id']) &&
           personReplacementWorkspaceProject3['workspace']?.['view'] === 'project' &&
-          personReplacementWorkspaceProject3['workspace']?.['step'] === 0x3 &&
+          personReplacementWorkspaceProject3['workspace']?.['step'] === 3 &&
           initialProject2['workspace']?.['view'] === 'project' &&
-          initialProject2['workspace']?.['step'] === 0x3,
+          initialProject2['workspace']?.['step'] === 3,
         ),
         value448 = value447
           ? resolvePersonReplacementVideoGenerationUiRefreshScope(
@@ -7477,9 +7477,9 @@ export function createReplacementStudioWorkspace({
           floatingMenuHost &&
           normalizeText(personReplacementWorkspaceProject3['id']) === normalizeText(initialProject2['id']) &&
           personReplacementWorkspaceProject3['workspace']?.['view'] === 'project' &&
-          personReplacementWorkspaceProject3['workspace']?.['step'] === 0x2 &&
+          personReplacementWorkspaceProject3['workspace']?.['step'] === 2 &&
           initialProject2['workspace']?.['view'] === 'project' &&
-          initialProject2['workspace']?.['step'] === 0x2,
+          initialProject2['workspace']?.['step'] === 2,
         ),
         value450 = value449
           ? resolvePersonReplacementImageGenerationUiRefreshScope(
@@ -7553,7 +7553,7 @@ export function createReplacementStudioWorkspace({
       const value454 = composeOutputPending2;
       composeOutputPending2 = options7?.['pending'] === !![];
       const value455 = floatingMenuHost?.['querySelector']?.(
-          '[data-person-replacement-action=\x22compose-output\x22]',
+          '[data-person-replacement-action="compose-output"]',
         ),
         value456 = handler59(renderCompositeComposeAction(initialProject2, handler22()));
       return (

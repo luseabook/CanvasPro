@@ -77,7 +77,7 @@ export async function resolveFinalResultDisplaySize(box, target = {}) {
     return calcDisplaySizeByMedia(box2.width, box2.height);
   return calcDisplaySizeByMedia(box.width, box.height);
 }
-export const RH_PENDING_CODES = new Set([0x324, 0x32d]);
+export const RH_PENDING_CODES = new Set([804, 813]);
 export const parseRhTaskId = (source) =>
   String(
     source?.task_id ||

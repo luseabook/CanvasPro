@@ -91,17 +91,17 @@ export function pickImageLodUrl({
   return { url: url || url2, lod: 'full' };
 }
 
-export const CANVAS_IMAGE_THUMB_MAX_EDGE_PX = 0x140;
+export const CANVAS_IMAGE_THUMB_MAX_EDGE_PX = 320;
 
 export const CANVAS_IMAGE_LOD_DOWNGRADE_RATIO = 0.82;
 
 function hashImageDisplayVersionKey(index = '') {
   const result = String(index || '');
   let data = 0x811c9dc5;
-  for (let options = 0x0; options < result['length']; options += 0x1) {
+  for (let options = 0; options < result['length']; options += 1) {
     ((data ^= result['charCodeAt'](options)), (data = Math['imul'](data, 0x1000193)));
   }
-  return (data >>> 0x0)['toString'](0x24);
+  return (data >>> 0)['toString'](36);
 }
 
 export function versionCanvasImageDisplayUrl(target = '', source = '') {
@@ -110,13 +110,13 @@ export function versionCanvasImageDisplayUrl(target = '', source = '') {
   if (!list2 || !enabled2) return list2;
   if (/^(?:https?:\/\/|\/\/|data:image\/|blob:|aic-local-preview:)/i['test'](list2)) return list2;
   const count = list2['indexOf']('#'),
-    next = count >= 0x0 ? list2['slice'](0x0, count) : list2,
-    current = count >= 0x0 ? list2['slice'](count) : '',
+    next = count >= 0 ? list2['slice'](0, count) : list2,
+    current = count >= 0 ? list2['slice'](count) : '',
     entry = next['includes']('?') ? '&' : '?';
   return '' + next + entry + 'aicv=' + hashImageDisplayVersionKey(enabled2) + current;
 }
 
-export function buildCanvasImageResultIdentityKey(options2 = {}, record = {}, payload = 0x0) {
+export function buildCanvasImageResultIdentityKey(options2 = {}, record = {}, payload = 0) {
   return [
     payload,
     options2?.['assetId'],
@@ -146,24 +146,24 @@ export function buildCanvasImageResultIdentityKey(options2 = {}, record = {}, pa
 
 function toPositiveNumber(state) {
   const count2 = Number(state);
-  return Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x0;
+  return Number['isFinite'](count2) && count2 > 0 ? count2 : 0;
 }
 
 function getPrimaryImageMetadata(options3 = {}) {
   const config = Array['isArray'](options3?.['images']) ? options3['images'] : [],
     scope = Number(options3?.['mainImageIndex']),
     input = Number['isFinite'](scope)
-      ? Math['max'](0x0, Math['min'](config['length'] - 0x1, Math['trunc'](scope)))
-      : 0x0;
-  return config[input] || config[0x0] || {};
+      ? Math['max'](0, Math['min'](config['length'] - 1, Math['trunc'](scope)))
+      : 0;
+  return config[input] || config[0] || {};
 }
 
 function pickPositiveNumber(...args) {
   for (const output of args) {
     const toPositiveNumber2 = toPositiveNumber(output);
-    if (toPositiveNumber2 > 0x0) return toPositiveNumber2;
+    if (toPositiveNumber2 > 0) return toPositiveNumber2;
   }
-  return 0x0;
+  return 0;
 }
 
 export function getCanvasImageIntrinsicPixelSize(options4 = {}) {
@@ -202,13 +202,13 @@ export function getCanvasImageThumbPixelSize(options5 = {}) {
       options5['thumbHeight'],
       options5['thumbnailHeight'],
     );
-  if (positiveNumber > 0x0 && positiveNumber2 > 0x0)
+  if (positiveNumber > 0 && positiveNumber2 > 0)
     return { width: positiveNumber, height: positiveNumber2 };
   const box = getCanvasImageIntrinsicPixelSize(options5),
     count3 = box['width'] || toPositiveNumber(options5?.['width']),
     count4 = box['height'] || toPositiveNumber(options5?.['height']);
-  if (!(count3 > 0x0) || !(count4 > 0x0)) return { width: 0x0, height: 0x0 };
-  const value2 = Math['min'](0x1, CANVAS_IMAGE_THUMB_MAX_EDGE_PX / Math['max'](count3, count4));
+  if (!(count3 > 0) || !(count4 > 0)) return { width: 0, height: 0 };
+  const value2 = Math['min'](1, CANVAS_IMAGE_THUMB_MAX_EDGE_PX / Math['max'](count3, count4));
   return { width: count3 * value2, height: count4 * value2 };
 }
 
@@ -217,13 +217,13 @@ export function getCanvasImageRequiredPixelSize(
   value3 = {},
   { devicePixelRatio: devicePixelRatio } = {},
 ) {
-  const toPositiveNumber3 = toPositiveNumber(value3?.['zoom']) || 0x1,
+  const toPositiveNumber3 = toPositiveNumber(value3?.['zoom']) || 1,
     toPositiveNumber4 =
       toPositiveNumber(devicePixelRatio) ||
       toPositiveNumber(value3?.['devicePixelRatio']) ||
       toPositiveNumber(value3?.['dpr']) ||
       toPositiveNumber(globalThis['devicePixelRatio']) ||
-      0x1;
+      1;
   return {
     width: toPositiveNumber(options6?.['width']) * toPositiveNumber3 * toPositiveNumber4,
     height: toPositiveNumber(options6?.['height']) * toPositiveNumber3 * toPositiveNumber4,
@@ -248,9 +248,9 @@ export function resolveCanvasImageLodMode({
   if (interactionBusy && value4 === MEDIA_LOD_MODE_FULL) return MEDIA_LOD_MODE_FULL;
   const box2 = getCanvasImageRequiredPixelSize(node, viewport, { devicePixelRatio: devicePixelRatio2 }),
     box3 = getCanvasImageThumbPixelSize(node);
-  if (!(box2['width'] > 0x0) || !(box2['height'] > 0x0) || !(box3['width'] > 0x0) || !(box3['height'] > 0x0))
+  if (!(box2['width'] > 0) || !(box2['height'] > 0) || !(box3['width'] > 0) || !(box3['height'] > 0))
     return MEDIA_LOD_MODE_FULL;
-  const value5 = value4 === MEDIA_LOD_MODE_FULL ? CANVAS_IMAGE_LOD_DOWNGRADE_RATIO : 0x1,
+  const value5 = value4 === MEDIA_LOD_MODE_FULL ? CANVAS_IMAGE_LOD_DOWNGRADE_RATIO : 1,
     value6 = box2['width'] <= box3['width'] * value5 && box2['height'] <= box3['height'] * value5;
   return value6 ? MEDIA_LOD_MODE_THUMB : MEDIA_LOD_MODE_FULL;
 }

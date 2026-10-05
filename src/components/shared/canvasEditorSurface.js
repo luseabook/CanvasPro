@@ -63,11 +63,11 @@ export function renderCanvasEditorSubmitButton(value) {
   );
 }
 export function positionCanvasEditorToolbar(el4, { center: center, top: top }, key = window) {
-  const index = el4['getBoundingClientRect']()['width'] / 0x2;
+  const index = el4['getBoundingClientRect']()['width'] / 2;
   ((el4['style']['left'] =
-    Math['max'](0xc + index, Math['min'](key['innerWidth'] - 0xc - index, center)) + 'px'),
+    Math['max'](12 + index, Math['min'](key['innerWidth'] - 12 - index, center)) + 'px'),
     (el4['style']['top'] =
-      Math['max'](0xc, Math['min'](key['innerHeight'] - el4['offsetHeight'] - 0xc, top)) + 'px'),
+      Math['max'](12, Math['min'](key['innerHeight'] - el4['offsetHeight'] - 12, top)) + 'px'),
     (el4['style']['bottom'] = 'auto'),
     (el4['style']['transform'] = 'translateX(-50%)'));
 }

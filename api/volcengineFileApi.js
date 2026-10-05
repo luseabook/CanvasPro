@@ -1,8 +1,8 @@
 import { buildApiUrl } from './apiBase.js';
 import { get, post } from './requester.js';
 const VOLCENGINE_DEFAULT_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3',
-  VOLCENGINE_FILE_POLL_INTERVAL_MS = 0x7d0,
-  VOLCENGINE_FILE_POLL_TIMEOUT_MS = 2 * 60 * 0x3e8;
+  VOLCENGINE_FILE_POLL_INTERVAL_MS = 2000,
+  VOLCENGINE_FILE_POLL_TIMEOUT_MS = 2 * 60 * 1000;
 function normalizeBaseUrl(value) {
   return String(value || VOLCENGINE_DEFAULT_BASE_URL)
     .trim()
@@ -55,7 +55,7 @@ async function fetchInputBlob(record) {
     provider: 'remote',
     buildUrl: false,
     responseType: 'blob',
-    timeout: 5 * 60 * 0x3e8,
+    timeout: 5 * 60 * 1000,
   });
 }
 export async function retrieveVolcengineFile(payload, enabled2, timeout = {}) {
@@ -66,7 +66,7 @@ export async function retrieveVolcengineFile(payload, enabled2, timeout = {}) {
     get2 = await get('/api/v2/proxy/task?apiUrl=' + encodeURIComponent(baseUrl), {
       headers: { Authorization: 'Bearer ' + enabled2 },
       provider: 'volcengine',
-      timeout: timeout.timeout || 0x7530,
+      timeout: timeout.timeout || 30000,
     });
   return normalizeFileObject(get2);
 }
@@ -107,7 +107,7 @@ export async function uploadBlobToVolcengineFile(enabled6, enabled7, timeout2 = 
   const post2 = await post('/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(baseUrl2), formData, {
     headers: { Authorization: 'Bearer ' + enabled7 },
     provider: 'volcengine',
-    timeout: timeout2.uploadTimeout || 5 * 60 * 0x3e8,
+    timeout: timeout2.uploadTimeout || 5 * 60 * 1000,
   });
   return await waitForVolcengineFileActive(post2, enabled7, timeout2);
 }

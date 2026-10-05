@@ -69,8 +69,8 @@ function captureOpenRuntimeParameterMenu(el) {
     return {
       fieldId: String(el2?.['dataset']?.['uiSchemaField'] || '')['trim'](),
       focusedValue: focusedValue,
-      scrollLeft: Number(el3['scrollLeft']) || 0x0,
-      scrollTop: Number(el3['scrollTop']) || 0x0,
+      scrollLeft: Number(el3['scrollLeft']) || 0,
+      scrollTop: Number(el3['scrollTop']) || 0,
     };
   }
   return null;
@@ -88,8 +88,8 @@ function restoreRuntimeParameterMenu(el5, target) {
     el6?.['__uiSchemaPortaledPopup'] ||
     el6?.['querySelector']?.('.ui-schema-floating-menu.show, .ui-schema-popup.show');
   if (!el9?.['classList']?.['contains']?.('show')) return;
-  ((el9['scrollLeft'] = Number(target?.['scrollLeft']) || 0x0),
-    (el9['scrollTop'] = Number(target?.['scrollTop']) || 0x0));
+  ((el9['scrollLeft'] = Number(target?.['scrollLeft']) || 0),
+    (el9['scrollTop'] = Number(target?.['scrollTop']) || 0));
   const enabled3 = String(target?.['focusedValue'] || '')['trim']();
   if (!enabled3) return;
   const el10 = Array['from'](el9['querySelectorAll']?.('[data-ui-schema-value]') || [])['find'](
@@ -178,7 +178,7 @@ function buildModelOptions(state, config, list5, scope, input) {
       selectedLabel: '模型：自动',
       subtitle: subtitle
         ? '跟随 CLI 默认模型：' + subtitle['displayName']
-        : '跟随\x20OpenAI\x20CLI\x20默认模型',
+        : '跟随 OpenAI CLI 默认模型',
     },
     value4 = [
       output,
@@ -188,7 +188,7 @@ function buildModelOptions(state, config, list5, scope, input) {
         selectedLabel: value5['displayName'],
         subtitle: [
           value5['displayName'] === value5['id'] ? '' : value5['id'],
-          value5['isDefault'] ? 'CLI\x20默认' : '',
+          value5['isDefault'] ? 'CLI 默认' : '',
         ]
           ['filter'](Boolean)
           ['join'](' · '),
@@ -334,7 +334,7 @@ export function bindAIGenTextRuntimeParameterControls(
     catalog2 = {},
     bindModelUiSchemaControls2 = () => {},
     value38 = ![],
-    value39 = 0x0,
+    value39 = 0,
     enabled5 = ![],
     enabled6 = ![],
     value40 = '';
@@ -347,7 +347,7 @@ export function bindAIGenTextRuntimeParameterControls(
         list8 = buildAIGenTextRuntimeParameterFields(modelId3, nodeData2, catalog2, {
           catalogStatus: catalogStatus2,
         }),
-        enabled7 = list8['length'] > 0x0;
+        enabled7 = list8['length'] > 0;
       ((el17['hidden'] = !enabled7),
         (el17['innerHTML'] = enabled7
           ? renderAIGenTextRuntimeParameterMarkup(modelId3, nodeData2, catalog2, {
@@ -409,7 +409,7 @@ export function bindAIGenTextRuntimeParameterControls(
           cachedCliProviderStatus?.['loggedIn'] === !![] ||
           cachedCliProviderStatus?.['authConfigured'] === !![];
       if (!enabled8) return;
-      !enabled5 && normalizeCatalogModels(catalog2)['length'] === 0x0 && void handler({ force: !![] });
+      !enabled5 && normalizeCatalogModels(catalog2)['length'] === 0 && void handler({ force: !![] });
     };
   return (
     windowObject?.['addEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, value45),
@@ -439,7 +439,7 @@ export function bindAIGenTextRuntimeParameterControls(
       },
       destroy() {
         ((value38 = !![]),
-          (value39 += 0x1),
+          (value39 += 1),
           bindModelUiSchemaControls2?.(),
           windowObject?.['removeEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, value45),
           el17['replaceChildren']?.());

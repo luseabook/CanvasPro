@@ -18,7 +18,7 @@ export const RH_VIDEO_COMMERCIAL_DIGITAL_HUMAN_HELP_TOOLTIP = [
 ].join('\n');
 const RH_COMMERCIAL_DIGITAL_HUMAN_RESOLUTION_FIELD = Object.freeze({
   ...RH_VIDEO_RESOLUTION_FIELD,
-  defaultValue: 0x500,
+  defaultValue: 1280,
 });
 export const rhVideoCommercialDigitalHumanModelManifest = createRunningHubVideoModelManifest({
   modelId: RH_VIDEO_COMMERCIAL_DIGITAL_HUMAN_MODEL_ID,
@@ -126,7 +126,7 @@ export const rhVideoCommercialDigitalHumanExecutionManifest = createRunningHubVi
         description: '分辨率',
         source: 'param',
         fields: Object.freeze(['generationParams.rhVideoResolution', 'rhVideoResolution']),
-        defaultValue: 0x500,
+        defaultValue: 1280,
         transform: 'normalizeRhVideoResolution',
       }),
       Object.freeze({

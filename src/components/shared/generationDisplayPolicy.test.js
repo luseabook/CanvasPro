@@ -13,8 +13,8 @@ import {
 test('generationDisplayPolicy: recognizes adaptive labels and parses exact ratios', () => {
   assert.equal(isAdaptiveImageAspectRatioValue(''), true);
   assert.equal(isAdaptiveImageAspectRatioValue('auto'), true);
-  assert.equal(isAdaptiveImageAspectRatioValue('\u81ea\u9002\u5e94'), true);
-  assert.deepEqual(parseImageDisplayAspectRatio(' 16\uFF1A9 '), {
+  assert.equal(isAdaptiveImageAspectRatioValue('自适应'), true);
+  assert.deepEqual(parseImageDisplayAspectRatio(' 16：9 '), {
     width: 16,
     height: 9,
     label: '16:9',

@@ -20,7 +20,7 @@ export function syncStoryClipCardVideoInPlace({
   const el3 = findStoryClipCardShell(root, clipId),
     el4 = el3?.['querySelector']('.story-clip-card');
   if (!el3 || !el4) return ![];
-  el3['dataset']['storyVideoHistory'] = String(Number(resultCount) > 0x1);
+  el3['dataset']['storyVideoHistory'] = String(Number(resultCount) > 1);
   if (!refreshThumbnail) return !![];
   let el5 = el4['querySelector']('.story-clip-card-media');
   if (!thumbnailMarkup) return (el5?.['remove'](), el4['classList']['remove']('has-video-thumbnail'), !![]);
@@ -42,11 +42,11 @@ export function syncSelectedClipVideoMetadataInPlace(el6, key, index) {
     el7['querySelectorAll']('[data-story-video-result-index]')['forEach']((el8) => {
       el8['dataset']['storyVideoResultIndex'] = String(key);
     }));
-  const count = Math['max'](0x1, Number(index) || 0x1),
-    el9 = el7['querySelector']('.story-video-result-meta\x20span');
-  if (el9) el9['textContent'] = key + 0x1 + '/' + count;
+  const count = Math['max'](1, Number(index) || 1),
+    el9 = el7['querySelector']('.story-video-result-meta span');
+  if (el9) el9['textContent'] = key + 1 + '/' + count;
   return (
-    count < 0x2 &&
+    count < 2 &&
       el7['querySelectorAll']('.story-video-result-switch')['forEach']((el10) => {
         el10['remove']();
       }),

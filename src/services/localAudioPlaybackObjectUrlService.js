@@ -1,6 +1,6 @@
 import { fetchLocalMediaPlaybackBlob } from '../../api/localMediaPlaybackApi.js';
 import { createTrackedMediaObjectUrl, revokeTrackedMediaObjectUrl } from './mediaObjectUrlRegistry.js';
-const LOCAL_AUDIO_PLAYBACK_MAX_BYTES = 0x20 * 0x400 * 0x400,
+const LOCAL_AUDIO_PLAYBACK_MAX_BYTES = 32 * 1024 * 1024,
   ALLOWED_LOCAL_AUDIO_PATH = /^\/(?:output|data\/assets|data\/uploads)\//i,
   entriesBySource = new Map();
 function resolveCanonicalLocalSource(value) {
@@ -42,7 +42,7 @@ function startSharedFetch(signal, timeout) {
         !fetchLocalMediaPlaybackBlob2 ||
         signal['controller']['signal']['aborted'] ||
         entriesBySource['get'](signal['sourceUrl']) !== signal ||
-        countOwnerRefs(signal) === 0x0
+        countOwnerRefs(signal) === 0
       )
         return '';
       return (
@@ -89,7 +89,7 @@ export function releaseLocalAudioPlaybackObjectUrl(target, source) {
   if (!enabled6 || !enabled5 || !enabled6['ownerRefs']['has'](enabled5)) return ![];
   return (
     enabled6['ownerRefs']['delete'](enabled5),
-    countOwnerRefs(enabled6) === 0x0 &&
+    countOwnerRefs(enabled6) === 0 &&
       (entriesBySource['delete'](canonicalLocalSource), disposeEntry(enabled6)),
     !![]
   );
@@ -104,7 +104,7 @@ export const __localAudioPlaybackObjectUrlServiceForTest = {
       sourceUrl: sourceUrl2['sourceUrl'],
       objectUrl: sourceUrl2['objectUrl'],
       totalRefs: countOwnerRefs(sourceUrl2),
-      ownerRefs: Object['fromEntries'](Array['from'](sourceUrl2['ownerRefs'], (current) => [current, 0x1])),
+      ownerRefs: Object['fromEntries'](Array['from'](sourceUrl2['ownerRefs'], (current) => [current, 1])),
       aborted: sourceUrl2['controller']['signal']['aborted'],
     }));
   },

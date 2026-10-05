@@ -3,13 +3,13 @@ import { resolveModelExecution } from '../../manifests/index.js';
 import { isAgentEditableParamField } from './agentParameterHints.js';
 function stripMarkup(value) {
   return String(value || '')
-    ['replace'](/<[^>]*>/g, '\x20')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/<[^>]*>/g, ' ')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
 }
-function truncateText(item, key = 0x50) {
+function truncateText(item, key = 80) {
   const list = stripMarkup(item);
-  return list['length'] <= key ? list : list['slice'](0x0, Math['max'](0x0, key - 0x3)) + '...';
+  return list['length'] <= key ? list : list['slice'](0, Math['max'](0, key - 3)) + '...';
 }
 function getPlainObject(index) {
   return index && typeof index === 'object' && !Array['isArray'](index) ? index : {};
@@ -40,7 +40,7 @@ function resolveScopedValue(list2, entry = {}) {
       list2['trim'](),
     );
     if (!enabled2) return list2;
-    const el = resolveScopedExpression(enabled2[0x1], entry);
+    const el = resolveScopedExpression(enabled2[1], entry);
     return el['ok'] ? el['value'] : list2;
   }
   if (Array['isArray'](list2)) return list2['map']((record) => resolveScopedValue(record, entry));
@@ -59,37 +59,37 @@ function resolveActionArgs(options2 = {}, config = {}) {
 function formatTraceReason(scope = '') {
   const input = String(scope || ''),
     output = {
-      'selected\x20image\x20has\x20compatible\x20image-to-video\x20model':
+      'selected image has compatible image-to-video model':
         '已根据选中图片选择兼容的图生视频模型',
-      'requested\x20model\x20was\x20available\x20in\x20context': '已使用上下文中的请求模型',
-      'target\x20model\x20uiSchema\x20does\x20not\x20declare\x20removed\x20params':
+      'requested model was available in context': '已使用上下文中的请求模型',
+      'target model uiSchema does not declare removed params':
         '已移除目标模型不支持的参数',
-      'generation\x20run\x20requires\x20confirmation': '生成执行需要确认',
-      'existing\x20node\x20connection\x20change\x20requires\x20confirmation': '修改已有节点连接需要确认',
-      'existing\x20node\x20prompt\x20change\x20requires\x20confirmation': '修改已有节点 Prompt 需要确认',
-      'existing\x20node\x20generation\x20params\x20change\x20requires\x20confirmation':
+      'generation run requires confirmation': '生成执行需要确认',
+      'existing node connection change requires confirmation': '修改已有节点连接需要确认',
+      'existing node prompt change requires confirmation': '修改已有节点 Prompt 需要确认',
+      'existing node generation params change requires confirmation':
         '修改已有节点参数需要确认',
-      'existing\x20node\x20model\x20change\x20requires\x20confirmation': '修改已有节点模型需要确认',
-      'existing\x20input\x20slot\x20change\x20requires\x20confirmation': '修改已有输入槽需要确认',
-      'node\x20delete\x20requires\x20confirmation': '删除节点需要确认',
-      'large\x20batch\x20requires\x20confirmation': '批量操作数量较多，需要确认',
-      'planner\x20requested\x20confirmation': '规划器要求确认',
-      'action\x20risk\x20requires\x20confirmation': '动作风险要求确认',
-      'command\x20risk\x20requires\x20confirmation': '命令风险要求确认',
+      'existing node model change requires confirmation': '修改已有节点模型需要确认',
+      'existing input slot change requires confirmation': '修改已有输入槽需要确认',
+      'node delete requires confirmation': '删除节点需要确认',
+      'large batch requires confirmation': '批量操作数量较多，需要确认',
+      'planner requested confirmation': '规划器要求确认',
+      'action risk requires confirmation': '动作风险要求确认',
+      'command risk requires confirmation': '命令风险要求确认',
     };
   return output[input] || input || '需要确认';
 }
 function summarizeDebugTraceForConfirmation(list3 = []) {
-  if (!Array['isArray'](list3) || list3['length'] === 0x0) return [];
+  if (!Array['isArray'](list3) || list3['length'] === 0) return [];
   const list4 = [];
   for (const value3 of list3) {
     value3?.['type'] === 'contextual_default_applied' &&
       value3['field'] === 'model' &&
       list4['push']('模型选择：' + formatTraceReason(value3['reason']) + '。');
     if (value3?.['type'] === 'params_filtered') {
-      const count = Array['isArray'](value3['removedParamIds']) ? value3['removedParamIds']['length'] : 0x0;
+      const count = Array['isArray'](value3['removedParamIds']) ? value3['removedParamIds']['length'] : 0;
       list4['push'](
-        count > 0x0 ? '参数检查：已自动忽略当前模型不支持的设置。' : '参数检查：当前设置均受所选模型支持。',
+        count > 0 ? '参数检查：已自动忽略当前模型不支持的设置。' : '参数检查：当前设置均受所选模型支持。',
       );
     }
     (value3?.['type'] === 'confirmation_required' &&
@@ -100,7 +100,7 @@ function summarizeDebugTraceForConfirmation(list3 = []) {
       value3?.['type'] === 'parameter_hints_unsupported' &&
         list4['push']('参数识别：部分生成设置不受当前模型支持，已忽略。'));
   }
-  return list4['slice'](0x0, 0x6);
+  return list4['slice'](0, 6);
 }
 export function createAgentPlanLifecycle({
   readCanvasState: readCanvasState,
@@ -109,7 +109,7 @@ export function createAgentPlanLifecycle({
   isSafeAction: isSafeAction,
 } = {}) {
   if (typeof readCanvasState !== 'function' || typeof isSafeAction !== 'function')
-    throw new TypeError('[agentPlanLifecycle]\x20readCanvasState\x20and\x20isSafeAction\x20are\x20required');
+    throw new TypeError('[agentPlanLifecycle] readCanvasState and isSafeAction are required');
   function run() {
     return localeProvider?.() || 'zh-CN';
   }
@@ -149,7 +149,7 @@ export function createAgentPlanLifecycle({
       type: String(options3['type'] || ''),
       label: label(options3['type'], args),
       args: args,
-      promptSummary: truncateText(args['prompt'] || args['text'] || '', 0x3c),
+      promptSummary: truncateText(args['prompt'] || args['text'] || '', 60),
     };
   }
   function inputSource(state3 = {}, value13 = '') {
@@ -236,7 +236,7 @@ export function createAgentPlanLifecycle({
               ['map']((value27) => String(value27 || '')['trim']())
               ['filter'](Boolean)
           : [String(actionArgs['nodeId'] || '')['trim']()]['filter'](Boolean),
-      nodeId = nodeIds[0x0] || '',
+      nodeId = nodeIds[0] || '',
       value28 = readCanvasState(),
       providerHint = run2(value28, nodeId) || {},
       modelExecution = resolveModelExecution(providerHint['model'], {
@@ -260,7 +260,7 @@ export function createAgentPlanLifecycle({
       provider: String(providerHint['provider'] || modelLabel?.['provider'] || ''),
       promptSummary: truncateText(
         providerHint['prompt'] || providerHint['storyboardScript']?.['prompt'] || '',
-        0x78,
+        120,
       ),
       params: params,
       editableParams: editableParams(modelLabel, params),
@@ -290,7 +290,7 @@ export function createAgentPlanLifecycle({
   function recover(errorCode = {}, retryPlan = {}) {
     const count2 = Number(errorCode['raw']?.['result']?.['failedIndex']),
       enabled4 =
-        Number['isFinite'](count2) && count2 >= 0x0
+        Number['isFinite'](count2) && count2 >= 0
           ? retryPlan['actions']?.[count2] || null
           : retryPlan['actions']?.['find']((value32) => value32?.['type'] === 'generation.run') || null;
     if (!enabled4) return { recovery: null, retryPlan: retryPlan };
@@ -304,7 +304,7 @@ export function createAgentPlanLifecycle({
         { id: 'keepPrepared', label: cancelNotice('keepPrepared') },
       ],
     };
-    if (!Number['isFinite'](count2) || count2 < 0x0 || count2 >= retryPlan['actions']['length'])
+    if (!Number['isFinite'](count2) || count2 < 0 || count2 >= retryPlan['actions']['length'])
       return { recovery: recovery2, retryPlan: retryPlan };
     const value33 = errorCode['raw']?.['result']?.['aliases'];
     return {
@@ -314,7 +314,7 @@ export function createAgentPlanLifecycle({
         actions: retryPlan['actions']['slice'](count2),
         preExecutedActions: [
           ...(Array['isArray'](retryPlan['preExecutedActions']) ? retryPlan['preExecutedActions'] : []),
-          ...retryPlan['actions']['slice'](0x0, count2),
+          ...retryPlan['actions']['slice'](0, count2),
         ],
         scope: {
           ...(retryPlan['scope'] && typeof retryPlan['scope'] === 'object' ? retryPlan['scope'] : {}),
@@ -326,29 +326,29 @@ export function createAgentPlanLifecycle({
   function describe({ plan: plan = null, recovery: recovery = null } = {}) {
     if (recovery) {
       const value34 = recovery['failedAction']?.['label'] || recovery['failedAction']?.['type'] || '';
-      return truncateText(value34 ? '失败动作：' + value34 : '上次生成失败，可重新规划。', 0xf0);
+      return truncateText(value34 ? '失败动作：' + value34 : '上次生成失败，可重新规划。', 240);
     }
     const value35 = plan?.['confirmationSummary'] || {},
       list8 = Array['isArray'](value35['pendingActions']) ? value35['pendingActions'] : [],
       list9 = Array['isArray'](value35['completedActions']) ? value35['completedActions'] : [],
       list10 = list8['map']((value36) => value36?.['label'] || value36?.['type'] || '')
         ['filter'](Boolean)
-        ['slice'](0x0, 0x3),
+        ['slice'](0, 3),
       list11 = [];
-    if (list9['length']) list11['push']('已准备 ' + list9['length'] + '\x20步');
+    if (list9['length']) list11['push']('已准备 ' + list9['length'] + ' 步');
     if (list10['length']) list11['push']('待确认：' + list10['join']('，'));
     if (value35['generation']?.['modelLabel']) list11['push']('模型：' + value35['generation']['modelLabel']);
     return (
       value35['generation']?.['promptSummary'] &&
         list11['push']('Prompt：' + value35['generation']['promptSummary']),
-      truncateText(list11['join']('；') || plan?.['reply'] || '', 0xf0)
+      truncateText(list11['join']('；') || plan?.['reply'] || '', 240)
     );
   }
   function partition(options8 = {}) {
     const pending = Array['isArray'](options8['actions']) ? options8['actions'] : [],
       count3 = pending['findIndex']((value37) => !isSafeAction(value37));
-    if (count3 <= 0x0) return { prefix: [], pending: pending };
-    return { prefix: pending['slice'](0x0, count3), pending: pending['slice'](count3) };
+    if (count3 <= 0) return { prefix: [], pending: pending };
+    return { prefix: pending['slice'](0, count3), pending: pending['slice'](count3) };
   }
   return Object['freeze']({
     describe: describe,

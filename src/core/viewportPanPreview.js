@@ -8,16 +8,16 @@ let canvasEl = null,
   sidePlusHolderEl = null,
   sidePlusHolderInitialTransform = '',
   previewStartViewport = null;
-function toFiniteNumber(value, item = 0x0) {
+function toFiniteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function normalizeViewport(box = {}) {
-  const zoom = toFiniteNumber(box['zoom'], 0x1);
+  const zoom = toFiniteNumber(box['zoom'], 1);
   return {
-    x: toFiniteNumber(box['x'], 0x0),
-    y: toFiniteNumber(box['y'], 0x0),
-    zoom: zoom > 0x0 ? zoom : 0x1,
+    x: toFiniteNumber(box['x'], 0),
+    y: toFiniteNumber(box['y'], 0),
+    zoom: zoom > 0 ? zoom : 1,
   };
 }
 function resolveCanvasEl(value2 = null) {

@@ -12,7 +12,7 @@ import {
 const escape = (value) =>
   String(value ?? '')
     ['replaceAll']('&', '&amp;')
-    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('"', '&quot;')
     ['replaceAll']('<', '&lt;');
 export class DirectorDeliveryPanel {
   constructor(item) {
@@ -37,7 +37,7 @@ export class DirectorDeliveryPanel {
       (this['busy'] || !list['length'] ? 'disabled' : '') +
       '>清空截图历史</button>\n      <button data-storyboard-3d-action="timeline-delivery-package" ' +
       (this['busy'] ? 'disabled' : '') +
-      '>导出项目与素材</button><label>导入项目包<input\x20type=\x22file\x22\x20accept=\x22.aic3d\x22\x20data-director-package-file\x20' +
+      '>导出项目与素材</button><label>导入项目包<input type="file" accept=".aic3d" data-director-package-file ' +
       (this['busy'] ? 'disabled' : '') +
       '></label>\n    </div>' +
       (this['busy']
@@ -48,15 +48,15 @@ export class DirectorDeliveryPanel {
         (error) =>
           '<label><input type="checkbox" data-director-screenshot="' +
           escape(error['assetId']) +
-          '\x22\x20' +
+          '" ' +
           (this['selected']['has'](error['assetId']) ? 'checked' : '') +
           '>' +
           escape(error['name']) +
           ' · ' +
-          error['time']['toFixed'](0x2) +
+          error['time']['toFixed'](2) +
           's</label><button data-storyboard-3d-action="timeline-delivery-preview" data-asset-id="' +
           escape(error['assetId']) +
-          '\x22\x20' +
+          '" ' +
           (this['busy'] ? 'disabled' : '') +
           '>查看截图</button>',
       )['join']('') || '尚未保存截图') +
@@ -64,11 +64,11 @@ export class DirectorDeliveryPanel {
       (this['preview']
         ? '<figure class="storyboard-3d-director-screenshot"><img src="' +
           escape(this['preview']['url']) +
-          '\x22\x20alt=\x22' +
+          '" alt="' +
           escape(this['preview']['name']) +
           '"><button data-storyboard-3d-action="timeline-delivery-close-preview">收起截图</button></figure>'
         : '') +
-      '\x0a\x20\x20\x20\x20<details><summary>回收站\x20·\x20' +
+      '\n    <details><summary>回收站 · ' +
       (project['recycleBin'] || [])['length'] +
       ' 项（保留最近 20 次）</summary>' +
       (project['recycleBin'] || [])
@@ -93,7 +93,7 @@ export class DirectorDeliveryPanel {
   ['change'](event) {
     const el = event['target'];
     if (el['matches']?.('[data-director-package-file]')) {
-      const options = el['files']?.[0x0];
+      const options = el['files']?.[0];
       el['value'] = '';
       if (options)
         void this['run']('正在导入项目与素材…', async () => {

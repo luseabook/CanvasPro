@@ -29,7 +29,7 @@ export function syncRendererBridge(enabled, value = {}) {
     delete enabled['v2Renderer']['wrapperMap'],
     Object['assign'](enabled['v2Renderer'], {
       getMountedNodeCount() {
-        return wrapperMap?.['size'] || 0x0;
+        return wrapperMap?.['size'] || 0;
       },
       isNodeMounted(item) {
         return !!(item && mountedNodeIds?.['has']?.(item) && wrapperMap?.['get']?.(item)?.['isConnected']);
@@ -48,7 +48,7 @@ export function syncRendererBridge(enabled, value = {}) {
           el3 = options?.['el'] || this['getMountedWrapper'](result);
         return data ? el3?.['querySelector']?.(data) || null : el3 || null;
       },
-      highlightDropSlot(enabled3, { kind: kind = '', index: index = -0x1 } = {}) {
+      highlightDropSlot(enabled3, { kind: kind = '', index: index = -1 } = {}) {
         if (!enabled3) return ![];
         const target = componentMap?.['get']?.(enabled3);
         if (kind === 'storyboard' && typeof target?.['highlightCell'] === 'function')
@@ -62,8 +62,8 @@ export function syncRendererBridge(enabled, value = {}) {
         const source = componentMap?.['get']?.(enabled4);
         let next = ![];
         return (
-          typeof source?.['highlightCell'] === 'function' && (source['highlightCell'](-0x1), (next = !![])),
-          typeof source?.['highlightSlot'] === 'function' && (source['highlightSlot'](-0x1), (next = !![])),
+          typeof source?.['highlightCell'] === 'function' && (source['highlightCell'](-1), (next = !![])),
+          typeof source?.['highlightSlot'] === 'function' && (source['highlightSlot'](-1), (next = !![])),
           next
         );
       },

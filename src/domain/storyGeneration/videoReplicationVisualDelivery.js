@@ -37,7 +37,7 @@ export function projectReplicationObservedShots(
             !list['length'] ||
             payload['has'](state['subject']) ||
             [...String(state['subject'] || '')['matchAll'](/[（(]([^（）()]+)[）)]/gu)]['some']((config) =>
-              payload['has'](config[0x1]),
+              payload['has'](config[1]),
             ),
         )
         ['map']((scope) =>
@@ -55,10 +55,10 @@ export function projectReplicationObservedShots(
             value4['kind'] === 'character' &&
             (value2 ? value4['id'] === value2 : value4['replicationSource']?.['ref'] === error2['id']),
         );
-      return value3['length'] === 0x1 && error2['name'] && value3[0x0]['name'] !== error2['name']
-        ? [[error2['name'], value3[0x0]['name']]]
+      return value3['length'] === 1 && error2['name'] && value3[0]['name'] !== error2['name']
+        ? [[error2['name'], value3[0]['name']]]
         : [];
-    })['sort']((value5, value6) => value6[0x0]['length'] - value5[0x0]['length']),
+    })['sort']((value5, value6) => value6[0]['length'] - value5[0]['length']),
     handler2 = (value7) => {
       const value8 = String(value7 || '');
       if (!enabled['length']) return value8;
@@ -70,8 +70,8 @@ export function projectReplicationObservedShots(
     },
     handler3 = isStorySeedance25PromptMode(value['promptMode'] || project['planning']?.['promptMode'])
       ? Math['round']
-      : (value13) => Number(value13['toFixed'](0x3));
-  let value14 = 0x0;
+      : (value13) => Number(value13['toFixed'](3));
+  let value14 = 0;
   const value15 = value['shots']['map']((args2) => ({
       ...args2,
       startSec: value14,
@@ -82,11 +82,11 @@ export function projectReplicationObservedShots(
   for (const [value16, value17] of map['entries']()) {
     const value18 = handler3(Math['max'](key, value17['startSec']) - key),
       value19 =
-        value16 === map['length'] - 0x1
+        value16 === map['length'] - 1
           ? Number(item['durationSec'])
           : handler3(Math['min'](index, value17['endSec']) - key);
     if (value19 <= value18) {
-      if (list2['length']) list2['at'](-0x1)['sources']['push'](value17);
+      if (list2['length']) list2['at'](-1)['sources']['push'](value17);
       else args3['push'](value17);
       continue;
     }
@@ -97,11 +97,11 @@ export function projectReplicationObservedShots(
         value15['map']((value21) => ({
           shot: value21,
           overlap: Math['min'](to, value21['endSec']) - Math['max'](from2, value21['startSec']),
-        }))['sort']((value22, value23) => value23['overlap'] - value22['overlap'])[0x0]?.['shot'] || {},
-      value24 = sources[0x0],
-      value25 = sources['at'](-0x1),
+        }))['sort']((value22, value23) => value23['overlap'] - value22['overlap'])[0]?.['shot'] || {},
+      value24 = sources[0],
+      value25 = sources['at'](-1),
       list3 = [...(args4['assetUsages'] || [])],
-      value26 = sources['map']((value27) => handler2(value27['visual']))['join']('\x0a');
+      value26 = sources['map']((value27) => handler2(value27['visual']))['join']('\n');
     for (const value28 of assets['filter'](
       (value29) => value29['kind'] === 'character' && value29['name'] && value26['includes'](value29['name']),
     )) {
@@ -112,9 +112,9 @@ export function projectReplicationObservedShots(
       );
       if (
         args5['length'] &&
-        new Set(args5['map']((value34) => value34['appearanceRef'] || ''))['size'] === 0x1
+        new Set(args5['map']((value34) => value34['appearanceRef'] || ''))['size'] === 1
       )
-        list3['push']({ ...args5[0x0] });
+        list3['push']({ ...args5[0] });
     }
     const args6 = replicationVisualFields(value24);
     for (const value35 of ['spatialStart', 'spatialEnd'])
@@ -127,17 +127,17 @@ export function projectReplicationObservedShots(
       ...args4,
       ...args6,
       assetUsages: list3,
-      id: value['ref'] + '-observed-' + (value20 + 0x1),
+      id: value['ref'] + '-observed-' + (value20 + 1),
       startSec: from2,
       endSec: to,
       durationSec: to - from2,
       visual: sources['map']((value39) => handler2(value39['visual']))
         ['filter'](Boolean)
-        ['join']('\x0a'),
+        ['join']('\n'),
       camera: sources['map']((value40) => handler2(value40['camera']))
         ['filter'](Boolean)
-        ['join']('\x0a'),
-      audio: [...new Set(sources['map']((value41) => value41['sound'])['filter'](Boolean))]['join']('\x0a'),
+        ['join']('\n'),
+      audio: [...new Set(sources['map']((value41) => value41['sound'])['filter'](Boolean))]['join']('\n'),
       dialogue: '',
       voiceover: '',
       replicationSourceShotIds: sources['map']((value42) => value42['id']),

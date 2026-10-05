@@ -183,7 +183,7 @@ installRendererRuntimeDiagnosticAccess((nodeId) => {
     parked: _parkedNodeIds['has'](nodeId),
     rendererMediaDeferred: rendererMediaDeferred?.['_rendererMediaDeferred'] === !![],
     pinReasons: Array['from'](_nodePinReasons['get'](nodeId) || []),
-    wrapperVideoCount: wrapperVideoCount?.['querySelectorAll']?.('video')?.['length'] || 0x0,
+    wrapperVideoCount: wrapperVideoCount?.['querySelectorAll']?.('video')?.['length'] || 0,
     ..._rendererRuntimeDiagnosticRenderState,
   };
 });
@@ -255,13 +255,13 @@ function _markRasterMediaInteractionBusy() {
 function _releaseRasterMediaInteractionBusy() {
   (_rasterPreviewCoordinator['setMediaLoadingBusy'](![]), _schedulePreparedMediaRuntimeCommit?.());
 }
-const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 0x2,
-  RENDERER_VIDEO_MEDIA_RESIDENCY_PADDING = 0x78,
-  RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_MS = 0x258,
-  RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_LIMIT = 0x3,
-  RENDERER_FULL_SURFACE_RELEASE_BATCH_SIZE = 0xc,
-  RENDERER_FULL_SURFACE_RELEASE_FRAME_BUDGET_MS = 0x4,
-  VISIBLE_VIDEO_STRUCTURAL_RECONCILE_DELAY_MS = 0x0,
+const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 2,
+  RENDERER_VIDEO_MEDIA_RESIDENCY_PADDING = 120,
+  RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_MS = 600,
+  RENDERER_INACTIVE_PRESENTED_MEDIA_LEASE_LIMIT = 3,
+  RENDERER_FULL_SURFACE_RELEASE_BATCH_SIZE = 12,
+  RENDERER_FULL_SURFACE_RELEASE_FRAME_BUDGET_MS = 4,
+  VISIBLE_VIDEO_STRUCTURAL_RECONCILE_DELAY_MS = 0,
   _mediaPresentation = createRendererMediaPresentationCoordinator({
     getNode: (input) => _currentSnapshot?.['nodes']?.[input],
     getComponent: (output) => _componentMap['get'](output),
@@ -271,7 +271,7 @@ const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 0x2,
     getParkedWrappers: () => _parkedWrapperMap['values'](),
     isMounted: (value4) => _mountedNodeIds['has'](value4),
     isInteractionBusy: _rendererInteractionGrace['isBusy'],
-    isPinned: (value5) => _getNodePinSet(value5, ![])?.['size'] > 0x0,
+    isPinned: (value5) => _getNodePinSet(value5, ![])?.['size'] > 0,
     isSelected: (value6) => {
       const list = _currentSnapshot?.['selectedNodeIds'];
       return Array['isArray'](list)
@@ -312,17 +312,17 @@ const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 0x2,
   _edgeDomCache = _edgeLayer['getDomCache'](),
   _nodeToEdgeIds = new Map(),
   _incomingEdgeIdsByTarget = new Map(),
-  FULL_ELIGIBLE_VISIBLE_IMAGE_RECONCILE_DELAY_MS = 0x0,
-  FULL_ELIGIBLE_VISIBLE_IMAGE_SETTLED_BUDGET_DELAY_MS = 0xdc,
-  HIGH_ZOOM_STALE_WARMUP_PRELOAD_CANCEL_PRIORITY_LIMIT = 0x96,
-  HIGH_ZOOM_STALE_FAST_PREVIEW_PRELOAD_CANCEL_PRIORITY_LIMIT = 0x50,
-  HIGH_ZOOM_STALE_PRELOAD_CANCEL_THROTTLE_MS = 0xdc,
-  VIEWPORT_INTERACTION_PRELOAD_CANCEL_THROTTLE_MS = 0xb4,
-  VIEWPORT_INTERACTION_WARMUP_CANCEL_PRIORITY_LIMIT = 0x96,
-  VIEWPORT_INTERACTION_FAST_PREVIEW_CANCEL_PRIORITY_LIMIT = 0x50;
-let _lastHighZoomStalePreloadCancelAt = 0x0,
-  _lastViewportInteractionPreloadCancelAt = 0x0,
-  _lastViewportJumpAt = 0x0;
+  FULL_ELIGIBLE_VISIBLE_IMAGE_RECONCILE_DELAY_MS = 0,
+  FULL_ELIGIBLE_VISIBLE_IMAGE_SETTLED_BUDGET_DELAY_MS = 220,
+  HIGH_ZOOM_STALE_WARMUP_PRELOAD_CANCEL_PRIORITY_LIMIT = 150,
+  HIGH_ZOOM_STALE_FAST_PREVIEW_PRELOAD_CANCEL_PRIORITY_LIMIT = 80,
+  HIGH_ZOOM_STALE_PRELOAD_CANCEL_THROTTLE_MS = 220,
+  VIEWPORT_INTERACTION_PRELOAD_CANCEL_THROTTLE_MS = 180,
+  VIEWPORT_INTERACTION_WARMUP_CANCEL_PRIORITY_LIMIT = 150,
+  VIEWPORT_INTERACTION_FAST_PREVIEW_CANCEL_PRIORITY_LIMIT = 80;
+let _lastHighZoomStalePreloadCancelAt = 0,
+  _lastViewportInteractionPreloadCancelAt = 0,
+  _lastViewportJumpAt = 0;
 const SELECTION_RELATED_HIGHLIGHT_COLORS = Object['freeze']([
   'white',
   'blue',
@@ -339,7 +339,7 @@ function cancelStaleLowPriorityPreloadsForHighZoom(value7) {
       ? performance['now']()
       : Date['now']();
   if (
-    _lastHighZoomStalePreloadCancelAt > 0x0 &&
+    _lastHighZoomStalePreloadCancelAt > 0 &&
     value8 - _lastHighZoomStalePreloadCancelAt < HIGH_ZOOM_STALE_PRELOAD_CANCEL_THROTTLE_MS
   )
     return;
@@ -362,7 +362,7 @@ function cancelQueuedViewportInteractionPreloads(value9) {
       ? performance['now']()
       : Date['now']();
   if (
-    _lastViewportInteractionPreloadCancelAt > 0x0 &&
+    _lastViewportInteractionPreloadCancelAt > 0 &&
     value10 - _lastViewportInteractionPreloadCancelAt < VIEWPORT_INTERACTION_PRELOAD_CANCEL_THROTTLE_MS
   )
     return;
@@ -412,8 +412,8 @@ function isRendererMediaRuntimeInteractionPriority({
     pickMode?.['hoverNodeId'] === nodeId5
   );
 }
-let _edgeIndexRev = -0x1,
-  _edgeEntriesRev = -0x1,
+let _edgeIndexRev = -1,
+  _edgeEntriesRev = -1,
   _edgeEntriesSource = null,
   _edgeEntriesCache = [],
   _cachedContainerWidth = null,
@@ -436,7 +436,7 @@ function _getNodePinSet(value11, value12 = ![]) {
 function _getPinnedNodeIds() {
   const value13 = new Set();
   for (const [value14, value15] of _nodePinReasons['entries']()) {
-    value15 && value15['size'] > 0x0 && value13['add'](value14);
+    value15 && value15['size'] > 0 && value13['add'](value14);
   }
   return value13;
 }
@@ -446,7 +446,7 @@ function _clearNodePin(value16) {
 function _clearAnchoredUiForNode(enabled2) {
   if (!enabled2) return;
   const value17 = _componentMap['get'](enabled2);
-  value17 && typeof value17['highlightCell'] === 'function' && value17['highlightCell'](-0x1);
+  value17 && typeof value17['highlightCell'] === 'function' && value17['highlightCell'](-1);
 }
 function _resolveVideoMediaLeaseKey(value18, value19) {
   const value20 = _sourceVideoSlotLifecycle['isManagedNode'](value18)
@@ -498,7 +498,7 @@ function _mountNode(value23, el2) {
 }
 function _flushMountBatch(el4, enabled3) {
   if (!el4 || !enabled3) return;
-  if (enabled3['childNodes'] && enabled3['childNodes']['length'] === 0x0) return;
+  if (enabled3['childNodes'] && enabled3['childNodes']['length'] === 0) return;
   el4['appendChild'](enabled3);
 }
 function _destroyNode(value24) {
@@ -575,7 +575,7 @@ function _syncRendererBridge() {
       const map = _getNodePinSet(nodeId7, ![]);
       if (!map) return;
       (map['delete'](String(value30 || 'src/ui/')),
-        map['size'] === 0x0 &&
+        map['size'] === 0 &&
           (_nodePinReasons['delete'](nodeId7), _schedulePreparedMediaRuntimeCommit?.()),
         _rendererRuntimeDiagnosticsEnabled &&
           recordRendererRuntimeDiagnostic({
@@ -609,7 +609,7 @@ function _rebuildEdgeIndex(value31) {
   }
 }
 function _ensureEdgeIndex(value34, value35) {
-  const value36 = typeof value35 === 'number' ? value35 : 0x0;
+  const value36 = typeof value35 === 'number' ? value35 : 0;
   if (value36 === _edgeIndexRev) return;
   const value37 = value34 || {},
     value38 = Object['values'](value37);
@@ -621,7 +621,7 @@ function _ensureEdgeIndex(value34, value35) {
 }
 function _getEdgeEntries(value39, value40) {
   const value41 = typeof value40 === 'number',
-    value42 = value41 ? value40 : 0x0,
+    value42 = value41 ? value40 : 0,
     value43 = value41
       ? value42 === _edgeEntriesRev
       : value42 === _edgeEntriesRev && value39 === _edgeEntriesSource;
@@ -638,7 +638,7 @@ function _buildSelectionRelatedSets(value44, value45) {
       value44 instanceof Set ? value44 : new Set(Array['isArray'](value44) ? value44 : []),
     relatedNodeIds = new Set(),
     relatedEdgeIds = new Set();
-  if (map2['size'] === 0x0) return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
+  if (map2['size'] === 0) return { relatedNodeIds: relatedNodeIds, relatedEdgeIds: relatedEdgeIds };
   for (const value46 of map2) {
     const enabled9 = _nodeToEdgeIds['get'](value46);
     if (!enabled9) continue;
@@ -696,9 +696,9 @@ function _getEdgeContainerSize(value57) {
     box = _getCachedContainerSize(_containerSizeSourceEl || value57),
     _nowMs3 = _nowMs();
   return {
-    containerW: Number['isFinite'](box['width']) ? box['width'] : 0x0,
-    containerH: Number['isFinite'](box['height']) ? box['height'] : 0x0,
-    layoutReadMs: Math['max'](0x0, _nowMs3 - _nowMs2),
+    containerW: Number['isFinite'](box['width']) ? box['width'] : 0,
+    containerH: Number['isFinite'](box['height']) ? box['height'] : 0,
+    layoutReadMs: Math['max'](0, _nowMs3 - _nowMs2),
   };
 }
 function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = ![] } = {}) {
@@ -717,10 +717,10 @@ function _collectMovedNodeIds(state2, value59) {
   if (value60) map3['add'](value60);
   const value61 = state2['_parentToChildren'] || {},
     list3 = Array['from'](map3);
-  for (let value62 = 0x0; value62 < list3['length']; value62++) {
+  for (let value62 = 0; value62 < list3['length']; value62++) {
     const value63 = list3[value62],
       enabled16 = value61[value63];
-    if (!enabled16 || enabled16['size'] === 0x0) continue;
+    if (!enabled16 || enabled16['size'] === 0) continue;
     for (const value64 of enabled16) {
       !map3['has'](value64) && (map3['add'](value64), list3['push'](value64));
     }
@@ -730,11 +730,11 @@ function _collectMovedNodeIds(state2, value59) {
 function _resolveDragRenderOffset(value65, enabled17) {
   if (!enabled17?.['isDragging']) return null;
   const movedNodeIds = _collectMovedNodeIds(value65, enabled17);
-  if (!movedNodeIds || movedNodeIds['size'] === 0x0) return null;
+  if (!movedNodeIds || movedNodeIds['size'] === 0) return null;
   return {
     movedNodeIds: movedNodeIds,
-    dx: Number['isFinite'](enabled17['pendingDx']) ? enabled17['pendingDx'] : 0x0,
-    dy: Number['isFinite'](enabled17['pendingDy']) ? enabled17['pendingDy'] : 0x0,
+    dx: Number['isFinite'](enabled17['pendingDx']) ? enabled17['pendingDx'] : 0,
+    dy: Number['isFinite'](enabled17['pendingDy']) ? enabled17['pendingDy'] : 0,
   };
 }
 export function clearRendererCache() {
@@ -754,8 +754,8 @@ export function clearRendererCache() {
     _selectionOverlay['reset'](),
     _nodeToEdgeIds['clear'](),
     _incomingEdgeIdsByTarget['clear'](),
-    (_edgeIndexRev = -0x1),
-    (_edgeEntriesRev = -0x1),
+    (_edgeIndexRev = -1),
+    (_edgeEntriesRev = -1),
     (_edgeEntriesSource = null),
     (_edgeEntriesCache = []),
     clearCachedEdgeVisibilityIndex(),
@@ -777,7 +777,7 @@ export function clearRendererCache() {
     (_containerSizeSourceEl = null),
     _rendererInteractionGrace['reset'](),
     _viewportJumpDetector['reset'](),
-    (_lastViewportJumpAt = 0x0),
+    (_lastViewportJumpAt = 0),
     clearRendererViewportMediaPreloadPause(),
     _nodePinReasons['clear'](),
     _pendingNodeDataMap['clear'](),
@@ -806,8 +806,8 @@ export function refreshManifestModelNodeUis() {
   return { refreshedNodeIds: refreshedNodeIds, remountedNodeIds: remountedNodeIds };
 }
 ((window['_edgeDomCache'] = _edgeDomCache), _syncRendererBridge());
-function _isNodeVisible(value71, value72, value73, value74, value75 = 0x0, value76 = 0x0) {
-  return isNodeInsideViewportPadding(value71, value72, value73, value74, 0xc8, value75, value76);
+function _isNodeVisible(value71, value72, value73, value74, value75 = 0, value76 = 0) {
+  return isNodeInsideViewportPadding(value71, value72, value73, value74, 200, value75, value76);
 }
 function _renderCullingOnly(value77, value78, value79, value80 = {}) {
   const enabled19 = value80?.['hideInvisible'] !== ![],
@@ -873,12 +873,12 @@ export function initRenderer(containerEl, canvasEl, value82) {
       (_mediaPresentation['resume'](), _rendererMediaRuntimePreparer['resume']());
     },
   });
-  let value86 = -0x1,
-    value87 = -0x1,
-    value88 = -0x1;
+  let value86 = -1,
+    value87 = -1,
+    value88 = -1;
   const run3 = (value89, value90) =>
     Number['isFinite'](value89?.['_nodeMembershipRev']) ? value89['_nodeMembershipRev'] : value90;
-  let count = 0x0,
+  let count = 0,
     setTimeout2 = null,
     requestAnimationFrame2 = null,
     value91 = !![],
@@ -944,12 +944,12 @@ export function initRenderer(containerEl, canvasEl, value82) {
             });
           });
         },
-        Math['max'](0x0, value94),
+        Math['max'](0, value94),
       )));
   }
   const value95 = () => {
     if (requestAnimationFrame2 !== null && value91) return;
-    scheduleDeferredReconcile(0x0);
+    scheduleDeferredReconcile(0);
   };
   _schedulePreparedMediaRuntimeCommit = value95;
   const rendererSelectionFastPath = createRendererSelectionFastPath({
@@ -963,7 +963,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       consumeViewport: (value97) => _viewportJumpDetector['consume'](value97),
       flushSelectionUpdate: (value98, value99) => run5(value98, value99),
       renderAffectedEdges: (value100, pathStyle, value101) => {
-        if (value100['size'] === 0x0 || pathStyle['ui']?.['connectionLinesVisible'] === ![]) return;
+        if (value100['size'] === 0 || pathStyle['ui']?.['connectionLinesVisible'] === ![]) return;
         _renderEdgesByIds(
           svgEl,
           value100,
@@ -1019,7 +1019,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
           ? viewport2['_nodeCount']
           : Object['keys'](viewport2['nodes'] || {})['length'],
       value106 = run3(viewport2, nodeCount),
-      edgesRev = typeof viewport2['_edgesRev'] === 'number' ? viewport2['_edgesRev'] : 0x0,
+      edgesRev = typeof viewport2['_edgesRev'] === 'number' ? viewport2['_edgesRev'] : 0,
       geometryRev = Number['isFinite'](viewport2['_nodeGeometryRev'])
         ? viewport2['_nodeGeometryRev']
         : Number['isFinite'](viewport2['_persistRev'])
@@ -1075,13 +1075,13 @@ export function initRenderer(containerEl, canvasEl, value82) {
     else enabled21 && (enabled21 = ![]);
     const {
         hasPendingStructuralOps: hasPendingStructuralOps,
-        deferredParkCount: deferredParkCount = 0x0,
+        deferredParkCount: deferredParkCount = 0,
         hasPendingVisibleVideoMounts: hasPendingVisibleVideoMounts = ![],
         hasPendingFullEligibleVisibleImageMounts: hasPendingFullEligibleVisibleImageMounts = ![],
       } = value107
         ? {
             hasPendingStructuralOps: ![],
-            deferredParkCount: 0x0,
+            deferredParkCount: 0,
             hasPendingVisibleVideoMounts: ![],
             hasPendingFullEligibleVisibleImageMounts: ![],
           }
@@ -1103,9 +1103,9 @@ export function initRenderer(containerEl, canvasEl, value82) {
             {
               mode: renderMode,
               deferHeavyMediaMount: deferHeavyMediaMount,
-              deferParking: remainingMs > 0x0,
+              deferParking: remainingMs > 0,
               fullImageSettleReady:
-                _lastViewportJumpAt <= 0x0 ||
+                _lastViewportJumpAt <= 0 ||
                 _nowMs() - _lastViewportJumpAt >= FULL_ELIGIBLE_VISIBLE_IMAGE_SETTLED_BUDGET_DELAY_MS,
               deferInitialRasterPlanning: deferInitialRasterPlanning,
               framePlan: framePlan2,
@@ -1207,7 +1207,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
               if (!enabled26) continue;
               for (const value111 of enabled26) value109['add'](value111);
             }
-            if (value109['size'] > 0x0)
+            if (value109['size'] > 0)
               _renderEdgesByIds(
                 svgEl,
                 value109,
@@ -1220,7 +1220,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
                 { containerSize: containerW2 || null, pathStyle: edgePathStyle },
               );
             else {
-              if (!enabled25 || enabled25['size'] === 0x0) {
+              if (!enabled25 || enabled25['size'] === 0) {
                 const args5 = run7(![]);
                 args5 &&
                   _renderEdges(
@@ -1267,11 +1267,11 @@ export function initRenderer(containerEl, canvasEl, value82) {
         hasPendingStructuralOps: hasPendingStructuralOps,
       });
       ((value92 = edgeOnlySnapshot2 ? viewport2 : null),
-        scheduleDeferredReconcile(0x0, { bypassInteractionGrace: !![], edgeOnlySnapshot: edgeOnlySnapshot2 ? viewport2 : null }));
+        scheduleDeferredReconcile(0, { bypassInteractionGrace: !![], edgeOnlySnapshot: edgeOnlySnapshot2 ? viewport2 : null }));
     } else {
       if (hasPendingStructuralOps) {
         const rendererLowZoomMountLimit =
-          resolveRendererLowZoomMountLimit({ viewport: viewport2['viewport'], nodeCount: nodeCount }) > 0x0;
+          resolveRendererLowZoomMountLimit({ viewport: viewport2['viewport'], nodeCount: nodeCount }) > 0;
         scheduleDeferredReconcile(
           Math['min'](
             getRendererStructuralReconcileDelayMs(nodeCount),
@@ -1280,12 +1280,12 @@ export function initRenderer(containerEl, canvasEl, value82) {
               : hasPendingFullEligibleVisibleImageMounts
                 ? FULL_ELIGIBLE_VISIBLE_IMAGE_RECONCILE_DELAY_MS
                 : rendererLowZoomMountLimit
-                  ? 0x168
-                  : 0x60,
+                  ? 360
+                  : 96,
           ),
           { bypassInteractionGrace: hasPendingFullEligibleVisibleImageMounts === !![] },
         );
-      } else remainingMs > 0x0 && scheduleDeferredReconcile(remainingMs + 0x10);
+      } else remainingMs > 0 && scheduleDeferredReconcile(remainingMs + 16);
     }
     rendererSelectionFastPath['rememberRenderedSnapshot'](viewport2);
   }
@@ -1295,7 +1295,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       value112 =
         isPerfProbeEnabled2 && typeof performance !== 'undefined' && typeof performance['now'] === 'function'
           ? performance['now']()
-          : 0x0;
+          : 0;
     let mode2 = 'steady';
     try {
       const interactionState = getInteractionRenderState(),
@@ -1310,7 +1310,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
             ? snapshot['_nodeCount']
             : Object['keys'](snapshot['nodes'] || {})['length'],
         value113 = run3(snapshot, nodeCount2),
-        value114 = typeof snapshot['_edgesRev'] === 'number' ? snapshot['_edgesRev'] : 0x0,
+        value114 = typeof snapshot['_edgesRev'] === 'number' ? snapshot['_edgesRev'] : 0,
         value115 =
           (interactionState['isDragging'] || interactionState['isDraggingCell']) && interactionState['isCommittingDrag'] !== !![],
         enabled27 = nodeCount2 !== value86 || value113 !== value87,
@@ -1369,7 +1369,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       if (interactionActive['isPanning']) {
         (_rendererInteractionGrace['markBusy'](), (mode2 = 'panning'));
         const value120 = performance['now']();
-        value120 - count > 0x50 &&
+        value120 - count > 80 &&
           ((count = value120), _renderCullingOnly(canvasEl, snapshot['nodes'], viewport3));
         if (svgWrapper['style']['display'] === 'none') svgWrapper['style']['display'] = '';
         scheduleDeferredReconcile(viewportInteractionReconcileDelay);
@@ -1510,7 +1510,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       selectedNodeSet = new Set(value127),
       selectedNodeRankMap = buildSelectedNodeRankMap(value127),
       value128 = parentToChildren['edges'] || {},
-      value129 = typeof parentToChildren['_edgesRev'] === 'number' ? parentToChildren['_edgesRev'] : 0x0;
+      value129 = typeof parentToChildren['_edgesRev'] === 'number' ? parentToChildren['_edgesRev'] : 0;
     _ensureEdgeIndex(value128, value129);
     const value130 =
         parentToChildren['ui']?.['selectionRelatedHighlightEnabled'] === ![]
@@ -1520,7 +1520,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       relatedHighlightColor = _normalizeSelectionRelatedHighlightColor(
         parentToChildren['ui']?.['selectionRelatedHighlightColor'],
       ),
-      viewport4 = parentToChildren['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 },
+      viewport4 = parentToChildren['viewport'] || { x: 0, y: 0, zoom: 1 },
       { width: width2, height: height2 } = _getCachedContainerSize(
         canvasEl['parentElement'] || canvasEl,
       ),
@@ -1662,7 +1662,7 @@ function _getIncomingEdgeSignature(value141, value142, value143) {
       const enabled33 = value142?.[value147];
       if (!enabled33 || enabled33['targetId'] !== value146) continue;
       const value148 = value143?.[enabled33['sourceId']],
-        value149 = typeof value148?.['_bizRev'] === 'number' ? value148['_bizRev'] : 0x0,
+        value149 = typeof value148?.['_bizRev'] === 'number' ? value148['_bizRev'] : 0,
         value150 = String(enabled33['refSlot'] || ''),
         _buildGroupOutputOrderSignature2 = _buildGroupOutputOrderSignature(enabled33, value141);
       list7['push'](
@@ -1800,8 +1800,8 @@ function _syncMountedNodePresentation({
       node6['x'] + ',' + node6['y'] + ',' + node6['width'] + ',' + node6['height'],
     positionChanged = wrapperEl2['_posKey'] !== value158,
     active2 = dragContext3?.['isDragging'] && dragTargets4 && dragTargets4['has'](nodeId10),
-    offsetX = active2 ? (Number['isFinite'](dragContext3['pendingDx']) ? dragContext3['pendingDx'] : 0x0) : 0x0,
-    offsetY = active2 ? (Number['isFinite'](dragContext3['pendingDy']) ? dragContext3['pendingDy'] : 0x0) : 0x0,
+    offsetX = active2 ? (Number['isFinite'](dragContext3['pendingDx']) ? dragContext3['pendingDx'] : 0) : 0,
+    offsetY = active2 ? (Number['isFinite'](dragContext3['pendingDy']) ? dragContext3['pendingDy'] : 0) : 0,
     visible2 = _isNodeVisible(node6, viewport5, containerW3, containerH2, offsetX, offsetY),
     value159 = _componentMap['get'](nodeId10);
   mediaLodMode === null && syncNodeMediaLodMode(wrapperEl2, node6, viewport5);
@@ -1845,7 +1845,7 @@ function _syncMountedNodePresentation({
           recordRendererLifecycleSkippedUpdate(lifecycleStats));
       else {
         _nodeDataSnapshotMap['set'](nodeId10, signature3);
-        const value161 = lifecycleStats ? _nowMs() : 0x0;
+        const value161 = lifecycleStats ? _nowMs() : 0;
         (value159['update'](node6),
           (didUpdate = !![]),
           lifecycleStats &&
@@ -1938,10 +1938,10 @@ function _syncMountedNodePresentation({
     typeof value159['syncSelectionState'] === 'function' &&
     value159['syncSelectionState']({
       selected: isSelected6,
-      singleSelected: selectedNodeSet3['size'] === 0x1,
+      singleSelected: selectedNodeSet3['size'] === 1,
       visible: !![],
     });
-  const rendererNodeZIndex = getRendererNodeZIndex(node6, isSelected6, selectedNodeRankMap3?.['get']?.(nodeId10) ?? -0x1, {
+  const rendererNodeZIndex = getRendererNodeZIndex(node6, isSelected6, selectedNodeRankMap3?.['get']?.(nodeId10) ?? -1, {
     isFocused: focused2,
   });
   syncRendererNodePresentationZIndex(wrapperEl2, rendererNodeZIndex);
@@ -1998,9 +1998,9 @@ function _syncMountedNodePresentation({
         height3 = Number(node6['videoHeight']),
         enabled35 =
           Number['isFinite'](fps) &&
-          fps > 0x0 &&
+          fps > 0 &&
           Number['isFinite'](frames) &&
-          frames > 0x0,
+          frames > 0,
         value170 = enabled35 ? '1' : '0';
       el20['dataset']['visible'] !== value170 && (el20['dataset']['visible'] = value170);
       if (!enabled35 && typeof value159?.['requestVideoMetaForNodeInfo'] === 'function')
@@ -2023,7 +2023,7 @@ function _syncMountedNodePresentation({
         ? ((deferredUpdate = !![]), recordRendererLifecycleSkippedUpdate(lifecycleStats))
         : _nodeDataSnapshotMap['set'](nodeId10, signature3);
     if (!skipInstanceUpdate && !deferInstanceUpdate) {
-      const value171 = lifecycleStats ? _nowMs() : 0x0;
+      const value171 = lifecycleStats ? _nowMs() : 0;
       (value159['update'](node6), (didUpdate = !![]));
       if (lifecycleStats) {
         const breakdown = value159?.['_lastUpdatePerfBreakdown'] || null;
@@ -2055,8 +2055,8 @@ function _syncMountedNodePresentation({
       wrapperEl2['classList']['add']('conn-hoverTarget');
       const value174 = window['getComputedStyle'](wrapperEl2)['borderRadius'];
       let count2 = parseFloat(value174);
-      if (isNaN(count2) || count2 <= 0x0) count2 = 0x10;
-      wrapperEl2['style']['setProperty']('--hover-br', count2 + 0x4 + 'px');
+      if (isNaN(count2) || count2 <= 0) count2 = 16;
+      wrapperEl2['style']['setProperty']('--hover-br', count2 + 4 + 'px');
     }
     let value175 = ![];
     if (connOverlay3 && connOverlay3['side'] === 'left') value175 = !![];
@@ -2091,7 +2091,7 @@ function _renderNodesImpl(
   interactionBusy = {},
 ) {
   const pickConnectMode = value176,
-    viewport6 = value177 || { x: 0x0, y: 0x0, zoom: 0x1 },
+    viewport6 = value177 || { x: 0, y: 0, zoom: 1 },
     value181 = value178 || {},
     parentToChildren2 = value179 || {},
     showVideoMeta4 = value180 !== ![],
@@ -2104,7 +2104,7 @@ function _renderNodesImpl(
       selectedNodeSet: selectedNodeSet4,
       parentToChildren: parentToChildren2,
     }),
-    value183 = _rendererRuntimeDiagnosticsEnabled ? _nowMs() : 0x0,
+    value183 = _rendererRuntimeDiagnosticsEnabled ? _nowMs() : 0,
     value184 = interactionBusy?.['framePlan'] || null,
     { width: width4, height: height4 } =
       value184?.['containerRect'] || _getCachedContainerSize(canvasEl2['parentElement'] || canvasEl2),
@@ -2209,7 +2209,7 @@ function _renderNodesImpl(
         candidateNodeIds: virtualizationResult['previewCandidateIds'],
         viewport: viewport6,
         isVisible: (value190) =>
-          isNodeInsideViewportPadding(value190, viewport6, width4, height4, 0x0),
+          isNodeInsideViewportPadding(value190, viewport6, width4, height4, 0),
         getPreviousMode: (value191) =>
           String(_wrapperMap['get'](value191)?.['dataset']?.['mediaLodMode'] || '')['trim'](),
         interactionBusy:
@@ -2247,10 +2247,10 @@ function _renderNodesImpl(
       containerH: height4,
       spatialIndex: !!spatialIndex,
       nodeCount: nodeCount4,
-      mountCandidateCount: virtualizationResult['mountCandidateIds']?.['size'] || 0x0,
-      previewCandidateCount: virtualizationResult['previewCandidateIds']?.['size'] || 0x0,
-      parkCandidateCount: virtualizationResult['parkCandidateIds']?.['size'] || 0x0,
-      keepAliveCount: virtualizationResult['keepAliveNodeIds']?.['size'] || 0x0,
+      mountCandidateCount: virtualizationResult['mountCandidateIds']?.['size'] || 0,
+      previewCandidateCount: virtualizationResult['previewCandidateIds']?.['size'] || 0,
+      parkCandidateCount: virtualizationResult['parkCandidateIds']?.['size'] || 0,
+      keepAliveCount: virtualizationResult['keepAliveNodeIds']?.['size'] || 0,
       scenePressure: mountCandidateIds2['pressure'],
       sceneFullSurfaceBudget: mountCandidateIds2['fullSurfaceBudget'],
       sceneFullSurfaceCount: mountCandidateIds2['fullSurfaceIds']['size'],
@@ -2262,9 +2262,9 @@ function _renderNodesImpl(
       mode: interactionBusy?.['mode'] || 'steady',
       cacheHit: cacheHit,
       nodeCount: nodeCount4,
-      mountCandidateCount: virtualizationResult['mountCandidateIds']?.['size'] || 0x0,
-      previewCandidateCount: virtualizationResult['previewCandidateIds']?.['size'] || 0x0,
-      parkCandidateCount: virtualizationResult['parkCandidateIds']?.['size'] || 0x0,
+      mountCandidateCount: virtualizationResult['mountCandidateIds']?.['size'] || 0,
+      previewCandidateCount: virtualizationResult['previewCandidateIds']?.['size'] || 0,
+      parkCandidateCount: virtualizationResult['parkCandidateIds']?.['size'] || 0,
       fullEligibleVisibleImageCount: fullEligibleVisibleImageNodeIds['size'],
       plannedFullEligibleVisibleImageCount: plannedFullEligibleVisibleImageNodeIds['size'],
       scenePressure: mountCandidateIds2['pressure'],
@@ -2300,7 +2300,7 @@ function _renderNodesImpl(
       _rendererInteractionGrace['isBusy'](),
     mediaLoadingBusy = viewportBusy || interactionBusy?.['previewOnly'] === !![],
     suppressNewMedia =
-      viewportBusy && resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0x0,
+      viewportBusy && resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0,
     freezeActive = _rasterPreviewCoordinator['sync']({
       canvasEl: canvasEl2,
       nodes: nodes,
@@ -2346,20 +2346,20 @@ function _renderNodesImpl(
     });
   const candidateSignature = value192 + '|raster:' + freezeActive['signature'],
     previewCandidateIds =
-      mountCandidateIds2['exactVisibleGenerationBusyIds']['size'] > 0x0
+      mountCandidateIds2['exactVisibleGenerationBusyIds']['size'] > 0
         ? new Set([...domPreviewCandidateIds, ...mountCandidateIds2['exactVisibleGenerationBusyIds']])
         : domPreviewCandidateIds;
   cancelStaleLowPriorityPreloadsForHighZoom(suppressNewMedia);
   if (interactionBusy?.['previewOnly'] === !![]) {
     _fastPreviewContinuation['reset']();
     const visibleNodeCount = mountCandidateIds2['exactVisibleIds']['size'];
-    let rasterVisibleNodeCount = 0x0;
+    let rasterVisibleNodeCount = 0;
     if (
       visibleNodeCount > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount'] &&
       visibleNodeCount <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']
     )
       for (const value196 of mountCandidateIds2['exactVisibleIds']) {
-        freezeActive['rasterIds']['has'](value196) && (rasterVisibleNodeCount += 0x1);
+        freezeActive['rasterIds']['has'](value196) && (rasterVisibleNodeCount += 1);
       }
     const previewCoverageEligible = shouldPrepareRendererViewportPreviewCoverage({
         viewport: viewport6,
@@ -2394,7 +2394,7 @@ function _renderNodesImpl(
     });
     let previewCoverageCreated = null,
       ready = ![],
-      presentedNodeCount = 0x0,
+      presentedNodeCount = 0,
       missingExactVisibleNodeCount = [];
     if (previewCoverageEligible) {
       const presentedNodeIds = new Set();
@@ -2411,7 +2411,7 @@ function _renderNodesImpl(
           presentedNodeIds['add'](value197);
       }
       ((missingExactVisibleNodeCount = [...mountCandidateIds2['exactVisibleIds']]['filter']((value199) => !presentedNodeIds['has'](value199))),
-        (ready = missingExactVisibleNodeCount['length'] === 0x0),
+        (ready = missingExactVisibleNodeCount['length'] === 0),
         (presentedNodeCount = presentedNodeIds['size']),
         (previewCoverageCreated = createRendererViewportPreviewCoverage({
           viewport: viewport6,
@@ -2437,12 +2437,12 @@ function _renderNodesImpl(
           missingExactVisibleNodeCount: missingExactVisibleNodeCount['length'],
           missingExactVisibleNodeTypes: missingExactVisibleNodeCount['reduce']((value200, value201) => {
             const value202 = String(nodes?.[value201]?.['type'] || 'unknown');
-            return ((value200[value202] = Number(value200[value202] || 0x0) + 0x1), value200);
+            return ((value200[value202] = Number(value200[value202] || 0) + 1), value200);
           }, {}),
         }),
       {
         hasPendingStructuralOps: ![],
-        deferredParkCount: 0x0,
+        deferredParkCount: 0,
         hasPendingVisibleVideoMounts: ![],
         hasPendingFullEligibleVisibleImageMounts: ![],
         previewCoverage: previewCoverageCreated,
@@ -2492,7 +2492,7 @@ function _renderNodesImpl(
       frameBudgetMs: RENDERER_FULL_SURFACE_RELEASE_FRAME_BUDGET_MS,
     });
   let hasPendingStructuralOps2 = ![],
-    deferredParkCount2 = 0x0,
+    deferredParkCount2 = 0,
     enabled37 = null;
   const heavyMediaUpdateFrameBudget = createHeavyMediaUpdateFrameBudget({ nodeCount: nodeCount4, now: _nowMs });
   let hasPendingVisibleVideoMounts2 = ![],
@@ -2545,11 +2545,11 @@ function _renderNodesImpl(
       }
       if (enabled38 && parkCandidateIds['has'](nodeId11)) {
         if (value182) {
-          deferredParkCount2 += 0x1;
+          deferredParkCount2 += 1;
           continue;
         }
         if (rendererStructuralBudget2['hasBudget']()) {
-          const value208 = lifecycleStats2 ? _nowMs() : 0x0;
+          const value208 = lifecycleStats2 ? _nowMs() : 0;
           (_parkNode(nodeId11),
             lifecycleStats2 &&
               recordRendererLifecycleDuration(lifecycleStats2, 'park', node7, _nowMs() - value208, 'park'),
@@ -2565,7 +2565,7 @@ function _renderNodesImpl(
     if (isNodeType4) {
       const withinResidency =
         lowZoomRealVideoNodeIds['has'](nodeId11) ||
-        resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0x0;
+        resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0;
       _videoMediaResidency['sync'](nodeId11, {
         withinResidency:
           withinResidency &&
@@ -2770,7 +2770,7 @@ function _renderNodesImpl(
         hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = !![];
         continue;
       }
-      const value210 = lifecycleStats2 ? _nowMs() : 0x0,
+      const value210 = lifecycleStats2 ? _nowMs() : 0,
         value211 = enabled44 ? _rendererMediaRuntimePreparer['take'](nodeId11, node7, variant) : null;
       ({ wrapperEl: wrapperEl3, instance: instance } = value211
         ? _registerNodeRuntime(value211)
@@ -2826,7 +2826,7 @@ function _renderNodesImpl(
           continue;
         }
         !enabled37 && (enabled37 = document['createDocumentFragment']());
-        const value212 = lifecycleStats2 ? _nowMs() : 0x0;
+        const value212 = lifecycleStats2 ? _nowMs() : 0;
         _mountNode(nodeId11, enabled37);
         lifecycleStats2 &&
           recordRendererLifecycleDuration(lifecycleStats2, 'remount', node7, _nowMs() - value212, 'remount');
@@ -2854,7 +2854,7 @@ function _renderNodesImpl(
         options: interactionBusy,
       }),
       enabled46 =
-        nodeCount4 >= 0x78 &&
+        nodeCount4 >= 120 &&
         isNodeType(node7, ['ai-video', 'ai-audio']) &&
         !isSelected7 &&
         (!isSelectionRelated7 || shouldForceDeferRelatedVideoDetails2) &&
@@ -2927,7 +2927,7 @@ function _renderNodesImpl(
         _isNodeVisible(node8, viewport6, width4, height4) &&
         (value209 ||
           shouldHydrateVideoMediaImmediately2 ||
-          resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0x0) &&
+          resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0) &&
         instance?.['prepareRendererVisibleVideoPreview']?.() === !![],
       _syncMountedNodePresentation2 = _syncMountedNodePresentation({
         wrapperEl: wrapperEl3,
@@ -2997,10 +2997,10 @@ function _renderNodesImpl(
     }),
       value213 && _pendingNodeDataMap['delete'](nodeId11));
   }
-  const count3 = enabled37?.['childNodes']?.['length'] || 0x0,
-    value215 = lifecycleStats2 && count3 > 0x0 ? _nowMs() : 0x0;
+  const count3 = enabled37?.['childNodes']?.['length'] || 0,
+    value215 = lifecycleStats2 && count3 > 0 ? _nowMs() : 0;
   _flushMountBatch(canvasEl2, enabled37);
-  if (lifecycleStats2 && count3 > 0x0) {
+  if (lifecycleStats2 && count3 > 0) {
     const _nowMs4 = _nowMs() - value215;
     ((lifecycleStats2['mountBatchCount'] += count3),
       (lifecycleStats2['mountBatchFlushMs'] += _nowMs4),
@@ -3050,9 +3050,9 @@ function _renderNodesImpl(
 function _renderNodes(...args9) {
   if (!_rendererRuntimeDiagnosticsEnabled) return _renderNodesImpl(...args9);
   const _nowMs5 = _nowMs(),
-    previewOnly = args9[0xc] || {},
-    value216 = args9[0x1] || {},
-    value217 = args9[0xb] || null,
+    previewOnly = args9[12] || {},
+    value216 = args9[1] || {},
+    value217 = args9[11] || null,
     nodeCount5 = Number['isFinite'](previewOnly?.['framePlan']?.['nodeCount'])
       ? previewOnly['framePlan']['nodeCount']
       : Number['isFinite'](value217?.['_nodeCount'])
@@ -3097,7 +3097,7 @@ function _cleanupNodes(el23, value218) {
   });
   if (value219) {
     const el25 = document['getElementById']('v2-side-plus-holder');
-    el25 && el25['children']['length'] > 0x0 && el25['replaceChildren']();
+    el25 && el25['children']['length'] > 0 && el25['replaceChildren']();
   }
 }
 function _createSvgLayer() {
@@ -3172,7 +3172,7 @@ function _renderEdges(
 }
 function _clearRenderedEdges(value224) {
   const count4 = _edgeLayer['clearRenderedEdges'](value224);
-  count4 > 0x0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] });
+  count4 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] });
 }
 function _clearRenderedEdgesFromDocument() {
   if (typeof document === 'undefined') {
@@ -3189,7 +3189,7 @@ function _cleanupEdges(value226, value227) {
   const count5 = _edgeLayer['cleanupEdges'](value226, value227);
   (document['querySelectorAll']('.v2-edge-thumbnail')['forEach']((el30) => el30['remove']()),
     document['querySelectorAll']('[id^="v2-thumb-"]')['forEach']((el31) => el31['remove']()),
-    count5 > 0x0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] }));
+    count5 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] }));
 }
 function _createPickerEl() {
   const el32 = document['createElement']('div');
@@ -3202,7 +3202,7 @@ function _createPickerEl() {
       flexDirection: 'column',
       gap: '4px',
       background: 'var(--preset-menu-bg)',
-      border: '1px\x20solid\x20var(--preset-menu-border)',
+      border: '1px solid var(--preset-menu-border)',
       borderRadius: 'var(--radius-18)',
       padding: '8px',
       minWidth: '160px',
@@ -3222,7 +3222,7 @@ function _renderPicker(el33, enabled47, value228) {
   ((el33['style']['display'] = 'flex'),
     (el33['style']['left'] = enabled47['screenX'] + 'px'),
     (el33['style']['top'] = enabled47['screenY'] + 'px'));
-  if (el33['children']['length'] > 0x0) return;
+  if (el33['children']['length'] > 0) return;
   const el34 = document['createElement']('div');
   ((el34['textContent'] = t('coreUi.renderer.picker.addNode')),
     Object['assign'](el34['style'], {
@@ -3257,7 +3257,7 @@ function _renderPicker(el33, enabled47, value228) {
         padding: '7px 12px',
         cursor: 'pointer',
         textAlign: 'left',
-        transition: 'background\x200.15s',
+        transition: 'background 0.15s',
       }),
       el33['appendChild'](el35));
   }

@@ -25,7 +25,7 @@ import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../util
 import { waitForImageElementReady } from './imageOverlayReadiness.js';
 const getCssVar = (value) =>
     getComputedStyle(document['documentElement'])['getPropertyValue'](value)['trim'](),
-  DEFAULT_MATTING_BRUSH_SIZE_PX = 0x28,
+  DEFAULT_MATTING_BRUSH_SIZE_PX = 40,
   MAX_MATTING_BRUSH_SIZE_PX = IMAGE_BRUSH_MAX_SIZE_PX,
   OPAQUE_MASK_PREVIEW_CLEAR = 'black';
 function imageMattingText(item, key = {}) {
@@ -59,8 +59,8 @@ const isFiniteCommandPoint = (box) =>
     toolButtons: null,
     cursorEl: null,
     _cursorHover: ![],
-    _cursorLast: { x: 0x0, y: 0x0 },
-    _cursorRaf: 0x0,
+    _cursorLast: { x: 0, y: 0 },
+    _cursorRaf: 0,
     _unsubscribe: null,
     _commands: [],
     _redoStack: [],
@@ -119,19 +119,19 @@ const isFiniteCommandPoint = (box) =>
         (this['_unsubscribe'] = appStore['subscribeSelector'](
           (state) => {
             const nx = state['nodes']?.[nodeId],
-              vx = state['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 },
+              vx = state['viewport'] || { x: 0, y: 0, zoom: 1 },
               tool2 = state['matting'] || {};
             return {
               hasNode: !!nx,
-              nx: nx ? nx['x'] : 0x0,
-              ny: nx ? nx['y'] : 0x0,
-              nw: nx ? nx['width'] : 0x0,
-              nh: nx ? nx['height'] : 0x0,
+              nx: nx ? nx['x'] : 0,
+              ny: nx ? nx['y'] : 0,
+              nw: nx ? nx['width'] : 0,
+              nh: nx ? nx['height'] : 0,
               vx: vx['x'],
               vy: vx['y'],
-              vz: vx['zoom'] || 0x1,
-              vox: vx['_screenOriginX'] || 0x0,
-              voy: vx['_screenOriginY'] || 0x0,
+              vz: vx['zoom'] || 1,
+              vox: vx['_screenOriginX'] || 0,
+              voy: vx['_screenOriginY'] || 0,
               tool: tool2['tool'] || 'brush',
               brushSizePx: clampMattingBrushSize(tool2['brushSizePx']),
               brushMode: tool2['brushMode'] || 'normal',
@@ -221,8 +221,8 @@ const isFiniteCommandPoint = (box) =>
         (this['toolButtons'] = null),
         (this['cursorEl'] = null),
         (this['_cursorHover'] = ![]),
-        (this['_cursorLast'] = { x: 0x0, y: 0x0 }),
-        (this['_cursorRaf'] = 0x0),
+        (this['_cursorLast'] = { x: 0, y: 0 }),
+        (this['_cursorRaf'] = 0),
         (this['_view'] = null));
     },
     _createUI(source, next = {}) {
@@ -302,7 +302,7 @@ const isFiniteCommandPoint = (box) =>
           });
         }),
         this['sizeRangeEl']['addEventListener']('input', (event5) => {
-          const brushSizePx2 = clampMattingBrushSize(event5['target']['value'], 0x1);
+          const brushSizePx2 = clampMattingBrushSize(event5['target']['value'], 1);
           (appStore['setMattingState']({ brushSizePx: brushSizePx2 }),
             (this['sizeValueEl']['textContent'] = String(brushSizePx2)),
             this['_syncCursor']());
@@ -326,10 +326,10 @@ const isFiniteCommandPoint = (box) =>
           this['_cursorLast'] = { x: x2, y: y2 };
           if (this['_cursorRaf']) return;
           this['_cursorRaf'] = requestAnimationFrame(() => {
-            ((this['_cursorRaf'] = 0x0), this['_syncCursor']());
+            ((this['_cursorRaf'] = 0), this['_syncCursor']());
           });
         },
-        handler3 = (output, value2, value3, value4 = 0x0) => {
+        handler3 = (output, value2, value3, value4 = 0) => {
           const state2 = appStore['getStateRaw'](),
             box2 = state2['nodes']?.[this['nodeId']];
           if (!box2) return ![];
@@ -349,11 +349,11 @@ const isFiniteCommandPoint = (box) =>
             value6 = state2['matting']?.['tool'] || 'brush';
           if (value6 === 'bucket') {
             const clampMattingBrushSize3 = clampMattingBrushSize(state2['matting']?.['brushSizePx']),
-              value7 = clampMattingBrushSize3 / (state2['viewport']['zoom'] || 0x1);
+              value7 = clampMattingBrushSize3 / (state2['viewport']['zoom'] || 1);
             return (this['_fillArea'](value5, value7), !![]);
           }
           const clampMattingBrushSize4 = clampMattingBrushSize(state2['matting']?.['brushSizePx']),
-            sizeWorld = clampMattingBrushSize4 / (state2['viewport']['zoom'] || 0x1),
+            sizeWorld = clampMattingBrushSize4 / (state2['viewport']['zoom'] || 1),
             mode = state2['matting']?.['brushMode'] || 'normal';
           return (
             value6 === 'eraser'
@@ -430,10 +430,10 @@ const isFiniteCommandPoint = (box) =>
       if (!this['_cursorHover']) return;
       const value12 = this['_view']?.['tool'] || 'brush';
       if (value12 !== 'brush' && value12 !== 'eraser' && value12 !== 'bucket') return;
-      const count = event16['deltaY'] || 0x0,
-        value13 = count < 0x0 ? 0x1 : -0x1,
+      const count = event16['deltaY'] || 0,
+        value13 = count < 0 ? 1 : -1,
         clampMattingBrushSize5 = clampMattingBrushSize(this['_view']?.['brushSizePx']),
-        brushSizePx3 = clampMattingBrushSize(clampMattingBrushSize5 + value13 * 0x2);
+        brushSizePx3 = clampMattingBrushSize(clampMattingBrushSize5 + value13 * 2);
       if (brushSizePx3 === clampMattingBrushSize5) return;
       appStore['setMattingState']({ brushSizePx: brushSizePx3 });
       if (this['sizeRangeEl']) this['sizeRangeEl']['value'] = String(brushSizePx3);
@@ -542,9 +542,9 @@ const isFiniteCommandPoint = (box) =>
         (this['containerEl']['style']['top'] = Math['round'](box6['y']) + 'px'),
         (this['containerEl']['style']['width'] = value21 + 'px'),
         (this['containerEl']['style']['height'] = value22 + 'px'));
-      const value23 = window['devicePixelRatio'] || 0x1,
-        value24 = Math['max'](0x1, value21),
-        value25 = Math['max'](0x1, value22);
+      const value23 = window['devicePixelRatio'] || 1,
+        value24 = Math['max'](1, value21),
+        value25 = Math['max'](1, value22);
       if (
         this['canvasEl']['width'] !== Math['round'](value24 * value23) ||
         this['canvasEl']['height'] !== Math['round'](value25 * value23)
@@ -554,21 +554,21 @@ const isFiniteCommandPoint = (box) =>
           (this['canvasEl']['style']['width'] = value24 + 'px'),
           (this['canvasEl']['style']['height'] = value25 + 'px'));
         const value26 = this['canvasEl']['getContext']('2d');
-        (value26['setTransform'](value23, 0x0, 0x0, value23, 0x0, 0x0),
+        (value26['setTransform'](value23, 0, 0, value23, 0, 0),
           (value26['lineCap'] = 'round'),
           (value26['lineJoin'] = 'round'));
       }
-      const value27 = Math['max'](0xc, Math['round'](box6['y']) - 0x36);
-      ((this['toolbarEl']['style']['left'] = Math['round'](box6['x'] + value21 / 0x2) + 'px'),
+      const value27 = Math['max'](12, Math['round'](box6['y']) - 54);
+      ((this['toolbarEl']['style']['left'] = Math['round'](box6['x'] + value21 / 2) + 'px'),
         (this['toolbarEl']['style']['top'] = value27 + 'px'),
         this['_render'](box5));
     },
     _render(value28 = this['_view']?.['viewport']) {
       if (!this['active'] || !this['canvasEl']) return;
       const ctx = this['canvasEl']['getContext']('2d'),
-        value29 = Number(this['canvasEl']['style']['width']['replace']('px', '')) || 0x1,
-        value30 = Number(this['canvasEl']['style']['height']['replace']('px', '')) || 0x1;
-      ctx['clearRect'](0x0, 0x0, value29, value30);
+        value29 = Number(this['canvasEl']['style']['width']['replace']('px', '')) || 1,
+        value30 = Number(this['canvasEl']['style']['height']['replace']('px', '')) || 1;
+      ctx['clearRect'](0, 0, value29, value30);
       const boundarySource = this['_commands'],
         normalMaskCtx = this['_prepareNormalMaskCanvas'](value29, value30),
         alphaMaskCtx = this['_prepareAlphaMaskCanvas'](value29, value30);
@@ -589,8 +589,8 @@ const isFiniteCommandPoint = (box) =>
         this['_compositeAlphaMask'](ctx, value28, value29, value30));
     },
     _prepareNormalMaskCanvas(value31, value32) {
-      const value33 = Math['max'](0x1, Math['round'](value31 || 0x1)),
-        value34 = Math['max'](0x1, Math['round'](value32 || 0x1));
+      const value33 = Math['max'](1, Math['round'](value31 || 1)),
+        value34 = Math['max'](1, Math['round'](value32 || 1));
       if (
         !this['_normalMaskCanvas'] ||
         this['_normalMaskCanvas']['width'] !== value33 ||
@@ -614,15 +614,15 @@ const isFiniteCommandPoint = (box) =>
       const ctx2 = this['_normalMaskCanvas']['getContext']('2d');
       if (!ctx2) return null;
       return (
-        ctx2['clearRect'](0x0, 0x0, value33, value34),
+        ctx2['clearRect'](0, 0, value33, value34),
         (ctx2['lineCap'] = 'round'),
         (ctx2['lineJoin'] = 'round'),
         ctx2
       );
     },
     _prepareAlphaMaskCanvas(value35, value36) {
-      const value37 = Math['max'](0x1, Math['round'](value35 || 0x1)),
-        value38 = Math['max'](0x1, Math['round'](value36 || 0x1));
+      const value37 = Math['max'](1, Math['round'](value35 || 1)),
+        value38 = Math['max'](1, Math['round'](value36 || 1));
       if (
         !this['_alphaMaskCanvas'] ||
         this['_alphaMaskCanvas']['width'] !== value37 ||
@@ -646,7 +646,7 @@ const isFiniteCommandPoint = (box) =>
       const ctx3 = this['_alphaMaskCanvas']['getContext']('2d');
       if (!ctx3) return null;
       return (
-        ctx3['clearRect'](0x0, 0x0, value37, value38),
+        ctx3['clearRect'](0, 0, value37, value38),
         (ctx3['lineCap'] = 'round'),
         (ctx3['lineJoin'] = 'round'),
         ctx3
@@ -654,54 +654,54 @@ const isFiniteCommandPoint = (box) =>
     },
     _compositeNormalMask(ctx4, value39, value40) {
       if (!ctx4 || !this['_normalMaskCanvas'] || !this['_normalOverlayCanvas']) return;
-      const value41 = Math['max'](0x1, Number(value39) || 0x1),
-        value42 = Math['max'](0x1, Number(value40) || 0x1),
+      const value41 = Math['max'](1, Number(value39) || 1),
+        value42 = Math['max'](1, Number(value40) || 1),
         ctx5 = this['_normalOverlayCanvas']['getContext']('2d');
       if (!ctx5) return;
       const pixelToolPalette = getPixelToolPalette();
-      (ctx5['clearRect'](0x0, 0x0, value41, value42),
+      (ctx5['clearRect'](0, 0, value41, value42),
         ctx5['save'](),
         (ctx5['globalCompositeOperation'] = 'source-over'),
-        (ctx5['globalAlpha'] = 0x1),
+        (ctx5['globalAlpha'] = 1),
         (ctx5['fillStyle'] = pixelToolPalette['maskPreviewFill']),
-        ctx5['fillRect'](0x0, 0x0, value41, value42),
+        ctx5['fillRect'](0, 0, value41, value42),
         (ctx5['globalCompositeOperation'] = 'destination-in'),
-        ctx5['drawImage'](this['_normalMaskCanvas'], 0x0, 0x0, value41, value42),
+        ctx5['drawImage'](this['_normalMaskCanvas'], 0, 0, value41, value42),
         ctx5['restore'](),
         ctx4['save'](),
         (ctx4['globalCompositeOperation'] = 'source-over'),
-        (ctx4['globalAlpha'] = 0x1),
-        ctx4['drawImage'](this['_normalOverlayCanvas'], 0x0, 0x0, value41, value42),
+        (ctx4['globalAlpha'] = 1),
+        ctx4['drawImage'](this['_normalOverlayCanvas'], 0, 0, value41, value42),
         ctx4['restore']());
     },
     _compositeAlphaMask(ctx6, box11, value43, value44) {
       if (!ctx6 || !this['_alphaMaskCanvas'] || !this['_alphaOverlayCanvas']) return;
-      const value45 = Math['max'](0x1, Number(value43) || 0x1),
-        value46 = Math['max'](0x1, Number(value44) || 0x1),
+      const value45 = Math['max'](1, Number(value43) || 1),
+        value46 = Math['max'](1, Number(value44) || 1),
         ctx7 = this['_alphaOverlayCanvas']['getContext']('2d');
       if (!ctx7) return;
-      ctx7['clearRect'](0x0, 0x0, value45, value46);
-      const value47 = box11?.['zoom'] || 0x1,
+      ctx7['clearRect'](0, 0, value45, value46);
+      const value47 = box11?.['zoom'] || 1,
         value48 = this['_createCheckerboardPattern'](ctx7, value47);
       (ctx7['save'](),
         (ctx7['globalCompositeOperation'] = 'source-over'),
         (ctx7['globalAlpha'] = 0.8),
         (ctx7['fillStyle'] = value48),
-        ctx7['fillRect'](0x0, 0x0, value45, value46),
+        ctx7['fillRect'](0, 0, value45, value46),
         (ctx7['globalCompositeOperation'] = 'destination-in'),
-        (ctx7['globalAlpha'] = 0x1),
-        ctx7['drawImage'](this['_alphaMaskCanvas'], 0x0, 0x0, value45, value46),
+        (ctx7['globalAlpha'] = 1),
+        ctx7['drawImage'](this['_alphaMaskCanvas'], 0, 0, value45, value46),
         ctx7['restore'](),
         ctx6['save'](),
         (ctx6['globalCompositeOperation'] = 'source-over'),
-        (ctx6['globalAlpha'] = 0x1),
-        ctx6['drawImage'](this['_alphaOverlayCanvas'], 0x0, 0x0, value45, value46),
+        (ctx6['globalAlpha'] = 1),
+        ctx6['drawImage'](this['_alphaOverlayCanvas'], 0, 0, value45, value46),
         ctx6['restore']());
     },
     _renderCommands(ctx8, box12, list, value49 = ![], cache = {}) {
-      const zoom2 = box12['zoom'] || 0x1,
-        width = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 0x1,
-        height = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 0x1,
+      const zoom2 = box12['zoom'] || 1,
+        width = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 1,
+        height = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 1,
         strokeStyle = getPixelToolPalette(),
         ctx9 = cache['normalMaskCtx'] || null,
         ctx10 = cache['alphaMaskCtx'] || null,
@@ -709,21 +709,21 @@ const isFiniteCommandPoint = (box) =>
       list['forEach']((fillCommand, value50) => {
         if (fillCommand['type'] === 'mask-preview') {
           if (!fillCommand['img']) return;
-          const value51 = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 0x1,
-            value52 = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 0x1;
+          const value51 = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 1,
+            value52 = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 1;
           (ctx8['save'](),
             (ctx8['globalCompositeOperation'] = 'source-over'),
-            ctx8['drawImage'](fillCommand['img'], 0x0, 0x0, value51, value52),
+            ctx8['drawImage'](fillCommand['img'], 0, 0, value51, value52),
             ctx8['restore']());
           return;
         }
         if (fillCommand['type'] === 'mask-base') {
           if (!fillCommand['canvas'] || !ctx9) return;
-          const value53 = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 0x1,
-            value54 = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 0x1;
+          const value53 = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 1,
+            value54 = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 1;
           (ctx9['save'](),
             (ctx9['globalCompositeOperation'] = 'source-over'),
-            ctx9['drawImage'](fillCommand['canvas'], 0x0, 0x0, value53, value54),
+            ctx9['drawImage'](fillCommand['canvas'], 0, 0, value53, value54),
             ctx9['restore']());
           return;
         }
@@ -778,7 +778,7 @@ const isFiniteCommandPoint = (box) =>
                   strokeStyle: strokeStyle['maskPreviewFill'],
                   fillStyle: strokeStyle['maskPreviewFill'],
                   globalCompositeOperation: 'source-over',
-                  globalAlpha: 0x1,
+                  globalAlpha: 1,
                 }));
           ctx8['restore']();
           return;
@@ -821,11 +821,11 @@ const isFiniteCommandPoint = (box) =>
         }
         if (fillCommand['type'] === 'fill') {
           const value56 = fillCommand['mode'] === 'alpha',
-            value57 = Number(fillCommand['x'] ?? fillCommand['startPoint']?.['x']) || 0x0,
-            value58 = Number(fillCommand['y'] ?? fillCommand['startPoint']?.['y']) || 0x0,
+            value57 = Number(fillCommand['x'] ?? fillCommand['startPoint']?.['x']) || 0,
+            value58 = Number(fillCommand['y'] ?? fillCommand['startPoint']?.['y']) || 0,
             count2 = list2['indexOf'](fillCommand),
             list3 =
-              count2 >= 0x0 ? list2['slice'](0x0, count2) : list['slice'](0x0, value50),
+              count2 >= 0 ? list2['slice'](0, count2) : list['slice'](0, value50),
             boundaryCommands = list3['filter'](
               (value59) => value59?.['type'] === 'brush' || value59?.['type'] === 'eraser',
             ),
@@ -842,8 +842,8 @@ const isFiniteCommandPoint = (box) =>
               seedY: seedY,
               extraKey: 'mode:' + (fillCommand['mode'] || ''),
               pointToPixel: (box13) => ({
-                x: Number(box13?.['x'] || 0x0) * zoom2,
-                y: Number(box13?.['y'] || 0x0) * zoom2,
+                x: Number(box13?.['x'] || 0) * zoom2,
+                y: Number(box13?.['y'] || 0) * zoom2,
               }),
               getStrokeWidth: (value60) =>
                 getBrushLineWidth(value60?.['sizeWorld'], zoom2, value60?.['type']),
@@ -853,7 +853,7 @@ const isFiniteCommandPoint = (box) =>
               paintFilledRegion(ctx10, cachedSealedFillRegion, width, height, {
                 fillStyle: '#fff',
                 globalCompositeOperation: 'source-over',
-                globalAlpha: 0x1,
+                globalAlpha: 1,
               });
             else {
               const fillStyle = this['_createCheckerboardPattern'](ctx8, zoom2);
@@ -882,16 +882,16 @@ const isFiniteCommandPoint = (box) =>
       });
     },
     _createCheckerboardPattern(value61, value62) {
-      const value63 = 0x8 * value62,
+      const value63 = 8 * value62,
         box14 = document['createElement']('canvas');
-      ((box14['width'] = value63 * 0x2), (box14['height'] = value63 * 0x2));
+      ((box14['width'] = value63 * 2), (box14['height'] = value63 * 2));
       const ctx11 = box14['getContext']('2d'),
         pixelToolPalette2 = getPixelToolPalette();
       return (
         (ctx11['fillStyle'] = pixelToolPalette2['checkerLight']),
-        ctx11['fillRect'](0x0, 0x0, value63 * 0x2, value63 * 0x2),
+        ctx11['fillRect'](0, 0, value63 * 2, value63 * 2),
         (ctx11['fillStyle'] = pixelToolPalette2['checkerDark']),
-        ctx11['fillRect'](0x0, 0x0, value63, value63),
+        ctx11['fillRect'](0, 0, value63, value63),
         ctx11['fillRect'](value63, value63, value63, value63),
         value61['createPattern'](box14, 'repeat')
       );
@@ -901,8 +901,8 @@ const isFiniteCommandPoint = (box) =>
         mode2 = value65['matting']?.['brushMode'] || 'normal',
         value66 = {
           type: 'fill',
-          x: Number(box15?.['x']) || 0x0,
-          y: Number(box15?.['y']) || 0x0,
+          x: Number(box15?.['x']) || 0,
+          y: Number(box15?.['y']) || 0,
           mode: mode2,
         };
       (this['_commands']['push'](value66),
@@ -911,17 +911,17 @@ const isFiniteCommandPoint = (box) =>
         this['_render']());
     },
     _undo() {
-      if (this['_commands']['length'] === 0x0) return;
+      if (this['_commands']['length'] === 0) return;
       const value67 = this['_commands']['pop']();
       (this['_redoStack']['push'](value67), (this['_dirty'] = !![]), this['_render']());
     },
     _redo() {
-      if (this['_redoStack']['length'] === 0x0) return;
+      if (this['_redoStack']['length'] === 0) return;
       const value68 = this['_redoStack']['pop']();
       (this['_commands']['push'](value68), (this['_dirty'] = !![]), this['_render']());
     },
     _clear() {
-      if (this['_commands']['length'] === 0x0 && this['_redoStack']['length'] === 0x0) return;
+      if (this['_commands']['length'] === 0 && this['_redoStack']['length'] === 0) return;
       ((this['_commands'] = []),
         (this['_redoStack'] = []),
         (this['_draft'] = null),
@@ -944,8 +944,8 @@ const isFiniteCommandPoint = (box) =>
       el13['style']['pointerEvents'] = 'none';
       try {
         const value70 = this['nodeId'],
-          value71 = Math['max'](0x1, Number(box16['width']) || 0x1),
-          value72 = Math['max'](0x1, Number(box16['height']) || 0x1),
+          value71 = Math['max'](1, Number(box16['width']) || 1),
+          value72 = Math['max'](1, Number(box16['height']) || 1),
           maskSaveToken = generateId('mask_save'),
           list4 = this['_commands']
             ['filter'](
@@ -959,13 +959,13 @@ const isFiniteCommandPoint = (box) =>
               if (mode3['type'] === 'fill')
                 return {
                   type: 'fill',
-                  x: Number(mode3['x'] ?? mode3['startPoint']?.['x']) || 0x0,
-                  y: Number(mode3['y'] ?? mode3['startPoint']?.['y']) || 0x0,
+                  x: Number(mode3['x'] ?? mode3['startPoint']?.['x']) || 0,
+                  y: Number(mode3['y'] ?? mode3['startPoint']?.['y']) || 0,
                   mode: mode3['mode'],
                 };
               return {
                 type: mode3['type'],
-                sizeWorld: Number(mode3['sizeWorld']) || 0x0,
+                sizeWorld: Number(mode3['sizeWorld']) || 0,
                 mode: mode3['mode'],
                 points: Array['isArray'](mode3['points'])
                   ? mode3['points']['map']((box17) => ({
@@ -975,7 +975,7 @@ const isFiniteCommandPoint = (box) =>
                   : [],
               };
             });
-        if (this['_baseMaskCleared'] && list4['length'] === 0x0) {
+        if (this['_baseMaskCleared'] && list4['length'] === 0) {
           (appStore['updateNodeData'](value70, {
             mask: '',
             maskPreview: '',
@@ -998,17 +998,17 @@ const isFiniteCommandPoint = (box) =>
             const box18 = await this['_loadImage'](enabled3),
               width2 = box18['naturalWidth'] || box18['width'],
               height2 = box18['naturalHeight'] || box18['height'],
-              value76 = Math['max'](value71 / width2, value72 / height2) || 0x1,
+              value76 = Math['max'](value71 / width2, value72 / height2) || 1,
               value77 = width2 * value76,
               value78 = height2 * value76,
-              value79 = (value71 - value77) / 0x2,
-              value80 = (value72 - value78) / 0x2,
+              value79 = (value71 - value77) / 2,
+              value80 = (value72 - value78) / 2,
               handler6 = (box19) => {
                 const value81 = (Number(box19?.['x']) - value79) / value76,
                   value82 = (Number(box19?.['y']) - value80) / value76;
                 return {
-                  x: Math['max'](0x0, Math['min'](width2 - 0x1, value81)),
-                  y: Math['max'](0x0, Math['min'](height2 - 0x1, value82)),
+                  x: Math['max'](0, Math['min'](width2 - 1, value81)),
+                  y: Math['max'](0, Math['min'](height2 - 1, value82)),
                 };
               },
               box20 = document['createElement']('canvas');
@@ -1017,23 +1017,23 @@ const isFiniteCommandPoint = (box) =>
             ctx12['imageSmoothingEnabled'] = ![];
             const fillStyle2 = getCssVar('--canvas-white'),
               cssVar = getCssVar('--canvas-black');
-            ((ctx12['fillStyle'] = cssVar), ctx12['fillRect'](0x0, 0x0, width2, height2));
+            ((ctx12['fillStyle'] = cssVar), ctx12['fillRect'](0, 0, width2, height2));
             if (value74)
               try {
                 const value83 = await this['_loadImage'](localPathToUrl(value74));
-                ctx12['drawImage'](value83, 0x0, 0x0, width2, height2);
+                ctx12['drawImage'](value83, 0, 0, width2, height2);
                 const value84 = appStore['getState']()['nodes']?.[value70],
                   value85 = String(value84?.['maskPolarity'] || '')['trim']();
                 value85 !== 'paint-white' && this['_invertCanvasBinary'](ctx12);
               } catch (value86) {}
-            const run2 = (value87, strokeStyle3, count3 = 0x1) => {
+            const run2 = (value87, strokeStyle3, count3 = 1) => {
               const points3 = (Array['isArray'](value87['points']) ? value87['points'] : [])['map'](
                 (value88) => handler6(value88),
               );
               if (!points3['length']) return;
               ctx12['save']();
-              const lineWidth3 = count3 >= 0x6 ? 'eraser' : 'brush',
-                brushLineWidth = getBrushLineWidth(value87['sizeWorld'], 0x1 / value76, lineWidth3);
+              const lineWidth3 = count3 >= 6 ? 'eraser' : 'brush',
+                brushLineWidth = getBrushLineWidth(value87['sizeWorld'], 1 / value76, lineWidth3);
               (drawRoundBrushStroke(ctx12, {
                 points: points3,
                 lineWidth: lineWidth3 === 'eraser' ? getEraserClearLineWidth(brushLineWidth) : brushLineWidth,
@@ -1046,15 +1046,15 @@ const isFiniteCommandPoint = (box) =>
             list4['forEach']((x5, value89) => {
               if (!x5) return;
               if (x5['type'] === 'brush') {
-                run2(x5, fillStyle2, 0x1);
+                run2(x5, fillStyle2, 1);
                 return;
               }
               if (x5['type'] === 'eraser') {
-                run2(x5, cssVar, 0x6);
+                run2(x5, cssVar, 6);
                 return;
               }
               if (x5['type'] === 'fill') {
-                const commands = list4['slice'](0x0, value89)['filter'](
+                const commands = list4['slice'](0, value89)['filter'](
                     (value90) => value90?.['type'] === 'brush' || value90?.['type'] === 'eraser',
                   ),
                   box21 = buildBinaryBoundaryMask({
@@ -1066,7 +1066,7 @@ const isFiniteCommandPoint = (box) =>
                       return { x: x6['x'], y: x6['y'] };
                     },
                     getStrokeWidth: (value92) =>
-                      getBrushLineWidth(value92?.['sizeWorld'], 0x1 / value76, value92?.['type']),
+                      getBrushLineWidth(value92?.['sizeWorld'], 1 / value76, value92?.['type']),
                   }),
                   box22 = handler6({ x: x5['x'], y: x5['y'] }),
                   floodFillRegion2 = floodFillRegion(
@@ -1089,16 +1089,16 @@ const isFiniteCommandPoint = (box) =>
                 return;
               }
             });
-            const value93 = ctx12['getImageData'](0x0, 0x0, width2, height2)['data'],
-              value94 = Math['max'](0x1, Math['floor'](Math['max'](width2, height2) / 0x100));
+            const value93 = ctx12['getImageData'](0, 0, width2, height2)['data'],
+              value94 = Math['max'](1, Math['floor'](Math['max'](width2, height2) / 256));
             let enabled5 = ![];
-            for (let value95 = 0x0; value95 < height2 && !enabled5; value95 += value94) {
-              for (let value96 = 0x0; value96 < width2; value96 += value94) {
-                const value97 = (value95 * width2 + value96) * 0x4,
+            for (let value95 = 0; value95 < height2 && !enabled5; value95 += value94) {
+              for (let value96 = 0; value96 < width2; value96 += value94) {
+                const value97 = (value95 * width2 + value96) * 4,
                   count4 = value93[value97],
-                  count5 = value93[value97 + 0x1],
-                  count6 = value93[value97 + 0x2];
-                if (count4 > 0x5 || count5 > 0x5 || count6 > 0x5) {
+                  count5 = value93[value97 + 1],
+                  count6 = value93[value97 + 2];
+                if (count4 > 5 || count5 > 5 || count6 > 5) {
                   enabled5 = !![];
                   break;
                 }
@@ -1167,7 +1167,7 @@ const isFiniteCommandPoint = (box) =>
       }
     },
     _resolveNodeImageUrl(value101) {
-      const value102 = value101['mainImageIndex'] || 0x0,
+      const value102 = value101['mainImageIndex'] || 0,
         value103 = value101['images'] && value101['images'][value102],
         value104 = value101['localPath'] || value103?.['localPath'],
         url = localPathToUrl(value104);
@@ -1184,43 +1184,43 @@ const isFiniteCommandPoint = (box) =>
     },
     _invertCanvasBinary(canvas) {
       const box23 = canvas?.['canvas'],
-        enabled10 = box23?.['width'] || 0x0,
-        enabled11 = box23?.['height'] || 0x0;
+        enabled10 = box23?.['width'] || 0,
+        enabled11 = box23?.['height'] || 0;
       if (!enabled10 || !enabled11) return;
-      const value105 = canvas['getImageData'](0x0, 0x0, enabled10, enabled11),
+      const value105 = canvas['getImageData'](0, 0, enabled10, enabled11),
         list5 = value105['data'];
-      for (let value106 = 0x0; value106 < list5['length']; value106 += 0x4) {
+      for (let value106 = 0; value106 < list5['length']; value106 += 4) {
         ((list5[value106] = 0xff - list5[value106]),
-          (list5[value106 + 0x1] = 0xff - list5[value106 + 0x1]),
-          (list5[value106 + 0x2] = 0xff - list5[value106 + 0x2]));
+          (list5[value106 + 1] = 0xff - list5[value106 + 1]),
+          (list5[value106 + 2] = 0xff - list5[value106 + 2]));
       }
-      canvas['putImageData'](value105, 0x0, 0x0);
+      canvas['putImageData'](value105, 0, 0);
     },
     _createMaskBaseCanvas(box24, value107 = 'paint-white') {
-      const value108 = Math['max'](0x1, Number(box24?.['naturalWidth'] || box24?.['width']) || 0x1),
-        value109 = Math['max'](0x1, Number(box24?.['naturalHeight'] || box24?.['height']) || 0x1),
+      const value108 = Math['max'](1, Number(box24?.['naturalWidth'] || box24?.['width']) || 1),
+        value109 = Math['max'](1, Number(box24?.['naturalHeight'] || box24?.['height']) || 1),
         box25 = document['createElement']('canvas');
       ((box25['width'] = value108), (box25['height'] = value109));
       const ctx13 = box25['getContext']('2d', { willReadFrequently: !![] });
       if (!ctx13) return null;
-      ctx13['drawImage'](box24, 0x0, 0x0, value108, value109);
-      const value110 = ctx13['getImageData'](0x0, 0x0, value108, value109),
+      ctx13['drawImage'](box24, 0, 0, value108, value109);
+      const value110 = ctx13['getImageData'](0, 0, value108, value109),
         { data: data2 } = value110,
         value111 = String(value107 || '')['trim']() === 'paint-white';
-      for (let value112 = 0x0; value112 < data2['length']; value112 += 0x4) {
+      for (let value112 = 0; value112 < data2['length']; value112 += 4) {
         const value113 = Math['max'](
             data2[value112],
-            data2[value112 + 0x1],
-            data2[value112 + 0x2],
+            data2[value112 + 1],
+            data2[value112 + 2],
           ),
           count7 = value111 ? value113 : 0xff - value113,
-          value114 = count7 > 0x5 ? count7 : 0x0;
+          value114 = count7 > 5 ? count7 : 0;
         ((data2[value112] = 0xff),
-          (data2[value112 + 0x1] = 0xff),
-          (data2[value112 + 0x2] = 0xff),
-          (data2[value112 + 0x3] = value114));
+          (data2[value112 + 1] = 0xff),
+          (data2[value112 + 2] = 0xff),
+          (data2[value112 + 3] = value114));
       }
-      return (ctx13['putImageData'](value110, 0x0, 0x0), box25);
+      return (ctx13['putImageData'](value110, 0, 0), box25);
     },
     _loadExistingMask() {
       if (!this['active']) return;

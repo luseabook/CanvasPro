@@ -5,7 +5,7 @@ export const PROMPT_EMPTY_POLICIES = Object['freeze']({
   ALLOW: 'allow',
 });
 export const PROMPT_EMPTY_POLICY_VALUES = Object['freeze'](Object['values'](PROMPT_EMPTY_POLICIES));
-const DEFAULT_PROMPT_MIN_LENGTH = 0x1;
+const DEFAULT_PROMPT_MIN_LENGTH = 1;
 function isPlainObject(enabled) {
   return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
@@ -16,7 +16,7 @@ function normalizePromptEmptyPolicy(value) {
 function normalizePromptMinLength(key) {
   if (key === undefined || key === null || key === '') return DEFAULT_PROMPT_MIN_LENGTH;
   const count = Number(key);
-  return Number['isInteger'](count) && count >= 0x0 ? count : DEFAULT_PROMPT_MIN_LENGTH;
+  return Number['isInteger'](count) && count >= 0 ? count : DEFAULT_PROMPT_MIN_LENGTH;
 }
 function resolveDefaultEmptyPolicy({
   modelManifest: modelManifest2,
@@ -64,12 +64,12 @@ export function resolveGenerationPromptPolicy({
 export function countPromptCharacters(data = '') {
   const list2 = String(data || '')['trim']();
   let options = list2['length'];
-  for (let target = 0x0; target < list2['length'] - 0x1; target += 0x1) {
+  for (let target = 0; target < list2['length'] - 1; target += 1) {
     const count2 = list2['charCodeAt'](target);
-    if (count2 < 0xd800 || count2 > 0xdbff) continue;
-    const count3 = list2['charCodeAt'](target + 0x1);
-    if (count3 < 0xdc00 || count3 > 0xdfff) continue;
-    ((options -= 0x1), (target += 0x1));
+    if (count2 < 55296 || count2 > 56319) continue;
+    const count3 = list2['charCodeAt'](target + 1);
+    if (count3 < 56320 || count3 > 57343) continue;
+    ((options -= 1), (target += 1));
   }
   return options;
 }
@@ -90,7 +90,7 @@ export function evaluateGenerationPromptBoundary({
     promptLength = countPromptCharacters(promptText);
   if (promptLength >= reason['minLength'])
     return { ok: !![], reason: '', promptLength: promptLength, ...reason };
-  if (promptLength > 0x0) return { ok: ![], reason: 'promptTooShort', promptLength: promptLength, ...reason };
+  if (promptLength > 0) return { ok: ![], reason: 'promptTooShort', promptLength: promptLength, ...reason };
   if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW'])
     return { ok: !![], reason: '', promptLength: promptLength, ...reason };
   if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === !![])

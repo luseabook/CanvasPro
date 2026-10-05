@@ -102,7 +102,7 @@ function removeConfiguredToolbarActions(el2, result = []) {
       ['map']((data) => String(data || '')['trim']())
       ['filter'](Boolean),
   );
-  if (args['size'] < 0x1) return;
+  if (args['size'] < 1) return;
   el2['querySelectorAll']('button')['forEach']((el3) => {
     const options = [...args]['some']((target) =>
       el3['classList']['contains']('act-' + target),
@@ -125,11 +125,11 @@ function attachUiStop(el4, { wheel: wheel = ![] } = {}) {
 }
 function getShortcutLabel(source) {
   const list = getShortcutKeys(source);
-  return list['length'] > 0x0 ? '[' + list['join']('+') + ']' : '';
+  return list['length'] > 0 ? '[' + list['join']('+') + ']' : '';
 }
 function buildTooltipText(next, current) {
   const shortcutLabel = getShortcutLabel(current);
-  return shortcutLabel ? next + '\x20' + shortcutLabel : next;
+  return shortcutLabel ? next + ' ' + shortcutLabel : next;
 }
 function cameraTimelineSampleToDraft(fov) {
   if (!fov) return null;
@@ -146,7 +146,7 @@ function cameraTimelineSampleToDraft(fov) {
     payload = new threeRuntime['Matrix4']()['lookAt'](
       entry,
       record,
-      new threeRuntime['Vector3'](0x0, 0x1, 0x0),
+      new threeRuntime['Vector3'](0, 1, 0),
     ),
     x2 = new threeRuntime['Quaternion']()['setFromRotationMatrix'](payload)['normalize'](),
     x3 = new threeRuntime['Euler']()['setFromQuaternion'](x2, 'YXZ');
@@ -163,7 +163,7 @@ function cameraTimelineSampleToDraft(fov) {
 function normalizeCameraSlot(handle) {
   const count = Number(handle);
   if (!Number['isInteger'](count)) return null;
-  if (count < 0x1 || count > 0xa) return null;
+  if (count < 1 || count > 10) return null;
   return count;
 }
 function resolveCameraSlotEntries(list2 = []) {
@@ -178,7 +178,7 @@ function resolveCameraSlotEntries(list2 = []) {
     }),
     list3['forEach']((camera2) => {
       if (list4['some']((state) => state['camera']?.['id'] === camera2?.['id'])) return;
-      for (let slot2 = 0x1; slot2 <= 0xa; slot2 += 0x1) {
+      for (let slot2 = 1; slot2 <= 10; slot2 += 1) {
         if (map['has'](slot2)) continue;
         (map['add'](slot2), list4['push']({ camera: camera2, slot: slot2 }));
         break;
@@ -191,48 +191,48 @@ function lerp(input, output, value2) {
   return input + (output - input) * value2;
 }
 function smootherstep(value3) {
-  const value4 = Math['max'](0x0, Math['min'](0x1, Number(value3) || 0x0));
-  return value4 * value4 * value4 * (value4 * (value4 * 0x6 - 0xf) + 0xa);
+  const value4 = Math['max'](0, Math['min'](1, Number(value3) || 0));
+  return value4 * value4 * value4 * (value4 * (value4 * 6 - 15) + 10);
 }
 function interpolateVector3(box, box2, value5) {
   return {
-    x: lerp(Number(box?.['x']) || 0x0, Number(box2?.['x']) || 0x0, value5),
-    y: lerp(Number(box?.['y']) || 0x0, Number(box2?.['y']) || 0x0, value5),
-    z: lerp(Number(box?.['z']) || 0x0, Number(box2?.['z']) || 0x0, value5),
+    x: lerp(Number(box?.['x']) || 0, Number(box2?.['x']) || 0, value5),
+    y: lerp(Number(box?.['y']) || 0, Number(box2?.['y']) || 0, value5),
+    z: lerp(Number(box?.['z']) || 0, Number(box2?.['z']) || 0, value5),
   };
 }
 function cloneVector3(value6) {
-  return interpolateVector3(value6, value6, 0x1);
+  return interpolateVector3(value6, value6, 1);
 }
 function quaternionToRotation(value7) {
   const value8 = value7?.['clone']?.() || new threeRuntime['Quaternion'](),
-    x4 = new threeRuntime['Euler'](0x0, 0x0, 0x0, 'YXZ')['setFromQuaternion'](value8, 'YXZ');
+    x4 = new threeRuntime['Euler'](0, 0, 0, 'YXZ')['setFromQuaternion'](value8, 'YXZ');
   return { x: x4['x'], y: x4['y'], z: x4['z'] };
 }
 function areSceneViewsEquivalent(event3, event4, value9 = 0.00001) {
   if (!event3 || !event4) return ![];
   return (
     Math['abs'](
-      (Number(event3?.['target']?.['x']) || 0x0) - (Number(event4?.['target']?.['x']) || 0x0),
+      (Number(event3?.['target']?.['x']) || 0) - (Number(event4?.['target']?.['x']) || 0),
     ) <= value9 &&
     Math['abs'](
-      (Number(event3?.['target']?.['y']) || 0x0) - (Number(event4?.['target']?.['y']) || 0x0),
+      (Number(event3?.['target']?.['y']) || 0) - (Number(event4?.['target']?.['y']) || 0),
     ) <= value9 &&
     Math['abs'](
-      (Number(event3?.['target']?.['z']) || 0x0) - (Number(event4?.['target']?.['z']) || 0x0),
+      (Number(event3?.['target']?.['z']) || 0) - (Number(event4?.['target']?.['z']) || 0),
     ) <= value9 &&
-    Math['abs']((Number(event3?.['orbitYaw']) || 0x0) - (Number(event4?.['orbitYaw']) || 0x0)) <=
+    Math['abs']((Number(event3?.['orbitYaw']) || 0) - (Number(event4?.['orbitYaw']) || 0)) <=
       value9 &&
-    Math['abs']((Number(event3?.['orbitPitch']) || 0x0) - (Number(event4?.['orbitPitch']) || 0x0)) <=
+    Math['abs']((Number(event3?.['orbitPitch']) || 0) - (Number(event4?.['orbitPitch']) || 0)) <=
       value9 &&
     Math['abs'](
-      (Number(event3?.['orbitDistance']) || 0x0) - (Number(event4?.['orbitDistance']) || 0x0),
+      (Number(event3?.['orbitDistance']) || 0) - (Number(event4?.['orbitDistance']) || 0),
     ) <= value9
   );
 }
 const PANORAMA_CAPTURE_MODE_OPTIONS = [
   { key: 'adaptive', labelKey: 'adaptive', iconClass: 'is-adaptive' },
-  { key: '9:16', labelKey: 'vertical', ratio: 0x9 / 0x10, iconClass: 'is-9-16' },
+  { key: '9:16', labelKey: 'vertical', ratio: 9 / 16, iconClass: 'is-9-16' },
   { key: '2.35:1', labelKey: 'cinema', ratio: 2.35, iconClass: 'is-2-35-1' },
 ];
 function normalizeCaptureMode(value10) {
@@ -244,7 +244,7 @@ function getCaptureModeMeta(value11) {
   const captureMode = normalizeCaptureMode(value11);
   return (
     PANORAMA_CAPTURE_MODE_OPTIONS['find']((event6) => event6['key'] === captureMode) ||
-    PANORAMA_CAPTURE_MODE_OPTIONS[0x0]
+    PANORAMA_CAPTURE_MODE_OPTIONS[0]
   );
 }
 function getCaptureModeLabel(value12) {
@@ -253,20 +253,20 @@ function getCaptureModeLabel(value12) {
   return value13 ? panoramaSceneText('capture.modes.' + value13) : String(event7?.['key'] || '');
 }
 function computeCaptureFrameRect(value14, value15, value16) {
-  const width = Math['max'](0x0, Number(value14) || 0x0),
-    height = Math['max'](0x0, Number(value15) || 0x0);
-  if (width <= 0x0 || height <= 0x0) return { x: 0x0, y: 0x0, width: 0x0, height: 0x0 };
+  const width = Math['max'](0, Number(value14) || 0),
+    height = Math['max'](0, Number(value15) || 0);
+  if (width <= 0 || height <= 0) return { x: 0, y: 0, width: 0, height: 0 };
   const captureMode2 = normalizeCaptureMode(value16);
-  if (captureMode2 === 'adaptive') return { x: 0x0, y: 0x0, width: width, height: height };
+  if (captureMode2 === 'adaptive') return { x: 0, y: 0, width: width, height: height };
   const captureModeMeta = getCaptureModeMeta(captureMode2)['ratio'];
-  if (!(captureModeMeta > 0x0)) return { x: 0x0, y: 0x0, width: width, height: height };
+  if (!(captureModeMeta > 0)) return { x: 0, y: 0, width: width, height: height };
   const value17 = width / height;
   if (value17 >= captureModeMeta) {
     const width2 = height * captureModeMeta;
-    return { x: (width - width2) / 0x2, y: 0x0, width: width2, height: height };
+    return { x: (width - width2) / 2, y: 0, width: width2, height: height };
   }
   const height2 = width / captureModeMeta;
-  return { x: 0x0, y: (height - height2) / 0x2, width: width, height: height2 };
+  return { x: 0, y: (height - height2) / 2, width: width, height: height2 };
 }
 export function resolveNextPanoramaMouseTool(value18) {
   return String(value18 || '')['trim']() === 'box-select' ? 'navigate' : 'box-select';
@@ -310,23 +310,23 @@ async function cropCaptureBlobToFrame({
   const captureMode3 = normalizeCaptureMode(mode);
   if (captureMode3 === 'adaptive') return blob;
   const box3 = computeCaptureFrameRect(viewportWidth, viewportHeight, captureMode3);
-  if (box3['width'] <= 0x0 || box3['height'] <= 0x0) return blob;
+  if (box3['width'] <= 0 || box3['height'] <= 0) return blob;
   const box4 = await decodeImageBlob(blob);
   try {
-    const count2 = Number(box4['width']) || Number(box4['videoWidth']) || 0x0,
-      count3 = Number(box4['height']) || Number(box4['videoHeight']) || 0x0;
-    if (count2 <= 0x0 || count3 <= 0x0) return blob;
-    const value26 = count2 / Math['max'](0x1, viewportWidth),
-      value27 = count3 / Math['max'](0x1, viewportHeight),
-      value28 = Math['max'](0x0, Math['round'](box3['x'] * value26)),
-      value29 = Math['max'](0x0, Math['round'](box3['y'] * value27)),
+    const count2 = Number(box4['width']) || Number(box4['videoWidth']) || 0,
+      count3 = Number(box4['height']) || Number(box4['videoHeight']) || 0;
+    if (count2 <= 0 || count3 <= 0) return blob;
+    const value26 = count2 / Math['max'](1, viewportWidth),
+      value27 = count3 / Math['max'](1, viewportHeight),
+      value28 = Math['max'](0, Math['round'](box3['x'] * value26)),
+      value29 = Math['max'](0, Math['round'](box3['y'] * value27)),
       value30 = Math['min'](
         count2 - value28,
-        Math['max'](0x1, Math['round'](box3['width'] * value26)),
+        Math['max'](1, Math['round'](box3['width'] * value26)),
       ),
       value31 = Math['min'](
         count3 - value29,
-        Math['max'](0x1, Math['round'](box3['height'] * value27)),
+        Math['max'](1, Math['round'](box3['height'] * value27)),
       ),
       box5 = document['createElement']('canvas');
     ((box5['width'] = value30), (box5['height'] = value31));
@@ -339,8 +339,8 @@ async function cropCaptureBlobToFrame({
         value29,
         value30,
         value31,
-        0x0,
-        0x0,
+        0,
+        0,
         value30,
         value31,
       ),
@@ -356,7 +356,7 @@ export class PanoramaSceneNode {
       (this['id'] = value32['id']),
       (this['_isPanorama360'] = String(value32?.['type'] || '')['trim']() === PANORAMA_360_NODE_TYPE),
       (this['el'] = document['createElement']('div')),
-      (this['el']['className'] = 'v2-node-component\x20panorama-scene-component'),
+      (this['el']['className'] = 'v2-node-component panorama-scene-component'),
       this['el']['classList']['toggle']('is-panorama-360', this['_isPanorama360']),
       (this['_sceneState'] = getPanoramaSceneState(value32)),
       (this['_openMenuKey'] = null),
@@ -371,14 +371,14 @@ export class PanoramaSceneNode {
       (this['_isNodeHovered'] = ![]),
       (this['_isUnmounted'] = ![]),
       (this['_contextMenuTarget'] = null),
-      (this['_cameraJumpRaf'] = 0x0),
-      (this['_cameraJumpToken'] = 0x0),
+      (this['_cameraJumpRaf'] = 0),
+      (this['_cameraJumpToken'] = 0),
       (this['_pendingCameraJumpCommit'] = null),
-      (this['_pendingCameraJumpReleaseRaf'] = 0x0),
-      (this['_timelinePlaybackRaf'] = 0x0),
-      (this['_timelinePlaybackStartedAt'] = 0x0),
-      (this['_timelinePlaybackStartTime'] = 0x0),
-      (this['_timelinePreviewTime'] = 0x0),
+      (this['_pendingCameraJumpReleaseRaf'] = 0),
+      (this['_timelinePlaybackRaf'] = 0),
+      (this['_timelinePlaybackStartedAt'] = 0),
+      (this['_timelinePlaybackStartTime'] = 0),
+      (this['_timelinePreviewTime'] = 0),
       (this['_isTimelinePlaying'] = ![]),
       (this['_hasRequestedCharacterPreload'] = ![]),
       (this['_defaultSceneFocalLength'] = SCENE_DEFAULT_FOCAL_LENGTH_MM),
@@ -421,7 +421,7 @@ export class PanoramaSceneNode {
       (this['_viewportEl'] = document['createElement']('div')),
       (this['_viewportEl']['className'] = 'panorama-scene-viewport'),
       (this['_viewportEl']['dataset']['sceneInteraction'] = 'panorama'),
-      (this['_viewportEl']['tabIndex'] = 0x0),
+      (this['_viewportEl']['tabIndex'] = 0),
       this['_viewportEl']['addEventListener']('pointerdown', this['_handleViewportPointerDown']),
       this['_viewportEl']['addEventListener']('contextmenu', this['_handleViewportContextMenu']),
       this['_viewportEl']['addEventListener']('dblclick', this['_handleViewportDoubleClick']),
@@ -617,7 +617,7 @@ export class PanoramaSceneNode {
       (el7['textContent'] = panoramaSceneText('contextMenu.deleteObject')));
     const el8 = document['createElement']('span');
     return (
-      (el8['className'] = 'v2-menu-kbd\x20panorama-scene-object-menu__kbd'),
+      (el8['className'] = 'v2-menu-kbd panorama-scene-object-menu__kbd'),
       (el8['dataset']['shortcutAction'] = 'delete'),
       el5['appendChild'](el6),
       el5['appendChild'](el7),
@@ -728,7 +728,7 @@ export class PanoramaSceneNode {
       })),
       this['_interaction']['attach'](),
       (this['_resizeObserver'] = new ResizeObserver((value36) => {
-        const box6 = value36?.[0x0]?.['contentRect'];
+        const box6 = value36?.[0]?.['contentRect'];
         (this['_bridge']?.['resize'](box6?.['width'], box6?.['height']), this['_positionMenus']());
       })),
       this['_resizeObserver']['observe'](this['_viewportEl']),
@@ -752,8 +752,8 @@ export class PanoramaSceneNode {
       )),
       (this['_unsubscribeViewport'] = appStore['subscribeSelector'](
         (value39) => {
-          const box7 = value39['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 };
-          return (box7['x'] || 0x0) + '|' + (box7['y'] || 0x0) + '|' + (box7['zoom'] || 0x1);
+          const box7 = value39['viewport'] || { x: 0, y: 0, zoom: 1 };
+          return (box7['x'] || 0) + '|' + (box7['y'] || 0) + '|' + (box7['zoom'] || 1);
         },
         () => {
           this['_positionMenus']();
@@ -795,12 +795,12 @@ export class PanoramaSceneNode {
     return args4 ? { ...args4 } : null;
   }
   ['_cancelCameraJumpAnimation']({ clearDraft: clearDraft = !![] } = {}) {
-    ((this['_cameraJumpToken'] += 0x1),
+    ((this['_cameraJumpToken'] += 1),
       this['_cameraJumpRaf'] &&
-        (cancelAnimationFrame(this['_cameraJumpRaf']), (this['_cameraJumpRaf'] = 0x0)),
+        (cancelAnimationFrame(this['_cameraJumpRaf']), (this['_cameraJumpRaf'] = 0)),
       this['_pendingCameraJumpReleaseRaf'] &&
         (cancelAnimationFrame(this['_pendingCameraJumpReleaseRaf']),
-        (this['_pendingCameraJumpReleaseRaf'] = 0x0)),
+        (this['_pendingCameraJumpReleaseRaf'] = 0)),
       (this['_pendingCameraJumpCommit'] = null),
       clearDraft && this['_bridge']?.['clearDraftView']?.());
   }
@@ -822,12 +822,12 @@ export class PanoramaSceneNode {
   ['_isDefaultSceneView'](event8) {
     const event9 = createDefaultSceneView();
     return (
-      Math['abs']((Number(event8?.['target']?.['x']) || 0x0) - event9['target']['x']) < 1e-9 &&
-      Math['abs']((Number(event8?.['target']?.['y']) || 0x0) - event9['target']['y']) < 1e-9 &&
-      Math['abs']((Number(event8?.['target']?.['z']) || 0x0) - event9['target']['z']) < 1e-9 &&
-      Math['abs']((Number(event8?.['orbitYaw']) || 0x0) - event9['orbitYaw']) < 1e-9 &&
-      Math['abs']((Number(event8?.['orbitPitch']) || 0x0) - event9['orbitPitch']) < 1e-9 &&
-      Math['abs']((Number(event8?.['orbitDistance']) || 0x0) - event9['orbitDistance']) < 1e-9
+      Math['abs']((Number(event8?.['target']?.['x']) || 0) - event9['target']['x']) < 1e-9 &&
+      Math['abs']((Number(event8?.['target']?.['y']) || 0) - event9['target']['y']) < 1e-9 &&
+      Math['abs']((Number(event8?.['target']?.['z']) || 0) - event9['target']['z']) < 1e-9 &&
+      Math['abs']((Number(event8?.['orbitYaw']) || 0) - event9['orbitYaw']) < 1e-9 &&
+      Math['abs']((Number(event8?.['orbitPitch']) || 0) - event9['orbitPitch']) < 1e-9 &&
+      Math['abs']((Number(event8?.['orbitDistance']) || 0) - event9['orbitDistance']) < 1e-9
     );
   }
   ['_maybeReleasePendingCameraJumpDraft']() {
@@ -839,7 +839,7 @@ export class PanoramaSceneNode {
     if (Math['abs'](value46 - enabled3['targetFocalLength']) > 0.000001) return;
     const value47 = enabled3['token'];
     this['_pendingCameraJumpReleaseRaf'] = requestAnimationFrame(() => {
-      this['_pendingCameraJumpReleaseRaf'] = 0x0;
+      this['_pendingCameraJumpReleaseRaf'] = 0;
       const enabled4 = this['_pendingCameraJumpCommit'];
       if (!enabled4 || enabled4['token'] !== value47) return;
       const value48 = this['_sceneState']?.['viewport']?.['sceneView'] || null,
@@ -899,12 +899,12 @@ export class PanoramaSceneNode {
             Number(box8['z']),
             Number(box8['w']),
           )['normalize']();
-        const box9 = value54?.['rotation'] || { x: 0x0, y: 0x0, z: 0x0 };
+        const box9 = value54?.['rotation'] || { x: 0, y: 0, z: 0 };
         return new threeRuntime['Quaternion']()['setFromEuler'](
           new threeRuntime['Euler'](
-            Number(box9['x']) || 0x0,
-            Number(box9['y']) || 0x0,
-            Number(box9['z']) || 0x0,
+            Number(box9['x']) || 0,
+            Number(box9['y']) || 0,
+            Number(box9['z']) || 0,
             'YXZ',
           ),
         );
@@ -938,9 +938,9 @@ export class PanoramaSceneNode {
         position: cloneVector3(rotation2['position']),
         quaternion: { x: x6['x'], y: x6['y'], z: x6['z'], w: x6['w'] },
         rotation: rotation2['rotation'] || quaternionToRotation(x6),
-        fov: Number['isFinite'](Number(rotation2['fov'])) ? Number(rotation2['fov']) : 0x3a,
+        fov: Number['isFinite'](Number(rotation2['fov'])) ? Number(rotation2['fov']) : 58,
       },
-      value57 = 0x1c2,
+      value57 = 450,
       value58 = performance['now'](),
       handler5 = (value59) => {
         const position = interpolateVector3(value56['position'], targetPose2['position'], value59),
@@ -968,18 +968,18 @@ export class PanoramaSceneNode {
           disableSmoothing: !![],
         });
       };
-    handler5(0x0);
+    handler5(0);
     const value60 = (value61) => {
       if (value55 !== this['_cameraJumpToken']) return;
-      const value62 = Math['max'](0x0, value61 - value58),
-        count4 = Math['min'](0x1, value62 / value57),
+      const value62 = Math['max'](0, value61 - value58),
+        count4 = Math['min'](1, value62 / value57),
         smootherstep2 = smootherstep(count4);
       handler5(smootherstep2);
-      if (count4 < 0x1) {
+      if (count4 < 1) {
         this['_cameraJumpRaf'] = requestAnimationFrame(value60);
         return;
       }
-      ((this['_cameraJumpRaf'] = 0x0),
+      ((this['_cameraJumpRaf'] = 0),
         this['_commitCameraJumpTarget']({
           targetPose: targetPose2,
           referenceSceneView: referenceSceneView2,
@@ -1008,7 +1008,7 @@ export class PanoramaSceneNode {
   }
   ['_stopCameraTimelinePlayback']({ clearDraft: clearDraft = ![] } = {}) {
     this['_timelinePlaybackRaf'] &&
-      (cancelAnimationFrame(this['_timelinePlaybackRaf']), (this['_timelinePlaybackRaf'] = 0x0));
+      (cancelAnimationFrame(this['_timelinePlaybackRaf']), (this['_timelinePlaybackRaf'] = 0));
     this['_isTimelinePlaying'] = ![];
     if (clearDraft) this['_bridge']?.['clearDraftView']?.();
     renderCameraTimelinePanel(this['_timelinePanelEl'], this['_sceneState']?.['cameraTimeline'], {
@@ -1022,19 +1022,19 @@ export class PanoramaSceneNode {
       return;
     }
     const cameraTimeline2 = normalizeCameraTimeline(this['_sceneState']?.['cameraTimeline']);
-    if (cameraTimeline2['keyframes']['length'] < 0x2) return;
+    if (cameraTimeline2['keyframes']['length'] < 2) return;
     ((this['_isTimelinePlaying'] = !![]),
       (this['_timelinePlaybackStartTime'] =
         this['_timelinePreviewTime'] >= cameraTimeline2['duration']
-          ? 0x0
+          ? 0
           : this['_timelinePreviewTime'] || cameraTimeline2['currentTime']),
       (this['_timelinePlaybackStartedAt'] = performance['now']()));
     const value64 = (value65) => {
       if (!this['_isTimelinePlaying']) return;
       const cameraTimeline3 = normalizeCameraTimeline(this['_sceneState']?.['cameraTimeline']),
-        value66 = (value65 - this['_timelinePlaybackStartedAt']) / 0x3e8;
+        value66 = (value65 - this['_timelinePlaybackStartedAt']) / 1000;
       let value67 = this['_timelinePlaybackStartTime'] + value66;
-      if (cameraTimeline3['loop'] && cameraTimeline3['duration'] > 0x0) value67 %= cameraTimeline3['duration'];
+      if (cameraTimeline3['loop'] && cameraTimeline3['duration'] > 0) value67 %= cameraTimeline3['duration'];
       else {
         if (value67 >= cameraTimeline3['duration']) {
           (this['_previewCameraTimelineAt'](cameraTimeline3['duration'], { fromPlayback: !![] }),
@@ -1086,11 +1086,11 @@ export class PanoramaSceneNode {
             event10['key'] +
             '"\n              aria-label="' +
             panoramaSceneText('capture.modeAria', { label: label }) +
-            '\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22panorama-capture-menu__icon\x20' +
+            '"\n            >\n              <span class="panorama-capture-menu__icon ' +
             event10['iconClass'] +
             '" aria-hidden="true">\n                <span class="panorama-capture-menu__icon-shape"></span>\n              </span>\n              <span class="panorama-capture-menu__label">' +
             label +
-            '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'
+            '</span>\n            </button>\n          '
           );
         })['join']('') +
         '\n      </div>\n    '),
@@ -1160,8 +1160,8 @@ export class PanoramaSceneNode {
     return normalizeCaptureMode(this['_sceneState']?.['capture']?.['mode']);
   }
   ['_resolveCaptureFrameRect']() {
-    const value74 = this['_viewportEl']?.['clientWidth'] || 0x0,
-      value75 = this['_viewportEl']?.['clientHeight'] || 0x0;
+    const value74 = this['_viewportEl']?.['clientWidth'] || 0,
+      value75 = this['_viewportEl']?.['clientHeight'] || 0;
     return computeCaptureFrameRect(value74, value75, this['_resolveCaptureMode']());
   }
   ['_syncCaptureMenuState']() {
@@ -1197,8 +1197,8 @@ export class PanoramaSceneNode {
     if (!blob2) return null;
     return cropCaptureBlobToFrame({
       blob: blob2,
-      viewportWidth: this['_viewportEl']?.['clientWidth'] || 0x0,
-      viewportHeight: this['_viewportEl']?.['clientHeight'] || 0x0,
+      viewportWidth: this['_viewportEl']?.['clientWidth'] || 0,
+      viewportHeight: this['_viewportEl']?.['clientHeight'] || 0,
       mode: this['_resolveCaptureMode'](),
     });
   }
@@ -1208,25 +1208,25 @@ export class PanoramaSceneNode {
       (el18['innerHTML'] =
         '\n      <div class="panorama-grid-panel__title">' +
         panoramaSceneText('grid.title') +
-        '</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22panorama-grid-panel__metrics-row\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label\x20class=\x22panorama-grid-panel__metric-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22panorama-grid-panel__metric-label\x22\x20data-grid-label=\x22rows\x22>' +
+        '</div>\n      <div class="panorama-grid-panel__metrics-row">\n        <label class="panorama-grid-panel__metric-item">\n          <span class="panorama-grid-panel__metric-label" data-grid-label="rows">' +
         panoramaSceneText('grid.rows') +
         '</span>\n          <div class="panorama-grid-panel__metric-control rh-stepper">\n            <div class="rh-stepper-value panorama-grid-panel__metric-stepper" data-grid-field="rows" role="spinbutton" aria-label="' +
         panoramaSceneText('grid.rowsAria') +
         '" aria-valuenow="1" tabindex="0">1</div>\n          </div>\n        </label>\n        <label class="panorama-grid-panel__metric-item">\n          <span class="panorama-grid-panel__metric-label" data-grid-label="cols">' +
         panoramaSceneText('grid.cols') +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22panorama-grid-panel__metric-control\x20rh-stepper\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-stepper-value\x20panorama-grid-panel__metric-stepper\x22\x20data-grid-field=\x22cols\x22\x20role=\x22spinbutton\x22\x20aria-label=\x22' +
+        '</span>\n          <div class="panorama-grid-panel__metric-control rh-stepper">\n            <div class="rh-stepper-value panorama-grid-panel__metric-stepper" data-grid-field="cols" role="spinbutton" aria-label="' +
         panoramaSceneText('grid.colsAria') +
         '" aria-valuenow="1" tabindex="0">1</div>\n          </div>\n        </label>\n      </div>\n      <div class="panorama-grid-panel__metrics-row">\n        <label class="panorama-grid-panel__metric-item">\n          <span class="panorama-grid-panel__metric-label" data-grid-label="spacingX">' +
         panoramaSceneText('grid.spacingX') +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22panorama-grid-panel__metric-control\x20rh-stepper\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-stepper-value\x20panorama-grid-panel__metric-stepper\x22\x20data-grid-field=\x22spacingX\x22\x20role=\x22spinbutton\x22\x20aria-label=\x22' +
+        '</span>\n          <div class="panorama-grid-panel__metric-control rh-stepper">\n            <div class="rh-stepper-value panorama-grid-panel__metric-stepper" data-grid-field="spacingX" role="spinbutton" aria-label="' +
         panoramaSceneText('grid.spacingXAria') +
-        '\x22\x20aria-valuenow=\x221.0\x22\x20tabindex=\x220\x22>1.0</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label\x20class=\x22panorama-grid-panel__metric-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22panorama-grid-panel__metric-label\x22\x20data-grid-label=\x22spacingZ\x22>' +
+        '" aria-valuenow="1.0" tabindex="0">1.0</div>\n          </div>\n        </label>\n        <label class="panorama-grid-panel__metric-item">\n          <span class="panorama-grid-panel__metric-label" data-grid-label="spacingZ">' +
         panoramaSceneText('grid.spacingZ') +
         '</span>\n          <div class="panorama-grid-panel__metric-control rh-stepper">\n            <div class="rh-stepper-value panorama-grid-panel__metric-stepper" data-grid-field="spacingZ" role="spinbutton" aria-label="' +
         panoramaSceneText('grid.spacingZAria') +
         '" aria-valuenow="1.0" tabindex="0">1.0</div>\n          </div>\n        </label>\n      </div>\n      <div class="panorama-grid-panel__appearance-row">\n        <div class="panorama-grid-panel__appearance-group panorama-grid-panel__appearance-group--gender">\n          <span class="panorama-grid-panel__appearance-label" data-grid-label="gender">' +
         panoramaSceneText('grid.gender') +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22panorama-grid-panel__appearance-options\x20panorama-grid-panel__appearance-options--gender\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '</span>\n          <div class="panorama-grid-panel__appearance-options panorama-grid-panel__appearance-options--gender">\n            ' +
         PANORAMA_MANNEQUIN_GENDER_OPTIONS['map'](([value79, , value80]) => {
           const label2 = getPanoramaMannequinGenderLabel(value79);
           return (
@@ -1234,7 +1234,7 @@ export class PanoramaSceneNode {
             value79 +
             '" aria-label="' +
             panoramaSceneText('grid.setGenderAria', { label: label2 }) +
-            '\x22>' +
+            '">' +
             value80 +
             '</button>'
           );
@@ -1252,14 +1252,14 @@ export class PanoramaSceneNode {
             '"></button>'
           );
         })['join']('') +
-        '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22panorama-grid-panel__apply\x22>' +
+        '\n          </div>\n        </div>\n      </div>\n      <button type="button" class="panorama-grid-panel__apply">' +
         panoramaSceneText('grid.apply') +
-        '</button>\x0a\x20\x20\x20\x20'));
+        '</button>\n    '));
     const value82 = {
-        rows: { min: 0x1, max: 0xc, step: 0x1, precision: 0x0 },
-        cols: { min: 0x1, max: 0xc, step: 0x1, precision: 0x0 },
-        spacingX: { min: 0.5, max: 0x8, step: 0.1, precision: 0x1 },
-        spacingZ: { min: 0.5, max: 0x8, step: 0.1, precision: 0x1 },
+        rows: { min: 1, max: 12, step: 1, precision: 0 },
+        cols: { min: 1, max: 12, step: 1, precision: 0 },
+        spacingX: { min: 0.5, max: 8, step: 0.1, precision: 1 },
+        spacingZ: { min: 0.5, max: 8, step: 0.1, precision: 1 },
       },
       handler6 = (value83, value84) => {
         const enabled8 = value82[value83];
@@ -1267,13 +1267,13 @@ export class PanoramaSceneNode {
         const value85 = Number(value84);
         if (!Number['isFinite'](value85)) return null;
         const value86 = Math['min'](enabled8['max'], Math['max'](enabled8['min'], value85));
-        if (enabled8['precision'] === 0x0) return Math['round'](value86);
+        if (enabled8['precision'] === 0) return Math['round'](value86);
         return Number(value86['toFixed'](enabled8['precision']));
       },
       handler7 = (value87, value88) => {
         const enabled9 = value82[value87];
         if (!enabled9 || !Number['isFinite'](Number(value88))) return '';
-        return enabled9['precision'] === 0x0
+        return enabled9['precision'] === 0
           ? String(Math['round'](Number(value88)))
           : Number(value88)['toFixed'](enabled9['precision']);
       },
@@ -1289,13 +1289,13 @@ export class PanoramaSceneNode {
         const value94 = handler6(value92, value93);
         if (!Number['isFinite'](value94)) return;
         setPanoramaSceneGridPlacement({ nodeId: this['id'], patch: { [value92]: value94 } });
-        const value95 = el18['querySelector']('[data-grid-field="' + value92 + '\x22]');
+        const value95 = el18['querySelector']('[data-grid-field="' + value92 + '"]');
         handler8(value95, value92, value94);
       };
     return (
       Object['keys'](value82)['forEach']((value96) => {
         const value97 = value82[value96],
-          enabled10 = el18['querySelector']('[data-grid-field="' + value96 + '\x22]');
+          enabled10 = el18['querySelector']('[data-grid-field="' + value96 + '"]');
         if (!enabled10) return;
         let box11 = null,
           enabled11 = ![];
@@ -1309,8 +1309,8 @@ export class PanoramaSceneNode {
           value100 = (event13) => {
             if (!box11) return;
             const value101 = event13['clientX'] - box11['x'];
-            if (!box11['moved'] && Math['abs'](value101) >= 0x3) box11['moved'] = !![];
-            const value102 = Math['trunc'](value101 / 0x6),
+            if (!box11['moved'] && Math['abs'](value101) >= 3) box11['moved'] = !![];
+            const value102 = Math['trunc'](value101 / 6),
               value103 = box11['v'] + value102 * value97['step'];
             if (value103 === box11['last']) return;
             ((box11['last'] = value103), handler9(value96, value103));
@@ -1370,18 +1370,18 @@ export class PanoramaSceneNode {
             }),
               (el22['onkeydown'] = (event16) => {
                 const value113 =
-                  event16['key'] === 'ArrowRight' ? 0x1 : event16['key'] === 'ArrowLeft' ? -0x1 : 0x0;
+                  event16['key'] === 'ArrowRight' ? 1 : event16['key'] === 'ArrowLeft' ? -1 : 0;
                 if (value113) {
                   (event16['preventDefault'](), event16['stopPropagation']());
                   const value114 = run4();
                   handler9(value96, value114 + value113 * value97['step']);
                   return;
                 }
-                (event16['key'] === 'Enter' || event16['key'] === '\x20') &&
+                (event16['key'] === 'Enter' || event16['key'] === ' ') &&
                   (event16['preventDefault'](), event16['stopPropagation'](), handler10(el22));
               }),
               (el22['onmousedown'] = (x8) => {
-                if (x8['button'] !== 0x0) return;
+                if (x8['button'] !== 0) return;
                 (x8['preventDefault'](), (enabled11 = ![]));
                 const v = run4();
                 ((box11 = {
@@ -1555,7 +1555,7 @@ export class PanoramaSceneNode {
   ['_selectNodeOnCanvas']({ preserveExistingSelection: preserveExistingSelection = ![] } = {}) {
     const list7 = appStore['getStateRaw']()['selectedNodeIds'] || [];
     if (preserveExistingSelection && list7['includes'](this['id'])) return;
-    if (list7['length'] === 0x1 && list7[0x0] === this['id']) return;
+    if (list7['length'] === 1 && list7[0] === this['id']) return;
     appStore['setSelectedNodes']([this['id']]);
   }
   ['_isEditing']() {
@@ -1620,9 +1620,9 @@ export class PanoramaSceneNode {
           list10 = Array['isArray'](enabled21['images']) ? enabled21['images'] : [],
           value125 = Number(enabled21['mainImageIndex']),
           value126 = Number['isFinite'](value125)
-            ? Math['max'](0x0, Math['min'](list10['length'] - 0x1, Math['trunc'](value125)))
-            : 0x0,
-          value127 = list10[value126] || list10[0x0] || null,
+            ? Math['max'](0, Math['min'](list10['length'] - 1, Math['trunc'](value125)))
+            : 0,
+          value127 = list10[value126] || list10[0] || null,
           value128 = [
             String(enabled21['localPath'] || '')['trim'](),
             String(enabled21['originalLocalPath'] || '')['trim'](),
@@ -1645,7 +1645,7 @@ export class PanoramaSceneNode {
             ':' +
             enabled18['sourceId'] +
             ':' +
-            Number(enabled18['createdAt'] || 0x0) +
+            Number(enabled18['createdAt'] || 0) +
             ':' +
             value124 +
             ':' +
@@ -1672,7 +1672,7 @@ export class PanoramaSceneNode {
       event19['target']['value'] = '';
       return;
     }
-    const file = event19['target']['files']?.[0x0];
+    const file = event19['target']['files']?.[0];
     if (!file) return;
     this['_selectNodeOnCanvas']();
     const uploadPanoramaSceneImage2 = await uploadPanoramaSceneImage({ nodeId: this['id'], file: file });
@@ -1719,14 +1719,14 @@ export class PanoramaSceneNode {
     if (!this['_contextMenuEl'] || !this['_overlayEl']) return;
     const box12 = this['_overlayEl']['getBoundingClientRect']();
     if (!box12['width'] || !box12['height']) return;
-    const value134 = this['_contextMenuEl']['offsetWidth'] || 0x84,
-      value135 = this['_contextMenuEl']['offsetHeight'] || 0x2c,
+    const value134 = this['_contextMenuEl']['offsetWidth'] || 132,
+      value135 = this['_contextMenuEl']['offsetHeight'] || 44,
       value136 = Math['max'](
-        0x0,
+        0,
         Math['min'](value131 - box12['left'], box12['width'] - value134),
       ),
       value137 = Math['max'](
-        0x0,
+        0,
         Math['min'](value132 - box12['top'], box12['height'] - value135),
       );
     ((this['_contextMenuEl']['style']['left'] = value136 + 'px'),
@@ -2020,18 +2020,18 @@ export class PanoramaSceneNode {
     );
     if (!list11) return;
     (event26['preventDefault'](), event26['stopPropagation'](), this['_selectNodeOnCanvas']());
-    const value141 = list11['slice'](0x4);
+    const value141 = list11['slice'](4);
     void this['_handleToolbarAction'](value141);
   }
   ['_syncGridPanelValues']() {
     if (!this['_gridPanelEl']) return;
     const value142 = this['_sceneState']['gridPlacement'],
-      handler12 = (value143, value144, count5 = 0x0) => {
-        const el31 = this['_gridPanelEl']['querySelector']('[data-grid-field="' + value143 + '\x22]');
+      handler12 = (value143, value144, count5 = 0) => {
+        const el31 = this['_gridPanelEl']['querySelector']('[data-grid-field="' + value143 + '"]');
         if (!el31) return;
         if (!Number['isFinite'](Number(value144))) return;
         const value145 =
-          count5 > 0x0
+          count5 > 0
             ? Number(value144)['toFixed'](count5)
             : String(Math['round'](Number(value144)));
         el31['tagName'] === 'INPUT'
@@ -2039,10 +2039,10 @@ export class PanoramaSceneNode {
           : ((el31['textContent'] = value145),
             el31['setAttribute']('aria-valuenow', String(value144)));
       };
-    (handler12('rows', value142['rows'], 0x0),
-      handler12('cols', value142['cols'], 0x0),
-      handler12('spacingX', value142['spacingX'], 0x1),
-      handler12('spacingZ', value142['spacingZ'], 0x1));
+    (handler12('rows', value142['rows'], 0),
+      handler12('cols', value142['cols'], 0),
+      handler12('spacingX', value142['spacingX'], 1),
+      handler12('spacingZ', value142['spacingZ'], 1));
     const value146 = value142['gender'] === 'female' ? 'female' : 'male';
     this['_gridPanelEl']['querySelectorAll']('[data-grid-gender]')['forEach']((el32) => {
       el32['classList']['toggle']('is-active', el32['dataset']['gridGender'] === value146);
@@ -2110,20 +2110,20 @@ export class PanoramaSceneNode {
         ?.['querySelector']?.('.panorama-scene-focus-menu__slider')
         ?.['setAttribute']('aria-label', panoramaSceneText('focus.sliderAria')),
       handler14('.panorama-grid-panel__title', panoramaSceneText('grid.title')),
-      handler14('[data-grid-label=\x22rows\x22]', panoramaSceneText('grid.rows')),
+      handler14('[data-grid-label="rows"]', panoramaSceneText('grid.rows')),
       handler14('[data-grid-label="cols"]', panoramaSceneText('grid.cols')),
       handler14('[data-grid-label="spacingX"]', panoramaSceneText('grid.spacingX')),
       handler14('[data-grid-label="spacingZ"]', panoramaSceneText('grid.spacingZ')),
-      handler14('[data-grid-label=\x22gender\x22]', panoramaSceneText('grid.gender')),
+      handler14('[data-grid-label="gender"]', panoramaSceneText('grid.gender')),
       handler14('[data-grid-label="color"]', panoramaSceneText('grid.color')),
       this['_gridPanelEl']
         ?.['querySelector']?.('[data-grid-field="rows"]')
         ?.['setAttribute']('aria-label', panoramaSceneText('grid.rowsAria')),
       this['_gridPanelEl']
-        ?.['querySelector']?.('[data-grid-field=\x22cols\x22]')
+        ?.['querySelector']?.('[data-grid-field="cols"]')
         ?.['setAttribute']('aria-label', panoramaSceneText('grid.colsAria')),
       this['_gridPanelEl']
-        ?.['querySelector']?.('[data-grid-field=\x22spacingX\x22]')
+        ?.['querySelector']?.('[data-grid-field="spacingX"]')
         ?.['setAttribute']('aria-label', panoramaSceneText('grid.spacingXAria')),
       this['_gridPanelEl']
         ?.['querySelector']?.('[data-grid-field="spacingZ"]')
@@ -2176,7 +2176,7 @@ export class PanoramaSceneNode {
         const list13 = Array['from'](el42['classList'])['find']((value159) =>
             value159['startsWith']('act-'),
           ),
-          value160 = list13?.['slice'](0x4),
+          value160 = list13?.['slice'](4),
           value161 = value160 === 'navigate',
           value162 = value161
             ? value157 === 'navigate' || value157 === 'box-select'
@@ -2302,7 +2302,7 @@ export class PanoramaSceneNode {
     const el60 = this['_bottomToolbarEl']['querySelector']('.act-camera');
     if (el60) {
       const enabled31 = this['_supportsCameraFeatures'](),
-        value168 = this['_sceneState']['cameras']['length'] >= 0xa;
+        value168 = this['_sceneState']['cameras']['length'] >= 10;
       ((el60['hidden'] = !enabled31),
         el60['setAttribute']('aria-hidden', enabled31 ? 'false' : 'true'),
         (el60['disabled'] = !enabled31),
@@ -2361,7 +2361,7 @@ export class PanoramaSceneNode {
         el65['classList']['toggle']('is-collapsed', value169));
     });
     const list15 = this['el']?.['querySelectorAll']?.('.act-fullscreen') || [];
-    if (list15['length'] > 0x0) {
+    if (list15['length'] > 0) {
       const value171 = this['_isBrowserFullscreen'](),
         value172 = value171
           ? panoramaSceneText('toolbar.exitFullscreen')
@@ -2421,14 +2421,14 @@ export class PanoramaSceneNode {
   }
   ['_positionMenus']() {
     if (!this['_bottomToolbarPopoverLayerEl'] || !this['_bottomToolbarEl']) return;
-    if (this['_bottomToolbarEl']['offsetWidth'] <= 0x0 || this['_bottomToolbarEl']['offsetHeight'] <= 0x0)
+    if (this['_bottomToolbarEl']['offsetWidth'] <= 0 || this['_bottomToolbarEl']['offsetHeight'] <= 0)
       return;
     const run7 = (y2) => {
         if (!(y2 instanceof HTMLElement)) return null;
-        const count6 = y2['offsetWidth'] || 0x0,
-          count7 = y2['offsetHeight'] || 0x0;
-        if (count6 <= 0x0 || count7 <= 0x0) return null;
-        return { x: (y2['offsetLeft'] || 0x0) + count6 / 0x2, y: y2['offsetTop'] || 0x0 };
+        const count6 = y2['offsetWidth'] || 0,
+          count7 = y2['offsetHeight'] || 0;
+        if (count6 <= 0 || count7 <= 0) return null;
+        return { x: (y2['offsetLeft'] || 0) + count6 / 2, y: y2['offsetTop'] || 0 };
       },
       box13 = run7(this['_bottomToolbarEl']['querySelector']('.act-mannequin-entry'));
     box13 &&
@@ -2487,7 +2487,7 @@ export class PanoramaSceneNode {
     const enabled42 =
         enabled39 &&
         this['_supportsCameraFeatures']() &&
-        this['_sceneState']['cameras']['length'] > 0x0 &&
+        this['_sceneState']['cameras']['length'] > 0 &&
         this['_openMenuKey'] === 'camera',
       enabled43 =
         enabled39 &&
@@ -2613,10 +2613,10 @@ export class PanoramaSceneNode {
       window['removeEventListener']('panorama-scene:capture-shortcut', this['_handleCaptureShortcutEvent']),
       void this['_exitBrowserFullscreen']({ skipSync: !![] }),
       this['_cameraJumpRaf'] &&
-        (cancelAnimationFrame(this['_cameraJumpRaf']), (this['_cameraJumpRaf'] = 0x0)),
+        (cancelAnimationFrame(this['_cameraJumpRaf']), (this['_cameraJumpRaf'] = 0)),
       this['_pendingCameraJumpReleaseRaf'] &&
         (cancelAnimationFrame(this['_pendingCameraJumpReleaseRaf']),
-        (this['_pendingCameraJumpReleaseRaf'] = 0x0)),
+        (this['_pendingCameraJumpReleaseRaf'] = 0)),
       (this['_pendingCameraJumpCommit'] = null),
       this['_stopCameraTimelinePlayback']({ clearDraft: !![] }),
       this['_resizeObserver']?.['disconnect'](),

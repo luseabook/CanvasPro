@@ -32,15 +32,15 @@ export function createCompletionNavigation({
           ? list2['some']((key) => key['id'] === value['nodeId'])
           : Boolean(list2[value['nodeId']]);
       });
-    if (list['length'] !== 0x1) return (showToast('对应的画布节点已删除或项目已关闭。', 'warn'), ![]);
+    if (list['length'] !== 1) return (showToast('对应的画布节点已删除或项目已关闭。', 'warn'), ![]);
     if (!requestWorkspaceMode('canvas')) return ![];
-    const index = list[0x0]['id'];
+    const index = list[0]['id'];
     await canvasTabs['switchTo'](index);
     if (enabled || canvasTabs['getActiveCanvasId']() !== index) return ![];
     if (!store['getState']()['nodes']?.[value['nodeId']]) return ![];
     return (
       store['setSelectedNodes']([value['nodeId']]),
-      viewport['focusNode'](value['nodeId'], 0x60, 0x1f4, { maxZoom: 1.15 })
+      viewport['focusNode'](value['nodeId'], 96, 500, { maxZoom: 1.15 })
     );
   }
   const run2 = subscribe((result) => {

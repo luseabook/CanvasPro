@@ -10,7 +10,7 @@ import {
   resolveRunningHubModelApiBaseUrl,
 } from '../src/modules/runningHubProviderProfiles.js';
 const credentials = new Map();
-let nextScope = 0x0;
+let nextScope = 0;
 export function resolveRunningHubPricingContext(value, item, args, handler = getProviderConfig) {
   const { modelManifest: modelManifest, executionManifest: executionManifest } = item;
   if (
@@ -47,7 +47,7 @@ export function resolveRunningHubPricingContext(value, item, args, handler = get
     resolved: item,
     apiKey: index,
     persist: ![],
-    debounceMs: 0x15e,
+    debounceMs: 350,
     key:
       'runninghub|' +
       runningHubModelApiBaseUrl +
@@ -101,12 +101,12 @@ export async function fetchRunningHubPricing(enabled) {
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + enabled['apiKey'] },
         body: JSON['stringify'](args2),
       },
-      0x2ee0,
+      12000,
     ),
     source = request2['data'];
   if (!request2['success'])
     throw new Error(
-      '参考价请求失败' + (request2['status'] ? '（HTTP\x20' + request2['status'] + '）' : '，请检查网络连接'),
+      '参考价请求失败' + (request2['status'] ? '（HTTP ' + request2['status'] + '）' : '，请检查网络连接'),
     );
   if (source?.['errorCode'] === '1014')
     throw new Error('当前线路的 Key 不支持模型 API，请在设置中配置企业级共享 Key');
@@ -115,13 +115,13 @@ export async function fetchRunningHubPricing(enabled) {
       '厂商无法按当前参数报价（' +
         String(source['errorCode'])
           ['replace'](/[^\w-]/g, '')
-          ['slice'](0x0, 0x1e) +
+          ['slice'](0, 30) +
         '）',
     );
   if (
     typeof source?.['estimatedPrice'] !== 'number' ||
     !Number['isFinite'](source['estimatedPrice']) ||
-    source['estimatedPrice'] < 0x0 ||
+    source['estimatedPrice'] < 0 ||
     !/^[A-Z]{3}$/['test'](source['currency'] || '')
   )
     throw new Error('参考价暂不可用');
@@ -130,10 +130,10 @@ export async function fetchRunningHubPricing(enabled) {
     currency: source['currency'],
     isFreeThisCall: source['isFreeThisCall'] === !![],
     excludesReferenceUsage:
-      enabled['hasReferences'] === !![] || (enabled['references'] || [])['length'] > 0x0,
+      enabled['hasReferences'] === !![] || (enabled['references'] || [])['length'] > 0,
     referenceBasis:
       enabled['kind'] === 'image' &&
-      (enabled['hasReferences'] || (enabled['references'] || [])['length'] > 0x0)
+      (enabled['hasReferences'] || (enabled['references'] || [])['length'] > 0)
         ? 'textToImage'
         : 'parameters',
   };

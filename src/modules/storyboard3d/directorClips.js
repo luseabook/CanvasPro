@@ -5,7 +5,7 @@ export function normalizeDirectorClips(key, index) {
     map = new Set(list['map'](({ key: key2 }) => key2['id'])),
     map2 = new Set();
   return (Array['isArray'](key) ? key : [])
-    ['slice'](0x0, 0x12c)
+    ['slice'](0, 300)
     ['map']((error, result) => {
       const keyframeIds = [...new Set(Array['isArray'](error?.['keyframeIds']) ? error['keyframeIds'] : [])][
         'filter'
@@ -14,7 +14,7 @@ export function normalizeDirectorClips(key, index) {
       keyframeIds['forEach']((options) => map2['add'](options));
       const list2 = list['filter'](({ key: key3 }) => keyframeIds['includes'](key3['id'])),
         start = Math['max'](
-          0x0,
+          0,
           Math['min'](
             3599.9,
             finite(error['start'], Math['min'](...list2['map'](({ key: key4 }) => key4['time']))),
@@ -22,13 +22,13 @@ export function normalizeDirectorClips(key, index) {
         );
       return {
         id: String(error['id'] || 'motion-clip-' + result),
-        name: String(error['name'] || '运动片段')['slice'](0x0, 0x78),
+        name: String(error['name'] || '运动片段')['slice'](0, 120),
         keyframeIds: keyframeIds,
         start: start,
         end: Math['max'](
           start + 0.1,
           Math['min'](
-            0xe10,
+            3600,
             finite(error['end'], Math['max'](...list2['map'](({ key: key5 }) => key5['time']))),
           ),
         ),
@@ -44,10 +44,10 @@ export function resolveDirectorClipSample(next, keys, time) {
     list3 = (next || [])['filter']((entry) => entry['keyframeIds']['some']((record) => map3['has'](record)));
   if (!list3['length']) return { keys: keys, time: time };
   const map4 = new Set(list3['flatMap']((payload) => payload['keyframeIds'])),
-    enabled = list3['filter']((handle) => handle['start'] <= time)['at'](-0x1);
+    enabled = list3['filter']((handle) => handle['start'] <= time)['at'](-1);
   if (!enabled) return { keys: keys['filter']((state) => !map4['has'](state['id'])), time: time };
   const keys2 = keys['filter']((config) => !map4['has'](config['id']) && config['time'] > enabled['end']);
-  if (time >= enabled['end'] && keys2['length'] && time >= keys2[0x0]['time'])
+  if (time >= enabled['end'] && keys2['length'] && time >= keys2[0]['time'])
     return { keys: keys2, time: time };
   const map5 = new Set(enabled['keyframeIds']);
   return {
@@ -93,21 +93,21 @@ export function editDirectorClip(value5, { kind: kind, id: id, start: start3, en
   if (
     !Number['isFinite'](count) ||
     !Number['isFinite'](count2) ||
-    count < 0x0 ||
-    count2 > 0xe10 ||
-    count2 - count < 0x1 / structuredClone3['fps']
+    count < 0 ||
+    count2 > 3600 ||
+    count2 - count < 1 / structuredClone3['fps']
   )
     throw new Error('片段范围必须在 0–3600 秒内且至少一帧。');
   if (kind === 'action' && !move) {
     const count3 = enabled2['offset'] + (count - enabled2['start']) * enabled2['speed'];
-    if (count3 < 0x0) throw new Error('无法向前扩展到动作源起点之前。');
+    if (count3 < 0) throw new Error('无法向前扩展到动作源起点之前。');
     enabled2['offset'] = count3;
   }
   if (kind === 'motion' && move) {
     const count4 = count - enabled2['start'],
       map7 = new Set(enabled2['keyframeIds']),
       list5 = collectDirectorKeys(structuredClone3)['filter'](({ key: key9 }) => map7['has'](key9['id']));
-    if (list5['some'](({ key: key10 }) => key10['time'] + count4 < 0x0 || key10['time'] + count4 > 0xe10))
+    if (list5['some'](({ key: key10 }) => key10['time'] + count4 < 0 || key10['time'] + count4 > 3600))
       throw new Error('移动后源关键帧超出范围。');
     list5['forEach'](({ key: key11 }) => {
       key11['time'] += count4;
@@ -140,7 +140,7 @@ export function pasteDirectorClip(value14, value15, count5) {
   if (!clip2) throw new Error('片段已不存在。');
   const structuredClone5 = structuredClone(clip2),
     count6 = count5 - structuredClone5['start'];
-  if (count5 < 0x0 || structuredClone5['end'] + count6 > 0xe10) throw new Error('复制片段超出镜头时长范围。');
+  if (count5 < 0 || structuredClone5['end'] + count6 > 3600) throw new Error('复制片段超出镜头时长范围。');
   ((structuredClone5['id'] = 'clip-' + globalThis['crypto']['randomUUID']()),
     (structuredClone5['start'] += count6),
     (structuredClone5['end'] += count6));
@@ -152,7 +152,7 @@ export function pasteDirectorClip(value14, value15, count5) {
         id: 'key-' + globalThis['crypto']['randomUUID'](),
         time: time2['key']['time'] + count6,
       };
-      if (value16['time'] < 0x0 || value16['time'] > 0xe10) throw new Error('源关键帧超出复制范围。');
+      if (value16['time'] < 0 || value16['time'] > 3600) throw new Error('源关键帧超出复制范围。');
       map8['set'](time2['key']['id'], value16['id']);
       const enabled3 = structuredClone4['objectTracks']['find'](
         (value17) => value17['objectId'] === time2['objectId'],

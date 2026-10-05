@@ -180,7 +180,7 @@ function installFetchMockForConfig(value) {
             return makeTextResponse(
               JSON.stringify({
                 id: 'ark-direct-response-1',
-                created: 0x6a18a500,
+                created: 1780000000,
                 data: [{ url: 'https://ark.example.com/seedream.png' }],
               }),
             );
@@ -235,7 +235,7 @@ function installFetchMockForConfig(value) {
   }));
 function makeJsonResponse(scope, ok = 200) {
   return {
-    ok: ok >= 200 && ok < 0x12c,
+    ok: ok >= 200 && ok < 300,
     status: ok,
     headers: {
       get(input) {
@@ -249,7 +249,7 @@ function makeJsonResponse(scope, ok = 200) {
 function makeTextResponse(output, ok2 = 200) {
   const value2 = String(output || '');
   return {
-    ok: ok2 >= 200 && ok2 < 0x12c,
+    ok: ok2 >= 200 && ok2 < 300,
     status: ok2,
     headers: {
       get(value3) {
@@ -275,7 +275,7 @@ function makeTextResponseWithHeaders(value5, value6 = {}, ok3 = 200) {
       ]),
     );
   return {
-    ok: ok3 >= 200 && ok3 < 0x12c,
+    ok: ok3 >= 200 && ok3 < 300,
     status: ok3,
     headers: {
       get(value11) {
@@ -1230,7 +1230,7 @@ function getProxyTaskApiUrl(value13) {
         assert.equal(dom51.body.sref, 'https://www.runninghub.cn/style.png'),
         assert.equal(dom51.body.quality, '4'),
         assert.equal(dom51.body.iw, 2),
-        assert.equal(dom51.body.sw, 0x12c),
+        assert.equal(dom51.body.sw, 300),
         assert.equal(dom51.body.hd, true));
       const dom52 = await buildGenerateImageRequest27({
         prompt: 'p',
@@ -1320,7 +1320,7 @@ function getProxyTaskApiUrl(value13) {
         if (value41.startsWith('/api/v2/proxy/upload?'))
           return (
             assert.equal(response2.headers?.Authorization, 'Bearer k_rhm'),
-            makeJsonResponse({ code: 0x191, errorMessage: 'invalid model api key' })
+            makeJsonResponse({ code: 401, errorMessage: 'invalid model api key' })
           );
         throw new Error('unexpected fetch url: ' + value41);
       };
@@ -1604,7 +1604,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value61, value62, ...args) =>
-          handler(value61, Number(value62) > 0x1388 ? Number(value62) : 0, ...args)),
+          handler(value61, Number(value62) > 5000 ? Number(value62) : 0, ...args)),
         (globalThis.fetch = async (value63, dom57 = {}) => {
           const value64 = String(value63);
           if (value64 === '/api/config')
@@ -1664,7 +1664,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value70, value71, ...args2) =>
-          handler2(value70, Number(value71) > 0x1388 ? Number(value71) : 0, ...args2)),
+          handler2(value70, Number(value71) > 5000 ? Number(value71) : 0, ...args2)),
         (globalThis.fetch = async (value72, dom58 = {}) => {
           const value73 = String(value72);
           if (value73 === '/api/config')
@@ -1711,7 +1711,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value81, value82, ...args3) =>
-          handler3(value81, Number(value82) > 0x1388 ? Number(value82) : 0, ...args3)),
+          handler3(value81, Number(value82) > 5000 ? Number(value82) : 0, ...args3)),
         (globalThis.fetch = async (value83, dom59 = {}) => {
           const value84 = String(value83);
           if (value84 === '/api/config')
@@ -1763,7 +1763,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value89, value90, ...args4) =>
-          handler4(value89, Number(value90) > 0x1388 ? Number(value90) : 0, ...args4)),
+          handler4(value89, Number(value90) > 5000 ? Number(value90) : 0, ...args4)),
         (globalThis.fetch = async (value91, dom60 = {}) => {
           const value92 = String(value91);
           if (value92 === '/api/config')
@@ -1814,7 +1814,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value98, value99, ...args5) =>
-          handler5(value98, Number(value99) > 0x1388 ? Number(value99) : 0, ...args5)),
+          handler5(value98, Number(value99) > 5000 ? Number(value99) : 0, ...args5)),
         (globalThis.fetch = async (value100, value101 = {}) => {
           const value102 = String(value100);
           if (value102 === '/api/config')
@@ -1868,7 +1868,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value106, value107, ...args6) =>
-          handler6(value106, Number(value107) > 0x1388 ? Number(value107) : 0, ...args6)),
+          handler6(value106, Number(value107) > 5000 ? Number(value107) : 0, ...args6)),
         (globalThis.fetch = async (value108, value109 = {}) => {
           const value110 = String(value108);
           if (value110 === '/api/config')
@@ -1975,8 +1975,8 @@ function getProxyTaskApiUrl(value13) {
           if (value122 === '/api/v2/proxy/image') {
             const value123 = JSON.parse(String(dom62.body || '{}'));
             (assert.ok(String(value123.apiUrl || '').includes('/openapi/v2/query')), (count4 += 1));
-            if (count4 === 1) return makeJsonResponse({ code: 0x324, msg: '运行中' });
-            if (count4 === 2) return makeJsonResponse({ code: 0x32d, msg: '排队中' });
+            if (count4 === 1) return makeJsonResponse({ code: 804, msg: '运行中' });
+            if (count4 === 2) return makeJsonResponse({ code: 813, msg: '排队中' });
             return makeJsonResponse({
               code: 0,
               data: { status: 'SUCCESS', results: [{ url: 'https://img.example.com/rh-openapi-final.png' }] },
@@ -2118,7 +2118,7 @@ function getProxyTaskApiUrl(value13) {
     let value147 = 0;
     try {
       ((globalThis.setTimeout = (value148, value149, ...args7) =>
-        handler7(value148, Number(value149) > 0x1388 ? Number(value149) : 0, ...args7)),
+        handler7(value148, Number(value149) > 5000 ? Number(value149) : 0, ...args7)),
         (globalThis.fetch = async (value150, value151 = {}) => {
           const list13 = String(value150);
           if (list13 === '/api/config') return makeJsonResponse({ providers: {} });
@@ -2187,7 +2187,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value162, value163, ...args8) =>
-          handler8(value162, Number(value163) > 0x1388 ? Number(value163) : 0, ...args8)),
+          handler8(value162, Number(value163) > 5000 ? Number(value163) : 0, ...args8)),
         (globalThis.fetch = async (value164, value165 = {}) => {
           const value166 = String(value164);
           if (value166 === '/api/config')
@@ -2253,7 +2253,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value175, value176, ...args9) =>
-          handler9(value175, Number(value176) > 0x1388 ? Number(value176) : 0, ...args9)),
+          handler9(value175, Number(value176) > 5000 ? Number(value176) : 0, ...args9)),
         (globalThis.fetch = async (value177, dom63 = {}) => {
           const value178 = String(value177);
           if (value178 === '/api/config')
@@ -2714,7 +2714,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value228, value229, ...args10) =>
-          handler10(value228, Number(value229) > 0x1388 ? Number(value229) : 0, ...args10)),
+          handler10(value228, Number(value229) > 5000 ? Number(value229) : 0, ...args10)),
         (globalThis.fetch = async (value230, dom69 = {}) => {
           const list24 = String(value230);
           if (list24 === '/api/config')
@@ -2785,7 +2785,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value236, value237, ...args11) =>
-          handler11(value236, Number(value237) > 0x1388 ? Number(value237) : 0, ...args11)),
+          handler11(value236, Number(value237) > 5000 ? Number(value237) : 0, ...args11)),
         (globalThis.fetch = async (value238, value239 = {}) => {
           const list26 = String(value238);
           if (list26 === '/api/config')
@@ -2837,7 +2837,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value245, value246, ...args12) =>
-          handler12(value245, Number(value246) > 0x1388 ? Number(value246) : 0, ...args12)),
+          handler12(value245, Number(value246) > 5000 ? Number(value246) : 0, ...args12)),
         (globalThis.fetch = async (value247, dom70 = {}) => {
           const list27 = String(value247);
           if (list27 === '/api/config')
@@ -2897,7 +2897,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value252, value253, ...args13) =>
-          handler13(value252, Number(value253) > 0x1388 ? Number(value253) : 0, ...args13)),
+          handler13(value252, Number(value253) > 5000 ? Number(value253) : 0, ...args13)),
         (globalThis.fetch = async (value254) => {
           const value255 = String(value254);
           if (value255 === '/api/config')
@@ -2950,7 +2950,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value259, value260, ...args14) =>
-          handler14(value259, Number(value260) > 0x1388 ? Number(value260) : 0, ...args14)),
+          handler14(value259, Number(value260) > 5000 ? Number(value260) : 0, ...args14)),
         (globalThis.fetch = async (value261, dom72 = {}) => {
           const value262 = String(value261);
           if (value262 === '/api/config')
@@ -3056,7 +3056,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value279, value280, ...args15) =>
-          handler15(value279, Number(value280) > 0x1388 ? Number(value280) : 0, ...args15)),
+          handler15(value279, Number(value280) > 5000 ? Number(value280) : 0, ...args15)),
         (globalThis.fetch = async (value281, dom74 = {}) => {
           const value282 = String(value281);
           if (value282 === '/api/config')
@@ -3160,7 +3160,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value297, value298, ...args16) =>
-          handler17(value297, Number(value298) > 0x1388 ? Number(value298) : 0, ...args16)),
+          handler17(value297, Number(value298) > 5000 ? Number(value298) : 0, ...args16)),
         (globalThis.fetch = async (value299, dom75 = {}) => {
           const value300 = String(value299);
           if (value300 === '/api/config')
@@ -3178,7 +3178,7 @@ function getProxyTaskApiUrl(value13) {
           if (value300 === '/api/v2/save_output_from_url')
             return makeJsonResponse({ path: 'output/grsai-sse-direct-1.png' });
           if (value300.startsWith('/api/v2/proxy/task?'))
-            return makeJsonResponse({ message: 'should-not-poll' }, 0x1f4);
+            return makeJsonResponse({ message: 'should-not-poll' }, 500);
           throw new Error('unexpected fetch url: ' + value300);
         }));
       const { clearApiConfig: clearApiConfig67 } = await import('./configApi.js');
@@ -3204,7 +3204,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value308, value309, ...args17) =>
-          handler18(value308, Number(value309) > 0x1388 ? Number(value309) : 0, ...args17)),
+          handler18(value308, Number(value309) > 5000 ? Number(value309) : 0, ...args17)),
         (globalThis.fetch = async (value310, dom76 = {}) => {
           const value311 = String(value310);
           if (value311 === '/api/config')
@@ -3263,7 +3263,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value318, value319, ...args18) =>
-          handler19(value318, Number(value319) > 0x1388 ? Number(value319) : 0, ...args18)),
+          handler19(value318, Number(value319) > 5000 ? Number(value319) : 0, ...args18)),
         (globalThis.fetch = async (value320, value321 = {}) => {
           const value322 = String(value320);
           if (value322 === '/api/config')
@@ -3311,7 +3311,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value329, value330, ...args19) =>
-          handler20(value329, Number(value330) > 0x1388 ? Number(value330) : 0, ...args19)),
+          handler20(value329, Number(value330) > 5000 ? Number(value330) : 0, ...args19)),
         (globalThis.fetch = async (value331, value332 = {}) => {
           const value333 = String(value331);
           if (value333 === '/api/config')
@@ -3357,7 +3357,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value338, value339, ...args20) =>
-          handler21(value338, Number(value339) > 0x1388 ? Number(value339) : 0, ...args20)),
+          handler21(value338, Number(value339) > 5000 ? Number(value339) : 0, ...args20)),
         (globalThis.fetch = async (value340, value341 = {}) => {
           const value342 = String(value340);
           if (value342 === '/api/config')
@@ -3401,7 +3401,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value347, value348, ...args21) =>
-          handler22(value347, Number(value348) > 0x1388 ? Number(value348) : 0, ...args21)),
+          handler22(value347, Number(value348) > 5000 ? Number(value348) : 0, ...args21)),
         (globalThis.fetch = async (value349, dom77 = {}) => {
           const value350 = String(value349);
           if (value350 === '/api/config')
@@ -3458,7 +3458,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value357, value358, ...args22) =>
-          handler23(value357, Number(value358) > 0x1388 ? Number(value358) : 0, ...args22)),
+          handler23(value357, Number(value358) > 5000 ? Number(value358) : 0, ...args22)),
         (globalThis.fetch = async (value359, dom78 = {}) => {
           const value360 = String(value359);
           if (value360 === '/api/config')
@@ -3514,7 +3514,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value367, value368, ...args23) =>
-          handler24(value367, Number(value368) > 0x1388 ? Number(value368) : 0, ...args23)),
+          handler24(value367, Number(value368) > 5000 ? Number(value368) : 0, ...args23)),
         (globalThis.fetch = async (value369, dom79 = {}) => {
           const value370 = String(value369);
           if (value370 === '/api/config')
@@ -3573,7 +3573,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value377, value378, ...args24) =>
-          handler25(value377, Number(value378) > 0x1388 ? Number(value378) : 0, ...args24)),
+          handler25(value377, Number(value378) > 5000 ? Number(value378) : 0, ...args24)),
         (globalThis.fetch = async (value379, dom80 = {}) => {
           const value380 = String(value379);
           if (value380 === '/api/config')
@@ -3630,7 +3630,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value387, value388, ...args25) =>
-          handler26(value387, Number(value388) > 0x1388 ? Number(value388) : 0, ...args25)),
+          handler26(value387, Number(value388) > 5000 ? Number(value388) : 0, ...args25)),
         (globalThis.fetch = async (value389, value390 = {}) => {
           const value391 = String(value389);
           if (value391 === '/api/config')
@@ -3702,7 +3702,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value397, value398, ...args26) =>
-          handler27(value397, Number(value398) > 0x1388 ? Number(value398) : 0, ...args26)),
+          handler27(value397, Number(value398) > 5000 ? Number(value398) : 0, ...args26)),
         (globalThis.fetch = async (value399, value400 = {}) => {
           const value401 = String(value399);
           if (value401 === '/api/config')
@@ -3737,7 +3737,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value405, value406, ...args27) =>
-          handler28(value405, Number(value406) > 0x1388 ? Number(value406) : 0, ...args27)),
+          handler28(value405, Number(value406) > 5000 ? Number(value406) : 0, ...args27)),
         (globalThis.fetch = async (value407) => {
           const value408 = String(value407);
           if (value408 === '/api/config')
@@ -3793,7 +3793,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value413, value414, ...args28) =>
-          handler29(value413, Number(value414) > 0x1388 ? Number(value414) : 0, ...args28)),
+          handler29(value413, Number(value414) > 5000 ? Number(value414) : 0, ...args28)),
         (globalThis.fetch = async (value415) => {
           const value416 = String(value415);
           if (value416 === '/api/config')
@@ -3845,7 +3845,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value421, value422, ...args29) =>
-          handler30(value421, Number(value422) > 0x1388 ? Number(value422) : 0, ...args29)),
+          handler30(value421, Number(value422) > 5000 ? Number(value422) : 0, ...args29)),
         (globalThis.fetch = async (value423, value424 = {}) => {
           const value425 = String(value423);
           if (value425 === '/api/config')
@@ -3895,7 +3895,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value430, value431, ...args30) =>
-          handler31(value430, Number(value431) > 0x1388 ? Number(value431) : 0, ...args30)),
+          handler31(value430, Number(value431) > 5000 ? Number(value431) : 0, ...args30)),
         (globalThis.fetch = async (value432, value433 = {}) => {
           const value434 = String(value432);
           if (value434 === '/api/config')
@@ -3915,7 +3915,7 @@ function getProxyTaskApiUrl(value13) {
           if (value434.startsWith('/api/v2/proxy/task?'))
             return (
               (count12 += 1),
-              makeJsonResponse({ code: 0x190, message: 'invalid task id' }, { status: 0x190 })
+              makeJsonResponse({ code: 400, message: 'invalid task id' }, { status: 400 })
             );
           if (value434 === '/api/v2/save_output_from_url')
             return makeJsonResponse({ path: 'output/apimart-only-id.png' });
@@ -3948,7 +3948,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value440, value441, ...args31) =>
-          handler32(value440, Number(value441) > 0x1388 ? Number(value441) : 0, ...args31)),
+          handler32(value440, Number(value441) > 5000 ? Number(value441) : 0, ...args31)),
         (globalThis.fetch = async (value442, dom81 = {}) => {
           const value443 = String(value442);
           if (value443 === '/api/config')
@@ -4025,7 +4025,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value451, value452, ...args32) =>
-          handler33(value451, Number(value452) > 0x1388 ? Number(value452) : 0, ...args32)),
+          handler33(value451, Number(value452) > 5000 ? Number(value452) : 0, ...args32)),
         (globalThis.fetch = async (value453, dom82 = {}) => {
           const value454 = String(value453);
           if (value454 === '/api/config')
@@ -4102,7 +4102,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value462, value463, ...args33) =>
-          handler34(value462, Number(value463) > 0x1388 ? Number(value463) : 0, ...args33)),
+          handler34(value462, Number(value463) > 5000 ? Number(value463) : 0, ...args33)),
         (globalThis.fetch = async (value464, value465 = {}) => {
           const value466 = String(value464);
           if (value466 === '/api/config')
@@ -4122,7 +4122,7 @@ function getProxyTaskApiUrl(value13) {
           if (value466.startsWith('/api/v2/proxy/task?'))
             return (
               (value461 += 1),
-              makeJsonResponse({ code: 0x190, message: 'Invalid task ID' }, { status: 0x190 })
+              makeJsonResponse({ code: 400, message: 'Invalid task ID' }, { status: 400 })
             );
           if (value466 === '/api/v2/save_output_from_url')
             return makeJsonResponse({ path: 'output/should-not-save.png' });
@@ -4154,7 +4154,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value470, value471, ...args34) =>
-          handler35(value470, Number(value471) > 0x1388 ? Number(value471) : 0, ...args34)),
+          handler35(value470, Number(value471) > 5000 ? Number(value471) : 0, ...args34)),
         (globalThis.fetch = async (value472, value473 = {}) => {
           const list49 = String(value472);
           if (list49 === '/api/config')
@@ -4218,7 +4218,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value479, value480, ...args35) =>
-          handler36(value479, Number(value480) > 0x1388 ? Number(value480) : 0, ...args35)),
+          handler36(value479, Number(value480) > 5000 ? Number(value480) : 0, ...args35)),
         (globalThis.fetch = async (value481, dom83 = {}) => {
           const value482 = String(value481);
           if (value482 === '/api/config')
@@ -4281,7 +4281,7 @@ function getProxyTaskApiUrl(value13) {
     try {
       ((globalThis.window = { currentProjectId: 'proj-test', location: { href: 'http://localhost/' } }),
         (globalThis.setTimeout = (value489, value490, ...args36) =>
-          handler37(value489, Number(value490) > 0x1388 ? Number(value490) : 0, ...args36)),
+          handler37(value489, Number(value490) > 5000 ? Number(value490) : 0, ...args36)),
         (globalThis.fetch = async (value491, dom84 = {}) => {
           const value492 = String(value491);
           if (value492 === '/api/config')

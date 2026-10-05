@@ -236,11 +236,11 @@ test('bailian rejects an empty or oversized recording', async () => {
     /待识别音频为空/,
   );
   await assert.rejects(
-    transcribeBailianAudio(bailianArgs({ audio: { size: 0x2 * 0x400 ** 0x3 + 1 }, fetchImpl })),
+    transcribeBailianAudio(bailianArgs({ audio: { size: 2 * 1024 ** 3 + 1 }, fetchImpl })),
     /百炼录音识别最多支持 12 小时、2 GB 文件/,
   );
   await assert.rejects(
-    transcribeBailianAudio(bailianArgs({ durationSec: 0xc * 0x3c * 0x3c + 1, fetchImpl })),
+    transcribeBailianAudio(bailianArgs({ durationSec: 12 * 60 * 60 + 1, fetchImpl })),
     /百炼录音识别最多支持 12 小时、2 GB 文件/,
   );
 });

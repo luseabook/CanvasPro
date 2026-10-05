@@ -141,7 +141,7 @@ export function createProviderSettingsController({
       return providerModelCatalogBundleRegistry['sync'](collectEnabledVendorModels(source));
     } catch (next) {
       console['warn']('[Provider Model Catalog] sync failed:', next);
-      return { changed: false, registered: 0x0 };
+      return { changed: false, registered: 0 };
     }
   }
   function run2(providerId, message = {}) {
@@ -456,8 +456,8 @@ export function createProviderSettingsController({
       return;
     }
     const count = run10(value41, value42),
-      total = RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](value42) ? 0x2 : 0x1;
-    if (count > 0x0) {
+      total = RUNNINGHUB_SETTINGS_PROVIDER_IDS['includes'](value42) ? 2 : 1;
+    if (count > 0) {
       if (isProviderConnectionVerified(value41, value42)) {
         run17(value42, 'success', trApiInput('diagnostics.passed'));
         return;
@@ -469,7 +469,7 @@ export function createProviderSettingsController({
       run17(
         value42,
         'configured',
-        total > 0x1
+        total > 1
           ? trApiInput('statuses.configuredCount', { count: count, total: total })
           : trApiInput('statuses.configured'),
       );
@@ -488,11 +488,11 @@ export function createProviderSettingsController({
       el15 = documentObject2['getElementById']('modelServiceReadinessStatus');
     if (!el13 || !el14 || !el15) return;
     const count2 = run11(value45)['length'];
-    ((el13['dataset']['state'] = count2 > 0x0 ? 'ready' : 'empty'),
-      (el14['textContent'] = trApiInput(count2 > 0x0 ? 'readiness.ready' : 'readiness.empty', {
+    ((el13['dataset']['state'] = count2 > 0 ? 'ready' : 'empty'),
+      (el14['textContent'] = trApiInput(count2 > 0 ? 'readiness.ready' : 'readiness.empty', {
         count: count2,
       })),
-      (el15['textContent'] = trApiInput(count2 > 0x0 ? 'readiness.readyShort' : 'readiness.emptyShort', {
+      (el15['textContent'] = trApiInput(count2 > 0 ? 'readiness.readyShort' : 'readiness.emptyShort', {
         count: count2,
       })));
   }
@@ -521,8 +521,8 @@ export function createProviderSettingsController({
   }
   function run21(value50) {
     const count3 = Number(value50);
-    if (!Number['isFinite'](count3) || count3 <= 0x0) return null;
-    return Math['max'](0x1, Math['floor'](count3));
+    if (!Number['isFinite'](count3) || count3 <= 0) return null;
+    return Math['max'](1, Math['floor'](count3));
   }
   function run22(value51, enabled4 = null) {
     if (!enabled4 || typeof enabled4 !== 'object') return null;
@@ -620,7 +620,7 @@ export function createProviderSettingsController({
         ));
       return;
     }
-    if (list['length'] === 0x0) {
+    if (list['length'] === 0) {
       (run19(enabled5),
         syncModelServiceReadinessSummary(enabled5),
         el4['showToast']?.(trApiInput('diagnostics.fillOneProviderKey'), 'warn'));
@@ -675,7 +675,7 @@ export function createProviderSettingsController({
               }));
         }),
       );
-      if (list3['length'] > 0x0) {
+      if (list3['length'] > 0) {
         const value71 = collectConfig(
             typeof getConfigSnapshot === 'function' ? getConfigSnapshot() : options,
           ),
@@ -694,13 +694,13 @@ export function createProviderSettingsController({
             (run16(value72), run18(currentProviderConnectionResults['config'], value72));
           }));
         try {
-          currentProviderConnectionResults['appliedProviderIds']['length'] > 0x0 &&
+          currentProviderConnectionResults['appliedProviderIds']['length'] > 0 &&
             (await saveConfig(currentProviderConnectionResults['config']),
             onConfigSnapshotChange(currentProviderConnectionResults['config']),
             syncModelServiceReadinessSummary(currentProviderConnectionResults['config']),
             refreshManifestModelNodeUis?.());
         } catch (error2) {
-          console['warn']('[API\x20Config]\x20provider\x20diagnostics\x20save\x20failed:', error2);
+          console['warn']('[API Config] provider diagnostics save failed:', error2);
           const value73 = collectConfig(
             typeof getConfigSnapshot === 'function' ? getConfigSnapshot() : options,
           );
@@ -731,22 +731,22 @@ export function createProviderSettingsController({
         );
       });
       const list5 = list2['filter'](({ id: id2 }) => !list4['includes'](id2));
-      if (list5['length'] === 0x0 && list4['length'] === 0x0) {
-        const label3 = providerResults[list[0x0]],
+      if (list5['length'] === 0 && list4['length'] === 0) {
+        const label3 = providerResults[list[0]],
           value77 = value66
             ? trApiInput('diagnostics.providerPassed', { label: label3?.['label'] || value66 })
             : trApiInput('diagnostics.allPassed');
         el4['showToast']?.(value77, 'success');
       } else {
-        if (list5['length'] > 0x0) {
-          const label4 = list5[0x0];
+        if (list5['length'] > 0) {
+          const label4 = list5[0];
           el4['showToast']?.(
             trApiInput('diagnostics.providerFailed', {
               label: label4['label'],
               error: label4['error'],
             }),
             'error',
-            0x2328,
+            9000,
           );
         }
       }
@@ -809,7 +809,7 @@ export function createProviderSettingsController({
       runningHubDefaultSiteSettings['bind'](),
       bindModelCatalogProviderCardVisibility({
         store: store,
-        card: documentObject2['querySelector']('[data-subscription-provider-card=\x22binghuo\x22]'),
+        card: documentObject2['querySelector']('[data-subscription-provider-card="binghuo"]'),
         providerId: 'binghuo',
       }),
       (target = Promise['resolve']()

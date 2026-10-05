@@ -1,77 +1,77 @@
 import { deriveStoryboard3DCameraOptics } from './cameraShotSystem.js';
-const DEFAULT_SIZE = Object['freeze']({ character: [0.65, 1.8, 0.5], prop: [0x1, 0x1, 0x1] }),
+const DEFAULT_SIZE = Object['freeze']({ character: [0.65, 1.8, 0.5], prop: [1, 1, 1] }),
   SHOT_PROFILES = Object['freeze']([
-    { shotSize: 'EST', distanceScale: 4.2, focalLength: 0x1c },
-    { shotSize: 'ELS', distanceScale: 3.3, focalLength: 0x23 },
-    { shotSize: 'LS', distanceScale: 2.6, focalLength: 0x23 },
-    { shotSize: 'MLS', distanceScale: 2.1, focalLength: 0x32 },
-    { shotSize: 'MED', distanceScale: 1.65, focalLength: 0x32 },
-    { shotSize: 'MCU', distanceScale: 1.3, focalLength: 0x41 },
+    { shotSize: 'EST', distanceScale: 4.2, focalLength: 28 },
+    { shotSize: 'ELS', distanceScale: 3.3, focalLength: 35 },
+    { shotSize: 'LS', distanceScale: 2.6, focalLength: 35 },
+    { shotSize: 'MLS', distanceScale: 2.1, focalLength: 50 },
+    { shotSize: 'MED', distanceScale: 1.65, focalLength: 50 },
+    { shotSize: 'MCU', distanceScale: 1.3, focalLength: 65 },
     { shotSize: 'CU', distanceScale: 1.05, focalLength: 0x55 },
-    { shotSize: 'ECU', distanceScale: 0.82, focalLength: 0x64 },
+    { shotSize: 'ECU', distanceScale: 0.82, focalLength: 100 },
   ]),
-  AZIMUTH_SAMPLES = Object['freeze']([0x0, -0x2d, 0x2d, -0x5a, 0x5a, -0x87, 0x87, 0xb4]),
-  ELEVATION_SAMPLES = Object['freeze']([0x0, 0x12, -0xc, 0x23]);
-function finite(value, item = 0x0) {
+  AZIMUTH_SAMPLES = Object['freeze']([0, -45, 45, -90, 90, -135, 135, 180]),
+  ELEVATION_SAMPLES = Object['freeze']([0, 18, -12, 35]);
+function finite(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function clamp(index, result, data) {
   return Math['min'](data, Math['max'](result, index));
 }
-function vector3(box, options = [0x0, 0x0, 0x0]) {
+function vector3(box, options = [0, 0, 0]) {
   if (Array['isArray'](box))
-    return [finite(box[0x0], options[0x0]), finite(box[0x1], options[0x1]), finite(box[0x2], options[0x2])];
+    return [finite(box[0], options[0]), finite(box[1], options[1]), finite(box[2], options[2])];
   return [
-    finite(box?.['x'], options[0x0]),
-    finite(box?.['y'], options[0x1]),
-    finite(box?.['z'], options[0x2]),
+    finite(box?.['x'], options[0]),
+    finite(box?.['y'], options[1]),
+    finite(box?.['z'], options[2]),
   ];
 }
 function add3(target, source) {
-  return [target[0x0] + source[0x0], target[0x1] + source[0x1], target[0x2] + source[0x2]];
+  return [target[0] + source[0], target[1] + source[1], target[2] + source[2]];
 }
 function subtract3(next, current) {
-  return [next[0x0] - current[0x0], next[0x1] - current[0x1], next[0x2] - current[0x2]];
+  return [next[0] - current[0], next[1] - current[1], next[2] - current[2]];
 }
 function scale3(entry, record) {
   return entry['map']((payload) => payload * record);
 }
 function dot3(handle, state) {
-  return handle[0x0] * state[0x0] + handle[0x1] * state[0x1] + handle[0x2] * state[0x2];
+  return handle[0] * state[0] + handle[1] * state[1] + handle[2] * state[2];
 }
 function cross3(config, scope) {
   return [
-    config[0x1] * scope[0x2] - config[0x2] * scope[0x1],
-    config[0x2] * scope[0x0] - config[0x0] * scope[0x2],
-    config[0x0] * scope[0x1] - config[0x1] * scope[0x0],
+    config[1] * scope[2] - config[2] * scope[1],
+    config[2] * scope[0] - config[0] * scope[2],
+    config[0] * scope[1] - config[1] * scope[0],
   ];
 }
 function length3(input) {
-  return Math['hypot'](input[0x0], input[0x1], input[0x2]);
+  return Math['hypot'](input[0], input[1], input[2]);
 }
-function normalize3(output, args = [0x0, 0x0, 0x1]) {
+function normalize3(output, args = [0, 0, 1]) {
   const length32 = length3(output);
-  return length32 > 1e-8 ? scale3(output, 0x1 / length32) : [...args];
+  return length32 > 1e-8 ? scale3(output, 1 / length32) : [...args];
 }
 function degreesToRadians(value2) {
-  return (value2 * Math['PI']) / 0xb4;
+  return (value2 * Math['PI']) / 180;
 }
 function boundsFromMinMax(value3, value4) {
   return {
     min: value3,
     max: value4,
-    center: value3['map']((value5, value6) => (value5 + value4[value6]) / 0x2),
+    center: value3['map']((value5, value6) => (value5 + value4[value6]) / 2),
     size: value4['map']((value7, value8) => value7 - value3[value8]),
   };
 }
 function mergeBounds(args2) {
-  if (args2['length'] === 0x0) return null;
-  const value9 = [...args2[0x0]['min']],
-    value10 = [...args2[0x0]['max']];
+  if (args2['length'] === 0) return null;
+  const value9 = [...args2[0]['min']],
+    value10 = [...args2[0]['max']];
   return (
-    args2['slice'](0x1)['forEach']((value11) => {
-      for (let count2 = 0x0; count2 < 0x3; count2 += 0x1) {
+    args2['slice'](1)['forEach']((value11) => {
+      for (let count2 = 0; count2 < 3; count2 += 1) {
         ((value9[count2] = Math['min'](value9[count2], value11['min'][count2])),
           (value10[count2] = Math['max'](value10[count2], value11['max'][count2])));
       }
@@ -81,7 +81,7 @@ function mergeBounds(args2) {
 }
 function objectBounds(value12) {
   const vector32 = vector3(value12?.['transform']?.['position']),
-    vector33 = vector3(value12?.['transform']?.['scale'], [0x1, 0x1, 0x1])['map'](Math['abs']),
+    vector33 = vector3(value12?.['transform']?.['scale'], [1, 1, 1])['map'](Math['abs']),
     value13 = value12?.['worldBounds']?.['min'],
     value14 = value12?.['worldBounds']?.['max'];
   if (value13 && value14) {
@@ -104,9 +104,9 @@ function objectBounds(value12) {
 }
 function boundsCorners(value22) {
   const list = [];
-  for (const value23 of [value22['min'][0x0], value22['max'][0x0]]) {
-    for (const value24 of [value22['min'][0x1], value22['max'][0x1]]) {
-      for (const value25 of [value22['min'][0x2], value22['max'][0x2]])
+  for (const value23 of [value22['min'][0], value22['max'][0]]) {
+    for (const value24 of [value22['min'][1], value22['max'][1]]) {
+      for (const value25 of [value22['min'][2], value22['max'][2]])
         list['push']([value23, value24, value25]);
     }
   }
@@ -114,11 +114,11 @@ function boundsCorners(value22) {
 }
 function cameraBasis(value26) {
   const vector37 = vector3(value26['position']),
-    vector38 = vector3(value26['target'], [0x0, 1.2, 0x0]),
-    v3 = normalize3(subtract3(vector38, vector37), [0x0, 0x0, -0x1]),
-    value27 = Math['abs'](v3[0x1]) > 0.98 ? [0x0, 0x0, 0x1] : [0x0, 0x1, 0x0],
-    v32 = normalize3(cross3(v3, value27), [0x1, 0x0, 0x0]),
-    v33 = normalize3(cross3(v32, v3), [0x0, 0x1, 0x0]);
+    vector38 = vector3(value26['target'], [0, 1.2, 0]),
+    v3 = normalize3(subtract3(vector38, vector37), [0, 0, -1]),
+    value27 = Math['abs'](v3[1]) > 0.98 ? [0, 0, 1] : [0, 1, 0],
+    v32 = normalize3(cross3(v3, value27), [1, 0, 0]),
+    v33 = normalize3(cross3(v32, v3), [0, 1, 0]);
   return { position: vector37, forward: v3, right: v32, up: v33 };
 }
 function projectPoint(value28, value29) {
@@ -127,8 +127,8 @@ function projectPoint(value28, value29) {
     dot32 = dot3(subtract32, cameraBasis2['forward']);
   if (dot32 <= Math['max'](0.001, finite(value29['near'], 0.1))) return null;
   const storyboard3DCameraOptics = deriveStoryboard3DCameraOptics(value29),
-    value30 = Math['tan'](degreesToRadians(storyboard3DCameraOptics['verticalFov']) / 0x2),
-    value31 = Math['tan'](degreesToRadians(storyboard3DCameraOptics['horizontalFov']) / 0x2);
+    value30 = Math['tan'](degreesToRadians(storyboard3DCameraOptics['verticalFov']) / 2),
+    value31 = Math['tan'](degreesToRadians(storyboard3DCameraOptics['horizontalFov']) / 2);
   return {
     x: dot3(subtract32, cameraBasis2['right']) / (dot32 * value31),
     y: dot3(subtract32, cameraBasis2['up']) / (dot32 * value30),
@@ -137,14 +137,14 @@ function projectPoint(value28, value29) {
 }
 function segmentIntersectsBounds(value32, value33, value34) {
   const subtract33 = subtract3(value33, value32);
-  let count3 = 0x0,
-    value35 = 0x1;
-  for (let count4 = 0x0; count4 < 0x3; count4 += 0x1) {
+  let count3 = 0,
+    value35 = 1;
+  for (let count4 = 0; count4 < 3; count4 += 1) {
     if (Math['abs'](subtract33[count4]) < 1e-8) {
       if (value32[count4] < value34['min'][count4] || value32[count4] > value34['max'][count4]) return ![];
       continue;
     }
-    const value36 = 0x1 / subtract33[count4];
+    const value36 = 1 / subtract33[count4];
     let value37 = (value34['min'][count4] - value32[count4]) * value36,
       value38 = (value34['max'][count4] - value32[count4]) * value36;
     if (value37 > value38) [value37, value38] = [value38, value37];
@@ -155,12 +155,12 @@ function segmentIntersectsBounds(value32, value33, value34) {
 }
 function resolveShotAngle(value39, count5, value40) {
   if (value40) return 'overShoulder';
-  if (count5 >= 0x20) return 'top';
-  if (count5 >= 0xe) return 'high';
-  if (count5 <= -0x8) return 'low';
+  if (count5 >= 32) return 'top';
+  if (count5 >= 14) return 'high';
+  if (count5 <= -8) return 'low';
   const count6 = Math['abs'](value39);
-  if (count6 >= 0x96) return 'rear';
-  if (count6 >= 0x46 && count6 <= 0x6e) return 'profile';
+  if (count6 >= 150) return 'rear';
+  if (count6 >= 70 && count6 <= 110) return 'profile';
   return 'eye';
 }
 function candidateSimilarity(value41, value42) {
@@ -169,10 +169,10 @@ function candidateSimilarity(value41, value42) {
     vector311 = vector3(value41['camera']['target']),
     v34 = normalize3(subtract3(vector39, vector311)),
     v35 = normalize3(subtract3(vector310, vector311)),
-    value43 = (clamp(dot3(v34, v35), -0x1, 0x1) + 0x1) / 0x2,
+    value43 = (clamp(dot3(v34, v35), -1, 1) + 1) / 2,
     value44 = Math['abs'](value41['camera']['focalLength'] - value42['camera']['focalLength']),
-    value45 = 0x1 - clamp(value44 / 0x64, 0x0, 0x1),
-    value46 = value41['shotSize'] === value42['shotSize'] ? 0x1 : 0x0;
+    value45 = 1 - clamp(value44 / 100, 0, 1),
+    value46 = value41['shotSize'] === value42['shotSize'] ? 1 : 0;
   return value43 * 0.58 + value45 * 0.27 + value46 * 0.15;
 }
 export function identifyStoryboard3DSubjects(value47, { subjectIds: subjectIds } = {}) {
@@ -182,9 +182,9 @@ export function identifyStoryboard3DSubjects(value47, { subjectIds: subjectIds }
     ),
     value50 = new Set((Array['isArray'](subjectIds) ? subjectIds : [])['map'](String)),
     value51 =
-      value50['size'] > 0x0 ? value48['filter']((value52) => value50['has'](String(value52['id']))) : [],
+      value50['size'] > 0 ? value48['filter']((value52) => value50['has'](String(value52['id']))) : [],
     value53 = value48['filter']((value54) => value54['type'] === 'character'),
-    value55 = value51['length'] > 0x0 ? value51 : value53['length'] > 0x0 ? value53 : value48;
+    value55 = value51['length'] > 0 ? value51 : value53['length'] > 0 ? value53 : value48;
   return value55['map']((value56) => ({
     id: String(value56['id'] || ''),
     type: value56['type'],
@@ -197,32 +197,32 @@ export function computeStoryboard3DSubjectBounds(value57, value58 = {}) {
   return args3 ? { ...args3, subjectIds: list2['map']((value60) => value60['id']) } : null;
 }
 export function evaluateStoryboard3DFraming(value61, enabled) {
-  if (!enabled) return { outOfFrameRatio: 0x1, headroom: 0x0, centerOffset: 0x1, projectedBounds: null };
+  if (!enabled) return { outOfFrameRatio: 1, headroom: 0, centerOffset: 1, projectedBounds: null };
   const list3 = boundsCorners(enabled)
     ['map']((value62) => projectPoint(value62, value61))
     ['filter'](Boolean);
-  if (list3['length'] === 0x0)
-    return { outOfFrameRatio: 0x1, headroom: 0x0, centerOffset: 0x1, projectedBounds: null };
+  if (list3['length'] === 0)
+    return { outOfFrameRatio: 1, headroom: 0, centerOffset: 1, projectedBounds: null };
   const value63 = Math['min'](...list3['map']((box2) => box2['x'])),
     value64 = Math['max'](...list3['map']((box3) => box3['x'])),
     value65 = Math['min'](...list3['map']((box4) => box4['y'])),
     value66 = Math['max'](...list3['map']((box5) => box5['y'])),
-    value67 = list3['filter']((box6) => Math['abs'](box6['x']) > 0x1 || Math['abs'](box6['y']) > 0x1)[
+    value67 = list3['filter']((box6) => Math['abs'](box6['x']) > 1 || Math['abs'](box6['y']) > 1)[
       'length'
     ],
-    value68 = (value63 + value64) / 0x2,
-    value69 = (value65 + value66) / 0x2;
+    value68 = (value63 + value64) / 2,
+    value69 = (value65 + value66) / 2;
   return {
     outOfFrameRatio: value67 / list3['length'],
-    headroom: 0x1 - value66,
+    headroom: 1 - value66,
     centerOffset: Math['hypot'](value68, value69),
     projectedBounds: { minX: value63, maxX: value64, minY: value65, maxY: value66 },
   };
 }
 export function estimateStoryboard3DOcclusion(value70, value71, list4 = []) {
-  if (!Array['isArray'](value71) || value71['length'] === 0x0) return 0x1;
+  if (!Array['isArray'](value71) || value71['length'] === 0) return 1;
   const vector312 = vector3(value70?.['position']);
-  let value72 = 0x0;
+  let value72 = 0;
   return (
     value71['forEach']((value73) => {
       const value74 = value73['bounds']['center'],
@@ -230,23 +230,23 @@ export function estimateStoryboard3DOcclusion(value70, value71, list4 = []) {
           (value76) =>
             value76['id'] !== value73['id'] && segmentIntersectsBounds(vector312, value74, value76['bounds']),
         );
-      if (value75) value72 += 0x1;
+      if (value75) value72 += 1;
     }),
     value72 / value71['length']
   );
 }
 export function scoreStoryboard3DShotCandidate(
   value77,
-  { framing: framing, occlusionRatio: occlusionRatio = 0x0 } = {},
+  { framing: framing, occlusionRatio: occlusionRatio = 0 } = {},
 ) {
   const args4 = framing || evaluateStoryboard3DFraming(value77['camera'], value77['subjectBounds']),
-    count7 = 0x1 - clamp(args4['outOfFrameRatio'], 0x0, 0x1),
-    count8 = 0x1 - clamp(Math['abs'](args4['headroom'] - 0.12) / 0.7, 0x0, 0x1),
-    count9 = 0x1 - clamp(args4['centerOffset'] / 1.2, 0x0, 0x1),
-    count10 = 0x1 - clamp(occlusionRatio, 0x0, 0x1),
+    count7 = 1 - clamp(args4['outOfFrameRatio'], 0, 1),
+    count8 = 1 - clamp(Math['abs'](args4['headroom'] - 0.12) / 0.7, 0, 1),
+    count9 = 1 - clamp(args4['centerOffset'] / 1.2, 0, 1),
+    count10 = 1 - clamp(occlusionRatio, 0, 1),
     value78 =
-      Math['round'](clamp(count7 * 0.43 + count10 * 0.28 + count8 * 0.17 + count9 * 0.12, 0x0, 0x1) * 0x3e8) /
-      0x3e8,
+      Math['round'](clamp(count7 * 0.43 + count10 * 0.28 + count8 * 0.17 + count9 * 0.12, 0, 1) * 1000) /
+      1000,
     list5 = [];
   if (count7 >= 0.9) list5['push']('subjects-in-frame');
   else {
@@ -277,30 +277,30 @@ export function deduplicateStoryboard3DShotCandidates(
     enabled2
   );
 }
-export function selectDiverseStoryboard3DShotCandidates(value84, value85 = 0x9) {
+export function selectDiverseStoryboard3DShotCandidates(value84, value85 = 9) {
   const list7 = [...(Array['isArray'](value84) ? value84 : [])],
     list8 = [],
-    value86 = Math['max'](0x0, Math['round'](finite(value85, 0x9)));
-  while (list8['length'] < value86 && list7['length'] > 0x0) {
-    let value87 = 0x0,
+    value86 = Math['max'](0, Math['round'](finite(value85, 9)));
+  while (list8['length'] < value86 && list7['length'] > 0) {
+    let value87 = 0,
       value88 = -Infinity;
     (list7['forEach']((value89, value90) => {
       const value91 =
-          list8['length'] === 0x0
-            ? 0x0
+          list8['length'] === 0
+            ? 0
             : Math['max'](...list8['map']((value92) => candidateSimilarity(value89, value92))),
-        value93 = 0x1 - value91,
+        value93 = 1 - value91,
         value94 = value89['score'] * 0.72 + value93 * 0.28;
       (value94 > value88 || (value94 === value88 && String(value89['id']) < String(list7[value87]['id']))) &&
         ((value87 = value90), (value88 = value94));
     }),
-      list8['push'](list7['splice'](value87, 0x1)[0x0]));
+      list8['push'](list7['splice'](value87, 1)[0]));
   }
   return list8;
 }
 export function generateStoryboard3DShotCandidates(
   value95,
-  { count: count = 0x9, subjectIds: subjectIds2, shotSizes: shotSizes, variation: variation = 0x0 } = {},
+  { count: count = 9, subjectIds: subjectIds2, shotSizes: shotSizes, variation: variation = 0 } = {},
 ) {
   const list9 = identifyStoryboard3DSubjects(value95, { subjectIds: subjectIds2 }),
     args5 = mergeBounds(list9['map']((value96) => value96['bounds']));
@@ -312,14 +312,14 @@ export function generateStoryboard3DShotCandidates(
       )
       ['map']((value99) => ({ id: String(value99['id'] || ''), bounds: objectBounds(value99) })),
     value100 = new Set(
-      Array['isArray'](shotSizes) && shotSizes['length'] > 0x0
+      Array['isArray'](shotSizes) && shotSizes['length'] > 0
         ? shotSizes
         : SHOT_PROFILES['map']((value101) => value101['shotSize']),
     ),
-    value102 = Math['max'](0x1, args5['size'][0x0], args5['size'][0x1], args5['size'][0x2]),
-    value103 = Math['round'](finite(variation, 0x0)) * 0x7,
+    value102 = Math['max'](1, args5['size'][0], args5['size'][1], args5['size'][2]),
+    value103 = Math['round'](finite(variation, 0)) * 7,
     value104 = [];
-  let value105 = 0x0;
+  let value105 = 0;
   SHOT_PROFILES['filter']((value106) => value100['has'](value106['shotSize']))['forEach'](
     (value107, value108) => {
       AZIMUTH_SAMPLES['forEach']((value109, value110) => {
@@ -328,12 +328,12 @@ export function generateStoryboard3DShotCandidates(
           value112 = value109 + value103,
           radians = degreesToRadians(value112),
           radians2 = degreesToRadians(value111),
-          value113 = value102 * value107['distanceScale'] * (0x1 + ((value108 + value110) % 0x3) * 0.08),
+          value113 = value102 * value107['distanceScale'] * (1 + ((value108 + value110) % 3) * 0.08),
           value114 = value113 * Math['cos'](radians2),
           value115 = [
-            args5['center'][0x0] + Math['sin'](radians) * value114,
-            args5['center'][0x1] + Math['sin'](radians2) * value113,
-            args5['center'][0x2] + Math['cos'](radians) * value114,
+            args5['center'][0] + Math['sin'](radians) * value114,
+            args5['center'][1] + Math['sin'](radians2) * value113,
+            args5['center'][2] + Math['cos'](radians) * value114,
           ],
           value116 = [...args5['center']],
           value117 = {
@@ -341,15 +341,15 @@ export function generateStoryboard3DShotCandidates(
             target: value116,
             focalLength: value107['focalLength'],
             near: 0.1,
-            far: Math['max'](0x3e8, value113 * 0x14),
+            far: Math['max'](1000, value113 * 20),
             aspectRatio: '16:9',
           },
           evaluateStoryboard3DFraming2 = evaluateStoryboard3DFraming(value117, args5),
           estimateStoryboard3DOcclusion2 = estimateStoryboard3DOcclusion(value117, list9, value97),
           value118 =
-            list9['length'] >= 0x2 &&
-            Math['abs'](value112) >= 0x19 &&
-            Math['abs'](value112) <= 0x3c &&
+            list9['length'] >= 2 &&
+            Math['abs'](value112) >= 25 &&
+            Math['abs'](value112) <= 60 &&
             value107['shotSize'] === 'MCU',
           scoreStoryboard3DShotCandidate2 = scoreStoryboard3DShotCandidate(
             { camera: value117, subjectBounds: args5 },
@@ -365,7 +365,7 @@ export function generateStoryboard3DShotCandidates(
           metrics: scoreStoryboard3DShotCandidate2['metrics'],
           subjectIds: list9['map']((value119) => value119['id']),
         }),
-          (value105 += 0x1));
+          (value105 += 1));
       });
     },
   );

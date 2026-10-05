@@ -26,13 +26,13 @@ export function createPersonReplacementVideoSyncPlayback({
     handler2 = (target) => (target === 'source' ? sourcePlay : resultPlay),
     handler3 = (source) => {
       const count = Number(source?.['currentTime']);
-      return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+      return Number['isFinite'](count) && count > 0 ? count : 0;
     },
     handler4 = (next, current) => {
       const count2 = Number(next?.['duration']),
         entry =
-          Number['isFinite'](count2) && count2 > 0x0 ? count2 : Math['max'](0x0, Number(current) || 0x0);
-      return Math['max'](0x0, Math['min'](entry, Number(current) || 0x0));
+          Number['isFinite'](count2) && count2 > 0 ? count2 : Math['max'](0, Number(current) || 0);
+      return Math['max'](0, Math['min'](entry, Number(current) || 0));
     },
     handler5 = (record, payload, { force: force = ![] } = {}) => {
       const handle = handler4(record, payload);
@@ -116,7 +116,7 @@ export function createPersonReplacementVideoSyncPlayback({
     result = value8 === 'source' ? 'source' : 'result';
     const value9 = handler(result),
       force2 = sourceVideo['ended'] === !![] || resultVideo['ended'] === !![],
-      value10 = force2 ? 0x0 : handler3(value9);
+      value10 = force2 ? 0 : handler3(value9);
     (handler5(value9, value10, { force: force2 }),
       handler8({ force: !![] }),
       (enabled3 = !![]),

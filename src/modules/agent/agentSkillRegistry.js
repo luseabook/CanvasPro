@@ -1,49 +1,49 @@
 import { parseAgentSkillMarkdown } from './agentSkillPackage.js';
-function normalizeText(value, count = 0x0) {
+function normalizeText(value, count = 0) {
   const list = String(value == null ? '' : value)['trim']();
-  return count > 0x0 ? list['slice'](0x0, count) : list;
+  return count > 0 ? list['slice'](0, count) : list;
 }
-function normalizeStringArray(item, key = 0x28) {
+function normalizeStringArray(item, key = 40) {
   return [
     ...new Set(
-      (Array['isArray'](item) ? item : [])['map']((index) => normalizeText(index, 0xa0))['filter'](Boolean),
+      (Array['isArray'](item) ? item : [])['map']((index) => normalizeText(index, 160))['filter'](Boolean),
     ),
-  ]['slice'](0x0, key);
+  ]['slice'](0, key);
 }
 function normalizeResources(list2 = []) {
   return (Array['isArray'](list2) ? list2 : [])
     ['map']((error = {}) => ({
-      name: normalizeText(error['name'], 0xa0),
-      content: normalizeText(error['content'], 0x10 * 0x400),
+      name: normalizeText(error['name'], 160),
+      content: normalizeText(error['content'], 16 * 1024),
     }))
     ['filter']((error2) => error2['name'] && error2['content'])
-    ['slice'](0x0, 0x18);
+    ['slice'](0, 24);
 }
 export function normalizeRuntimeAgentSkill(defaultParams = {}, result = 'built-in') {
   return {
-    schemaVersion: 0x1,
-    id: normalizeText(defaultParams['id'] || defaultParams['name'], 0x40)['toLowerCase'](),
-    title: normalizeText(defaultParams['title'] || defaultParams['id'] || defaultParams['name'], 0x78),
-    description: normalizeText(defaultParams['description'], 0x258),
-    category: normalizeText(defaultParams['category'], 0x50) || 'canvas',
-    version: normalizeText(defaultParams['version'], 0x28) || 'built-in',
-    riskLevel: normalizeText(defaultParams['riskLevel'], 0x14) || 'safe',
+    schemaVersion: 1,
+    id: normalizeText(defaultParams['id'] || defaultParams['name'], 64)['toLowerCase'](),
+    title: normalizeText(defaultParams['title'] || defaultParams['id'] || defaultParams['name'], 120),
+    description: normalizeText(defaultParams['description'], 600),
+    category: normalizeText(defaultParams['category'], 80) || 'canvas',
+    version: normalizeText(defaultParams['version'], 40) || 'built-in',
+    riskLevel: normalizeText(defaultParams['riskLevel'], 20) || 'safe',
     appliesWhen: normalizeStringArray(defaultParams['appliesWhen']),
     triggers: normalizeStringArray(defaultParams['triggers']),
     requiredInputs: normalizeStringArray(defaultParams['requiredInputs']),
     missingInputQuestions: normalizeStringArray(defaultParams['missingInputQuestions']),
-    recommendedModelKind: normalizeText(defaultParams['recommendedModelKind'], 0x28),
+    recommendedModelKind: normalizeText(defaultParams['recommendedModelKind'], 40),
     defaultParams:
       defaultParams['defaultParams'] && typeof defaultParams['defaultParams'] === 'object'
         ? { ...defaultParams['defaultParams'] }
         : {},
     commands: normalizeStringArray(defaultParams['commands']),
     manualOnly: defaultParams['manualOnly'] === !![],
-    managedBy: normalizeText(defaultParams['managedBy'], 0x50),
-    instructions: normalizeText(defaultParams['instructions'], 0x18 * 0x400),
-    source: normalizeText(defaultParams['source'], 0x28) || result,
-    packageId: normalizeText(defaultParams['packageId'], 0x64),
-    resourceNames: normalizeStringArray(defaultParams['resourceNames'], 0x18),
+    managedBy: normalizeText(defaultParams['managedBy'], 80),
+    instructions: normalizeText(defaultParams['instructions'], 24 * 1024),
+    source: normalizeText(defaultParams['source'], 40) || result,
+    packageId: normalizeText(defaultParams['packageId'], 100),
+    resourceNames: normalizeStringArray(defaultParams['resourceNames'], 24),
     resources: normalizeResources(defaultParams['resources']),
     execution: {
       scriptsAvailable: defaultParams['execution']?.['scriptsAvailable'] === !![],
@@ -79,9 +79,9 @@ function collectRelevanceTerms(entry = '') {
   const text5 = normalizeText(entry)['toLowerCase'](),
     record = new Set(text5['match'](/[a-z0-9][a-z0-9_-]{1,}/g) || []);
   for (const list3 of text5['match'](/[\u3400-\u9fff]{2,}/g) || []) {
-    const list4 = list3['slice'](0x0, 0x50);
-    for (const payload of [0x2, 0x3]) {
-      for (let handle = 0x0; handle <= list4['length'] - payload; handle += 0x1) {
+    const list4 = list3['slice'](0, 80);
+    for (const payload of [2, 3]) {
+      for (let handle = 0; handle <= list4['length'] - payload; handle += 1) {
         const state = list4['slice'](handle, handle + payload);
         if (!IGNORED_RELEVANCE_TERMS['has'](state)) record['add'](state);
       }
@@ -91,29 +91,29 @@ function collectRelevanceTerms(entry = '') {
 }
 function scoreDescriptionRelevance(config, scope = {}) {
   const relevanceTerms = collectRelevanceTerms(config);
-  if (relevanceTerms['size'] === 0x0) return 0x0;
-  const map = collectRelevanceTerms((scope['title'] || '') + '\x20' + (scope['description'] || ''));
-  let input = 0x0;
+  if (relevanceTerms['size'] === 0) return 0;
+  const map = collectRelevanceTerms((scope['title'] || '') + ' ' + (scope['description'] || ''));
+  let input = 0;
   for (const output of relevanceTerms) {
-    if (map['has'](output)) input += 0x1;
+    if (map['has'](output)) input += 1;
   }
-  return Math['min'](0xb4, input * 0x3c);
+  return Math['min'](180, input * 60);
 }
 function scoreInstalledSkill(args, value2 = {}) {
   const list5 = normalizeText(value2['userMessage'])['toLowerCase'](),
     isExplicitSkillRequest2 = isExplicitSkillRequest(list5, args);
-  if (args['manualOnly'] && !isExplicitSkillRequest2) return 0x0;
-  let count2 = isExplicitSkillRequest2 ? 0x3e8 : 0x0;
+  if (args['manualOnly'] && !isExplicitSkillRequest2) return 0;
+  let count2 = isExplicitSkillRequest2 ? 1000 : 0;
   for (const value3 of [...args['triggers'], ...args['appliesWhen']]) {
     const text6 = normalizeText(value3)['toLowerCase']();
-    if (text6 && list5['includes'](text6)) count2 += 0xf0;
+    if (text6 && list5['includes'](text6)) count2 += 240;
   }
   if (!isExplicitSkillRequest2) count2 += scoreDescriptionRelevance(list5, args);
   return (
-    count2 > 0x0 &&
+    count2 > 0 &&
       value2['targetKind'] &&
       args['recommendedModelKind'] === value2['targetKind'] &&
-      (count2 += 0x28),
+      (count2 += 40),
     count2
   );
 }
@@ -186,7 +186,7 @@ export function createAgentSkillRegistryCore({
       return (
         (loaded = list7),
         (diagnostics = list8),
-        (rootPath = normalizeText(value6['rootPath'], 0x1f4)),
+        (rootPath = normalizeText(value6['rootPath'], 500)),
         {
           available: !![],
           loaded: loaded['length'],
@@ -201,19 +201,19 @@ export function createAgentSkillRegistryCore({
     },
     setDisabledSkillIds(list9 = []) {
       map2['clear']();
-      for (const value8 of normalizeStringArray(list9, 0x64)) map2['add'](value8);
+      for (const value8 of normalizeStringArray(list9, 100)) map2['add'](value8);
       return [...map2];
     },
     setSkillEnabled(value9, value10 = !![]) {
-      const text7 = normalizeText(value9, 0x40)['toLowerCase']();
+      const text7 = normalizeText(value9, 64)['toLowerCase']();
       if (!text7 || !listSkills()['some']((value11) => value11['id'] === text7)) return ![];
       if (value10 === ![]) map2['add'](text7);
       else map2['delete'](text7);
       return !![];
     },
-    select({ maxSkills: maxSkills = 0x2, ...args5 } = {}) {
+    select({ maxSkills: maxSkills = 2, ...args5 } = {}) {
       const value12 = Number(maxSkills),
-        value13 = Math['max'](0x0, Number['isFinite'](value12) ? Math['trunc'](value12) : 0x2);
+        value13 = Math['max'](0, Number['isFinite'](value12) ? Math['trunc'](value12) : 2);
       return listSkills()
         ['filter']((value14) => value14['enabled'] !== ![])
         ['map']((skill, index2) => ({
@@ -224,11 +224,11 @@ export function createAgentSkillRegistryCore({
               ? scoreBuiltInSkill(skill, args5)
               : scoreInstalledSkill(skill, args5),
         }))
-        ['filter']((value15) => value15['score'] > 0x0)
+        ['filter']((value15) => value15['score'] > 0)
         ['sort'](
           (value16, value17) => value17['score'] - value16['score'] || value16['index'] - value17['index'],
         )
-        ['slice'](0x0, value13)
+        ['slice'](0, value13)
         ['map']((value18) => value18['skill']);
     },
     getState() {

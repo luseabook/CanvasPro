@@ -392,7 +392,7 @@ export function createVideoNodePreviewControlsModule(index) {
           if (value6 === 'pause') this._showPausedCenterIndicator();
           else this._hideCenterIndicator();
           this._centerIndicatorTimer = null;
-        }, 0x208)));
+        }, 520)));
     }
     ['_getActivePreviewVideoEl']() {
       const value7 =

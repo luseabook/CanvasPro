@@ -109,7 +109,7 @@ function createYouchuanNumberField({
   defaultValue: defaultValue3,
   min: min,
   max: max,
-  step: step = max === 0x3e8 ? 50 : max === 100 ? 5 : 1,
+  step: step = max === 1000 ? 50 : max === 100 ? 5 : 1,
   description: description2,
 }) {
   return Object.freeze({
@@ -159,7 +159,7 @@ const YOUCHUAN_CHAOS_FIELD = createYouchuanNumberField({
     label: '风格化',
     defaultValue: 0,
     min: 0,
-    max: 0x3e8,
+    max: 1000,
     description:
       '控制 Midjourney 自带审美和艺术化介入强度。低值更按提示词执行；高值画面更有风格和美感，但可能偏离细节。',
   }),
@@ -184,7 +184,7 @@ const YOUCHUAN_CHAOS_FIELD = createYouchuanNumberField({
     label: '风格权重',
     defaultValue: 100,
     min: 0,
-    max: 0x3e8,
+    max: 1000,
     description: '有风格参考图时生效。控制参考图的色彩、材质、光影和整体氛围影响；值越高越贴近参考风格。',
   }),
   YOUCHUAN_V81_QUALITY_FIELD = createYouchuanSegmentedField({
@@ -242,7 +242,7 @@ const YOUCHUAN_CHAOS_FIELD = createYouchuanNumberField({
     label: '怪异度',
     defaultValue: 0,
     min: 0,
-    max: 0xbb8,
+    max: 3000,
     description:
       '加入更反常、古怪或实验性的审美选择。0 最稳定；数值越高越容易出现意料之外的造型、组合和气质。',
   }),
@@ -260,7 +260,7 @@ const YOUCHUAN_CHAOS_FIELD = createYouchuanNumberField({
     label: 'Omni 权重',
     defaultValue: 100,
     min: 0,
-    max: 0x3e8,
+    max: 1000,
     description:
       'V7 参考权重。控制 Omni/参考图对主体外观和形态的影响；值越高参考越强，值越低越让提示词自由发挥。',
   }),

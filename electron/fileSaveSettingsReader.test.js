@@ -52,7 +52,7 @@ test('a file without either key is skipped in favour of a later one', (t) => {
 
 test('a BOM, malformed json and a json array are all tolerated', (t) => {
   const dir = makeTempDir(t),
-    bom = writeSettings(dir, 'bom.json', '\uFEFF' + JSON.stringify({ fileSavePaths: { dataDir: 'F:/d' } })),
+    bom = writeSettings(dir, 'bom.json', '\ufeff' + JSON.stringify({ fileSavePaths: { dataDir: 'F:/d' } })),
     malformed = writeSettings(dir, 'broken.json', '{ not json'),
     arraySettings = writeSettings(dir, 'array.json', JSON.stringify([{ fileSavePaths: {} }]));
   assert.deepEqual(readUserSettingsFromFilesSync([bom]), { fileSavePaths: { dataDir: 'F:/d' } });

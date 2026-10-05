@@ -14,7 +14,7 @@ export function createPersonReplacementResultHistoryController({
   let kind = null,
     focus = null,
     value = '',
-    item = 0x0;
+    item = 0;
   const personReplacementResultHistoryLayout = createPersonReplacementResultHistoryLayout(),
     handler = (key) =>
       Array['from'](getRoot()?.['querySelectorAll']?.(TOGGLE) || [])['find'](
@@ -26,7 +26,7 @@ export function createPersonReplacementResultHistoryController({
         el2 = focus?.['ownerDocument']?.['activeElement'];
       return {
         ...kind,
-        scrollLeft: scrollLeft?.['scrollLeft'] || 0x0,
+        scrollLeft: scrollLeft?.['scrollLeft'] || 0,
         focus:
           focus?.['contains']?.(el2) && el2?.['matches']?.('button')
             ? Object['fromEntries'](
@@ -55,7 +55,7 @@ export function createPersonReplacementResultHistoryController({
         (el3['setAttribute']('aria-expanded', String(target)),
           el3['setAttribute'](
             'aria-label',
-            '' + (target ? '收起' : '展开') + el3['dataset']['resultCount'] + '\x20个结果',
+            '' + (target ? '收起' : '展开') + el3['dataset']['resultCount'] + ' 个结果',
           ));
       }
     },
@@ -100,11 +100,11 @@ export function createPersonReplacementResultHistoryController({
       )
         return (hide(), ![]);
       const count = shot['shots']['findIndex']((payload) => payload['id'] === kind['shotId']);
-      if (count < 0x0) return (hide(), ![]);
+      if (count < 0) return (hide(), ![]);
       const enabled = renderHistoryMenu({
-        kind: kind['step'] === 0x3 ? 'video' : 'image',
+        kind: kind['step'] === 3 ? 'video' : 'image',
         shot: shot['shots'][count],
-        title: '片段' + String(count + 0x1)['padStart'](0x2, '0'),
+        title: '片段' + String(count + 1)['padStart'](2, '0'),
         allowSingleResult: !![],
       });
       if (!enabled) return (hide(), ![]);
@@ -125,12 +125,12 @@ export function createPersonReplacementResultHistoryController({
         focus['classList']['add']('is-visible'),
         focus['setAttribute']('aria-hidden', 'false'),
         (focus['dataset']['shotId'] = kind['shotId']),
-        (focus['dataset']['historyKind'] = kind['step'] === 0x3 ? 'video' : 'image'),
+        (focus['dataset']['historyKind'] = kind['step'] === 3 ? 'video' : 'image'),
         personReplacementResultHistoryLayout['show'](focus),
         handler2());
       if (el4?.['shotId'] === kind['shotId']) {
         const state = focus['querySelector']('.story-media-history-list');
-        if (state) state['scrollLeft'] = el4['scrollLeft'] || 0x0;
+        if (state) state['scrollLeft'] = el4['scrollLeft'] || 0;
         if (el4['focus']) {
           const el6 = Array['from'](focus['querySelectorAll']('button'))['find']((el7) =>
             Object['entries'](el4['focus'])['every'](([config, scope]) => el7['dataset'][config] === scope),

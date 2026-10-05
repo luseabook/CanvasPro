@@ -47,7 +47,7 @@ export function buildPersonReplacementImageGate({
         (inputUrls || promptPackage['referenceImages']?.['map']((options) => options['ref']) || [])
           ['map']((target) => String(target || '')['trim']())
           ['filter'](Boolean),
-      )['size'] + (index ? 0x1 : 0x0),
+      )['size'] + (index ? 1 : 0),
     source = modelManifest?.['extensions']?.['inputValidation']?.['rejectImageOverflow'] === !![],
     args = source && Number['isFinite'](item) && data > item,
     enabled2 = promptPackage['promptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL,
@@ -105,18 +105,18 @@ export function buildPersonReplacementImageGate({
       'person-limit': '单次最多替换 8 个目标人物。',
       'missing-locator': '存在缺少定位框的人物，请切换关键帧或手动补框后再生成。',
       'missing-orientation':
-        '还有 ' + unresolvedOrientationPersonIds['length'] + '\x20个人物未确认朝向，请先选择朝向。',
-      'missing-mapping': '还有 ' + unmappedPersonIds['length'] + '\x20个人物框未绑定可用的目标形象。',
+        '还有 ' + unresolvedOrientationPersonIds['length'] + ' 个人物未确认朝向，请先选择朝向。',
+      'missing-mapping': '还有 ' + unmappedPersonIds['length'] + ' 个人物框未绑定可用的目标形象。',
       'missing-person-box': '请先把至少一个素材形象拖到首帧人物框。',
     };
   return {
-    eligible: entry['length'] === 0x0,
+    eligible: entry['length'] === 0,
     manual: enabled2,
     sceneOnly: enabled5,
     enforceImageLimit: source,
-    mappingComplete: !enabled2 && mappedPersonIds['length'] > 0x0 && entry['length'] === 0x0,
+    mappingComplete: !enabled2 && mappedPersonIds['length'] > 0 && entry['length'] === 0,
     blockers: entry,
-    message: record[entry[0x0]] || '',
+    message: record[entry[0]] || '',
     duplicateRoleLabels: list,
     mappedPersonIds: mappedPersonIds,
     missingLocatorPersonIds: missingLocatorPersonIds,

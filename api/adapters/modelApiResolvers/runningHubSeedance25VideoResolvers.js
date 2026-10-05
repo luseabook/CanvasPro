@@ -42,7 +42,7 @@ function getRawMediaCount(options3 = {}, data = [], target = '') {
     normalizeInputList(data)['length'],
     normalizeInputList(options3?.[target + 's'])['length'],
     normalizeInputList(options3?.[target + 'Urls'])['length'],
-    String(options3?.[source] || '')['trim']() ? 0x1 : 0x0,
+    String(options3?.[source] || '')['trim']() ? 1 : 0,
   );
 }
 function getRunningHubSeedance25MediaCounts({
@@ -79,7 +79,7 @@ function resolveRunningHubSeedance25Route(options4 = {}) {
     runningHubSeedance25MediaCounts['image'] +
       runningHubSeedance25MediaCounts['video'] +
       runningHubSeedance25MediaCounts['audio'] <=
-    0x0
+    0
   )
     return 'text';
   const runningHubSeedance25Mode = getRunningHubSeedance25Mode(options4['payload'], options4['currentBody']);
@@ -104,7 +104,7 @@ function removeUnsupportedFields(handle, state) {
 function normalizeConversionSlots(config) {
   const list = Array['isArray'](config) ? config : ['all'],
     list2 = list['map']((scope) => String(scope || '')['trim']())['filter'](Boolean);
-  return list2['length'] > 0x0 ? list2 : ['all'];
+  return list2['length'] > 0 ? list2 : ['all'];
 }
 function applyRealPersonConversionSlots(input) {
   input['realPersonMode'] === !![]
@@ -134,7 +134,7 @@ export function runninghubSeedance25Video({
       runningHubSeedance25MediaCounts2['image'] +
         runningHubSeedance25MediaCounts2['video'] +
         runningHubSeedance25MediaCounts2['audio'] >
-      0x0,
+      0,
     value3 = value2 ? runningHubSeedance25Mode2 : 'text2video',
     value4 =
       value3 === 'multimodal2video'
@@ -156,7 +156,7 @@ export function runninghubSeedance25Video({
     list6 = normalizeInputList(inputAudios);
   output['prompt'] = enabled;
   const optionalIntegerInRange = normalizeOptionalIntegerInRange(output['seed'], {
-    min: -0x1,
+    min: -1,
     max: 0x7fffffff,
   });
   if (optionalIntegerInRange === null) delete output['seed'];
@@ -170,35 +170,35 @@ export function runninghubSeedance25Video({
     return output;
   }
   if (value4 === 'reference') {
-    if (list4['length'] + list5['length'] + list6['length'] <= 0x0)
+    if (list4['length'] + list5['length'] + list6['length'] <= 0)
       throw new Error('RunningHub Seedance 2.5 multimodal mode requires image, video, or audio input');
-    if (runningHubSeedance25MediaCounts2['image'] > 0x1e)
+    if (runningHubSeedance25MediaCounts2['image'] > 30)
       throw new Error('RunningHub Seedance 2.5 multimodal mode supports at most 30 image inputs');
-    if (runningHubSeedance25MediaCounts2['video'] > 0xa)
+    if (runningHubSeedance25MediaCounts2['video'] > 10)
       throw new Error(
-        'RunningHub\x20Seedance\x202.5\x20multimodal\x20mode\x20supports\x20at\x20most\x2010\x20video\x20inputs',
+        'RunningHub Seedance 2.5 multimodal mode supports at most 10 video inputs',
       );
-    if (runningHubSeedance25MediaCounts2['audio'] > 0xa)
+    if (runningHubSeedance25MediaCounts2['audio'] > 10)
       throw new Error('RunningHub Seedance 2.5 multimodal mode supports at most 10 audio inputs');
-    list4['length'] > 0x0 && (output['imageUrls'] = list4['slice'](0x0, 0x1e));
-    if (list5['length'] > 0x0) output['videoUrls'] = list5['slice'](0x0, 0xa);
-    if (list6['length'] > 0x0) output['audioUrls'] = list6['slice'](0x0, 0xa);
+    list4['length'] > 0 && (output['imageUrls'] = list4['slice'](0, 30));
+    if (list5['length'] > 0) output['videoUrls'] = list5['slice'](0, 10);
+    if (list6['length'] > 0) output['audioUrls'] = list6['slice'](0, 10);
     return (
       (output['omniReferenceTaskType'] = getRunningHubSeedance25OmniReferenceTaskType(payload, output)),
       applyRealPersonConversionSlots(output),
       output
     );
   }
-  if (runningHubSeedance25MediaCounts2['video'] > 0x0 || runningHubSeedance25MediaCounts2['audio'] > 0x0)
+  if (runningHubSeedance25MediaCounts2['video'] > 0 || runningHubSeedance25MediaCounts2['audio'] > 0)
     throw new Error(
       'RunningHub Seedance 2.5 image/frame modes only accept image input; use multimodal mode for video or audio',
     );
-  if (value3 === 'image2video' && list3['length'] !== 0x1)
+  if (value3 === 'image2video' && list3['length'] !== 1)
     throw new Error('RunningHub Seedance 2.5 image-to-video mode requires exactly 1 image input');
-  if (value3 === 'frames2video' && list3['length'] !== 0x2)
+  if (value3 === 'frames2video' && list3['length'] !== 2)
     throw new Error('RunningHub Seedance 2.5 first-last-frame mode requires exactly 2 image inputs');
-  output['firstFrameUrl'] = list3[0x0];
-  if (list3[0x1]) output['lastFrameUrl'] = list3[0x1];
+  output['firstFrameUrl'] = list3[0];
+  if (list3[1]) output['lastFrameUrl'] = list3[1];
   return ((output['ratio'] = 'adaptive'), applyRealPersonConversionSlots(output), output);
 }
 export function runninghubSeedance25VideoEndpoint(options5 = {}) {

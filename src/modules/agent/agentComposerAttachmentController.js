@@ -35,7 +35,7 @@ export function createAgentComposerAttachmentController({
       'image/*,video/*,audio/*',
     ),
     documentInput = createHiddenFileInput(documentObject, 'agent-document-input', '.txt,.docx,.pdf', !![]);
-  let documentSeq = 0x0,
+  let documentSeq = 0,
     documents = [];
   function getDocumentDisplayRefs() {
     return documents['map'](({ id: id, file: file }) => ({
@@ -66,7 +66,7 @@ export function createAgentComposerAttachmentController({
   }
   function attachDocuments(files = []) {
     const knownKeys = new Set(documents['map']((entry) => documentKey(entry['file'])));
-    let addedCount = 0x0;
+    let addedCount = 0;
     for (const file of Array['from'](files || [])) {
       const validation = validateAgentDocumentFile(file, validateDocumentFile);
       if (!validation['ok']) {
@@ -82,13 +82,13 @@ export function createAgentComposerAttachmentController({
         );
         break;
       }
-      ((documentSeq += 0x1),
+      ((documentSeq += 1),
         documents['push']({ id: 'agent-document-' + documentSeq, file: file }),
         knownKeys['add'](key),
-        (addedCount += 0x1));
+        (addedCount += 1));
     }
     return (
-      addedCount > 0x0 &&
+      addedCount > 0 &&
         (onDocumentChange?.(),
         setNotice?.(formatText?.('documentAttached', { count: addedCount }) || text?.('documentAttached')),
         focusInput?.()),
@@ -108,7 +108,7 @@ export function createAgentComposerAttachmentController({
       if (!isContextCurrent(context)) return;
       const uploadedList = Array['isArray'](uploaded) ? uploaded : [uploaded],
         nodes = uploadedList['map'](normalizeMaterialNode)['filter'](Boolean);
-      if (nodes['length'] === 0x0) {
+      if (nodes['length'] === 0) {
         setNotice?.(text?.('uploadMaterialFailed'));
         return;
       }
@@ -121,7 +121,7 @@ export function createAgentComposerAttachmentController({
   }
   return (
     materialInput['addEventListener']('change', () => {
-      (uploadMaterialFile(materialInput['files']?.[0x0]), (materialInput['value'] = ''));
+      (uploadMaterialFile(materialInput['files']?.[0]), (materialInput['value'] = ''));
     }),
     documentInput['addEventListener']('change', () => {
       (attachDocuments(documentInput['files']), (documentInput['value'] = ''));

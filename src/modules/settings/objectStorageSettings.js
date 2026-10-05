@@ -470,7 +470,7 @@ export async function verifyObjectStorageConnection(
       );
     (await saveConfig({ ...getCurrentSnapshot(), objectStorage: objectStorage7 }),
       renderObjectStorageForm(value27, objectStorage7));
-    const value28 = result2?.['cleanupOk'] === ![] ? '\x20' + tr('status.testCleanupWarning') : '',
+    const value28 = result2?.['cleanupOk'] === ![] ? ' ' + tr('status.testCleanupWarning') : '',
       message8 = '' + tr('status.testSuccess') + value28;
     return (
       setStatus(value27, 'success', message8),

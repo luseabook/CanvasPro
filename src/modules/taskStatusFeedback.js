@@ -1,17 +1,17 @@
 import { showTaskStatusNotification } from '../services/completionNotificationService.js';
 import { ACTIVE_TASK_STATUSES } from './taskCenterModel.js';
-const WAIT_NOTICE_MS = 0xa * 0x3c * 0x3e8,
+const WAIT_NOTICE_MS = 10 * 60 * 1000,
   clean = (text, limit) =>
     String(text || '')
-      ['replace'](/\s+/g, '\x20')
+      ['replace'](/\s+/g, ' ')
       ['trim']()
-      ['slice'](0x0, limit);
+      ['slice'](0, limit);
 export function createTaskStatusFeedback({
   notify: notify = showTaskStatusNotification,
   setTimer: setTimer = setTimeout,
   clearTimer: clearTimer = clearTimeout,
   waitMs: waitMs = WAIT_NOTICE_MS,
-  mergeMs: mergeMs = 0x258,
+  mergeMs: mergeMs = 600,
   now: now = Date['now'],
 } = {}) {
   const createdAt = now(),
@@ -39,17 +39,17 @@ export function createTaskStatusFeedback({
           pendingFailures['delete'](groupKey);
           const failed = group['tasks']['filter']((entry) => entry['status'] === 'failed');
           if (!failed['length']) return;
-          const first = failed[0x0],
-            title = clean(first['title'], 0x3c) || '生成任务',
-            detail = clean(first['error'], 0x78) || '请点击查看任务详情',
+          const first = failed[0],
+            title = clean(first['title'], 60) || '生成任务',
+            detail = clean(first['error'], 120) || '请点击查看任务详情',
             completedCount = group['tasks']['filter']((entry) => entry['status'] === 'complete')['length'];
           emitNotification({
             type: 'error',
             navigation: pickNavigation(first),
             body:
-              group['tasks']['length'] === 0x1
+              group['tasks']['length'] === 1
                 ? title + '失败：' + detail
-                : '多项任务已结束：成功\x20' +
+                : '多项任务已结束：成功 ' +
                   completedCount +
                   ' 个，失败 ' +
                   failed['length'] +
@@ -80,7 +80,7 @@ export function createTaskStatusFeedback({
               type: 'warn',
               navigation: pickNavigation(entry['task']),
               body:
-                (clean(entry['task']['title'], 0x3c) || '生成任务') +
+                (clean(entry['task']['title'], 60) || '生成任务') +
                 '等待较久，尚未确认完成。点击查看进度，请勿重复提交。',
             }));
         }, waitMs)),

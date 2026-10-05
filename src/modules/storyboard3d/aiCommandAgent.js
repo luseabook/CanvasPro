@@ -33,12 +33,12 @@ export const STORYBOARD_3D_AI_COMMAND_SYSTEM_PROMPT = [
   '只能使用 outputSchema 中列出的 tool。',
   '引用已有对象时必须使用上下文里真实存在的 sceneId、objectId、shotId。',
   'availableAssets.rows 每行按 availableAssets.columns 排列；添加道具时，assetId 必须逐字使用第一列的真实 id。',
-  '不要搜索、猜测或编造资产\x20ID；availableAssets\x20已经是完整可用清单。',
+  '不要搜索、猜测或编造资产 ID；availableAssets 已经是完整可用清单。',
   'position、rotation、scale、target 都是长度为 3 的有限数字数组，rotation 使用弧度。',
   'availableAssets 的 spatial 列描述资产尺寸、锚点和语义角色；摆放时必须据此避免悬空、穿插或错误高度。',
   '不要直接操作 Three.js；所有修改必须表示为命令。',
   '同一次用户请求的全部修改使用同一个 transactionId，失败时由执行器整体回滚。',
-]['join']('\x0a');
+]['join']('\n');
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -46,18 +46,18 @@ function resultText(item) {
   if (typeof item === 'string') return item;
   return item?.['text'] || item?.['outputText'] || item?.['content'] || '';
 }
-function finiteNumber(key, index, { min: min = -0x186a0, max: max = 0x186a0 } = {}) {
+function finiteNumber(key, index, { min: min = -100000, max: max = 100000 } = {}) {
   const result = Number(key);
   if (!Number['isFinite'](result) || result < min || result > max)
     throw new TypeError(
-      index + '\x20must\x20be\x20a\x20finite\x20number\x20between\x20' + min + ' and ' + max + '.',
+      index + ' must be a finite number between ' + min + ' and ' + max + '.',
     );
   return result;
 }
 function vector3(data, options, args = null) {
   if (data == null && args) return [...args];
-  if (!Array['isArray'](data) || data['length'] !== 0x3)
-    throw new TypeError(options + '\x20must\x20contain\x20exactly\x20three\x20numbers.');
+  if (!Array['isArray'](data) || data['length'] !== 3)
+    throw new TypeError(options + ' must contain exactly three numbers.');
   return data['map']((target, source) => finiteNumber(target, options + '[' + source + ']'));
 }
 function requiredId(next, current) {
@@ -65,19 +65,19 @@ function requiredId(next, current) {
   if (!text) throw new TypeError(current + ' is required.');
   return text;
 }
-function optionalText(entry, record = 0x1f4) {
-  return normalizeText(entry)['slice'](0x0, record);
+function optionalText(entry, record = 500) {
+  return normalizeText(entry)['slice'](0, record);
 }
 function normalizeTransformArgs(payload, { partial: partial = ![] } = {}) {
   const box = {};
   return (
     (!partial || payload['position'] != null) &&
-      (box['position'] = vector3(payload['position'], 'args.position', [0x0, 0x0, 0x0])),
+      (box['position'] = vector3(payload['position'], 'args.position', [0, 0, 0])),
     (!partial || payload['rotation'] != null) &&
-      (box['rotation'] = vector3(payload['rotation'], 'args.rotation', [0x0, 0x0, 0x0])),
+      (box['rotation'] = vector3(payload['rotation'], 'args.rotation', [0, 0, 0])),
     (!partial || payload['scale'] != null) &&
-      (box['scale'] = vector3(payload['scale'], 'args.scale', [0x1, 0x1, 0x1])['map']((handle, state) =>
-        finiteNumber(handle, 'args.scale[' + state + ']', { min: 0.001, max: 0x3e8 }),
+      (box['scale'] = vector3(payload['scale'], 'args.scale', [1, 1, 1])['map']((handle, state) =>
+        finiteNumber(handle, 'args.scale[' + state + ']', { min: 0.001, max: 1000 }),
       )),
     box
   );
@@ -92,7 +92,7 @@ function normalizeCommandArgs(config, scope = {}) {
   if (directorAIArgs) return directorAIArgs;
   switch (config) {
     case 'createScene':
-      return { name: optionalText(error['name'], 0x78) || '新场景' };
+      return { name: optionalText(error['name'], 120) || '新场景' };
     case 'getSceneLayout':
     case 'listShots':
     case 'checkComposition':
@@ -100,15 +100,15 @@ function normalizeCommandArgs(config, scope = {}) {
     case 'addProp':
       return {
         assetId: requiredId(error['assetId'], 'args.assetId'),
-        name: optionalText(error['name'], 0x78),
+        name: optionalText(error['name'], 120),
         ...normalizeTransformArgs(error),
       };
     case 'addCharacter':
       return {
         assetId: requiredId(error['assetId'], 'args.assetId'),
-        name: optionalText(error['name'], 0x78),
-        bodyPreset: optionalText(error['bodyPreset'], 0x50),
-        actionId: optionalText(error['actionId'], 0x78),
+        name: optionalText(error['name'], 120),
+        bodyPreset: optionalText(error['bodyPreset'], 80),
+        actionId: optionalText(error['actionId'], 120),
         ...normalizeTransformArgs(error),
       };
     case 'addLight':
@@ -116,15 +116,15 @@ function normalizeCommandArgs(config, scope = {}) {
         lightType: ['directional', 'point', 'spot', 'ambient']['includes'](error['lightType'])
           ? error['lightType']
           : 'directional',
-        intensity: finiteNumber(error['intensity'] ?? 0x1, 'args.intensity', { min: 0x0, max: 0x64 }),
-        color: optionalText(error['color'], 0x20),
-        position: vector3(error['position'], 'args.position', [0x3, 0x5, 0x3]),
-        target: vector3(error['target'], 'args.target', [0x0, 0x0, 0x0]),
+        intensity: finiteNumber(error['intensity'] ?? 1, 'args.intensity', { min: 0, max: 100 }),
+        color: optionalText(error['color'], 32),
+        position: vector3(error['position'], 'args.position', [3, 5, 3]),
+        target: vector3(error['target'], 'args.target', [0, 0, 0]),
       };
     case 'updateObject':
       return {
         objectId: requiredId(error['objectId'], 'args.objectId'),
-        name: optionalText(error['name'], 0x78),
+        name: optionalText(error['name'], 120),
         visible: typeof error['visible'] === 'boolean' ? error['visible'] : undefined,
         locked: typeof error['locked'] === 'boolean' ? error['locked'] : undefined,
         ...normalizeTransformArgs(error, { partial: !![] }),
@@ -144,24 +144,24 @@ function normalizeCommandArgs(config, scope = {}) {
       };
     case 'adjustCamera':
       return {
-        position: vector3(error['position'], 'args.position', [0x0, 1.6, 0x5]),
-        target: vector3(error['target'], 'args.target', [0x0, 0x1, 0x0]),
-        focalLength: finiteNumber(error['focalLength'] ?? 0x32, 'args.focalLength', { min: 0x8, max: 0x12c }),
+        position: vector3(error['position'], 'args.position', [0, 1.6, 5]),
+        target: vector3(error['target'], 'args.target', [0, 1, 0]),
+        focalLength: finiteNumber(error['focalLength'] ?? 50, 'args.focalLength', { min: 8, max: 300 }),
       };
     case 'addShot':
       return {
-        name: optionalText(error['name'], 0x78) || '新镜头',
-        description: optionalText(error['description'], 0x3e8),
+        name: optionalText(error['name'], 120) || '新镜头',
+        description: optionalText(error['description'], 1000),
       };
     case 'updateShot':
       return {
         shotId: requiredId(error['shotId'], 'args.shotId'),
-        name: optionalText(error['name'], 0x78),
-        description: optionalText(error['description'], 0x3e8),
+        name: optionalText(error['name'], 120),
+        description: optionalText(error['description'], 1000),
         focalLength:
           error['focalLength'] == null
             ? undefined
-            : finiteNumber(error['focalLength'], 'args.focalLength', { min: 0x8, max: 0x12c }),
+            : finiteNumber(error['focalLength'], 'args.focalLength', { min: 8, max: 300 }),
       };
     default:
       throw new TypeError('Unsupported storyboard AI tool: ' + config);
@@ -169,13 +169,13 @@ function normalizeCommandArgs(config, scope = {}) {
 }
 export function validateStoryboard3DAICommandPlan(
   enabled,
-  { sceneIds: sceneIds = [], maximumCommands: maximumCommands = 0x32 } = {},
+  { sceneIds: sceneIds = [], maximumCommands: maximumCommands = 50 } = {},
 ) {
   if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled))
-    throw new TypeError('AI\x20command\x20plan\x20must\x20be\x20an\x20object.');
+    throw new TypeError('AI command plan must be an object.');
   const requiredId2 = requiredId(enabled['transactionId'], 'transactionId'),
     input = Array['isArray'](enabled['commands']) ? enabled['commands'] : [];
-  if (input['length'] === 0x0 || input['length'] > maximumCommands)
+  if (input['length'] === 0 || input['length'] > maximumCommands)
     throw new RangeError('commands must contain between 1 and ' + maximumCommands + ' items.');
   const enabled2 = new Set(sceneIds['map'](normalizeText)['filter'](Boolean)),
     output = input['map']((enabled3, value2) => {
@@ -185,12 +185,12 @@ export function validateStoryboard3DAICommandPlan(
       if (!TOOL_SET['has'](text2)) throw new TypeError('commands[' + value2 + '].tool is not allowed.');
       const text3 = normalizeText(enabled3['sceneId']);
       if (text2 !== 'createScene') {
-        if (!text3) throw new TypeError('commands[' + value2 + '].sceneId\x20is\x20required.');
-        if (enabled2['size'] > 0x0 && !enabled2['has'](text3))
+        if (!text3) throw new TypeError('commands[' + value2 + '].sceneId is required.');
+        if (enabled2['size'] > 0 && !enabled2['has'](text3))
           throw new TypeError('commands[' + value2 + '].sceneId does not exist.');
       }
       return {
-        commandId: normalizeText(enabled3['commandId']) || requiredId2 + ':' + (value2 + 0x1),
+        commandId: normalizeText(enabled3['commandId']) || requiredId2 + ':' + (value2 + 1),
         transactionId: requiredId2,
         tool: text2,
         sceneId: text3,
@@ -200,7 +200,7 @@ export function validateStoryboard3DAICommandPlan(
     });
   return {
     transactionId: requiredId2,
-    summary: optionalText(enabled['summary'], 0x3e8),
+    summary: optionalText(enabled['summary'], 1000),
     commands: output,
     readOnly: output['every']((value3) => READ_ONLY_TOOL_SET['has'](value3['tool'])),
   };
@@ -246,17 +246,17 @@ function buildAvailableAssetContext(list2 = []) {
     ['filter']((value12) => ['builtin', 'pack']['includes'](value12?.['source']?.['kind']))
     ['map']((value13) => [
       normalizeText(value13?.['id']),
-      normalizeText(value13?.['name'])['slice'](0x0, 0x50),
-      normalizeText(value13?.['category'])['slice'](0x0, 0x50),
+      normalizeText(value13?.['name'])['slice'](0, 80),
+      normalizeText(value13?.['category'])['slice'](0, 80),
       (Array['isArray'](value13?.['tags']) ? value13['tags'] : [])
         ['map'](normalizeText)
         ['filter'](Boolean)
-        ['slice'](0x0, 0x4)
-        ['map']((value14) => value14['slice'](0x0, 0x50))
+        ['slice'](0, 4)
+        ['map']((value14) => value14['slice'](0, 80))
         ['join'](','),
       describeStoryboard3DAssetSpatialMetadata(value13),
     ])
-    ['filter']((value15) => value15[0x0]);
+    ['filter']((value15) => value15[0]);
   return { columns: ['id', 'name', 'category', 'tags', 'spatial'], rows: value11 };
 }
 export function buildStoryboard3DAICommandPrompt({
@@ -264,7 +264,7 @@ export function buildStoryboard3DAICommandPrompt({
   project: project,
   assets: assets = [],
 } = {}) {
-  const text4 = normalizeText(instruction)['slice'](0x0, 0x1388);
+  const text4 = normalizeText(instruction)['slice'](0, 5000);
   if (!text4) throw new Error('请输入要执行的 3D 场景指令。');
   const value16 = (Array['isArray'](assets) ? assets : [])['filter']((value17) =>
     ['builtin', 'pack']['includes'](value17?.['source']?.['kind']),
@@ -282,7 +282,7 @@ export function buildStoryboard3DAICommandPrompt({
       setObjectPath: 'shotId, objectId, points, start, duration, smooth',
       setCameraMotion: 'shotId, preset:orbit/arc/push/pull/crane/slide/spiral, start, duration, amount',
       setCameraFollow:
-        'shotId,\x20mode:relative/path/fixed,\x20followObjectId,\x20lookAtObjectId,\x20followOffset,\x20lookAtOffset,\x20start,\x20duration',
+        'shotId, mode:relative/path/fixed, followObjectId, lookAtObjectId, followOffset, lookAtOffset, start, duration',
       addActionClip: 'shotId, objectId, actionId, start, duration, speed',
     },
     outputSchema: {
@@ -291,9 +291,9 @@ export function buildStoryboard3DAICommandPrompt({
       commands: [
         {
           commandId: '可选；事务内唯一',
-          tool: 'allowedTools\x20中的一项',
+          tool: 'allowedTools 中的一项',
           sceneId: '真实场景 ID；仅 createScene 可为空',
-          args: '与\x20tool\x20对应的参数对象',
+          args: '与 tool 对应的参数对象',
         },
       ],
     },
@@ -305,7 +305,7 @@ function parseCommandPlanResult(value18) {
   try {
     return JSON['parse'](text5);
   } catch {
-    throw new Error('3D\x20Agent\x20未返回有效的严格\x20JSON。');
+    throw new Error('3D Agent 未返回有效的严格 JSON。');
   }
 }
 export async function generateStoryboard3DAICommandPlan({
@@ -322,7 +322,7 @@ export async function generateStoryboard3DAICommandPlan({
     storyboard3DAICommandPrompt = buildStoryboard3DAICommandPrompt({
       instruction: instruction2,
       project: project2,
-      assets: assetLibrary?.['list']?.({ limit: 0x640 }) || [],
+      assets: assetLibrary?.['list']?.({ limit: 1600 }) || [],
     }),
     value19 = (project2?.['scenes'] || [])['map']((value20) => value20?.['id'])['filter'](Boolean),
     args2 = {
@@ -331,7 +331,7 @@ export async function generateStoryboard3DAICommandPlan({
       prompt: storyboard3DAICommandPrompt,
       systemPrompt: STORYBOARD_3D_AI_COMMAND_SYSTEM_PROMPT,
       temperature: 0.15,
-      timeoutMs: 0x3a980,
+      timeoutMs: 240000,
     };
   onProgress?.({ stage: 'planning', message: '正在规划受控场景命令' });
   const request2 = await request(args2);

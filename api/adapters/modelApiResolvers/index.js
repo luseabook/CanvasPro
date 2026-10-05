@@ -19,7 +19,7 @@ import {
   resolveNanoBananaSelectionFromModel,
 } from '../../../src/modules/nanoBananaModeRules.js';
 import { resolveModelExecution } from '../../../src/manifests/index.js';
-const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
+const PPIO_MIN_PIXELS = 2560 * 1440,
   PPIO_MAX_PIXELS = 0x9ec290,
   PPIO_MIN_RATIO = 1 / 16,
   PPIO_MAX_RATIO = 16,
@@ -28,10 +28,10 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
   PPIO_DEFAULT_QUALITY = '2K',
   PPIO_DEFAULT_RATIO = '1:1',
   PPIO_QUALITY_PIXEL_MAP = Object.freeze({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   PPIO_RATIO_OPTIONS = Object.freeze([
     Object.freeze({ label: '1:1', w: 1, h: 1 }),
@@ -46,16 +46,16 @@ const PPIO_MIN_PIXELS = 0xa00 * 0x5a0,
     Object.freeze({ label: '21:9', w: 21, h: 9 }),
   ]),
   PPIO_RATIO_LABEL_SET = new Set(PPIO_RATIO_OPTIONS.map((item) => item.label)),
-  RUNNINGHUB_MODEL_DIMENSION_MIN = 0x200,
-  RUNNINGHUB_MODEL_DIMENSION_MAX = 0x2000,
+  RUNNINGHUB_MODEL_DIMENSION_MIN = 512,
+  RUNNINGHUB_MODEL_DIMENSION_MAX = 8192,
   RUNNINGHUB_MODEL_DIMENSION_ALIGN = 8,
   RUNNINGHUB_MODEL_DEFAULT_QUALITY = '2K',
   RUNNINGHUB_MODEL_DEFAULT_RATIO = '1:1',
   RUNNINGHUB_MODEL_QUALITY_PIXEL_MAP = Object.freeze({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   RUNNINGHUB_MODEL_RATIO_LIST = Object.freeze([
     '1:1',
@@ -693,8 +693,8 @@ function runninghubImage({
     width = value152
       ? providerRatioPayload?.ratioCapability === 'dimensions'
         ? {
-            width: Number(providerRatioPayload?.params?.width) || 0x800,
-            height: Number(providerRatioPayload?.params?.height) || 0x800,
+            width: Number(providerRatioPayload?.params?.width) || 2048,
+            height: Number(providerRatioPayload?.params?.height) || 2048,
           }
         : resolveRunningHubModelDimensions(imageSize3, payload7.aspectRatio)
       : null,
@@ -712,7 +712,7 @@ function runninghubImage({
     value153 = {
       prompt: finalPrompt4 || '',
       ...(value152
-        ? { width: width?.width || 0x800, height: width?.height || 0x800 }
+        ? { width: width?.width || 2048, height: width?.height || 2048 }
         : !enabled13
           ? { resolution: resolution }
           : {}),
@@ -3022,7 +3022,7 @@ function normalizeAgnesVideoFrameCount(value325) {
   const value326 = Number(value325);
   if (!Number.isFinite(value326)) return value325;
   const value327 = 49,
-    value328 = 0x1b9,
+    value328 = 441,
     value329 = Math.min(Math.max(value327, Math.trunc(value326)), value328),
     value330 = Math.round((value329 - 1) / 8) * 8 + 1;
   return Math.min(value328, Math.max(value327, value330));

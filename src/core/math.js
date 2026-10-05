@@ -746,13 +746,13 @@ export function calcWorldBounds(value136, box40 = null) {
   const nodesWorldBounds = computeNodesWorldBounds(value136);
   if (!nodesWorldBounds) {
     if (box40) {
-      const value137 = 0x780,
-        value138 = 0x438,
+      const value137 = 1920,
+        value138 = 1080,
         minX3 = -box40.x / box40.zoom,
         minY3 = -box40.y / box40.zoom,
         width5 = value137 / box40.zoom,
         height5 = value138 / box40.zoom,
-        value139 = 0x258;
+        value139 = 600;
       return {
         minX: minX3 - value139,
         minY: minY3 - value139,
@@ -762,9 +762,9 @@ export function calcWorldBounds(value136, box40 = null) {
         height: height5 + value139 * 2,
       };
     }
-    return { minX: 0, minY: 0, maxX: 0x7d0, maxY: 0x7d0, width: 0x7d0, height: 0x7d0 };
+    return { minX: 0, minY: 0, maxX: 2000, maxY: 2000, width: 2000, height: 2000 };
   }
-  const value140 = 0x258,
+  const value140 = 600,
     minX4 = nodesWorldBounds.minX - value140,
     minY4 = nodesWorldBounds.minY - value140,
     maxX3 = nodesWorldBounds.maxX + value140,
@@ -1391,12 +1391,12 @@ export {
 } from './rotationMath.js';
 export { projectPointToViewportEdge, spreadViewportBoundaryPoint } from './viewportBoundaryMath.js';
 
-export function getViewportScreenBounds(options2 = {}, value303 = 0x0, value304 = 0x0) {
+export function getViewportScreenBounds(options2 = {}, value303 = 0, value304 = 0) {
   const box50 = getViewportScreenOrigin(options2),
-    value305 = Number['isFinite'](Number(value303)) ? Number(value303) : 0x0,
-    value306 = Number['isFinite'](Number(value304)) ? Number(value304) : 0x0,
-    value307 = Math['max'](0x0, value305 - box50['x']),
-    value308 = Math['max'](0x0, value306 - box50['y']);
+    value305 = Number['isFinite'](Number(value303)) ? Number(value303) : 0,
+    value306 = Number['isFinite'](Number(value304)) ? Number(value304) : 0,
+    value307 = Math['max'](0, value305 - box50['x']),
+    value308 = Math['max'](0, value306 - box50['y']);
   return {
     left: box50['x'],
     top: box50['y'],
@@ -1404,43 +1404,43 @@ export function getViewportScreenBounds(options2 = {}, value303 = 0x0, value304 
     bottom: box50['y'] + value308,
     width: value307,
     height: value308,
-    centerX: box50['x'] + value307 / 0x2,
-    centerY: box50['y'] + value308 / 0x2,
+    centerX: box50['x'] + value307 / 2,
+    centerY: box50['y'] + value308 / 2,
   };
 }
 
-export function getViewportScreenCenter(options3 = {}, value309 = 0x0, value310 = 0x0) {
+export function getViewportScreenCenter(options3 = {}, value309 = 0, value310 = 0) {
   const viewportScreenBounds = getViewportScreenBounds(options3, value309, value310);
   return { x: viewportScreenBounds['centerX'], y: viewportScreenBounds['centerY'] };
 }
 
-function _medianLayoutMetric(value311, value312, value313 = 0x1) {
+function _medianLayoutMetric(value311, value312, value313 = 1) {
   const list27 = (Array['isArray'](value311) ? value311 : [])
-    ['map']((value314) => Math['max'](0x0, _toFiniteNumber(value314?.[value312], 0x0)))
-    ['filter']((count12) => count12 > 0x0)
+    ['map']((value314) => Math['max'](0, _toFiniteNumber(value314?.[value312], 0)))
+    ['filter']((count12) => count12 > 0)
     ['sort']((value315, value316) => value315 - value316);
-  if (list27['length'] === 0x0) return value313;
-  const value317 = Math['floor'](list27['length'] / 0x2);
-  if (list27['length'] % 0x2 === 0x1) return list27[value317];
-  return (list27[value317 - 0x1] + list27[value317]) / 0x2;
+  if (list27['length'] === 0) return value313;
+  const value317 = Math['floor'](list27['length'] / 2);
+  if (list27['length'] % 2 === 1) return list27[value317];
+  return (list27[value317 - 1] + list27[value317]) / 2;
 }
 
 function _sortGridLayoutItems(value318) {
   const _sortLayoutItems2 = _sortLayoutItems(value318);
-  if (_sortLayoutItems2['length'] <= 0x1) return _sortLayoutItems2;
-  const value319 = Math['max'](0x8, _medianLayoutMetric(_sortLayoutItems2, 'height', 0x28) * 0.35),
+  if (_sortLayoutItems2['length'] <= 1) return _sortLayoutItems2;
+  const value319 = Math['max'](8, _medianLayoutMetric(_sortLayoutItems2, 'height', 40) * 0.35),
     value320 = [];
   for (const box51 of _sortLayoutItems2) {
-    const _toFiniteNumber36 = _toFiniteNumber(box51?.['top'] ?? box51?.['y'], 0x0),
-      value321 = Math['max'](0x0, _toFiniteNumber(box51?.['height'], 0x0)),
+    const _toFiniteNumber36 = _toFiniteNumber(box51?.['top'] ?? box51?.['y'], 0),
+      value321 = Math['max'](0, _toFiniteNumber(box51?.['height'], 0)),
       _toFiniteNumber37 = _toFiniteNumber(box51?.['bottom'], _toFiniteNumber36 + value321),
-      _toFiniteNumber38 = _toFiniteNumber(box51?.['cy'], _toFiniteNumber36 + value321 / 0x2);
+      _toFiniteNumber38 = _toFiniteNumber(box51?.['cy'], _toFiniteNumber36 + value321 / 2);
     let box52 = null,
       value322 = Infinity;
     for (const box53 of value320) {
       const value323 =
           Math['min'](box53['bottom'], _toFiniteNumber37) - Math['max'](box53['top'], _toFiniteNumber36),
-        value324 = Math['max'](0x1, Math['min'](box53['bottom'] - box53['top'], value321 || 0x1)),
+        value324 = Math['max'](1, Math['min'](box53['bottom'] - box53['top'], value321 || 1)),
         value325 = Math['abs'](_toFiniteNumber38 - box53['centerY']),
         value326 = value323 >= value324 * 0.25 || value325 <= value319;
       value326 && value325 < value322 && ((box52 = box53), (value322 = value325));
@@ -1465,8 +1465,8 @@ function _sortGridLayoutItems(value318) {
     value320['sort']((value327, box54) => value327['top'] - box54['top']),
     value320['flatMap']((value328) =>
       value328['items']['sort']((box55, box56) => {
-        const _toFiniteNumber39 = _toFiniteNumber(box55?.['left'] ?? box55?.['x'], 0x0),
-          _toFiniteNumber40 = _toFiniteNumber(box56?.['left'] ?? box56?.['x'], 0x0);
+        const _toFiniteNumber39 = _toFiniteNumber(box55?.['left'] ?? box55?.['x'], 0),
+          _toFiniteNumber40 = _toFiniteNumber(box56?.['left'] ?? box56?.['x'], 0);
         if (_toFiniteNumber39 !== _toFiniteNumber40) return _toFiniteNumber39 - _toFiniteNumber40;
         return String(box55?.['id'] || '')['localeCompare'](String(box56?.['id'] || ''));
       }),
@@ -1496,7 +1496,7 @@ function _resolveGridRelationLayout(value329, value330) {
     if (value333['has'](value335)) continue;
     (value333['add'](value335), value332['push']({ sourceId: enabled22, targetId: enabled23 }));
   }
-  if (value332['length'] === 0x0) return null;
+  if (value332['length'] === 0) return null;
   const map4 = new Map(
       _sortGridLayoutItems2['map']((value336, value337) => [String(value336['id']), value337]),
     ),
@@ -1508,42 +1508,42 @@ function _resolveGridRelationLayout(value329, value330) {
     (args3['add'](sourceId), args3['add'](targetId));
     if (!enabled24['has'](sourceId)) enabled24['set'](sourceId, []);
     (enabled24['get'](sourceId)['push'](targetId),
-      map5['set'](targetId, (map5['get'](targetId) || 0x0) + 0x1));
-    if (!map5['has'](sourceId)) map5['set'](sourceId, 0x0);
-    if (!map6['has'](sourceId)) map6['set'](sourceId, 0x0);
-    if (!map6['has'](targetId)) map6['set'](targetId, 0x0);
+      map5['set'](targetId, (map5['get'](targetId) || 0) + 1));
+    if (!map5['has'](sourceId)) map5['set'](sourceId, 0);
+    if (!map6['has'](sourceId)) map6['set'](sourceId, 0);
+    if (!map6['has'](targetId)) map6['set'](targetId, 0);
   }
   const value338 = (value339, value340) =>
     (map4['get'](value339) ?? Number['MAX_SAFE_INTEGER']) -
       (map4['get'](value340) ?? Number['MAX_SAFE_INTEGER']) || value339['localeCompare'](value340);
-  let value341 = [...args3]['filter']((value342) => (map5['get'](value342) || 0x0) === 0x0)['sort'](value338);
+  let value341 = [...args3]['filter']((value342) => (map5['get'](value342) || 0) === 0)['sort'](value338);
   const enabled25 = new Set();
-  while (value341['length'] > 0x0) {
+  while (value341['length'] > 0) {
     const value343 = value341;
     value341 = [];
     for (const value344 of value343) {
       enabled25['add'](value344);
-      const value345 = map6['get'](value344) || 0x0;
+      const value345 = map6['get'](value344) || 0;
       for (const value346 of enabled24['get'](value344) || []) {
-        map6['set'](value346, Math['max'](map6['get'](value346) || 0x0, value345 + 0x1));
-        const count13 = (map5['get'](value346) || 0x0) - 0x1;
+        map6['set'](value346, Math['max'](map6['get'](value346) || 0, value345 + 1));
+        const count13 = (map5['get'](value346) || 0) - 1;
         map5['set'](value346, count13);
-        if (count13 === 0x0) value341['push'](value346);
+        if (count13 === 0) value341['push'](value346);
       }
     }
     value341['sort'](value338);
   }
   const value347 = [...args3]['filter']((value348) => !enabled25['has'](value348));
-  if (value347['length'] > 0x0) {
+  if (value347['length'] > 0) {
     const value349 = value347['reduce'](
-      (value350, value351) => Math['max'](value350, map6['get'](value351) || 0x0),
-      0x0,
+      (value350, value351) => Math['max'](value350, map6['get'](value351) || 0),
+      0,
     );
     for (const value352 of value347) map6['set'](value352, value349);
   }
   const value353 = [...args3]['reduce'](
-    (value354, value355) => Math['max'](value354, (map6['get'](value355) || 0x0) + 0x1),
-    0x1,
+    (value354, value355) => Math['max'](value354, (map6['get'](value355) || 0) + 1),
+    1,
   );
   return { connectedIds: args3, layerById: map6, layerCount: value353, relations: value332 };
 }
@@ -1554,11 +1554,11 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
   list28['forEach']((value357, value358) => {
     const value359 = String(value357['id']);
     let value360 = enabled26['connectedIds']['has'](value359)
-      ? Math['min'](value356 - 0x1, enabled26['layerById']['get'](value359) || 0x0)
+      ? Math['min'](value356 - 1, enabled26['layerById']['get'](value359) || 0)
       : value358 % value356;
     if (!enabled26['connectedIds']['has'](value359)) {
       const value361 = Math['min'](...list29['map']((list30) => list30['length']));
-      for (let value362 = 0x0; value362 < value356; value362 += 0x1) {
+      for (let value362 = 0; value362 < value356; value362 += 1) {
         const value363 = (value360 + value362) % value356;
         if (list29[value363]['length'] === value361) {
           value360 = value363;
@@ -1589,20 +1589,20 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
       const list31 = (map10['get'](value372) || [])
         ['filter']((value374) => {
           const value375 = map7['get'](value374);
-          return count14 > 0x0 ? value375 < value373 : value375 > value373;
+          return count14 > 0 ? value375 < value373 : value375 > value373;
         })
         ['map']((value376) => map11['get'](value376))
         ['filter'](Number['isFinite'])
         ['sort']((value377, value378) => value377 - value378);
-      if (list31['length'] === 0x0) return null;
-      const value379 = Math['floor'](list31['length'] / 0x2);
-      return list31['length'] % 0x2 === 0x1
+      if (list31['length'] === 0) return null;
+      const value379 = Math['floor'](list31['length'] / 2);
+      return list31['length'] % 2 === 1
         ? list31[value379]
-        : (list31[value379 - 0x1] + list31[value379]) / 0x2;
+        : (list31[value379 - 1] + list31[value379]) / 2;
     },
     handler7 = (count15) => {
-      const value380 = count15 > 0x0 ? 0x1 : value356 - 0x2,
-        value381 = count15 > 0x0 ? value356 : -0x1;
+      const value380 = count15 > 0 ? 1 : value356 - 2,
+        value381 = count15 > 0 ? value356 : -1;
       for (let value382 = value380; value382 !== value381; value382 += count15) {
         const map12 = new Map(
             list29[value382]['map']((value383, value384) => [String(value383['id']), value384]),
@@ -1618,11 +1618,11 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
             value391 = String(value389['id']),
             value392 = value385['get'](value390),
             value393 = value385['get'](value391),
-            value394 = value392 ?? map12['get'](value390) ?? 0x0,
-            value395 = value393 ?? map12['get'](value391) ?? 0x0;
+            value394 = value392 ?? map12['get'](value390) ?? 0,
+            value395 = value393 ?? map12['get'](value391) ?? 0;
           if (value394 !== value395) return value394 - value395;
           return (
-            (map12['get'](value390) ?? 0x0) - (map12['get'](value391) ?? 0x0) ||
+            (map12['get'](value390) ?? 0) - (map12['get'](value391) ?? 0) ||
             (map9['get'](value390) ?? Number['MAX_SAFE_INTEGER']) -
               (map9['get'](value391) ?? Number['MAX_SAFE_INTEGER']) ||
             value390['localeCompare'](value391)
@@ -1631,8 +1631,8 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
           handler6(value382));
       }
     };
-  for (let count16 = 0x0; count16 < 0x2; count16 += 0x1) {
-    (handler7(0x1), handler7(-0x1));
+  for (let count16 = 0; count16 < 2; count16 += 1) {
+    (handler7(1), handler7(-1));
   }
   const value396 = enabled26['relations']['filter'](
       ({ sourceId: sourceId3, targetId: targetId3 }) => map7['get'](sourceId3) !== map7['get'](targetId3),
@@ -1640,8 +1640,8 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
     map13 = new Map(),
     value397 = new Map();
   for (const { sourceId: sourceId4, targetId: targetId4 } of value396) {
-    (map13['set'](sourceId4, (map13['get'](sourceId4) || 0x0) + 0x1),
-      value397['set'](targetId4, (value397['get'](targetId4) || 0x0) + 0x1));
+    (map13['set'](sourceId4, (map13['get'](sourceId4) || 0) + 1),
+      value397['set'](targetId4, (value397['get'](targetId4) || 0) + 1));
   }
   const map14 = new Map(list28['map']((value398) => [String(value398['id']), String(value398['id'])])),
     map15 = new Map(
@@ -1681,33 +1681,33 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
     };
   value396['sort']((value413, value414) => {
     const value415 =
-        map13['get'](value413['sourceId']) === 0x1 && value397['get'](value413['targetId']) === 0x1,
-      value416 = map13['get'](value414['sourceId']) === 0x1 && value397['get'](value414['targetId']) === 0x1;
-    if (value415 !== value416) return value415 ? -0x1 : 0x1;
+        map13['get'](value413['sourceId']) === 1 && value397['get'](value413['targetId']) === 1,
+      value416 = map13['get'](value414['sourceId']) === 1 && value397['get'](value414['targetId']) === 1;
+    if (value415 !== value416) return value415 ? -1 : 1;
     const value417 =
-        map13['get'](value413['sourceId']) === 0x1 || value397['get'](value413['targetId']) === 0x1,
-      value418 = map13['get'](value414['sourceId']) === 0x1 || value397['get'](value414['targetId']) === 0x1;
-    if (value417 !== value418) return value417 ? -0x1 : 0x1;
+        map13['get'](value413['sourceId']) === 1 || value397['get'](value413['targetId']) === 1,
+      value418 = map13['get'](value414['sourceId']) === 1 || value397['get'](value414['targetId']) === 1;
+    if (value417 !== value418) return value417 ? -1 : 1;
     const value419 = Math['abs'](map7['get'](value413['sourceId']) - map7['get'](value413['targetId'])),
       value420 = Math['abs'](map7['get'](value414['sourceId']) - map7['get'](value414['targetId']));
     if (value419 !== value420) return value419 - value420;
     const value421 = Math['abs'](
-        (map11['get'](value413['sourceId']) || 0x0) - (map11['get'](value413['targetId']) || 0x0),
+        (map11['get'](value413['sourceId']) || 0) - (map11['get'](value413['targetId']) || 0),
       ),
       value422 = Math['abs'](
-        (map11['get'](value414['sourceId']) || 0x0) - (map11['get'](value414['targetId']) || 0x0),
+        (map11['get'](value414['sourceId']) || 0) - (map11['get'](value414['targetId']) || 0),
       );
     if (value421 !== value422) return value421 - value422;
     const value423 = map8['get'](value413['sourceId']),
       value424 = map8['get'](value413['targetId']),
       value425 = map8['get'](value414['sourceId']),
       value426 = map8['get'](value414['targetId']),
-      value427 = Math['abs']((value423?.['cy'] || 0x0) - (value424?.['cy'] || 0x0)),
-      value428 = Math['abs']((value425?.['cy'] || 0x0) - (value426?.['cy'] || 0x0));
+      value427 = Math['abs']((value423?.['cy'] || 0) - (value424?.['cy'] || 0)),
+      value428 = Math['abs']((value425?.['cy'] || 0) - (value426?.['cy'] || 0));
     if (value427 !== value428) return value427 - value428;
-    const count17 = (map9['get'](value413['sourceId']) || 0x0) - (map9['get'](value414['sourceId']) || 0x0);
-    if (count17 !== 0x0) return count17;
-    return (map9['get'](value413['targetId']) || 0x0) - (map9['get'](value414['targetId']) || 0x0);
+    const count17 = (map9['get'](value413['sourceId']) || 0) - (map9['get'](value414['sourceId']) || 0);
+    if (count17 !== 0) return count17;
+    return (map9['get'](value413['targetId']) || 0) - (map9['get'](value414['targetId']) || 0);
   })['forEach'](({ sourceId: sourceId5, targetId: targetId5 }) => handler9(sourceId5, targetId5));
   const args5 = new Map();
   list28['forEach']((value429, value430) => {
@@ -1735,35 +1735,35 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
 
 export function resolveArrangeGridColumns(list32, value440 = {}) {
   const list33 = Array['isArray'](list32) ? list32['filter'](Boolean) : [];
-  if (list33['length'] <= 0x1) return Math['max'](0x1, list33['length']);
+  if (list33['length'] <= 1) return Math['max'](1, list33['length']);
   const count18 = Number(value440['columns']);
-  if (Number['isFinite'](count18) && count18 > 0x0) return Math['max'](0x1, Math['trunc'](count18));
+  if (Number['isFinite'](count18) && count18 > 0) return Math['max'](1, Math['trunc'](count18));
   const selectionBounds3 = computeSelectionBounds(list33),
-    value441 = Math['max'](0x0, _toFiniteNumber(value440['gapX'] ?? value440['gap'], 0x28)),
-    value442 = Math['max'](0x0, _toFiniteNumber(value440['gapY'] ?? value440['gap'], 0x28)),
-    _medianLayoutMetric2 = _medianLayoutMetric(list33, 'width', 0x1),
-    _medianLayoutMetric3 = _medianLayoutMetric(list33, 'height', 0x1),
+    value441 = Math['max'](0, _toFiniteNumber(value440['gapX'] ?? value440['gap'], 40)),
+    value442 = Math['max'](0, _toFiniteNumber(value440['gapY'] ?? value440['gap'], 40)),
+    _medianLayoutMetric2 = _medianLayoutMetric(list33, 'width', 1),
+    _medianLayoutMetric3 = _medianLayoutMetric(list33, 'height', 1),
     count19 = Number(value440['targetAspect']),
     value443 =
-      selectionBounds3 && selectionBounds3['height'] > 0x0
+      selectionBounds3 && selectionBounds3['height'] > 0
         ? selectionBounds3['width'] / selectionBounds3['height']
-        : 0x1,
+        : 1,
     value444 = Math['max'](
       0.75,
-      Math['min'](0x10 / 0x9, Number['isFinite'](count19) && count19 > 0x0 ? count19 : value443),
+      Math['min'](16 / 9, Number['isFinite'](count19) && count19 > 0 ? count19 : value443),
     ),
     count20 = Number(value440['maxColumns']),
     value445 = Math['min'](
       list33['length'],
-      Number['isFinite'](count20) && count20 > 0x0 ? Math['max'](0x2, Math['trunc'](count20)) : 0x6,
+      Number['isFinite'](count20) && count20 > 0 ? Math['max'](2, Math['trunc'](count20)) : 6,
     );
-  let value446 = 0x2,
+  let value446 = 2,
     value447 = Infinity;
-  for (let value448 = 0x2; value448 <= value445; value448 += 0x1) {
+  for (let value448 = 2; value448 <= value445; value448 += 1) {
     const value449 = Math['ceil'](list33['length'] / value448),
-      value450 = value448 * _medianLayoutMetric2 + (value448 - 0x1) * value441,
-      value451 = value449 * _medianLayoutMetric3 + (value449 - 0x1) * value442,
-      value452 = value450 / Math['max'](0x1, value451),
+      value450 = value448 * _medianLayoutMetric2 + (value448 - 1) * value441,
+      value451 = value449 * _medianLayoutMetric3 + (value449 - 1) * value442,
+      value452 = value450 / Math['max'](1, value451),
       value453 = Math['abs'](Math['log'](value452 / value444)),
       value454 = (value448 * value449 - list33['length']) / list33['length'],
       value455 = value453 + value454 * 0.9;
@@ -1780,7 +1780,7 @@ export function resolveArrangeGridColumns(list32, value440 = {}) {
 function queryNodeSpatialCells(value456, value457, value458, value459, value460) {
   const value461 = new Set(),
     enabled27 =
-      (value458 - value457 + 0x1) * (value460 - value459 + 0x1) > Math['max'](0x40, value456['nodeCount']),
+      (value458 - value457 + 1) * (value460 - value459 + 1) > Math['max'](64, value456['nodeCount']),
     value462 = enabled27 ? value456['nodeRects']['keys']() : value456['spanningIds'] || [];
   for (const value463 of value462) {
     const box57 = value456['nodeRects']['get'](value463),
@@ -1794,14 +1794,14 @@ function queryNodeSpatialCells(value456, value457, value458, value459, value460)
       value461['add'](value463);
   }
   if (!enabled27)
-    for (let value465 = value457; value465 <= value458; value465 += 0x1) {
-      for (let value466 = value459; value466 <= value460; value466 += 0x1) {
+    for (let value465 = value457; value465 <= value458; value465 += 1) {
+      for (let value466 = value459; value466 <= value460; value466 += 1) {
         const list34 = value456['boundsCells']['get'](getNodeSpatialCellKey(value465, value466));
-        if (!list34 || list34['length'] === 0x0) continue;
+        if (!list34 || list34['length'] === 0) continue;
         for (const value467 of list34) value461['add'](value467);
       }
     }
-  if (value461['size'] === 0x0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  if (value461['size'] === 0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
   return Array['from'](value461)['sort']((value468, value469) => {
     const value470 = value456['nodeRects']['get'](value468)?.['order'] ?? Infinity,
       value471 = value456['nodeRects']['get'](value469)?.['order'] ?? Infinity;

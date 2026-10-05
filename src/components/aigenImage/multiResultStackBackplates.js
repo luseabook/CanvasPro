@@ -101,76 +101,76 @@ export function clearMultiResultStackClasses({
     stackWrap?.classList?.remove(MULTI_RESULT_STACK_WRAP_EXPANDED_CLASS));
 }
 
-export const MAX_MULTI_RESULT_VISIBLE_ITEMS = 0x10;
+export const MAX_MULTI_RESULT_VISIBLE_ITEMS = 16;
 
-const EXPANDED_GRID_NODE_ROW = 0x2,
-  EXPANDED_GRID_4X4_NODE_ROW = 0x3,
+const EXPANDED_GRID_NODE_ROW = 2,
+  EXPANDED_GRID_4X4_NODE_ROW = 3,
   FOUR_IMAGE_GRID_SLOT_ORDER = Object['freeze']([
-    Object['freeze']({ r: 0x1, c: 0x1 }),
-    Object['freeze']({ r: 0x0, c: 0x0 }),
-    Object['freeze']({ r: 0x0, c: 0x1 }),
+    Object['freeze']({ r: 1, c: 1 }),
+    Object['freeze']({ r: 0, c: 0 }),
+    Object['freeze']({ r: 0, c: 1 }),
   ]),
   EXPANDED_GRID_SLOT_ORDER = Object['freeze']([
-    Object['freeze']({ r: 0x2, c: 0x1 }),
-    Object['freeze']({ r: 0x2, c: 0x2 }),
-    Object['freeze']({ r: 0x1, c: 0x0 }),
-    Object['freeze']({ r: 0x1, c: 0x1 }),
-    Object['freeze']({ r: 0x1, c: 0x2 }),
-    Object['freeze']({ r: 0x0, c: 0x0 }),
-    Object['freeze']({ r: 0x0, c: 0x1 }),
-    Object['freeze']({ r: 0x0, c: 0x2 }),
-    Object['freeze']({ r: 0x2, c: 0x3 }),
-    Object['freeze']({ r: 0x1, c: 0x3 }),
-    Object['freeze']({ r: 0x0, c: 0x3 }),
+    Object['freeze']({ r: 2, c: 1 }),
+    Object['freeze']({ r: 2, c: 2 }),
+    Object['freeze']({ r: 1, c: 0 }),
+    Object['freeze']({ r: 1, c: 1 }),
+    Object['freeze']({ r: 1, c: 2 }),
+    Object['freeze']({ r: 0, c: 0 }),
+    Object['freeze']({ r: 0, c: 1 }),
+    Object['freeze']({ r: 0, c: 2 }),
+    Object['freeze']({ r: 2, c: 3 }),
+    Object['freeze']({ r: 1, c: 3 }),
+    Object['freeze']({ r: 0, c: 3 }),
   ]),
   EXPANDED_GRID_4X4_SLOT_ORDER = Object['freeze']([
-    Object['freeze']({ r: 0x3, c: 0x1 }),
-    Object['freeze']({ r: 0x3, c: 0x2 }),
-    Object['freeze']({ r: 0x3, c: 0x3 }),
-    Object['freeze']({ r: 0x2, c: 0x0 }),
-    Object['freeze']({ r: 0x2, c: 0x1 }),
-    Object['freeze']({ r: 0x2, c: 0x2 }),
-    Object['freeze']({ r: 0x2, c: 0x3 }),
-    Object['freeze']({ r: 0x1, c: 0x0 }),
-    Object['freeze']({ r: 0x1, c: 0x1 }),
-    Object['freeze']({ r: 0x1, c: 0x2 }),
-    Object['freeze']({ r: 0x1, c: 0x3 }),
-    Object['freeze']({ r: 0x0, c: 0x0 }),
-    Object['freeze']({ r: 0x0, c: 0x1 }),
-    Object['freeze']({ r: 0x0, c: 0x2 }),
-    Object['freeze']({ r: 0x0, c: 0x3 }),
+    Object['freeze']({ r: 3, c: 1 }),
+    Object['freeze']({ r: 3, c: 2 }),
+    Object['freeze']({ r: 3, c: 3 }),
+    Object['freeze']({ r: 2, c: 0 }),
+    Object['freeze']({ r: 2, c: 1 }),
+    Object['freeze']({ r: 2, c: 2 }),
+    Object['freeze']({ r: 2, c: 3 }),
+    Object['freeze']({ r: 1, c: 0 }),
+    Object['freeze']({ r: 1, c: 1 }),
+    Object['freeze']({ r: 1, c: 2 }),
+    Object['freeze']({ r: 1, c: 3 }),
+    Object['freeze']({ r: 0, c: 0 }),
+    Object['freeze']({ r: 0, c: 1 }),
+    Object['freeze']({ r: 0, c: 2 }),
+    Object['freeze']({ r: 0, c: 3 }),
   ]);
 
 function normalizeMainIndex(count2, state) {
-  return Number['isFinite'](Number(count2)) && count2 >= 0x0 && count2 < state
+  return Number['isFinite'](Number(count2)) && count2 >= 0 && count2 < state
     ? Math['floor'](Number(count2))
-    : 0x0;
+    : 0;
 }
 
 function getExpandedGridLayout(count3) {
-  if (count3 === 0x4) return { nodeRow: 0x1, slotOrder: FOUR_IMAGE_GRID_SLOT_ORDER };
-  if (count3 > MAX_MULTI_RESULT_VISIBLE_ITEMS - 0x4)
+  if (count3 === 4) return { nodeRow: 1, slotOrder: FOUR_IMAGE_GRID_SLOT_ORDER };
+  if (count3 > MAX_MULTI_RESULT_VISIBLE_ITEMS - 4)
     return { nodeRow: EXPANDED_GRID_4X4_NODE_ROW, slotOrder: EXPANDED_GRID_4X4_SLOT_ORDER };
   return { nodeRow: EXPANDED_GRID_NODE_ROW, slotOrder: EXPANDED_GRID_SLOT_ORDER };
 }
 
 export function buildMultiResultExpandedSlotMap({
-  imageCount: imageCount = 0x0,
-  mainIndex: mainIndex = 0x0,
-  previewWidth: previewWidth = 0x0,
-  previewHeight: previewHeight = 0x0,
-  gap: gap = 0x0,
+  imageCount: imageCount = 0,
+  mainIndex: mainIndex = 0,
+  previewWidth: previewWidth = 0,
+  previewHeight: previewHeight = 0,
+  gap: gap = 0,
 } = {}) {
   const toFiniteCount4 = toFiniteCount(imageCount),
     mainIndex2 = normalizeMainIndex(mainIndex, toFiniteCount4),
     config = new Map();
-  if (toFiniteCount4 <= 0x1) return config;
-  const scope = Math['max'](0x1, Number(previewWidth) || 0x1),
-    input = Math['max'](0x1, Number(previewHeight) || 0x1),
-    output = Math['max'](0x0, Number(gap) || 0x0),
+  if (toFiniteCount4 <= 1) return config;
+  const scope = Math['max'](1, Number(previewWidth) || 1),
+    input = Math['max'](1, Number(previewHeight) || 1),
+    output = Math['max'](0, Number(gap) || 0),
     { nodeRow: nodeRow, slotOrder: slotOrder } = getExpandedGridLayout(toFiniteCount4);
-  let value2 = 0x0;
-  for (let value3 = 0x0; value3 < toFiniteCount4; value3 += 0x1) {
+  let value2 = 0;
+  for (let value3 = 0; value3 < toFiniteCount4; value3 += 1) {
     if (value3 === mainIndex2) continue;
     const enabled = slotOrder[value2];
     if (!enabled) break;
@@ -179,21 +179,21 @@ export function buildMultiResultExpandedSlotMap({
       top: (enabled['r'] - nodeRow) * (input + output),
       left: enabled['c'] * (scope + output),
     }),
-      (value2 += 0x1));
+      (value2 += 1));
   }
   return config;
 }
 
-export function buildMultiResultCollapsedFrame(value4 = 0x1) {
+export function buildMultiResultCollapsedFrame(value4 = 1) {
   const value5 = Math['min'](
       MAX_MULTI_RESULT_BACKPLATES,
-      Math['max'](0x1, Math['floor'](Number(value4) || 0x1)),
+      Math['max'](1, Math['floor'](Number(value4) || 1)),
     ),
-    value6 = value5 - 0x1;
+    value6 = value5 - 1;
   return {
-    x: Math['min'](0xa + value6 * 0x7, 0x42),
-    y: Math['min'](value6 * 0x3, 0x18),
-    rotate: Math['min'](0x4 + value6 * 2.2, 0x12),
+    x: Math['min'](10 + value6 * 7, 66),
+    y: Math['min'](value6 * 3, 24),
+    rotate: Math['min'](4 + value6 * 2.2, 18),
     scale: Math['max'](0.99 - value6 * 0.016, 0.86),
     opacity: Math['max'](0.58 - value6 * 0.055, 0.18),
   };
@@ -201,24 +201,24 @@ export function buildMultiResultCollapsedFrame(value4 = 0x1) {
 
 export function shouldEnableMultiResultLayerDragOut({
   isImagesExpanded: isImagesExpanded = ![],
-  imageCount: imageCount = 0x0,
-  imageIndex: imageIndex = -0x1,
-  mainImageIndex: mainImageIndex = 0x0,
+  imageCount: imageCount = 0,
+  imageIndex: imageIndex = -1,
+  mainImageIndex: mainImageIndex = 0,
 } = {}) {
   const toFiniteCount5 = toFiniteCount(imageCount);
-  if (!isImagesExpanded || toFiniteCount5 <= 0x1) return ![];
+  if (!isImagesExpanded || toFiniteCount5 <= 1) return ![];
   const mainIndex3 = normalizeMainIndex(mainImageIndex, toFiniteCount5),
-    count4 = Number['isFinite'](Number(imageIndex)) ? Math['floor'](Number(imageIndex)) : -0x1;
-  return count4 >= 0x0 && count4 < toFiniteCount5 && count4 !== mainIndex3;
+    count4 = Number['isFinite'](Number(imageIndex)) ? Math['floor'](Number(imageIndex)) : -1;
+  return count4 >= 0 && count4 < toFiniteCount5 && count4 !== mainIndex3;
 }
 
 export function resolveMultiResultMainSwap({
-  imageCount: imageCount = 0x0,
-  previousMainIndex: previousMainIndex = 0x0,
-  nextMainIndex: nextMainIndex = 0x0,
+  imageCount: imageCount = 0,
+  previousMainIndex: previousMainIndex = 0,
+  nextMainIndex: nextMainIndex = 0,
 } = {}) {
   const toFiniteCount6 = toFiniteCount(imageCount);
-  if (toFiniteCount6 <= 0x1) return null;
+  if (toFiniteCount6 <= 1) return null;
   const mainIndex4 = normalizeMainIndex(previousMainIndex, toFiniteCount6),
     mainIndex5 = normalizeMainIndex(nextMainIndex, toFiniteCount6);
   if (mainIndex4 === mainIndex5) return null;

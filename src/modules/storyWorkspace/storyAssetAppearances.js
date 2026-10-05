@@ -30,7 +30,7 @@ export const STORY_ASSET_REFERENCE_PROMPT_SUFFIX =
 export function appendStoryAssetReferencePrompt(item = '') {
   const text = normalizeText(item),
     text2 = normalizeText(text['split'](STORY_ASSET_REFERENCE_PROMPT_SUFFIX)['join'](''));
-  return [text2, STORY_ASSET_REFERENCE_PROMPT_SUFFIX]['filter'](Boolean)['join']('\x0a');
+  return [text2, STORY_ASSET_REFERENCE_PROMPT_SUFFIX]['filter'](Boolean)['join']('\n');
 }
 export function compileStoryAssetReferencePrompt(key = '') {
   return normalizeText(key)['split'](STORY_ASSET_STYLE_REFERENCE_MENTION)['join']('@图片2');
@@ -71,18 +71,18 @@ function buildLegacyPrompt(options2 = {}) {
     sanitizeStoryAssetPublicPromptText(options2['prompt']),
   ]
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function normalizeStoryAssetAppearance(args = {}, target = {}) {
   const text5 = normalizeText(target['assetId']) || 'asset',
-    count = Math['max'](0x0, Math['trunc'](Number(target['index']) || 0x0)),
+    count = Math['max'](0, Math['trunc'](Number(target['index']) || 0)),
     sanitizeStoryAssetPublicPromptText2 =
       sanitizeStoryAssetPublicPromptText(args['prompt']) ||
       sanitizeStoryAssetPublicPromptText(target['fallbackPrompt']);
   return {
     ...args,
-    id: normalizeText(args['id']) || text5 + '-appearance-' + (count + 0x1),
-    name: normalizeText(args['name']) || (count === 0x0 ? '基础形象' : '形象\x20' + (count + 0x1)),
+    id: normalizeText(args['id']) || text5 + '-appearance-' + (count + 1),
+    name: normalizeText(args['name']) || (count === 0 ? '基础形象' : '形象 ' + (count + 1)),
     occurrences: normalizeText(args['occurrences']) || normalizeText(target['occurrences']) || '当前项目',
     description: sanitizeStoryAssetPublicDescriptionText(args['description']),
     scriptFacts: stripStoryAssetInternalEvidenceMetadata(args['scriptFacts']),
@@ -93,8 +93,8 @@ export function normalizeStoryAssetAppearance(args = {}, target = {}) {
     error: normalizeText(args['error']),
   };
 }
-export function normalizeStoryAsset(args2 = {}, source = 0x0) {
-  const text6 = normalizeText(args2['id']) || 'story-asset-' + (source + 0x1),
+export function normalizeStoryAsset(args2 = {}, source = 0) {
+  const text6 = normalizeText(args2['id']) || 'story-asset-' + (source + 1),
     next = ['scene', 'prop']['includes'](args2['kind']) ? args2['kind'] : 'character',
     storyAssetDisplayName = normalizeStoryAssetDisplayName(args2['name'], next, source),
     current =
@@ -115,16 +115,16 @@ export function normalizeStoryAsset(args2 = {}, source = 0x0) {
         assetId: text6,
         index: count2,
         occurrences: args2['occurrences'],
-        fallbackPrompt: count2 === 0x0 ? buildLegacyPrompt(args2) : '',
+        fallbackPrompt: count2 === 0 ? buildLegacyPrompt(args2) : '',
       }),
     ),
     text7 = normalizeText(args2['baseAppearanceId']),
     payload =
-      next === 'character' && entry['length'] > 0x1
+      next === 'character' && entry['length'] > 1
         ? entry['find']((handle) => handle['id'] === text7) ||
           entry['find']((state) => state['isBaseAppearance'] === !![]) ||
           entry['find']((config) => normalizeText(config['name']) === '基础形象') ||
-          entry[0x0]
+          entry[0]
         : null;
   return {
     ...args2,
@@ -183,7 +183,7 @@ export function normalizeStoryWorkspaceAssetData(options3 = {}) {
 export function getStoryAssetAppearances(options4 = {}) {
   return getWorkspaceAssetAppearances(options4);
 }
-export function getStoryAssetAppearance(options5 = {}, value7 = 0x0) {
+export function getStoryAssetAppearance(options5 = {}, value7 = 0) {
   return getWorkspaceAssetAppearance(options5, value7);
 }
 export function getStoryAssetBaseAppearance(options6 = {}) {
@@ -194,14 +194,14 @@ export function getPreferredStoryAssetBaseAppearance(options7 = {}) {
   return (
     getStoryAssetBaseAppearance(options7) ||
     storyAssetAppearances['find']((value8) => normalizeText(value8['name']) === '基础形象') ||
-    storyAssetAppearances[0x0] ||
+    storyAssetAppearances[0] ||
     null
   );
 }
 export function isStoryAssetBaseAppearance(options8 = {}, enabled3 = null) {
   if (options8['kind'] !== 'character' || !enabled3) return ![];
   const list = getStoryAssetAppearances(options8);
-  if (list['length'] === 0x1) return normalizeText(list[0x0]?.['id']) === normalizeText(enabled3['id']);
+  if (list['length'] === 1) return normalizeText(list[0]?.['id']) === normalizeText(enabled3['id']);
   const storyAssetBaseAppearance = getStoryAssetBaseAppearance(options8);
   return Boolean(
     storyAssetBaseAppearance &&
@@ -209,7 +209,7 @@ export function isStoryAssetBaseAppearance(options8 = {}, enabled3 = null) {
   );
 }
 export function setStoryAssetBaseAppearance(options9 = {}, value9 = '') {
-  if (options9['kind'] !== 'character' || getStoryAssetAppearances(options9)['length'] < 0x2) return ![];
+  if (options9['kind'] !== 'character' || getStoryAssetAppearances(options9)['length'] < 2) return ![];
   const storyAssetAppearances2 = getStoryAssetAppearances(options9)['find'](
     (value10) => normalizeText(value10['id']) === normalizeText(value9),
   );
@@ -217,7 +217,7 @@ export function setStoryAssetBaseAppearance(options9 = {}, value9 = '') {
   return ((options9['baseAppearanceId'] = storyAssetAppearances2['id']), !![]);
 }
 export function ensureStoryAssetBaseAppearance(options10 = {}) {
-  if (options10['kind'] !== 'character' || getStoryAssetAppearances(options10)['length'] < 0x2) return ![];
+  if (options10['kind'] !== 'character' || getStoryAssetAppearances(options10)['length'] < 2) return ![];
   if (getStoryAssetBaseAppearance(options10)) return ![];
   const preferredStoryAssetBaseAppearance = getPreferredStoryAssetBaseAppearance(options10);
   if (!preferredStoryAssetBaseAppearance) return ![];
@@ -225,7 +225,7 @@ export function ensureStoryAssetBaseAppearance(options10 = {}) {
 }
 export function shouldGenerateStoryAssetBaseAppearanceFirst(options11 = {}, value11 = null) {
   const storyAssetAppearances3 = getStoryAssetAppearances(options11);
-  if (options11['kind'] !== 'character' || storyAssetAppearances3['length'] < 0x2) return ![];
+  if (options11['kind'] !== 'character' || storyAssetAppearances3['length'] < 2) return ![];
   const preferredStoryAssetBaseAppearance2 = getPreferredStoryAssetBaseAppearance(options11);
   if (!preferredStoryAssetBaseAppearance2 || normalizeText(preferredStoryAssetBaseAppearance2['imageUrl']))
     return ![];
@@ -233,17 +233,17 @@ export function shouldGenerateStoryAssetBaseAppearanceFirst(options11 = {}, valu
 }
 export function resolveStoryAssetAppearanceOriginalUrl(options12 = {}) {
   const value12 =
-    options12['generatedImages']?.[Math['max'](0x0, Number(options12['activeIndex']) || 0x0)] ||
+    options12['generatedImages']?.[Math['max'](0, Number(options12['activeIndex']) || 0)] ||
     options12['generatedImage'] ||
     {};
   return resolveCanvasImagePreviewUrl(value12) || normalizeText(options12['imageUrl']);
 }
 export function getStoryAssetAppearanceReferenceUrls(options13 = {}, value13 = null) {
   const storyAssetAppearances4 = getStoryAssetAppearances(options13);
-  if (options13['kind'] !== 'character' || storyAssetAppearances4['length'] === 0x0) return [];
+  if (options13['kind'] !== 'character' || storyAssetAppearances4['length'] === 0) return [];
   const enabled4 =
-    storyAssetAppearances4['length'] === 0x1
-      ? storyAssetAppearances4[0x0]
+    storyAssetAppearances4['length'] === 1
+      ? storyAssetAppearances4[0]
       : getStoryAssetBaseAppearance(options13);
   if (!enabled4 || !normalizeText(value13?.['id'])) return [];
   if (normalizeText(enabled4['id']) === normalizeText(value13['id'])) {
@@ -269,7 +269,7 @@ export function buildStoryAssetAppearanceGenerationTasks(
       list3 = includeExisting
         ? storyAssetAppearances5
         : storyAssetAppearances5['filter']((value15) => !normalizeText(value15['imageUrl']));
-    if (value14['kind'] !== 'character' || storyAssetAppearances5['length'] < 0x2)
+    if (value14['kind'] !== 'character' || storyAssetAppearances5['length'] < 2)
       return list3['map']((value16) => ({ asset: value14, appearance: value16 }));
     const preferredStoryAssetBaseAppearance3 = getPreferredStoryAssetBaseAppearance(value14);
     if (
@@ -299,11 +299,11 @@ export async function runStoryAssetAppearanceGenerationTasks(
     if (!args6['has'](text8)) args6['set'](text8, []);
     args6['get'](text8)['push']({ task: value21, taskIndex: value22 });
   });
-  const value24 = new Array(Array['isArray'](list4) ? list4['length'] : 0x0);
+  const value24 = new Array(Array['isArray'](list4) ? list4['length'] : 0);
   return (
     await Promise['all'](
       [...args6['values']()]['map'](async (value25) => {
-        for (let value26 = 0x0; value26 < value25['length']; value26 += 0x1) {
+        for (let value26 = 0; value26 < value25['length']; value26 += 1) {
           const { task: task, taskIndex: taskIndex } = value25[value26];
           if (
             shouldStop({
@@ -318,7 +318,7 @@ export async function runStoryAssetAppearanceGenerationTasks(
             taskIndex: taskIndex,
             laneIndex: value26,
             laneLength: value25['length'],
-            remainingTasks: value25['slice'](value26 + 0x1)['map']((value27) => value27['task']),
+            remainingTasks: value25['slice'](value26 + 1)['map']((value27) => value27['task']),
           });
         }
       }),

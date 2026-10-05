@@ -116,8 +116,8 @@ export const rhVideoV54ModelManifest = createRunningHubVideoModelManifest({
       label: '外扩遮罩',
       ariaLabel: '外扩遮罩数值',
       defaultValue: 25,
-      min: -0x270f,
-      max: 0x270f,
+      min: -9999,
+      max: 9999,
       step: 1,
       disableWhenSpecialMode: 'cameraMove',
       description:

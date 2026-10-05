@@ -38,7 +38,7 @@ export function inferManifestDraftAdapterType(options3 = {}) {
   }
   if (hasWorkflowShape(options3)) return 'workflow';
   if (hasModelApiShape(options3)) return 'modelApi';
-  throw new Error('Unable\x20to\x20infer\x20manifest\x20draft\x20adapterType');
+  throw new Error('Unable to infer manifest draft adapterType');
 }
 function buildExecutionId({
   source: source,
@@ -60,7 +60,7 @@ function buildUiSchema(options4 = {}) {
 }
 function buildInputSlots(options5 = {}) {
   if (options5['inputSlots']) return options5['inputSlots'];
-  return { maxByKind: { image: 0x0, video: 0x0, audio: 0x0 } };
+  return { maxByKind: { image: 0, video: 0, audio: 0 } };
 }
 function buildOutputType(options6 = {}, current) {
   return normalizeText(options6['outputType'] || options6['result']?.['outputType'], current);
@@ -146,7 +146,7 @@ export function buildManifestDraftBundle(source4 = {}) {
     kind4 = normalizeKind(source4['kind']),
     provider4 = normalizeText(source4['provider'], adapterType2 === 'workflow' ? 'runninghubwf' : ''),
     modelId2 = normalizeText(source4['modelId']);
-  if (!modelId2) throw new Error('Manifest\x20draft\x20source\x20missing\x20modelId');
+  if (!modelId2) throw new Error('Manifest draft source missing modelId');
   if (!provider4) throw new Error('Manifest draft source missing provider');
   const outputType4 = buildOutputType(source4, kind4),
     executionId3 = buildExecutionId({

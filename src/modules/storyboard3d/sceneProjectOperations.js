@@ -5,21 +5,21 @@ export const STORYBOARD_3D_ENVIRONMENT_PRESETS = Object['freeze']({
   empty: Object['freeze']({ ...createDefaultStoryboard3DEnvironment('empty') }),
   outdoor: Object['freeze']({
     ...createDefaultStoryboard3DEnvironment('outdoor'),
-    groundSize: 0xc8,
+    groundSize: 200,
     backgroundColor: '#8fb5d9',
   }),
   indoor: Object['freeze']({
     ...createDefaultStoryboard3DEnvironment('indoor'),
-    groundSize: 0x32,
+    groundSize: 50,
     backgroundColor: '#24262b',
   }),
   studio: Object['freeze']({
     ...createDefaultStoryboard3DEnvironment('studio'),
-    groundSize: 0x1e,
+    groundSize: 30,
     backgroundColor: '#15161a',
   }),
 });
-function finite(value, item = 0x0) {
+function finite(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -30,7 +30,7 @@ function normalizeName(options) {
   return String(options || '')['trim']();
 }
 function resolveNow(target, source) {
-  return Math['max'](0x0, finite(source, finite(target?.['updatedAt'], 0x0)));
+  return Math['max'](0, finite(source, finite(target?.['updatedAt'], 0)));
 }
 function collectProjectIds(next) {
   const current = new Set();
@@ -50,19 +50,19 @@ function collectProjectIds(next) {
 }
 function createUniqueId({ prefix: prefix, sourceId: sourceId, usedIds: usedIds, idFactory: idFactory }) {
   if (typeof idFactory === 'function') {
-    let count = 0x0;
-    while (count < 0x3e8) {
+    let count = 0;
+    while (count < 1000) {
       const name = normalizeName(idFactory(prefix));
       if (name && !usedIds['has'](name)) return (usedIds['add'](name), name);
-      count += 0x1;
+      count += 1;
     }
-    throw new Error('Unable to create a unique ' + prefix + '\x20id');
+    throw new Error('Unable to create a unique ' + prefix + ' id');
   }
   const handle = (normalizeName(sourceId) || prefix) + '-copy';
   let state = handle,
-    config = 0x2;
+    config = 2;
   while (usedIds['has'](state)) {
-    ((state = handle + '-' + config), (config += 0x1));
+    ((state = handle + '-' + config), (config += 1));
   }
   return (usedIds['add'](state), state);
 }
@@ -101,7 +101,7 @@ function cloneSceneWithNewIds(
         : {}),
     }))),
     (error['shots'] = (Array['isArray'](error['shots']) ? error['shots'] : [])['map']((args4, value3) => {
-      const value4 = String(args4['id'] || 'shot-' + (value3 + 0x1)),
+      const value4 = String(args4['id'] || 'shot-' + (value3 + 1)),
         uniqueId3 = createUniqueId({
           prefix: 'shot',
           sourceId: value4,
@@ -127,7 +127,7 @@ function cloneSceneWithNewIds(
       );
     })),
     (error['activeShotId'] =
-      args['get'](String(error['activeShotId'] || '')) || error['shots'][0x0]?.['id'] || ''));
+      args['get'](String(error['activeShotId'] || '')) || error['shots'][0]?.['id'] || ''));
   const value5 = new Map([[input, uniqueId], ...map, ...args]);
   if (error['generatedLayers'])
     error['generatedLayers'] = remapDirectorIdentities(error['generatedLayers'], value5);
@@ -215,7 +215,7 @@ export function saveStoryboard3DProjectAsCopy(
           ),
         }
       : {}),
-    activeSceneId: map2['get'](String(args5['activeSceneId'] || '')) || value25[0x0]?.['id'] || '',
+    activeSceneId: map2['get'](String(args5['activeSceneId'] || '')) || value25[0]?.['id'] || '',
     createdAt: now3,
     updatedAt: now3,
   };
@@ -243,7 +243,7 @@ export function duplicateStoryboard3DScene(
     value31,
     (value33) => {
       const count2 = value33['scenes']['findIndex']((value34) => value34['id'] === value32);
-      if (count2 < 0x0) return ![];
+      if (count2 < 0) return ![];
       const cloneSceneWithNewIds3 = cloneSceneWithNewIds(value33['scenes'][count2], {
         usedIds: projectIds2,
         idFactory: idFactory4,
@@ -251,7 +251,7 @@ export function duplicateStoryboard3DScene(
         now: now6,
       });
       return (
-        value33['scenes']['splice'](count2 + 0x1, 0x0, cloneSceneWithNewIds3),
+        value33['scenes']['splice'](count2 + 1, 0, cloneSceneWithNewIds3),
         (value33['activeSceneId'] = cloneSceneWithNewIds3['id']),
         !![]
       );
@@ -263,14 +263,14 @@ export function deleteStoryboard3DScene(value35, value36, { now: now7 } = {}) {
   return updateProject(
     value35,
     (value37) => {
-      if (!Array['isArray'](value37['scenes']) || value37['scenes']['length'] <= 0x1) return ![];
+      if (!Array['isArray'](value37['scenes']) || value37['scenes']['length'] <= 1) return ![];
       const count3 = value37['scenes']['findIndex']((value38) => value38['id'] === value36);
-      if (count3 < 0x0) return ![];
+      if (count3 < 0) return ![];
       return (
-        value37['scenes']['splice'](count3, 0x1),
+        value37['scenes']['splice'](count3, 1),
         value37['activeSceneId'] === value36 &&
           (value37['activeSceneId'] =
-            value37['scenes'][Math['min'](count3, value37['scenes']['length'] - 0x1)]['id']),
+            value37['scenes'][Math['min'](count3, value37['scenes']['length'] - 1)]['id']),
         !![]
       );
     },
@@ -282,11 +282,11 @@ export function reorderStoryboard3DScene(value39, value40, value41, { now: now8 
     value39,
     (value42) => {
       const count4 = value42['scenes']['findIndex']((value43) => value43['id'] === value40);
-      if (count4 < 0x0) return ![];
-      const clamp2 = clamp(Math['round'](finite(value41, count4)), 0x0, value42['scenes']['length'] - 0x1);
+      if (count4 < 0) return ![];
+      const clamp2 = clamp(Math['round'](finite(value41, count4)), 0, value42['scenes']['length'] - 1);
       if (clamp2 === count4) return ![];
-      const [value44] = value42['scenes']['splice'](count4, 0x1);
-      return (value42['scenes']['splice'](clamp2, 0x0, value44), !![]);
+      const [value44] = value42['scenes']['splice'](count4, 1);
+      return (value42['scenes']['splice'](clamp2, 0, value44), !![]);
     },
     now8,
   );
@@ -298,7 +298,7 @@ export function applyStoryboard3DEnvironmentPreset(
   { overrides: overrides = {}, now: now9 } = {},
 ) {
   const enabled = STORYBOARD_3D_ENVIRONMENT_PRESETS[value47];
-  if (!enabled) throw new Error('Unsupported\x203D\x20environment\x20preset:\x20' + value47);
+  if (!enabled) throw new Error('Unsupported 3D environment preset: ' + value47);
   return updateProject(
     value45,
     (value48) => {
@@ -309,7 +309,7 @@ export function applyStoryboard3DEnvironmentPreset(
           ...cloneStoryboard3DProject(enabled),
           ...(overrides && typeof overrides === 'object' ? overrides : {}),
           type: enabled['type'],
-          groundSize: Math['max'](0x1, finite(overrides?.['groundSize'], enabled['groundSize'])),
+          groundSize: Math['max'](1, finite(overrides?.['groundSize'], enabled['groundSize'])),
           showGrid: overrides?.['showGrid'] !== ![],
           showOutline: overrides?.['showOutline'] !== ![],
           enableShadows: overrides?.['enableShadows'] !== ![],
@@ -339,7 +339,7 @@ export function replaceStoryboard3DShotFromCurrentView(
     value49,
     (value50) => {
       const count5 = value50['scenes']['findIndex']((value51) => value51['id'] === sceneId);
-      if (count5 < 0x0 || !findShot(value50['scenes'][count5], shotId)) return ![];
+      if (count5 < 0 || !findShot(value50['scenes'][count5], shotId)) return ![];
       const replaceStoryboard3DShotCamera2 = replaceStoryboard3DShotCamera(
           value50['scenes'][count5],
           shotId,
@@ -360,26 +360,26 @@ export function replaceStoryboard3DShotFromCurrentView(
 }
 export function createStoryboard3DShotThumbnailToken(enabled2, enabled3) {
   if (!enabled2 || !enabled3?.['id'] || !enabled3?.['camera'])
-    throw new Error('A\x20scene\x20id\x20and\x20persisted\x20shot\x20camera\x20are\x20required');
+    throw new Error('A scene id and persisted shot camera are required');
   return {
     kind: 'storyboard3d-shot-thumbnail-token',
-    version: 0x1,
+    version: 1,
     sceneId: String(enabled2),
     shotId: String(enabled3['id']),
     cameraSignature: stableCameraSignature(enabled3['camera']),
-    shotUpdatedAt: Math['max'](0x0, finite(enabled3['updatedAt'], 0x0)),
+    shotUpdatedAt: Math['max'](0, finite(enabled3['updatedAt'], 0)),
   };
 }
 export function applyStoryboard3DShotThumbnail(value52, value53, value54, { now: now12 } = {}) {
   const cloneStoryboard3DProject3 = cloneStoryboard3DProject(value52);
-  if (value53?.['kind'] !== 'storyboard3d-shot-thumbnail-token' || value53?.['version'] !== 0x1)
+  if (value53?.['kind'] !== 'storyboard3d-shot-thumbnail-token' || value53?.['version'] !== 1)
     return { project: cloneStoryboard3DProject3, applied: ![], reason: 'invalid-token' };
   const scene3 = findScene(cloneStoryboard3DProject3, value53['sceneId']),
     shot2 = findShot(scene3, value53['shotId']);
   if (!shot2) return { project: cloneStoryboard3DProject3, applied: ![], reason: 'shot-not-found' };
   if (
     stableCameraSignature(shot2['camera']) !== value53['cameraSignature'] ||
-    Math['max'](0x0, finite(shot2['updatedAt'], 0x0)) !== value53['shotUpdatedAt']
+    Math['max'](0, finite(shot2['updatedAt'], 0)) !== value53['shotUpdatedAt']
   )
     return { project: cloneStoryboard3DProject3, applied: ![], reason: 'stale-token' };
   const name7 = normalizeName(value54);

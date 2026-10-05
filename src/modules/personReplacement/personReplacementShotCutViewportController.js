@@ -19,10 +19,10 @@ function clamp(value, item, key, index = item) {
   return Number['isFinite'](result) ? Math['min'](key, Math['max'](item, result)) : index;
 }
 function formatPreciseClock(data) {
-  const options = Math['max'](0x0, Number(data) || 0x0),
-    target = Math['floor'](options / 0x3c),
-    source = options - target * 0x3c;
-  return String(target)['padStart'](0x2, '0') + ':' + source['toFixed'](0x2)['padStart'](0x5, '0');
+  const options = Math['max'](0, Number(data) || 0),
+    target = Math['floor'](options / 60),
+    source = options - target * 60;
+  return String(target)['padStart'](2, '0') + ':' + source['toFixed'](2)['padStart'](5, '0');
 }
 export function createPersonReplacementShotCutViewportController({
   session: session,
@@ -30,7 +30,7 @@ export function createPersonReplacementShotCutViewportController({
   renderIcon: renderIcon = () => '',
 } = {}) {
   if (!session?.['workspaceState'])
-    throw new TypeError('Shot\x20cut\x20viewport\x20requires\x20a\x20session.');
+    throw new TypeError('Shot cut viewport requires a session.');
   const enabled = session['workspaceState'],
     isBusy = () => enabled['isSubmitting'] || enabled['isSmartDetecting'],
     isDraftMutationBusy = () => isBusy() || enabled['isKeyframeCapturing'],
@@ -40,22 +40,22 @@ export function createPersonReplacementShotCutViewportController({
         personReplacementShotCutDisplayDuration = getPersonReplacementShotCutDisplayDuration(
           enabled['draft'],
         ),
-        clamp2 = clamp(enabled['playheadSec'], 0x0, personReplacementShotCutTotalDuration, 0x0);
+        clamp2 = clamp(enabled['playheadSec'], 0, personReplacementShotCutTotalDuration, 0);
       enabled['playheadSec'] = clamp2;
       !enabled['playheadElement'] &&
         (enabled['playheadElement'] =
           el?.['querySelector']?.('[data-person-replacement-shot-cut-playhead]') || null);
       enabled['playheadElement']?.['style']?.['setProperty']?.(
         'left',
-        (personReplacementShotCutDisplayDuration > 0x0
-          ? (clamp2 / personReplacementShotCutDisplayDuration) * 0x64
-          : 0x0) + '%',
+        (personReplacementShotCutDisplayDuration > 0
+          ? (clamp2 / personReplacementShotCutDisplayDuration) * 100
+          : 0) + '%',
       );
       !enabled['clockElement'] &&
         (enabled['clockElement'] =
           el?.['querySelector']?.('[data-person-replacement-shot-cut-current-time]') || null);
       enabled['clockElement'] && (enabled['clockElement']['textContent'] = formatPreciseClock(clamp2));
-      const el2 = el?.['querySelector']?.('[data-person-replacement-action=\x27split-shot-cut\x27]');
+      const el2 = el?.['querySelector']?.('[data-person-replacement-action=\'split-shot-cut\']');
       if (el2) {
         const personReplacementShotCutPositionAtTimelineSec =
             getPersonReplacementShotCutPositionAtTimelineSec(enabled['draft'], clamp2),
@@ -65,7 +65,7 @@ export function createPersonReplacementShotCutViewportController({
             canSplitPersonReplacementShotCutRange(
               next,
               personReplacementShotCutPositionAtTimelineSec['sourceTimeSec'] -
-                (Number(next['startSec']) || 0x0),
+                (Number(next['startSec']) || 0),
             ),
           ),
           current = enabled['isSubmitting'] || enabled['isSmartDetecting'] || !enabled2;
@@ -78,7 +78,7 @@ export function createPersonReplacementShotCutViewportController({
       const el3 = getRoot()?.['querySelector']?.("[data-person-replacement-action='undo-shot-cut']");
       if (!el3) return;
       const entry =
-        enabled['isSubmitting'] || enabled['isSmartDetecting'] || enabled['undoStack']['length'] === 0x0;
+        enabled['isSubmitting'] || enabled['isSmartDetecting'] || enabled['undoStack']['length'] === 0;
       el3['disabled'] = entry;
       if (entry) el3['setAttribute']?.('disabled', '');
       else el3['removeAttribute']?.('disabled');
@@ -95,28 +95,28 @@ export function createPersonReplacementShotCutViewportController({
         width2 = el4?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
         el5 = el4?.['querySelector']?.('[data-person-replacement-shot-cut-timeline]');
       if (!width2 || !el5) return ![];
-      const currentZoom = Math['max'](0.08, Number(enabled['timelineZoom']) || 0x1),
+      const currentZoom = Math['max'](0.08, Number(enabled['timelineZoom']) || 1),
         zoom =
           delta === 'reset'
-            ? 0x1
+            ? 1
             : getMediaClipTimelineNextZoom({
                 currentZoom: currentZoom,
-                delta: delta === 'in' ? -0x1 : 0x1,
+                delta: delta === 'in' ? -1 : 1,
                 minZoom: 0.08,
-                maxZoom: 0x6,
+                maxZoom: 6,
               }),
         box = width2['getBoundingClientRect']?.() || {
-          left: 0x0,
-          width: width2['clientWidth'] || 0x0,
+          left: 0,
+          width: width2['clientWidth'] || 0,
         },
-        viewportWidthPx = Math['max'](0x1, Number(width2['clientWidth']) || Number(box['width']) || 0x1),
+        viewportWidthPx = Math['max'](1, Number(width2['clientWidth']) || Number(box['width']) || 1),
         anchorX = clamp(
           Number['isFinite'](Number(clientX))
-            ? Number(clientX) - Number(box['left'] || 0x0)
-            : viewportWidthPx / 0x2,
-          0x0,
+            ? Number(clientX) - Number(box['left'] || 0)
+            : viewportWidthPx / 2,
+          0,
           viewportWidthPx,
-          viewportWidthPx / 0x2,
+          viewportWidthPx / 2,
         ),
         durationSec = getPersonReplacementShotCutDisplayDuration(enabled['draft']),
         mediaClipTimelineTrackWidthPx = getMediaClipTimelineTrackWidthPx({
@@ -125,12 +125,12 @@ export function createPersonReplacementShotCutViewportController({
           zoom: currentZoom,
         }),
         anchorSec = clamp(
-          ((Math['max'](0x0, Number(width2['scrollLeft']) || 0x0) + anchorX) /
-            Math['max'](0x1, mediaClipTimelineTrackWidthPx)) *
+          ((Math['max'](0, Number(width2['scrollLeft']) || 0) + anchorX) /
+            Math['max'](1, mediaClipTimelineTrackWidthPx)) *
             durationSec,
-          0x0,
+          0,
           durationSec,
-          0x0,
+          0,
         ),
         trackWidthPx = getMediaClipTimelineTrackWidthPx({
           durationSec: getPersonReplacementShotCutTotalDuration(enabled['draft']),
@@ -158,10 +158,10 @@ export function createPersonReplacementShotCutViewportController({
             getPersonReplacementShotCutRulerFrameRate(enabled['draft']),
           )),
         (width2['scrollLeft'] = Math['max'](
-          0x0,
+          0,
           Math['min'](
-            Math['max'](0x0, trackWidthPx - viewportWidthPx),
-            Number(mediaClipTimelineZoomScrollLeft) || 0x0,
+            Math['max'](0, trackWidthPx - viewportWidthPx),
+            Number(mediaClipTimelineZoomScrollLeft) || 0,
           ),
         )),
         syncPlayhead(),

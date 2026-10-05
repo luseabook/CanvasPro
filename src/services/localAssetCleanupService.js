@@ -56,8 +56,8 @@ export function formatCleanupBytes(options) {
   const list = ['B', 'KB', 'MB', 'GB', 'TB'];
   let count2 = count,
     count3 = 0;
-  while (count2 >= 0x400 && count3 < list.length - 1) {
-    ((count2 /= 0x400), (count3 += 1));
+  while (count2 >= 1024 && count3 < list.length - 1) {
+    ((count2 /= 1024), (count3 += 1));
   }
   const target = count2 >= 100 || count3 === 0 ? 0 : count2 >= 10 ? 1 : 2;
   return count2.toFixed(target) + ' ' + list[count3];

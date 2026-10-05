@@ -221,7 +221,7 @@ function createStore({ edges: edges, nodes: nodes = {}, incoming: incoming }) {
     (container3.appendChild(store8),
       bindRefThumbOrderDrag({ owner: {}, container: container3, store: store7, nodeId: 'target' }),
       store6.dispatch('dragstart', createEvent(store6)),
-      store8.dispatch('dragover', createEvent(store8, 0x3e7)),
+      store8.dispatch('dragover', createEvent(store8, 999)),
       store6.dispatch('dragend', createEvent(store6)),
       assert.deepEqual(
         container3.children.map((el5) => el5.dataset.edgeId),

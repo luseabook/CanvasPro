@@ -10,9 +10,9 @@ function clamp(index, result, data, options = result) {
   return Number['isFinite'](target) ? Math['min'](data, Math['max'](result, target)) : options;
 }
 function formatPlaybackTime(source) {
-  const next = Math['max'](0x0, Number(source) || 0x0),
-    current = Math['floor'](next / 0x3c);
-  return current + ':' + String(Math['floor'](next % 0x3c))['padStart'](0x2, '0');
+  const next = Math['max'](0, Number(source) || 0),
+    current = Math['floor'](next / 60);
+  return current + ':' + String(Math['floor'](next % 60))['padStart'](2, '0');
 }
 export function createPersonReplacementVideoPlaybackController({
   getRoot: getRoot,
@@ -78,7 +78,7 @@ export function createPersonReplacementVideoPlaybackController({
         (value2 = () => {
           list2['forEach']((handler) => handler());
         }),
-        list2['length'] > 0x0
+        list2['length'] > 0
       );
     },
     handler2 = () => {
@@ -124,17 +124,17 @@ export function createPersonReplacementVideoPlaybackController({
       reset && Array['from'](map['keys']())['forEach'](destroyRole);
       bindCenterIndicators();
       const output = getProject();
-      if (output?.['workspace']?.['view'] !== 'project' || output['workspace']['step'] !== 0x3) return ![];
+      if (output?.['workspace']?.['view'] !== 'project' || output['workspace']['step'] !== 3) return ![];
       const el3 = getRoot(),
         value3 = getSelectedShot(output);
       return (
         list4['forEach']((master) => {
           destroyRole(master);
           const muted = el3?.['querySelector']?.(
-              '[data-person-replacement-video-player="' + master + '\x22]',
+              '[data-person-replacement-video-player="' + master + '"]',
             ),
             controlsEl = el3?.['querySelector']?.(
-              '[data-person-replacement-video-controls=\x22' + master + '\x22]',
+              '[data-person-replacement-video-controls="' + master + '"]',
             ),
             sourceUrl = normalizeText(muted?.['dataset']?.['personReplacementVideoUrl']);
           if (!muted || !controlsEl || !sourceUrl) return;
@@ -151,14 +151,14 @@ export function createPersonReplacementVideoPlaybackController({
           let value4 = ![];
           const value5 = map2['get'](master);
           let lastAudibleVolume = value5
-            ? clamp(Number(value5['lastAudibleVolume']), 0x0, 0x1, 0x1) || 0x1
-            : clamp(Number(muted['volume']), 0x0, 0x1, 0x1) || 0x1;
+            ? clamp(Number(value5['lastAudibleVolume']), 0, 1, 1) || 1
+            : clamp(Number(muted['volume']), 0, 1, 1) || 1;
           value5 &&
-            ((muted['volume'] = clamp(Number(value5['volume']), 0x0, 0x1, 0x1)),
+            ((muted['volume'] = clamp(Number(value5['volume']), 0, 1, 1)),
             (muted['muted'] = value5['muted'] === !![]));
           const run2 = () => {
-            const volume = clamp(Number(muted['volume']), 0x0, 0x1, 0x0);
-            if (muted['muted'] !== !![] && volume > 0x0) lastAudibleVolume = volume;
+            const volume = clamp(Number(muted['volume']), 0, 1, 0);
+            if (muted['muted'] !== !![] && volume > 0) lastAudibleVolume = volume;
             map2['set'](master, {
               muted: muted['muted'] === !![],
               volume: volume,
@@ -180,20 +180,20 @@ export function createPersonReplacementVideoPlaybackController({
             handler3 = () => {
               const count = Number(muted['duration']),
                 count2 = Number(muted['currentTime']),
-                duration = Number['isFinite'](count) && count > 0x0 ? count : 0x0,
+                duration = Number['isFinite'](count) && count > 0 ? count : 0,
                 currentTime =
-                  Number['isFinite'](count2) && count2 > 0x0 ? Math['min'](count2, duration || count2) : 0x0;
+                  Number['isFinite'](count2) && count2 > 0 ? Math['min'](count2, duration || count2) : 0;
               return {
                 duration: duration,
                 currentTime: currentTime,
-                ratio: duration > 0x0 ? clamp(currentTime / duration, 0x0, 0x1, 0x0) : 0x0,
+                ratio: duration > 0 ? clamp(currentTime / duration, 0, 1, 0) : 0,
               };
             },
             handler4 = ({ duration: duration2, currentTime: currentTime2, ratio: ratio }) => {
               if (el9) el9['textContent'] = formatPlaybackTime(currentTime2);
               if (el10) el10['textContent'] = formatPlaybackTime(duration2);
-              if (el8?.['style']) el8['style']['width'] = ratio * 0x64 + '%';
-              (el7?.['setAttribute']?.('aria-valuenow', String(Math['round'](ratio * 0x64))),
+              if (el8?.['style']) el8['style']['width'] = ratio * 100 + '%';
+              (el7?.['setAttribute']?.('aria-valuenow', String(Math['round'](ratio * 100))),
                 el7?.['setAttribute']?.(
                   'aria-valuetext',
                   formatPlaybackTime(currentTime2) + ' / ' + formatPlaybackTime(duration2),
@@ -207,9 +207,9 @@ export function createPersonReplacementVideoPlaybackController({
                 el4?.['setAttribute']?.('aria-label', '' + (value8 ? '暂停' : '播放') + text),
                 el4?.['removeAttribute']?.('title'));
               const count3 = Math['round'](
-                  clamp(muted['muted'] ? 0x0 : Number(muted['volume']), 0x0, 0x1, 0x0) * 0x64,
+                  clamp(muted['muted'] ? 0 : Number(muted['volume']), 0, 1, 0) * 100,
                 ),
-                value9 = muted['muted'] === !![] || count3 === 0x0;
+                value9 = muted['muted'] === !![] || count3 === 0;
               el5 &&
                 ((el5['value'] = String(count3)),
                 el5['style']?.['setProperty']?.('--story-video-volume-progress', count3 + '%'),
@@ -235,18 +235,18 @@ export function createPersonReplacementVideoPlaybackController({
                 muted['pause']?.();
                 return;
               }
-              if (muted['ended']) muted['currentTime'] = 0x0;
+              if (muted['ended']) muted['currentTime'] = 0;
               (await value7['play'](), handler5());
             },
             handler6 = (value10) => {
               const duration3 = Number(muted['duration']),
                 box = el7?.['getBoundingClientRect']?.();
-              if (!(duration3 > 0x0) || !(Number(box?.['width']) > 0x0)) return ![];
+              if (!(duration3 > 0) || !(Number(box?.['width']) > 0)) return ![];
               const currentTime3 = clamp(
-                (Number(value10) - Number(box['left'] || 0x0)) / Number(box['width']),
-                0x0,
-                0x1,
-                0x0,
+                (Number(value10) - Number(box['left'] || 0)) / Number(box['width']),
+                0,
+                1,
+                0,
               );
               return (
                 (muted['currentTime'] = currentTime3 * duration3),
@@ -289,28 +289,28 @@ export function createPersonReplacementVideoPlaybackController({
             value16 = (event6) => {
               if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](event6['key'])) return;
               const count4 = Number(muted['duration']);
-              if (!(count4 > 0x0)) return;
+              if (!(count4 > 0)) return;
               (event6['preventDefault']?.(), event6['stopPropagation']?.());
-              if (event6['key'] === 'Home') muted['currentTime'] = 0x0;
+              if (event6['key'] === 'Home') muted['currentTime'] = 0;
               else {
                 if (event6['key'] === 'End') muted['currentTime'] = count4;
                 else {
-                  const value17 = event6['key'] === 'ArrowLeft' ? -0x5 : 0x5;
-                  muted['currentTime'] = clamp(muted['currentTime'] + value17, 0x0, count4, 0x0);
+                  const value17 = event6['key'] === 'ArrowLeft' ? -5 : 5;
+                  muted['currentTime'] = clamp(muted['currentTime'] + value17, 0, count4, 0);
                 }
               }
               handler5();
             },
             value18 = (event7) => {
               event7['stopPropagation']?.();
-              const clamp2 = clamp(Number(event7['currentTarget']?.['value']), 0x0, 0x64, 0x0);
-              if (clamp2 > 0x0) lastAudibleVolume = clamp2 / 0x64;
-              ((muted['muted'] = ![]), (muted['volume'] = clamp2 / 0x64), handler5());
+              const clamp2 = clamp(Number(event7['currentTarget']?.['value']), 0, 100, 0);
+              if (clamp2 > 0) lastAudibleVolume = clamp2 / 100;
+              ((muted['muted'] = ![]), (muted['volume'] = clamp2 / 100), handler5());
             },
             value19 = (event8) => {
               (event8?.['preventDefault']?.(), event8?.['stopPropagation']?.());
-              const clamp3 = clamp(Number(muted['volume']), 0x0, 0x1, 0x0);
-              (muted['muted'] !== !![] && clamp3 > 0x0
+              const clamp3 = clamp(Number(muted['volume']), 0, 1, 0);
+              (muted['muted'] !== !![] && clamp3 > 0
                 ? ((lastAudibleVolume = clamp3), (muted['muted'] = !![]))
                 : ((muted['volume'] = lastAudibleVolume), (muted['muted'] = ![])),
                 handler5());
@@ -375,7 +375,7 @@ export function createPersonReplacementVideoPlaybackController({
             }));
         }),
         handler2(),
-        map['size'] > 0x0
+        map['size'] > 0
       );
     };
   return Object['freeze']({

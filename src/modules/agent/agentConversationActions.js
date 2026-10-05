@@ -53,7 +53,7 @@ export function createAgentConversationActions({
     const el4 = document['createElement']('textarea');
     ((el4['className'] = 'agent-message-edit-input'),
       el4['setAttribute']('aria-label', agentConversationActionText('edit')),
-      (el4['rows'] = 0x4),
+      (el4['rows'] = 4),
       (el4['value'] = result['user']['content']));
     const el5 = run(
       agentConversationActionText('save'),
@@ -83,9 +83,9 @@ export function createAgentConversationActions({
       options = itemId2
         ? itemId2['itemId'] +
           ':' +
-          (index2?.['activeIndex'] || 0x0) +
+          (index2?.['activeIndex'] || 0) +
           ':' +
-          (index2?.['versions']['length'] || 0x1) +
+          (index2?.['versions']['length'] || 1) +
           ':' +
           agentConversationActionText('retry')
         : '',
@@ -106,8 +106,8 @@ export function createAgentConversationActions({
       messagesEl['querySelectorAll']('.agent-message-actions')['forEach']((el6) => el6['remove']()),
       (value = options));
     if (!itemId2 || list['length'] !== runtime['sessionStore']['getHistory']()['length']) return;
-    const el7 = list['at'](-0x2),
-      source = list['at'](-0x1),
+    const el7 = list['at'](-2),
+      source = list['at'](-1),
       next = document['createElement']('div');
     next['className'] = 'agent-message-actions';
     const el8 = run(agentConversationActionText('edit'), () => run3(itemId2, el7), 'agent-message-edit');
@@ -140,14 +140,14 @@ export function createAgentConversationActions({
           ),
         );
       });
-    if (index2?.['versions']['length'] > 0x1) {
+    if (index2?.['versions']['length'] > 1) {
       const el9 = run(
           '‹',
           () =>
             onResult(
               runtime['selectAssistantVersion']({
                 itemId: itemId2['itemId'],
-                index: index2['activeIndex'] - 0x1,
+                index: index2['activeIndex'] - 1,
               }),
             ),
           'agent-message-version-prev',
@@ -158,7 +158,7 @@ export function createAgentConversationActions({
             onResult(
               runtime['selectAssistantVersion']({
                 itemId: itemId2['itemId'],
-                index: index2['activeIndex'] + 0x1,
+                index: index2['activeIndex'] + 1,
               }),
             ),
           'agent-message-version-next',
@@ -168,7 +168,7 @@ export function createAgentConversationActions({
       const el11 = document['createElement']('span');
       ((el11['className'] = 'agent-message-version-count'),
         el11['setAttribute']('aria-label', agentConversationActionText('version')),
-        (el11['textContent'] = index2['activeIndex'] + 0x1 + ' / ' + index2['versions']['length']),
+        (el11['textContent'] = index2['activeIndex'] + 1 + ' / ' + index2['versions']['length']),
         current['append'](el9, el11, el10));
     }
     ((el7['querySelector']('.agent-message-footer') || el7)['append'](next),
@@ -185,7 +185,7 @@ export function createAgentConversationActions({
         (el12['classList']['contains']('agent-message-version-prev') &&
           !agentEditableTurn?.['activeIndex']) ||
         (el12['classList']['contains']('agent-message-version-next') &&
-          agentEditableTurn?.['activeIndex'] === agentEditableTurn?.['versions']['length'] - 0x1) ||
+          agentEditableTurn?.['activeIndex'] === agentEditableTurn?.['versions']['length'] - 1) ||
         ((el12['classList']['contains']('agent-message-regenerate') ||
           el12['classList']['contains']('agent-message-edit')) &&
           agentEditableTurn?.['versions']['length'] >= AGENT_REPLY_VERSION_LIMIT);

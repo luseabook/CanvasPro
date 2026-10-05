@@ -14,18 +14,18 @@ export {
 import { normalizeStoryPromptMode } from './storyPromptModes.js';
 import { STORY_STYLE_CUSTOM_ID, resolveStoryStyleSelection } from './storyStyleCatalog.js';
 import { createDemoStoryWorkspaceData } from './storyWorkspaceData.js';
-export const STORY_SCRIPT_MAX_CHARACTERS = 0x186a0;
-export const STORY_IDEA_MAX_CHARACTERS = 0x1388;
-export const STORY_CUSTOM_STYLE_MAX_CHARACTERS = 0x1f4;
-export const STORY_EPISODE_COUNT_MIN = 0x1;
-export const STORY_EPISODE_COUNT_MAX = 0x64;
-export const STORY_PUBLIC_EPISODE_COUNT_OPTIONS = Object['freeze']([0x3, 0x5, 0xa, 0x14]);
-export const STORY_DEVELOPER_EPISODE_COUNT_OPTIONS = Object['freeze']([0x1e, 0x32]);
+export const STORY_SCRIPT_MAX_CHARACTERS = 100000;
+export const STORY_IDEA_MAX_CHARACTERS = 5000;
+export const STORY_CUSTOM_STYLE_MAX_CHARACTERS = 500;
+export const STORY_EPISODE_COUNT_MIN = 1;
+export const STORY_EPISODE_COUNT_MAX = 100;
+export const STORY_PUBLIC_EPISODE_COUNT_OPTIONS = Object['freeze']([3, 5, 10, 20]);
+export const STORY_DEVELOPER_EPISODE_COUNT_OPTIONS = Object['freeze']([30, 50]);
 export const STORY_EPISODE_COUNT_OPTIONS = Object['freeze']([
   ...STORY_PUBLIC_EPISODE_COUNT_OPTIONS,
   ...STORY_DEVELOPER_EPISODE_COUNT_OPTIONS,
 ]);
-export const STORY_SCENE_MAX_SECONDS_OPTIONS = Object['freeze']([0xf, 0x1e]);
+export const STORY_SCENE_MAX_SECONDS_OPTIONS = Object['freeze']([15, 30]);
 export const STORY_ASPECT_RATIO_OPTIONS = Object['freeze'](
   ASPECT_RATIO_FIELD['options']['map']((args) => Object['freeze']({ ...args })),
 );
@@ -36,11 +36,11 @@ export function normalizeStoryEpisodeCount(item) {
   const key = Math['trunc'](Number(item));
   return Number['isFinite'](key) && key >= STORY_EPISODE_COUNT_MIN && key <= STORY_EPISODE_COUNT_MAX
     ? key
-    : STORY_PUBLIC_EPISODE_COUNT_OPTIONS[0x0];
+    : STORY_PUBLIC_EPISODE_COUNT_OPTIONS[0];
 }
 export function normalizeStorySceneMaxSeconds(index) {
   const result = Math['trunc'](Number(index));
-  return STORY_SCENE_MAX_SECONDS_OPTIONS['includes'](result) ? result : 0xf;
+  return STORY_SCENE_MAX_SECONDS_OPTIONS['includes'](result) ? result : 15;
 }
 export function normalizeStoryProjectPlanning(
   options = {},
@@ -91,17 +91,17 @@ export function buildStoryHomeGenerationRequest({
   styleId: styleId = STORY_STYLE_CUSTOM_ID,
   stylePrompt: stylePrompt = '',
   videoStyle: videoStyle = '',
-  episodeCount: episodeCount = 0x3,
-  sceneMaxSeconds: sceneMaxSeconds = 0xf,
+  episodeCount: episodeCount = 3,
+  sceneMaxSeconds: sceneMaxSeconds = 15,
   promptMode: promptMode = 'seedance-2.0',
   allowDeveloperPromptModes: allowDeveloperPromptModes = ![],
 } = {}) {
   if (mode === 'collaborate') return { ok: ![], error: '请先在 AI 协作创作中确认正文，再进入制作。' };
   const args2 = mode === 'generate' || mode === 'rewrite' ? mode : 'upload',
-    text2 = normalizeText(idea)['slice'](0x0, STORY_IDEA_MAX_CHARACTERS),
-    text3 = normalizeText(rewriteInstruction)['slice'](0x0, STORY_IDEA_MAX_CHARACTERS),
+    text2 = normalizeText(idea)['slice'](0, STORY_IDEA_MAX_CHARACTERS),
+    text3 = normalizeText(rewriteInstruction)['slice'](0, STORY_IDEA_MAX_CHARACTERS),
     text4 = normalizeText(scriptFileName),
-    record = String(scriptText || '')['slice'](0x0, STORY_SCRIPT_MAX_CHARACTERS);
+    record = String(scriptText || '')['slice'](0, STORY_SCRIPT_MAX_CHARACTERS);
   if (args2 === 'upload' && !text4) return { ok: ![], error: '请先上传剧本或粘贴文本。' };
   if (args2 === 'upload' && !normalizeText(record))
     return { ok: ![], error: '当前文件尚未解析出可用文本，请使用 TXT、DOCX、文本型 PDF 或粘贴文本。' };
@@ -131,7 +131,7 @@ export function buildStoryHomeGenerationRequest({
     rewriteInstruction: args2 === 'rewrite' ? text3 : '',
     aspectRatio: normalizeStoryAspectRatio(aspectRatio),
     styleId: storyStyleSelection['styleId'],
-    visualStyle: storyStyleSelection['stylePrompt']['slice'](0x0, STORY_CUSTOM_STYLE_MAX_CHARACTERS),
+    visualStyle: storyStyleSelection['stylePrompt']['slice'](0, STORY_CUSTOM_STYLE_MAX_CHARACTERS),
     ...(args2 !== 'upload' ? { episodeCount: normalizeStoryEpisodeCount(episodeCount) } : {}),
     sceneMaxSeconds: normalizeStorySceneMaxSeconds(sceneMaxSeconds),
     promptMode: normalizeStoryPromptMode(promptMode, { allowDeveloperModes: allowDeveloperPromptModes }),
@@ -213,7 +213,7 @@ export function normalizeGeneratedStoryContract(options3 = {}) {
 function normalizeGeneratedStoryPlotBeats(list = []) {
   return (Array['isArray'](list) ? list : [])
     ['map']((config, scope) => ({
-      ref: normalizeText(config?.['ref']) || 'plot-beat-' + (scope + 0x1),
+      ref: normalizeText(config?.['ref']) || 'plot-beat-' + (scope + 1),
       stage: normalizeText(config?.['stage']),
       event: normalizeText(config?.['event']),
       consequence: normalizeText(config?.['consequence']),
@@ -228,13 +228,13 @@ export function applyGeneratedStoryResult(output, value2 = {}, value3 = {}) {
     list3 = Array['isArray'](value2['chapters'])
       ? value2['chapters']
           ['map']((value4, value5) => ({
-            id: normalizeText(value4?.['id']) || 'chapter-' + (value5 + 0x1),
-            title: normalizeText(value4?.['title']) || '第\x20' + (value5 + 0x1) + '\x20章',
+            id: normalizeText(value4?.['id']) || 'chapter-' + (value5 + 1),
+            title: normalizeText(value4?.['title']) || '第 ' + (value5 + 1) + ' 章',
             content: normalizeText(value4?.['content']),
           }))
           ['filter']((value6) => value6['content'])
       : [],
-    value7 = list3['map']((value8) => value8['title'] + '\x0a' + value8['content'])['join']('\x0a\x0a');
+    value7 = list3['map']((value8) => value8['title'] + '\n' + value8['content'])['join']('\n\n');
   return {
     ...args5,
     project: {
@@ -261,7 +261,7 @@ export function applyGeneratedStoryResult(output, value2 = {}, value3 = {}) {
         ? normalizeGeneratedStoryContinuityFacts(value2['continuityFacts'])
         : normalizeGeneratedStoryContinuityFacts(args5['project']?.['continuityFacts']),
       summaryRevision:
-        Math['max'](0x0, Math['trunc'](Number(args5['project']?.['summaryRevision']) || 0x0)) + 0x1,
+        Math['max'](0, Math['trunc'](Number(args5['project']?.['summaryRevision']) || 0)) + 1,
       characters: Array['isArray'](value2['characters'])
         ? value2['characters']['map']((args6) => ({ ...args6 }))
         : [],
@@ -276,7 +276,7 @@ export function invalidateStoryPlanningDownstream(
   options4 = {},
   {
     clearEpisodeOutlines: clearEpisodeOutlines = ![],
-    episodeScriptStartIndex: episodeScriptStartIndex = 0x0,
+    episodeScriptStartIndex: episodeScriptStartIndex = 0,
   } = {},
 ) {
   const args8 = options4 && typeof options4 === 'object' ? options4 : {},
@@ -289,13 +289,13 @@ export function invalidateStoryPlanningDownstream(
         : !args10['compiledScript'] && Array['isArray'](args10['chapters'])
           ? args10['chapters']
           : [],
-    value9 = Math['max'](0x0, Math['trunc'](Number(episodeScriptStartIndex) || 0x0));
+    value9 = Math['max'](0, Math['trunc'](Number(episodeScriptStartIndex) || 0));
   return {
     ...args9,
     project: {
       ...args10,
       ...(clearEpisodeOutlines
-        ? { outlineStatus: 'pending', outlineSourceSummaryRevision: 0x0, storyFacts: [] }
+        ? { outlineStatus: 'pending', outlineSourceSummaryRevision: 0, storyFacts: [] }
         : {}),
       sourceChapters: list4['map']((args11) => ({ ...args11 })),
       chapters: [],
@@ -312,7 +312,7 @@ export function invalidateStoryPlanningDownstream(
             : markStoryEpisodeProductionStale({
                 ...args12,
                 clips: args8['episodes'][value10]?.['clips'] || [],
-                clipCount: args8['episodes'][value10]?.['clips']?.['length'] || 0x0,
+                clipCount: args8['episodes'][value10]?.['clips']?.['length'] || 0,
               }),
         ),
   };
@@ -321,10 +321,10 @@ export function markStorySummaryDownstreamStale(enabled = {}) {
   if (!enabled?.['project'] || typeof enabled['project'] !== 'object') return ![];
   const value11 = enabled['project'];
   value11['summaryRevision'] =
-    Math['max'](0x0, Math['trunc'](Number(value11['summaryRevision']) || 0x0)) + 0x1;
+    Math['max'](0, Math['trunc'](Number(value11['summaryRevision']) || 0)) + 1;
   const value12 =
-    (Array['isArray'](enabled['episodes']) && enabled['episodes']['length'] > 0x0) ||
-    (Array['isArray'](enabled['assets']) && enabled['assets']['length'] > 0x0) ||
+    (Array['isArray'](enabled['episodes']) && enabled['episodes']['length'] > 0) ||
+    (Array['isArray'](enabled['assets']) && enabled['assets']['length'] > 0) ||
     normalizeText(value11['outlineStatus']) === 'completed';
   if (value12 && value11['outlineStatus'] !== 'generating')
     return ((value11['outlineStatus'] = 'stale'), !![]);
@@ -359,8 +359,8 @@ export function createGeneratedStoryProjectData(
       storyContract: normalizeGeneratedStoryContract(),
       plotBeats: [],
       continuityFacts: [],
-      summaryRevision: 0x0,
-      outlineSourceSummaryRevision: 0x0,
+      summaryRevision: 0,
+      outlineSourceSummaryRevision: 0,
       characters: [],
       sourceChapters: [],
       chapters: [],
@@ -426,11 +426,11 @@ export function createUploadedStoryProjectData({
       plotScript: uploadedStoryScript['sourceText'],
       narrationScript: uploadedStoryScript['sourceText'],
       compiledScript: {
-        revision: 0x1,
+        revision: 1,
         episodeIds: uploadedStoryScript['episodes']['map']((value13) => value13['id']),
         fullText: uploadedStoryScript['episodes']
           ['map']((value14) => value14['script']['fullText'])
-          ['join']('\x0a\x0a'),
+          ['join']('\n\n'),
         confirmedAt: Date['now'](),
       },
     }),

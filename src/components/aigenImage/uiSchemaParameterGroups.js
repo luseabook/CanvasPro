@@ -20,13 +20,13 @@ export function renderParameterGroups(fields, context, renderContext, renderFiel
     groupsById['get'](groupId)['fields']['push'](field);
   }
   return groups['map']((group) => {
-    if (!group['id']) return renderField(group['fields'][0x0], context, renderContext);
+    if (!group['id']) return renderField(group['fields'][0], context, renderContext);
     const menuTriggerId = escapeHtmlAttr('parameter-group:' + group['id']),
       labelHtml = escapeHtmlAttr(group['label']),
       infoHtml = group['description']
         ? '<span class="rh-tip ui-schema-info-tip" tabindex="0" data-tooltip="' +
           escapeHtmlAttr(group['description']) +
-          '\x22\x20aria-label=\x22' +
+          '" aria-label="' +
           escapeHtmlAttr(group['description']) +
           '">!</span>'
         : '',
@@ -36,7 +36,7 @@ export function renderParameterGroups(fields, context, renderContext, renderFiel
         )
         ['join']('');
     return (
-      '<div\x20class=\x22ui-schema-pill-menu\x20ui-schema-parameter-group\x22\x20data-ui-schema-composite-field=\x22' +
+      '<div class="ui-schema-pill-menu ui-schema-parameter-group" data-ui-schema-composite-field="' +
       menuTriggerId +
       '">\n      <button type="button" class="img-pill-btn ui-schema-menu-trigger" data-ui-schema-menu-trigger="' +
       menuTriggerId +
@@ -46,11 +46,11 @@ export function renderParameterGroups(fields, context, renderContext, renderFiel
       labelHtml +
       '" aria-hidden="true"><div class="ui-schema-floating-menu-title">' +
       labelHtml +
-      '\x20' +
+      ' ' +
       infoHtml +
       '</div>' +
       fieldsHtml +
-      '</div>\x0a\x20\x20\x20\x20</div>'
+      '</div>\n    </div>'
     );
   })['join']('');
 }

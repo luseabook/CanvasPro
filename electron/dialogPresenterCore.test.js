@@ -58,7 +58,7 @@ function createScreen(overrides = {}) {
       calls.nearest.push(point);
       if (overrides.displayThrows) throw new Error('display unavailable');
       if (overrides.display === null) return null;
-      return overrides.display || { workArea: { x: 0x0, y: 0x0, width: 0x780, height: 0x410 } };
+      return overrides.display || { workArea: { x: 0, y: 0, width: 1920, height: 1040 } };
     },
   };
   return { calls, api };
@@ -147,10 +147,10 @@ test('creates and reuses an offscreen owner window at the work-area corner', () 
   const owner = presenter.getDialogParentWindow();
   assert.equal(calls.windows.length, 1);
   assert.deepEqual(owner.options, {
-    x: 0x77e,
-    y: 0x40e,
-    width: 0x1,
-    height: 0x1,
+    x: 1918,
+    y: 1038,
+    width: 1,
+    height: 1,
     show: false,
     frame: false,
     transparent: true,
@@ -183,12 +183,12 @@ test('falls back to an offscreen-invisible origin when the screen API fails', ()
   const owner = presenter.getDialogParentWindow();
   assert.deepEqual(
     { x: owner.options.x, y: owner.options.y, width: owner.options.width, height: owner.options.height },
-    { x: -0x7d00, y: -0x7d00, width: 0x1, height: 0x1 },
+    { x: -32000, y: -32000, width: 1, height: 1 },
   );
 });
 
 test('uses bounds when the nearest display has no work area', () => {
-  const screen = createScreen({ display: { bounds: { x: 0xa, y: 0x14, width: 0x64, height: 0x32 } } });
+  const screen = createScreen({ display: { bounds: { x: 10, y: 20, width: 100, height: 50 } } });
   const { app, dialog, BrowserWindowClass } = createDeps();
   const presenter = createForegroundDialogPresenterCore({
     app: app,
@@ -199,7 +199,7 @@ test('uses bounds when the nearest display has no work area', () => {
     screenApi: screen.api,
   });
   const owner = presenter.getDialogParentWindow();
-  assert.equal(owner.options.x, 0x6c);
+  assert.equal(owner.options.x, 108);
   assert.equal(owner.options.y, 0x44);
 });
 
@@ -214,7 +214,7 @@ test('an unusable cursor point still yields the offscreen origin', () => {
     BrowserWindowClass: BrowserWindowClass,
     screenApi: screen.api,
   });
-  assert.equal(presenter.getDialogParentWindow().options.x, -0x7d00);
+  assert.equal(presenter.getDialogParentWindow().options.x, -32000);
 });
 
 test('showOpenDialog hands the main window to the dialog API and raises it', async () => {
@@ -285,7 +285,7 @@ test('offscreen owner is shown for the dialog and hidden afterwards without bein
   const owner = calls.windows[0];
   assert.deepEqual(owner.actions, [
     ['setOpacity', 0],
-    ['setBounds', { x: 0x77e, y: 0x40e, width: 0x1, height: 0x1 }],
+    ['setBounds', { x: 1918, y: 1038, width: 1, height: 1 }],
     ['setOpacity', 0],
     ['setAlwaysOnTop', true, 'screen-saver'],
     ['show'],

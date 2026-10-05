@@ -42,18 +42,18 @@ function measurePerf(index, result, data) {
     performance['measure'](index, result, data);
   } catch {}
 }
-const CANVAS_MEDIA_WARMUP_OPEN_DELAY_MS = 0x15e,
-  CANVAS_MEDIA_WARMUP_OPEN_MAX_JOBS = 0x60,
-  CANVAS_MEDIA_WARMUP_SNAPSHOT_MAX_JOBS = 0x30,
-  VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS = [0x4b0, 0xbb8, 0x1b58, 0x36b0, 0x55f0],
-  DENSE_VISUAL_SNAPSHOT_NODE_COUNT = 0x78,
-  DENSE_VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS = [0x2328, 0x4650, 0x7530, 0xafc8],
-  VISUAL_SNAPSHOT_BACKFILL_RETRY_MS = 0x9c4,
-  VISUAL_SNAPSHOT_INTERACTION_SETTLE_MS = 0x1f4;
+const CANVAS_MEDIA_WARMUP_OPEN_DELAY_MS = 350,
+  CANVAS_MEDIA_WARMUP_OPEN_MAX_JOBS = 96,
+  CANVAS_MEDIA_WARMUP_SNAPSHOT_MAX_JOBS = 48,
+  VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS = [1200, 3000, 7000, 14000, 22000],
+  DENSE_VISUAL_SNAPSHOT_NODE_COUNT = 120,
+  DENSE_VISUAL_SNAPSHOT_BACKFILL_DELAYS_MS = [9000, 18000, 30000, 45000],
+  VISUAL_SNAPSHOT_BACKFILL_RETRY_MS = 2500,
+  VISUAL_SNAPSHOT_INTERACTION_SETTLE_MS = 500;
 function countCanvasNodes(list) {
   if (Array['isArray'](list)) return list['length'];
   if (list && typeof list === 'object') return Object['keys'](list)['length'];
-  return 0x0;
+  return 0;
 }
 function isChromeShellRuntime() {
   const options = String(
@@ -65,11 +65,11 @@ function createEmptyCanvasSnapshot() {
   return {
     nodes: [],
     edges: [],
-    viewport: { x: 0x0, y: 0x0, zoom: 1.1 },
+    viewport: { x: 0, y: 0, zoom: 1.1 },
     assets: [],
     storyboard3dProjects: [],
-    _persistRevHint: 0x0,
-    _contentPersistRevHint: 0x0,
+    _persistRevHint: 0,
+    _contentPersistRevHint: 0,
   };
 }
 function cloneMultiDataSnapshot(target) {
@@ -169,16 +169,16 @@ export function buildTabsRenderSignature(list3 = [], config = null) {
   );
 }
 export function getCanvasTabScrollMetrics(el = {}) {
-  const scrollWidth = Math['max'](0x0, Number(el['scrollWidth']) || 0x0),
+  const scrollWidth = Math['max'](0, Number(el['scrollWidth']) || 0),
     clientWidth = Math['max'](
-      0x0,
+      0,
       Number(el['clientWidth']) ||
         Number(el['getBoundingClientRect']?.()['width']) ||
         Number(el['offsetWidth']) ||
-        0x0,
+        0,
     ),
-    maxScrollLeft = Math['max'](0x0, scrollWidth - clientWidth),
-    scrollLeft = Math['min'](maxScrollLeft, Math['max'](0x0, Number(el['scrollLeft']) || 0x0));
+    maxScrollLeft = Math['max'](0, scrollWidth - clientWidth),
+    scrollLeft = Math['min'](maxScrollLeft, Math['max'](0, Number(el['scrollLeft']) || 0));
   return { clientWidth: clientWidth, maxScrollLeft: maxScrollLeft, scrollLeft: scrollLeft, scrollWidth: scrollWidth };
 }
 export function scrollCanvasTabsWithWheel(enabled5, event = {}) {
@@ -188,14 +188,14 @@ export function scrollCanvasTabsWithWheel(enabled5, event = {}) {
     maxScrollLeft: maxScrollLeft2,
     scrollLeft: scrollLeft2,
   } = getCanvasTabScrollMetrics(enabled5);
-  if (maxScrollLeft2 <= 0x1) return ![];
-  const count = Number(event['deltaX']) || 0x0,
-    scope = Number(event['deltaY']) || 0x0,
-    enabled6 = Math['abs'](count) > Math['abs'](scope) && count !== 0x0 ? count : scope;
+  if (maxScrollLeft2 <= 1) return ![];
+  const count = Number(event['deltaX']) || 0,
+    scope = Number(event['deltaY']) || 0,
+    enabled6 = Math['abs'](count) > Math['abs'](scope) && count !== 0 ? count : scope;
   if (!enabled6) return ![];
-  const count2 = Number(event['deltaMode']) || 0x0,
-    input = count2 === 0x1 ? 0x10 : count2 === 0x2 ? Math['max'](clientWidth2, 0x1) : 0x1,
-    output = Math['min'](maxScrollLeft2, Math['max'](0x0, scrollLeft2 + enabled6 * input));
+  const count2 = Number(event['deltaMode']) || 0,
+    input = count2 === 1 ? 16 : count2 === 2 ? Math['max'](clientWidth2, 1) : 1,
+    output = Math['min'](maxScrollLeft2, Math['max'](0, scrollLeft2 + enabled6 * input));
   if (output === scrollLeft2) return ![];
   return ((enabled5['scrollLeft'] = output), event['preventDefault']?.(), !![]);
 }
@@ -208,7 +208,7 @@ function normalizeCanvasProjectContext(isTemporary = {}, value2 = {}) {
     projectName: projectName,
     recentId: String(isTemporary['recentId'] || '')['trim'](),
     displayPath: String(isTemporary['displayPath'] || '')['trim'](),
-    lastModified: Math['max'](0x0, Number(isTemporary['lastModified'] || 0x0) || 0x0),
+    lastModified: Math['max'](0, Number(isTemporary['lastModified'] || 0) || 0),
     isTemporary: isTemporary['isTemporary'] === !![],
     workspaceProjectScoped: isTemporary['workspaceProjectScoped'] !== ![],
   };
@@ -248,19 +248,19 @@ const CanvasTabManager = {
   _visualSnapshotIdleRetryTimer: null,
   _visualSnapshotIdleRetryCanvasId: null,
   _visualSnapshotBackfillCapturePromise: null,
-  _visualSnapshotBackfillGeneration: 0x0,
+  _visualSnapshotBackfillGeneration: 0,
   _visualSnapshotInteractionGuardDocument: null,
   _visualSnapshotInteractionGuardHandlers: null,
   _visualSnapshotActivePointers: new Set(),
-  _visualSnapshotSettleUntil: 0x0,
+  _visualSnapshotSettleUntil: 0,
   _mediaWarmupTimer: null,
   _tabOverflowResizeObserver: null,
   _taskSafeCanvasTransitionPromise: null,
   _backgroundTaskStores: new Map(),
   _showTaskTransitionBlocked(value4, value5 = 'switchBlockedByTasks') {
     const count3 = Math['max'](
-      0x1,
-      Number(value4?.['blockers']?.['length'] || value4?.['activeCount'] || 0x0),
+      1,
+      Number(value4?.['blockers']?.['length'] || value4?.['activeCount'] || 0),
     );
     window['showToast']?.(canvasTabsText(value5, { count: count3 }), 'warn');
   },
@@ -279,10 +279,10 @@ const CanvasTabManager = {
     }
   },
   _getStorePersistRev() {
-    return Number(appStore['getStateRaw']()?.['_persistRev'] || 0x0);
+    return Number(appStore['getStateRaw']()?.['_persistRev'] || 0);
   },
   _getStoreContentPersistRev() {
-    return Number(appStore['getStateRaw']()?.['_contentPersistRev'] || 0x0);
+    return Number(appStore['getStateRaw']()?.['_contentPersistRev'] || 0);
   },
   _rememberCanvasPersistRev(enabled7 = this['_activeId']) {
     if (!enabled7) return;
@@ -298,11 +298,11 @@ const CanvasTabManager = {
     { persist: persist = !![], updatedNodeId: updatedNodeId } = {},
   ) {
     const value8 = this['_canvases']['findIndex']((value9) => value9['id'] === value7);
-    if (value8 === -0x1 || !store) return ![];
+    if (value8 === -1 || !store) return ![];
     const captureBackgroundTaskCanvas2 = captureBackgroundTaskCanvas(store, this['_canvases'][value8], updatedNodeId),
       value10 = captureBackgroundTaskCanvas2['snapshot'],
-      value11 = Number(store['getStateRaw']()?.['_persistRev'] || 0x0),
-      value12 = Number(store['getStateRaw']()?.['_contentPersistRev'] || 0x0),
+      value11 = Number(store['getStateRaw']()?.['_persistRev'] || 0),
+      value12 = Number(store['getStateRaw']()?.['_contentPersistRev'] || 0),
       value13 = this['_buildCanvasRecord'](this['_canvases'][value8], value10);
     return (
       (value13['_persistRevHint'] = value11),
@@ -315,7 +315,7 @@ const CanvasTabManager = {
   },
   _handoffActiveCanvasTasks(taskScopeId = this['_activeId']) {
     if (!taskScopeId || !hasActiveGenerationTasksForStore(appStore))
-      return { ok: !![], movedCount: 0x0, taskScopeId: taskScopeId || '' };
+      return { ok: !![], movedCount: 0, taskScopeId: taskScopeId || '' };
     let targetStore = null,
       handoffActiveGenerationTasks2 = null;
     try {
@@ -332,7 +332,7 @@ const CanvasTabManager = {
               updatedNodeId: updatedNodeId2,
             }),
         })),
-        handoffActiveGenerationTasks2['movedCount'] > 0x0 &&
+        handoffActiveGenerationTasks2['movedCount'] > 0 &&
           (this['_backgroundTaskStores']['set'](taskScopeId, targetStore),
           this['_syncBackgroundTaskCanvas'](taskScopeId, targetStore, { persist: ![] })),
         handoffActiveGenerationTasks2
@@ -344,8 +344,8 @@ const CanvasTabManager = {
         console['error']('[CanvasTabManager] Failed to hand off active generation tasks:', error2),
         {
           ok: ![],
-          movedCount: 0x0,
-          activeCount: Number(handoffActiveGenerationTasks2?.['movedCount'] || 0x1),
+          movedCount: 0,
+          activeCount: Number(handoffActiveGenerationTasks2?.['movedCount'] || 1),
           taskScopeId: taskScopeId,
           blockers: [{ reason: 'background-store-handoff-failed', error: error2 }],
         }
@@ -453,20 +453,20 @@ const CanvasTabManager = {
         });
         value25 === value24 && list4['push']({ canvas: canvas, context: context });
       }
-      if (list4['length'] === 0x0) continue;
+      if (list4['length'] === 0) continue;
       if (value21) {
         const canvas2 =
           list4['find'](({ canvas: canvas3 }) => run(canvas3?.['name']) === value21) ||
           list4['find'](({ context: context2 }) => run(context2?.['projectName']) === value21);
         if (canvas2) return canvas2['canvas']['id'];
       }
-      return list4[0x0]['canvas']['id'];
+      return list4[0]['canvas']['id'];
     }
     if (value21) {
       const list5 = this['_canvases']['filter'](
         (error3) => run(error3?.['name']) === value21,
       );
-      if (list5['length'] === 0x1) return list5[0x0]['id'];
+      if (list5['length'] === 1) return list5[0]['id'];
     }
     return '';
   },
@@ -516,17 +516,17 @@ const CanvasTabManager = {
     const box =
         id?.['viewport'] && typeof id['viewport'] === 'object'
           ? id['viewport']
-          : { x: 0x0, y: 0x0, zoom: 1.1 },
+          : { x: 0, y: 0, zoom: 1.1 },
       persistRevHint = Number['isFinite'](id?.['_persistRevHint'])
         ? Number(id['_persistRevHint'])
-        : 0x0;
+        : 0;
     return createStableSignature({
       id: id?.['id'] ?? null,
       name: id?.['name'] ?? '未命名画布',
       persistRevHint: persistRevHint,
       viewport: {
-        x: Number(box['x']) || 0x0,
-        y: Number(box['y']) || 0x0,
+        x: Number(box['x']) || 0,
+        y: Number(box['y']) || 0,
         zoom: Number(box['zoom']) || 1.1,
       },
       nodes: this['_buildCanvasStructureDigest'](id?.['nodes'], [
@@ -583,7 +583,7 @@ const CanvasTabManager = {
       (el4['textContent'] =
         this['_canvases']['find']((value41) => value41['id'] === enabled13)?.['name'] || value39));
     if (deferRender) {
-      window['setTimeout'](() => this['renderTabs'](), 0x0);
+      window['setTimeout'](() => this['renderTabs'](), 0);
       return;
     }
     this['renderTabs']();
@@ -592,14 +592,14 @@ const CanvasTabManager = {
     if (this['_tabContainerBound'] || !el6) return;
     this['_tabContainerBound'] = !![];
     let value42 = '',
-      count4 = 0x0;
+      count4 = 0;
     const run2 = (event3) => {
         const el7 = event3['target']['closest']('.canvas-tab');
         if (!el7 || !el6['contains'](el7)) return '';
         return el7['dataset']['id'] || '';
       },
       handler2 = (event4) => {
-        if (event4['button'] !== 0x1) return ![];
+        if (event4['button'] !== 1) return ![];
         const enabled14 = run2(event4);
         if (!enabled14) return ![];
         return (
@@ -636,11 +636,11 @@ const CanvasTabManager = {
         handler2(value47);
       }),
       el6['addEventListener']('auxclick', (event6) => {
-        if (event6['button'] !== 0x1) return;
+        if (event6['button'] !== 1) return;
         const enabled17 = run2(event6);
         if (!enabled17) return;
         (event6['preventDefault'](), event6['stopPropagation']());
-        if (enabled17 === value42 && Date['now']() - count4 < 0x320) return;
+        if (enabled17 === value42 && Date['now']() - count4 < 800) return;
         ((value42 = enabled17), (count4 = Date['now']()), void this['deleteCanvas'](enabled17));
       }),
       el6['addEventListener']('contextmenu', async (clientX2) => {
@@ -715,16 +715,16 @@ const CanvasTabManager = {
     const el12 = this['_getTabScrollShell'](value52);
     if (!el12?.['classList']) return;
     const { maxScrollLeft: maxScrollLeft3, scrollLeft: scrollLeft3 } = getCanvasTabScrollMetrics(value52),
-      value53 = maxScrollLeft3 > 0x1;
+      value53 = maxScrollLeft3 > 1;
     (el12['classList']['toggle']('has-overflow', value53),
-      el12['classList']['toggle']('has-left-fade', value53 && scrollLeft3 > 0x1),
-      el12['classList']['toggle']('has-right-fade', value53 && scrollLeft3 < maxScrollLeft3 - 0x1));
+      el12['classList']['toggle']('has-left-fade', value53 && scrollLeft3 > 1),
+      el12['classList']['toggle']('has-right-fade', value53 && scrollLeft3 < maxScrollLeft3 - 1));
   },
   _revealActiveTab(el13) {
     const value54 = el13?.['querySelector']?.('.canvas-tab.active');
     value54?.['scrollIntoView']?.({ behavior: 'auto', block: 'nearest', inline: 'nearest' });
   },
-  _showTabContextMenu(canvasId4, { clientX: clientX = 0x0, clientY: clientY = 0x0 } = {}) {
+  _showTabContextMenu(canvasId4, { clientX: clientX = 0, clientY: clientY = 0 } = {}) {
     if (!canvasId4) return;
     this['_removeTabContextMenu']();
     const list7 = [
@@ -768,7 +768,7 @@ const CanvasTabManager = {
             filename = canvasId4['name'] + '.aicanvas',
             saveTextDownload2 = await saveTextDownload({
               filename: filename,
-              content: JSON['stringify'](value56, null, 0x2),
+              content: JSON['stringify'](value56, null, 2),
               mimeType: 'application/json',
               filterName: 'SHUO Canvas Project',
             });
@@ -802,7 +802,7 @@ const CanvasTabManager = {
         restoreTarget: document['querySelector']?.(
           '.canvas-tab[data-id="' +
             (globalThis['CSS']?.['escape']?.(String(canvasId4['id'])) || String(canvasId4['id'])) +
-            '\x22]',
+            '"]',
         ),
         onClose: () => {
           this['_tabContextMenuSession'] = null;
@@ -877,14 +877,14 @@ const CanvasTabManager = {
   },
   _holdVisualSnapshotCaptureAfterInteraction() {
     this['_visualSnapshotSettleUntil'] = Math['max'](
-      Number(this['_visualSnapshotSettleUntil']) || 0x0,
+      Number(this['_visualSnapshotSettleUntil']) || 0,
       this['_getVisualSnapshotNow']() + VISUAL_SNAPSHOT_INTERACTION_SETTLE_MS,
     );
   },
   _invalidateVisualSnapshotBackfillCapture() {
     return (
       (this['_visualSnapshotBackfillGeneration'] =
-        (Number(this['_visualSnapshotBackfillGeneration']) || 0x0) + 0x1),
+        (Number(this['_visualSnapshotBackfillGeneration']) || 0) + 1),
       this['_visualSnapshotBackfillGeneration']
     );
   },
@@ -936,7 +936,7 @@ const CanvasTabManager = {
   _getActiveCanvasNodeCount() {
     const value63 = this['_canvases']['find']((value64) => value64['id'] === this['_activeId']),
       countCanvasNodes2 = countCanvasNodes(value63?.['nodes']);
-    if (countCanvasNodes2 > 0x0) return countCanvasNodes2;
+    if (countCanvasNodes2 > 0) return countCanvasNodes2;
     return countCanvasNodes(appStore['getStateRaw']?.()?.['nodes']);
   },
   _resolveVisualSnapshotBackfillDelays() {
@@ -959,8 +959,8 @@ const CanvasTabManager = {
   _isVisualSnapshotInteractionBusy() {
     if (this['_isViewportBusyForVisualSnapshot']())
       return (this['_holdVisualSnapshotCaptureAfterInteraction'](), !![]);
-    if ((this['_visualSnapshotActivePointers']?.['size'] || 0x0) > 0x0) return !![];
-    return this['_getVisualSnapshotNow']() < (Number(this['_visualSnapshotSettleUntil']) || 0x0);
+    if ((this['_visualSnapshotActivePointers']?.['size'] || 0) > 0) return !![];
+    return this['_getVisualSnapshotNow']() < (Number(this['_visualSnapshotSettleUntil']) || 0);
   },
   _hasPendingVideoLoadForVisualSnapshot() {
     const value67 = typeof document !== 'undefined' ? document : null,
@@ -971,7 +971,7 @@ const CanvasTabManager = {
       const enabled21 = String(
         el19?.['currentSrc'] || el19?.['getAttribute']?.('src') || el19?.['src'] || '',
       )['trim']();
-      return !!enabled21 && Number(el19?.['readyState'] || 0x0) < 0x2;
+      return !!enabled21 && Number(el19?.['readyState'] || 0) < 2;
     });
   },
   _shouldDeferVisualSnapshotBackfill() {
@@ -980,25 +980,25 @@ const CanvasTabManager = {
     if (this['_hasPendingVideoLoadForVisualSnapshot']()) return !![];
     const canvasMediaSchedulerStats = getCanvasMediaSchedulerStats();
     return (
-      Number(canvasMediaSchedulerStats['imagePreloadActive'] || 0x0) > 0x0 ||
-      Number(canvasMediaSchedulerStats['imagePreloadQueued'] || 0x0) > 0x0
+      Number(canvasMediaSchedulerStats['imagePreloadActive'] || 0) > 0 ||
+      Number(canvasMediaSchedulerStats['imagePreloadQueued'] || 0) > 0
     );
   },
   _isVisualSnapshotWorthReplacing(enabled22, enabled23, { force: force = ![] } = {}) {
     if (!enabled23) return ![];
     if (!enabled22) return !![];
     const value68 = Math['max'](
-        0x0,
-        Number(enabled22['readyMediaNodeCount'] ?? enabled22['mediaNodeCount']) || 0x0,
+        0,
+        Number(enabled22['readyMediaNodeCount'] ?? enabled22['mediaNodeCount']) || 0,
       ),
       value69 = Math['max'](
-        0x0,
-        Number(enabled23['readyMediaNodeCount'] ?? enabled23['mediaNodeCount']) || 0x0,
+        0,
+        Number(enabled23['readyMediaNodeCount'] ?? enabled23['mediaNodeCount']) || 0,
       );
     if (value69 > value68) return !![];
     if (value69 < value68) return ![];
-    const value70 = Math['max'](0x0, Number(enabled22['visibleNodeCount']) || 0x0),
-      value71 = Math['max'](0x0, Number(enabled23['visibleNodeCount']) || 0x0);
+    const value70 = Math['max'](0, Number(enabled22['visibleNodeCount']) || 0),
+      value71 = Math['max'](0, Number(enabled23['visibleNodeCount']) || 0);
     if (value71 > value70) return !![];
     return force && value71 >= value70;
   },
@@ -1007,7 +1007,7 @@ const CanvasTabManager = {
     if (this['_isVisualSnapshotInteractionBusy']())
       return (this['_scheduleVisualSnapshotIdleRetry'](this['_activeId']), null);
     const value72 = this['_canvases']['findIndex']((value73) => value73['id'] === this['_activeId']);
-    if (value72 === -0x1) return null;
+    if (value72 === -1) return null;
     if (typeof document === 'undefined') return null;
     const canvasEl = document['getElementById']('v2-canvas');
     if (!canvasEl) return null;
@@ -1032,7 +1032,7 @@ const CanvasTabManager = {
   _getActiveVisualSnapshotCaptureInput({ force: force = ![] } = {}) {
     if (!this['_activeId']) return null;
     const idx = this['_canvases']['findIndex']((value75) => value75['id'] === this['_activeId']);
-    if (idx === -0x1) return null;
+    if (idx === -1) return null;
     if (typeof document === 'undefined') return null;
     const canvasEl2 = document['getElementById']('v2-canvas');
     if (!canvasEl2) return null;
@@ -1052,7 +1052,7 @@ const CanvasTabManager = {
     force: force = ![],
     persistIfChanged: persistIfChanged = ![],
   } = {}) {
-    const value76 = Number(this['_visualSnapshotBackfillGeneration']) || 0x0,
+    const value76 = Number(this['_visualSnapshotBackfillGeneration']) || 0,
       enabled24 = this['_getActiveVisualSnapshotCaptureInput']({ force: force });
     if (!enabled24) return null;
     if (this['_isVisualSnapshotInteractionBusy']())
@@ -1060,7 +1060,7 @@ const CanvasTabManager = {
     let visualSnapshot2 = await captureCanvasVisualSnapshotFromElectron(enabled24);
     if (
       this['_activeId'] !== enabled24['canvasId'] ||
-      value76 !== (Number(this['_visualSnapshotBackfillGeneration']) || 0x0) ||
+      value76 !== (Number(this['_visualSnapshotBackfillGeneration']) || 0) ||
       this['_isVisualSnapshotInteractionBusy']()
     )
       return (
@@ -1076,7 +1076,7 @@ const CanvasTabManager = {
     if (!visualSnapshot2) return null;
     if (
       this['_activeId'] !== enabled24['canvasId'] ||
-      value76 !== (Number(this['_visualSnapshotBackfillGeneration']) || 0x0) ||
+      value76 !== (Number(this['_visualSnapshotBackfillGeneration']) || 0) ||
       this['_isVisualSnapshotInteractionBusy']()
     )
       return (
@@ -1087,7 +1087,7 @@ const CanvasTabManager = {
     const value77 = this['_canvases']['findIndex'](
       (value78) => value78['id'] === enabled24['canvasId'],
     );
-    if (value77 === -0x1) return null;
+    if (value77 === -1) return null;
     const value79 = this['_canvases'][value77]?.['visualSnapshot'] || null;
     if (!this['_isVisualSnapshotWorthReplacing'](value79, visualSnapshot2, { force: force })) return null;
     return (
@@ -1133,7 +1133,7 @@ const CanvasTabManager = {
           if (value82 && this['_activeId'] !== value82) return;
           this['_warmupCanvasVisibleMedia'](enabled25, { maxJobs: maxJobs });
         },
-        Math['max'](0x0, Number(delayMs) || 0x0),
+        Math['max'](0, Number(delayMs) || 0),
       );
     return (timer?.['unref']?.(), (this['_mediaWarmupTimer'] = timer), timer);
   },
@@ -1164,7 +1164,7 @@ const CanvasTabManager = {
         }
         void this['_requestVisualSnapshotBackfillCapture'](value85);
       },
-      Math['max'](0x0, Number(value86) || 0x0),
+      Math['max'](0, Number(value86) || 0),
     );
     return (
       timer2?.['unref']?.(),
@@ -1199,7 +1199,7 @@ const CanvasTabManager = {
         (this['_clearVisualSnapshotIdleRetryTimer'](),
           void this['_requestVisualSnapshotBackfillCapture'](value90));
       },
-      Math['max'](0x0, Number(value91) || 0x0),
+      Math['max'](0, Number(value91) || 0),
     );
     return (timer3?.['unref']?.(), timer3);
   },
@@ -1213,7 +1213,7 @@ const CanvasTabManager = {
   hydrateActiveCanvasSnapshot(value94) {
     if (!this['_activeId']) return;
     const value95 = this['_canvases']['findIndex']((value96) => value96['id'] === this['_activeId']);
-    if (value95 === -0x1) return;
+    if (value95 === -1) return;
     ((this['_canvases'][value95] = this['_buildCanvasRecord'](this['_canvases'][value95], value94)),
       this['_scheduleCanvasVisibleMediaWarmup'](this['_canvases'][value95]),
       this['_clearCanvasSurface'](),
@@ -1238,7 +1238,7 @@ const CanvasTabManager = {
       (this['_lastContentPersistRevByCanvas'] = new Map()),
       (this['_savedSignatureByCanvas'] = new Map()),
       (this['_lastTabsRenderSignature'] = ''));
-    if (this['_canvases']['length'] === 0x0) {
+    if (this['_canvases']['length'] === 0) {
       const id2 = 'canvas_default_' + Date['now']();
       (this['_canvases']['push']({
         id: id2,
@@ -1249,15 +1249,15 @@ const CanvasTabManager = {
         this['_projectContextByCanvasId']['set'](
           id2,
           normalizeCanvasProjectContext(
-            { projectName: this['_canvases'][0x0]['name'], isTemporary: !![] },
-            { canvasId: id2, projectName: this['_canvases'][0x0]['name'] },
+            { projectName: this['_canvases'][0]['name'], isTemporary: !![] },
+            { canvasId: id2, projectName: this['_canvases'][0]['name'] },
           ),
         ),
-        this['_hydrateCanvasSnapshot'](this['_canvases'][0x0]));
+        this['_hydrateCanvasSnapshot'](this['_canvases'][0]));
     } else {
       const value101 =
         this['_canvases']['find']((value102) => value102?.['id'] === value97['activeCanvasId']) ||
-        this['_canvases'][0x0];
+        this['_canvases'][0];
       this['_activeId'] = value101?.['id'] ?? null;
       const captureCurrentProjectContext2 = captureCurrentProjectContext(value101);
       (this['_canvases']['forEach']((projectId) => {
@@ -1306,7 +1306,7 @@ const CanvasTabManager = {
   _flushCurrentCanvas() {
     if (!this['_activeId']) return;
     const value106 = this['_canvases']['findIndex']((value107) => value107['id'] === this['_activeId']);
-    if (value106 === -0x1) return;
+    if (value106 === -1) return;
     flushAllPendingPromptHtmlCommits();
     const _persistRevHint2 = this['_getStorePersistRev']();
     if (this['_lastPersistRevByCanvas']['get'](this['_activeId']) === _persistRevHint2) return;
@@ -1316,8 +1316,8 @@ const CanvasTabManager = {
       ((this['_canvases'][value106] = {
         ...this['_canvases'][value106],
         viewport: {
-          x: Number(box2['x']) || 0x0,
-          y: Number(box2['y']) || 0x0,
+          x: Number(box2['x']) || 0,
+          y: Number(box2['y']) || 0,
           zoom: Number(box2['zoom']) || 1.1,
         },
         _persistRevHint: _persistRevHint2,
@@ -1374,7 +1374,7 @@ const CanvasTabManager = {
       if (response2?.['ok'] === ![]) return (this['_showTaskTransitionBlocked'](response2), ![]);
       this['_clearCanvasSurface']();
       const id3 = 'canvas_' + Date['now'](),
-        name = canvasTabsText('newCanvasName', { index: this['_canvases']['length'] + 0x1 });
+        name = canvasTabsText('newCanvasName', { index: this['_canvases']['length'] + 1 });
       return (
         this['_canvases']['push']({ id: id3, name: name, ...createEmptyCanvasSnapshot() }),
         this['_projectContextByCanvasId']['set'](
@@ -1470,24 +1470,24 @@ const CanvasTabManager = {
       (await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === ![]
     )
       return ![];
-    if (this['_canvases']['length'] <= 0x1)
+    if (this['_canvases']['length'] <= 1)
       return (window['showToast'](canvasTabsText('keepOneCanvas'), 'warn'), ![]);
     const value120 = this['_canvases']['findIndex']((value121) => value121['id'] === value118);
-    if (value120 === -0x1) return ![];
+    if (value120 === -1) return ![];
     if (value118 === this['_activeId']) this['_flushCurrentCanvas']();
     const value122 = this['_canvases'][value120];
     if (canvasHasLiveGeneration(value122))
-      return (this['_showTaskTransitionBlocked']({ activeCount: 0x1 }, 'deleteBlockedByTasks'), ![]);
+      return (this['_showTaskTransitionBlocked']({ activeCount: 1 }, 'deleteBlockedByTasks'), ![]);
     const enabled27 = await this['_confirmDeleteDirtyCanvas'](value122, value119);
     if (!enabled27) return ![];
-    (this['_canvases']['splice'](value120, 0x1),
+    (this['_canvases']['splice'](value120, 1),
       this['_projectContextByCanvasId']['delete'](value118),
       this['_backgroundTaskStores']['delete'](value118),
       this['_lastPersistRevByCanvas']['delete'](value118),
       this['_lastContentPersistRevByCanvas']['delete'](value118),
       this['_savedSignatureByCanvas']['delete'](value118));
     if (this['_activeId'] === value118) {
-      const value123 = this['_canvases'][Math['max'](0x0, value120 - 0x1)];
+      const value123 = this['_canvases'][Math['max'](0, value120 - 1)];
       ((this['_activeId'] = value123['id']),
         this['_showCanvasVisualSnapshot'](value123),
         this['_clearCanvasSurface'](),
@@ -1633,11 +1633,11 @@ const CanvasTabManager = {
         id: String(persistRev?.['id'] || ''),
         name: String(persistRev?.['name'] || ''),
         persistRev:
-          persistRev?.['id'] === activeCanvasId ? value132 : Number(persistRev?.['_persistRevHint']) || 0x0,
+          persistRev?.['id'] === activeCanvasId ? value132 : Number(persistRev?.['_persistRevHint']) || 0,
         contentPersistRev:
           persistRev?.['id'] === activeCanvasId
             ? this['_getStoreContentPersistRev']()
-            : Number(persistRev?.['_contentPersistRevHint']) || 0x0,
+            : Number(persistRev?.['_contentPersistRevHint']) || 0,
       })),
     };
   },

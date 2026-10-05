@@ -180,8 +180,8 @@ export class SourceTextNode {
   }
   ['_updateSizeByLength'](count4, payload = false) {
     if (!this._data.width || this._data.width < 100) {
-      let width = 0x104;
-      if (count4 > 0x12c) width = 0x208;
+      let width = 260;
+      if (count4 > 300) width = 520;
       payload
         ? appStore.updateNodeData(this.id, { width: width, height: width })
         : ((this._data.width = width), (this._data.height = width));

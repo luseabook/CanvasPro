@@ -64,7 +64,7 @@ export function bindCollaborationEditors({
     const target = event4['target'];
     if (
       !target['matches']?.(
-        'textarea,\x20input:not([type=\x22file\x22]):not([type=\x22button\x22]):not([type=\x22submit\x22]),\x20[contenteditable=\x22true\x22]',
+        'textarea, input:not([type="file"]):not([type="button"]):not([type="submit"]), [contenteditable="true"]',
       ) ||
       target['readOnly'] ||
       target['disabled']

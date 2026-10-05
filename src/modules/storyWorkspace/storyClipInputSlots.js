@@ -37,12 +37,12 @@ export function normalizeStoryClipInputs(options = {}) {
 }
 function getSlotCount(current, entry, record) {
   const payload = Number(current?.['maxByKind']?.[entry]);
-  if (Number['isFinite'](payload)) return Math['max'](0x0, Math['trunc'](payload));
+  if (Number['isFinite'](payload)) return Math['max'](0, Math['trunc'](payload));
   const handle = (current?.['fixedSlots'] || [])['filter'](
       (state) => normalizeText(state?.['kind']) === entry,
     )['length'],
     config = Number(current?.['minByKind']?.[entry]);
-  return Math['max'](handle, record + 0x1, Number['isFinite'](config) ? Math['trunc'](config) : 0x0, 0x1);
+  return Math['max'](handle, record + 1, Number['isFinite'](config) ? Math['trunc'](config) : 0, 1);
 }
 function assignInputsToSlots(list2, list3) {
   const input = new Map(),
@@ -71,7 +71,7 @@ export function buildStoryClipInputSlotViewModel({
 } = {}) {
   const modelId2 = resolveModelExecution(modelId, { providerHint: provider });
   if (!modelId2?.['modelManifest'] || modelId2['modelManifest']['kind'] !== 'video')
-    throw new Error('视频模型缺少\x20manifest：' + (normalizeText(modelId) || '(empty)'));
+    throw new Error('视频模型缺少 manifest：' + (normalizeText(modelId) || '(empty)'));
   const asObject3 = asObject(modelId2['modelManifest']['inputSlots']),
     map2 = new Set(
       (Array['isArray'](asObject3['allowedKinds']) ? asObject3['allowedKinds'] : [])
@@ -83,25 +83,25 @@ export function buildStoryClipInputSlotViewModel({
     groups = MEDIA_KINDS['filter']((value5) => map2['has'](value5))['map']((kind2) => {
       const value6 = list4['filter']((value7) => normalizeText(value7?.['kind']) === kind2)['sort'](
           (value8, value9) =>
-            Number(value8?.['displayOrder'] || 0x0) - Number(value9?.['displayOrder'] || 0x0),
+            Number(value8?.['displayOrder'] || 0) - Number(value9?.['displayOrder'] || 0),
         ),
         length = getSlotCount(asObject3, kind2, storyClipInputs[kind2]['length']),
         value10 = Array['from']({ length: length }, (value11, index2) => {
           const required = value6[index2] || null;
           return {
-            id: normalizeText(required?.['id']) || kind2 + '-' + (index2 + 0x1),
+            id: normalizeText(required?.['id']) || kind2 + '-' + (index2 + 1),
             kind: kind2,
             index: index2,
-            label: normalizeText(required?.['label']) || KIND_LABELS[kind2] + '\x20' + (index2 + 0x1),
+            label: normalizeText(required?.['label']) || KIND_LABELS[kind2] + ' ' + (index2 + 1),
             required:
-              required?.['required'] === !![] || index2 < Number(asObject3?.['minByKind']?.[kind2] || 0x0),
+              required?.['required'] === !![] || index2 < Number(asObject3?.['minByKind']?.[kind2] || 0),
             fixed: Boolean(required),
           };
         });
       return {
         kind: kind2,
         label: KIND_LABELS[kind2],
-        min: Math['max'](0x0, Number(asObject3?.['minByKind']?.[kind2] || 0x0)),
+        min: Math['max'](0, Number(asObject3?.['minByKind']?.[kind2] || 0)),
         max: length,
         slots: assignInputsToSlots(value10, storyClipInputs[kind2]),
       };
@@ -130,7 +130,7 @@ export function updateStoryClipInput(
         !(
           Number['isFinite'](value14) &&
           !normalizeText(value15['slotId']) &&
-          value16 === Math['max'](0x0, Math['trunc'](value14))
+          value16 === Math['max'](0, Math['trunc'](value14))
         ),
     );
   if (value !== null && value !== undefined && value !== '') {

@@ -31,12 +31,12 @@ export function createImageLoadDiagnostics(
   return (
     (timer = schedule(() => {
       if (!enabled2) run('after-two-seconds');
-    }, 0x7d0)),
+    }, 2000)),
     timer?.['unref']?.(),
     {
       mark(stage, args = {}) {
         if (enabled2) return;
-        if (list['length'] >= 0x14) list['shift']();
+        if (list['length'] >= 20) list['shift']();
         list['push']({ stage: stage, elapsedMs: Math['round'](now() - startedAt), ...args });
         if (stage === 'paint-opportunity') run(stage);
       },
@@ -50,10 +50,10 @@ export function createImageLoadDiagnostics(
 export function getImageLoadTiming(width) {
   const resourceDurationMs = globalThis['performance']
     ?.['getEntriesByName']?.(width['currentSrc'] || width['src'])
-    ?.['at'](-0x1);
+    ?.['at'](-1);
   return {
-    width: width['naturalWidth'] || 0x0,
-    height: width['naturalHeight'] || 0x0,
+    width: width['naturalWidth'] || 0,
+    height: width['naturalHeight'] || 0,
     resourceDurationMs: resourceDurationMs ? Math['round'](resourceDurationMs['duration']) : null,
     transferBytes: resourceDurationMs?.['transferSize'] ?? null,
     documentVisible: globalThis['document']?.['visibilityState'] || 'unknown',

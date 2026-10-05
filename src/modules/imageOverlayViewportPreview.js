@@ -5,7 +5,7 @@ function normalizePreviewViewport(box) {
     y = Number(box['y']),
     zoom = Number(box['zoom']);
   if (!Number['isFinite'](x) || !Number['isFinite'](y) || !Number['isFinite'](zoom)) return null;
-  if (zoom <= 0x0) return null;
+  if (zoom <= 0) return null;
   return { x: x, y: y, zoom: zoom };
 }
 export function mergeImageOverlayPreviewViewport(args, value) {

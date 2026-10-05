@@ -24,7 +24,7 @@ function markMigrationCompleted(key) {
 function base64ToBytes(index) {
   const list = atob(String(index || '')),
     uint8Array = new Uint8Array(list['length']);
-  for (let result = 0x0; result < list['length']; result += 0x1) {
+  for (let result = 0; result < list['length']; result += 1) {
     uint8Array[result] = list['charCodeAt'](result);
   }
   return uint8Array;
@@ -42,7 +42,7 @@ export function decodeLegacyStorageValue(el) {
     const bytes = base64ToBytes(el['base64']),
       handler = globalThis[String(el['constructorName'] || '')] || Uint8Array;
     try {
-      return new handler(bytes['buffer']['slice'](0x0));
+      return new handler(bytes['buffer']['slice'](0));
     } catch {
       return bytes;
     }
@@ -53,11 +53,11 @@ export function decodeLegacyStorageValue(el) {
   );
 }
 export function applyLegacyLocalStorage(enabled, enabled2 = globalThis['localStorage']) {
-  if (!enabled2 || !enabled || typeof enabled !== 'object') return 0x0;
-  let next = 0x0;
+  if (!enabled2 || !enabled || typeof enabled !== 'object') return 0;
+  let next = 0;
   for (const [current, entry] of Object['entries'](enabled)) {
     if (enabled2['getItem'](current) !== null || entry === null || entry === undefined) continue;
-    (enabled2['setItem'](current, String(entry)), (next += 0x1));
+    (enabled2['setItem'](current, String(entry)), (next += 1));
   }
   return next;
 }
@@ -113,7 +113,7 @@ async function openDatabaseForImport(value6, error2, value7) {
   let openDatabase2 = await openDatabase(
     value6,
     error2['name'],
-    0x0,
+    0,
     (value8) => createMissingStores(value8, error2['stores']),
     value7,
   );
@@ -121,7 +121,7 @@ async function openDatabaseForImport(value6, error2, value7) {
     (error3) => error3?.['name'] && !openDatabase2['objectStoreNames']['contains'](error3['name']),
   );
   if (!enabled3) return openDatabase2;
-  const value9 = Math['max'](0x1, Number(openDatabase2['version'] || 0x0) + 0x1);
+  const value9 = Math['max'](1, Number(openDatabase2['version'] || 0) + 1);
   return (
     openDatabase2['close'](),
     (openDatabase2 = await openDatabase(
@@ -136,7 +136,7 @@ async function openDatabaseForImport(value6, error2, value7) {
 }
 function mergeStoreEntries(value11, error4, el3) {
   const list2 = Array['isArray'](error4?.['entries']) ? error4['entries'] : [];
-  if (!error4?.['name'] || list2['length'] === 0x0) return Promise['resolve'](0x0);
+  if (!error4?.['name'] || list2['length'] === 0) return Promise['resolve'](0);
   return new Promise((handler4, handler5) => {
     el3?.['throwIfAborted']();
     const value12 = value11['transaction'](error4['name'], 'readwrite'),
@@ -152,12 +152,12 @@ function mergeStoreEntries(value11, error4, el3) {
         else handler4(value14);
       },
       map = value12['objectStore'](error4['name']);
-    let value14 = 0x0;
+    let value14 = 0;
     ((value12['oncomplete'] = () => run2(el3?.['aborted'] ? el3['reason'] : null)),
       (value12['onerror'] = () => run2(value12['error'] || new Error('Unable to import ' + error4['name']))),
       (value12['onabort'] = () =>
         run2(
-          el3?.['reason'] || value12['error'] || new Error('Unable\x20to\x20import\x20' + error4['name']),
+          el3?.['reason'] || value12['error'] || new Error('Unable to import ' + error4['name']),
         )));
     try {
       for (const el4 of list2) {
@@ -169,7 +169,7 @@ function mergeStoreEntries(value11, error4, el3) {
           try {
             if (map['keyPath'] === null) map['put'](decodeLegacyStorageValue3, decodeLegacyStorageValue2);
             else map['put'](decodeLegacyStorageValue3);
-            value14 += 0x1;
+            value14 += 1;
           } catch (value16) {
             (handler6(), run2(value16));
           }
@@ -186,9 +186,9 @@ export async function importLegacyIndexedDatabases(
   enabled4 = globalThis['indexedDB'],
   { signal: signal } = {},
 ) {
-  if (!Array['isArray'](list3) || list3['length'] === 0x0) return 0x0;
+  if (!Array['isArray'](list3) || list3['length'] === 0) return 0;
   if (!enabled4?.['open']) throw new Error('IndexedDB is unavailable for storage migration');
-  let value18 = 0x0;
+  let value18 = 0;
   for (const error5 of list3) {
     if (!error5?.['name']) continue;
     signal?.['throwIfAborted']();
@@ -233,7 +233,7 @@ export async function migrateLegacyRendererStorageIfNeeded({
         indexedDbCount: indexedDbCount,
         skippedCount: Array['isArray'](reason['payload']['skipped'])
           ? reason['payload']['skipped']['length']
-          : 0x0,
+          : 0,
       };
     return (
       await signal2['wait'](() => bridge['complete'](args)),

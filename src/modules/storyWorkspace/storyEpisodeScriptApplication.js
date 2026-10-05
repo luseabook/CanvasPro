@@ -7,15 +7,15 @@ import {
 } from './storyPlanningData.js';
 import { invalidateStoryPlanningDownstream } from './storyProjectPlanning.js';
 const RUN_KIND = 'story-episode-script-run',
-  RUN_VERSION = 0x1,
+  RUN_VERSION = 1,
   STAGE_VERSION = '1',
   PROMPT_VERSION = 'episode-script/v2',
   SCHEMA_VERSION = 'story-episode-script/v2',
-  MAX_INVOCATIONS = 0x8,
-  MAX_RAW_RESPONSE_CHARACTERS = 0x1d4c0,
+  MAX_INVOCATIONS = 8,
+  MAX_RAW_RESPONSE_CHARACTERS = 120000,
   SCRIPT_RESPONSE_STEPS = new Set(['generation', 'repair', 'content-revision']),
   OPTIONAL_POST_GENERATION_STEPS = new Set(['timing-review', 'timing-recheck', 'content-revision']);
-let runSequence = 0x0;
+let runSequence = 0;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -39,20 +39,20 @@ function stableSerialize(list) {
 function fingerprintValue(index) {
   const list2 = stableSerialize(index);
   let result = 0x811c9dc5;
-  for (let data = 0x0; data < list2['length']; data += 0x1) {
+  for (let data = 0; data < list2['length']; data += 1) {
     ((result ^= list2['charCodeAt'](data)), (result = Math['imul'](result, 0x1000193)));
   }
-  return 'fnv1a-' + (result >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'fnv1a-' + (result >>> 0)['toString'](16)['padStart'](8, '0');
 }
-function getEpisodeRef(options = {}, target = 0x0) {
+function getEpisodeRef(options = {}, target = 0) {
   return (
-    normalizeText(options['ref'] || options['planningRef'] || options['id']) || 'episode-' + (target + 0x1)
+    normalizeText(options['ref'] || options['planningRef'] || options['id']) || 'episode-' + (target + 1)
   );
 }
 function getRunInput({
   project: project = {},
   episode: episode = {},
-  episodeIndex: episodeIndex = 0x0,
+  episodeIndex: episodeIndex = 0,
   previousEpisode: previousEpisode = null,
   nextEpisode: nextEpisode = null,
   execution: execution = {},
@@ -60,10 +60,10 @@ function getRunInput({
 } = {}) {
   return {
     projectId: normalizeText(project['id']),
-    summaryRevision: Math['max'](0x0, Math['trunc'](Number(project['summaryRevision']) || 0x0)),
-    outlineRevision: Math['max'](0x0, Math['trunc'](Number(project['outlineSourceSummaryRevision']) || 0x0)),
+    summaryRevision: Math['max'](0, Math['trunc'](Number(project['summaryRevision']) || 0)),
+    outlineRevision: Math['max'](0, Math['trunc'](Number(project['outlineSourceSummaryRevision']) || 0)),
     scriptMode: normalizeText(project['scriptMode']) || 'plot',
-    episodeIndex: Math['max'](0x0, Math['trunc'](Number(episodeIndex) || 0x0)),
+    episodeIndex: Math['max'](0, Math['trunc'](Number(episodeIndex) || 0)),
     episodeRef: getEpisodeRef(episode, episodeIndex),
     episodeFingerprint: fingerprintValue({
       title: episode['title'],
@@ -74,12 +74,12 @@ function getRunInput({
       existingScript: regeneration ? episode['script']?.['fullText'] : '',
     }),
     previousEpisodeFingerprint: fingerprintValue({
-      ref: getEpisodeRef(previousEpisode || {}, Math['max'](0x0, episodeIndex - 0x1)),
+      ref: getEpisodeRef(previousEpisode || {}, Math['max'](0, episodeIndex - 1)),
       script: previousEpisode?.['script']?.['fullText'],
       endingState: previousEpisode?.['endingState'],
     }),
     nextEpisodeFingerprint: fingerprintValue({
-      ref: getEpisodeRef(nextEpisode || {}, episodeIndex + 0x1),
+      ref: getEpisodeRef(nextEpisode || {}, episodeIndex + 1),
       synopsis: nextEpisode?.['synopsis'],
       hook: nextEpisode?.['hook'],
     }),
@@ -98,14 +98,14 @@ function normalizeInvocation(options2 = {}) {
   return {
     id: normalizeText(options2['id']),
     stepId: normalizeText(options2['stepId']),
-    attempt: Math['max'](0x1, Math['trunc'](Number(options2['attempt']) || 0x1)),
+    attempt: Math['max'](1, Math['trunc'](Number(options2['attempt']) || 1)),
     state: normalizeText(options2['state']),
     requestFingerprint: normalizeText(options2['requestFingerprint']),
-    rawResponse: String(options2['rawResponse'] || '')['slice'](0x0, MAX_RAW_RESPONSE_CHARACTERS),
+    rawResponse: String(options2['rawResponse'] || '')['slice'](0, MAX_RAW_RESPONSE_CHARACTERS),
     error: normalizeText(options2['error']),
-    preparedAt: Math['max'](0x0, Number(options2['preparedAt'] || 0x0)),
-    completedAt: Math['max'](0x0, Number(options2['completedAt'] || 0x0)),
-    retryAuthorizedAt: Math['max'](0x0, Number(options2['retryAuthorizedAt'] || 0x0)),
+    preparedAt: Math['max'](0, Number(options2['preparedAt'] || 0)),
+    completedAt: Math['max'](0, Number(options2['completedAt'] || 0)),
+    retryAuthorizedAt: Math['max'](0, Number(options2['retryAuthorizedAt'] || 0)),
   };
 }
 export function normalizeStoryEpisodeScriptRun(response) {
@@ -132,15 +132,15 @@ export function normalizeStoryEpisodeScriptRun(response) {
     candidateArtifact: cloneJson(response['candidateArtifact'] || null),
     errorCode: normalizeText(response['errorCode']),
     error: normalizeText(response['error']),
-    createdAt: Math['max'](0x0, Number(response['createdAt'] || 0x0)) || Date['now'](),
-    updatedAt: Math['max'](0x0, Number(response['updatedAt'] || 0x0)) || Date['now'](),
+    createdAt: Math['max'](0, Number(response['createdAt'] || 0)) || Date['now'](),
+    updatedAt: Math['max'](0, Number(response['updatedAt'] || 0)) || Date['now'](),
   };
 }
 function createRun(options3 = {}) {
   const input = getRunInput(options3),
     createdAt = Date['now']();
   return (
-    (runSequence += 0x1),
+    (runSequence += 1),
     {
       kind: RUN_KIND,
       version: RUN_VERSION,
@@ -173,7 +173,7 @@ function canResumeRun(next, args = {}) {
   const current =
     execution2['status'] === 'failed_retryable' &&
     execution2['errorCode'] === 'MODEL_CREDENTIAL_MISSING' &&
-    execution2['invocations']['length'] === 0x0 &&
+    execution2['invocations']['length'] === 0 &&
     !execution2['checkpoint'] &&
     !execution2['candidateArtifact'];
   if (current) return ![];
@@ -272,7 +272,7 @@ function mergeRepairDrafts(episodeRef, output) {
     rawResponses = [
       ...new Map(
         list4['map']((response3) => [
-          Math['max'](0x1, Math['trunc'](Number(response3?.['attempt']) || 0x1)) +
+          Math['max'](1, Math['trunc'](Number(response3?.['attempt']) || 1)) +
             ':' +
             String(response3?.['text'] || ''),
           response3,
@@ -299,8 +299,8 @@ function mergeRepairDrafts(episodeRef, output) {
     status: 'failed',
     episodeRef: episodeRef['input']['episodeRef'],
     attempts: Math['max'](
-      0x1,
-      ...rawResponses['map']((value9) => Math['trunc'](Number(value9?.['attempt']) || 0x0)),
+      1,
+      ...rawResponses['map']((value9) => Math['trunc'](Number(value9?.['attempt']) || 0)),
     ),
     rawResponses: rawResponses,
     ...(value8 ? { skipPostGenerationReview: !![] } : {}),
@@ -311,7 +311,7 @@ function getErrorCode(value10) {
 }
 export function createStoryEpisodeScriptApplication({ generateEpisodeScript: generateEpisodeScript } = {}) {
   if (typeof generateEpisodeScript !== 'function')
-    throw new TypeError('generateEpisodeScript\x20must\x20be\x20a\x20function');
+    throw new TypeError('generateEpisodeScript must be a function');
   async function execute(project2 = {}) {
     const response4 = normalizeStoryEpisodeScriptRun(project2['resumeRun']),
       resumed = canResumeRun(response4, project2);
@@ -346,7 +346,7 @@ export function createStoryEpisodeScriptApplication({ generateEpisodeScript: gen
                   ':' +
                   stepId['attempt'] +
                   ':' +
-                  (model['invocations']['length'] + 0x1),
+                  (model['invocations']['length'] + 1),
                 stepId: stepId['stepId'],
                 attempt: stepId['attempt'],
                 state: 'prepared',
@@ -364,13 +364,13 @@ export function createStoryEpisodeScriptApplication({ generateEpisodeScript: gen
               ['find'](
                 (value12) =>
                   value12['stepId'] === normalizeText(stepId['stepId']) &&
-                  value12['attempt'] === Math['max'](0x1, Math['trunc'](Number(stepId['attempt']) || 0x1)) &&
+                  value12['attempt'] === Math['max'](1, Math['trunc'](Number(stepId['attempt']) || 1)) &&
                   value12['state'] === 'prepared',
               );
             value11 &&
               ((value11['state'] = normalizeText(stepId['state'])),
               (value11['rawResponse'] = String(stepId['rawResponse'] || '')['slice'](
-                0x0,
+                0,
                 MAX_RAW_RESPONSE_CHARACTERS,
               )),
               (value11['error'] = normalizeText(stepId['error'])),
@@ -429,17 +429,17 @@ export function createStoryEpisodeScriptWorkspaceController({
     if (!enabled5) throw new Error('完整分集剧本 Agent 尚未初始化。');
     const episodeIndex2 = value14['episodes']['findIndex']((value15) => value15['id'] === episodeId['id']);
     if (
-      episodeIndex2 < 0x0 ||
+      episodeIndex2 < 0 ||
       (!regeneration && !canGenerateStoryEpisodeScript(value14['episodes'], episodeIndex2))
     )
       throw new Error(
-        '必须按顺序生成剧本；当前应先生成第\x20' +
-          (getNextStoryEpisodeScriptIndex(value14['episodes']) + 0x1) +
-          '\x20集。',
+        '必须按顺序生成剧本；当前应先生成第 ' +
+          (getNextStoryEpisodeScriptIndex(value14['episodes']) + 1) +
+          ' 集。',
       );
     const modelId = host['getPlanningContext'](value14, value13),
-      previousEpisode2 = episodeIndex2 > 0x0 ? value14['episodes'][episodeIndex2 - 0x1] : null,
-      nextEpisode2 = value14['episodes'][episodeIndex2 + 0x1] || null,
+      previousEpisode2 = episodeIndex2 > 0 ? value14['episodes'][episodeIndex2 - 1] : null,
+      nextEpisode2 = value14['episodes'][episodeIndex2 + 1] || null,
       execution3 = {
         modelId: modelId['model'],
         provider: modelId['provider'],
@@ -461,7 +461,7 @@ export function createStoryEpisodeScriptWorkspaceController({
     if (resumeRun && runRequiresPaidRetry(runFromTask)) {
       const value17 = await host['requestChoice']({
         overlayId: 'story-episode-script-paid-retry-' + episodeId['id'],
-        title: '第\x20' + (episodeIndex2 + 0x1) + ' 集正文生成结果未知',
+        title: '第 ' + (episodeIndex2 + 1) + ' 集正文生成结果未知',
         message:
           '上次正文生成或正文修复请求可能已经提交并计费，但没有收到确定结果。只有你确认后才会再次请求正文。',
         fallbackValue: null,
@@ -477,7 +477,7 @@ export function createStoryEpisodeScriptWorkspaceController({
       const args5 = {
           type: 'episode-script',
           scope: { episodeId: episodeId['id'] },
-          label: '生成第 ' + (episodeIndex2 + 0x1) + ' 集完整剧本',
+          label: '生成第 ' + (episodeIndex2 + 1) + ' 集完整剧本',
           status: status['status'] === 'failed_retryable' ? 'failed' : 'running',
           resumable: !![],
           modelId: status['input']['execution']['modelId'],
@@ -502,7 +502,7 @@ export function createStoryEpisodeScriptWorkspaceController({
         onProgress: ({ message: message } = {}) => {
           if (!host['isProjectTaskLive'](value13)) return;
           const message2 =
-            normalizeText(message) || '正在生成第\x20' + (episodeIndex2 + 0x1) + '\x20集完整剧本';
+            normalizeText(message) || '正在生成第 ' + (episodeIndex2 + 1) + ' 集完整剧本';
           (host['updateBackgroundTask'](value13, id, { status: 'running', message: message2 }),
             host['isProjectTaskCurrent'](value13) &&
               ((state2['episodeScriptGenerationStatus'] = message2), host['renderPlanningProgress']()));
@@ -527,7 +527,7 @@ export function createStoryEpisodeScriptWorkspaceController({
       return (
         host['finishBackgroundTask'](value13, id, {
           status: 'succeeded',
-          message: '第\x20' + (episodeIndex2 + 0x1) + ' 集完整剧本已生成',
+          message: '第 ' + (episodeIndex2 + 1) + ' 集完整剧本已生成',
           resumable: ![],
           resumePayload: createRunPayload(completeRun(value19['run'])),
         }),
@@ -552,8 +552,8 @@ export function createStoryEpisodeScriptWorkspaceController({
           host['finishBackgroundTask'](value13, id, {
             status: 'failed',
             message: message3
-              ? '第\x20' + (episodeIndex2 + 0x1) + ' 集返回已保存，可继续修复'
-              : '第\x20' + (episodeIndex2 + 0x1) + ' 集剧本生成失败',
+              ? '第 ' + (episodeIndex2 + 1) + ' 集返回已保存，可继续修复'
+              : '第 ' + (episodeIndex2 + 1) + ' 集剧本生成失败',
             error: error2?.['message'] || '完整分集剧本生成失败。',
             resumable: !![],
             ...(error2?.['storyEpisodeScriptRun']

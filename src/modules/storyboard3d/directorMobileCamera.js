@@ -11,7 +11,7 @@ import {
 } from './shotAnimation.js';
 import { syncStoryboard3DCameraObjectFromShot } from './projectModel.js';
 const escape = (value) =>
-  String(value)['replaceAll']('&', '&amp;')['replaceAll']('\x22', '&quot;')['replaceAll']('<', '&lt;');
+  String(value)['replaceAll']('&', '&amp;')['replaceAll']('"', '&quot;')['replaceAll']('<', '&lt;');
 export class DirectorMobileCamera {
   constructor(
     item,
@@ -24,8 +24,8 @@ export class DirectorMobileCamera {
     ((this['panel'] = item),
       (this['timeline'] = item['timeline']),
       (this['api'] = key),
-      (this['epoch'] = 0x0),
-      (this['sequence'] = -0x1));
+      (this['epoch'] = 0),
+      (this['sequence'] = -1));
   }
   ['render']() {
     return (
@@ -36,7 +36,7 @@ export class DirectorMobileCamera {
       (this['pairing']
         ? '<button data-storyboard-3d-action="timeline-mobile-disconnect">断开</button><button data-storyboard-3d-action="timeline-mobile-save" ' +
           (this['camera'] ? '' : 'disabled') +
-          '>保存当前机位</button><button\x20data-storyboard-3d-action=\x22timeline-mobile-record\x22\x20' +
+          '>保存当前机位</button><button data-storyboard-3d-action="timeline-mobile-record" ' +
           (this['camera'] ? '' : 'disabled') +
           '>' +
           (this['recording'] ? '结束并保存运镜' : '录制运镜') +
@@ -44,13 +44,13 @@ export class DirectorMobileCamera {
         : '') +
       '</div>' +
       (this['pairing']
-        ? '<p>手机与电脑连接同一局域网，在手机浏览器打开下方地址。配对\x2015\x20分钟后失效。</p>' +
+        ? '<p>手机与电脑连接同一局域网，在手机浏览器打开下方地址。配对 15 分钟后失效。</p>' +
           this['pairing']['urls']
-            ['map']((index) => '<input aria-label="手机连接地址" readonly value="' + escape(index) + '\x22>')
+            ['map']((index) => '<input aria-label="手机连接地址" readonly value="' + escape(index) + '">')
             ['join']('') +
-          (this['pairing']['secure'] ? '' : '<p>当前为触控模式；陀螺仪需要可信\x20HTTPS\x20连接。</p>')
+          (this['pairing']['secure'] ? '' : '<p>当前为触控模式；陀螺仪需要可信 HTTPS 连接。</p>')
         : '') +
-      '<output\x20data-mobile-status\x20role=\x22status\x22>' +
+      '<output data-mobile-status role="status">' +
       escape(this['message'] || '') +
       '</output></fieldset>'
     );
@@ -109,7 +109,7 @@ export class DirectorMobileCamera {
           this['timeline']['readCurrentCamera']?.() || this['panel']['context']()['shot']['camera'],
         )),
         (this['message'] = '等待手机连接…'),
-        (this['sequence'] = -0x1),
+        (this['sequence'] = -1),
         void this['poll'](data));
     } catch (error) {
       if (data === this['epoch']) this['message'] = error['message'];
@@ -133,19 +133,19 @@ export class DirectorMobileCamera {
         const current = this['recording'];
         if (current) {
           const time = Math['min'](
-            0xe10,
-            current['start'] + (performance['now']() - current['clock']) / 0x3e8,
+            3600,
+            current['start'] + (performance['now']() - current['clock']) / 1000,
           );
           current['frames']['push']({ time: time, camera: structuredClone(this['camera']) });
-          if (current['frames']['length'] >= 0xe10 || time >= 0xe10) this['finishRecording']();
+          if (current['frames']['length'] >= 3600 || time >= 3600) this['finishRecording']();
         }
         ((this['message'] = this['recording']
-          ? '录制中 · ' + this['recording']['frames']['length'] + '\x20帧'
+          ? '录制中 · ' + this['recording']['frames']['length'] + ' 帧'
           : '手机已连接，正在预览机位。'),
           this['preview']());
         if (next) this['timeline']['requestRender']?.();
       } else {
-        if (source['pose'] && Date['now']() / 0x3e8 - source['receivedAt'] > 0xa)
+        if (source['pose'] && Date['now']() / 1000 - source['receivedAt'] > 10)
           this['message'] = '等待手机操作；如已离线，请重新连接。';
       }
       const el = this['timeline']['getRoot']?.()?.['querySelector']('[data-mobile-status]');
@@ -155,7 +155,7 @@ export class DirectorMobileCamera {
       return;
     }
     if (target === this['epoch'])
-      this['timer'] = this['timeline']['window']['setTimeout'](() => void this['poll'](target), 0x64);
+      this['timer'] = this['timeline']['window']['setTimeout'](() => void this['poll'](target), 100);
   }
   ['preview']() {
     if (!this['camera'] || !this['pairing']) return;
@@ -173,11 +173,11 @@ export class DirectorMobileCamera {
     const start = this['recording'];
     this['recording'] = null;
     if (!start?.['frames']['length']) return;
-    const time2 = Math['min'](0xe10, start['start'] + (performance['now']() - start['clock']) / 0x3e8);
-    if (time2 - start['frames']['at'](-0x1)['time'] > 0.04)
+    const time2 = Math['min'](3600, start['start'] + (performance['now']() - start['clock']) / 1000);
+    if (time2 - start['frames']['at'](-1)['time'] > 0.04)
       start['frames']['push']({
         time: time2,
-        camera: structuredClone(this['camera'] || start['frames']['at'](-0x1)['camera']),
+        camera: structuredClone(this['camera'] || start['frames']['at'](-1)['camera']),
       });
     (this['timeline']['commitMutation']?.({
       type: 'director-mobile-record',
@@ -187,7 +187,7 @@ export class DirectorMobileCamera {
         const payload = record['scenes']['find']((handle) => handle['id'] === start['sceneId']),
           camera = payload?.['shots']['find']((state) => state['id'] === start['shotId']);
         if (!camera) return record;
-        const config = start['frames']['at'](-0x1)['time'];
+        const config = start['frames']['at'](-1)['time'];
         let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(camera['animation'], {
           camera: camera['camera'],
         });
@@ -212,7 +212,7 @@ export class DirectorMobileCamera {
             lookAtObjectId: '',
           }),
           (camera['animation'] = normalizeStoryboard3DShotAnimation(storyboard3DShotAnimation)),
-          (camera['camera'] = structuredClone(camera['animation']['cameraKeyframes'][0x0]['camera'])),
+          (camera['camera'] = structuredClone(camera['animation']['cameraKeyframes'][0]['camera'])),
           syncStoryboard3DCameraObjectFromShot(payload, camera),
           record
         );

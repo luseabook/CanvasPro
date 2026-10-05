@@ -724,7 +724,7 @@ export function __resetGenerationTaskRuntimeForTest() {
   activeTasks.clear();
 }
 
-let activeTaskSequence = 0x0;
+let activeTaskSequence = 0;
 
 function findActiveTaskContext(
   value28,
@@ -739,7 +739,7 @@ function findActiveTaskContext(
         (!storeLike || value30['store'] === storeLike) &&
         (!enabled13 || value30['taskCenterTaskId'] === enabled13),
     );
-  return value29['find']((value31) => isContextInFlight(value31)) || value29[0x0] || null;
+  return value29['find']((value31) => isContextInFlight(value31)) || value29[0] || null;
 }
 
 function normalizeCompletionFeedbackOutcome(value32, value33) {
@@ -966,14 +966,14 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
             ? 'pause-not-supported'
             : 'abort-unavailable',
   }));
-  if (value61['length'] > 0x0)
-    return { ok: ![], projectId: value59, activeCount: list4['length'], pausedCount: 0x0, blockers: value61 };
+  if (value61['length'] > 0)
+    return { ok: ![], projectId: value59, activeCount: list4['length'], pausedCount: 0, blockers: value61 };
   if (value60['dryRun'] === !![])
     return {
       ok: !![],
       projectId: value59,
       activeCount: list4['length'],
-      pausedCount: 0x0,
+      pausedCount: 0,
       blockers: [],
       pausedTasks: [],
     };
@@ -986,8 +986,8 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
         taskType: value64['taskType'],
       }));
   });
-  const value65 = Math['max'](0x64, Number(value60['timeoutMs']) || 0xbb8);
-  if (list4['length'] > 0x0) {
+  const value65 = Math['max'](100, Number(value60['timeoutMs']) || 3000);
+  if (list4['length'] > 0) {
     let setTimeout2 = null;
     const value66 = new Promise((handler3) => {
         ((setTimeout2 = setTimeout(() => handler3(![]), value65)), setTimeout2?.['unref']?.());
@@ -1006,7 +1006,7 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
         blockers: list5['map']((args23) => ({ ...args23, reason: 'pause-timeout' })),
         pausedTasks: list5,
       };
-    await new Promise((value68) => setTimeout(value68, 0x0));
+    await new Promise((value68) => setTimeout(value68, 0));
   }
   return {
     ok: !![],
@@ -1038,7 +1038,7 @@ export function handoffActiveGenerationTasks({
   mirrorTaskState: mirrorTaskState = null,
 } = {}) {
   const enabled19 = String(taskScopeId || '')['trim']();
-  if (!targetStore2 || !enabled19) return { ok: ![], movedCount: 0x0, taskScopeId: enabled19 };
+  if (!targetStore2 || !enabled19) return { ok: ![], movedCount: 0, taskScopeId: enabled19 };
   const value74 = Array['from'](activeTasks['values']())['filter'](
     (value75) => isContextInFlight(value75) && value75['store'] === sourceStore,
   );

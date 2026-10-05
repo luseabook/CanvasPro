@@ -27,13 +27,13 @@ export {
 } from './gltfImportAdapter.js';
 export const STORYBOARD_3D_MODEL_FORMATS = Object['freeze'](Object['keys'](MODEL_FORMATS));
 export const STORYBOARD_3D_MODEL_ACCEPT = '.glb,.gltf,.fbx,.obj,.stl';
-export const DEFAULT_MODEL_IMPORT_MAX_BYTES = 0x100 * 0x400 * 0x400;
+export const DEFAULT_MODEL_IMPORT_MAX_BYTES = 256 * 1024 * 1024;
 function extensionOf(value) {
   const item = String(value || '')
     ['trim']()
     ['toLowerCase']()
     ['match'](/\.([a-z0-9]+)$/);
-  return item?.[0x1] || '';
+  return item?.[1] || '';
 }
 export function detectStoryboard3DModelFormat(error) {
   const extensionOf2 = extensionOf(error?.['name'] || error?.['fileName']);
@@ -42,7 +42,7 @@ export function detectStoryboard3DModelFormat(error) {
       ['trim']()
       ['toLowerCase'](),
     list = Object['entries'](MODEL_FORMATS)['filter'](([, index]) => index['mimeTypes']['includes'](key));
-  return list['length'] === 0x1 ? list[0x0][0x0] : '';
+  return list['length'] === 1 ? list[0][0] : '';
 }
 export function validateStoryboard3DModelSource(
   error2,
@@ -55,38 +55,38 @@ export function validateStoryboard3DModelSource(
   if (!enabled) ok['push']({ code: 'MODEL_FILE_NAME_REQUIRED', message: '模型文件缺少名称。' });
   if (!format)
     ok['push']({ code: 'MODEL_FORMAT_UNSUPPORTED', message: '仅支持 GLB、GLTF、FBX、OBJ 和 STL。' });
-  if (!Number['isFinite'](count) || count <= 0x0)
+  if (!Number['isFinite'](count) || count <= 0)
     ok['push']({ code: 'MODEL_FILE_EMPTY', message: '模型文件为空。' });
   return (
     Number['isFinite'](count) &&
       count > maxBytes &&
       ok['push']({
         code: 'MODEL_FILE_TOO_LARGE',
-        message: '模型文件不能超过 ' + Math['round'](maxBytes / 0x400 / 0x400) + '\x20MB。',
+        message: '模型文件不能超过 ' + Math['round'](maxBytes / 1024 / 1024) + ' MB。',
       }),
     typeof error2?.['arrayBuffer'] !== 'function' &&
       ok['push']({ code: 'MODEL_FILE_UNREADABLE', message: '当前文件对象不可读取。' }),
-    { ok: ok['length'] === 0x0, format: format, errors: ok }
+    { ok: ok['length'] === 0, format: format, errors: ok }
   );
 }
-function ascii(list2, result = 0x0, data = list2['length']) {
+function ascii(list2, result = 0, data = list2['length']) {
   return new TextDecoder('utf-8', { fatal: ![] })['decode'](list2['subarray'](result, data));
 }
 function inspectGlb(options) {
-  if (options['byteLength'] < 0x14) return ![];
+  if (options['byteLength'] < 20) return ![];
   const dataView = new DataView(options['buffer'], options['byteOffset'], options['byteLength']),
-    target = dataView['getUint32'](0x8, !![]),
-    source = dataView['getUint32'](0xc, !![]);
+    target = dataView['getUint32'](8, !![]),
+    source = dataView['getUint32'](12, !![]);
   if (
-    dataView['getUint32'](0x0, !![]) !== 0x46546c67 ||
-    dataView['getUint32'](0x4, !![]) !== 0x2 ||
+    dataView['getUint32'](0, !![]) !== 0x46546c67 ||
+    dataView['getUint32'](4, !![]) !== 2 ||
     target !== options['byteLength'] ||
-    dataView['getUint32'](0x10, !![]) !== 0x4e4f534a ||
-    0x14 + source > options['byteLength']
+    dataView['getUint32'](16, !![]) !== 0x4e4f534a ||
+    20 + source > options['byteLength']
   )
     return ![];
   try {
-    const next = JSON['parse'](ascii(options, 0x14, 0x14 + source)['trim']());
+    const next = JSON['parse'](ascii(options, 20, 20 + source)['trim']());
     return String(next?.['asset']?.['version'] || '')['startsWith']('2');
   } catch {
     return ![];
@@ -101,20 +101,20 @@ function inspectGltf(current) {
   }
 }
 function inspectObj(list3) {
-  const ascii2 = ascii(list3, 0x0, Math['min'](list3['length'], 0x2 * 0x400 * 0x400));
+  const ascii2 = ascii(list3, 0, Math['min'](list3['length'], 2 * 1024 * 1024));
   return /^\s*v\s+[-+\d.]/m['test'](ascii2) && /^\s*f\s+\S+/m['test'](ascii2);
 }
 function inspectFbx(list4) {
-  const list5 = ascii(list4, 0x0, Math['min'](list4['length'], 0x400));
+  const list5 = ascii(list4, 0, Math['min'](list4['length'], 1024));
   return list5['startsWith']('Kaydara FBX Binary') || list5['includes']('FBXHeaderExtension');
 }
 function inspectStl(list6) {
-  if (list6['byteLength'] >= 0x54) {
+  if (list6['byteLength'] >= 84) {
     const dataView2 = new DataView(list6['buffer'], list6['byteOffset'], list6['byteLength']),
-      record = dataView2['getUint32'](0x50, !![]);
-    if (0x54 + record * 0x32 === list6['byteLength']) return !![];
+      record = dataView2['getUint32'](80, !![]);
+    if (84 + record * 50 === list6['byteLength']) return !![];
   }
-  const ascii3 = ascii(list6, 0x0, Math['min'](list6['length'], 0x1000));
+  const ascii3 = ascii(list6, 0, Math['min'](list6['length'], 4096));
   return /^\s*solid\b/i['test'](ascii3) && /\bfacet\s+normal\b/i['test'](ascii3);
 }
 export async function inspectStoryboard3DModelFile(payload, handle = {}) {
@@ -162,11 +162,11 @@ export function setStoryboard3DModelNormalization(enabled3, response) {
   return (
     (enabled3['userData'][STORYBOARD_3D_MODEL_NORMALIZATION_USER_DATA_KEY] = {
       status: 'ready',
-      uniformScale: Math['max'](0.000001, Number(response['uniformScale']) || 0x1),
+      uniformScale: Math['max'](0.000001, Number(response['uniformScale']) || 1),
       translation: {
-        x: Number(response['translation']?.['x']) || 0x0,
-        y: Number(response['translation']?.['y']) || 0x0,
-        z: Number(response['translation']?.['z']) || 0x0,
+        x: Number(response['translation']?.['x']) || 0,
+        y: Number(response['translation']?.['y']) || 0,
+        z: Number(response['translation']?.['z']) || 0,
       },
     }),
     enabled3
@@ -177,19 +177,19 @@ export function readStoryboard3DModelNormalization(input) {
   if (response2?.['status'] !== 'ready') return null;
   return {
     status: 'ready',
-    uniformScale: Math['max'](0.000001, Number(response2['uniformScale']) || 0x1),
+    uniformScale: Math['max'](0.000001, Number(response2['uniformScale']) || 1),
     translation: {
-      x: Number(response2['translation']?.['x']) || 0x0,
-      y: Number(response2['translation']?.['y']) || 0x0,
-      z: Number(response2['translation']?.['z']) || 0x0,
+      x: Number(response2['translation']?.['x']) || 0,
+      y: Number(response2['translation']?.['y']) || 0,
+      z: Number(response2['translation']?.['z']) || 0,
     },
   };
 }
-export function createStoryboard3DModelNormalizationPlan(output, { targetSize: targetSize = 0x2 } = {}) {
+export function createStoryboard3DModelNormalizationPlan(output, { targetSize: targetSize = 2 } = {}) {
   if (!finiteBounds(output))
     return {
       status: 'awaiting-bounds',
-      targetSize: Math['max'](0.1, Number(targetSize) || 0x2),
+      targetSize: Math['max'](0.1, Number(targetSize) || 2),
       operations: ['measure-bounds', 'uniform-scale', 'center-xz', 'place-on-ground'],
     };
   const min = {
@@ -203,21 +203,21 @@ export function createStoryboard3DModelNormalizationPlan(output, { targetSize: t
       z: Number(output['max']['z']),
     },
     size = {
-      x: Math['max'](0x0, max['x'] - min['x']),
-      y: Math['max'](0x0, max['y'] - min['y']),
-      z: Math['max'](0x0, max['z'] - min['z']),
+      x: Math['max'](0, max['x'] - min['x']),
+      y: Math['max'](0, max['y'] - min['y']),
+      z: Math['max'](0, max['z'] - min['z']),
     },
     count2 = Math['max'](size['x'], size['y'], size['z']);
-  if (count2 <= 1e-8) throw new Error('Model\x20bounds\x20have\x20no\x20measurable\x20size.');
-  const uniformScale = Math['max'](0.1, Number(targetSize) || 0x2) / count2;
+  if (count2 <= 1e-8) throw new Error('Model bounds have no measurable size.');
+  const uniformScale = Math['max'](0.1, Number(targetSize) || 2) / count2;
   return {
     status: 'ready',
-    targetSize: Math['max'](0.1, Number(targetSize) || 0x2),
+    targetSize: Math['max'](0.1, Number(targetSize) || 2),
     uniformScale: uniformScale,
     translation: {
-      x: -((min['x'] + max['x']) / 0x2) * uniformScale || 0x0,
-      y: -min['y'] * uniformScale || 0x0,
-      z: -((min['z'] + max['z']) / 0x2) * uniformScale || 0x0,
+      x: -((min['x'] + max['x']) / 2) * uniformScale || 0,
+      y: -min['y'] * uniformScale || 0,
+      z: -((min['z'] + max['z']) / 2) * uniformScale || 0,
     },
     sourceBounds: { min: min, max: max, size: size },
     operations: ['uniform-scale', 'center-xz', 'place-on-ground'],
@@ -228,7 +228,7 @@ export async function importStoryboard3DModelFile(
   {
     parsers: parsers = {},
     relatedFiles: relatedFiles = [],
-    targetSize: targetSize = 0x2,
+    targetSize: targetSize = 2,
     maxBytes: maxBytes = DEFAULT_MODEL_IMPORT_MAX_BYTES,
     signal: signal,
     onProgress: onProgress,
@@ -236,14 +236,14 @@ export async function importStoryboard3DModelFile(
 ) {
   const format3 = await inspectStoryboard3DModelFile(value2, { maxBytes: maxBytes });
   if (!format3['ok']) {
-    const error3 = new Error(format3['errors']['map']((error4) => error4['message'])['join']('\x20'));
-    ((error3['code'] = format3['errors'][0x0]?.['code'] || 'MODEL_IMPORT_INVALID'),
+    const error3 = new Error(format3['errors']['map']((error4) => error4['message'])['join'](' '));
+    ((error3['code'] = format3['errors'][0]?.['code'] || 'MODEL_IMPORT_INVALID'),
       (error3['details'] = format3));
     throw error3;
   }
   const run = parsers[format3['parserId']] || parsers[format3['format']];
   if (typeof run !== 'function') {
-    const error5 = new Error('缺少 ' + format3['format']['toUpperCase']() + '\x20模型解析器。');
+    const error5 = new Error('缺少 ' + format3['format']['toUpperCase']() + ' 模型解析器。');
     ((error5['code'] = 'MODEL_PARSER_UNAVAILABLE'), (error5['format'] = format3['format']));
     throw error5;
   }
@@ -262,14 +262,14 @@ export function createStoryboard3DModelResourceMap(list7 = []) {
   const map = new Map();
   for (const error6 of list7) {
     const value3 = String(error6?.['webkitRelativePath'] || error6?.['name'] || '')['replaceAll'](
-        '\x5c',
+        '\\',
         '/',
       ),
       enabled4 = value3['split']('/')
         ['filter']((value4) => value4 && value4 !== '.' && value4 !== '..')
         ['join']('/');
     if (!enabled4) continue;
-    (map['set'](enabled4, error6), map['set'](enabled4['split']('/')['at'](-0x1), error6));
+    (map['set'](enabled4, error6), map['set'](enabled4['split']('/')['at'](-1), error6));
   }
   return map;
 }

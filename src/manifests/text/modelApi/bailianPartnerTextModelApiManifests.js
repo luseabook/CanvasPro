@@ -1,10 +1,10 @@
 import { BAILIAN_TEXT_OUTPUT_TOKENS_FIELD } from './bailianTextModelApiManifests.js';
 const MODELS = [
-    { model: 'deepseek-v4-pro', title: 'DeepSeek\x20V4\x20Pro' },
+    { model: 'deepseek-v4-pro', title: 'DeepSeek V4 Pro' },
     { model: 'deepseek-v4-pro-0813', title: 'DeepSeek V4 Pro 0813', lowEffort: !![] },
     { model: 'deepseek-v4-flash', title: 'DeepSeek V4 Flash' },
     { model: 'deepseek-v4-flash-0731', title: 'DeepSeek V4 Flash 0731', lowEffort: !![] },
-    { model: 'kimi-k3', title: 'Kimi\x20K3', image: !![] },
+    { model: 'kimi-k3', title: 'Kimi K3', image: !![] },
   ],
   executionId = (value) => 'bailian.model-api.text.' + value + '.v1',
   responseMapping = { resultPaths: ['choices[].message.content'] };
@@ -21,8 +21,8 @@ export const bailianPartnerTextModelManifests = Object['freeze'](
     description: image ? '百炼官方 · 图文理解 · 仅思考模式' : '百炼官方 · 文本推理',
     inputSlots: {
       allowedKinds: image ? ['text', 'image'] : ['text'],
-      minByKind: { text: 0x0 },
-      maxByKind: { image: image ? 0x8 : 0x0, video: 0x0, audio: 0x0 },
+      minByKind: { text: 0 },
+      maxByKind: { image: image ? 8 : 0, video: 0, audio: 0 },
     },
     uiSchema: {
       fields: [

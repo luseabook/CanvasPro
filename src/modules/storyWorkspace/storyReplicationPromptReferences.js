@@ -1,28 +1,28 @@
 import { protectStoryPromptPills } from './storyClipPromptReferences.js';
 import { normalizeStoryPromptMode } from './storyPromptModes.js';
 const text = (value) => String(value ?? '')['trim'](),
-  escapeRegExp = (item) => item['replace'](/[.*+?^${}()|[\]\\]/gu, '\x5c$&'),
+  escapeRegExp = (item) => item['replace'](/[.*+?^${}()|[\]\\]/gu, '\\$&'),
   ref = (key) => text(key?.['planningRef'] || key?.['ref'] || key?.['id']),
   matchesRef = (index, result) => [text(index?.['id']), ref(index)]['includes'](text(result)),
   mention = (data, options) =>
-    '@' + text(data['name']) + (text(options?.['name']) ? '\x20·\x20' + text(options['name']) : '');
+    '@' + text(data['name']) + (text(options?.['name']) ? ' · ' + text(options['name']) : '');
 function compactCharacterReferenceHeaders(target, source) {
   const args = new Map(),
     next = 'character-reference-header';
   for (const { asset: asset, appearance: appearance, token: token } of source) {
     if (asset['kind'] !== 'character') continue;
     const regExp = new RegExp(
-      '(^|\x5cn|<div>|<p>|<br\x5cs*/?>)' + escapeRegExp(token) + '：人物外观、发型和服装以该参考图为准。',
+      '(^|\\n|<div>|<p>|<br\\s*/?>)' + escapeRegExp(token) + '：人物外观、发型和服装以该参考图为准。',
       'gu',
     );
     target = target['replace'](regExp, (current, entry) => {
-      const record = args['size'] === 0x0;
+      const record = args['size'] === 0;
       return (args['set'](asset['id'] + ':' + appearance['id'], token), entry + (record ? next : ''));
     });
   }
   return target['replace'](
     next,
-    '人物形象、发型与服装分别参考\x20' + [...args['values']()]['join']('、') + '。',
+    '人物形象、发型与服装分别参考 ' + [...args['values']()]['join']('、') + '。',
   );
 }
 function compactSeedanceReplicationLines(payload, handle, state) {
@@ -31,19 +31,19 @@ function compactSeedanceReplicationLines(payload, handle, state) {
         config = config['split'](scope['token'])['join'](mention(scope['asset'], scope['appearance']));
       return config['trim']();
     },
-    input = payload['split']('\x0a'),
+    input = payload['split']('\n'),
     count = input['findIndex']((output) => output['startsWith']('人物站位：')),
     value2 = input['findIndex']((value3) => /^分镜1\b/u['test'](value3));
-  if (count >= 0x0 && value2 > count) {
+  if (count >= 0 && value2 > count) {
     const value4 = input[count]['slice']('人物站位：'['length']);
     (!run(input[value2])['includes'](run(value4)) &&
-      (input[value2] = input[value2]['replace']('：', '：' + value4 + '\x20')),
+      (input[value2] = input[value2]['replace']('：', '：' + value4 + ' ')),
       (input[count] = ''));
   }
-  let value5 = -0x1;
+  let value5 = -1;
   return input['map']((value6) => {
-    const value7 = value6['match'](/^分镜(\d+)\b/u)?.[0x1];
-    if (value7) value5 = Number(value7) - 0x1;
+    const value7 = value6['match'](/^分镜(\d+)\b/u)?.[1];
+    if (value7) value5 = Number(value7) - 1;
     if (
       state['shots']?.[value5]?.['dialogue'] &&
       /^音效：(?:人声对话|激动的人声对话)[。.]?$/u['test'](value6)
@@ -64,21 +64,21 @@ function compactSeedanceReplicationLines(payload, handle, state) {
       );
   })
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function getStoryReplicationCharacterDisplayLabel(enabled, value11, value12 = []) {
   if (enabled?.['kind'] !== 'character' || !enabled['replicationSource']) return '';
   const value13 = value12['filter']((value14) => value14['kind'] === 'character'),
     count2 = value13['findIndex']((value15) => value15['id'] === enabled['id']);
-  if (count2 < 0x0) return '';
+  if (count2 < 0) return '';
   const list = enabled['appearances'] || [],
     value16 = list['findIndex']((value17) => value17['id'] === value11?.['id']);
   return (
     '角色' +
-    (count2 + 0x1) +
+    (count2 + 1) +
     ' · ' +
     (value11?.['sourceOrigin'] === 'library' ? '替换形象' : '参考形象') +
-    (list['length'] > 0x1 ? value16 + 0x1 : '')
+    (list['length'] > 1 ? value16 + 1 : '')
   );
 }
 function selectedCharacters(value18, value19) {
@@ -86,12 +86,12 @@ function selectedCharacters(value18, value19) {
   for (const value20 of value18) {
     for (const value21 of value20['assetUsages'] || []) {
       const value22 = value19['filter']((value23) => matchesRef(value23, value21['assetRef'])),
-        value24 = value22['length'] === 0x1 ? value22[0x0] : null;
+        value24 = value22['length'] === 1 ? value22[0] : null;
       if (value24?.['kind'] !== 'character') continue;
       const value25 = value24['appearances'] || [],
         enabled2 = value21['appearanceRef']
           ? value25['find']((value26) => matchesRef(value26, value21['appearanceRef']))
-          : value25['find']((value27) => value27['id'] === value24['baseAppearanceId']) || value25[0x0];
+          : value25['find']((value27) => value27['id'] === value24['baseAppearanceId']) || value25[0];
       if (!enabled2) continue;
       const enabled3 = map['get'](value24['id']);
       if (!enabled3) map['set'](value24['id'], { asset: value24, appearance: enabled2 });
@@ -135,8 +135,8 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
   const list3 = [],
     map2 = new Map(
       [...args2['matchAll'](/((?:<|&lt;)Subject \d+(?:>|&gt;)) 是角色 ([^，\n]+)，/gu)]['map']((value37) => [
-        value37[0x2],
-        value37[0x1],
+        value37[2],
+        value37[1],
       ]),
     );
   args2 = args2['replace'](/((?:<|&lt;)Subject \d+(?:>|&gt;)) 是角色 [^，\n]+，/gu, '$1 是人物参考，');
@@ -150,11 +150,11 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
   for (const value42 of protectStoryPromptPills2['pills']) {
     const args4 = list2['find'](({ asset: asset2, appearance: appearance2 }) =>
       value42['html']['includes'](
-        'data-asset-id=\x22story-asset:' +
+        'data-asset-id="story-asset:' +
           encodeURIComponent(asset2['id']) +
           ':' +
           encodeURIComponent(appearance2['id']) +
-          '\x22',
+          '"',
       ),
     );
     if (args4) list3['push']({ ...args4, token: value42['token'] });
@@ -184,21 +184,21 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
     (value48, list6, value49) => {
       const enabled4 = value49['match'](/^([^：:]+)[：:]([\s\S]*)$/u);
       if (!enabled4) return list6 + handler(value48['slice'](list6['length']));
-      const value50 = enabled4[0x1]['trim'](),
+      const value50 = enabled4[1]['trim'](),
         value51 = value50['match'](/^(旁白|内心独白|独白|解说|画外音)[（(]([^）)]+)[）)]$/u),
-        value52 = value51 ? value51[0x2]['trim']() : value50,
+        value52 = value51 ? value51[2]['trim']() : value50,
         value53 = value31['filter'](
           (value54) =>
             value54['kind'] === 'character' &&
             [text(value54['name']), text(value54['replicationSource']?.['name'])]['includes'](value52),
         );
-      if (value53['length'] !== 0x1) return list6 + handler(value48['slice'](list6['length']));
-      const value55 = value53[0x0],
+      if (value53['length'] !== 1) return list6 + handler(value48['slice'](list6['length']));
+      const value55 = value53[0],
         edCharacters = selectedCharacters(value30['shots'] || [], value31)['find'](
           (value56) => value56['asset']['id'] === value55['id'],
         ),
         value57 = value55['appearances'] || [],
-        enabled5 = edCharacters?.['appearance'] || (value57['length'] === 0x1 ? value57[0x0] : null);
+        enabled5 = edCharacters?.['appearance'] || (value57['length'] === 1 ? value57[0] : null);
       if (!enabled5) return list6 + handler(value48['slice'](list6['length']));
       const value58 = list3['find'](
           (value59) =>
@@ -209,11 +209,11 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
       return (
         list6 +
         '画外音：' +
-        (value51?.[0x1] || '旁白') +
+        (value51?.[1] || '旁白') +
         '（' +
         value60 +
         '，该旁白不驱动口型）：' +
-        handler(enabled4[0x2])
+        handler(enabled4[2])
       );
     },
   )),
@@ -238,19 +238,19 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
   if (storyPromptMode) args2 = compactSeedanceReplicationLines(args2, list3, value30);
   const edCharacters2 = selectedCharacters(value72, value31);
   let args5 = edCharacters2;
-  args2 = args2['split']('\x0a')
+  args2 = args2['split']('\n')
     ['map']((value73) => {
       const value74 = value73['replace'](/\uE002replication-text-(\d+)\uE003/gu, (value75, value76) =>
           value32[value76]?.['content']['startsWith']('<') ? '' : value75,
         ),
-        value77 = value74['match'](/^(?:分镜|镜头|\[Shot )(\d+)/u)?.[0x1];
-      if (value77) args5 = selectedCharacters([value72[Number(value77) - 0x1] || {}], value31);
+        value77 = value74['match'](/^(?:分镜|镜头|\[Shot )(\d+)/u)?.[1];
+      if (value77) args5 = selectedCharacters([value72[Number(value77) - 1] || {}], value31);
       else {
-        const value78 = value74['match'](/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)秒：/u)?.[0x1];
+        const value78 = value74['match'](/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)秒：/u)?.[1];
         if (value78 != null)
           args5 = selectedCharacters(
             value72['filter'](
-              (value79) => Number(Number(value79['startSec'])['toFixed'](0x1)) === Number(value78),
+              (value79) => Number(Number(value79['startSec'])['toFixed'](1)) === Number(value78),
             ),
             value31,
           );
@@ -285,7 +285,7 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
       return value73['replace'](
         new RegExp(enabled7['map'](escapeRegExp)['join']('|'), 'gu'),
         (value84, value85) => {
-          if (value73[value85 - 0x1] === '@') return value84;
+          if (value73[value85 - 1] === '@') return value84;
           const enabled8 = map3['get'](value84);
           if (!enabled8) return value84;
           if (map2['has'](value84)) return map2['get'](value84);
@@ -299,7 +299,7 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
         },
       );
     })
-    ['join']('\x0a');
+    ['join']('\n');
   for (const { token: token4, content: content } of value32['reverse']())
     args2 = args2['split'](token4)['join'](content);
   return protectStoryPromptPills2['restore'](args2);

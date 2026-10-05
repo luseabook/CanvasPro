@@ -1,12 +1,12 @@
 function nodeKey(el) {
-  if (el['nodeType'] === 0x3 && !el['nodeValue']['trim']()) {
+  if (el['nodeType'] === 3 && !el['nodeValue']['trim']()) {
     let enabled = el['nextSibling'];
-    while (enabled?.['nodeType'] === 0x3 && !enabled['nodeValue']['trim']()) enabled = enabled['nextSibling'];
+    while (enabled?.['nodeType'] === 3 && !enabled['nodeValue']['trim']()) enabled = enabled['nextSibling'];
     return 'space:' + (enabled ? nodeKey(enabled) : 'end');
   }
-  if (el['nodeType'] !== 0x1) return String(el['nodeType']);
+  if (el['nodeType'] !== 1) return String(el['nodeType']);
   if (el['matches']('.story-asset-card-shell')) {
-    const el2 = el['querySelector'](':scope\x20>\x20[data-story-asset-id]');
+    const el2 = el['querySelector'](':scope > [data-story-asset-id]');
     if (el2) return el['tagName'] + ':shell:' + el2['dataset']['storyAssetId'];
   }
   const value = el['dataset'] || {},
@@ -36,7 +36,7 @@ export function reconcilePersonReplacementStableDom(
 ) {
   const run = (el3, args) => {
     if (preserveSelector && el3['matches']?.(preserveSelector) && args['matches']?.(preserveSelector)) return;
-    if (el3['nodeType'] !== 0x1) {
+    if (el3['nodeType'] !== 1) {
       if (el3['nodeValue'] !== args['nodeValue']) el3['nodeValue'] = args['nodeValue'];
       return;
     }

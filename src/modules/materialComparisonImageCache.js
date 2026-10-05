@@ -2,24 +2,24 @@ import { resolveCanvasImageSourceUrl } from '../services/canvasMediaLocalService
 import { firstNonEmpty } from '../utils/validators.js';
 const caches = new WeakMap();
 export function getComparisonOriginalKey(value) {
-  const item = Array['isArray'](value?.['images']) ? value['images'][value['mainImageIndex'] || 0x0] : null,
+  const item = Array['isArray'](value?.['images']) ? value['images'][value['mainImageIndex'] || 0] : null,
     nonEmpty = firstNonEmpty(item?.['sourceId'], value?.['sourceId']),
     canvasImageSourceUrl = resolveCanvasImageSourceUrl(item) || resolveCanvasImageSourceUrl(value);
   return nonEmpty || canvasImageSourceUrl ? JSON['stringify']([nonEmpty, canvasImageSourceUrl]) : '';
 }
 export function createComparisonImageCache({
-  maxBytes: maxBytes = 0x100 * 0x400 * 0x400,
-  maxEntries: maxEntries = 0x4,
-  ttlMs: ttlMs = 0x1d4c0,
+  maxBytes: maxBytes = 256 * 1024 * 1024,
+  maxEntries: maxEntries = 4,
+  ttlMs: ttlMs = 120000,
   now: now = Date['now'],
   schedule: schedule = setTimeout,
   cancel: cancel = clearTimeout,
   revoke: revoke = (key) => URL['revokeObjectURL'](key),
 } = {}) {
   const map = new Map();
-  let index = 0x0,
+  let index = 0,
     timer = null,
-    result = 0x0;
+    result = 0;
   function run(data, options = '') {
     const response = map['get'](data);
     if (!response) return;
@@ -40,7 +40,7 @@ export function createComparisonImageCache({
       () => {
         (run2(), run3());
       },
-      Math['max'](0x1, next - now()),
+      Math['max'](1, next - now()),
     )),
       timer?.['unref']?.());
   }
@@ -61,16 +61,16 @@ export function createComparisonImageCache({
     },
     put(enabled, args, handle = result) {
       const { image: image, url: url } = args,
-        bytes = Number(image?.['naturalWidth']) * Number(image?.['naturalHeight']) * 0x4;
+        bytes = Number(image?.['naturalWidth']) * Number(image?.['naturalHeight']) * 4;
       if (
         handle !== result ||
         !enabled ||
         !url ||
         !image?.['complete'] ||
         !Number['isFinite'](bytes) ||
-        bytes <= 0x0 ||
+        bytes <= 0 ||
         bytes > maxBytes ||
-        maxEntries < 0x1
+        maxEntries < 1
       )
         return ![];
       run2();

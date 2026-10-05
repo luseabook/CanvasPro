@@ -1,6 +1,6 @@
 import { desktopBridge } from '../../services/desktopBridge.js';
 import { t } from '../../i18n/index.js';
-let revision = 0x0,
+let revision = 0,
   lastFailure = '',
   syncQueue = Promise['resolve']();
 export function syncNotificationShortcut(keys) {

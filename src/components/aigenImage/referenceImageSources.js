@@ -79,11 +79,11 @@ function appendImageIdentityFields(record, payload, handle = {}) {
 
 function hashRefImageVersionKey(config = '') {
   const identityPart2 = normalizeIdentityPart(config);
-  let scope = 0x1505;
-  for (let input = 0x0; input < identityPart2['length']; input += 0x1) {
-    ((scope = ((scope << 0x5) + scope) ^ identityPart2['charCodeAt'](input)), (scope >>>= 0x0));
+  let scope = 5381;
+  for (let input = 0; input < identityPart2['length']; input += 1) {
+    ((scope = ((scope << 5) + scope) ^ identityPart2['charCodeAt'](input)), (scope >>>= 0));
   }
-  return scope['toString'](0x24);
+  return scope['toString'](36);
 }
 
 export function resolveRefImageMediaIdentityKey(output, value2 = {}) {
@@ -108,7 +108,7 @@ export function versionRefImageUrl(value3 = '', value4 = '') {
   if (!enabled3 || !identityPart3) return enabled3;
   if (/^(?:blob:|data:)/i['test'](enabled3)) return enabled3;
   if (!enabled3['startsWith']('/')) return enabled3;
-  const [value5, value6 = ''] = enabled3['split']('#', 0x2),
+  const [value5, value6 = ''] = enabled3['split']('#', 2),
     value7 = value5['includes']('?') ? '&' : '?',
     hashRefImageVersionKey2 = hashRefImageVersionKey(identityPart3);
   return '' + value5 + value7 + 'aicv=' + hashRefImageVersionKey2 + (value6 ? '#' + value6 : '');

@@ -67,7 +67,7 @@ test("getProviderApiKeyFieldIds normalizes provider aliases and prioritizes mode
 
 test("inferProviderIdFromApiKeyMessage recognizes explicit and provider-specific messages", () => {
   assert.equal(
-    inferProviderIdFromApiKeyMessage("\u5382\u5546: agnes API Key 未配置"),
+    inferProviderIdFromApiKeyMessage("厂商: agnes API Key 未配置"),
     "agnes",
   );
   assert.equal(
@@ -110,7 +110,7 @@ test("isApiKeyMissingMessage accepts English and Chinese configuration prompts",
   );
   assert.equal(
     isApiKeyMissingMessage(
-      "\u8bf7\u5148\u5728\u8bbe\u7f6e\u4e2d\u586b\u5199 API Key",
+      "请先在设置中填写 API Key",
     ),
     true,
   );
@@ -151,7 +151,7 @@ test("showProviderApiKeyMissingToast forwards message, type, duration, and actio
       assert.equal(calls[0][0], "Custom message");
       assert.equal(calls[0][1], "error");
       assert.equal(calls[0][2], 1234);
-      assert.equal(calls[0][3].actionLabel, "\u53bb\u8bbe\u7f6e");
+      assert.equal(calls[0][3].actionLabel, "去设置");
       assert.equal(typeof calls[0][3].onAction, "function");
     },
   );
@@ -170,7 +170,7 @@ test("showProviderApiKeyMissingToast uses defaults and opens settings without to
     },
     () => {
       showProviderApiKeyMissingToast("");
-      assert.equal(calls[0][0], "\u8bf7\u5148\u586b\u5199 API Key");
+      assert.equal(calls[0][0], "请先填写 API Key");
       assert.equal(calls[0][1], "warn");
     },
   );

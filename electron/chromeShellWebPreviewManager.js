@@ -1,15 +1,15 @@
-const MAX_EVENT_QUEUE_SIZE = 0xa0,
-  MIN_VIEWPORT_WIDTH = 0x140,
-  MIN_VIEWPORT_HEIGHT = 0xb4,
-  MAX_VIEWPORT_WIDTH = 0x780,
-  MAX_VIEWPORT_HEIGHT = 0x4b0,
-  SNAPSHOT_QUALITY = 0x48,
-  SCREENCAST_QUALITY = 0x3a,
-  SCREENCAST_MAX_WIDTH = 0x500,
-  SCREENCAST_MAX_HEIGHT = 0x320,
-  SCREENCAST_MIN_FRAME_INTERVAL_MS = 0x18,
-  EVENT_WAIT_MIN_MS = 0x32,
-  EVENT_WAIT_MAX_MS = 0x1388;
+const MAX_EVENT_QUEUE_SIZE = 160,
+  MIN_VIEWPORT_WIDTH = 320,
+  MIN_VIEWPORT_HEIGHT = 180,
+  MAX_VIEWPORT_WIDTH = 1920,
+  MAX_VIEWPORT_HEIGHT = 1200,
+  SNAPSHOT_QUALITY = 72,
+  SCREENCAST_QUALITY = 58,
+  SCREENCAST_MAX_WIDTH = 1280,
+  SCREENCAST_MAX_HEIGHT = 800,
+  SCREENCAST_MIN_FRAME_INTERVAL_MS = 24,
+  EVENT_WAIT_MIN_MS = 50,
+  EVENT_WAIT_MAX_MS = 5000;
 function clampNumber(value, min, max, fallback) {
   const numeric = Number(value);
   if (!Number['isFinite'](numeric)) return fallback;
@@ -34,13 +34,13 @@ function toEntryKey(nodeId, tabId) {
   return normalizeNodeId(nodeId) + '\x00' + normalizeTabId(tabId);
 }
 function normalizeViewport(viewport = {}) {
-  const zoomFactor = Math['max'](0.05, Number(viewport?.['zoomFactor']) || 0x1),
+  const zoomFactor = Math['max'](0.05, Number(viewport?.['zoomFactor']) || 1),
     bounds = viewport?.['bounds'] && typeof viewport['bounds'] === 'object' ? viewport['bounds'] : {},
-    visualWidth = clampNumber(bounds['width'], 0x1, MAX_VIEWPORT_WIDTH, 0x3c0),
-    visualHeight = clampNumber(bounds['height'], 0x1, MAX_VIEWPORT_HEIGHT, 0x258);
+    visualWidth = clampNumber(bounds['width'], 1, MAX_VIEWPORT_WIDTH, 960),
+    visualHeight = clampNumber(bounds['height'], 1, MAX_VIEWPORT_HEIGHT, 600);
   return {
-    width: clampNumber(visualWidth / zoomFactor, MIN_VIEWPORT_WIDTH, MAX_VIEWPORT_WIDTH, 0x3c0),
-    height: clampNumber(visualHeight / zoomFactor, MIN_VIEWPORT_HEIGHT, MAX_VIEWPORT_HEIGHT, 0x258),
+    width: clampNumber(visualWidth / zoomFactor, MIN_VIEWPORT_WIDTH, MAX_VIEWPORT_WIDTH, 960),
+    height: clampNumber(visualHeight / zoomFactor, MIN_VIEWPORT_HEIGHT, MAX_VIEWPORT_HEIGHT, 600),
     visualWidth: visualWidth,
     visualHeight: visualHeight,
     zoomFactor: zoomFactor,
@@ -51,18 +51,18 @@ function createReferenceSnapshotExpression() {
 }
 function normalizeInputModifiers(input = {}) {
   return (
-    (input['altKey'] ? 0x1 : 0x0) |
-    (input['ctrlKey'] ? 0x2 : 0x0) |
-    (input['metaKey'] ? 0x4 : 0x0) |
-    (input['shiftKey'] ? 0x8 : 0x0)
+    (input['altKey'] ? 1 : 0) |
+    (input['ctrlKey'] ? 2 : 0) |
+    (input['metaKey'] ? 4 : 0) |
+    (input['shiftKey'] ? 8 : 0)
   );
 }
 function normalizeMouseButton(button) {
-  if (button === 0x0 || button === 'left') return 'left';
-  if (button === 0x1 || button === 'middle') return 'middle';
-  if (button === 0x2 || button === 'right') return 'right';
-  if (button === 0x3 || button === 'back') return 'back';
-  if (button === 0x4 || button === 'forward') return 'forward';
+  if (button === 0 || button === 'left') return 'left';
+  if (button === 1 || button === 'middle') return 'middle';
+  if (button === 2 || button === 'right') return 'right';
+  if (button === 3 || button === 'back') return 'back';
+  if (button === 4 || button === 'forward') return 'forward';
   return 'none';
 }
 export function createChromeShellWebPreviewManager({
@@ -77,13 +77,13 @@ export function createChromeShellWebPreviewManager({
     sessionEntries = new Map(),
     eventQueue = [],
     waiters = new Set();
-  let eventSequence = 0x0,
+  let eventSequence = 0,
     disposed = ![];
   function drainEvents() {
-    return eventQueue['splice'](0x0, eventQueue['length']);
+    return eventQueue['splice'](0, eventQueue['length']);
   }
   function settleWaiters() {
-    if (eventQueue['length'] === 0x0 || waiters['size'] === 0x0) return;
+    if (eventQueue['length'] === 0 || waiters['size'] === 0) return;
     const waiter = waiters['values']()['next']()['value'];
     waiters['delete'](waiter);
     if (waiter['timer']) clearTimeoutFn(waiter['timer']);
@@ -93,12 +93,12 @@ export function createChromeShellWebPreviewManager({
     const id = normalizeNodeId(nodeId),
       tab = normalizeTabId(tabId);
     if (payload?.['type'] === 'snapshot')
-      for (let index = eventQueue['length'] - 0x1; index >= 0x0; index -= 0x1) {
+      for (let index = eventQueue['length'] - 1; index >= 0; index -= 1) {
         const queued = eventQueue[index];
         queued?.['type'] === 'snapshot' &&
           queued['nodeId'] === id &&
           queued['tabId'] === tab &&
-          eventQueue['splice'](index, 0x1);
+          eventQueue['splice'](index, 1);
       }
     eventQueue['push']({
       nodeId: id,
@@ -142,7 +142,7 @@ export function createChromeShellWebPreviewManager({
       (entry['viewportHeight'] = viewport['height']),
       await client['send'](
         'Emulation.setDeviceMetricsOverride',
-        { width: viewport['width'], height: viewport['height'], deviceScaleFactor: 0x1, mobile: ![] },
+        { width: viewport['width'], height: viewport['height'], deviceScaleFactor: 1, mobile: ![] },
         entry['sessionId'],
       ),
       !![]
@@ -153,8 +153,8 @@ export function createChromeShellWebPreviewManager({
     try {
       const history = await client['send']('Page.getNavigationHistory', {}, entry['sessionId']),
         entries = Array['isArray'](history?.['entries']) ? history['entries'] : [],
-        currentIndex = Math['max'](0x0, Number(history?.['currentIndex']) || 0x0);
-      return { canGoBack: currentIndex > 0x0, canGoForward: currentIndex < entries['length'] - 0x1 };
+        currentIndex = Math['max'](0, Number(history?.['currentIndex']) || 0);
+      return { canGoBack: currentIndex > 0, canGoForward: currentIndex < entries['length'] - 1 };
     } catch {
       return { canGoBack: ![], canGoForward: ![] };
     }
@@ -205,9 +205,9 @@ export function createChromeShellWebPreviewManager({
             surfaceMode: 'remote-snapshot',
             dataUrl: 'data:' + mimeType + ';base64,' + data,
             freezeToken: 'ready',
-            width: entry['visualWidth'] || entry['viewportWidth'] || 0x0,
-            height: entry['visualHeight'] || entry['viewportHeight'] || 0x0,
-            zoomFactor: entry['zoomFactor'] || 0x1,
+            width: entry['visualWidth'] || entry['viewportWidth'] || 0,
+            height: entry['visualHeight'] || entry['viewportHeight'] || 0,
+            zoomFactor: entry['zoomFactor'] || 1,
           },
           entry['tabId'],
         ),
@@ -217,7 +217,7 @@ export function createChromeShellWebPreviewManager({
       return (
         logFailure(
           'chrome_web_preview.snapshot_failed',
-          'Chrome\x20browser\x20node\x20snapshot\x20failed',
+          'Chrome browser node snapshot failed',
           error,
           entry,
         ),
@@ -228,7 +228,7 @@ export function createChromeShellWebPreviewManager({
         entry['captureQueued'] && ((entry['captureQueued'] = ![]), void captureSnapshot(entry)));
     }
   }
-  function scheduleSnapshot(entry, delayMs = 0x5a) {
+  function scheduleSnapshot(entry, delayMs = 90) {
     if (!entry || entry['disposing']) return;
     if (entry['screencastActive']) return;
     if (entry['inputCaptureTimer']) clearTimeoutFn(entry['inputCaptureTimer']);
@@ -236,7 +236,7 @@ export function createChromeShellWebPreviewManager({
       () => {
         ((entry['inputCaptureTimer'] = null), void captureSnapshot(entry));
       },
-      Math['max'](0x0, Number(delayMs) || 0x0),
+      Math['max'](0, Number(delayMs) || 0),
     );
   }
   function shouldStream(entry) {
@@ -253,9 +253,9 @@ export function createChromeShellWebPreviewManager({
     return {
       format: 'jpeg',
       quality: SCREENCAST_QUALITY,
-      maxWidth: Math['min'](SCREENCAST_MAX_WIDTH, Math['max'](0x1, entry['viewportWidth'] || 0x1)),
-      maxHeight: Math['min'](SCREENCAST_MAX_HEIGHT, Math['max'](0x1, entry['viewportHeight'] || 0x1)),
-      everyNthFrame: 0x1,
+      maxWidth: Math['min'](SCREENCAST_MAX_WIDTH, Math['max'](1, entry['viewportWidth'] || 1)),
+      maxHeight: Math['min'](SCREENCAST_MAX_HEIGHT, Math['max'](1, entry['viewportHeight'] || 1)),
+      everyNthFrame: 1,
     };
   }
   async function reconcileScreencast(entry, { restart: restart = ![] } = {}) {
@@ -294,7 +294,7 @@ export function createChromeShellWebPreviewManager({
                   entry['sessionId'],
                 ),
                 (entry['screencastActive'] = !![]),
-                (entry['lastScreencastEmitAt'] = 0x0));
+                (entry['lastScreencastEmitAt'] = 0));
             } catch (error) {
               ((entry['screencastUnavailable'] = !![]),
                 (entry['screencastDesired'] = ![]),
@@ -329,9 +329,9 @@ export function createChromeShellWebPreviewManager({
           streaming: !![],
           dataUrl: 'data:image/jpeg;base64,' + data,
           freezeToken: 'live',
-          width: entry['visualWidth'] || entry['viewportWidth'] || 0x0,
-          height: entry['visualHeight'] || entry['viewportHeight'] || 0x0,
-          zoomFactor: entry['zoomFactor'] || 0x1,
+          width: entry['visualWidth'] || entry['viewportWidth'] || 0,
+          height: entry['visualHeight'] || entry['viewportHeight'] || 0,
+          zoomFactor: entry['zoomFactor'] || 1,
         },
         entry['tabId'],
       ),
@@ -340,7 +340,7 @@ export function createChromeShellWebPreviewManager({
   }
   function throttleScreencastFrame(entry, data) {
     const elapsed = now() - entry['lastScreencastEmitAt'];
-    if (entry['lastScreencastEmitAt'] === 0x0 || elapsed >= SCREENCAST_MIN_FRAME_INTERVAL_MS) {
+    if (entry['lastScreencastEmitAt'] === 0 || elapsed >= SCREENCAST_MIN_FRAME_INTERVAL_MS) {
       if (entry['screencastFrameTimer']) clearTimeoutFn(entry['screencastFrameTimer']);
       return (
         (entry['screencastFrameTimer'] = null),
@@ -357,7 +357,7 @@ export function createChromeShellWebPreviewManager({
           const pending = entry['pendingScreencastFrame'];
           ((entry['pendingScreencastFrame'] = null), emitScreencastFrame(entry, pending));
         },
-        Math['max'](0x0, SCREENCAST_MIN_FRAME_INTERVAL_MS - elapsed),
+        Math['max'](0, SCREENCAST_MIN_FRAME_INTERVAL_MS - elapsed),
       )),
       ![]
     );
@@ -421,14 +421,14 @@ export function createChromeShellWebPreviewManager({
         screencastUnavailable: ![],
         screencastRestartRequested: ![],
         screencastReconcilePromise: null,
-        lastScreencastEmitAt: 0x0,
+        lastScreencastEmitAt: 0,
         screencastFrameTimer: null,
         pendingScreencastFrame: null,
-        viewportWidth: 0x0,
-        viewportHeight: 0x0,
-        visualWidth: 0x0,
-        visualHeight: 0x0,
-        zoomFactor: 0x1,
+        viewportWidth: 0,
+        viewportHeight: 0,
+        visualWidth: 0,
+        visualHeight: 0,
+        zoomFactor: 1,
         readyPromise: null,
       };
     return (
@@ -442,7 +442,7 @@ export function createChromeShellWebPreviewManager({
         ),
           pushEvent(
             entry['nodeId'],
-            { type: 'failed', message: String(error?.['message'] || error || 'Browser\x20target\x20failed') },
+            { type: 'failed', message: String(error?.['message'] || error || 'Browser target failed') },
             entry['tabId'],
           ));
         throw error;
@@ -572,8 +572,8 @@ export function createChromeShellWebPreviewManager({
         if (action === 'back' || action === 'forward') {
           const history = await client['send']('Page.getNavigationHistory', {}, entry['sessionId']),
             entries = Array['isArray'](history?.['entries']) ? history['entries'] : [],
-            currentIndex = Math['max'](0x0, Number(history?.['currentIndex']) || 0x0),
-            targetIndex = action === 'back' ? currentIndex - 0x1 : currentIndex + 0x1,
+            currentIndex = Math['max'](0, Number(history?.['currentIndex']) || 0),
+            targetIndex = action === 'back' ? currentIndex - 1 : currentIndex + 1,
             targetEntry = entries[targetIndex];
           if (targetEntry?.['id'] == null) {
             const navigationState = await readNavigationState(entry);
@@ -599,22 +599,22 @@ export function createChromeShellWebPreviewManager({
               const mouseType = String(input['type'] || '');
               if (!['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']['includes'](mouseType))
                 return { ok: ![], error: 'unsupported-input' };
-              const xRatio = Math['max'](0x0, Math['min'](0x1, Number(input['xRatio']) || 0x0)),
-                yRatio = Math['max'](0x0, Math['min'](0x1, Number(input['yRatio']) || 0x0));
+              const xRatio = Math['max'](0, Math['min'](1, Number(input['xRatio']) || 0)),
+                yRatio = Math['max'](0, Math['min'](1, Number(input['yRatio']) || 0));
               await client['send'](
                 'Input.dispatchMouseEvent',
                 {
                   type: mouseType,
-                  x: xRatio * Math['max'](0x1, entry['viewportWidth'] || 0x1),
-                  y: yRatio * Math['max'](0x1, entry['viewportHeight'] || 0x1),
+                  x: xRatio * Math['max'](1, entry['viewportWidth'] || 1),
+                  y: yRatio * Math['max'](1, entry['viewportHeight'] || 1),
                   modifiers: modifiers,
                   button: normalizeMouseButton(input['button']),
-                  buttons: Math['max'](0x0, Number(input['buttons']) || 0x0),
-                  clickCount: Math['max'](0x0, Number(input['clickCount']) || 0x0),
+                  buttons: Math['max'](0, Number(input['buttons']) || 0),
+                  clickCount: Math['max'](0, Number(input['clickCount']) || 0),
                   ...(mouseType === 'mouseWheel'
                     ? {
-                        deltaX: Number(input['deltaX']) || 0x0,
-                        deltaY: Number(input['deltaY']) || 0x0,
+                        deltaX: Number(input['deltaX']) || 0,
+                        deltaY: Number(input['deltaY']) || 0,
                       }
                     : {}),
                 },
@@ -633,8 +633,8 @@ export function createChromeShellWebPreviewManager({
                     code: String(input['code'] || ''),
                     text: keyType === 'keyDown' ? String(input['text'] || '') : '',
                     unmodifiedText: keyType === 'keyDown' ? String(input['text'] || '') : '',
-                    windowsVirtualKeyCode: Math['max'](0x0, Number(input['keyCode']) || 0x0),
-                    nativeVirtualKeyCode: Math['max'](0x0, Number(input['keyCode']) || 0x0),
+                    windowsVirtualKeyCode: Math['max'](0, Number(input['keyCode']) || 0),
+                    nativeVirtualKeyCode: Math['max'](0, Number(input['keyCode']) || 0),
                     autoRepeat: input['repeat'] === !![],
                   },
                   entry['sessionId'],
@@ -678,7 +678,7 @@ export function createChromeShellWebPreviewManager({
                 tabId: tabId,
                 pageUrl: String(reference?.['pageUrl'] || entry['url'] || entry['requestedUrl'] || ''),
                 pageTitle: String(reference?.['pageTitle'] || ''),
-                selectedText: String(reference?.['selectedText'] || '')['slice'](0x0, 0x1388),
+                selectedText: String(reference?.['selectedText'] || '')['slice'](0, 5000),
                 screenshotDataUrl: screenshot?.['data'] ? 'data:image/webp;base64,' + screenshot['data'] : '',
                 capturedAt: new Date(now())['toISOString'](),
                 ...navigationState,
@@ -734,9 +734,9 @@ export function createChromeShellWebPreviewManager({
             : [],
         ),
         targets = [...entries['values']()]['filter']((entry) => {
-          if (nodeIds['size'] > 0x0 && !nodeIds['has'](entry['nodeId'])) return ![];
-          if (tabIds['size'] > 0x0 && !tabIds['has'](entry['tabId'])) return ![];
-          return nodeIds['size'] > 0x0 || tabIds['size'] > 0x0 || payload?.['all'] === !![];
+          if (nodeIds['size'] > 0 && !nodeIds['has'](entry['nodeId'])) return ![];
+          if (tabIds['size'] > 0 && !tabIds['has'](entry['tabId'])) return ![];
+          return nodeIds['size'] > 0 || tabIds['size'] > 0 || payload?.['all'] === !![];
         }),
         disposedEntries = await Promise['all'](targets['map'](disposeEntry));
       return { ok: !![], disposed: disposedEntries['filter'](Boolean)['length'] };
@@ -747,8 +747,8 @@ export function createChromeShellWebPreviewManager({
     },
     waitForEvents(options = {}) {
       if (disposed) return Promise['resolve']([]);
-      if (eventQueue['length'] > 0x0) return Promise['resolve'](drainEvents());
-      const waitMs = clampNumber(options?.['waitMs'], EVENT_WAIT_MIN_MS, EVENT_WAIT_MAX_MS, 0x3e8);
+      if (eventQueue['length'] > 0) return Promise['resolve'](drainEvents());
+      const waitMs = clampNumber(options?.['waitMs'], EVENT_WAIT_MIN_MS, EVENT_WAIT_MAX_MS, 1000);
       return new Promise((resolve) => {
         const waiter = { resolve: resolve, timer: null };
         ((waiter['timer'] = setTimeoutFn(() => {
@@ -763,7 +763,7 @@ export function createChromeShellWebPreviewManager({
         unsubscribe?.(),
         await Promise['all']([...entries['values']()]['map'](disposeEntry)),
         sessionEntries['clear'](),
-        (eventQueue['length'] = 0x0));
+        (eventQueue['length'] = 0));
       for (const waiter of waiters) {
         if (waiter['timer']) clearTimeoutFn(waiter['timer']);
         waiter['resolve']([]);

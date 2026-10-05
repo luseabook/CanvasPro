@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { describeSystemCommandFailure, resolveWindowsSystemToolPath } from './windowsSystemTools.js';
 const WINDOWS_PID_ENV_NAME = 'AIC_BACKEND_IDENTITY_PIDS_BASE64',
-  PROCESS_QUERY_TIMEOUT_MS = 0x1388,
+  PROCESS_QUERY_TIMEOUT_MS = 5000,
   WINDOWS_PROCESS_QUERY_SCRIPT = ('\n$encodedPids = [Environment]::GetEnvironmentVariable("' +
     WINDOWS_PID_ENV_NAME +
     '")\nif ([String]::IsNullOrWhiteSpace($encodedPids)) { exit 2 }\n$pidJson = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($encodedPids))\n$requestedPids = @(ConvertFrom-Json $pidJson)\n$rows = @()\nforeach ($requestedPid in $requestedPids) {\n  $numericPid = 0\n  if (-not [int]::TryParse([string]$requestedPid, [ref]$numericPid)) { continue }\n  try {\n    $record = Get-CimInstance Win32_Process -Filter ("ProcessId = " + $numericPid) -ErrorAction Stop\n  } catch {\n    continue\n  }\n  if ($null -eq $record) { continue }\n  $rows += [pscustomobject]@{\n    pid = [int]$record.ProcessId\n    executablePath = [string]$record.ExecutablePath\n    commandLine = [string]$record.CommandLine\n  }\n}\n$json = ConvertTo-Json -InputObject @($rows) -Compress\n$encodedRows = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($json))\n[Console]::Out.Write($encodedRows)\n')[
@@ -14,7 +14,7 @@ function normalizePids(pids = []) {
     ...new Set(
       (Array['isArray'](pids) ? pids : [])
         ['map']((pid) => Number(pid))
-        ['filter']((normalizedPid) => Number['isInteger'](normalizedPid) && normalizedPid > 0x0),
+        ['filter']((normalizedPid) => Number['isInteger'](normalizedPid) && normalizedPid > 0),
     ),
   ];
 }
@@ -97,12 +97,12 @@ function inspectWindowsBackendProcesses({ pids: pids, env: env, spawnProcess: sp
     );
   } catch (cause) {
     throw createIdentityError(
-      'Failed\x20to\x20inspect\x20Windows\x20processes\x20that\x20own\x20the\x20startup\x20port',
+      'Failed to inspect Windows processes that own the startup port',
       cause,
       { command: powershellPath, failure: describeSystemCommandFailure(cause) },
     );
   }
-  if (result?.['status'] !== 0x0 || result?.['error'] || result?.['signal'])
+  if (result?.['status'] !== 0 || result?.['error'] || result?.['signal'])
     throw createIdentityError(
       'Failed to inspect Windows processes that own the startup port',
       result?.['error'] || null,
@@ -129,8 +129,8 @@ function inspectPosixBackendProcesses({ pids: pids, spawnProcess: spawnProcess }
       encoding: 'utf8',
       timeout: PROCESS_QUERY_TIMEOUT_MS,
     });
-    if (result?.['status'] === 0x1) continue;
-    if (result?.['status'] !== 0x0 || result?.['error'] || result?.['signal'])
+    if (result?.['status'] === 1) continue;
+    if (result?.['status'] !== 0 || result?.['error'] || result?.['signal'])
       throw createIdentityError(
         'Failed to inspect process ' + pid + ' that owns the startup port',
         result?.['error'] || null,
@@ -147,7 +147,7 @@ export function inspectBackendProcesses({
   spawnProcess: spawnProcess = spawnSync,
 } = {}) {
   const normalizedPids = normalizePids(pids);
-  if (normalizedPids['length'] === 0x0) return [];
+  if (normalizedPids['length'] === 0) return [];
   return platform === 'win32'
     ? inspectWindowsBackendProcesses({ pids: normalizedPids, env: env, spawnProcess: spawnProcess })
     : inspectPosixBackendProcesses({ pids: normalizedPids, spawnProcess: spawnProcess });

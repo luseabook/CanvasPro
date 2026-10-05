@@ -1,13 +1,13 @@
-const DEFAULT_LOCAL_MEDIA_PLAYBACK_TIMEOUT_MS = 0x384,
-  DEFAULT_LOCAL_MEDIA_PLAYBACK_MAX_BYTES = 0x20 * 0x400 * 0x400,
-  STREAM_READ_YIELD_EVERY_CHUNKS = 0x4,
+const DEFAULT_LOCAL_MEDIA_PLAYBACK_TIMEOUT_MS = 900,
+  DEFAULT_LOCAL_MEDIA_PLAYBACK_MAX_BYTES = 32 * 1024 * 1024,
+  STREAM_READ_YIELD_EVERY_CHUNKS = 4,
   TYPED_RESULT_MODE = 'typed';
-function playbackFetchResult(value, status, blob = null, item = 0x0) {
+function playbackFetchResult(value, status, blob = null, item = 0) {
   if (value === TYPED_RESULT_MODE)
     return {
       status: status,
       blob: blob,
-      httpStatus: Number(item || 0x0),
+      httpStatus: Number(item || 0),
     };
   return blob;
 }
@@ -25,7 +25,7 @@ function throwIfAborted(enabled) {
   throw new DOMException('The operation was aborted', 'AbortError');
 }
 async function yieldToMainThread(result) {
-  (await new Promise((data) => setTimeout(data, 0x0)), throwIfAborted(result));
+  (await new Promise((data) => setTimeout(data, 0)), throwIfAborted(result));
 }
 async function readBoundedResponseBlob(dom, options, { signal: signal = null, url: url = '' } = {}) {
   const nowMs2 = nowMs();
@@ -36,25 +36,25 @@ async function readBoundedResponseBlob(dom, options, { signal: signal = null, ur
       markLocalPlaybackProbe('body-read-end', {
         url: url,
         streamed: ![],
-        blobSize: Number(target?.['size'] || 0x0),
+        blobSize: Number(target?.['size'] || 0),
         durationMs: nowMs() - nowMs2,
       }),
-      target?.['size'] > 0x0 && target['size'] <= options ? target : null
+      target?.['size'] > 0 && target['size'] <= options ? target : null
     );
   }
   const source = dom['body']['getReader'](),
     list = [];
-  let totalBytes = 0x0,
-    chunkCount = 0x0,
-    yieldCount = 0x0;
+  let totalBytes = 0,
+    chunkCount = 0,
+    yieldCount = 0;
   markLocalPlaybackProbe('body-read-start', { url: url, streamed: !![] });
   try {
     while (!![]) {
       throwIfAborted(signal);
       const { done: done, value: value2 } = await source['read']();
       if (done) break;
-      chunkCount += 0x1;
-      const count = Number(value2?.['byteLength'] || value2?.['length'] || 0x0);
+      chunkCount += 1;
+      const count = Number(value2?.['byteLength'] || value2?.['length'] || 0);
       totalBytes += count;
       if (totalBytes > options) {
         try {
@@ -62,10 +62,10 @@ async function readBoundedResponseBlob(dom, options, { signal: signal = null, ur
         } catch {}
         return null;
       }
-      if (count > 0x0) list['push'](value2);
-      chunkCount % STREAM_READ_YIELD_EVERY_CHUNKS === 0x0 &&
-        ((yieldCount += 0x1),
-        yieldCount === 0x1 &&
+      if (count > 0) list['push'](value2);
+      chunkCount % STREAM_READ_YIELD_EVERY_CHUNKS === 0 &&
+        ((yieldCount += 1),
+        yieldCount === 1 &&
           markLocalPlaybackProbe('body-read-yield', {
             url: url,
             chunkCount: chunkCount,
@@ -78,7 +78,7 @@ async function readBoundedResponseBlob(dom, options, { signal: signal = null, ur
       source['releaseLock']?.();
     } catch {}
   }
-  if (!(totalBytes > 0x0)) return null;
+  if (!(totalBytes > 0)) return null;
   const nowMs3 = nowMs();
   markLocalPlaybackProbe('blob-construct-start', {
     url: url,
@@ -93,7 +93,7 @@ async function readBoundedResponseBlob(dom, options, { signal: signal = null, ur
       url: url,
       chunkCount: chunkCount,
       totalBytes: totalBytes,
-      blobSize: Number(blob2['size'] || 0x0),
+      blobSize: Number(blob2['size'] || 0),
       durationMs: nowMs() - nowMs3,
     }),
     markLocalPlaybackProbe('body-read-end', {
@@ -119,10 +119,10 @@ export async function fetchLocalMediaPlaybackBlob(
   const url2 = String(next || '')['trim']();
   if (!url2) return (markLocalPlaybackProbe('empty-url'), playbackFetchResult(resultMode, 'empty-url'));
   const byteLimit = Number['isFinite'](Number(maxBytes))
-      ? Math['max'](0x0, Number(maxBytes))
+      ? Math['max'](0, Number(maxBytes))
       : DEFAULT_LOCAL_MEDIA_PLAYBACK_MAX_BYTES,
     current = Number['isFinite'](Number(timeout))
-      ? Math['max'](0x0, Number(timeout))
+      ? Math['max'](0, Number(timeout))
       : DEFAULT_LOCAL_MEDIA_PLAYBACK_TIMEOUT_MS,
     signal3 = new AbortController();
   let entry = '';
@@ -146,7 +146,7 @@ export async function fetchLocalMediaPlaybackBlob(
       signal: signal3['signal'],
     });
     if (!response?.['ok']) {
-      const status2 = Number(response?.['status'] || 0x0);
+      const status2 = Number(response?.['status'] || 0);
       return (
         markLocalPlaybackProbe('response-error', {
           url: url2,
@@ -154,13 +154,13 @@ export async function fetchLocalMediaPlaybackBlob(
         }),
         playbackFetchResult(
           resultMode,
-          status2 === 0x194 || status2 === 0x19a ? 'hard-missing' : 'http-error',
+          status2 === 404 || status2 === 410 ? 'hard-missing' : 'http-error',
           null,
           status2,
         )
       );
     }
-    const contentLength = Number(response['headers']?.['get']?.('content-length') || 0x0);
+    const contentLength = Number(response['headers']?.['get']?.('content-length') || 0);
     if (contentLength > byteLimit) {
       try {
         await response['body']?.['cancel']?.();
@@ -182,7 +182,7 @@ export async function fetchLocalMediaPlaybackBlob(
       markLocalPlaybackProbe(boundedResponseBlob ? 'ready' : 'empty-body', {
         url: url2,
         contentLength: contentLength,
-        blobSize: Number(boundedResponseBlob?.['size'] || 0x0),
+        blobSize: Number(boundedResponseBlob?.['size'] || 0),
         blobType: String(boundedResponseBlob?.['type'] || ''),
       }),
       playbackFetchResult(resultMode, boundedResponseBlob ? 'ready' : 'empty-body', boundedResponseBlob)

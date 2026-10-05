@@ -53,8 +53,8 @@ export function createStoryProjectPersistenceWorkspaceController({
   const syncCurrentProjectEntry = () => projectData['syncCurrentEntry'](),
     coordinator = createWorkspacePersistenceCoordinator({
       ready: ![],
-      debounceMs: 0x3e8,
-      maxWaitMs: 0x1388,
+      debounceMs: 1000,
+      maxWaitMs: 5000,
       save: saveWorkspace,
       getSnapshot: () => projectData['createSnapshot'](),
       setTimeoutFn: windowObject?.['setTimeout']?.['bind']?.(windowObject),
@@ -74,7 +74,7 @@ export function createStoryProjectPersistenceWorkspaceController({
     if (!immediate && TRANSIENT_ACTIONS['has'](action)) return;
     coordinator['schedule']({
       immediate: immediate,
-      delayMs: uiOnly || UI_ACTIONS['has'](action) ? 0x1388 : 0x3e8,
+      delayMs: uiOnly || UI_ACTIONS['has'](action) ? 5000 : 1000,
     });
   }
   function projectId() {
@@ -85,9 +85,9 @@ export function createStoryProjectPersistenceWorkspaceController({
       ),
       index = 'story-' + Date['now']() + '-import';
     let result = index,
-      data = 0x2;
+      data = 2;
     while (map['has'](result)) {
-      ((result = index + '-' + data), (data += 0x1));
+      ((result = index + '-' + data), (data += 1));
     }
     return result;
   }

@@ -173,7 +173,7 @@ function normalizeRhV54SpecialModeValue(state) {
 }
 function normalizeRhV54MaskExpandValue(scope) {
   const input = Number(scope);
-  return Number.isFinite(input) ? Math.max(-0x270f, Math.min(0x270f, Math.trunc(input))) : 25;
+  return Number.isFinite(input) ? Math.max(-9999, Math.min(9999, Math.trunc(input))) : 25;
 }
 function normalizeRhV54BreastJiggleValue(output) {
   const value2 = Number(output);
@@ -1449,7 +1449,7 @@ export function createVideoNodeParameterPanelModule(value66) {
                 resolution3.classList.add('active'));
             }),
         );
-      const duration3 = 0x118,
+      const duration3 = 280,
         handler6 = (value144) => {
           const enabled15 = String(value144 || '').trim();
           if (!enabled15 || enabled15 === '自适应') return { w: 1, h: 1, label: '自适应' };
@@ -1490,8 +1490,8 @@ export function createVideoNodeParameterPanelModule(value66) {
                 this._ratioAnimTimer = null;
               }, value152 + 80);
             },
-            value153 = this._data.width || 0x12c,
-            value154 = this._data.height || 0x12c,
+            value153 = this._data.width || 300,
+            value154 = this._data.height || 300,
             box = getAIGenerationNodeSize(value148, value149),
             width = box.width,
             height = box.height,
@@ -1759,7 +1759,7 @@ export function createVideoNodeParameterPanelModule(value66) {
           const value227 = await api.buildGenerateVideoRequest(enabled19),
             outputText = formatFinalApiDebugRequest(value227),
             value228 = store.getState(),
-            x = this._data.x + (this._data.width || 0x17c) + 50,
+            x = this._data.x + (this._data.width || 380) + 50,
             y = this._data.y;
           let enabled20 = Object.values(value228.nodes).find((item26) => item26.type === 'debug');
           (!enabled20
@@ -1768,8 +1768,8 @@ export function createVideoNodeParameterPanelModule(value66) {
                 type: 'debug',
                 x: x,
                 y: y,
-                width: 0x17c,
-                height: 0x12c,
+                width: 380,
+                height: 300,
                 name: videoPanelText('debugNodeName'),
                 outputText: outputText,
               })

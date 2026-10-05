@@ -3,7 +3,7 @@ function getPlainObject(value) {
   return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
 }
 function isPositiveSize(item, key) {
-  return Number(item) > 0x0 && Number(key) > 0x0;
+  return Number(item) > 0 && Number(key) > 0;
 }
 export function findVideoAspectRatioField(index) {
   const list = Array['isArray'](index?.['uiSchema']?.['fields']) ? index['uiSchema']['fields'] : [];
@@ -47,14 +47,14 @@ export function resolveVideoAdaptiveAspectRatio({
   provider: provider = '',
   model: model = '',
   modelManifest: modelManifest = null,
-  displayWidth: displayWidth = 0x0,
-  displayHeight: displayHeight = 0x0,
-  sourceWidth: sourceWidth = 0x0,
-  sourceHeight: sourceHeight = 0x0,
+  displayWidth: displayWidth = 0,
+  displayHeight: displayHeight = 0,
+  sourceWidth: sourceWidth = 0,
+  sourceHeight: sourceHeight = 0,
   imageSize: imageSize = '',
 } = {}) {
   const list5 = getConcreteVideoAspectRatioOptions(modelManifest);
-  if (list5['length'] <= 0x0) return '';
+  if (list5['length'] <= 0) return '';
   if (isPositiveSize(displayWidth, displayHeight))
     return pickClosestRatioForProviderModel({
       provider: provider,
@@ -71,7 +71,7 @@ export function resolveVideoAdaptiveAspectRatio({
       height: Number(sourceHeight),
       imageSize: imageSize,
     });
-  return list5['includes']('1:1') ? '1:1' : list5[0x0];
+  return list5['includes']('1:1') ? '1:1' : list5[0];
 }
 export function applyVideoAdaptiveAspectRatio(payload2, nodeData2 = {}) {
   const modelManifest2 = nodeData2?.['modelManifest'] || null,

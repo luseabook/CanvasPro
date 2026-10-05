@@ -10,27 +10,27 @@ export function authorDirectorPath(
     points: points,
     camera: camera,
     object: object,
-    start: start = 0x0,
-    duration: duration = 0x3,
+    start: start = 0,
+    duration: duration = 3,
     smooth: smooth = ![],
   } = {},
 ) {
   const item = (points || [])
     ['filter'](
-      (list) => Array['isArray'](list) && list['length'] === 0x3 && list['every'](Number['isFinite']),
+      (list) => Array['isArray'](list) && list['length'] === 3 && list['every'](Number['isFinite']),
     )
-    ['slice'](0x0, 0x64);
-  if (item['length'] < 0x2) throw new Error('轨迹至少需要两个不同的位置。');
+    ['slice'](0, 100);
+  if (item['length'] < 2) throw new Error('轨迹至少需要两个不同的位置。');
   if (object?.['locked']) throw new Error('请先解锁对象。');
   const key = item['map']((list2, index) =>
-      index ? Math['hypot'](...list2['map']((result, data) => result - item[index - 0x1][data])) : 0x0,
+      index ? Math['hypot'](...list2['map']((result, data) => result - item[index - 1][data])) : 0,
     ),
-    count = key['reduce']((options, target) => options + target, 0x0);
+    count = key['reduce']((options, target) => options + target, 0);
   if (count < 0.001) throw new Error('轨迹过短，请移动指针绘制路线。');
   let args = normalizeStoryboard3DShotAnimation(value);
-  const source = Math['max'](0x0, Math['min'](3599.9, Number(start) || 0x0)),
-    next = Math['max'](0.1, Math['min'](0xe10 - source, Number(duration) || 0x3));
-  let current = 0x0;
+  const source = Math['max'](0, Math['min'](3599.9, Number(start) || 0)),
+    next = Math['max'](0.1, Math['min'](3600 - source, Number(duration) || 3));
+  let current = 0;
   if (object) {
     const entry = args['objectTracks']['find']((record) => record['objectId'] === object['id']);
     if (entry) {
@@ -60,10 +60,10 @@ export function authorDirectorPath(
         value: config,
         easing: 'linear',
       });
-      const output = scope === item['length'] - 0x1 ? item[scope - 0x1] : config,
-        value2 = scope === item['length'] - 0x1 ? config : item[scope + 0x1],
+      const output = scope === item['length'] - 1 ? item[scope - 1] : config,
+        value2 = scope === item['length'] - 1 ? config : item[scope + 1],
         value3 = [...object['transform']['rotation']];
-      ((value3[0x1] = Math['atan2'](value2[0x0] - output[0x0], value2[0x2] - output[0x2])),
+      ((value3[1] = Math['atan2'](value2[0] - output[0], value2[2] - output[2])),
         (args = upsertStoryboard3DObjectKeyframe(args, {
           objectId: object['id'],
           property: 'rotation',

@@ -38,7 +38,7 @@ export function collectSettingsSearchEntries(key) {
             title = data['textContent']['trim'](),
             description = Array['from'](target2['querySelectorAll']('.settings-desc[data-i18n]'))
               ['map']((options) => options['textContent']['trim']())
-              ['join']('\x20'),
+              ['join'](' '),
             source = data['closest']('.settings-card')
               ?.['querySelector']('.settings-card-title')
               ?.['textContent']['trim'](),
@@ -113,7 +113,7 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
         (enabled6 = !![]));
       const value3 = enabled8['split'](/\s+/),
         settingsSearchEntries = collectSettingsSearchEntries(root)['filter']((value4) => {
-          const value5 = (value4['category'] + '\x20' + value4['title'] + '\x20' + value4['description'])[
+          const value5 = (value4['category'] + ' ' + value4['title'] + ' ' + value4['description'])[
             'toLocaleLowerCase'
           ]();
           return value3['every']((value6) => value5['includes'](value6));
@@ -142,7 +142,7 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
       }),
         setModelServiceSettingsSearchCards(value10),
         root['classList']['add']('is-settings-searching'),
-        (enabled4['scrollTop'] = 0x0),
+        (enabled4['scrollTop'] = 0),
         (enabled5['textContent'] = count['size']
           ? t('settings.search.count', { count: count['size'] })
           : t('settings.search.empty')),
@@ -159,7 +159,7 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
         value17['key'] === 'ArrowDown' &&
           value17['target'] === enabled3 &&
           enabled6 &&
-          (value17['preventDefault'](), listFocusableElements(enabled4)[0x0]?.['focus']());
+          (value17['preventDefault'](), listFocusableElements(enabled4)[0]?.['focus']());
     },
     value18 = () => {
       enabled7 = !![];

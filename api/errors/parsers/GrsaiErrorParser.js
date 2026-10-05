@@ -4,18 +4,18 @@ const GRSAI_OFFICIAL_CODES = {
     '-22': { type: ErrorType.TASK_FAILED, message: '任务不存在', retryable: false },
   },
   GRSAI_HTTP_STATUS_MAP = {
-    0x190: { type: ErrorType.INVALID_PARAMS, message: '请求参数错误', retryable: false },
-    0x191: { type: ErrorType.AUTH_ERROR, message: 'API Key 无效或已过期', retryable: false },
-    0x193: { type: ErrorType.FORBIDDEN, message: '没有访问权限', retryable: false },
-    0x194: { type: ErrorType.MODEL_UNAVAILABLE, message: '模型或任务不存在', retryable: false },
-    0x1ad: { type: ErrorType.RATE_LIMIT, message: '请求过于频繁，请稍后重试', retryable: true },
-    0x1f4: { type: ErrorType.SERVER_ERROR, message: '服务器内部错误，请稍后重试', retryable: true },
-    0x1f6: { type: ErrorType.SERVICE_UNAVAILABLE, message: '网关错误，请稍后重试', retryable: true },
-    0x1f7: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务暂时不可用，请稍后重试', retryable: true },
+    400: { type: ErrorType.INVALID_PARAMS, message: '请求参数错误', retryable: false },
+    401: { type: ErrorType.AUTH_ERROR, message: 'API Key 无效或已过期', retryable: false },
+    403: { type: ErrorType.FORBIDDEN, message: '没有访问权限', retryable: false },
+    404: { type: ErrorType.MODEL_UNAVAILABLE, message: '模型或任务不存在', retryable: false },
+    429: { type: ErrorType.RATE_LIMIT, message: '请求过于频繁，请稍后重试', retryable: true },
+    500: { type: ErrorType.SERVER_ERROR, message: '服务器内部错误，请稍后重试', retryable: true },
+    502: { type: ErrorType.SERVICE_UNAVAILABLE, message: '网关错误，请稍后重试', retryable: true },
+    503: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务暂时不可用，请稍后重试', retryable: true },
   };
 function extractErrorCode(value, count) {
   if (value?.code !== undefined && value?.code !== 0) return value.code;
-  if (count >= 0x190) return count;
+  if (count >= 400) return count;
   return null;
 }
 function extractErrorMessage(error) {
@@ -65,7 +65,7 @@ export function parseError(enabled, status) {
       status: status,
       retryable: false,
     });
-  if (status >= 0x190) return ApiError.fromHttpStatus(status, 'grsai', message);
+  if (status >= 400) return ApiError.fromHttpStatus(status, 'grsai', message);
   if (code !== null && code !== undefined)
     return new ApiError({
       type: ErrorType.UNKNOWN,

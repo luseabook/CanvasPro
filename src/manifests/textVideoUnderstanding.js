@@ -4,7 +4,7 @@ export function isVideoAnalysisModel(value) {
   return (
     item?.['kind'] === 'text' &&
     item['inputSlots']?.['allowedKinds']?.['includes']('video') === !![] &&
-    Number(item['inputSlots']?.['maxByKind']?.['video']) > 0x0
+    Number(item['inputSlots']?.['maxByKind']?.['video']) > 0
   );
 }
 export function getVideoAnalysisModelIds() {

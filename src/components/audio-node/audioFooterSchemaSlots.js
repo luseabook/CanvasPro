@@ -77,15 +77,15 @@ export function buildAudioWorkflowFooterHtml({
     (mode ? '' : 'display:none;') +
     '">\n              ' +
     mode +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22prompt-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-batch-slot\x22\x20style=\x22' +
+    '\n            </div>\n          </div>\n          <div class="prompt-actions">\n            <div class="ui-schema-placement ui-schema-batch-slot" style="' +
     (batch ? '' : 'display:none;') +
-    '\x22>' +
+    '">' +
     batch +
     '</div>\n            <div class="rh-adv-wrap" style="position:relative;' +
     (advanced ? '' : 'display:none;') +
     '">\n              <button type="button" class="img-pill-btn rh-adv-btn advanced-settings-icon-button" data-tooltip="' +
     current +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     current +
     '" aria-expanded="false">' +
     ADVANCED_SETTINGS_TUNE_ICON_MARKUP +
@@ -101,7 +101,7 @@ export function buildAudioWorkflowFooterHtml({
     (labels['generateTitle'] || '') +
     '">\n              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>\n            </button>\n          </div>\n          <div class="rh-adv-panel">\n            ' +
     advanced +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>'
+    '\n          </div>'
   );
 }
 function updateHtmlSlot(enabled2, entry) {

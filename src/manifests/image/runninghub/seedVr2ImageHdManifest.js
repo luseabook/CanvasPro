@@ -20,11 +20,11 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
     imageMenu: { group: 'runninghubWorkflow' },
     imageHdMenu: { enabled: !![] },
   },
-  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 0x1 },
+  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 1 },
   inputSlots: {
     allowedKinds: ['image'],
-    minByKind: { image: 0x1 },
-    maxByKind: { text: 0x0, image: 0x1, video: 0x0, audio: 0x0 },
+    minByKind: { image: 1 },
+    maxByKind: { text: 0, image: 1, video: 0, audio: 0 },
   },
   uiSchema: {
     fields: [
@@ -35,8 +35,8 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
         placement: 'resolution',
         label: '分辨率',
         menuTitle: '分辨率',
-        defaultValue: 0x1000,
-        options: [0x800, 0x1000]['map']((value) => ({
+        defaultValue: 4096,
+        options: [2048, 4096]['map']((value) => ({
           value: value,
           label: String(value),
           selectedLabel: '分辨率' + value,
@@ -72,12 +72,12 @@ export const seedVr2ImageHdExecutionManifest = Object['freeze']({
         nodeId: '54',
         fieldName: 'value',
         field: 'generationParams.rhResolution',
-        defaultValue: 0x1000,
+        defaultValue: 4096,
         transform: 'integer',
         description: '放大分辨率',
       },
     ],
   },
   result: { taskIdPath: 'taskId', urlFields: ['url', 'imageUrl'] },
-  validation: { minInputImages: 0x1, missingInputMessage: '请提供待高清的源图片' },
+  validation: { minInputImages: 1, missingInputMessage: '请提供待高清的源图片' },
 });

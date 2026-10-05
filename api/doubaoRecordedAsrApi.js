@@ -12,7 +12,7 @@ export async function transcribeDoubaoRecording({
     'https://openspeech.bytedance.com/api/v3/auc/bigmodel/recognize/flash',
     {
       method: 'POST',
-      signal: signal || AbortSignal.timeout(0x2bf20),
+      signal: signal || AbortSignal.timeout(180000),
       headers: {
         'Content-Type': 'application/json',
         'X-Api-Resource-Id': DOUBAO_RECORDED_ASR_RESOURCE,
@@ -24,7 +24,7 @@ export async function transcribeDoubaoRecording({
       },
       body: JSON.stringify({
         user: { uid: 'ai-canvas-recording' },
-        audio: { data: audioBase64, format: 'mp3', rate: 0x3e80, channel: 0x1 },
+        audio: { data: audioBase64, format: 'mp3', rate: 16000, channel: 1 },
         request: {
           model_name: 'bigmodel',
           show_utterances: true,

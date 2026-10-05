@@ -12,20 +12,20 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function safeFileName(item) {
   const key = String(item || 'storyboard-3d')
     ['trim']()
     ['replace'](/[\\/:*?"<>|]+/g, '-')
-    ['replace'](/\s+/g, '\x20')
-    ['slice'](0x0, 0x50);
+    ['replace'](/\s+/g, ' ')
+    ['slice'](0, 80);
   return key || 'storyboard-3d';
 }
 export function collectStoryboard3DProjectShots(index) {
   const list = Array['isArray'](index?.['scenes']) ? index['scenes'] : [],
-    sceneId = list['find']((result) => result['id'] === index?.['activeSceneId']) || list[0x0];
+    sceneId = list['find']((result) => result['id'] === index?.['activeSceneId']) || list[0];
   if (!sceneId) return [];
   return (Array['isArray'](sceneId['shots']) ? sceneId['shots'] : [])['map']((args, sceneShotIndex) => ({
     ...args,
@@ -36,10 +36,10 @@ export function collectStoryboard3DProjectShots(index) {
 }
 export function getActiveStoryboard3DProjectShot(data) {
   const list2 = Array['isArray'](data?.['scenes']) ? data['scenes'] : [],
-    sceneId2 = list2['find']((options) => options['id'] === data?.['activeSceneId']) || list2[0x0];
+    sceneId2 = list2['find']((options) => options['id'] === data?.['activeSceneId']) || list2[0];
   if (!sceneId2) return null;
   const list3 = Array['isArray'](sceneId2['shots']) ? sceneId2['shots'] : [],
-    args2 = list3['find']((target) => target['id'] === sceneId2['activeShotId']) || list3[0x0];
+    args2 = list3['find']((target) => target['id'] === sceneId2['activeShotId']) || list3[0];
   return args2 ? { ...args2, sceneId: sceneId2['id'], sceneName: sceneId2['name'] } : null;
 }
 export function normalizeStoryboard3DExportOptions(includeMetadata = {}) {
@@ -55,14 +55,14 @@ export function normalizeStoryboard3DExportOptions(includeMetadata = {}) {
       ? includeMetadata['resolution']
       : '1080p',
     source =
-      Number(includeMetadata['gridSize']) || Math['pow'](Number(includeMetadata['columns']) || 0x3, 0x2),
-    gridSize = [0x4, 0x9, 0x10]['includes'](source) ? source : 0x9;
+      Number(includeMetadata['gridSize']) || Math['pow'](Number(includeMetadata['columns']) || 3, 2),
+    gridSize = [4, 9, 16]['includes'](source) ? source : 9;
   return {
     mode: mode,
     ...(mode['endsWith']('video')
       ? {
-          videoStart: Math['max'](0x0, Math['min'](0xe10, Number(includeMetadata['videoStart']) || 0x0)),
-          videoEnd: Math['max'](0x0, Math['min'](0xe10, Number(includeMetadata['videoEnd']) || 0x0)),
+          videoStart: Math['max'](0, Math['min'](3600, Number(includeMetadata['videoStart']) || 0)),
+          videoEnd: Math['max'](0, Math['min'](3600, Number(includeMetadata['videoEnd']) || 0)),
           videoTrack: String(includeMetadata['videoTrack'] || 'all'),
         }
       : {}),
@@ -90,10 +90,10 @@ export function reconcileStoryboard3DExportSelection(current, entry = [], record
     list6 = uniqueShotIds(record)['filter']((payload) => map['has'](payload));
   if (current === 'grid-png') return [];
   if (current === 'sequence-png' || current === 'sequence-video')
-    return list6['length'] > 0x0 ? list6 : list5['slice'](0x0, 0x1);
-  return list6[0x0] ? [list6[0x0]] : list5['slice'](0x0, 0x1);
+    return list6['length'] > 0 ? list6 : list5['slice'](0, 1);
+  return list6[0] ? [list6[0]] : list5['slice'](0, 1);
 }
-export function createStoryboard3DExportGridSlots(list7 = [], gridSize2 = 0x9, handle = []) {
+export function createStoryboard3DExportGridSlots(list7 = [], gridSize2 = 9, handle = []) {
   const length = normalizeStoryboard3DExportOptions({ gridSize: gridSize2 })['gridSize'],
     list8 = uniqueShotIds(list7),
     map2 = new Set(list8),
@@ -112,21 +112,21 @@ function createCollageSlotAdapter(id, slotIndex, value2) {
     isEmpty: !id,
     x: x,
     y: y,
-    width: 0x1,
-    height: 0x1,
+    width: 1,
+    height: 1,
   };
 }
 export function placeStoryboard3DShotInGrid(
   list10 = [],
-  { shotId: shotId, sourceIndex: sourceIndex = -0x1, targetIndex: targetIndex = -0x1 } = {},
+  { shotId: shotId, sourceIndex: sourceIndex = -1, targetIndex: targetIndex = -1 } = {},
 ) {
   const list11 = (Array['isArray'](list10) ? list10 : [])['map']((value3) => String(value3 || '')),
     enabled = String(shotId || '')['trim']();
-  if (!enabled || targetIndex < 0x0 || targetIndex >= list11['length']) return list11;
+  if (!enabled || targetIndex < 0 || targetIndex >= list11['length']) return list11;
   const value4 = list11['indexOf'](enabled),
-    count = sourceIndex >= 0x0 ? sourceIndex : value4;
-  if (count >= 0x0 && count !== targetIndex) {
-    const value5 = Math['max'](0x1, Math['round'](Math['sqrt'](list11['length']))),
+    count = sourceIndex >= 0 ? sourceIndex : value4;
+  if (count >= 0 && count !== targetIndex) {
+    const value5 = Math['max'](1, Math['round'](Math['sqrt'](list11['length']))),
       items = list11['map']((value6, value7) => createCollageSlotAdapter(value6, value7, value5)),
       collageItemSwapPatch = buildCollageItemSwapPatch({ items: items }, count, targetIndex);
     if (collageItemSwapPatch)
@@ -144,13 +144,13 @@ export function placeStoryboard3DShotInGrid(
 function renderChoiceButtons(value11, list13, value12) {
   return list13['map'](
     ({ value: value13, label: label, note: note = '' }) =>
-      '<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-export-choice' +
+      '<button type="button" class="storyboard-3d-export-choice' +
       (value13 === value12 ? ' is-active' : '') +
       '" data-storyboard-3d-export-action="set-option" data-storyboard-3d-export-option="' +
       escapeHtml(value11) +
       '" data-storyboard-3d-export-value="' +
       escapeHtml(value13) +
-      '\x22\x20data-export-focus-key=\x22' +
+      '" data-export-focus-key="' +
       escapeHtml(value11 + ':' + value13) +
       '" aria-pressed="' +
       (value13 === value12) +
@@ -165,13 +165,13 @@ function renderShotVisual(error) {
   const value14 = String(error?.['thumbnailUrl'] || '')['trim']();
   if (value14)
     return (
-      '<img\x20src=\x22' +
+      '<img src="' +
       escapeHtml(value14) +
       '" alt="' +
       escapeHtml(error?.['name'] || '分镜预览') +
-      '\x22>'
+      '">'
     );
-  return '<span\x20class=\x22storyboard-3d-export-shot-placeholder\x22\x20aria-hidden=\x22true\x22><i></i></span>';
+  return '<span class="storyboard-3d-export-shot-placeholder" aria-hidden="true"><i></i></span>';
 }
 function renderShotRail(list14, value15, value16, list15) {
   const map3 = new Set(value15),
@@ -185,9 +185,9 @@ function renderShotRail(list14, value15, value16, list15) {
     (enabled2 ? '分镜素材' : '分镜选择') +
     '</strong></div><span>' +
     value18 +
-    '</span></div>\x0a\x20\x20\x20\x20' +
+    '</span></div>\n    ' +
     (value17
-      ? '<button\x20type=\x22button\x22\x20class=\x22storyboard-3d-export-select-all\x22\x20data-storyboard-3d-export-action=\x22toggle-all-shots\x22\x20data-export-focus-key=\x22toggle-all\x22>' +
+      ? '<button type="button" class="storyboard-3d-export-select-all" data-storyboard-3d-export-action="toggle-all-shots" data-export-focus-key="toggle-all">' +
         (map3['size'] === list14['length'] ? '取消全选' : '全选分镜') +
         '</button>'
       : '') +
@@ -199,20 +199,20 @@ function renderShotRail(list14, value15, value16, list15) {
         (value20 ? ' is-selected' : '') +
         '" draggable="true" data-storyboard-3d-export-drag-shot-id="' +
         escapeHtml(error2['id']) +
-        '\x22\x20' +
+        '" ' +
         (enabled2
           ? ''
-          : 'data-storyboard-3d-export-action=\x22toggle-shot\x22\x20data-storyboard-3d-export-shot-id=\x22' +
+          : 'data-storyboard-3d-export-action="toggle-shot" data-storyboard-3d-export-shot-id="' +
             escapeHtml(error2['id']) +
-            '\x22') +
-        '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-export-shot-thumb\x22>' +
+            '"') +
+        '>\n          <span class="storyboard-3d-export-shot-thumb">' +
         renderShotVisual(error2) +
         '<b>' +
-        String(value19 + 0x1)['padStart'](0x2, '0') +
-        '</b></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        String(value19 + 1)['padStart'](2, '0') +
+        '</b></span>\n          ' +
         (enabled2
-          ? '<div\x20class=\x22storyboard-3d-export-shot-copy\x22><strong>' +
-            escapeHtml(error2['name'] || '镜头 ' + (value19 + 0x1)) +
+          ? '<div class="storyboard-3d-export-shot-copy"><strong>' +
+            escapeHtml(error2['name'] || '镜头 ' + (value19 + 1)) +
             '</strong><small>' +
             escapeHtml(error2['sceneName'] || '未命名场景') +
             '</small></div>'
@@ -223,7 +223,7 @@ function renderShotRail(list14, value15, value16, list15) {
             '" aria-pressed="' +
             value20 +
             '"><span><strong>' +
-            escapeHtml(error2['name'] || '镜头 ' + (value19 + 0x1)) +
+            escapeHtml(error2['name'] || '镜头 ' + (value19 + 1)) +
             '</strong><small>' +
             escapeHtml(error2['sceneName'] || '未命名场景') +
             '</small></span></button>') +
@@ -236,18 +236,18 @@ function renderShotRail(list14, value15, value16, list15) {
       : value17
         ? '点击卡片可多选要导出的分镜。'
         : '点击卡片选择一个要导出的分镜。') +
-    '</p>\x0a\x20\x20</aside>'
+    '</p>\n  </aside>'
   );
 }
 function renderGridComposer(list16, map4, value21) {
   return (
-    '<div\x20class=\x22storyboard-3d-export-grid-composer\x22\x20data-storyboard-3d-export-grid-size=\x22' +
+    '<div class="storyboard-3d-export-grid-composer" data-storyboard-3d-export-grid-size="' +
     value21 +
     '">\n    ' +
     list16['map']((value22, value23) => {
       const error3 = map4['get'](value22);
       return (
-        '<div\x20class=\x22storyboard-3d-export-grid-slot' +
+        '<div class="storyboard-3d-export-grid-slot' +
         (error3 ? ' is-filled' : '') +
         '" data-storyboard-3d-export-grid-slot="' +
         value23 +
@@ -257,12 +257,12 @@ function renderGridComposer(list16, map4, value21) {
         (error3
           ? renderShotVisual(error3) +
             '<span><b>' +
-            String(value23 + 0x1)['padStart'](0x2, '0') +
+            String(value23 + 1)['padStart'](2, '0') +
             '</b><small>' +
             escapeHtml(error3['name'] || '未命名镜头') +
             '</small></span>'
           : '<span class="storyboard-3d-export-grid-empty"><b>' +
-            String(value23 + 0x1)['padStart'](0x2, '0') +
+            String(value23 + 1)['padStart'](2, '0') +
             '</b><small>拖入分镜</small></span>') +
         '\n      </div>'
       );
@@ -315,42 +315,42 @@ function renderOptions({
       ['720p', '1080p', '2K', '4K']['map']((value29) => ({ value: value29, label: value29 })),
       options2['resolution'],
     ) +
-    '</div></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</div></div>\n          ' +
     (value27
       ? '<div data-storyboard-3d-grid-size><span>宫格布局</span><div class="storyboard-3d-export-grid-size-options">' +
         renderChoiceButtons(
           'gridSize',
-          [0x4, 0x9, 0x10]['map']((label2) => ({ value: String(label2), label: label2 + ' 宫格' })),
+          [4, 9, 16]['map']((label2) => ({ value: String(label2), label: label2 + ' 宫格' })),
           String(options2['gridSize']),
         ) +
         '</div></div>'
       : '') +
     '\n        </section>\n        <section class="storyboard-3d-export-stage' +
     (value27 ? ' is-grid' : '') +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-3d-export-stage-heading\x22><span><small>02</small><strong>' +
+    '">\n          <div class="storyboard-3d-export-stage-heading"><span><small>02</small><strong>' +
     (value27 ? '宫格编排' : '输出预览') +
     '</strong></span><em>' +
     box['width'] +
-    '\x20×\x20' +
+    ' × ' +
     box['height'] +
     (value27 ? ' / 格' : '') +
     '</em></div>\n          ' +
     (value27
       ? renderGridComposer(gridSlots, map5, options2['gridSize'])
       : '<div class="storyboard-3d-export-single-preview">' +
-        renderShotVisual(map5['get'](selectedShotIds[0x0])) +
+        renderShotVisual(map5['get'](selectedShotIds[0])) +
         '<div><strong>' +
         box['width'] +
         ' × ' +
         box['height'] +
         '</strong><small>' +
-        (options2['mode'] === 'sequence-png' ? value25 + '\x20个独立文件' : '导出首个所选镜头') +
+        (options2['mode'] === 'sequence-png' ? value25 + ' 个独立文件' : '导出首个所选镜头') +
         '</small></div></div>') +
     '\n          ' +
     (value27
       ? '<p class="storyboard-3d-export-grid-help">已载入 ' +
         value26 +
-        '\x20个镜头。拖动左侧分镜到任意格，或在格子之间拖动互换。</p>'
+        ' 个镜头。拖动左侧分镜到任意格，或在格子之间拖动互换。</p>'
       : '') +
     '\n        </section>\n        ' +
     (options2['mode']['endsWith']('video')
@@ -358,7 +358,7 @@ function renderOptions({
         options2['videoStart'] +
         '"></label><label>结束 / 秒（0 为镜头末尾）<input type="number" name="videoEnd" min="0" max="3600" step="0.1" value="' +
         options2['videoEnd'] +
-        '\x22></label><label>录制轨道<select\x20name=\x22videoTrack\x22><option\x20value=\x22all\x22\x20' +
+        '"></label><label>录制轨道<select name="videoTrack"><option value="all" ' +
         (options2['videoTrack'] === 'all' ? 'selected' : '') +
         '>完整镜头</option><option value="camera" ' +
         (options2['videoTrack'] === 'camera' ? 'selected' : '') +
@@ -368,7 +368,7 @@ function renderOptions({
             (error4) =>
               '<option value="' +
               escapeHtml(error4['id']) +
-              '\x22\x20' +
+              '" ' +
               (options2['videoTrack'] === error4['id'] ? 'selected' : '') +
               '>' +
               escapeHtml(error4['name']) +
@@ -446,7 +446,7 @@ export class Storyboard3DExportController {
         el['setAttribute']('role', 'dialog'),
         el['setAttribute']('aria-modal', 'true'),
         el['setAttribute']('aria-label', '导出 3D 分镜'),
-        (el['tabIndex'] = -0x1),
+        (el['tabIndex'] = -1),
         (el['dataset']['uiStop'] = '1'),
         el['addEventListener']('click', this['_handleClick']),
         el['addEventListener']('change', this['_handleChange']),
@@ -477,7 +477,7 @@ export class Storyboard3DExportController {
       this['_render'](),
       value32 &&
         focusFirstElement(this['root'], {
-          preferredSelector: '[data-export-focus-key=\x22mode:current-png\x22]',
+          preferredSelector: '[data-export-focus-key="mode:current-png"]',
         }),
       this
     );
@@ -623,7 +623,7 @@ export class Storyboard3DExportController {
   ['_handleDragStart'](event2) {
     const value52 = event2['target']['closest']('[data-storyboard-3d-export-grid-slot]'),
       value53 = event2['target']['closest']('[data-storyboard-3d-export-drag-shot-id]'),
-      sourceIndex2 = value52 ? Number(value52['getAttribute']('data-storyboard-3d-export-grid-slot')) : -0x1,
+      sourceIndex2 = value52 ? Number(value52['getAttribute']('data-storyboard-3d-export-grid-slot')) : -1,
       shotId2 = value52
         ? this['gridSlots'][sourceIndex2]
         : value53?.['getAttribute']('data-storyboard-3d-export-drag-shot-id') || '';
@@ -637,7 +637,7 @@ export class Storyboard3DExportController {
         JSON['stringify'](this['dragState']),
       ));
     if (event2['dataTransfer'])
-      event2['dataTransfer']['effectAllowed'] = sourceIndex2 >= 0x0 ? 'move' : 'copy';
+      event2['dataTransfer']['effectAllowed'] = sourceIndex2 >= 0 ? 'move' : 'copy';
   }
   ['_handleDragOver'](event3) {
     const el8 = event3['target']['closest']('[data-storyboard-3d-export-grid-slot]');
@@ -648,7 +648,7 @@ export class Storyboard3DExportController {
         ['forEach']((el9) => el9['classList']['remove']('is-drop-target')),
       el8['classList']['add']('is-drop-target'));
     if (event3['dataTransfer'])
-      event3['dataTransfer']['dropEffect'] = this['dragState']?.['sourceIndex'] >= 0x0 ? 'move' : 'copy';
+      event3['dataTransfer']['dropEffect'] = this['dragState']?.['sourceIndex'] >= 0 ? 'move' : 'copy';
   }
   ['_handleDragLeave'](event4) {
     const el10 = event4['target']['closest']('[data-storyboard-3d-export-grid-slot]');
@@ -701,7 +701,7 @@ export class Storyboard3DExportController {
         this['options']['mode'] === 'grid-png'
           ? this['gridSlots']['map']((value57) => map7['get'](value57) || null)
           : enabled6
-            ? [value55[0x0]]['filter'](Boolean)
+            ? [value55[0]]['filter'](Boolean)
             : value55;
     if (!shots3['some'](Boolean)) {
       this['_setProgress']('请先选择至少一个要导出的镜头。');
@@ -729,7 +729,7 @@ export class Storyboard3DExportController {
         includeShotNumber: this['options']['includeMetadata'],
         includeShotAngle: this['options']['includeMetadata'],
         includeFocalLength: this['options']['includeMetadata'],
-        metadataHeight: this['options']['includeMetadata'] && !enabled6 ? undefined : 0x0,
+        metadataHeight: this['options']['includeMetadata'] && !enabled6 ? undefined : 0,
         onProgress: ({ stage: stage, current: current2, total: total }) => {
           if (stage === 'encoding') this['_setProgress']('正在编码图片…');
           else {
@@ -740,14 +740,14 @@ export class Storyboard3DExportController {
       let mimeType = this['options']['mode'] === 'current-jpeg' ? 'image/jpeg' : 'image/png';
       const results = kind
         ? [
-            await this['renderVideo'](shots3[0x0], {
+            await this['renderVideo'](shots3[0], {
               ...args4,
               shots: shots3,
               signal: signal['signal'],
               onProgress: ({ current: current3, total: total2 }) => {
                 if (this['exportAbort'] !== signal) return;
                 this['_setProgress'](
-                  '正在录制 ' + current3['toFixed'](0x1) + ' / ' + total2['toFixed'](0x1) + '\x20秒',
+                  '正在录制 ' + current3['toFixed'](1) + ' / ' + total2['toFixed'](1) + ' 秒',
                 );
                 const el12 = this['root']?.['querySelector']('[data-storyboard-3d-export-meter]');
                 el12 && ((el12['max'] = total2), (el12['value'] = current3));
@@ -762,13 +762,13 @@ export class Storyboard3DExportController {
                 ...args5,
                 mimeType: mimeType,
                 columns:
-                  this['options']['mode'] === 'grid-png' ? Math['sqrt'](this['options']['gridSize']) : 0x1,
+                  this['options']['mode'] === 'grid-png' ? Math['sqrt'](this['options']['gridSize']) : 1,
               }),
             ];
       if (signal['signal']['aborted']) throw new DOMException('已取消导出', 'AbortError');
-      const el13 = this['root']?.['querySelector']('[data-storyboard-3d-export-action=\x22cancel\x22]');
+      const el13 = this['root']?.['querySelector']('[data-storyboard-3d-export-action="cancel"]');
       if (el13) el13['hidden'] = !![];
-      if (kind) mimeType = results[0x0]['blob']['type'];
+      if (kind) mimeType = results[0]['blob']['type'];
       const value58 = kind
         ? mimeType === 'video/mp4'
           ? 'mp4'
@@ -778,7 +778,7 @@ export class Storyboard3DExportController {
           : 'png';
       if (returnToCanvas === 'local') {
         const value59 = results['map']((blob2, value60) => {
-            const value61 = results['length'] > 0x1 ? '-' + String(value60 + 0x1)['padStart'](0x2, '0') : '';
+            const value61 = results['length'] > 1 ? '-' + String(value60 + 1)['padStart'](2, '0') : '';
             return {
               kind: kind ? 'video' : 'image',
               blob: blob2['blob'],
@@ -809,7 +809,7 @@ export class Storyboard3DExportController {
         this['_setProgress'](
           returnToCanvas === 'canvas'
             ? '已将导出结果发送到画布。'
-            : '已导出到本地，共 ' + results['length'] + '\x20个文件。',
+            : '已导出到本地，共 ' + results['length'] + ' 个文件。',
         ));
     } catch (error5) {
       if (this['exportAbort'] !== signal) return;

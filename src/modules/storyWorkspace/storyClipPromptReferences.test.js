@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { protectStoryPromptPills, syncStoryClipPromptReferences } from './storyClipPromptReferences.js';
 
 // 占位符两端是私用区字符 U+E000 / U+E001，避免 story-pill-1 与 story-pill-10 前缀串位
-const token = (index) => `\uE000story-pill-${index}\uE001`;
+const token = (index) => `story-pill-${index}`;
 const pill = (label, extra = '') => `<span class="ref-pill" data-label="${label}"${extra}>@${label}</span>`;
 
 test('reference pills are swapped for private-use tokens and restored', () => {

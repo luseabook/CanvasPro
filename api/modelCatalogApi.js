@@ -1,10 +1,10 @@
 import { buildApiUrl, fetchWithTimeout } from './apiBase.js';
 export const BINGHUO_MODEL_CATALOG_PATH = '/api/v2/model-catalog?provider=binghuo';
 export class ModelCatalogApiError extends Error {
-  constructor(value, { status: status = 0x0, cause: cause } = {}) {
+  constructor(value, { status: status = 0, cause: cause } = {}) {
     (super(String(value || '模型目录请求失败'), cause ? { cause: cause } : undefined),
       (this['name'] = 'ModelCatalogApiError'),
-      (this['status'] = Number(status) || 0x0));
+      (this['status'] = Number(status) || 0));
   }
 }
 function normalizeIdentity(item) {
@@ -24,14 +24,14 @@ async function readErrorMessage(response2) {
       return enabled['trim']();
     }
   } catch {
-    return 'HTTP ' + (response2?.['status'] || 0x0);
+    return 'HTTP ' + (response2?.['status'] || 0);
   }
 }
 export async function fetchBinghuoModelCatalog({
   installId: installId,
   deviceId: deviceId,
   etag: etag = '',
-  timeout: timeout = 0x3a98,
+  timeout: timeout = 15000,
 } = {}) {
   const identity = normalizeIdentity(installId),
     identity2 = normalizeIdentity(deviceId);
@@ -58,12 +58,12 @@ export async function fetchBinghuoModelCatalog({
     );
   }
   const args = {
-    httpStatus: Number(status2['status']) || 0x0,
+    httpStatus: Number(status2['status']) || 0,
     etag: readResponseHeader(status2, 'ETag'),
     cacheControl: readResponseHeader(status2, 'Cache-Control'),
     lastModified: readResponseHeader(status2, 'Last-Modified'),
   };
-  if (status2['status'] === 0x130) return { status: 'not-modified', bundle: null, ...args };
+  if (status2['status'] === 304) return { status: 'not-modified', bundle: null, ...args };
   if (!status2['ok'])
     throw new ModelCatalogApiError(await readErrorMessage(status2), {
       status: status2['status'],

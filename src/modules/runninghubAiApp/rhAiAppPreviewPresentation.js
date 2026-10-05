@@ -356,7 +356,7 @@ export function createRhAiAppPreviewPresentation({
           el25 =
             el23 ||
             el24?.['querySelector']?.(
-              '.rh-adv-title,\x20.ui-schema-field-label,\x20' + 'span:not(.rh-tip):not(.ui-schema-info-tip)',
+              '.rh-adv-title, .ui-schema-field-label, ' + 'span:not(.rh-tip):not(.ui-schema-info-tip)',
             );
         el25 &&
           (el25['classList']['add']('rh-ai-app-preview-rename-target'),
@@ -397,7 +397,7 @@ export function createRhAiAppPreviewPresentation({
     ['_getPreviewZoneElement'](value13) {
       const value14 = String(value13 || '')['trim']();
       if (!['input', 'prompt', 'params', 'advanced']['includes'](value14)) return null;
-      return this['nodePreviewEl']?.['querySelector']?.('[data-preview-zone="' + value14 + '\x22]') || null;
+      return this['nodePreviewEl']?.['querySelector']?.('[data-preview-zone="' + value14 + '"]') || null;
     }
     ['clearUiSchemaBinding']() {
       (this['previewUiSchemaCleanup']?.(), (this['previewUiSchemaCleanup'] = null));

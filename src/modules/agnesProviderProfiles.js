@@ -7,7 +7,7 @@ export const AGNES_MODEL_API_PROFILE_IDS = Object['freeze']([
 export const AGNES_MODEL_API_PROFILES = Object['freeze']({
   [AGNES_DOMESTIC_PROFILE_ID]: Object['freeze']({
     id: AGNES_DOMESTIC_PROFILE_ID,
-    label: 'Agnes\x20AI（国内）',
+    label: 'Agnes AI（国内）',
     shortLabel: '国内',
     switchLabel: 'Agnes AI 国内版',
     credentialLabel: 'API Key',
@@ -16,9 +16,9 @@ export const AGNES_MODEL_API_PROFILES = Object['freeze']({
   }),
   [AGNES_INTERNATIONAL_PROFILE_ID]: Object['freeze']({
     id: AGNES_INTERNATIONAL_PROFILE_ID,
-    label: 'Agnes\x20AI（国际）',
+    label: 'Agnes AI（国际）',
     shortLabel: '国际',
-    switchLabel: 'Agnes\x20AI\x20国际版',
+    switchLabel: 'Agnes AI 国际版',
     credentialLabel: 'API Key',
     region: 'international',
     apiUrl: 'https://apihub.agnes-ai.com',

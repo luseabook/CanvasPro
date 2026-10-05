@@ -2,43 +2,43 @@ import * as threeRuntime from './threeRuntime.js';
 import { applyAdaptiveCameraProjection } from './scene3dCameraNavigation.js';
 function positive(value, item, key = 0.001) {
   const count = Number(value);
-  return Math['max'](key, Number['isFinite'](count) && count > 0x0 ? count : item);
+  return Math['max'](key, Number['isFinite'](count) && count > 0 ? count : item);
 }
 export function createScene3DViewProjectionState(index) {
   return {
-    viewport: { width: 0x1, height: 0x1 },
+    viewport: { width: 1, height: 1 },
     view: {
       type: 'perspective',
-      verticalSize: 0x14,
+      verticalSize: 20,
       near: positive(index?.['near'], 0.1),
-      far: positive(index?.['far'], 0xfa, 0x1),
+      far: positive(index?.['far'], 250, 1),
       axis: null,
       top: ![],
       center: null,
     },
     perspective: {
-      fov: positive(index?.['fov'], 0x37, 0x1),
+      fov: positive(index?.['fov'], 55, 1),
       near: positive(index?.['near'], 0.1),
-      far: positive(index?.['far'], 0xfa, 0x1),
+      far: positive(index?.['far'], 250, 1),
     },
   };
 }
 export function rememberScene3DPerspectiveProjection(enabled, enabled2) {
   if (!enabled || !enabled2?.['isPerspectiveCamera']) return;
   enabled['perspective'] = {
-    fov: positive(enabled2['fov'], enabled['perspective']['fov'], 0x1),
+    fov: positive(enabled2['fov'], enabled['perspective']['fov'], 1),
     near: positive(enabled2['near'], enabled['perspective']['near']),
-    far: positive(enabled2['far'], enabled['perspective']['far'], 0x1),
+    far: positive(enabled2['far'], enabled['perspective']['far'], 1),
   };
 }
 export function applyScene3DViewProjectionSize(enabled3, box, result, data) {
   if (!enabled3 || !box) return;
-  const width = positive(result, enabled3['viewport']['width'], 0x1),
-    height = positive(data, enabled3['viewport']['height'], 0x1);
+  const width = positive(result, enabled3['viewport']['width'], 1),
+    height = positive(data, enabled3['viewport']['height'], 1);
   enabled3['viewport'] = { width: width, height: height };
   const options = width / height;
   if (box['isOrthographicCamera']) {
-    const positive2 = positive(enabled3['view']['verticalSize'], 0x14, 0.1) * 0.5,
+    const positive2 = positive(enabled3['view']['verticalSize'], 20, 0.1) * 0.5,
       target = positive2 * options;
     ((box['left'] = -target),
       (box['right'] = target),
@@ -57,8 +57,8 @@ export function switchScene3DViewProjection(source, next, type, args = {}) {
   const verticalSize = positive(center['verticalSize'], source['view']['verticalSize'], 0.1),
     current = type2 === 'orthographic' ? 0.01 : source['perspective']['near'],
     near = positive(center['near'], current),
-    entry = type2 === 'orthographic' ? 0x3e8 : source['perspective']['far'],
-    far = Math['max'](near + 0x1, positive(center['far'], entry, 0x1)),
+    entry = type2 === 'orthographic' ? 1000 : source['perspective']['far'],
+    far = Math['max'](near + 1, positive(center['far'], entry, 1)),
     axis =
       type2 === 'orthographic'
         ? ['top', 'front', 'right']['includes'](center['axis'])
@@ -82,10 +82,10 @@ export function switchScene3DViewProjection(source, next, type, args = {}) {
     !enabled4 &&
       ((record =
         type2 === 'orthographic'
-          ? new threeRuntime['OrthographicCamera'](-0x1, 0x1, 0x1, -0x1, near, far)
+          ? new threeRuntime['OrthographicCamera'](-1, 1, 1, -1, near, far)
           : new threeRuntime['PerspectiveCamera'](
               source['perspective']['fov'],
-              0x1,
+              1,
               source['perspective']['near'],
               source['perspective']['far'],
             )),
@@ -112,11 +112,11 @@ export function resolveScene3DOrthographicPose(payload, event, handle) {
       ? 'top'
       : null;
   if (!axis2) return null;
-  const target2 = payload['view']['center'] || event?.['target'] || { x: 0x0, y: 0x0, z: 0x0 };
+  const target2 = payload['view']['center'] || event?.['target'] || { x: 0, y: 0, z: 0 };
   return {
     axis: axis2,
     target: target2,
-    distance: Math['max'](0.1, Number(event?.['distance']) || Number(handle) || 0x14),
+    distance: Math['max'](0.1, Number(event?.['distance']) || Number(handle) || 20),
   };
 }
 export function resolveScene3DOrthographicTopPose(state, config, scope) {
@@ -124,13 +124,13 @@ export function resolveScene3DOrthographicTopPose(state, config, scope) {
   return scene3DOrthographicPose?.['axis'] === 'top' ? scene3DOrthographicPose : null;
 }
 export function computeScene3DWorldUnitsPerPixel(box2, input, enabled5) {
-  const positive3 = positive(input, 0x1, 0x1);
+  const positive3 = positive(input, 1, 1);
   if (box2?.['isOrthographicCamera'])
-    return Math['abs'](box2['top'] - box2['bottom']) / positive(box2['zoom'], 0x1) / positive3;
-  if (!box2?.['position'] || !enabled5) return 0x0;
+    return Math['abs'](box2['top'] - box2['bottom']) / positive(box2['zoom'], 1) / positive3;
+  if (!box2?.['position'] || !enabled5) return 0;
   const output = Math['max'](0.001, box2['position']['distanceTo'](enabled5)),
-    value2 = (positive(box2['fov'], 0x3a, 0x1) * Math['PI']) / 0xb4;
-  return (0x2 * Math['tan'](value2 / 0x2) * output) / positive3;
+    value2 = (positive(box2['fov'], 58, 1) * Math['PI']) / 180;
+  return (2 * Math['tan'](value2 / 2) * output) / positive3;
 }
 function resolveBridgeState(enabled6) {
   return (
@@ -182,9 +182,9 @@ export function applyBridgeCameraProjection(camera, pose, fallbackFov) {
     const { axis: axis3, target: target3, distance: distance } = scene3DOrthographicPose2;
     return (
       axis3 === 'top'
-        ? (camera['camera']['up']['set'](0x0, 0x0, -0x1),
+        ? (camera['camera']['up']['set'](0, 0, -1),
           camera['camera']['position']['set'](target3['x'], target3['y'] + distance, target3['z']))
-        : (camera['camera']['up']['set'](0x0, 0x1, 0x0),
+        : (camera['camera']['up']['set'](0, 1, 0),
           camera['camera']['position']['set'](
             axis3 === 'right' ? target3['x'] + distance : target3['x'],
             target3['y'],
@@ -194,5 +194,5 @@ export function applyBridgeCameraProjection(camera, pose, fallbackFov) {
       !![]
     );
   }
-  return (camera['camera']['up']['set'](0x0, 0x1, 0x0), ![]);
+  return (camera['camera']['up']['set'](0, 1, 0), ![]);
 }

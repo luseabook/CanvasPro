@@ -19,13 +19,13 @@ const TEXT = Object['freeze']({
   }),
   'en-US': Object['freeze']({
     empty: 'This project has no long-term memory yet. Say “Remember: our brand voice is concise and direct.”',
-    inspect: 'Long-term\x20memory\x20for\x20this\x20project:\x0a{lines}',
+    inspect: 'Long-term memory for this project:\n{lines}',
     remembered: "Saved to this project's long-term memory: {items}.",
     unchanged: "Those details are already in this project's long-term memory.",
     forgotten: "Removed {count} item(s) from this project's long-term memory.",
     notFound: 'No matching project memory was found.',
-    cleared: 'Cleared\x20this\x20project\x27s\x20long-term\x20memory.',
-    brandVoice: 'Brand\x20voice',
+    cleared: 'Cleared this project\'s long-term memory.',
+    brandVoice: 'Brand voice',
     preferredModels: 'Preferred models',
     namingRules: 'Naming rules',
     preferences: 'Other preferences',
@@ -71,11 +71,11 @@ export function createAgentProjectMemoryConversationRuntime({
     const target = projectMemoryStore['getMemory']();
     if (isAgentProjectMemoryEmpty(target))
       return run(options, formatText('empty', {}, localeProvider?.()), target);
-    const lines = AGENT_PROJECT_MEMORY_CATEGORIES['filter']((source) => target[source]['length'] > 0x0)
+    const lines = AGENT_PROJECT_MEMORY_CATEGORIES['filter']((source) => target[source]['length'] > 0)
       ['map'](
-        (next) => '-\x20' + formatText(next, {}, localeProvider?.()) + '：' + target[next]['join']('；'),
+        (next) => '- ' + formatText(next, {}, localeProvider?.()) + '：' + target[next]['join']('；'),
       )
-      ['join']('\x0a');
+      ['join']('\n');
     return run(options, formatText('inspect', { lines: lines }, localeProvider?.()), target);
   }
   function handle({ message: message = '', runId: runId = '' } = {}) {
@@ -91,7 +91,7 @@ export function createAgentProjectMemoryConversationRuntime({
     if (detectAgentProjectMemoryIntent2['operation'] === 'remember') {
       const items = projectMemoryStore['remember'](detectAgentProjectMemoryIntent2['records']),
         current =
-          items['added']['length'] > 0x0
+          items['added']['length'] > 0
             ? formatText(
                 'remembered',
                 {
@@ -112,7 +112,7 @@ export function createAgentProjectMemoryConversationRuntime({
       return run(
         runId,
         formatText(
-          count['removed'] > 0x0 ? 'forgotten' : 'notFound',
+          count['removed'] > 0 ? 'forgotten' : 'notFound',
           { count: count['removed'] },
           localeProvider?.(),
         ),

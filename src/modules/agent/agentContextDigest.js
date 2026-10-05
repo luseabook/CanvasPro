@@ -1,21 +1,21 @@
 import { compactAgentConversationText } from './agentConversationText.js';
-export const AGENT_CONTEXT_DIGEST_SCHEMA_VERSION = 0x1;
-export const AGENT_CONTEXT_DIGEST_RECENT_MESSAGE_LIMIT = 0xc;
-export const AGENT_CONTEXT_DIGEST_MIN_BATCH_MESSAGES = 0x8;
-const MAX_GOAL_CHARS = 0x320,
-  MAX_ITEM_CHARS = 0x1e0,
-  MAX_ITEMS_PER_SECTION = 0xa,
-  MAX_MESSAGE_CHARS = 0x7d0,
+export const AGENT_CONTEXT_DIGEST_SCHEMA_VERSION = 1;
+export const AGENT_CONTEXT_DIGEST_RECENT_MESSAGE_LIMIT = 12;
+export const AGENT_CONTEXT_DIGEST_MIN_BATCH_MESSAGES = 8;
+const MAX_GOAL_CHARS = 800,
+  MAX_ITEM_CHARS = 480,
+  MAX_ITEMS_PER_SECTION = 10,
+  MAX_MESSAGE_CHARS = 2000,
   DIGEST_ARRAY_FIELDS = Object['freeze'](['constraints', 'decisions', 'completed', 'pending']);
 function compactWhitespace(value = '') {
   return String(value || '')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
 }
 function truncateText(item, key) {
   const list = compactWhitespace(item);
   if (list['length'] <= key) return list;
-  return list['slice'](0x0, Math['max'](0x0, key - 0x3)) + '...';
+  return list['slice'](0, Math['max'](0, key - 3)) + '...';
 }
 function normalizeDigestItems(index) {
   if (!Array['isArray'](index)) return [];
@@ -40,11 +40,11 @@ export function normalizeAgentContextDigest(enabled = null) {
       pending: normalizeDigestItems(enabled['pending']),
       coveredThroughItemId: String(enabled['coveredThroughItemId'] || '')
         ['trim']()
-        ['slice'](0x0, 0xa0),
-      coveredThroughTs: Math['max'](0x0, Math['trunc'](Number(enabled['coveredThroughTs'] || 0x0))),
-      coveredMessageCount: Math['max'](0x0, Math['trunc'](Number(enabled['coveredMessageCount'] || 0x0))),
+        ['slice'](0, 160),
+      coveredThroughTs: Math['max'](0, Math['trunc'](Number(enabled['coveredThroughTs'] || 0))),
+      coveredMessageCount: Math['max'](0, Math['trunc'](Number(enabled['coveredMessageCount'] || 0))),
     },
-    options = Boolean(data['goal'] || DIGEST_ARRAY_FIELDS['some']((target) => data[target]['length'] > 0x0)),
+    options = Boolean(data['goal'] || DIGEST_ARRAY_FIELDS['some']((target) => data[target]['length'] > 0)),
     source = Boolean(data['coveredThroughItemId'] || data['coveredThroughTs'] || data['coveredMessageCount']);
   return options || source ? data : null;
 }
@@ -55,14 +55,14 @@ function findCoveredMessageIndex(list3, next) {
   const current = String(next?.['coveredThroughItemId'] || '')['trim']();
   if (current) {
     const count = list3['findIndex']((entry) => getMessageItemId(entry) === current);
-    if (count >= 0x0) return count;
+    if (count >= 0) return count;
   }
-  const count2 = Number(next?.['coveredThroughTs'] || 0x0);
-  if (count2 > 0x0)
-    for (let count3 = list3['length'] - 0x1; count3 >= 0x0; count3 -= 0x1) {
-      if (Number(list3[count3]?.['ts'] || 0x0) <= count2) return count3;
+  const count2 = Number(next?.['coveredThroughTs'] || 0);
+  if (count2 > 0)
+    for (let count3 = list3['length'] - 1; count3 >= 0; count3 -= 1) {
+      if (Number(list3[count3]?.['ts'] || 0) <= count2) return count3;
     }
-  return -0x1;
+  return -1;
 }
 function normalizeDigestMessage(error = {}) {
   const role = String(error['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
@@ -72,14 +72,14 @@ function normalizeDigestMessage(error = {}) {
     ),
     status = String(error['status'] || '')
       ['trim']()
-      ['slice'](0x0, 0x50);
+      ['slice'](0, 80);
   if (!content && !status) return null;
   return {
     role: role,
     content: content,
     ...(status ? { status: status } : {}),
     itemId: getMessageItemId(error),
-    ts: Math['max'](0x0, Math['trunc'](Number(error['ts'] || 0x0))),
+    ts: Math['max'](0, Math['trunc'](Number(error['ts'] || 0))),
   };
 }
 export function selectAgentContextDigestBatch({
@@ -91,15 +91,15 @@ export function selectAgentContextDigestBatch({
   const list4 = Array['isArray'](history) ? history : [],
     contextDigest2 = normalizeAgentContextDigest(contextDigest),
     record = Math['max'](
-      0x0,
-      list4['length'] - Math['max'](0x1, Math['trunc'](Number(recentMessageLimit) || 0x1)),
+      0,
+      list4['length'] - Math['max'](1, Math['trunc'](Number(recentMessageLimit) || 1)),
     ),
     coveredMessageIndex = findCoveredMessageIndex(list4, contextDigest2),
-    payload = coveredMessageIndex >= 0x0 ? coveredMessageIndex + 0x1 : 0x0,
+    payload = coveredMessageIndex >= 0 ? coveredMessageIndex + 1 : 0,
     messages = list4['slice'](payload, record)['map'](normalizeDigestMessage)['filter'](Boolean);
-  if (messages['length'] < Math['max'](0x1, Math['trunc'](Number(minBatchMessages) || 0x1)))
+  if (messages['length'] < Math['max'](1, Math['trunc'](Number(minBatchMessages) || 1)))
     return { contextDigest: contextDigest2, messages: [], coveredThrough: null };
-  const itemId = messages['at'](-0x1);
+  const itemId = messages['at'](-1);
   return {
     contextDigest: contextDigest2,
     messages: messages,
@@ -111,16 +111,16 @@ export function attachAgentContextDigestCursor(
   {
     previousDigest: previousDigest = null,
     coveredThrough: coveredThrough = null,
-    messageCount: messageCount = 0x0,
+    messageCount: messageCount = 0,
   } = {},
 ) {
   return normalizeAgentContextDigest({
     ...(handle || {}),
     coveredThroughItemId: String(coveredThrough?.['itemId'] || '')['trim'](),
-    coveredThroughTs: Math['max'](0x0, Math['trunc'](Number(coveredThrough?.['ts'] || 0x0))),
+    coveredThroughTs: Math['max'](0, Math['trunc'](Number(coveredThrough?.['ts'] || 0))),
     coveredMessageCount:
-      Math['max'](0x0, Math['trunc'](Number(previousDigest?.['coveredMessageCount'] || 0x0))) +
-      Math['max'](0x0, Math['trunc'](Number(messageCount || 0x0))),
+      Math['max'](0, Math['trunc'](Number(previousDigest?.['coveredMessageCount'] || 0))) +
+      Math['max'](0, Math['trunc'](Number(messageCount || 0))),
   });
 }
 export function compactAgentContextDigestForPrompt(value2 = null) {

@@ -42,9 +42,9 @@ function createSourceState(el3, source) {
     declaredSource: getDeclaredVideoSource(el3),
     callbackId: null,
     frameCallbackObserved: ![],
-    frameCallbackAt: 0x0,
+    frameCallbackAt: 0,
     presented: ![],
-    presentedAt: 0x0,
+    presentedAt: 0,
     metadata: null,
     listeners: new Set(),
   };
@@ -67,16 +67,16 @@ function readSourceState(options) {
     return { source: source2, state: createSourceState(options, source2) };
   return { source: source2, state: state };
 }
-function isCurrentPresentedFrameValid(el4, target, next = 0x2) {
+function isCurrentPresentedFrameValid(el4, target, next = 2) {
   return !!(
     el4 &&
     target &&
     el4['isConnected'] !== ![] &&
     getVideoPresentationSource(el4) === target &&
     videoFramePresentationState['get'](el4)?.['declaredSource'] === getDeclaredVideoSource(el4) &&
-    Number(el4['readyState'] || 0x0) >= next &&
-    Number(el4['videoWidth'] || 0x0) > 0x0 &&
-    Number(el4['videoHeight'] || 0x0) > 0x0 &&
+    Number(el4['readyState'] || 0) >= next &&
+    Number(el4['videoWidth'] || 0) > 0 &&
+    Number(el4['videoHeight'] || 0) > 0 &&
     !el4['error']
   );
 }
@@ -97,7 +97,7 @@ export function hasPresentedVideoFrame(enabled4, entry = '') {
   return !!(
     record?.['presented'] === !![] &&
     record['source'] === videoPresentationSource &&
-    isCurrentPresentedFrameValid(enabled4, videoPresentationSource, 0x1)
+    isCurrentPresentedFrameValid(enabled4, videoPresentationSource, 1)
   );
 }
 export function watchVideoFramePresentation(el5, payload) {
@@ -112,9 +112,9 @@ export function watchVideoFramePresentation(el5, payload) {
       (el5['dataset']['firstFramePresentedSource'] = source4));
     globalThis['window']?.['__runtimeCompareMark']?.('video-frame-presentation:ready', {
       source: source4,
-      readyState: Number(el5['readyState'] || 0x0),
-      videoWidth: Number(el5['videoWidth'] || 0x0),
-      videoHeight: Number(el5['videoHeight'] || 0x0),
+      readyState: Number(el5['readyState'] || 0),
+      videoWidth: Number(el5['videoWidth'] || 0),
+      videoHeight: Number(el5['videoHeight'] || 0),
     });
     const handle = Array['from'](state2['listeners']);
     state2['listeners']['clear']();
@@ -148,26 +148,26 @@ export function watchVideoFramePresentation(el5, payload) {
       const output = !!(
         el5?.['isConnected'] !== ![] &&
         getVideoPresentationSource(el5) === source4 &&
-        Number(el5?.['videoWidth'] || box['width'] || 0x0) > 0x0 &&
-        Number(el5?.['videoHeight'] || box['height'] || 0x0) > 0x0 &&
+        Number(el5?.['videoWidth'] || box['width'] || 0) > 0 &&
+        Number(el5?.['videoHeight'] || box['height'] || 0) > 0 &&
         !el5?.['error']
       );
       output &&
         ((state2['frameCallbackObserved'] = !![]),
-        (state2['frameCallbackAt'] = Number(scope || 0x0)),
+        (state2['frameCallbackAt'] = Number(scope || 0)),
         (state2['metadata'] = {
-          mediaTime: Number(box['mediaTime'] || 0x0),
-          presentedFrames: Number(box['presentedFrames'] || 0x0),
-          width: Number(box['width'] || el5['videoWidth'] || 0x0),
-          height: Number(box['height'] || el5['videoHeight'] || 0x0),
+          mediaTime: Number(box['mediaTime'] || 0),
+          presentedFrames: Number(box['presentedFrames'] || 0),
+          width: Number(box['width'] || el5['videoWidth'] || 0),
+          height: Number(box['height'] || el5['videoHeight'] || 0),
         }));
       if (!isCurrentPresentedFrameValid(el5, source4)) {
         globalThis['window']?.['__runtimeCompareMark']?.('video-frame-presentation:invalid', {
           source: source4,
           currentSource: getVideoPresentationSource(el5),
-          readyState: Number(el5?.['readyState'] || 0x0),
-          videoWidth: Number(el5?.['videoWidth'] || 0x0),
-          videoHeight: Number(el5?.['videoHeight'] || 0x0),
+          readyState: Number(el5?.['readyState'] || 0),
+          videoWidth: Number(el5?.['videoWidth'] || 0),
+          videoHeight: Number(el5?.['videoHeight'] || 0),
         });
         return;
       }
@@ -178,9 +178,9 @@ export function watchVideoFramePresentation(el5, payload) {
         (el5['dataset']['firstFramePresentedSource'] = source4));
       globalThis['window']?.['__runtimeCompareMark']?.('video-frame-presentation:ready', {
         source: source4,
-        readyState: Number(el5['readyState'] || 0x0),
-        videoWidth: Number(el5['videoWidth'] || 0x0),
-        videoHeight: Number(el5['videoHeight'] || 0x0),
+        readyState: Number(el5['readyState'] || 0),
+        videoWidth: Number(el5['videoWidth'] || 0),
+        videoHeight: Number(el5['videoHeight'] || 0),
       });
       const value2 = Array['from'](state2['listeners']);
       state2['listeners']['clear']();

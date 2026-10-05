@@ -5,10 +5,10 @@ export function createCollaborationReviewState({
   onChange: onChange,
   onComment: onComment = () => {},
 }) {
-  let args = { revision: -0x1, summaries: [], activities: [], loading: ![], error: '' },
+  let args = { revision: -1, summaries: [], activities: [], loading: ![], error: '' },
     value = null,
-    item = -0x1,
-    count = Number['isInteger'](initialRevision) ? initialRevision : -0x1;
+    item = -1,
+    count = Number['isInteger'](initialRevision) ? initialRevision : -1;
   const run = (args2) => {
     current() && ((args = { ...args, ...args2 }), onChange(args));
   };
@@ -31,7 +31,7 @@ export function createCollaborationReviewState({
             )
               throw new Error('协作动态响应无效');
             const index =
-              count < 0x0
+              count < 0
                 ? []
                 : args3['activities']
                     ['filter'](

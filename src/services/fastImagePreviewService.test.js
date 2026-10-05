@@ -10,8 +10,8 @@ import {
 // —— 构造各格式头部字节（端口用十六进制字面量，此处用十进制构造，语义等价）——
 function pngBytes(w, h, total = 33) {
   const b = new Uint8Array(total);
-  b.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0);
-  b.set([0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52], 8); // IHDR
+  b.set([137, 80, 78, 71, 0x0d, 0x0a, 26, 0x0a], 0);
+  b.set([0x00, 0x00, 0x00, 0x0d, 73, 72, 0x44, 82], 8); // IHDR
   b[16] = (w >>> 24) & 0xff;
   b[17] = (w >>> 16) & 0xff;
   b[18] = (w >>> 8) & 0xff;
@@ -25,7 +25,7 @@ function pngBytes(w, h, total = 33) {
 function jpegBytes(segments, total = 40) {
   const b = new Uint8Array(total);
   b[0] = 0xff;
-  b[1] = 0xd8;
+  b[1] = 216;
   let p = 2;
   for (const s of segments) {
     b.set(s, p);
@@ -33,7 +33,7 @@ function jpegBytes(segments, total = 40) {
   }
   return b;
 }
-function sofSegment(w, h, marker = 0xc0, segLen = 0x11) {
+function sofSegment(w, h, marker = 192, segLen = 0x11) {
   return [
     0xff,
     marker,
@@ -48,7 +48,7 @@ function sofSegment(w, h, marker = 0xc0, segLen = 0x11) {
 }
 function gifBytes(w, h) {
   const b = new Uint8Array(13);
-  b.set([0x47, 0x49, 0x46, 0x38, 0x39, 0x61], 0); // GIF89a
+  b.set([71, 73, 70, 56, 57, 97], 0); // GIF89a
   b[6] = w & 0xff;
   b[7] = (w >>> 8) & 0xff;
   b[8] = h & 0xff;
@@ -57,8 +57,8 @@ function gifBytes(w, h) {
 }
 function webpBytes(fourcc, dims, total = 30) {
   const b = new Uint8Array(total);
-  b.set([0x52, 0x49, 0x46, 0x46], 0); // RIFF
-  b.set([0x57, 0x45, 0x42, 0x50], 8); // WEBP
+  b.set([82, 73, 70, 70], 0); // RIFF
+  b.set([87, 69, 66, 80], 8); // WEBP
   b.set(
     fourcc.split('').map((c) => c.charCodeAt(0)),
     12,
@@ -75,7 +75,7 @@ test('PNG：读 IHDR 大端宽高', () => {
 test('PNG：不足 24 字节 / 魔数不符 / 宽或高为 0 一律 null', () => {
   assert.equal(readImageHeaderSize(pngBytes(10, 10, 23)), null);
   const bad = pngBytes(10, 10);
-  bad[1] = 0x51;
+  bad[1] = 81;
   assert.equal(readImageHeaderSize(bad), null);
   assert.equal(readImageHeaderSize(pngBytes(0, 10)), null);
   assert.equal(readImageHeaderSize(pngBytes(10, 0)), null);
@@ -84,40 +84,40 @@ test('JPEG：FF D8 + SOF0 大端宽高', () => {
   assert.deepEqual(readImageHeaderSize(jpegBytes([sofSegment(800, 600)])), { width: 800, height: 600 });
 });
 test('JPEG：SOF 白名单外的段被跳过，直到命中 SOF', () => {
-  const com = [0xff, 0xfe, 0x00, 0x06, 1, 2, 3, 4];
+  const com = [0xff, 254, 0x00, 0x06, 1, 2, 3, 4];
   assert.deepEqual(readImageHeaderSize(jpegBytes([com, sofSegment(640, 480)])), { width: 640, height: 480 });
 });
 test('JPEG：D9/SOS 终止、段长越界、宽高为 0 都返回 null', () => {
-  assert.equal(readImageHeaderSize(jpegBytes([[0xff, 0xd9]])), null);
-  assert.equal(readImageHeaderSize(jpegBytes([[0xff, 0xda, 0x00, 0x04, 0, 0]])), null);
+  assert.equal(readImageHeaderSize(jpegBytes([[0xff, 217]])), null);
+  assert.equal(readImageHeaderSize(jpegBytes([[0xff, 218, 0x00, 0x04, 0, 0]])), null);
   // 段长声称超出缓冲 ⇒ break（不是继续解析）
-  assert.equal(readImageHeaderSize(jpegBytes([sofSegment(10, 10, 0xc0, 0x40)], 40)), null);
+  assert.equal(readImageHeaderSize(jpegBytes([sofSegment(10, 10, 192, 64)], 40)), null);
   assert.equal(readImageHeaderSize(jpegBytes([sofSegment(0, 10)])), null);
 });
 test('JPEG：缺少 APPn 之外无 SOF 时 null；无 FF D8 魔数时 null', () => {
-  assert.equal(readImageHeaderSize(jpegBytes([[0xff, 0xe0, 0x00, 0x06, 1, 2, 3, 4]], 20)), null);
+  assert.equal(readImageHeaderSize(jpegBytes([[0xff, 224, 0x00, 0x06, 1, 2, 3, 4]], 20)), null);
   const b = jpegBytes([sofSegment(10, 10)]);
-  b[1] = 0xd9;
+  b[1] = 217;
   assert.equal(readImageHeaderSize(b), null);
 });
 test('GIF：小端宽高，版本必须是 GIF87a/89a', () => {
   assert.deepEqual(readImageHeaderSize(gifBytes(320, 240)), { width: 320, height: 240 });
   const bad = gifBytes(320, 240);
-  bad[5] = 0x62; // GIF89b
+  bad[5] = 98; // GIF89b
   assert.equal(readImageHeaderSize(bad), null);
   assert.equal(readImageHeaderSize(gifBytes(0, 240)), null);
 });
 test('WebP VP8X：24 位小端宽高各 +1', () => {
-  assert.deepEqual(readImageHeaderSize(webpBytes('VP8X', [0x2f, 0x01, 0x00, 0x63, 0x00, 0x00])), {
-    width: 0x130,
-    height: 0x64,
+  assert.deepEqual(readImageHeaderSize(webpBytes('VP8X', [47, 0x01, 0x00, 99, 0x00, 0x00])), {
+    width: 304,
+    height: 100,
   });
 });
 test('WebP VP8 （有损）：14 位掩码宽高', () => {
   const b = webpBytes('VP8 ', []);
-  b[26] = 0x9d;
+  b[26] = 157;
   b[27] = 0x01; // (0x19d)&0x3fff = 413
-  b[28] = 0x7d;
+  b[28] = 125;
   b[29] = 0x00; // 125
   assert.deepEqual(readImageHeaderSize(b), { width: 413, height: 125 });
   const zero = webpBytes('VP8 ', []);
@@ -125,19 +125,19 @@ test('WebP VP8 （有损）：14 位掩码宽高', () => {
 });
 test('WebP VP8L（无损）：签名字节 0x2f 必须存在，宽高 +1', () => {
   const b = webpBytes('VP8L', []);
-  b[20] = 0x2f;
-  b[21] = 0x63;
+  b[20] = 47;
+  b[21] = 99;
   b[22] = 0x00;
   b[23] = 0x00;
   assert.deepEqual(readImageHeaderSize(b), { width: 100, height: 1 });
   const bad = webpBytes('VP8L', []);
-  bad[20] = 0x2e;
+  bad[20] = 46;
   assert.equal(readImageHeaderSize(bad), null);
 });
 test('WebP：RIFF/WEBP 魔数或长度不足一律 null', () => {
   assert.equal(readImageHeaderSize(webpBytes('VP8X', [1, 1, 1, 1, 1, 1], 29)), null);
   const b = webpBytes('VP8X', [1, 1, 1, 1, 1, 1]);
-  b[0] = 0x51;
+  b[0] = 81;
   assert.equal(readImageHeaderSize(b), null);
   const c = webpBytes('VP9 ', [1, 1, 1, 1, 1, 1]);
   assert.equal(readImageHeaderSize(c), null);
@@ -166,9 +166,9 @@ test('readImageFileHeaderSize：默认按 512 KiB 切片，显式过小值被抬
     },
   });
   assert.deepEqual(await readImageFileHeaderSize(blob(seen)), { width: 11, height: 22 });
-  assert.deepEqual(seen[0], [0, 0x200 * 0x400]);
+  assert.deepEqual(seen[0], [0, 512 * 1024]);
   await readImageFileHeaderSize(blob(seen), { maxHeaderBytes: 1 });
-  assert.deepEqual(seen[1], [0, 0x20]);
+  assert.deepEqual(seen[1], [0, 32]);
   await readImageFileHeaderSize(blob(seen), { maxHeaderBytes: '4096' });
   assert.deepEqual(seen[2], [0, 4096]);
 });

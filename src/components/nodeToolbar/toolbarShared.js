@@ -18,6 +18,6 @@ export function showDevToast(text, key = '') {
     el2.offsetHeight,
     el2.classList.add('is-visible'),
     setTimeout(() => {
-      (el2.classList.remove('is-visible'), setTimeout(() => el2.remove(), 0x12c));
-    }, 0x7d0));
+      (el2.classList.remove('is-visible'), setTimeout(() => el2.remove(), 300));
+    }, 2000));
 }

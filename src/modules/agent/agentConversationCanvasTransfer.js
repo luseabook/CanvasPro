@@ -10,25 +10,25 @@ const TEXT_NODE_TRANSFER_PATTERNS = Object['freeze']([
   ]),
   APPEND_PROMPT_PATTERN = /追加|补充|append|add\s+to/iu,
   VERSION_NUMBER_MAP = Object['freeze']({
-    一: 0x1,
-    二: 0x2,
-    三: 0x3,
-    四: 0x4,
-    五: 0x5,
-    六: 0x6,
-    七: 0x7,
-    八: 0x8,
-    九: 0x9,
-    十: 0xa,
+    一: 1,
+    二: 2,
+    三: 3,
+    四: 4,
+    五: 5,
+    六: 6,
+    七: 7,
+    八: 8,
+    九: 9,
+    十: 10,
   });
 function parseVersionNumber(value = '') {
   const item = String(value || '')['trim']();
   if (/^\d+$/['test'](item)) return Number(item);
-  return VERSION_NUMBER_MAP[item] || 0x0;
+  return VERSION_NUMBER_MAP[item] || 0;
 }
 function getRequestedVersion(key = '') {
   const index = String(key || '')['match'](/第\s*([一二三四五六七八九十\d]+)\s*版/iu);
-  return index ? parseVersionNumber(index[0x1]) : 0x0;
+  return index ? parseVersionNumber(index[1]) : 0;
 }
 function collectVersionBlocks(result = '') {
   const enabled = String(result || '')['trim']();
@@ -43,7 +43,7 @@ function collectVersionBlocks(result = '') {
     if (source) {
       if (options) list['push'](options);
       options = {
-        version: parseVersionNumber(source[0x1] || source[0x2]),
+        version: parseVersionNumber(source[1] || source[2]),
         lines: [target['trim']()],
       };
     } else options && options['lines']['push'](target);
@@ -51,25 +51,25 @@ function collectVersionBlocks(result = '') {
   if (options) list['push'](options);
   return list;
 }
-function extractVersionBlock(next = '', count = 0x0) {
+function extractVersionBlock(next = '', count = 0) {
   const enabled2 = String(next || '')['trim']();
-  if (!enabled2 || count <= 0x0) return enabled2;
+  if (!enabled2 || count <= 0) return enabled2;
   const versionBlocks = collectVersionBlocks(enabled2)['find']((current) => current['version'] === count);
-  return versionBlocks ? versionBlocks['lines']['join']('\x0a')['trim']() : enabled2;
+  return versionBlocks ? versionBlocks['lines']['join']('\n')['trim']() : enabled2;
 }
 function getAssistantText(error = {}) {
   return String(error['content'] || error['reply'] || error['message'] || error['question'] || '')['trim']();
 }
-function resolveSourceEntry(list2 = [], count2 = 0x0) {
-  if (count2 > 0x0)
-    for (let count3 = list2['length'] - 0x1; count3 >= 0x0; count3 -= 0x1) {
+function resolveSourceEntry(list2 = [], count2 = 0) {
+  if (count2 > 0)
+    for (let count3 = list2['length'] - 1; count3 >= 0; count3 -= 1) {
       const entry = list2[count3],
         content = collectVersionBlocks(getAssistantText(entry))['find'](
           (record) => record['version'] === count2,
         );
-      if (content) return { entry: entry, content: content['lines']['join']('\x0a')['trim']() };
+      if (content) return { entry: entry, content: content['lines']['join']('\n')['trim']() };
     }
-  const entry2 = list2['at'](-0x1) || null;
+  const entry2 = list2['at'](-1) || null;
   return { entry: entry2, content: extractVersionBlock(getAssistantText(entry2), count2) };
 }
 export function resolveAgentConversationCanvasTransfer({

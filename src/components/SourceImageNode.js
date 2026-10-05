@@ -50,10 +50,10 @@ import { getDefaultDreaminaImageModelId } from './aigenImage/dreaminaModelMenuHe
 const SOURCE_IMAGE_MIN_SIZE = 150,
   SOURCE_IMAGE_IDLE_PRELOAD_TIMEOUT_MS = 40,
   SOURCE_IMAGE_BUSY_RETRY_MS = 48,
-  SOURCE_IMAGE_MAX_BUSY_WAIT_MS = 0x2bc,
+  SOURCE_IMAGE_MAX_BUSY_WAIT_MS = 700,
   SOURCE_IMAGE_LOD_HOVER_REFRESH_DELAY_MS = 160,
   DREAMINA_POLL_TIMEOUT_CODE = 'DREAMINA_POLL_TIMEOUT',
-  DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 0x3e8,
+  DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 1000,
   NON_RECOVERABLE_FAILURE_STATUSES = new Set(['cancelled', 'canceled', 'error', 'fail', 'failed']),
   DREAMINA_NON_RECOVERABLE_STATUSES = new Set([...NON_RECOVERABLE_FAILURE_STATUSES, 'idle']),
   DREAMINA_NON_RECOVERABLE_PHASES = new Set([...NON_RECOVERABLE_FAILURE_STATUSES, 'done']);
@@ -852,8 +852,8 @@ export class SourceImageNode {
         if (this._data.fixedSize) return;
         if (!this._data.needsAutoResize) return;
         const { width: width7, height: height4 } = getAutoMediaSizeByShortSide(
-          imageWidth2 || 0x3e8,
-          imageHeight || 0x3e8,
+          imageWidth2 || 1000,
+          imageHeight || 1000,
         );
         appStore.updateNodeData(this.id, { width: width7, height: height4, needsAutoResize: false });
       })
@@ -938,13 +938,13 @@ export class SourceImageNode {
     if (!this._rhResumeRetryTimer) return;
     (clearTimeout(this._rhResumeRetryTimer), (this._rhResumeRetryTimer = null));
   }
-  ['_scheduleRunningHubRecoveryRetry'](value68 = 0x1388) {
+  ['_scheduleRunningHubRecoveryRetry'](value68 = 5000) {
     (this._clearRunningHubRecoveryRetry(),
       (this._rhResumeRetryTimer = setTimeout(
         () => {
           ((this._rhResumeRetryTimer = null), this._maybeResumeRunningHubTask());
         },
-        Math.max(0x3e8, Number(value68) || 0x1388),
+        Math.max(1000, Number(value68) || 5000),
       )));
   }
   ['_isDreaminaRecoverableTask'](enabled25 = this._data) {
@@ -1479,7 +1479,7 @@ export class SourceImageNode {
               (this._jobUI.style.opacity = '1'),
               (this._jobUI.style.transition = ''),
               stopLoading(this._jobUI));
-          }, 0x190));
+          }, 400));
         if (this._hint) this._hint.style.display = 'block';
         if (this._uploadBtn) this._uploadBtn.disabled = false;
       }

@@ -30,19 +30,19 @@ function requireFunction(value, name) {
 export function parseLocalPreviewRange(rangeHeader, size) {
   const totalSize = Number(size),
     match = String(rangeHeader || '')['match'](/^bytes=(\d*)-(\d*)$/);
-  if (!match || !Number['isSafeInteger'](totalSize) || totalSize <= 0x0) return null;
-  const startText = match[0x1],
-    endText = match[0x2];
-  let start = startText ? Number['parseInt'](startText, 0xa) : 0x0,
-    end = endText ? Number['parseInt'](endText, 0xa) : totalSize - 0x1;
+  if (!match || !Number['isSafeInteger'](totalSize) || totalSize <= 0) return null;
+  const startText = match[1],
+    endText = match[2];
+  let start = startText ? Number['parseInt'](startText, 10) : 0,
+    end = endText ? Number['parseInt'](endText, 10) : totalSize - 1;
   if (!startText && endText) {
-    const suffixLength = Number['parseInt'](endText, 0xa);
-    if (!Number['isInteger'](suffixLength) || suffixLength <= 0x0) return null;
-    ((start = Math['max'](0x0, totalSize - suffixLength)), (end = totalSize - 0x1));
+    const suffixLength = Number['parseInt'](endText, 10);
+    if (!Number['isInteger'](suffixLength) || suffixLength <= 0) return null;
+    ((start = Math['max'](0, totalSize - suffixLength)), (end = totalSize - 1));
   }
   if (!Number['isInteger'](start) || !Number['isInteger'](end)) return null;
-  if (start < 0x0 || end < start || start >= totalSize) return null;
-  return { start: start, end: Math['min'](end, totalSize - 0x1) };
+  if (start < 0 || end < start || start >= totalSize) return null;
+  return { start: start, end: Math['min'](end, totalSize - 1) };
 }
 export function isPreviewableLocalMedia(fileInfo = {}, filePath = '') {
   const type = String(fileInfo?.['type'] || '')['toLowerCase']();
@@ -69,7 +69,7 @@ export function createLocalPreviewProtocolRuntime({
   ttlMs: ttlMs,
   resolveLocalVirtualPath: resolveLocalVirtualPath,
   now: now = Date['now'],
-  createToken: createToken = () => randomBytes(0x18)['toString']('hex'),
+  createToken: createToken = () => randomBytes(24)['toString']('hex'),
   resolveRealPath: resolveRealPath = realpathSync,
   statFile: statFile = statSync,
   createFileReadStream: createFileReadStream = createReadStream,
@@ -82,7 +82,7 @@ export function createLocalPreviewProtocolRuntime({
   const resolveVirtualPath = requireFunction(resolveLocalVirtualPath, 'resolveLocalVirtualPath'),
     clock = requireFunction(now, 'now'),
     mintToken = requireFunction(createToken, 'createToken'),
-    entryTtlMs = Math['max'](0x1, Number(ttlMs) || 0x1),
+    entryTtlMs = Math['max'](1, Number(ttlMs) || 1),
     entries = new Map();
   let installed = ![];
   function resolveSourcePath(request = {}) {
@@ -94,7 +94,7 @@ export function createLocalPreviewProtocolRuntime({
   function clearExpired() {
     const currentTime = clock();
     for (const [token, entry] of entries['entries']()) {
-      (!entry || Number(entry['expiresAt'] || 0x0) <= currentTime) && entries['delete'](token);
+      (!entry || Number(entry['expiresAt'] || 0) <= currentTime) && entries['delete'](token);
     }
   }
   function createUrl(request = {}) {
@@ -126,24 +126,24 @@ export function createLocalPreviewProtocolRuntime({
         try {
           clearExpired();
           const requestUrl = new URLCtor(request['url']),
-            token = decodeURIComponent(requestUrl['pathname']['split']('/')['filter'](Boolean)[0x0] || ''),
+            token = decodeURIComponent(requestUrl['pathname']['split']('/')['filter'](Boolean)[0] || ''),
             entry = entries['get'](token);
-          if (!entry) return new ResponseCtor('Preview not found', { status: 0x194 });
+          if (!entry) return new ResponseCtor('Preview not found', { status: 404 });
           const fileStat = statFile(entry['path']);
           if (!fileStat['isFile']())
-            return (entries['delete'](token), new ResponseCtor('Preview not found', { status: 0x194 }));
+            return (entries['delete'](token), new ResponseCtor('Preview not found', { status: 404 }));
           const totalSize = fileStat['size'],
             range = parseLocalPreviewRange(request['headers']['get']('range'), totalSize),
             headers = {
               'Content-Type': entry['mimeType'],
               'Accept-Ranges': 'bytes',
               'Access-Control-Allow-Origin': appOrigin,
-              'Cache-Control': 'private, max-age=' + Math['floor'](entryTtlMs / 0x3e8) + ', immutable',
+              'Cache-Control': 'private, max-age=' + Math['floor'](entryTtlMs / 1000) + ', immutable',
             };
           if (range)
             return (
               (headers['Content-Range'] = 'bytes ' + range['start'] + '-' + range['end'] + '/' + totalSize),
-              (headers['Content-Length'] = String(range['end'] - range['start'] + 0x1)),
+              (headers['Content-Length'] = String(range['end'] - range['start'] + 1)),
               new ResponseCtor(
                 toWebStream(
                   createFileReadStream(entry['path'], {
@@ -151,20 +151,20 @@ export function createLocalPreviewProtocolRuntime({
                     end: range['end'],
                   }),
                 ),
-                { status: 0xce, headers: headers },
+                { status: 206, headers: headers },
               )
             );
           return (
             (headers['Content-Length'] = String(totalSize)),
             new ResponseCtor(toWebStream(createFileReadStream(entry['path'])), {
-              status: 0xc8,
+              status: 200,
               headers: headers,
             })
           );
         } catch (error) {
           return (
             logWarning('[electron] local preview failed:', error),
-            new ResponseCtor('Preview failed', { status: 0x1f4 })
+            new ResponseCtor('Preview failed', { status: 500 })
           );
         }
       }),

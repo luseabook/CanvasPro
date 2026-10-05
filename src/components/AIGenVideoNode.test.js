@@ -189,8 +189,8 @@ function createElementStub() {
     store.loadState({
       nodes: {
         [id4]: output,
-        imageA: { id: 'imageA', type: 'source-image', width: 0x384, height: 0x640 },
-        imageB: { id: 'imageB', type: 'source-image', width: 0x640, height: 0x384 },
+        imageA: { id: 'imageA', type: 'source-image', width: 900, height: 1600 },
+        imageB: { id: 'imageB', type: 'source-image', width: 1600, height: 900 },
       },
       edges: { edgeA: edgeA, edgeB: edgeB },
       viewport: { x: 0, y: 0, zoom: 1 },
@@ -235,7 +235,7 @@ function createElementStub() {
         model: 'apimart/seedance-test',
         provider: 'apimart',
         prompt: 'first prompt',
-        videos: [{ localPath: 'output/final-a.mp4', videoWidth: 0x500, videoHeight: 0x2d0 }],
+        videos: [{ localPath: 'output/final-a.mp4', videoWidth: 1280, videoHeight: 720 }],
         _bizRev: 1,
       };
     store.loadState({ nodes: { [id5]: args3 }, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } });
@@ -276,7 +276,7 @@ function createElementStub() {
       assert.equal(value9, 1));
     const value10 = {
       ...args4,
-      videos: [{ localPath: 'output/final-b.mp4', videoWidth: 0x500, videoHeight: 0x2d0 }],
+      videos: [{ localPath: 'output/final-b.mp4', videoWidth: 1280, videoHeight: 720 }],
       _bizRev: 3,
     };
     (store.loadState({ nodes: { [id5]: value10 }, edges: {}, viewport: { x: 0, y: 0, zoom: 1 } }),

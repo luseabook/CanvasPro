@@ -30,8 +30,8 @@ export function validateSegmentRetakeSubmitNode(options = {}) {
 function buildClipSignature(options2 = {}) {
   return [
     options2['sourceMediaKey'] || options2['sourceLocalPath'] || options2['sourceUrl'] || '',
-    Number(options2['range']?.['startSec']) || 0x0,
-    Number(options2['range']?.['endSec']) || 0x0,
+    Number(options2['range']?.['startSec']) || 0,
+    Number(options2['range']?.['endSec']) || 0,
   ]['join']('|');
 }
 function isVideoProviderAssetRef(options3 = {}) {
@@ -42,7 +42,7 @@ function isVideoProviderAssetRef(options3 = {}) {
 }
 function replaceVideoInputs(enabled2, url, duration) {
   if (!enabled2 || typeof enabled2 !== 'object') return;
-  const args = Array['isArray'](enabled2['videoEntries']) ? enabled2['videoEntries'][0x0] || {} : {};
+  const args = Array['isArray'](enabled2['videoEntries']) ? enabled2['videoEntries'][0] || {} : {};
   ((enabled2['videos'] = [url]),
     (enabled2['videoEntries'] = [{ ...args, url: url, duration: duration }]),
     Array['isArray'](enabled2['videoRefs']) &&
@@ -67,7 +67,7 @@ export async function prepareSegmentRetakeSubmit({
   const signature = buildClipSignature(startSec),
     src = localPathToUrl(startSec['sourceLocalPath']) || String(startSec['sourceUrl'] || '')['trim'](),
     fullLength =
-      Number(startSec['sourceDurationSec']) > 0x0 &&
+      Number(startSec['sourceDurationSec']) > 0 &&
       Math['abs'](Number(startSec['range']['startSec'])) <= 0.001 &&
       Math['abs'](Number(startSec['range']['endSec']) - Number(startSec['sourceDurationSec'])) <= 0.001;
   let localPath = '',

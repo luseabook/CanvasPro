@@ -8,10 +8,10 @@ function firstText(...args) {
   return '';
 }
 function firstNode(state = {}) {
-  return Array['isArray'](state?.['nodes']) ? state['nodes'][0x0] || {} : {};
+  return Array['isArray'](state?.['nodes']) ? state['nodes'][0] || {} : {};
 }
 function firstItem(options = {}) {
-  return Array['isArray'](options?.['items']) ? options['items'][0x0] || {} : {};
+  return Array['isArray'](options?.['items']) ? options['items'][0] || {} : {};
 }
 function resolveMediaSrc(options2 = {}) {
   const node = firstNode(options2),
@@ -64,7 +64,7 @@ export function applyGenerationHistoryVideoThumbnail(args2 = {}, data = {}) {
     ),
     nodes = Array['isArray'](args2?.['nodes'])
       ? args2['nodes']['map']((args3, count) =>
-          count === 0x0
+          count === 0
             ? {
                 ...args3,
                 posterUrl: posterUrl,
@@ -78,7 +78,7 @@ export function applyGenerationHistoryVideoThumbnail(args2 = {}, data = {}) {
       : [],
     items = Array['isArray'](args2?.['items'])
       ? args2['items']['map']((args4, count2) =>
-          count2 === 0x0
+          count2 === 0
             ? {
                 ...args4,
                 thumbSrc: posterUrl,
@@ -106,25 +106,25 @@ export function applyGenerationHistoryVideoThumbnail(args2 = {}, data = {}) {
     items: items,
   };
 }
-export function createVideoThumbnailRequestQueue({ concurrency: concurrency = 0x1 } = {}) {
-  const target = Math['max'](0x1, Math['trunc'](Number(concurrency) || 0x1)),
+export function createVideoThumbnailRequestQueue({ concurrency: concurrency = 1 } = {}) {
+  const target = Math['max'](1, Math['trunc'](Number(concurrency) || 1)),
     list2 = [],
     map = new Map();
-  let source = 0x0;
+  let source = 0;
   const run = () => {
-    while (source < target && list2['length'] > 0x0) {
+    while (source < target && list2['length'] > 0) {
       const promise = list2['shift']();
-      ((source += 0x1),
+      ((source += 1),
         Promise['resolve']()
           ['then'](promise['task'])
           ['then'](
             (next) => {
-              source -= 0x1;
+              source -= 1;
               if (map['get'](promise['key']) === promise['promise']) map['delete'](promise['key']);
               (run(), promise['resolve'](next));
             },
             (current) => {
-              source -= 0x1;
+              source -= 1;
               if (map['get'](promise['key']) === promise['promise']) map['delete'](promise['key']);
               (run(), promise['reject'](current));
             },

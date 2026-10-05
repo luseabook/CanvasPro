@@ -2,7 +2,7 @@ import { buildApiUrl } from './apiBase.js';
 import { readTextEventStream } from './textEventStream.js';
 export async function requestCliTextStream(
   provider,
-  { onText: onText, signal: signal, timeoutMs: timeoutMs = 0x1e848 },
+  { onText: onText, signal: signal, timeoutMs: timeoutMs = 125000 },
 ) {
   const signal2 = new AbortController(),
     handler = () => signal2['abort']();

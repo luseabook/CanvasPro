@@ -33,7 +33,7 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
       restoreTarget['setAttribute']('aria-expanded', 'true'),
       (showContextMenu2 = showContextMenu(
         box['left'],
-        box['top'] - 0x8,
+        box['top'] - 8,
         list2['map']((label) => {
           const desc = createShortcutCard(label, { preview: !![] });
           return {
@@ -65,7 +65,7 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
     ownerElement['addEventListener']('click', (event) => {
       const enabled2 = event['target']['closest']('[data-shortcut-category]');
       if (!enabled2) return;
-      (event['stopPropagation'](), run(enabled2, event['detail'] === 0x0));
+      (event['stopPropagation'](), run(enabled2, event['detail'] === 0));
     }),
     ownerElement['addEventListener']('keydown', (event2) => {
       const enabled3 = event2['target']['closest']('[data-shortcut-category]');
@@ -85,7 +85,7 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
       close: close,
       render(result) {
         (close(), (args = result));
-        const availableShortcutTemplates = getAvailableShortcutTemplates(args)['length'] > 0x0;
+        const availableShortcutTemplates = getAvailableShortcutTemplates(args)['length'] > 0;
         (ownerRoot['classList']['toggle']('has-template-library', availableShortcutTemplates),
           availableShortcutTemplates
             ? !enabled &&

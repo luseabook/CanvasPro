@@ -113,7 +113,7 @@ test('videoPoster derives the asset key, renders a 640px poster and normalises t
     'scale=640:-2',
     path.join(rig.assetsDir, 'derived', 'video', 'asset-1.poster.jpg'),
   ]);
-  assert.equal(run.options.timeoutMs, 0xea60);
+  assert.equal(run.options.timeoutMs, 60000);
   assert.equal(existsSync(path.join(rig.assetsDir, 'derived', 'video')), true);
   assert.deepEqual(result, {
     videoProxyStatus: 'not_required',
@@ -169,7 +169,7 @@ test('audioWaveform captures f32le audio and writes the waveform json', async (t
     'f32le',
     'pipe:1',
   ]);
-  assert.equal(run.options.timeoutMs, 0x1e * 0x3c * 0x3e8);
+  assert.equal(run.options.timeoutMs, 30 * 60 * 1000);
   const waveformFile = path.join(rig.assetsDir, 'derived', 'audio', 'asset-3.waveform.json');
   assert.equal(existsSync(waveformFile), true);
   assert.equal(readFileSync(waveformFile, 'utf8'), JSON.stringify({ version: 1, samples: 3, peaks: [0, 0.5, 1], bytes: 4 }) + '\n');

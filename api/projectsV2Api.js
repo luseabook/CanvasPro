@@ -8,7 +8,7 @@ const WORKFLOWS_FALLBACK_USER_FILE = '/api/v2/user/workflows.json',
   ASSET_STAGE_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000,
   _saveOutputFromUrlInflight = new Map(),
   _saveOutputFromUrlCache = new Map(),
-  SAVE_OUTPUT_FROM_URL_CACHE_LIMIT = 0x1f4;
+  SAVE_OUTPUT_FROM_URL_CACHE_LIMIT = 500;
 function _rememberSavedOutput(enabled, enabled2) {
   if (!enabled || !enabled2 || typeof enabled2 !== 'object') return;
   _saveOutputFromUrlCache.set(enabled, enabled2);
@@ -23,7 +23,7 @@ function _normalizeProjectFilename(item) {
   return enabled3.endsWith('.json') ? enabled3 : enabled3 + '.json';
 }
 function _isNotFoundError(error) {
-  return Number(error?.status) === 0x194 || /not found/i.test(String(error?.message || ''));
+  return Number(error?.status) === 404 || /not found/i.test(String(error?.message || ''));
 }
 function _extractWorkflowItems(key) {
   if (Array.isArray(key)) return key;
@@ -343,23 +343,23 @@ export async function checkLocalMediaExistsOnServer(value25) {
         responseType: 'text',
         allow404Null: true,
         returnMeta: true,
-        timeout: 0x2710,
+        timeout: 10000,
       }),
       count2 = Number(response?.status || 0);
-    return count2 >= 200 && count2 < 0x190;
+    return count2 >= 200 && count2 < 400;
   } catch {
     return false;
   }
 }
 const PROJECT_FILE_EXTENSION_RE = /\.(?:aicanvas|json)$/i;
 
-export const SAVE_OUTPUT_FROM_URL_TIMEOUT_MS = 0x5 * 0x3c * 0x3e8;
+export const SAVE_OUTPUT_FROM_URL_TIMEOUT_MS = 5 * 60 * 1000;
 
 const _localMediaStatInflight = new Map(),
   _localMediaStatCache = new Map(),
-  LOCAL_MEDIA_EXISTS_CACHE_LIMIT = 0x3e8,
-  LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS = 0x1e * 0x3e8,
-  LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS = 0x3 * 0x3e8;
+  LOCAL_MEDIA_EXISTS_CACHE_LIMIT = 1000,
+  LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS = 30 * 1000,
+  LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS = 3 * 1000;
 
 function isLocalRelativeUrl(value27) {
   const enabled7 = String(value27 || '')['trim']();
@@ -368,7 +368,7 @@ function isLocalRelativeUrl(value27) {
 
 function normalizePositiveTimeoutMs(value28, value29) {
   const count3 = Number(value28);
-  return Number['isFinite'](count3) && count3 > 0x0 ? count3 : value29;
+  return Number['isFinite'](count3) && count3 > 0 ? count3 : value29;
 }
 
 function _collectNormalizedLocalPaths(value30) {
@@ -382,7 +382,7 @@ function _collectNormalizedLocalPaths(value30) {
 
 function _evictSavedOutputCacheByLocalPaths(value33) {
   const map4 = _collectNormalizedLocalPaths(value33);
-  if (map4['size'] === 0x0) return;
+  if (map4['size'] === 0) return;
   for (const [value34, response2] of _saveOutputFromUrlCache['entries']()) {
     const localPath5 = normalizeLocalPath(
       response2?.['localPath'] || response2?.['path'] || response2?.['url'],
@@ -402,7 +402,7 @@ function _evictLocalMediaExistsCacheByLocalPaths(value35) {
 function _readLocalMediaStatCache(value37) {
   const enabled8 = _localMediaStatCache['get'](value37);
   if (!enabled8) return undefined;
-  if (Number(enabled8['expiresAt'] || 0x0) <= Date['now']())
+  if (Number(enabled8['expiresAt'] || 0) <= Date['now']())
     return (_localMediaStatCache['delete'](value37), undefined);
   return enabled8['stat'];
 }
@@ -412,9 +412,9 @@ function _rememberLocalMediaStat(enabled9, exists) {
   const stat = {
       exists: exists?.['exists'] === !![],
       sizeBytes:
-        Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0x0
+        Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0
           ? Number(exists['sizeBytes'])
-          : 0x0,
+          : 0,
       contentType: String(exists?.['contentType'] || '')['trim'](),
       lastModified: String(exists?.['lastModified'] || '')['trim'](),
     },
@@ -482,7 +482,7 @@ export async function discardStagedAssetUploadToServer(value43) {
   return await post(
     '/api/v2/assets/stage/discard',
     { stageId: stageId },
-    { provider: 'local', timeout: 0x1e * 0x3e8, retries: 0x0 },
+    { provider: 'local', timeout: 30 * 1000, retries: 0 },
   );
 }
 
@@ -492,7 +492,7 @@ export async function statLocalMediaOnServer(value44) {
         ? value44
         : String(value44?.['localPath'] || value44?.['path'] || '')['trim'](),
     url4 = _localPathToStaticRequestPath(value45);
-  if (!url4) return { exists: ![], sizeBytes: 0x0, contentType: '', lastModified: '' };
+  if (!url4) return { exists: ![], sizeBytes: 0, contentType: '', lastModified: '' };
   const _readLocalMediaStatCache2 = _readLocalMediaStatCache(url4);
   if (_readLocalMediaStatCache2 !== undefined) return _readLocalMediaStatCache2;
   if (_localMediaStatInflight['has'](url4)) return await _localMediaStatInflight['get'](url4);
@@ -503,15 +503,15 @@ export async function statLocalMediaOnServer(value44) {
     responseType: 'text',
     allow404Null: !![],
     returnMeta: !![],
-    timeout: 0x2710,
+    timeout: 10000,
   })
     ['then']((response3) => {
-      const count4 = Number(response3?.['status'] || 0x0),
-        exists2 = count4 >= 0xc8 && count4 < 0x190,
-        count5 = Number(response3?.['headers']?.['get']?.('content-length') || 0x0);
+      const count4 = Number(response3?.['status'] || 0),
+        exists2 = count4 >= 200 && count4 < 400,
+        count5 = Number(response3?.['headers']?.['get']?.('content-length') || 0);
       return _rememberLocalMediaStat(url4, {
         exists: exists2,
-        sizeBytes: exists2 && Number['isSafeInteger'](count5) && count5 >= 0x0 ? count5 : 0x0,
+        sizeBytes: exists2 && Number['isSafeInteger'](count5) && count5 >= 0 ? count5 : 0,
         contentType: exists2 ? String(response3?.['headers']?.['get']?.('content-type') || '')['trim']() : '',
         lastModified: exists2
           ? String(response3?.['headers']?.['get']?.('last-modified') || '')['trim']()
@@ -521,7 +521,7 @@ export async function statLocalMediaOnServer(value44) {
     ['catch'](() => {
       return _rememberLocalMediaStat(url4, {
         exists: ![],
-        sizeBytes: 0x0,
+        sizeBytes: 0,
         contentType: '',
         lastModified: '',
       });

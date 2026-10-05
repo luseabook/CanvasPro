@@ -14,14 +14,14 @@ function escapeText(item) {
   return item['replace'](/&/g, '&amp;')
     ['replace'](/</g, '&lt;')
     ['replace'](/>/g, '&gt;')
-    ['replace'](/\r\n?/g, '\x0a');
+    ['replace'](/\r\n?/g, '\n');
 }
 function prepareMentions(args, list, key) {
   if (!/[@＠]/['test'](list)) return null;
   const list2 = matchPromptMentions(list, key['candidates'](args));
   if (!list2['length']) return null;
   const enabled = globalThis['window']?.['getSelection']?.()?.['rangeCount']
-      ? window['getSelection']()['getRangeAt'](0x0)
+      ? window['getSelection']()['getRangeAt'](0)
       : null,
     promptEl = args['promptEl']['cloneNode'](!![]),
     list3 = [...args['promptEl']['querySelectorAll']('.ref-pill')],
@@ -34,10 +34,10 @@ function prepareMentions(args, list, key) {
     map = new Map(),
     issues = new Map(),
     list4 = [];
-  let target = 0x0;
+  let target = 0;
   for (const error of list2) {
     list4['push'](escapeText(list['slice'](target, error['start'])));
-    const enabled2 = error['candidates']['length'] === 0x1 ? error['candidates'][0x0] : null;
+    const enabled2 = error['candidates']['length'] === 1 ? error['candidates'][0] : null;
     if (enabled2 && !map['has'](enabled2)) {
       const reason = key['limit'](options, [...html, enabled2]);
       map['set'](enabled2, {
@@ -79,7 +79,7 @@ export function pasteNodePrompt(enabled3, event, store) {
     args2 = record ? null : prepareMentions(enabled3, entry, store),
     payload = record ? enabled4 : args2?.['html'];
   if (payload && insertHtml(payload)) {
-    const handle = record ? store['resolve'](enabled3) : { unresolved: 0x0 };
+    const handle = record ? store['resolve'](enabled3) : { unresolved: 0 };
     (store['hydrate'](enabled3),
       store['commit'](enabled3),
       handle['unresolved'] &&
@@ -93,7 +93,7 @@ export function pasteNodePrompt(enabled3, event, store) {
   }
   if (args2?.['issues']['size']) {
     const details = [...args2['issues']]
-      ['slice'](0x0, 0x3)
+      ['slice'](0, 3)
       ['map'](([state, config]) => '@' + state + '：' + config)
       ['join']('；');
     globalThis['window']?.['showToast']?.(

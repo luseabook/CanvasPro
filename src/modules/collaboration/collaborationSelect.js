@@ -21,7 +21,7 @@ export function createCollaborationSelect(el, value) {
     el['before'](el2),
     el2['append'](el, trigger, el5));
   let enabled = ![],
-    requestAnimationFrame2 = 0x0,
+    requestAnimationFrame2 = 0,
     item = '';
   function close(enabled2 = ![]) {
     if (!enabled) return;
@@ -42,21 +42,21 @@ export function createCollaborationSelect(el, value) {
       return;
     }
     const box = trigger['getBoundingClientRect'](),
-      key = Math['min'](Math['max'](box['width'], 0x82), innerWidth - 0x18);
+      key = Math['min'](Math['max'](box['width'], 130), innerWidth - 24);
     ((el5['style']['width'] = key + 'px'),
       (el5['style']['left'] =
-        Math['max'](0xc, Math['min'](box['right'] - key, innerWidth - key - 0xc)) + 'px'));
-    const count = innerHeight - box['bottom'] - 0x10,
-      index = box['top'] - 0x10,
-      result = count < 0x78 && index > count;
-    ((el5['style']['maxHeight'] = Math['max'](0x28, Math['min'](0x118, result ? index : count)) + 'px'),
-      (el5['style']['top'] = result ? 'auto' : box['bottom'] + 0x4 + 'px'),
-      (el5['style']['bottom'] = result ? innerHeight - box['top'] + 0x4 + 'px' : 'auto'),
+        Math['max'](12, Math['min'](box['right'] - key, innerWidth - key - 12)) + 'px'));
+    const count = innerHeight - box['bottom'] - 16,
+      index = box['top'] - 16,
+      result = count < 120 && index > count;
+    ((el5['style']['maxHeight'] = Math['max'](40, Math['min'](280, result ? index : count)) + 'px'),
+      (el5['style']['top'] = result ? 'auto' : box['bottom'] + 4 + 'px'),
+      (el5['style']['bottom'] = result ? innerHeight - box['top'] + 4 + 'px' : 'auto'),
       (requestAnimationFrame2 = requestAnimationFrame(run2)));
   }
   function sync() {
     ((trigger['disabled'] = el['disabled']),
-      (el3['textContent'] = el['selectedOptions'][0x0]?.['textContent'] || '请选择'));
+      (el3['textContent'] = el['selectedOptions'][0]?.['textContent'] || '请选择'));
     const data = JSON['stringify'](
       [...el['options']]['map']((el6) => [el6['value'], el6['textContent'], el6['disabled'], el6['hidden']]),
     );
@@ -82,7 +82,7 @@ export function createCollaborationSelect(el, value) {
     }
     for (const el9 of el5['children']) {
       const options = el9['dataset']['value'] === el['value'];
-      (el9['setAttribute']('aria-selected', String(options)), (el9['tabIndex'] = options ? 0x0 : -0x1));
+      (el9['setAttribute']('aria-selected', String(options)), (el9['tabIndex'] = options ? 0 : -1));
     }
   }
   function open() {
@@ -109,10 +109,10 @@ export function createCollaborationSelect(el, value) {
         target = list['indexOf'](document['activeElement']),
         source =
           event3['key'] === 'Home'
-            ? 0x0
+            ? 0
             : event3['key'] === 'End'
-              ? list['length'] - 0x1
-              : (target + (event3['key'] === 'ArrowDown' ? 0x1 : -0x1) + list['length']) % list['length'];
+              ? list['length'] - 1
+              : (target + (event3['key'] === 'ArrowDown' ? 1 : -1) + list['length']) % list['length'];
       list[source]?.['focus']();
     }),
     trigger['setAttribute']('aria-expanded', 'false'),

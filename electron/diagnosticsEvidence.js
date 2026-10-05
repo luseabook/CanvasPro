@@ -1,19 +1,19 @@
 export function summarizeBackendLog(value = '') {
   const excerpt = String(value)['split'](/\r?\n/),
     recentFindings = [];
-  let matchedLineCount = 0x0;
+  let matchedLineCount = 0;
   const enabled =
     /(?:\[(?:ERROR|CRITICAL|WARN(?:ING)?)\]|\b(?:ERROR|CRITICAL|WARNING):|^Traceback \(most recent call last\):|^\s*[\w.]+(?:Error|Exception):|spawn error:|exited code=(?!0(?:\s|$))\S+)/i;
-  for (let line = 0x0; line < excerpt['length']; line += 0x1) {
+  for (let line = 0; line < excerpt['length']; line += 1) {
     if (!enabled['test'](excerpt[line])) continue;
-    ((matchedLineCount += 0x1),
+    ((matchedLineCount += 1),
       recentFindings['push']({
-        line: line + 0x1,
-        excerpt: excerpt['slice'](Math['max'](0x0, line - 0x2), line + 0x4)
-          ['join']('\x0a')
-          ['slice'](0x0, 0x708),
+        line: line + 1,
+        excerpt: excerpt['slice'](Math['max'](0, line - 2), line + 4)
+          ['join']('\n')
+          ['slice'](0, 1800),
       }));
-    if (recentFindings['length'] > 0x1e) recentFindings['shift']();
+    if (recentFindings['length'] > 30) recentFindings['shift']();
   }
   return {
     detection: 'text-patterns',
@@ -44,6 +44,6 @@ export function mergeDiagnosticEvidence(args, list) {
   return [...map['values']()]['sort'](
     (index, result) =>
       String(index['ts'])['localeCompare'](String(result['ts'])) ||
-      Number(index['eventSeq'] || 0x0) - Number(result['eventSeq'] || 0x0),
+      Number(index['eventSeq'] || 0) - Number(result['eventSeq'] || 0),
   );
 }

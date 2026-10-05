@@ -41,7 +41,7 @@ export async function prepareImportedVideoAsset(
   args = {},
   {
     subscribeToAssetUpdates: subscribeToAssetUpdates = subscribeAssetUpdates,
-    timeoutMs: timeoutMs = 0x1d4c0,
+    timeoutMs: timeoutMs = 120000,
   } = {},
 ) {
   const args2 = args && typeof args === 'object' ? { ...args } : {};
@@ -64,7 +64,7 @@ export async function prepareImportedVideoAsset(
       () => {
         handler2(result, new Error('视频仍在转码，请稍后重试'));
       },
-      Math['max'](0x1, Number(timeoutMs) || 0x1d4c0),
+      Math['max'](1, Number(timeoutMs) || 120000),
     );
     try {
       ((handler = subscribeToAssetUpdates((args3 = {}) => {

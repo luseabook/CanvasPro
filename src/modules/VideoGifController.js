@@ -24,47 +24,47 @@ import { calcSafeSpawnPosNearNode } from './nodeSpawn.js';
 import { renderVideoTimelineThumbnails } from './videoTimelineThumbnails.js';
 import { resolveNodeVideoElement } from './nodeVideoElement.js';
 export const VIDEO_GIF_SETTINGS = Object['freeze']({
-  sizes: Object['freeze']([0x1e0, 0x2d0, 0x438]),
-  defaultSizeIndex: 0x1,
-  fpsOptions: Object['freeze']([0x8, 0xa, 0xc, 0xf, 0x14, 0x18]),
-  defaultFpsIndex: 0x4,
-  defaultDurationSec: 0x8,
-  targetBytes: 0x400 * 0x400,
+  sizes: Object['freeze']([480, 720, 1080]),
+  defaultSizeIndex: 1,
+  fpsOptions: Object['freeze']([8, 10, 12, 15, 20, 24]),
+  defaultFpsIndex: 4,
+  defaultDurationSec: 8,
+  targetBytes: 1024 * 1024,
 });
 const QUALITY_OPTIONS = Object['freeze'](['compact', 'balanced', 'high']),
   GIF_PREFERENCES_STORAGE_KEY = 'v2-video-gif-preferences',
   GIF_EDITOR_MIN_RANGE_SEC = 0.1,
-  GIF_EDITOR_VIEWPORT_MARGIN_PX = 0xc;
+  GIF_EDITOR_VIEWPORT_MARGIN_PX = 12;
 function videoGifText(value, item = {}) {
   return t('videoGif.' + value, item);
 }
 function clamp(key, index, result) {
-  return Math['max'](index, Math['min'](result, Number(key) || 0x0));
+  return Math['max'](index, Math['min'](result, Number(key) || 0));
 }
 function roundTime(data) {
-  return Math['round']((Number(data) || 0x0) * 0x64) / 0x64;
+  return Math['round']((Number(data) || 0) * 100) / 100;
 }
 function formatTime(options) {
-  const target = Math['max'](0x0, Number(options) || 0x0),
-    source = Math['floor'](target / 0x3c);
-  return source + ':' + (target % 0x3c)['toFixed'](0x1)['padStart'](0x4, '0');
+  const target = Math['max'](0, Number(options) || 0),
+    source = Math['floor'](target / 60);
+  return source + ':' + (target % 60)['toFixed'](1)['padStart'](4, '0');
 }
 export function formatVideoGifFileSize(next) {
-  const count = Math['max'](0x0, Number(next) || 0x0);
-  if (count < 0x400) return Math['round'](count) + '\x20B';
-  if (count < 0x400 * 0x400) return Math['round'](count / 0x400) + ' KB';
-  return (count / (0x400 * 0x400))['toFixed'](0x1) + ' MB';
+  const count = Math['max'](0, Number(next) || 0);
+  if (count < 1024) return Math['round'](count) + ' B';
+  if (count < 1024 * 1024) return Math['round'](count / 1024) + ' KB';
+  return (count / (1024 * 1024))['toFixed'](1) + ' MB';
 }
 export function resolveVideoGifOutputSize({
-  size: size = 0xf0,
-  sourceWidth: sourceWidth = 0x0,
-  sourceHeight: sourceHeight = 0x0,
+  size: size = 240,
+  sourceWidth: sourceWidth = 0,
+  sourceHeight: sourceHeight = 0,
 } = {}) {
-  const width = Math['max'](0x40, Math['round'](Number(size) || 0xf0));
-  if (!(sourceWidth > 0x0) || !(sourceHeight > 0x0)) return { width: width, height: width };
+  const width = Math['max'](64, Math['round'](Number(size) || 240));
+  if (!(sourceWidth > 0) || !(sourceHeight > 0)) return { width: width, height: width };
   const count2 = sourceWidth / sourceHeight;
-  if (count2 >= 0x1) return { width: width, height: Math['max'](0x1, Math['round'](width / count2)) };
-  return { width: Math['max'](0x1, Math['round'](width * count2)), height: width };
+  if (count2 >= 1) return { width: width, height: Math['max'](1, Math['round'](width / count2)) };
+  return { width: Math['max'](1, Math['round'](width * count2)), height: width };
 }
 export function resolveVideoGifDrawRect({
   sourceWidth: sourceWidth2,
@@ -73,10 +73,10 @@ export function resolveVideoGifDrawRect({
   targetHeight: targetHeight,
   fit: fit = 'contain',
 } = {}) {
-  const current = Math['max'](0x1, Number(sourceWidth2) || 0x1),
-    entry = Math['max'](0x1, Number(sourceHeight2) || 0x1),
-    record = Math['max'](0x1, Number(targetWidth) || 0x1),
-    payload = Math['max'](0x1, Number(targetHeight) || 0x1),
+  const current = Math['max'](1, Number(sourceWidth2) || 1),
+    entry = Math['max'](1, Number(sourceHeight2) || 1),
+    record = Math['max'](1, Number(targetWidth) || 1),
+    payload = Math['max'](1, Number(targetHeight) || 1),
     handle =
       fit === 'cover'
         ? Math['max'](record / current, payload / entry)
@@ -84,8 +84,8 @@ export function resolveVideoGifDrawRect({
     width2 = current * handle,
     height = entry * handle;
   return {
-    x: (record - width2) / 0x2,
-    y: (payload - height) / 0x2,
+    x: (record - width2) / 2,
+    y: (payload - height) / 2,
     width: width2,
     height: height,
   };
@@ -93,9 +93,9 @@ export function resolveVideoGifDrawRect({
 function getMainVideoItem(options2 = {}) {
   const state = Array['isArray'](options2['videos']) ? options2['videos'] : [],
     config = Number['isFinite'](Number(options2['mainVideoIndex']))
-      ? Math['max'](0x0, Math['trunc'](Number(options2['mainVideoIndex'])))
-      : 0x0;
-  return state[config] || state[0x0] || null;
+      ? Math['max'](0, Math['trunc'](Number(options2['mainVideoIndex'])))
+      : 0;
+  return state[config] || state[0] || null;
 }
 function getSourceName(error = {}) {
   return String(error['name'] || '')['trim']() || videoGifText('fallbackVideoName');
@@ -110,7 +110,7 @@ function createIconMarkup(output) {
   if (output === 'play')
     return '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="m8 5 11 7-11 7V5Z"/></svg>';
   if (output === 'pause')
-    return '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22currentColor\x22\x20width=\x2218\x22\x20height=\x2218\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M7\x205h4v14H7zM13\x205h4v14h-4z\x22/></svg>';
+    return '<svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg>';
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>';
 }
 function createPreviewMarkup() {
@@ -120,7 +120,7 @@ function createControlsMarkup() {
   return (
     '\n    <div class="v2-video-gifbar" role="group" data-gif-editor-shell>\n      <div class="v2-gif-editor-timeline" data-gif-timeline>\n        <div class="v2-gif-editor-range-summary">\n          <span data-gif-range-label></span>\n          <span data-gif-output-label></span>\n        </div>\n        <div class="v2-gif-editor-timeline-host" data-gif-timeline-host></div>\n      </div>\n      <div class="v2-annotate-toolbar v2-gif-editor-toolbar" data-gif-toolbar>\n        <button class="v2-annotate-btn icon-only act-cancel" type="button" data-gif-action="cancel" data-i18n-tooltip="videoGif.cancel" data-i18n-aria-label="videoGif.cancel">' +
     createIconMarkup('cancel') +
-    '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-annotate-divider\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-annotate-btn\x20icon-only\x22\x20type=\x22button\x22\x20data-gif-action=\x22play\x22\x20data-i18n-tooltip=\x22videoGif.play\x22\x20data-i18n-aria-label=\x22videoGif.play\x22><span\x20data-gif-play-icon>' +
+    '</button>\n        <div class="v2-annotate-divider"></div>\n        <button class="v2-annotate-btn icon-only" type="button" data-gif-action="play" data-i18n-tooltip="videoGif.play" data-i18n-aria-label="videoGif.play"><span data-gif-play-icon>' +
     createIconMarkup('play') +
     '</span><span data-gif-pause-icon hidden>' +
     createIconMarkup('pause') +
@@ -163,29 +163,29 @@ const VideoGifController = {
   qualityButtonEl: null,
   limitSizeButtonEl: null,
   generateButtonEl: null,
-  durationSec: 0x0,
-  startSec: 0x0,
-  endSec: 0x0,
-  sourceWidth: 0x0,
-  sourceHeight: 0x0,
-  sizeIndex: 0x0,
-  fpsIndex: 0x0,
-  qualityIndex: 0x1,
+  durationSec: 0,
+  startSec: 0,
+  endSec: 0,
+  sourceWidth: 0,
+  sourceHeight: 0,
+  sizeIndex: 0,
+  fpsIndex: 0,
+  qualityIndex: 1,
   _preferences: null,
   taskId: '',
-  _raf: 0x0,
-  _lastDrawAt: 0x0,
+  _raf: 0,
+  _lastDrawAt: 0,
   _drawDirty: !![],
-  _sessionToken: 0x0,
-  _exportToken: 0x0,
+  _sessionToken: 0,
+  _exportToken: 0,
   _busy: ![],
   _unsubscribeNode: null,
   _unsubscribeTask: null,
   _onKeyDown: null,
   _onResize: null,
-  _retryRaf: 0x0,
-  _retryCount: 0x0,
-  _thumbToken: 0x0,
+  _retryRaf: 0,
+  _retryCount: 0,
+  _thumbToken: 0,
   _timelineDragMode: null,
   _timelineDragSnapshot: null,
   _onTimelinePointerMove: null,
@@ -222,16 +222,16 @@ const VideoGifController = {
       (this['sourceLocalPath'] = enabled4),
       (this['ensureLocalSource'] = typeof ensureLocalSource === 'function' ? ensureLocalSource : null),
       this['_restorePreferences'](),
-      (this['durationSec'] = 0x0),
-      (this['startSec'] = 0x0),
-      (this['endSec'] = 0x0),
-      (this['sourceWidth'] = 0x0),
-      (this['sourceHeight'] = 0x0),
+      (this['durationSec'] = 0),
+      (this['startSec'] = 0),
+      (this['endSec'] = 0),
+      (this['sourceWidth'] = 0),
+      (this['sourceHeight'] = 0),
       (this['taskId'] = ''),
       (this['_busy'] = ![]),
       (this['_drawDirty'] = !![]),
       ++this['_sessionToken'],
-      (this['_retryCount'] = 0x0),
+      (this['_retryCount'] = 0),
       (this['_unsubscribeNode'] = appStore['subscribeSelector'](
         (state2) => Boolean(state2['nodes']?.[enabled]),
         (enabled5) => {
@@ -248,8 +248,8 @@ const VideoGifController = {
         if (!this['active'] || this['nodeId'] !== value2) return;
         const enabled6 = document['getElementById'](value2);
         if (!enabled6) {
-          this['_retryCount'] += 0x1;
-          if (this['_retryCount'] > 0xa) {
+          this['_retryCount'] += 1;
+          if (this['_retryCount'] > 10) {
             this['exit']({ silent: !![] });
             return;
           }
@@ -277,9 +277,9 @@ const VideoGifController = {
     const count3 = VIDEO_GIF_SETTINGS['sizes']['indexOf'](enabled7?.['size']),
       count4 = VIDEO_GIF_SETTINGS['fpsOptions']['indexOf'](enabled7?.['fps']),
       count5 = QUALITY_OPTIONS['indexOf'](enabled7?.['quality']);
-    ((this['sizeIndex'] = count3 >= 0x0 ? count3 : VIDEO_GIF_SETTINGS['defaultSizeIndex']),
-      (this['fpsIndex'] = count4 >= 0x0 ? count4 : VIDEO_GIF_SETTINGS['defaultFpsIndex']),
-      (this['qualityIndex'] = count5 >= 0x0 ? count5 : 0x1),
+    ((this['sizeIndex'] = count3 >= 0 ? count3 : VIDEO_GIF_SETTINGS['defaultSizeIndex']),
+      (this['fpsIndex'] = count4 >= 0 ? count4 : VIDEO_GIF_SETTINGS['defaultFpsIndex']),
+      (this['qualityIndex'] = count5 >= 0 ? count5 : 1),
       (this['limitSize'] = enabled7?.['limitSize'] === !![]));
   },
   _savePreferences(value5) {
@@ -364,7 +364,7 @@ const VideoGifController = {
       ['querySelector']('[data-gif-timeline-host]')
       ?.['appendChild'](videoRangeTimelineView['trackEl']),
       (this['trackEl'] = videoRangeTimelineView['trackEl']),
-      (this['trackEl']['tabIndex'] = -0x1),
+      (this['trackEl']['tabIndex'] = -1),
       (this['selectionEl'] = videoRangeTimelineView['selectionEl']),
       (this['leftHandleEl'] = videoRangeTimelineView['leftHandleEl']),
       (this['rightHandleEl'] = videoRangeTimelineView['rightHandleEl']),
@@ -390,27 +390,27 @@ const VideoGifController = {
       this['_listen'](this['barEl'], 'dblclick', (event2) => {
         (event2['preventDefault'](), event2['stopPropagation']());
       }),
-      this['_listen'](this['barEl']?.['querySelector']('[data-gif-action=\x22cancel\x22]'), 'click', () =>
+      this['_listen'](this['barEl']?.['querySelector']('[data-gif-action="cancel"]'), 'click', () =>
         this['exit'](),
       ),
       this['_listen'](this['playButtonEl'], 'click', () => void this['_togglePlayback']()),
       this['_listen'](this['sizeButtonEl'], 'click', () => {
         const list2 = VIDEO_GIF_SETTINGS['sizes'];
-        ((this['sizeIndex'] = (this['sizeIndex'] + 0x1) % list2['length']),
+        ((this['sizeIndex'] = (this['sizeIndex'] + 1) % list2['length']),
           this['_savePreferences'](),
           this['_resizeCanvas'](),
           this['_updateControls']());
       }),
       this['_listen'](this['fpsButtonEl'], 'click', () => {
         const list3 = VIDEO_GIF_SETTINGS['fpsOptions'];
-        ((this['fpsIndex'] = (this['fpsIndex'] + 0x1) % list3['length']),
+        ((this['fpsIndex'] = (this['fpsIndex'] + 1) % list3['length']),
           this['_savePreferences'](),
-          (this['_lastDrawAt'] = 0x0),
+          (this['_lastDrawAt'] = 0),
           (this['_drawDirty'] = !![]),
           this['_updateControls']());
       }),
       this['_listen'](this['qualityButtonEl'], 'click', () => {
-        ((this['qualityIndex'] = (this['qualityIndex'] + 0x1) % QUALITY_OPTIONS['length']),
+        ((this['qualityIndex'] = (this['qualityIndex'] + 1) % QUALITY_OPTIONS['length']),
           this['_savePreferences'](),
           this['_updateControls']());
       }),
@@ -443,7 +443,7 @@ const VideoGifController = {
             event3['target']?.['isContentEditable'];
         if (event3['key'] === 'Escape') (event3['preventDefault'](), this['exit']());
         else {
-          if ((event3['key'] === '\x20' || event3['code'] === 'Space') && !enabled8) {
+          if ((event3['key'] === ' ' || event3['code'] === 'Space') && !enabled8) {
             (event3['preventDefault'](), event3['stopPropagation'](), releaseCanvasPanShortcut());
             if (!event3['repeat']) void this['_togglePlayback']();
           } else
@@ -469,7 +469,7 @@ const VideoGifController = {
           shouldAssign: () => this['active'] && this['_sessionToken'] === value15,
         }));
       if (!this['active'] || this['_sessionToken'] !== value15) return;
-      if (enabled9['readyState'] >= 0x1) this['_handleMetadata']();
+      if (enabled9['readyState'] >= 1) this['_handleMetadata']();
     } catch (error2) {
       if (!this['active'] || this['_sessionToken'] !== value15) return;
       (this['loadingEl']?.['setAttribute']('hidden', ''),
@@ -484,25 +484,25 @@ const VideoGifController = {
   },
   _handleMetadata() {
     if (!this['active'] || !this['videoEl']) return;
-    const count6 = Number(this['videoEl']['duration']) || 0x0;
-    if (!(count6 > 0x0)) return;
-    if (this['durationSec'] > 0x0) return;
+    const count6 = Number(this['videoEl']['duration']) || 0;
+    if (!(count6 > 0)) return;
+    if (this['durationSec'] > 0) return;
     ((this['durationSec'] = count6),
-      (this['sourceWidth'] = Number(this['videoEl']['videoWidth']) || 0x0),
-      (this['sourceHeight'] = Number(this['videoEl']['videoHeight']) || 0x0),
-      (this['startSec'] = 0x0),
+      (this['sourceWidth'] = Number(this['videoEl']['videoWidth']) || 0),
+      (this['sourceHeight'] = Number(this['videoEl']['videoHeight']) || 0),
+      (this['startSec'] = 0),
       (this['endSec'] = Math['min'](count6, VIDEO_GIF_SETTINGS['defaultDurationSec'])),
       this['_resizeCanvas'](),
       this['_updateControls'](),
       this['loadingEl']?.['setAttribute']('hidden', ''));
     try {
-      this['videoEl']['currentTime'] = 0x0;
+      this['videoEl']['currentTime'] = 0;
     } catch {}
     this['_drawDirty'] = !![];
   },
   _getSettings() {
     const fps = VIDEO_GIF_SETTINGS,
-      size2 = fps['sizes'][this['sizeIndex']] || fps['sizes'][0x0],
+      size2 = fps['sizes'][this['sizeIndex']] || fps['sizes'][0],
       width3 = resolveVideoGifOutputSize({
         size: size2,
         sourceWidth: this['sourceWidth'],
@@ -515,9 +515,9 @@ const VideoGifController = {
       height: width3['height'],
       sourceWidth: this['sourceWidth'],
       sourceHeight: this['sourceHeight'],
-      fps: fps['fpsOptions'][this['fpsIndex']] || fps['fpsOptions'][0x0],
+      fps: fps['fpsOptions'][this['fpsIndex']] || fps['fpsOptions'][0],
       quality: QUALITY_OPTIONS[this['qualityIndex']] || 'balanced',
-      targetBytes: this['limitSize'] ? fps['targetBytes'] : 0x0,
+      targetBytes: this['limitSize'] ? fps['targetBytes'] : 0,
       start: this['startSec'],
       end: this['endSec'],
     };
@@ -527,7 +527,7 @@ const VideoGifController = {
     if (!this['canvasEl']) return;
     if (this['canvasEl']['width'] !== box['width']) this['canvasEl']['width'] = box['width'];
     if (this['canvasEl']['height'] !== box['height']) this['canvasEl']['height'] = box['height'];
-    ((this['canvasEl']['style']['aspectRatio'] = box['width'] + '\x20/\x20' + box['height']),
+    ((this['canvasEl']['style']['aspectRatio'] = box['width'] + ' / ' + box['height']),
       (this['_drawDirty'] = !![]),
       this['_updatePreviewLayout'](),
       this['_drawFrame']());
@@ -535,29 +535,29 @@ const VideoGifController = {
   _updatePreviewLayout() {
     if (!this['canvasEl'] || !this['mediaCardEl']) return;
     const box2 = this['_getSettings'](),
-      value16 = Math['max'](0x1, this['mediaCardEl']['clientWidth'] || 0x1),
-      value17 = Math['max'](0x1, this['mediaCardEl']['clientHeight'] || 0x1),
+      value16 = Math['max'](1, this['mediaCardEl']['clientWidth'] || 1),
+      value17 = Math['max'](1, this['mediaCardEl']['clientHeight'] || 1),
       value18 = Math['min'](value16 / box2['width'], value17 / box2['height']);
-    ((this['canvasEl']['style']['width'] = Math['max'](0x1, Math['round'](box2['width'] * value18)) + 'px'),
+    ((this['canvasEl']['style']['width'] = Math['max'](1, Math['round'](box2['width'] * value18)) + 'px'),
       (this['canvasEl']['style']['height'] =
-        Math['max'](0x1, Math['round'](box2['height'] * value18)) + 'px'),
+        Math['max'](1, Math['round'](box2['height'] * value18)) + 'px'),
       this['_updateBarViewportOffset']());
   },
   _updateBarViewportOffset() {
     if (!this['barEl']) return;
     this['barEl']['style']['left'] = '';
     const box3 = this['barEl']['getBoundingClientRect'](),
-      count7 = Math['max'](0x0, Number(window['innerWidth']) || 0x0);
-    if (!(box3['width'] > 0x0) || !(count7 > 0x0)) return;
+      count7 = Math['max'](0, Number(window['innerWidth']) || 0);
+    if (!(box3['width'] > 0) || !(count7 > 0)) return;
     const value19 = Math['min'](
       GIF_EDITOR_VIEWPORT_MARGIN_PX,
-      Math['max'](0x0, (count7 - box3['width']) / 0x2),
+      Math['max'](0, (count7 - box3['width']) / 2),
     );
-    let value20 = 0x0;
+    let value20 = 0;
     if (box3['left'] < value19) value20 = value19 - box3['left'];
     else box3['right'] > count7 - value19 && (value20 = count7 - value19 - box3['right']);
     if (Math['abs'](value20) < 0.5) return;
-    const value21 = Math['max'](0.0001, Number(appStore['getStateRaw']()['viewport']?.['zoom']) || 0x1);
+    const value21 = Math['max'](0.0001, Number(appStore['getStateRaw']()['viewport']?.['zoom']) || 1);
     this['barEl']['style']['left'] = 'calc(50% + ' + value20 / value21 + 'px)';
   },
   async _renderTimelineThumbnails(value22) {
@@ -583,8 +583,8 @@ const VideoGifController = {
     (this['_listen'](this['trackEl'], 'pointermove', (event4) => {
       if (this['_timelineDragMode'] || this['_busy'] || !this['selectionEl']) return;
       const box4 = this['selectionEl']['getBoundingClientRect'](),
-        value25 = Math['abs'](event4['clientX'] - box4['left']) < 0x14,
-        value26 = Math['abs'](event4['clientX'] - box4['right']) < 0x14;
+        value25 = Math['abs'](event4['clientX'] - box4['left']) < 20,
+        value26 = Math['abs'](event4['clientX'] - box4['right']) < 20;
       (this['leftHandleEl']?.['classList']['toggle']('hover-active', value25),
         this['rightHandleEl']?.['classList']['toggle']('hover-active', value26),
         (this['selectionEl']['style']['cursor'] =
@@ -597,17 +597,17 @@ const VideoGifController = {
         if (this['selectionEl']) this['selectionEl']['style']['cursor'] = '';
       }),
       this['_listen'](this['trackEl'], 'pointerdown', (event5) => {
-        if (this['_busy'] || !(this['durationSec'] > 0x0) || !this['selectionEl']) return;
+        if (this['_busy'] || !(this['durationSec'] > 0) || !this['selectionEl']) return;
         this['trackEl']['focus']({ preventScroll: !![] });
         const box5 = this['trackEl']['getBoundingClientRect'](),
           box6 = this['selectionEl']['getBoundingClientRect']();
         if (!box5['width']) return;
-        const value27 = Math['abs'](event5['clientX'] - box6['left']) < 0x14,
-          value28 = Math['abs'](event5['clientX'] - box6['right']) < 0x14,
+        const value27 = Math['abs'](event5['clientX'] - box6['left']) < 20,
+          value28 = Math['abs'](event5['clientX'] - box6['right']) < 20,
           value29 = event5['clientX'] >= box6['left'] && event5['clientX'] <= box6['right'];
         ((this['_timelineDragMode'] = value27 ? 'left' : value28 ? 'right' : value29 ? 'move' : 'scrub'),
           (this['_timelineDragSnapshot'] = {
-            clientX: Number(event5['clientX']) || 0x0,
+            clientX: Number(event5['clientX']) || 0,
             startSec: this['startSec'],
             endSec: this['endSec'],
           }),
@@ -618,7 +618,7 @@ const VideoGifController = {
           ),
           event5['preventDefault'](),
           event5['stopPropagation']());
-        const value30 = Number(event5['clientX']) || 0x0;
+        const value30 = Number(event5['clientX']) || 0;
         let enabled12 = ![];
         if (this['_timelineDragMode'] === 'scrub') this['_seekTimelineAtClientX'](event5['clientX']);
         else this['_timelineDragMode'] !== 'move' && this['_updateTimelineRangeAtClientX'](event5['clientX']);
@@ -629,7 +629,7 @@ const VideoGifController = {
             if (this['_timelineDragMode'] === 'scrub') this['_seekTimelineAtClientX'](event6['clientX']);
             else {
               if (this['_timelineDragMode'] === 'move') {
-                if (!enabled12 && Math['abs'](event6['clientX'] - value30) <= 0x2) return;
+                if (!enabled12 && Math['abs'](event6['clientX'] - value30) <= 2) return;
                 enabled12 = !![];
               }
               this['_updateTimelineRangeAtClientX'](event6['clientX']);
@@ -663,26 +663,26 @@ const VideoGifController = {
     if (this['selectionEl']) this['selectionEl']['style']['cursor'] = '';
   },
   _seekTimelineAtClientX(value33) {
-    if (!this['trackEl'] || !(this['durationSec'] > 0x0) || !this['videoEl']) return;
+    if (!this['trackEl'] || !(this['durationSec'] > 0) || !this['videoEl']) return;
     const box7 = this['trackEl']['getBoundingClientRect']();
     if (!box7['width']) return;
-    const clamp2 = clamp((value33 - box7['left']) / box7['width'], 0x0, 0x1),
-      value34 = Math['min'](Math['max'](0x0, this['durationSec'] - 0.001), clamp2 * this['durationSec']);
+    const clamp2 = clamp((value33 - box7['left']) / box7['width'], 0, 1),
+      value34 = Math['min'](Math['max'](0, this['durationSec'] - 0.001), clamp2 * this['durationSec']);
     try {
       (this['videoEl']['pause'](), (this['videoEl']['currentTime'] = value34));
     } catch {}
     ((this['_drawDirty'] = !![]), this['_renderTimeline']());
   },
   _updateTimelineRangeAtClientX(value35) {
-    if (!this['trackEl'] || !(this['durationSec'] > 0x0)) return;
+    if (!this['trackEl'] || !(this['durationSec'] > 0)) return;
     const box8 = this['trackEl']['getBoundingClientRect'](),
       event8 = this['_timelineDragSnapshot'];
     if (!box8['width'] || !event8) return;
     const value36 = Math['min'](GIF_EDITOR_MIN_RANGE_SEC, this['durationSec']),
-      clamp3 = clamp((value35 - box8['left']) / box8['width'], 0x0, 0x1),
+      clamp3 = clamp((value35 - box8['left']) / box8['width'], 0, 1),
       value37 = clamp3 * this['durationSec'];
     if (this['_timelineDragMode'] === 'left')
-      this['startSec'] = roundTime(clamp(value37, 0x0, Math['max'](0x0, this['endSec'] - value36)));
+      this['startSec'] = roundTime(clamp(value37, 0, Math['max'](0, this['endSec'] - value36)));
     else {
       if (this['_timelineDragMode'] === 'right')
         this['endSec'] = roundTime(clamp(value37, this['startSec'] + value36, this['durationSec']));
@@ -691,7 +691,7 @@ const VideoGifController = {
           const value38 = event8['endSec'] - event8['startSec'],
             value39 = ((Number(value35) - event8['clientX']) / box8['width']) * this['durationSec'];
           ((this['startSec'] = roundTime(
-            clamp(event8['startSec'] + value39, 0x0, Math['max'](0x0, this['durationSec'] - value38)),
+            clamp(event8['startSec'] + value39, 0, Math['max'](0, this['durationSec'] - value38)),
           )),
             (this['endSec'] = roundTime(this['startSec'] + value38)));
         }
@@ -710,35 +710,35 @@ const VideoGifController = {
   _renderTimeline() {
     if (!this['trackEl'] || !this['selectionEl'] || !this['leftHandleEl'] || !this['rightHandleEl']) return;
     const count8 = this['durationSec'],
-      value40 = Number['isFinite'](count8) && count8 > 0x0,
-      value41 = value40 ? clamp(this['startSec'], 0x0, count8) : 0x0,
-      value42 = value40 ? clamp(this['endSec'], value41, count8) : 0x0,
-      value43 = Math['max'](0x0, value42 - value41),
-      value44 = value40 ? (value41 / count8) * 0x64 : 0x0,
-      value45 = value40 ? (value43 / count8) * 0x64 : 0x0;
+      value40 = Number['isFinite'](count8) && count8 > 0,
+      value41 = value40 ? clamp(this['startSec'], 0, count8) : 0,
+      value42 = value40 ? clamp(this['endSec'], value41, count8) : 0,
+      value43 = Math['max'](0, value42 - value41),
+      value44 = value40 ? (value41 / count8) * 100 : 0,
+      value45 = value40 ? (value43 / count8) * 100 : 0;
     ((this['selectionEl']['style']['left'] = value44 + '%'),
       (this['selectionEl']['style']['width'] = value45 + '%'),
       (this['leftHandleEl']['style']['left'] = value44 + '%'),
       (this['rightHandleEl']['style']['left'] = value44 + value45 + '%'),
       this['timelineLabelEl'] &&
         ((this['timelineLabelEl']['textContent'] = value40
-          ? value43['toFixed'](0x2) + 's'
+          ? value43['toFixed'](2) + 's'
           : videoGifText('loadingPreview')),
-        (this['timelineLabelEl']['style']['left'] = value44 + value45 / 0x2 + '%')),
+        (this['timelineLabelEl']['style']['left'] = value44 + value45 / 2 + '%')),
       this['_renderTimelinePlayhead']());
   },
   _renderTimelinePlayhead() {
-    if (!this['playheadEl'] || !this['videoEl'] || !(this['durationSec'] > 0x0)) {
+    if (!this['playheadEl'] || !this['videoEl'] || !(this['durationSec'] > 0)) {
       if (this['playheadEl']) this['playheadEl']['style']['display'] = 'none';
       return;
     }
-    const clamp4 = clamp((Number(this['videoEl']['currentTime']) || 0x0) / this['durationSec'], 0x0, 0x1);
+    const clamp4 = clamp((Number(this['videoEl']['currentTime']) || 0) / this['durationSec'], 0, 1);
     ((this['playheadEl']['style']['display'] = 'block'),
-      (this['playheadEl']['style']['left'] = clamp4 * 0x64 + '%'));
+      (this['playheadEl']['style']['left'] = clamp4 * 100 + '%'));
   },
   async _togglePlayback() {
     const enabled13 = this['videoEl'];
-    if (!this['active'] || !enabled13 || !(this['durationSec'] > 0x0)) return;
+    if (!this['active'] || !enabled13 || !(this['durationSec'] > 0)) return;
     if (!enabled13['paused']) {
       enabled13['pause']();
       return;
@@ -767,7 +767,7 @@ const VideoGifController = {
     const value46 = (value47) => {
       if (!this['active']) return;
       const value48 = this['_getSettings'](),
-        value49 = 0x3e8 / Math['max'](0x1, value48['fps']),
+        value49 = 1000 / Math['max'](1, value48['fps']),
         enabled15 = this['videoEl'];
       if (enabled15 && !enabled15['paused'] && enabled15['currentTime'] >= this['endSec'] - 0.015)
         try {
@@ -786,7 +786,7 @@ const VideoGifController = {
     if (
       !el7 ||
       !sourceWidth3 ||
-      sourceWidth3['readyState'] < 0x2 ||
+      sourceWidth3['readyState'] < 2 ||
       !sourceWidth3['videoWidth'] ||
       !sourceWidth3['videoHeight']
     )
@@ -801,7 +801,7 @@ const VideoGifController = {
         targetHeight: targetWidth2['height'],
         fit: 'contain',
       });
-    (ctx['clearRect'](0x0, 0x0, targetWidth2['width'], targetWidth2['height']),
+    (ctx['clearRect'](0, 0, targetWidth2['width'], targetWidth2['height']),
       (ctx['imageSmoothingEnabled'] = !![]),
       (ctx['imageSmoothingQuality'] = 'high'),
       ctx['drawImage'](sourceWidth3, box9['x'], box9['y'], box9['width'], box9['height']),
@@ -817,16 +817,16 @@ const VideoGifController = {
     this['limitSizeButtonEl'] &&
       (this['limitSizeButtonEl']['setAttribute']('aria-checked', String(this['limitSize'])),
       this['limitSizeButtonEl']['classList']['toggle']('active', this['limitSize']));
-    const duration = Math['max'](0x0, this['endSec'] - this['startSec']);
+    const duration = Math['max'](0, this['endSec'] - this['startSec']);
     (this['rangeLabelEl'] &&
       (this['rangeLabelEl']['textContent'] = videoGifText('rangeSummary', {
         start: formatTime(this['startSec']),
         end: formatTime(this['endSec']),
-        duration: duration['toFixed'](0x1),
+        duration: duration['toFixed'](1),
       })),
       this['outputLabelEl'] &&
         (this['outputLabelEl']['textContent'] =
-          size3['targetBytes'] > 0x0
+          size3['targetBytes'] > 0
             ? videoGifText('wechatTarget', { size: formatVideoGifFileSize(size3['targetBytes']) })
             : videoGifText('unlimitedOutput')),
       this['_renderTimeline'](),
@@ -902,7 +902,7 @@ const VideoGifController = {
       if (!enabled18) throw new Error(videoGifText('errors.taskUnavailable'));
       ((this['taskId'] = enabled18), this['_subscribeTaskProgress'](enabled18, value57));
       const waitForElectronMediaTask2 = await waitForElectronMediaTask(enabled18, {
-        timeout: 0xa * 0x3c * 0x3e8,
+        timeout: 10 * 60 * 1000,
         diagnosticPayload: { kind: 'videoToGif', nodeId: this['nodeId'], src: src },
       });
       if (!this['active'] || value57 !== this['_exportToken']) return;
@@ -926,8 +926,8 @@ const VideoGifController = {
   async _createResultNode(value58, imageUrl = {}) {
     const localPath = pickResultLocalPath(imageUrl);
     if (!localPath) throw new Error(videoGifText('errors.incompleteResult'));
-    const naturalWidth = Math['max'](0x1, Number(imageUrl['imageWidth']) || 0x1),
-      naturalHeight = Math['max'](0x1, Number(imageUrl['imageHeight']) || 0x1),
+    const naturalWidth = Math['max'](1, Number(imageUrl['imageWidth']) || 1),
+      naturalHeight = Math['max'](1, Number(imageUrl['imageHeight']) || 1),
       box10 = getAutoMediaSizeByShortSide(naturalWidth, naturalHeight),
       x = calcSafeSpawnPosNearNode(
         appStore['getStateRaw']()['nodes'],
@@ -964,10 +964,10 @@ const VideoGifController = {
           fileName: fileName,
           mimeType: 'image/gif',
           gifPreset: imageUrl['preset'] || this['_getSettings']()['preset'],
-          gifFps: Number(imageUrl['fps']) || 0x0,
-          gifMaxColors: Number(imageUrl['maxColors']) || 0x0,
-          gifDuration: Number(imageUrl['duration']) || 0x0,
-          gifFileSize: Number(imageUrl['fileSize']) || 0x0,
+          gifFps: Number(imageUrl['fps']) || 0,
+          gifMaxColors: Number(imageUrl['maxColors']) || 0,
+          gifDuration: Number(imageUrl['duration']) || 0,
+          gifFileSize: Number(imageUrl['fileSize']) || 0,
           needsAutoResize: ![],
           fixedSize: !![],
         }),
@@ -983,7 +983,7 @@ const VideoGifController = {
     if (!this['active']) return;
     const value59 = this['taskId'],
       value60 = this['_busy'];
-    ((this['active'] = ![]), (this['_sessionToken'] += 0x1), (this['_exportToken'] += 0x1));
+    ((this['active'] = ![]), (this['_sessionToken'] += 1), (this['_exportToken'] += 1));
     if (!keepTask && value59) void cancelElectronMediaTask(value59);
     ((this['taskId'] = ''),
       this['_unsubscribeTask']?.(),
@@ -991,15 +991,15 @@ const VideoGifController = {
       this['_unsubscribeNode']?.(),
       (this['_unsubscribeNode'] = null),
       this['_finishTimelineDrag'](),
-      (this['_thumbToken'] += 0x1));
-    for (const run of this['_boundEvents']['splice'](0x0)) run();
+      (this['_thumbToken'] += 1));
+    for (const run of this['_boundEvents']['splice'](0)) run();
     if (this['_onKeyDown']) window['removeEventListener']('keydown', this['_onKeyDown'], !![]);
     if (this['_onResize']) window['removeEventListener']('resize', this['_onResize'], !![]);
     ((this['_onKeyDown'] = null), (this['_onResize'] = null));
     if (this['_raf']) cancelAnimationFrame(this['_raf']);
-    this['_raf'] = 0x0;
+    this['_raf'] = 0;
     if (this['_retryRaf']) cancelAnimationFrame(this['_retryRaf']);
-    this['_retryRaf'] = 0x0;
+    this['_retryRaf'] = 0;
     try {
       this['videoEl']?.['pause']?.();
     } catch {}

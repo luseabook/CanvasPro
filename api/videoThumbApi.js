@@ -43,7 +43,7 @@ export async function fetchVideoFirstFrameThumbFromServer(next, current = {}) {
   if (canUseElectronMediaTask())
     return await enqueueElectronMediaTask(buildMediaTaskPayload(src2, current), {
       wait: true,
-      timeout: 0x1d4c0,
+      timeout: 120000,
     });
   const entry = _inflight.get(src2);
   if (entry) return entry;

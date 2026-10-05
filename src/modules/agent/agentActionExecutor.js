@@ -100,14 +100,14 @@ function getAgentSidebarViewportInsets(options2 = {}) {
     return null;
   const el2 = dom['document']['querySelector']?.('.agent-sidebar.is-open'),
     right = Number(el2?.['getBoundingClientRect']?.()?.['width']);
-  return Number['isFinite'](right) && right > 0x0 ? { right: right } : null;
+  return Number['isFinite'](right) && right > 0 ? { right: right } : null;
 }
 function revealCreatedNodes(options3 = {}, list3 = []) {
-  if (typeof options3['focusNodes'] !== 'function' || list3['length'] === 0x0) return;
+  if (typeof options3['focusNodes'] !== 'function' || list3['length'] === 0) return;
   const viewportInsets = getAgentSidebarViewportInsets(options3),
     handler = () =>
-      options3['focusNodes'](list3, 0x60, 0x1f4, {
-        maxZoom: 0x1,
+      options3['focusNodes'](list3, 96, 500, {
+        maxZoom: 1,
         ...(viewportInsets ? { viewportInsets: viewportInsets } : {}),
       });
   typeof options3['scheduleFrame'] === 'function' ? options3['scheduleFrame'](handler) : handler();
@@ -116,18 +116,18 @@ function collectCreatedNodesOutsideVisibleCanvas(options4 = {}, record = {}, lis
   const payload = options4['windowObject'] || globalThis['window'],
     count = Number(payload?.['innerWidth']),
     count2 = Number(payload?.['innerHeight']);
-  if (!(count > 0x0) || !(count2 > 0x0)) return [];
+  if (!(count > 0) || !(count2 > 0)) return [];
   const box2 = getAgentSidebarViewportInsets(options4) || {},
-    handle = Math['max'](0x1, count - Math['max'](0x0, Number(box2['right']) || 0x0)),
-    box3 = record?.['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 },
-    state = Math['max'](0.0001, Number(box3['zoom']) || 0x1),
-    config = 0x10;
+    handle = Math['max'](1, count - Math['max'](0, Number(box2['right']) || 0)),
+    box3 = record?.['viewport'] || { x: 0, y: 0, zoom: 1 },
+    state = Math['max'](0.0001, Number(box3['zoom']) || 1),
+    config = 16;
   return list4['filter']((scope) => {
     const box4 = record?.['nodes']?.[scope];
     if (!box4) return ![];
-    const box5 = worldToScreen(Number(box4['x']) || 0x0, Number(box4['y']) || 0x0, box3),
-      input = Math['max'](0x1, Number(box4['width']) || 0xa0) * state,
-      output = Math['max'](0x1, Number(box4['height']) || 0x78) * state;
+    const box5 = worldToScreen(Number(box4['x']) || 0, Number(box4['y']) || 0, box3),
+      input = Math['max'](1, Number(box4['width']) || 160) * state,
+      output = Math['max'](1, Number(box4['height']) || 120) * state;
     return (
       box5['x'] < config ||
       box5['y'] < config ||
@@ -185,7 +185,7 @@ export async function executeAgentActions(
       : [];
   if (
     raw['ok'] === !![] &&
-    (unresolvedCommandIds2['unresolvedCommandIds']['length'] > 0x0 || missingNodeIds['length'] > 0x0)
+    (unresolvedCommandIds2['unresolvedCommandIds']['length'] > 0 || missingNodeIds['length'] > 0)
   )
     return {
       ok: ![],

@@ -492,17 +492,17 @@ export class AIGenVideoNode {
             throw new Error(aigenVideoNodeText('upload.imageOnly'));
           if (!sourceKind && !enabled7) throw new Error(aigenVideoNodeText('upload.unsupportedAsset'));
           const type = sourceKind ? 'source-video' : 'source-image';
-          let width = 0x12c,
-            height = 0x12c;
+          let width = 300,
+            height = 300;
           if (sourceKind) {
             const value4 = document.createElement('video');
             ((value4.src = URL.createObjectURL(error)),
               await new Promise((handler) => {
                 ((value4.onloadedmetadata = () => {
-                  const value5 = value4.videoWidth || 0x1a4,
-                    value6 = value4.videoHeight || 0x104,
+                  const value5 = value4.videoWidth || 420,
+                    value6 = value4.videoHeight || 260,
                     value7 = Math.min(value5, value6),
-                    value8 = 0x12c / (value7 || 1);
+                    value8 = 300 / (value7 || 1);
                   ((width = Math.round(value5 * value8)),
                     (height = Math.round(value6 * value8)),
                     URL.revokeObjectURL(value4.src),
@@ -517,10 +517,10 @@ export class AIGenVideoNode {
               const image = new Image();
               await new Promise((handler2) => {
                 ((image.onload = () => {
-                  const value9 = image.naturalWidth || 0x104,
-                    value10 = image.naturalHeight || 0x104,
+                  const value9 = image.naturalWidth || 260,
+                    value10 = image.naturalHeight || 260,
                     value11 = Math.min(value9, value10),
-                    value12 = 0x12c / (value11 || 1);
+                    value12 = 300 / (value11 || 1);
                   ((width = Math.round(value9 * value12)),
                     (height = Math.round(value10 * value12)),
                     handler2());
@@ -536,8 +536,8 @@ export class AIGenVideoNode {
             value13 = direction === 'down' ? 'down' : 'left',
             value14 = Number(box.x) || 0,
             value15 = Number(box.y) || 0,
-            value16 = Number(box.width) || 0x168,
-            value17 = Number(box.height) || 0x168,
+            value16 = Number(box.width) || 360,
+            value17 = Number(box.height) || 360,
             x = value14 - spacing - width,
             y =
               value13 === 'down' ? value15 + value17 + spacing : value15 + Math.round((value17 - height) / 2),
@@ -650,16 +650,16 @@ export class AIGenVideoNode {
           if (!enabled9 && !enabled10 && !sourceKind2)
             throw new Error(aigenVideoNodeText('upload.unsupportedAsset'));
           const type2 = sourceKind2 ? 'source-audio' : enabled10 ? 'source-video' : 'source-image';
-          let width2 = sourceKind2 ? 0x140 : enabled10 ? 0x168 : 0x12c,
-            height2 = sourceKind2 ? 140 : enabled10 ? 220 : 0x12c;
+          let width2 = sourceKind2 ? 320 : enabled10 ? 360 : 300,
+            height2 = sourceKind2 ? 140 : enabled10 ? 220 : 300;
           if (enabled9) {
             const image2 = new Image();
             await new Promise((handler3) => {
               ((image2.onload = () => {
-                const value23 = image2.naturalWidth || 0x104,
-                  value24 = image2.naturalHeight || 0x104,
+                const value23 = image2.naturalWidth || 260,
+                  value24 = image2.naturalHeight || 260,
                   value25 = Math.min(value23, value24),
-                  value26 = 0x12c / (value25 || 1);
+                  value26 = 300 / (value25 || 1);
                 ((width2 = Math.round(value23 * value26)),
                   (height2 = Math.round(value24 * value26)),
                   handler3());
@@ -676,8 +676,8 @@ export class AIGenVideoNode {
             value27 = direction2 === 'down' ? 'down' : 'left',
             value28 = Number(box2.x) || 0,
             value29 = Number(box2.y) || 0,
-            value30 = Number(box2.width) || 0x168,
-            value31 = Number(box2.height) || 0x168,
+            value30 = Number(box2.width) || 360,
+            value31 = Number(box2.height) || 360,
             x3 = value28 - spacing2 - width2,
             y2 =
               value27 === 'down'

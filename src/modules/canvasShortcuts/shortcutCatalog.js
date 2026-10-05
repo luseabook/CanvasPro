@@ -3,11 +3,11 @@ export const SHORTCUT_NODE_TYPES = Object['freeze'](['ai-text', 'ai-image', 'ai-
 export const SHORTCUT_CATEGORIES = Object['freeze'](['text', 'image', 'video', 'audio']);
 export function resolveShortcutCategory(value) {
   if (SHORTCUT_CATEGORIES['includes'](value['category'])) return value['category'];
-  if (value['action']?.['kind'] === 'node') return value['action']['nodeType']['slice'](0x3);
+  if (value['action']?.['kind'] === 'node') return value['action']['nodeType']['slice'](3);
   const item = [...(value['action']?.['graph']?.['nodes'] || [])]
     ['reverse']()
     ['find']((key) => SHORTCUT_NODE_TYPES['includes'](key['type']));
-  if (item) return item['type']['slice'](0x3);
+  if (item) return item['type']['slice'](3);
   return SHORTCUT_CATEGORIES['includes'](value['icon']) ? value['icon'] : 'text';
 }
 export function getAvailableShortcutTemplates(index) {
@@ -18,7 +18,7 @@ export function canManageCanvasShortcuts(data = globalThis['window']) {
 }
 export function createDefaultShortcutCatalog() {
   return {
-    schemaVersion: 0x1,
+    schemaVersion: 1,
     items: ['text', 'image', 'video', 'audio']['map']((icon, options) => ({
       id: 'default-' + icon,
       name: ['文本生成', '图片生成', '视频生成', '音频生成'][options],
@@ -31,8 +31,8 @@ export function createDefaultShortcutCatalog() {
   };
 }
 export function validateShortcutCatalog(target) {
-  if (target?.['schemaVersion'] !== 0x1) throw new Error('不支持的快捷方式配置版本');
-  if (!Array['isArray'](target['items']) || target['items']['length'] > 0x40)
+  if (target?.['schemaVersion'] !== 1) throw new Error('不支持的快捷方式配置版本');
+  if (!Array['isArray'](target['items']) || target['items']['length'] > 64)
     throw new Error('快捷方式最多 64 项');
   const map = new Set();
   for (const error of target['items']) {
@@ -40,20 +40,20 @@ export function validateShortcutCatalog(target) {
       !error ||
       typeof error['id'] !== 'string' ||
       !error['id']['trim']() ||
-      error['id']['length'] > 0x64 ||
+      error['id']['length'] > 100 ||
       map['has'](error['id'])
     )
       throw new Error('快捷方式标识无效或重复');
     map['add'](error['id']);
     if (error['category'] !== undefined && !SHORTCUT_CATEGORIES['includes'](error['category']))
       throw new Error('请选择文本、图片、视频或音频分类');
-    if (typeof error['name'] !== 'string' || !error['name']['trim']() || error['name']['length'] > 0x32)
+    if (typeof error['name'] !== 'string' || !error['name']['trim']() || error['name']['length'] > 50)
       throw new Error('请填写名称（最多 50 字）');
-    if (typeof error['badge'] !== 'string' || error['badge']['length'] > 0x18)
+    if (typeof error['badge'] !== 'string' || error['badge']['length'] > 24)
       throw new Error('角标最多 24 字');
     if (
       error['subtitle'] !== undefined &&
-      (typeof error['subtitle'] !== 'string' || error['subtitle']['length'] > 0x50)
+      (typeof error['subtitle'] !== 'string' || error['subtitle']['length'] > 80)
     )
       throw new Error('副标题最多 80 字');
     if (!SHORTCUT_ICONS['includes'](error['icon']) || typeof error['enabled'] !== 'boolean')
@@ -77,10 +77,10 @@ export function validateShortcutGraph(enabled) {
   if (
     !Array['isArray'](enabled?.['nodes']) ||
     !enabled['nodes']['length'] ||
-    enabled['nodes']['length'] > 0x100
+    enabled['nodes']['length'] > 256
   )
     throw new Error('模板需要 1～256 个节点');
-  if (!Array['isArray'](enabled['edges']) || enabled['edges']['length'] > 0x800)
+  if (!Array['isArray'](enabled['edges']) || enabled['edges']['length'] > 2048)
     throw new Error('模板连线无效');
   const map2 = new Set();
   for (const enabled2 of enabled['nodes']) {
@@ -97,7 +97,7 @@ export function validateShortcutGraph(enabled) {
     for (const source of ['x', 'y', 'width', 'height']) {
       if (
         !Number['isFinite'](enabled2[source]) ||
-        (['width', 'height']['includes'](source) && enabled2[source] <= 0x0)
+        (['width', 'height']['includes'](source) && enabled2[source] <= 0)
       )
         throw new Error('模板节点尺寸或位置无效');
     }
@@ -154,7 +154,7 @@ export function createShortcutCatalogStore({ load: load2, save: save2, canManage
       return enabled5;
     },
     async save(state, config) {
-      if (!canManage()) throw new Error('请开启开发者模式，并确认本地\x20.dev\x20文件存在');
+      if (!canManage()) throw new Error('请开启开发者模式，并确认本地 .dev 文件存在');
       if (!enabled4['loaded'] || record || enabled5) throw new Error('配置正在读写，请稍后再试');
       (validateShortcutCatalog(state), (record = !![]));
       try {

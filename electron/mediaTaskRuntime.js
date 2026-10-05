@@ -14,8 +14,8 @@ import {
   needsBrowserVideoProxy,
   resolveVideoPlaybackProxyTimeoutMs,
 } from './videoPlaybackProxy.js';
-const ASSET_IMPORT_FFPROBE_TIMEOUT_MS = 0x7530,
-  LONG_MEDIA_TASK_NOTIFICATION_MS = 0x4e20,
+const ASSET_IMPORT_FFPROBE_TIMEOUT_MS = 30000,
+  LONG_MEDIA_TASK_NOTIFICATION_MS = 20000,
   PERSON_REPLACEMENT_COMPOSE_TASK_PURPOSE = 'person-replacement-compose',
   VIDEO_PROXY_TRANSCODE_PRESET = 'veryfast',
   VIDEO_PROXY_TRANSCODE_CRF = '23';
@@ -25,12 +25,12 @@ function requireFunction(value, name) {
 }
 function parseFfprobeRatio(value) {
   const text = String(value || '')['trim']();
-  if (!text) return 0x0;
-  if (!text['includes']('/')) return Number(text) || 0x0;
+  if (!text) return 0;
+  if (!text['includes']('/')) return Number(text) || 0;
   const [numerator, denominator] = text['split']('/'),
     divisor = Number(denominator);
-  if (!divisor) return 0x0;
-  return (Number(numerator) || 0x0) / divisor;
+  if (!divisor) return 0;
+  return (Number(numerator) || 0) / divisor;
 }
 export function buildMediaTaskStatePatch(update = {}) {
   const status = String(update?.['status'] || ''),
@@ -38,7 +38,7 @@ export function buildMediaTaskStatePatch(update = {}) {
       mediaTaskId: update?.['taskId'] || '',
       mediaTaskKind: update?.['kind'] || '',
       mediaTaskStatus: status,
-      mediaTaskProgress: Number(update?.['progress'] || 0x0) || 0x0,
+      mediaTaskProgress: Number(update?.['progress'] || 0) || 0,
       mediaTaskError: update?.['error'] || '',
     };
   if (status === 'waiting' || status === 'processing')
@@ -75,10 +75,10 @@ function getMediaTaskDisplayName(kind) {
 }
 function formatNotificationBody(message, fallback) {
   const text = String(message || fallback || '')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
-  if (text['length'] <= 0xb4) return text;
-  return text['slice'](0x0, 0xb1) + '...';
+  if (text['length'] <= 180) return text;
+  return text['slice'](0, 177) + '...';
 }
 export function createMediaTaskRuntime({
   appRoot: appRoot,
@@ -120,7 +120,7 @@ export function createMediaTaskRuntime({
     proxyWorkDeduper = createVideoPlaybackProxyWorkDeduper(),
     notifiedTaskIds = new Set();
   let taskQueue = null,
-    activity = { activeCount: 0x0, waitingCount: 0x0, totalCount: 0x0, progress: 0x0, activeTasks: [] };
+    activity = { activeCount: 0, waitingCount: 0, totalCount: 0, progress: 0, activeTasks: [] };
   function createOutputFilename(purpose, extension) {
     const safePurpose = String(purpose || 'media')['replace'](/[^a-z0-9_-]/gi, '_') || 'media',
       safeExtension =
@@ -128,7 +128,7 @@ export function createMediaTaskRuntime({
           ['replace'](/^\.+/, '')
           ['replace'](/[^a-z0-9]/gi, '') || 'bin';
     return (
-      safePurpose + '_' + Date['now']() + '_' + randomBytes(0x3)['toString']('hex') + '.' + safeExtension
+      safePurpose + '_' + Date['now']() + '_' + randomBytes(3)['toString']('hex') + '.' + safeExtension
     );
   }
   function toOutputLocalPath(...segments) {
@@ -179,13 +179,13 @@ export function createMediaTaskRuntime({
         'json',
         sourcePath,
       ]),
-      stream = Array['isArray'](info['streams']) && info['streams'][0x0] ? info['streams'][0x0] : {},
+      stream = Array['isArray'](info['streams']) && info['streams'][0] ? info['streams'][0] : {},
       format = info['format'] || {};
     return {
-      duration: Number(format['duration'] || 0x0) || Number(stream['duration'] || 0x0) || 0x0,
-      fps: parseFfprobeRatio(stream['avg_frame_rate']) || parseFfprobeRatio(stream['r_frame_rate']) || 0x0,
-      width: Math['trunc'](Number(stream['width'] || 0x0)) || 0x0,
-      height: Math['trunc'](Number(stream['height'] || 0x0)) || 0x0,
+      duration: Number(format['duration'] || 0) || Number(stream['duration'] || 0) || 0,
+      fps: parseFfprobeRatio(stream['avg_frame_rate']) || parseFfprobeRatio(stream['r_frame_rate']) || 0,
+      width: Math['trunc'](Number(stream['width'] || 0)) || 0,
+      height: Math['trunc'](Number(stream['height'] || 0)) || 0,
     };
   }
   async function ffprobeHasAudio(queue, task, sourcePath) {
@@ -226,7 +226,7 @@ export function createMediaTaskRuntime({
     return buildVideoPlaybackInfo(info);
   }
   function buildVideoPlaybackInfo(info = {}) {
-    const stream = Array['isArray'](info['streams']) && info['streams'][0x0] ? info['streams'][0x0] : {},
+    const stream = Array['isArray'](info['streams']) && info['streams'][0] ? info['streams'][0] : {},
       format = info['format'] || {};
     return {
       codecName: String(stream['codec_name'] || '')
@@ -242,10 +242,10 @@ export function createMediaTaskRuntime({
       formatName: String(format['format_name'] || '')
         ['trim']()
         ['toLowerCase'](),
-      duration: Number(format['duration'] || 0x0) || 0x0,
-      fps: parseFfprobeRatio(stream['avg_frame_rate']) || parseFfprobeRatio(stream['r_frame_rate']) || 0x0,
-      width: Math['trunc'](Number(stream['width'] || 0x0)) || 0x0,
-      height: Math['trunc'](Number(stream['height'] || 0x0)) || 0x0,
+      duration: Number(format['duration'] || 0) || 0,
+      fps: parseFfprobeRatio(stream['avg_frame_rate']) || parseFfprobeRatio(stream['r_frame_rate']) || 0,
+      width: Math['trunc'](Number(stream['width'] || 0)) || 0,
+      height: Math['trunc'](Number(stream['height'] || 0)) || 0,
     };
   }
   async function probeVideoPlaybackInfoForImport(sourcePath) {
@@ -289,7 +289,7 @@ export function createMediaTaskRuntime({
     mkdirSync(derivedDir, { recursive: !![] });
     let proxyReady = ![];
     try {
-      proxyReady = existsSync(proxyAbs) && statSync(proxyAbs)['size'] > 0x0;
+      proxyReady = existsSync(proxyAbs) && statSync(proxyAbs)['size'] > 0;
     } catch {
       proxyReady = ![];
     }
@@ -337,36 +337,36 @@ export function createMediaTaskRuntime({
       runAssetVideoPlaybackProxy(queue, task, sourcePath, assetId),
     );
   }
-  function buildWaveformJsonFromFloat32(float32Samples, requestedSamples = 0xbe) {
+  function buildWaveformJsonFromFloat32(float32Samples, requestedSamples = 190) {
     const buffer = float32Samples['buffer']['slice'](
         float32Samples['byteOffset'],
         float32Samples['byteOffset'] + float32Samples['byteLength'],
       ),
-      samples = new Float32Array(buffer, 0x0, Math['floor'](float32Samples['byteLength'] / 0x4)),
-      sampleCount = Math['max'](0x28, Math['min'](0x190, Number(requestedSamples) || 0xbe)),
-      bucketSize = Math['max'](0x1, Math['floor'](samples['length'] / sampleCount)),
+      samples = new Float32Array(buffer, 0, Math['floor'](float32Samples['byteLength'] / 4)),
+      sampleCount = Math['max'](40, Math['min'](400, Number(requestedSamples) || 190)),
+      bucketSize = Math['max'](1, Math['floor'](samples['length'] / sampleCount)),
       peaks = [];
-    for (let index = 0x0; index < sampleCount; index += 0x1) {
+    for (let index = 0; index < sampleCount; index += 1) {
       const bucketStart = index * bucketSize,
         bucketEnd = Math['min'](samples['length'], bucketStart + bucketSize);
-      let peak = 0x0;
-      for (let cursor = bucketStart; cursor < bucketEnd; cursor += 0x1) {
-        peak = Math['max'](peak, Math['abs'](Number(samples[cursor]) || 0x0));
+      let peak = 0;
+      for (let cursor = bucketStart; cursor < bucketEnd; cursor += 1) {
+        peak = Math['max'](peak, Math['abs'](Number(samples[cursor]) || 0));
       }
-      peaks['push'](Number(Math['min'](0x1, peak)['toFixed'](0x4)));
+      peaks['push'](Number(Math['min'](1, peak)['toFixed'](4)));
     }
-    return { version: 0x1, samples: sampleCount, peaks: peaks };
+    return { version: 1, samples: sampleCount, peaks: peaks };
   }
   function handleTaskActivity(update = {}) {
     activity = {
-      activeCount: Number(update['activeCount'] || 0x0) || 0x0,
-      waitingCount: Number(update['waitingCount'] || 0x0) || 0x0,
-      totalCount: Number(update['totalCount'] || 0x0) || 0x0,
-      progress: Number(update['progress'] || 0x0) || 0x0,
+      activeCount: Number(update['activeCount'] || 0) || 0,
+      waitingCount: Number(update['waitingCount'] || 0) || 0,
+      totalCount: Number(update['totalCount'] || 0) || 0,
+      progress: Number(update['progress'] || 0) || 0,
       activeTasks: Array['isArray'](update['activeTasks']) ? update['activeTasks'] : [],
     };
-    const isActive = activity['activeCount'] > 0x0;
-    (setTaskbarProgressSource?.('media', isActive ? Math['max'](0.01, activity['progress']) : -0x1),
+    const isActive = activity['activeCount'] > 0;
+    (setTaskbarProgressSource?.('media', isActive ? Math['max'](0.01, activity['progress']) : -1),
       setPowerSaveBlocker?.('media', isActive));
   }
   function maybeNotifyLongMediaTask(update = {}) {
@@ -375,12 +375,12 @@ export function createMediaTaskRuntime({
     if (String(update['purpose'] || '')['trim']() === PERSON_REPLACEMENT_COMPOSE_TASK_PURPOSE) return;
     const taskId = String(update['taskId'] || '')['trim']();
     if (!taskId || notifiedTaskIds['has'](taskId)) return;
-    const startedAt = Number(update['startedAt'] || 0x0) || 0x0,
+    const startedAt = Number(update['startedAt'] || 0) || 0,
       finishedAt = Number(update['finishedAt'] || Date['now']()) || Date['now']();
     if (!startedAt || finishedAt - startedAt < LONG_MEDIA_TASK_NOTIFICATION_MS) return;
     if (typeof NotificationCtor?.['isSupported'] === 'function' && !NotificationCtor['isSupported']()) return;
     notifiedTaskIds['add'](taskId);
-    notifiedTaskIds['size'] > 0x1f4 &&
+    notifiedTaskIds['size'] > 500 &&
       notifiedTaskIds['delete'](notifiedTaskIds['values']()['next']()['value']);
     const displayName = getMediaTaskDisplayName(update['kind']),
       isFailure = status === 'failed';
@@ -408,7 +408,7 @@ export function createMediaTaskRuntime({
           mediaTaskId: update['taskId'] || '',
           mediaTaskKind: update['kind'] || '',
           mediaTaskStatus: status,
-          mediaTaskProgress: Number(update['progress'] || 0x0) || 0x0,
+          mediaTaskProgress: Number(update['progress'] || 0) || 0,
           mediaTaskError: update['error'] || '',
         },
         { expectedMediaTaskId: update['taskId'] },
@@ -421,7 +421,7 @@ export function createMediaTaskRuntime({
     if (taskQueue) return taskQueue;
     return (
       (taskQueue = new MediaTaskQueueCtor({
-        concurrency: 0x2,
+        concurrency: 2,
         onUpdate: handleTaskUpdate,
         onActivity: handleTaskActivity,
       })),

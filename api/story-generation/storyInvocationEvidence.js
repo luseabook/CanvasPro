@@ -52,7 +52,7 @@ export async function invokeStoryGenerationRequest({
   let key;
   const index = Date['now']();
   let firstTextMs = null,
-    streamUpdates = 0x0;
+    streamUpdates = 0;
   const metrics = (result = '') => ({
     elapsedMs: Date['now']() - index,
     firstTextMs: firstTextMs,
@@ -65,7 +65,7 @@ export async function invokeStoryGenerationRequest({
       ...requestPayload4,
       onText: (data) => {
         if (String(data)['trim']()) firstTextMs ??= Date['now']() - index;
-        ((streamUpdates += 0x1), requestPayload4['onText']?.(data));
+        ((streamUpdates += 1), requestPayload4['onText']?.(data));
       },
     });
     const options = String(key?.['finishReason'] || '')['toLowerCase']();

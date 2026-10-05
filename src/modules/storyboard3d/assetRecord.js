@@ -3,7 +3,7 @@ import {
   getStoryboard3DModelImportCapability,
   measureStoryboard3DImportedSceneBounds,
 } from './gltfImportAdapter.js';
-export const STORYBOARD_3D_ASSET_RECORD_VERSION = 0x1;
+export const STORYBOARD_3D_ASSET_RECORD_VERSION = 1;
 export const DEFAULT_STORYBOARD_3D_ASSET_DATABASE = 'ai-canvaspro';
 export const DEFAULT_STORYBOARD_3D_ASSET_STORE = 'storyboard3d-assets';
 function normalizeText(value) {
@@ -20,18 +20,18 @@ function normalizeBounds(item) {
   ]['map'](Number);
   if (!x['every'](Number['isFinite'])) return null;
   return {
-    min: { x: x[0x0], y: x[0x1], z: x[0x2] },
-    max: { x: x[0x3], y: x[0x4], z: x[0x5] },
+    min: { x: x[0], y: x[1], z: x[2] },
+    max: { x: x[3], y: x[4], z: x[5] },
   };
 }
 function toHex(args) {
-  return [...args]['map']((key) => key['toString'](0x10)['padStart'](0x2, '0'))['join']('');
+  return [...args]['map']((key) => key['toString'](16)['padStart'](2, '0'))['join']('');
 }
 export async function createCanonicalStoryboard3DAssetId(
   index,
   { cryptoObject: cryptoObject = globalThis['crypto'] } = {},
 ) {
-  if (typeof index?.['arrayBuffer'] !== 'function') throw new Error('Asset\x20file\x20is\x20unreadable.');
+  if (typeof index?.['arrayBuffer'] !== 'function') throw new Error('Asset file is unreadable.');
   if (typeof cryptoObject?.['subtle']?.['digest'] !== 'function')
     throw new Error('SHA-256 support is unavailable.');
   const result = await cryptoObject['subtle']['digest']('SHA-256', await index['arrayBuffer']());
@@ -43,7 +43,7 @@ export function createStoryboard3DIndexedDbAssetReference({
   key: key2,
 } = {}) {
   const key3 = normalizeText(key2);
-  if (!key3) throw new Error('IndexedDB\x20asset\x20key\x20is\x20required.');
+  if (!key3) throw new Error('IndexedDB asset key is required.');
   return {
     kind: 'indexeddb',
     databaseName: normalizeText(databaseName) || DEFAULT_STORYBOARD_3D_ASSET_DATABASE,
@@ -69,11 +69,11 @@ export async function createStoryboard3DAssetRecord({
     bounds =
       normalizeBounds(parsed?.['bounds']) ||
       normalizeBounds(measureStoryboard3DImportedSceneBounds(parsed?.['scene']));
-  if (!bounds) throw new Error('Parsed\x20asset\x20bounds\x20are\x20required.');
+  if (!bounds) throw new Error('Parsed asset bounds are required.');
   const data = parsed?.['scene']
       ? countStoryboard3DSceneTriangles(parsed['scene'])
       : Number(parsed?.['triangleCount']),
-    triangleCount = Math['max'](0x0, Math['floor'](Number(data) || 0x0)),
+    triangleCount = Math['max'](0, Math['floor'](Number(data) || 0)),
     storage = indexedDbReference
       ? createStoryboard3DIndexedDbAssetReference(indexedDbReference)
       : createStoryboard3DIndexedDbAssetReference({ key: key4 }),
@@ -86,17 +86,17 @@ export async function createStoryboard3DAssetRecord({
     source: {
       fileName: normalizeText(file?.['name']),
       mimeType: normalizeText(file?.['type']),
-      byteLength: Math['max'](0x0, Number(file?.['size']) || 0x0),
+      byteLength: Math['max'](0, Number(file?.['size']) || 0),
     },
     storage: storage,
     defaultScale:
       normalization?.['status'] === 'ready'
-        ? Math['max'](0.000001, Number(normalization['uniformScale']) || 0x1)
-        : 0x1,
+        ? Math['max'](0.000001, Number(normalization['uniformScale']) || 1)
+        : 1,
     bounds: bounds,
     triangleCount: triangleCount,
     limitations: [...new Set((options || [])['map'](normalizeText)['filter'](Boolean))],
     normalizationStatus: normalization?.['status'] === 'ready' ? 'ready' : 'awaiting-bounds',
-    createdAt: Math['max'](0x0, Number(createdAt) || 0x0),
+    createdAt: Math['max'](0, Number(createdAt) || 0),
   };
 }

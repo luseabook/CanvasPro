@@ -26,7 +26,7 @@ export function isStoryGenerateShortcut(event) {
   );
 }
 const STORY_WORKSPACE_NESTED_WHEEL_SELECTOR =
-    'textarea,\x20[contenteditable=\x22true\x22],\x20.node-model-submenu,\x20.story-style-grid,\x20.story-assets-list,\x20.story-episode-assets,\x20[data-workspace-episode-rail-list],\x20.story-clip-prompt-history-list,\x20.story-clip-strip',
+    'textarea, [contenteditable="true"], .node-model-submenu, .story-style-grid, .story-assets-list, .story-episode-assets, [data-workspace-episode-rail-list], .story-clip-prompt-history-list, .story-clip-strip',
   STORY_WORKSPACE_PERSISTENT_NESTED_SCROLL_SELECTORS = Object['freeze']([
     '.story-assets-list',
     '.story-asset-prompt-editor',
@@ -68,10 +68,10 @@ export function scrollStoryClipStripWithWheel(target) {
 export function scrollStoryClipPromptHistoryWithWheel(event2) {
   const el3 = event2?.['target']?.['closest']?.('.story-clip-prompt-history-list');
   if (!el3) return ![];
-  const count = Math['max'](0x0, Number(el3['scrollHeight'] || 0x0) - Number(el3['clientHeight'] || 0x0));
-  if (count <= 0x0) return ![];
-  const source = Math['max'](0x0, Number(el3['scrollTop']) || 0x0),
-    next = Math['max'](0x0, Math['min'](count, source + Number(event2['deltaY'] || 0x0)));
+  const count = Math['max'](0, Number(el3['scrollHeight'] || 0) - Number(el3['clientHeight'] || 0));
+  if (count <= 0) return ![];
+  const source = Math['max'](0, Number(el3['scrollTop']) || 0),
+    next = Math['max'](0, Math['min'](count, source + Number(event2['deltaY'] || 0)));
   return (event2['preventDefault']?.(), event2['stopPropagation']?.(), (el3['scrollTop'] = next), !![]);
 }
 export function getStoryAssetHoverCard(el4) {
@@ -105,9 +105,9 @@ export function normalizeStoryAssetDetailSplitRatio(scope) {
   return normalizeWorkspaceAssetDetailSplitRatio(scope);
 }
 export function normalizeStoryEpisodePanelRatios(input, output) {
-  const left = Math['max'](0xe, Math['min'](0x22, Number['isFinite'](Number(input)) ? Number(input) : 0x16)),
-    value2 = Math['max'](0x18, Math['min'](0x32, Number['isFinite'](Number(output)) ? Number(output) : 0x22));
-  return { left: left, center: Math['min'](value2, 0x4c - left) };
+  const left = Math['max'](14, Math['min'](0x22, Number['isFinite'](Number(input)) ? Number(input) : 22)),
+    value2 = Math['max'](24, Math['min'](50, Number['isFinite'](Number(output)) ? Number(output) : 0x22));
+  return { left: left, center: Math['min'](value2, 76 - left) };
 }
 export function applyStoryAssetSplitRatioToLayout(value3, value4, value5) {
   return applyWorkspaceAssetSplitRatioToLayout(value3, value4, value5);

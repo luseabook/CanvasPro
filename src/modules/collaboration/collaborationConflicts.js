@@ -70,7 +70,7 @@ export function partitionCollaborationConflict(blocked, dom, current, entry) {
         );
       if (
         (config &&
-          config['expiresAt'] * 0x3e8 > Date['now']() &&
+          config['expiresAt'] * 1000 > Date['now']() &&
           (config['actorId'] !== current || config['clientId'] !== entry)) ||
         (scope && (scope['actor'] !== current || scope['client'] !== entry))
       )

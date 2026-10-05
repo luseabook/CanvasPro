@@ -1,8 +1,8 @@
 import { getAutoMediaSizeByShortSide } from '../../services/fileService.js';
 function normalizeUploadMediaDimensions(value, item) {
-  const width = Math['round'](Number(value) || 0x0),
-    height = Math['round'](Number(item) || 0x0);
-  if (width <= 0x0 || height <= 0x0) return null;
+  const width = Math['round'](Number(value) || 0),
+    height = Math['round'](Number(item) || 0);
+  if (width <= 0 || height <= 0) return null;
   return { width: width, height: height };
 }
 export function buildSourceVideoUploadSizePatch(...args) {
@@ -54,12 +54,12 @@ export function readVideoFileNaturalSize(enabled) {
       (result['muted'] = !![]),
       (result['onloadedmetadata'] = () => {
         const args2 = normalizeUploadMediaDimensions(result['videoWidth'], result['videoHeight']),
-          duration = Number(result['duration'] || 0x0),
-          args3 = Number['isFinite'](duration) && duration > 0x0 ? { duration: duration } : {};
+          duration = Number(result['duration'] || 0),
+          args3 = Number['isFinite'](duration) && duration > 0 ? { duration: duration } : {};
         run(args2 ? { ...args2, ...args3 } : args3['duration'] ? args3 : null);
       }),
       (result['onerror'] = () => run(null)),
-      (setTimeout2 = setTimeout(() => run(null), 0xbb8)),
+      (setTimeout2 = setTimeout(() => run(null), 3000)),
       (result['src'] = index));
   });
 }
@@ -85,7 +85,7 @@ export function waitForNextPaint() {
         if (setTimeout3) clearTimeout(setTimeout3);
         handler3();
       };
-      ((setTimeout3 = setTimeout(next, 0x32)), run2(next));
+      ((setTimeout3 = setTimeout(next, 50)), run2(next));
     });
-  return new Promise((current) => setTimeout(current, 0x0));
+  return new Promise((current) => setTimeout(current, 0));
 }

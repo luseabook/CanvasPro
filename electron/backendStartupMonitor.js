@@ -17,7 +17,7 @@ export function createBackendStartupMonitor({
   onClose: onClose = null,
 } = {}) {
   if (!child || typeof child['once'] !== 'function')
-    throw new TypeError('Backend\x20child\x20process\x20is\x20required');
+    throw new TypeError('Backend child process is required');
   let ready = ![],
     failureSettled = ![],
     rejectFailure;
@@ -31,7 +31,7 @@ export function createBackendStartupMonitor({
   return (
     child['once']('error', (error) => {
       const spawnError = createBackendStartupError(
-        'Failed\x20to\x20spawn\x20local\x20backend:\x20' + (error?.['message'] || error),
+        'Failed to spawn local backend: ' + (error?.['message'] || error),
         'BACKEND_SPAWN_ERROR',
         { cause: error },
       );
@@ -72,7 +72,7 @@ export function launchMonitoredBackendProcess({
   onExit: onExit = null,
 } = {}) {
   if (typeof spawnProcess !== 'function')
-    throw new TypeError('Backend\x20process\x20launcher\x20is\x20required');
+    throw new TypeError('Backend process launcher is required');
   let logClosed = ![],
     spawnFailed = ![];
   const closeLog = () => {

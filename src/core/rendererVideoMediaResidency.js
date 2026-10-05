@@ -6,21 +6,21 @@ import { resolveCanvasVideoDisplayUrl } from '../services/canvasMediaLocalServic
 export function resolveRendererVideoMediaLeaseKey(value, item = null) {
   const key = Array['isArray'](value?.['videos']) ? value['videos'] : [],
     index = Number['isFinite'](Number(value?.['mainVideoIndex']))
-      ? Math['max'](0x0, Math['trunc'](Number(value['mainVideoIndex'])))
-      : 0x0,
+      ? Math['max'](0, Math['trunc'](Number(value['mainVideoIndex'])))
+      : 0,
     canvasVideoDisplayUrl =
-      resolveCanvasVideoDisplayUrl(key[index] || key[0x0] || {}) || resolveCanvasVideoDisplayUrl(value);
+      resolveCanvasVideoDisplayUrl(key[index] || key[0] || {}) || resolveCanvasVideoDisplayUrl(value);
   return [
     String(value?.['type'] || ''),
     index,
     String(canvasVideoDisplayUrl || ''),
     String(item?.['sourceKey'] || ''),
-    Number(item?.['sourceEpoch'] || 0x0),
+    Number(item?.['sourceEpoch'] || 0),
   ]['join']('|');
 }
-const DEFAULT_MEDIA_RESIDENCY_SUSPEND_DELAY_MS = 0x78,
-  DEFAULT_PRESENTED_MEDIA_LEASE_MS = 0x258,
-  DEFAULT_MAX_RETAINED_PRESENTED_MEDIA = 0x3;
+const DEFAULT_MEDIA_RESIDENCY_SUSPEND_DELAY_MS = 120,
+  DEFAULT_PRESENTED_MEDIA_LEASE_MS = 600,
+  DEFAULT_MAX_RETAINED_PRESENTED_MEDIA = 3;
 function nowMs() {
   return typeof performance !== 'undefined' && typeof performance['now'] === 'function'
     ? performance['now']()
@@ -43,9 +43,9 @@ export function createRendererVideoMediaResidencyController({
 } = {}) {
   const map = new Map(),
     map2 = new Map(),
-    options = Math['max'](0x0, Number(suspendDelayMs) || 0x0),
-    count = Math['max'](0x0, Number(presentedMediaLeaseMs) || 0x0),
-    count2 = Math['max'](0x0, Math['trunc'](Number(maxRetainedPresentedMedia) || 0x0)),
+    options = Math['max'](0, Number(suspendDelayMs) || 0),
+    count = Math['max'](0, Number(presentedMediaLeaseMs) || 0),
+    count2 = Math['max'](0, Math['trunc'](Number(maxRetainedPresentedMedia) || 0)),
     isRendererRuntimeDiagnosticsEnabled2 = isRendererRuntimeDiagnosticsEnabled();
   function run(enabled) {
     if (!enabled || enabled['timer'] === null) return;
@@ -83,7 +83,7 @@ export function createRendererVideoMediaResidencyController({
         (onParkSuspend?.(nodeId, enabled5, entry), map['delete'](nodeId));
         return;
       }
-      const record = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0x0,
+      const record = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
         suspended = onSuspend?.(nodeId, enabled5, entry);
       (isRendererRuntimeDiagnosticsEnabled2 &&
         recordRendererRuntimeDiagnostic({
@@ -153,7 +153,7 @@ export function createRendererVideoMediaResidencyController({
       (run3(nodeId2), run(config));
       const value2 = getComponent?.(nodeId2);
       if (isMounted?.(nodeId2) && isMediaDeferred(nodeId2, value2)) {
-        const value3 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0x0,
+        const value3 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
           resumed = onResume?.(nodeId2, value2, getWrapper?.(nodeId2));
         isRendererRuntimeDiagnosticsEnabled2 &&
           recordRendererRuntimeDiagnostic({
@@ -170,8 +170,8 @@ export function createRendererVideoMediaResidencyController({
       return;
     }
     if (
-      count2 > 0x0 &&
-      count > 0x0 &&
+      count2 > 0 &&
+      count > 0 &&
       (input || !enabled9 || output) &&
       shouldRetainPresentedMedia?.(nodeId2, getComponent?.(nodeId2), getWrapper?.(nodeId2)) === !![]
     ) {
@@ -195,7 +195,7 @@ export function createRendererVideoMediaResidencyController({
       (value4['leaseKey'] = String(leaseKey || '')));
     const value5 = getComponent?.(enabled10),
       value6 = getWrapper?.(enabled10);
-    if (retainPresentedMedia === !![] && count2 > 0x0 && count > 0x0 && !run4(enabled10, value5, value6)) {
+    if (retainPresentedMedia === !![] && count2 > 0 && count > 0 && !run4(enabled10, value5, value6)) {
       run8(enabled10, value4);
       return;
     }

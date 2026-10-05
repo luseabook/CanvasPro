@@ -6,13 +6,13 @@ import {
 } from '../../services/smartClipJobService.js';
 import { localPathToUrl, pickResultLocalPath } from '../../utils/localMediaPath.js';
 const TIMELINE_MATCH_TOLERANCE_SEC = 0.15;
-function toFiniteNumber(value, item = 0x0) {
+function toFiniteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function toPositiveIndex(index) {
   const count = Number(index);
-  if (!Number['isFinite'](count) || count < 0x1) return 0x0;
+  if (!Number['isFinite'](count) || count < 1) return 0;
   return Math['trunc'](count);
 }
 function serializeStageError(error, result) {
@@ -25,11 +25,11 @@ function serializeStageError(error, result) {
 }
 function normalizeSegment(data, sourcePosition) {
   const personDetection = data && typeof data === 'object' ? data : {},
-    start2 = Math['max'](0x0, toFiniteNumber(personDetection['start'], 0x0)),
-    count2 = Math['max'](0x0, toFiniteNumber(personDetection['duration'], 0x0)),
+    start2 = Math['max'](0, toFiniteNumber(personDetection['start'], 0)),
+    count2 = Math['max'](0, toFiniteNumber(personDetection['duration'], 0)),
     toFiniteNumber2 = toFiniteNumber(personDetection['end'], start2 + count2),
     end2 = Math['max'](start2, toFiniteNumber2),
-    duration2 = count2 > 0x0 ? count2 : Math['max'](0x0, end2 - start2),
+    duration2 = count2 > 0 ? count2 : Math['max'](0, end2 - start2),
     ref = pickResultLocalPath(personDetection);
   return {
     sourceIndex: toPositiveIndex(personDetection['index']),
@@ -37,8 +37,8 @@ function normalizeSegment(data, sourcePosition) {
     start: start2,
     end: end2 > start2 ? end2 : start2 + duration2,
     duration: duration2,
-    fps: Math['max'](0x0, toFiniteNumber(personDetection['fps'], 0x0)),
-    keyframeIndex: Math['max'](0x0, Math['trunc'](toFiniteNumber(personDetection['keyframeIndex'], 0x0))),
+    fps: Math['max'](0, toFiniteNumber(personDetection['fps'], 0)),
+    keyframeIndex: Math['max'](0, Math['trunc'](toFiniteNumber(personDetection['keyframeIndex'], 0))),
     keyframeTimeSec: Math['max'](start2, toFiniteNumber(personDetection['keyframeTimeSec'], start2)),
     personDetection:
       personDetection['personDetection'] && typeof personDetection['personDetection'] === 'object'
@@ -63,14 +63,14 @@ export function normalizePersonReplacementSmartClipSegments(options) {
       ),
     map = new Set(list['map']((entry) => entry['sourceIndex'])['filter'](Boolean)),
     map2 = new Set();
-  let record = 0x1;
+  let record = 1;
   return list['map']((args) => {
     let index2 = args['sourceIndex'];
     if (!index2 || map2['has'](index2)) {
       while (map['has'](record) || map2['has'](record)) {
-        record += 0x1;
+        record += 1;
       }
-      ((index2 = record), (record += 0x1));
+      ((index2 = record), (record += 1));
     }
     return (map2['add'](index2), { ...args, index: index2 });
   });
@@ -103,13 +103,13 @@ export function buildPersonReplacementShotBundles({
   return list4['map']((sourceIndex, index3) => {
     const clipRef = map3['get'](sourceIndex) || null,
       fps = map4['get'](sourceIndex) || null,
-      start3 = clipRef || fps || { start: 0x0, end: 0x0, duration: 0x0 },
+      start3 = clipRef || fps || { start: 0, end: 0, duration: 0 },
       errors = [];
     requireClip &&
       !clipRef?.['ref'] &&
       errors['push'](
         stageErrors['videoSegments'] ||
-          missingRefError('videoSegments', 'missing_clip_ref', 'Video\x20segment\x20output\x20is\x20missing'),
+          missingRefError('videoSegments', 'missing_clip_ref', 'Video segment output is missing'),
       );
     !fps?.['ref'] &&
       errors['push'](
@@ -124,16 +124,16 @@ export function buildPersonReplacementShotBundles({
       value2 = Boolean(fps?.['ref']),
       value3 = !requireClip || output,
       status =
-        value3 && value2 && errors['length'] === 0x0 ? 'ready' : output || value2 ? 'partial' : 'failed';
+        value3 && value2 && errors['length'] === 0 ? 'ready' : output || value2 ? 'partial' : 'failed';
     return {
-      id: 'shot-' + String(index3 + 0x1)['padStart'](0x3, '0'),
-      index: index3 + 0x1,
+      id: 'shot-' + String(index3 + 1)['padStart'](3, '0'),
+      index: index3 + 1,
       sourceIndex: sourceIndex,
       start: start3['start'],
       end: start3['end'],
-      duration: start3['duration'] || Math['max'](0x0, start3['end'] - start3['start']),
-      fps: fps?.['fps'] || clipRef?.['fps'] || 0x0,
-      keyframeIndex: fps?.['keyframeIndex'] || 0x0,
+      duration: start3['duration'] || Math['max'](0, start3['end'] - start3['start']),
+      fps: fps?.['fps'] || clipRef?.['fps'] || 0,
+      keyframeIndex: fps?.['keyframeIndex'] || 0,
       keyframeTimeSec: fps?.['keyframeTimeSec'] || start3['start'],
       personDetection: fps?.['personDetection'] || null,
       personFound: fps?.['personFound'] === !![],
@@ -152,11 +152,11 @@ function normalizeSourceRef(value4) {
 function createStageSuccess(value5) {
   const status2 = Array['isArray'](value5?.['segments']) ? value5['segments'] : [];
   return {
-    status: status2['length'] > 0x0 ? 'complete' : 'empty',
+    status: status2['length'] > 0 ? 'complete' : 'empty',
     jobId: String(value5?.['jobId'] || ''),
     count: status2['length'],
     error:
-      status2['length'] > 0x0
+      status2['length'] > 0
         ? null
         : {
             stage: String(value5?.['outputMode'] || 'unknown'),
@@ -198,7 +198,7 @@ async function runStage({
       stage: {
         status: jobId['code'] === 'cancelled' ? 'cancelled' : 'failed',
         jobId: jobId['jobId'],
-        count: 0x0,
+        count: 0,
         error: jobId,
       },
     };
@@ -218,7 +218,7 @@ export async function runPersonReplacementSmartClip({
       code: 'invalid_source',
       stage: 'prepare',
     });
-  if (typeof runJob !== 'function') throw new TypeError('Smart\x20clip\x20job\x20runner\x20is\x20required');
+  if (typeof runJob !== 'function') throw new TypeError('Smart clip job runner is required');
   const mode = normalizeSmartClipRunOptions(options3),
     options4 = {
       mode: mode['mode'],
@@ -247,7 +247,7 @@ export async function runPersonReplacementSmartClip({
     value8 = keyframes['stage']['status'] !== 'complete',
     value9 = shotBundles['some']((response) => response['status'] !== 'ready'),
     enabled3 = shotBundles['some']((response2) => response2['status'] !== 'failed'),
-    ok = shotBundles['length'] === 0x0 || !enabled3 ? 'failed' : value8 || value9 ? 'partial' : 'ready';
+    ok = shotBundles['length'] === 0 || !enabled3 ? 'failed' : value8 || value9 ? 'partial' : 'ready';
   return {
     ok: ok !== 'failed',
     status: ok,
@@ -255,7 +255,7 @@ export async function runPersonReplacementSmartClip({
     options: options4,
     shotBundles: shotBundles,
     stages: {
-      videoSegments: { status: 'deferred', jobId: '', count: 0x0, error: null },
+      videoSegments: { status: 'deferred', jobId: '', count: 0, error: null },
       keyframes: keyframes['stage'],
     },
   };

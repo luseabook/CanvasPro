@@ -1,6 +1,6 @@
 import { getStoryBackgroundTaskSummary } from './storyBackgroundTasks.js';
 import { duplicateStoryProjectEntry } from './storyProjectSession.js';
-export const STORY_PROJECT_PACKAGE_PAYLOAD_VERSION = 0x1;
+export const STORY_PROJECT_PACKAGE_PAYLOAD_VERSION = 1;
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
@@ -14,7 +14,7 @@ function cloneForPackage(item) {
 export function canCollectStoryProject(options = {}) {
   return (
     Boolean(options?.['data']?.['project']) &&
-    getStoryBackgroundTaskSummary(options['data'])['activeCount'] === 0x0
+    getStoryBackgroundTaskSummary(options['data'])['activeCount'] === 0
   );
 }
 export function createStoryProjectPackagePayload(enabled = {}) {
@@ -51,7 +51,7 @@ export function createImportedStoryProjectEntry(
     (duplicateStoryProjectEntry2['data']['project']['title'] = result),
     (duplicateStoryProjectEntry2['createdAt'] = Number(now) || Date['now']()),
     (duplicateStoryProjectEntry2['updatedAt'] = Number(now) || Date['now']()),
-    (duplicateStoryProjectEntry2['archivedAt'] = 0x0),
+    (duplicateStoryProjectEntry2['archivedAt'] = 0),
     (duplicateStoryProjectEntry2['projectTitleEdited'] = !![]),
     duplicateStoryProjectEntry2
   );

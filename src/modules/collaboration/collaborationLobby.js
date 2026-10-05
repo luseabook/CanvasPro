@@ -14,7 +14,7 @@ export function createCollaborationLobby({
     enabled = '';
   const el = element('div', 'collaboration-profile'),
     el2 = input('协作昵称', el);
-  ((el2['maxLength'] = 0x20),
+  ((el2['maxLength'] = 32),
     el2['addEventListener']('change', () => actions['setDisplayName'](el2['value'])));
   const el3 = element('button', 'collaboration-button collaboration-quiet');
   ((el3['type'] = 'button'),
@@ -71,11 +71,11 @@ export function createCollaborationLobby({
       ((list[options]['hidden'] = !!enabled || options !== value),
         (key[options]['disabled'] = !!enabled && options !== enabled),
         key[options]['setAttribute']('aria-selected', String(options === value)),
-        (key[options]['tabIndex'] = options === value ? 0x0 : -0x1));
+        (key[options]['tabIndex'] = options === value ? 0 : -1));
     }
   }
   const el7 = element('div', 'collaboration-current');
-  el7['append'](createContextMenuIcon('source', { size: 0x1c }));
+  el7['append'](createContextMenuIcon('source', { size: 28 }));
   const target = element('div', 'collaboration-current-text'),
     el8 = element('span', 'collaboration-node-count collaboration-subtle');
   (target['append'](element('strong', '', '当前画布'), el8), el7['append'](target));
@@ -196,7 +196,7 @@ export function createCollaborationLobby({
         }
         ((el19['hidden'] = !enabled4['session']),
           (item = !!enabled4['session']),
-          (el8['textContent'] = (enabled4['nodeCount'] || 0x0) + ' 个节点'));
+          (el8['textContent'] = (enabled4['nodeCount'] || 0) + ' 个节点'));
         const handle =
           enabled4['resumeRoom'] && !enabled4['session']
             ? enabled4['resumeRoom']['canvasId'] +

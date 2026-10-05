@@ -8,17 +8,17 @@ export function normalizeRunningHubReferenceMediaUrls(value) {
     list
   );
 }
-function normalizeCount(index, result = 0x0) {
+function normalizeCount(index, result = 0) {
   const data = Number(index);
   return Number['isFinite'](data)
-    ? Math['max'](0x0, Math['trunc'](data))
-    : Math['max'](0x0, Math['trunc'](Number(result) || 0x0));
+    ? Math['max'](0, Math['trunc'](data))
+    : Math['max'](0, Math['trunc'](Number(result) || 0));
 }
 function normalizeReferenceMediaSpec(args = {}, options = {}) {
   const loaderNodes = Array['isArray'](args['loaderNodes']) ? args['loaderNodes'] : [],
     slotCount = normalizeCount(args['slotCount'], loaderNodes['length']),
     maxCount = normalizeCount(args['maxCount'], slotCount),
-    minCount = normalizeCount(args['minCount'], 0x0),
+    minCount = normalizeCount(args['minCount'], 0),
     payloadField = String(args['payloadField'] || '')['trim'](),
     referenceFieldPrefixes = (
       Array['isArray'](args['referenceFieldPrefixes'])
@@ -47,16 +47,16 @@ function assertReferenceMediaSpec(enabled) {
         'RunningHub ' + (enabled['kind'] || 'media') + ' reference mapping is incomplete',
     );
   const enabled2 = enabled['loaderNodes']
-    ['slice'](0x0, enabled['maxCount'])
+    ['slice'](0, enabled['maxCount'])
     ['every']((source) => source?.['nodeId'] && source?.['fieldName']);
   if (!enabled2)
     throw new Error(
       enabled['mappingMissingMessage'] ||
-        'RunningHub ' + (enabled['kind'] || 'media') + '\x20loader\x20mapping\x20is\x20incomplete',
+        'RunningHub ' + (enabled['kind'] || 'media') + ' loader mapping is incomplete',
     );
   if (
-    enabled['slotCount'] > 0x0 &&
-    (!enabled['referenceNodeId'] || enabled['referenceFieldPrefixes']['length'] === 0x0)
+    enabled['slotCount'] > 0 &&
+    (!enabled['referenceNodeId'] || enabled['referenceFieldPrefixes']['length'] === 0)
   )
     throw new Error(
       enabled['mappingMissingMessage'] ||
@@ -70,7 +70,7 @@ function assertReferenceMediaSpec(enabled) {
   if (enabled['urls']['length'] < enabled['minCount'])
     throw new Error(
       enabled['minCountMessage'] ||
-        'RunningHub\x20' + (enabled['kind'] || 'media') + ' references require ' + enabled['minCount'],
+        'RunningHub ' + (enabled['kind'] || 'media') + ' references require ' + enabled['minCount'],
     );
 }
 function assertUploadedReferenceMedia(next, current) {
@@ -78,7 +78,7 @@ function assertUploadedReferenceMedia(next, current) {
   if (list2['length'] !== next['urls']['length'] || list2['some']((entry) => !String(entry || '')['trim']()))
     throw new Error(
       (next['uploadFailedMessage'] || 'RunningHUB 参考素材上传失败') +
-        '：预期\x20' +
+        '：预期 ' +
         next['urls']['length'] +
         ' 项，返回 ' +
         list2['filter']((record) => String(record || '')['trim']())['length'] +
@@ -89,7 +89,7 @@ function assertUploadedReferenceMedia(next, current) {
 export async function appendRunningHubReferenceMediaInputs({
   payload: payload = {},
   specs: specs = [],
-  requiredTotal: requiredTotal = 0x0,
+  requiredTotal: requiredTotal = 0,
   requiredTotalMessage: requiredTotalMessage = '',
   apiKey: apiKey,
   ctx: ctx,
@@ -100,8 +100,8 @@ export async function appendRunningHubReferenceMediaInputs({
     normalizeReferenceMediaSpec(handle, payload),
   );
   list3['forEach'](assertReferenceMediaSpec);
-  const state = list3['reduce']((config, scope) => config + scope['urls']['length'], 0x0);
-  if (state < normalizeCount(requiredTotal, 0x0))
+  const state = list3['reduce']((config, scope) => config + scope['urls']['length'], 0);
+  if (state < normalizeCount(requiredTotal, 0))
     throw new Error(requiredTotalMessage || 'RunningHub 工作流缺少参考素材');
   const uploadedCount = await Promise['all'](
     list3['map'](async (uploadFailedMessage) =>
@@ -128,7 +128,7 @@ export async function appendRunningHubReferenceMediaInputs({
     list3['forEach']((nodeId, value4) => {
       const value5 = uploadedCount[value4]['length'];
       nodeId['referenceFieldPrefixes']['forEach']((value6) => {
-        for (let value7 = value5; value7 < nodeId['slotCount']; value7 += 0x1) {
+        for (let value7 = value5; value7 < nodeId['slotCount']; value7 += 1) {
           helpers['pushManifestNode'](
             nodeInfoList,
             { nodeId: nodeId['referenceNodeId'], fieldName: '' + value6 + value7 },

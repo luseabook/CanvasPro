@@ -21,7 +21,7 @@ export function createPersonReplacementResultHistoryLayout() {
   return Object['freeze']({
     show(el3) {
       const data = el3?.['closest']?.('.person-replacement-middle-layout');
-      data !== el && (handler(), run(0x0, ![]), (el = data));
+      data !== el && (handler(), run(0, ![]), (el = data));
       const options = el3?.['querySelector']?.('.person-replacement-result-history-content');
       if (options !== el2) {
         (handler(), (el2 = options));
@@ -31,10 +31,10 @@ export function createPersonReplacementResultHistoryLayout() {
       handler2();
     },
     hide({ animate: animate = ![] } = {}) {
-      return (handler(), run(0x0, animate));
+      return (handler(), run(0, animate));
     },
     destroy() {
-      (handler(), run(0x0, ![]), (el = null));
+      (handler(), run(0, ![]), (el = null));
     },
   });
 }

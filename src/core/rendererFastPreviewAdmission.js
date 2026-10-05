@@ -1,48 +1,48 @@
-const BACKGROUND_NODE_LIMIT = 0x208,
-  MEDIA_LIMIT = 0x208,
+const BACKGROUND_NODE_LIMIT = 520,
+  MEDIA_LIMIT = 520,
   LOW_ZOOM_THRESHOLD = 0.45,
-  LOW_ZOOM_MEDIA_LIMIT = 0x80,
+  LOW_ZOOM_MEDIA_LIMIT = 128,
   VERY_LOW_ZOOM_THRESHOLD = 0.32,
-  VERY_LOW_ZOOM_MEDIA_LIMIT = 0x60,
-  BUSY_LOW_ZOOM_MEDIA_LIMIT = 0x20,
-  REFERENCE_VIEWPORT_AREA = 0x5a0 * 0x3c0,
-  SCALED_MEDIA_LIMIT_MAX = 0xf0,
-  MEDIUM_PREFETCH_MIN = 0xb4,
-  MEDIUM_PREFETCH_MAX = 0x104,
-  MEDIUM_PREFETCH_MEDIA_LIMIT = 0x20,
-  NON_MEDIA_LIMIT = 0x30,
-  LOW_PRIORITY_IMMEDIATE_SRC_LIMIT = 0x18,
-  LOW_PRIORITY_LARGE_IMMEDIATE_SRC_LIMIT = 0xc,
-  NORMAL_IMMEDIATE_SRC_LIMIT = 0x20,
-  NODE_CREATE_IMMEDIATE_LIMIT = 0x8,
-  REQUIRED_NODE_CREATE_IMMEDIATE_LIMIT = 0x10,
-  POOLED_NODE_CREATE_IMMEDIATE_LIMIT = 0x20,
-  NODE_CREATE_BATCH_SIZE = 0x8,
-  LARGE_CANDIDATE_COUNT = 0xb4,
-  HUGE_CANDIDATE_COUNT = 0x168,
-  LARGE_NODE_CREATE_IMMEDIATE_LIMIT = 0x8,
-  HUGE_NODE_CREATE_IMMEDIATE_LIMIT = 0x8,
-  LARGE_NODE_CREATE_BATCH_SIZE = 0x8,
-  HUGE_NODE_CREATE_BATCH_SIZE = 0x8,
-  BUSY_IMMEDIATE_SRC_LIMIT = 0x10,
-  BUSY_MOTION_AHEAD_MEDIA_LIMIT = 0x6,
-  VIDEO_IMMEDIATE_SRC_LIMIT = 0x10,
-  LARGE_VIDEO_IMMEDIATE_SRC_LIMIT = 0xa,
-  HUGE_VIDEO_IMMEDIATE_SRC_LIMIT = 0x8,
-  BUSY_VIDEO_IMMEDIATE_SRC_LIMIT = 0x2,
-  DENSE_INITIAL_IMMEDIATE_SRC_LIMIT = 0x2,
-  DENSE_INITIAL_VIDEO_IMMEDIATE_SRC_LIMIT = 0x1,
+  VERY_LOW_ZOOM_MEDIA_LIMIT = 96,
+  BUSY_LOW_ZOOM_MEDIA_LIMIT = 32,
+  REFERENCE_VIEWPORT_AREA = 1440 * 960,
+  SCALED_MEDIA_LIMIT_MAX = 240,
+  MEDIUM_PREFETCH_MIN = 180,
+  MEDIUM_PREFETCH_MAX = 260,
+  MEDIUM_PREFETCH_MEDIA_LIMIT = 32,
+  NON_MEDIA_LIMIT = 48,
+  LOW_PRIORITY_IMMEDIATE_SRC_LIMIT = 24,
+  LOW_PRIORITY_LARGE_IMMEDIATE_SRC_LIMIT = 12,
+  NORMAL_IMMEDIATE_SRC_LIMIT = 32,
+  NODE_CREATE_IMMEDIATE_LIMIT = 8,
+  REQUIRED_NODE_CREATE_IMMEDIATE_LIMIT = 16,
+  POOLED_NODE_CREATE_IMMEDIATE_LIMIT = 32,
+  NODE_CREATE_BATCH_SIZE = 8,
+  LARGE_CANDIDATE_COUNT = 180,
+  HUGE_CANDIDATE_COUNT = 360,
+  LARGE_NODE_CREATE_IMMEDIATE_LIMIT = 8,
+  HUGE_NODE_CREATE_IMMEDIATE_LIMIT = 8,
+  LARGE_NODE_CREATE_BATCH_SIZE = 8,
+  HUGE_NODE_CREATE_BATCH_SIZE = 8,
+  BUSY_IMMEDIATE_SRC_LIMIT = 16,
+  BUSY_MOTION_AHEAD_MEDIA_LIMIT = 6,
+  VIDEO_IMMEDIATE_SRC_LIMIT = 16,
+  LARGE_VIDEO_IMMEDIATE_SRC_LIMIT = 10,
+  HUGE_VIDEO_IMMEDIATE_SRC_LIMIT = 8,
+  BUSY_VIDEO_IMMEDIATE_SRC_LIMIT = 2,
+  DENSE_INITIAL_IMMEDIATE_SRC_LIMIT = 2,
+  DENSE_INITIAL_VIDEO_IMMEDIATE_SRC_LIMIT = 1,
   MOTION_LOOKAHEAD_FACTOR = 1.5,
-  MOTION_AHEAD_PADDING = 0x140,
-  VIDEO_EDGE_PREFETCH_PADDING = 0xf0,
+  MOTION_AHEAD_PADDING = 320,
+  VIDEO_EDGE_PREFETCH_PADDING = 240,
   LOW_ZOOM_EDGE_PREFETCH_MIN_ZOOM = 0.38,
-  LOW_ZOOM_EDGE_PREFETCH_PADDING = 0x2d0;
+  LOW_ZOOM_EDGE_PREFETCH_PADDING = 720;
 function normalizeViewport(box = {}) {
   const count = Number(box?.['zoom']);
   return {
-    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0x0,
-    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0x0,
-    zoom: Number['isFinite'](count) && count > 0x0 ? count : 0x1,
+    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0,
+    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0,
+    zoom: Number['isFinite'](count) && count > 0 ? count : 1,
   };
 }
 function resolveRequiredImmediateCreateLimit(options2 = {}) {
@@ -52,22 +52,22 @@ function resolveRequiredImmediateCreateLimit(options2 = {}) {
       NODE_CREATE_IMMEDIATE_LIMIT,
       Math['min'](value, REQUIRED_NODE_CREATE_IMMEDIATE_LIMIT),
     ),
-    key = Math['max'](0x0, Math['trunc'](Number(options2['availablePreviewNodePoolSize']) || 0x0));
+    key = Math['max'](0, Math['trunc'](Number(options2['availablePreviewNodePoolSize']) || 0));
   return Math['min'](POOLED_NODE_CREATE_IMMEDIATE_LIMIT, item + key);
 }
 function getViewportContainerSize(options3 = {}) {
   return {
     width: Math['max'](
-      0x1,
+      1,
       Number(options3['containerWidth'] ?? options3['containerW']) ||
-        (typeof window !== 'undefined' ? Number(window['innerWidth']) : 0x0) ||
-        0x640,
+        (typeof window !== 'undefined' ? Number(window['innerWidth']) : 0) ||
+        1600,
     ),
     height: Math['max'](
-      0x1,
+      1,
       Number(options3['containerHeight'] ?? options3['containerH']) ||
-        (typeof window !== 'undefined' ? Number(window['innerHeight']) : 0x0) ||
-        0x384,
+        (typeof window !== 'undefined' ? Number(window['innerHeight']) : 0) ||
+        900,
     ),
   };
 }
@@ -75,8 +75,8 @@ function getViewportWorldRect(options4 = {}) {
   const box2 = normalizeViewport(options4['viewport']),
     { width: width, height: height } = getViewportContainerSize(options4);
   return {
-    left: (0x0 - box2['x']) / box2['zoom'],
-    top: (0x0 - box2['y']) / box2['zoom'],
+    left: (0 - box2['x']) / box2['zoom'],
+    top: (0 - box2['y']) / box2['zoom'],
     right: (width - box2['x']) / box2['zoom'],
     bottom: (height - box2['y']) / box2['zoom'],
   };
@@ -85,14 +85,14 @@ function getViewportWorldCenter(options5 = {}) {
   const box3 = normalizeViewport(options5['viewport']),
     { width: width2, height: height2 } = getViewportContainerSize(options5);
   return {
-    x: ((0x0 - box3['x']) / box3['zoom'] + (width2 - box3['x']) / box3['zoom']) / 0x2,
-    y: ((0x0 - box3['y']) / box3['zoom'] + (height2 - box3['y']) / box3['zoom']) / 0x2,
+    x: ((0 - box3['x']) / box3['zoom'] + (width2 - box3['x']) / box3['zoom']) / 2,
+    y: ((0 - box3['y']) / box3['zoom'] + (height2 - box3['y']) / box3['zoom']) / 2,
   };
 }
 function getPreviewDistanceSq(box4, box5) {
-  if (!box4 || !box5) return 0x0;
-  const index = box4['x'] + box4['width'] / 0x2 - box5['x'],
-    result = box4['y'] + box4['height'] / 0x2 - box5['y'];
+  if (!box4 || !box5) return 0;
+  const index = box4['x'] + box4['width'] / 2 - box5['x'],
+    result = box4['y'] + box4['height'] / 2 - box5['y'];
   return index * index + result * result;
 }
 function getMotionAdjustedPreviewDistanceSq(enabled, data, target = {}) {
@@ -107,16 +107,16 @@ function getMotionAdjustedPreviewDistanceSq(enabled, data, target = {}) {
   return getPreviewDistanceSq(enabled, source);
 }
 function getPreviewViewportDistanceSq(box6, next = {}) {
-  if (!box6) return 0x0;
+  if (!box6) return 0;
   const box7 = getViewportWorldRect(next),
-    current = Number(box6['x']) || 0x0,
-    entry = Number(box6['y']) || 0x0,
-    record = current + Math['max'](0x1, Number(box6['width']) || 0x0),
-    payload = entry + Math['max'](0x1, Number(box6['height']) || 0x0),
+    current = Number(box6['x']) || 0,
+    entry = Number(box6['y']) || 0,
+    record = current + Math['max'](1, Number(box6['width']) || 0),
+    payload = entry + Math['max'](1, Number(box6['height']) || 0),
     handle =
-      record < box7['left'] ? box7['left'] - record : current > box7['right'] ? current - box7['right'] : 0x0,
+      record < box7['left'] ? box7['left'] - record : current > box7['right'] ? current - box7['right'] : 0,
     state =
-      payload < box7['top'] ? box7['top'] - payload : entry > box7['bottom'] ? entry - box7['bottom'] : 0x0;
+      payload < box7['top'] ? box7['top'] - payload : entry > box7['bottom'] ? entry - box7['bottom'] : 0;
   return handle * handle + state * state;
 }
 function getMotionAheadViewportOptions(args = {}) {
@@ -142,7 +142,7 @@ function getPreviewMediaPriorityDistanceSq(config, scope, input = {}) {
   const motionAheadViewportOptions = getMotionAheadViewportOptions(input);
   return getPreviewViewportDistanceSq(config, motionAheadViewportOptions || input);
 }
-export function isRendererFastPreviewGeometryVisible(box8, value2 = {}, value3 = 0x0) {
+export function isRendererFastPreviewGeometryVisible(box8, value2 = {}, value3 = 0) {
   if (!box8) return ![];
   const box9 = normalizeViewport(value2['viewport']),
     { width: width3, height: height3 } = getViewportContainerSize(value2),
@@ -150,7 +150,7 @@ export function isRendererFastPreviewGeometryVisible(box8, value2 = {}, value3 =
     value5 = box8['y'] * box9['zoom'] + box9['y'],
     value6 = box8['width'] * box9['zoom'],
     value7 = box8['height'] * box9['zoom'],
-    value8 = Math['max'](0x0, Number(value3) || 0x0);
+    value8 = Math['max'](0, Number(value3) || 0);
   return (
     value4 + value6 > -value8 &&
     value4 < width3 + value8 &&
@@ -169,11 +169,11 @@ function isGeometryInMotionDirection(box10, value11 = {}) {
   const enabled5 = value11?.['previewMotion'];
   if (!box10 || !enabled5?.['active']) return ![];
   const box11 = getViewportWorldRect(value11),
-    value12 = (Number(box10['x']) || 0x0) + Math['max'](0x1, Number(box10['width']) || 0x0) / 0x2,
-    value13 = (Number(box10['y']) || 0x0) + Math['max'](0x1, Number(box10['height']) || 0x0) / 0x2;
+    value12 = (Number(box10['x']) || 0) + Math['max'](1, Number(box10['width']) || 0) / 2,
+    value13 = (Number(box10['y']) || 0) + Math['max'](1, Number(box10['height']) || 0) / 2;
   if (Math['abs'](enabled5['dx']) >= Math['abs'](enabled5['dy']))
-    return enabled5['dx'] >= 0x0 ? value12 > box11['right'] : value12 < box11['left'];
-  return enabled5['dy'] >= 0x0 ? value13 > box11['bottom'] : value13 < box11['top'];
+    return enabled5['dx'] >= 0 ? value12 > box11['right'] : value12 < box11['left'];
+  return enabled5['dy'] >= 0 ? value13 > box11['bottom'] : value13 < box11['top'];
 }
 function isGeometryAtMotionFront(value14, value15 = {}) {
   return (
@@ -194,15 +194,15 @@ export function selectRendererMotionAheadMediaIds(list, value16 = {}) {
           getPreviewViewportDistanceSq(value18['geometry'], value16) -
           getPreviewViewportDistanceSq(value19['geometry'], value16),
       )
-      ['slice'](0x0, BUSY_MOTION_AHEAD_MEDIA_LIMIT)
+      ['slice'](0, BUSY_MOTION_AHEAD_MEDIA_LIMIT)
       ['map']((value20) => value20['nodeId']),
   );
 }
 export function isRendererFastPreviewMediaReadable(box12, value21 = {}) {
   return (
-    Math['max'](Number(box12?.['width']) || 0x0, Number(box12?.['height']) || 0x0) *
+    Math['max'](Number(box12?.['width']) || 0, Number(box12?.['height']) || 0) *
       normalizeViewport(value21['viewport'])['zoom'] >=
-    0x40
+    64
   );
 }
 function isGeometryAtVideoPrefetchEdge(value22, value23 = {}) {
@@ -230,15 +230,15 @@ function resolveCreateBatchSize(value28) {
   return NODE_CREATE_BATCH_SIZE;
 }
 function getCandidateUserRank(options6 = {}) {
-  if (options6['selected'] || options6['retained'] || options6['continuationPending']) return 0x0;
-  if (options6['visible'] || options6['motionFront'] || options6['motionAhead']) return 0x1;
-  if (options6['mounted']) return 0x2;
-  return 0x3;
+  if (options6['selected'] || options6['retained'] || options6['continuationPending']) return 0;
+  if (options6['visible'] || options6['motionFront'] || options6['motionAhead']) return 1;
+  if (options6['mounted']) return 2;
+  return 3;
 }
 function hasCandidateMedia(options7 = {}) {
   return (
     options7['hasMediaHint'] === !![] ||
-    (Array['isArray'](options7['sources']) && options7['sources']['length'] > 0x0)
+    (Array['isArray'](options7['sources']) && options7['sources']['length'] > 0)
   );
 }
 export function resolveRendererFastPreviewMediaQueuePriority(options8 = {}, value29 = {}) {
@@ -246,13 +246,13 @@ export function resolveRendererFastPreviewMediaQueuePriority(options8 = {}, valu
   return {
     userRank: getCandidateUserRank(options8),
     distanceSq: getPreviewMediaPriorityDistanceSq(options8['geometry'], value30, value29),
-    order: Number(options8['order'] || 0x0),
+    order: Number(options8['order'] || 0),
   };
 }
 function shouldPrioritizeMediaOrder(list2, value31 = {}) {
-  if (!Array['isArray'](list2) || list2['length'] === 0x0) return ![];
+  if (!Array['isArray'](list2) || list2['length'] === 0) return ![];
   const count2 = list2['filter']((value32) => hasCandidateMedia(value32))['length'];
-  if (count2 === 0x0) return ![];
+  if (count2 === 0) return ![];
   const value33 = Number(value31?.['viewport']?.['zoom']),
     value34 = list2['some']((value35) => value35['visible'] && hasCandidateMedia(value35)),
     value36 = list2['some']((enabled6) => !enabled6['visible'] && hasCandidateMedia(enabled6));
@@ -263,7 +263,7 @@ function buildCandidatePriority(candidate, value37, value38) {
   return {
     candidate: candidate,
     userRank: getCandidateUserRank(candidate),
-    mediaRank: hasCandidateMedia(candidate) ? 0x0 : 0x1,
+    mediaRank: hasCandidateMedia(candidate) ? 0 : 1,
     distanceSq: getPreviewMediaPriorityDistanceSq(candidate['geometry'], value37, value38),
     order: candidate['order'],
   };
@@ -306,19 +306,19 @@ function resolveMediaLimit({
   options: options9,
   suppressNewMedia: suppressNewMedia,
 }) {
-  if (suppressNewMedia) return 0x0;
+  if (suppressNewMedia) return 0;
   if (!isLowZoom) return MEDIA_LIMIT;
   if (options9?.['viewportBusy'] === !![]) return BUSY_LOW_ZOOM_MEDIA_LIMIT;
   const value49 = isVeryLowZoom ? VERY_LOW_ZOOM_MEDIA_LIMIT : LOW_ZOOM_MEDIA_LIMIT,
-    value50 = Number(candidateCount) || 0x0,
-    value51 = Math['max'](0x1, Number(options9['containerWidth'] ?? options9['containerW']) || 0x0),
-    value52 = Math['max'](0x1, Number(options9['containerHeight'] ?? options9['containerH']) || 0x0),
+    value50 = Number(candidateCount) || 0,
+    value51 = Math['max'](1, Number(options9['containerWidth'] ?? options9['containerW']) || 0),
+    value52 = Math['max'](1, Number(options9['containerHeight'] ?? options9['containerH']) || 0),
     count3 = value51 * value52,
     value53 =
-      Number['isFinite'](count3) && count3 > 0x1 ? Math['max'](0x1, count3 / REFERENCE_VIEWPORT_AREA) : 0x1;
+      Number['isFinite'](count3) && count3 > 1 ? Math['max'](1, count3 / REFERENCE_VIEWPORT_AREA) : 1;
   if (!isVeryLowZoom && value50 >= MEDIUM_PREFETCH_MIN && value50 <= MEDIUM_PREFETCH_MAX)
     return Math['min'](SCALED_MEDIA_LIMIT_MAX, Math['ceil'](MEDIUM_PREFETCH_MEDIA_LIMIT * value53), value50);
-  if (!Number['isFinite'](count3) || count3 <= 0x1) return value49;
+  if (!Number['isFinite'](count3) || count3 <= 1) return value49;
   return Math['min'](SCALED_MEDIA_LIMIT_MAX, Math['max'](value49, Math['ceil'](value49 * value53)));
 }
 function resolveMediaPlan(candidateCount2, options10 = {}) {
@@ -385,14 +385,14 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
           return value61['distanceSq'] - value62['distanceSq'];
         return value61['order'] - value62['order'];
       })
-      ['slice'](0x0, BUSY_MOTION_AHEAD_MEDIA_LIMIT)
+      ['slice'](0, BUSY_MOTION_AHEAD_MEDIA_LIMIT)
       ['forEach']((value63) => map['add'](value63['nodeId']));
-  const value64 = isLowZoom2 && options10?.['viewportBusy'] === !![] && map['size'] > 0x0,
-    value65 = value64 ? 0x0 : Math['max'](0x0, mediaLimit - map['size']),
+  const value64 = isLowZoom2 && options10?.['viewportBusy'] === !![] && map['size'] > 0,
+    value65 = value64 ? 0 : Math['max'](0, mediaLimit - map['size']),
     list5 = list4['filter']((value66) => !map['has'](value66['nodeId']))
       ['map']((priorityRank) => ({
         ...priorityRank,
-        priorityRank: priorityRank['mounted'] ? 0x0 : 0x1,
+        priorityRank: priorityRank['mounted'] ? 0 : 1,
         distanceSq: getPreviewMediaPriorityDistanceSq(priorityRank['geometry'], value58, options10),
       }))
       ['sort']((value67, value68) => {
@@ -402,7 +402,7 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
           return value67['distanceSq'] - value68['distanceSq'];
         return value67['order'] - value68['order'];
       })
-      ['slice'](0x0, value65);
+      ['slice'](0, value65);
   return {
     nodeIdsWithMedia: new Set([...map, ...list5['map']((value69) => value69['nodeId'])]),
     explicitMediaSourceOwnerIds: explicitMediaSourceOwnerIds,
@@ -437,7 +437,7 @@ function classifyCandidates(value72, value73) {
   const list6 = [],
     list7 = [];
   let count4 = NON_MEDIA_LIMIT,
-    value74 = 0x0;
+    value74 = 0;
   for (const enabled9 of value72) {
     if (!enabled9) continue;
     const value75 = enabled9['geometry'],
@@ -452,20 +452,20 @@ function classifyCandidates(value72, value73) {
       (value76['nearViewport'] = isGeometryNearViewport(value75, value73)),
       (value76['visible'] = isRendererFastPreviewGeometryVisible(value75, value73)),
       (value76['order'] = value74),
-      (value74 += 0x1));
+      (value74 += 1));
     if (isRequiredCandidate(value76)) list6['push'](value76);
     else {
       if (list7['length'] < BACKGROUND_NODE_LIMIT) {
         if (enabled9['kind'] !== 'image' && enabled9['kind'] !== 'video') {
-          if (count4 <= 0x0) continue;
-          count4 -= 0x1;
+          if (count4 <= 0) continue;
+          count4 -= 1;
         }
         list7['push'](value76);
       }
     }
   }
-  const value77 = Math['max'](0x0, BACKGROUND_NODE_LIMIT - list6['length']);
-  return [...list6, ...list7['slice'](0x0, value77)];
+  const value77 = Math['max'](0, BACKGROUND_NODE_LIMIT - list6['length']);
+  return [...list6, ...list7['slice'](0, value77)];
 }
 export function planRendererFastPreviewAdmission({
   candidateSeeds: candidateSeeds = [],
@@ -483,8 +483,8 @@ export function planRendererFastPreviewAdmission({
     handler = (value78) => existingPreviewNodeIds?.['has']?.(value78) === !![],
     value79 = candidates['reduce'](
       (value80, value81) =>
-        !handler(value81['nodeId']) && isRequiredImmediateCandidate(value81) ? value80 + 0x1 : value80,
-      0x0,
+        !handler(value81['nodeId']) && isRequiredImmediateCandidate(value81) ? value80 + 1 : value80,
+      0,
     );
   let count5 = Math['max'](
     resolveImmediateCreateLimit(candidates['length']),
@@ -494,11 +494,11 @@ export function planRendererFastPreviewAdmission({
     deferredCandidates = [];
   for (const value82 of candidates) {
     const enabled10 = handler(value82['nodeId']);
-    if (!enabled10 && count5 <= 0x0) {
+    if (!enabled10 && count5 <= 0) {
       deferredCandidates['push'](value82);
       continue;
     }
-    if (!enabled10) count5 -= 0x1;
+    if (!enabled10) count5 -= 1;
     immediateCandidates['push'](value82);
   }
   const mediaSrcBatchLimit = options['deferVisibleMediaSrc'] === !![];

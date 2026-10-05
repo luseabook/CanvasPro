@@ -35,10 +35,10 @@ export function createAgentConversationCanvasTransferRuntime({
   }
   async function handlePromptTransfer(transfer, message, runId) {
     const selectedIds = getSelectedNodeIds(readCanvasState?.() || {});
-    if (selectedIds['length'] !== 0x1) return replyWithText(runId, text('promptTransferTargetRequired'));
+    if (selectedIds['length'] !== 1) return replyWithText(runId, text('promptTransferTargetRequired'));
     const action = {
         type: transfer['mode'] === 'append' ? 'node.appendPrompt' : 'node.setPrompt',
-        args: { nodeId: selectedIds[0x0], text: transfer['content'] },
+        args: { nodeId: selectedIds[0], text: transfer['content'] },
       },
       planResult = await handlePlan(
         { status: 'ready', reply: text('promptTransferCompleted'), actions: [action] },

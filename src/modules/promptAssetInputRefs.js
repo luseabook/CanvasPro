@@ -30,7 +30,7 @@ export function normalizePromptAssetInputRefRecord(enabled = {}) {
     index = Number(key),
     type = normalizePromptMentionType(enabled['type']);
   if (!assetId || !Number['isFinite'](index) || !type || type === 'text') return null;
-  return { assetId: assetId, itemIndex: Math['max'](0x0, Math['trunc'](index)), type: type };
+  return { assetId: assetId, itemIndex: Math['max'](0, Math['trunc'](index)), type: type };
 }
 export function getPromptAssetInputRefRecords(options = {}) {
   const list = options?.[PROMPT_ASSET_INPUT_REFS_FIELD];
@@ -86,7 +86,7 @@ function appendResolvedAssetInputRefFromRecord(
     handle = Number(payload),
     type2 = resolveEffectiveInputKind(record) || normalizePromptMentionType(record?.['type']);
   if (!assetId3 || !Number['isFinite'](handle) || !type2 || (allowed && !allowed['has'](type2))) return ![];
-  const itemIndex2 = Math['max'](0x0, Math['trunc'](handle)),
+  const itemIndex2 = Math['max'](0, Math['trunc'](handle)),
     response = resolveAssetMentionRef({ assetId: assetId3, itemIndex: itemIndex2 });
   if (!response) return ![];
   const effectiveInputKind =
@@ -98,8 +98,8 @@ function appendResolvedAssetInputRefFromRecord(
     if (!String(response['url'] || '')['trim']()) return ![];
   }
   const state = assetId3 + ':' + itemIndex2 + ':' + type2,
-    assetMentionOccurrence = map['get'](state) || 0x0;
-  map['set'](state, assetMentionOccurrence + 0x1);
+    assetMentionOccurrence = map['get'](state) || 0;
+  map['set'](state, assetMentionOccurrence + 1);
   const config = {
     ...response,
     type: type2,
@@ -108,7 +108,7 @@ function appendResolvedAssetInputRefFromRecord(
   };
   return (
     Number['isFinite'](Number(promptAssetRefIndex)) &&
-      (config['promptAssetRefIndex'] = Math['max'](0x0, Math['trunc'](Number(promptAssetRefIndex)))),
+      (config['promptAssetRefIndex'] = Math['max'](0, Math['trunc'](Number(promptAssetRefIndex)))),
     list3['push'](config),
     !![]
   );
@@ -131,8 +131,8 @@ export function getAssetInputRefsFromPrompt(el3 = null, { allowedTypes: allowedT
         if (!String(response2['url'] || '')['trim']()) return;
       }
       const input = response2['assetId'] + ':' + response2['itemIndex'] + ':' + type3,
-        assetMentionOccurrence2 = map3['get'](input) || 0x0;
-      (map3['set'](input, assetMentionOccurrence2 + 0x1),
+        assetMentionOccurrence2 = map3['get'](input) || 0;
+      (map3['set'](input, assetMentionOccurrence2 + 1),
         list4['push']({
           ...response2,
           type: type3,
@@ -145,9 +145,9 @@ export function getAssetInputRefsFromPrompt(el3 = null, { allowedTypes: allowedT
 }
 function decodeHtmlAttrValue(output) {
   return String(output || '')
-    ['replace'](/&quot;/g, '\x22')
-    ['replace'](/&#39;/g, '\x27')
-    ['replace'](/&apos;/g, '\x27')
+    ['replace'](/&quot;/g, '"')
+    ['replace'](/&#39;/g, '\'')
+    ['replace'](/&apos;/g, '\'')
     ['replace'](/&lt;/g, '<')
     ['replace'](/&gt;/g, '>')
     ['replace'](/&amp;/g, '&');
@@ -159,7 +159,7 @@ function getHtmlAttrValue(value2 = '', value3 = '') {
     regExp = new RegExp(value4 + '\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s>]+))', 'i'),
     enabled3 = String(value2 || '')['match'](regExp);
   if (!enabled3) return '';
-  return decodeHtmlAttrValue(enabled3[0x1] ?? enabled3[0x2] ?? enabled3[0x3] ?? '')['trim']();
+  return decodeHtmlAttrValue(enabled3[1] ?? enabled3[2] ?? enabled3[3] ?? '')['trim']();
 }
 function htmlClassAttrContains(value5 = '', value6 = '') {
   return getHtmlAttrValue(value5, 'class')['split'](/\s+/)['filter'](Boolean)['includes'](value6);
@@ -173,7 +173,7 @@ export function getAssetInputRefsFromPromptHtml(value7 = '', { allowedTypes: all
     value10 = /<span\b([^>]*)>([\s\S]*?)<\/span>/gi;
   let value11 = null;
   while ((value11 = value10['exec'](sanitizePromptHtml2))) {
-    const value12 = value11[0x1] || '';
+    const value12 = value11[1] || '';
     if (!htmlClassAttrContains(value12, 'ref-pill')) continue;
     if (getHtmlAttrValue(value12, 'data-ref-origin') !== 'asset') continue;
     appendResolvedAssetInputRefFromRecord(
@@ -225,7 +225,7 @@ export function getAssetInputRefsFromPromptAndNode(
   for (const args of value17) {
     const value18 =
       args['assetId'] + ':' + args['itemIndex'] + ':' + args['type'] + ':' + args['assetRefSource'];
-    if (map4['has'](value18)) map4['get'](value18)['assetMentionOccurrence'] = -0x1;
+    if (map4['has'](value18)) map4['get'](value18)['assetMentionOccurrence'] = -1;
     else map4['set'](value18, { ...args });
   }
   return [...map4['values']()];

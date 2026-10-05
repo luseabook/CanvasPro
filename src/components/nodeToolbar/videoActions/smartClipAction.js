@@ -46,8 +46,8 @@ export function bindVideoSmartClipAction(key) {
             result = direction === 'down' ? 'down' : 'right',
             data = Number(box.x) || 0,
             options = Number(box.y) || 0,
-            target = Number(box.width) || 0x200,
-            source = Number(box.height) || 0x120,
+            target = Number(box.width) || 512,
+            source = Number(box.height) || 288,
             width = getAutoMediaSizeByShortSide(target, source),
             x = data + target + spacing,
             y =

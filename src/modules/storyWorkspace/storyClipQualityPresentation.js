@@ -42,7 +42,7 @@ export function renderStoryClipQualityNotes(payload, handle, handler) {
   const list = getStoryClipQualityNotes(payload, handle);
   if (!list['length']) return '';
   return (
-    '<details\x20class=\x22story-clip-quality-notes\x22\x20data-story-clip-quality-notes>\x0a\x20\x20\x20\x20<summary>本段有\x20' +
+    '<details class="story-clip-quality-notes" data-story-clip-quality-notes>\n    <summary>本段有 ' +
     list['length'] +
     ' 项需核对 · 已保留可编辑提示词</summary>\n    <div class="story-clip-quality-notes-body" tabindex="0" aria-label="本段生成核对记录">\n      <p>以下为生成时的核对记录，不属于视频提示词；编辑后请结合原片确认。</p>\n      <ul>' +
     list['map']((state) => '<li>' + handler(state) + '</li>')['join']('') +

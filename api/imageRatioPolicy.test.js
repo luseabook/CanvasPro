@@ -68,23 +68,23 @@ const GPT_IMAGE_2_RATIO_LABELS = [
       assert.deepEqual(parseRatioLabel('16 ﹕ 9'), { w: 16, h: 9, label: '16:9' }));
   }),
   test('imageRatioPolicy: nearest ratio mapping works for portrait and invalid sizes', () => {
-    (assert.equal(pickClosestRatio(0x2bc, 0x514), '9:16'), assert.equal(pickClosestRatio(0, 0), '1:1'));
+    (assert.equal(pickClosestRatio(700, 1300), '9:16'), assert.equal(pickClosestRatio(0, 0), '1:1'));
   }),
   test('imageRatioPolicy: adaptive source prefers display > input > fallback', () => {
     const adaptiveSourceSize = resolveAdaptiveSourceSize({
-      displayWidth: 0x640,
-      displayHeight: 0x384,
-      inputWidth: 0x320,
-      inputHeight: 0x4b0,
+      displayWidth: 1600,
+      displayHeight: 900,
+      inputWidth: 800,
+      inputHeight: 1200,
     });
-    assert.deepEqual(adaptiveSourceSize, { width: 0x640, height: 0x384, source: 'display' });
+    assert.deepEqual(adaptiveSourceSize, { width: 1600, height: 900, source: 'display' });
     const adaptiveSourceSize2 = resolveAdaptiveSourceSize({
       displayWidth: 0,
       displayHeight: 0,
-      inputWidth: 0x320,
-      inputHeight: 0x4b0,
+      inputWidth: 800,
+      inputHeight: 1200,
     });
-    assert.deepEqual(adaptiveSourceSize2, { width: 0x320, height: 0x4b0, source: 'input-media' });
+    assert.deepEqual(adaptiveSourceSize2, { width: 800, height: 1200, source: 'input-media' });
     const adaptiveSourceSize3 = resolveAdaptiveSourceSize({});
     assert.deepEqual(adaptiveSourceSize3, { width: 1, height: 1, source: 'fallback' });
   }),

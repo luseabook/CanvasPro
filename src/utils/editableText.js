@@ -11,7 +11,7 @@ export function insertPlainTextAtSelection(
       data = item['replace'](/&/g, '&amp;')
         ['replace'](/</g, '&lt;')
         ['replace'](/>/g, '&gt;')
-        ['replace'](/\r\n?|\n/g, result ? '\x0a' : '<br>')
+        ['replace'](/\r\n?|\n/g, result ? '\n' : '<br>')
         ['replace'](/(?:<br>|\n)$/, '<br class="Apple-interchange-newline">');
     try {
       if (documentObject['execCommand']('insertHTML', ![], data)) return !![];

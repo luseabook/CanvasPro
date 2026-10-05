@@ -39,15 +39,15 @@ export function shouldKeepManualPlaybackPresentationActive(data, options) {
 }
 export function createHoverVideoPlaybackLifecycle({
   releaseMedia: releaseMedia,
-  releaseDelayMs: releaseDelayMs = 0x0,
+  releaseDelayMs: releaseDelayMs = 0,
   schedule: schedule = (target, source) => globalThis['setTimeout'](target, source),
   cancel: cancel = (next) => globalThis['clearTimeout'](next),
 } = {}) {
   let current = ![],
     schedule2 = null,
-    entry = 0x0;
+    entry = 0;
   const run = () => {
-    entry += 0x1;
+    entry += 1;
     if (schedule2 === null) return ![];
     return (cancel(schedule2), (schedule2 = null), !![]);
   };
@@ -67,7 +67,7 @@ export function createHoverVideoPlaybackLifecycle({
             if (current || record !== entry) return;
             ((schedule2 = null), releaseMedia());
           },
-          Math['max'](0x0, Number(releaseDelayMs) || 0x0),
+          Math['max'](0, Number(releaseDelayMs) || 0),
         )),
         !![]
       );

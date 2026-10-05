@@ -38,7 +38,7 @@ function finishAnalysisAttempt(item, args, status = null) {
     status: status ? 'failed' : 'succeeded',
     ...(status
       ? {
-          error: String(status['message'] || '视频分析失败')['slice'](0x0, 0x4b0),
+          error: String(status['message'] || '视频分析失败')['slice'](0, 1200),
           code: status['code'],
           httpStatus: status['status'],
           errorType: status['type'],
@@ -47,7 +47,7 @@ function finishAnalysisAttempt(item, args, status = null) {
   };
   ((item['replication']['analysisAttempts'] = [...(item['replication']['analysisAttempts'] || []), context][
     'slice'
-  ](-0xa)),
+  ](-10)),
     void logDiagnosticEvent({
       type: 'story.replication_analysis_finished',
       level: status ? 'error' : 'info',
@@ -103,7 +103,7 @@ export function createStoryVideoReplicationWorkspaceController({
     typeof notifyTextTaskComplete !== 'function'
   )
     throw new TypeError(
-      'Story\x20video\x20replication\x20requires\x20task,\x20persistence,\x20and\x20presentation\x20adapters.',
+      'Story video replication requires task, persistence, and presentation adapters.',
     );
   function createSourcePreviewUrl(enabled) {
     const key = windowObject?.['URL'];
@@ -127,7 +127,7 @@ export function createStoryVideoReplicationWorkspaceController({
   function refreshEpisode(episodeId2) {
     if (
       state['view'] !== 'project' ||
-      state['step'] !== 0x1 ||
+      state['step'] !== 1 ||
       state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
       return ![];
@@ -150,7 +150,7 @@ export function createStoryVideoReplicationWorkspaceController({
   function refreshFooter() {
     if (
       state['view'] !== 'project' ||
-      state['step'] !== 0x1 ||
+      state['step'] !== 1 ||
       state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
       return ![];
@@ -168,7 +168,7 @@ export function createStoryVideoReplicationWorkspaceController({
     if (
       !isProjectTaskCurrent(target) ||
       state['view'] !== 'project' ||
-      state['step'] !== 0x1 ||
+      state['step'] !== 1 ||
       state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
       return ![];
@@ -202,7 +202,7 @@ export function createStoryVideoReplicationWorkspaceController({
     ((status2['replication'] = {
       ...(status2['replication'] || {}),
       status: 'uploading',
-      progress: 0xa,
+      progress: 10,
       error: '',
     }),
       run(projectId, episodeId3));
@@ -247,14 +247,14 @@ export function createStoryVideoReplicationWorkspaceController({
         ((status2['replication'] = {
           ...(status2['replication'] || {}),
           status: 'analyzing',
-          progress: 0x2d,
+          progress: 45,
           error: '',
         }),
           (status2['status'] = '解析中'));
       if (uploadOnly)
         return (
           (status2['replication']['status'] = 'pending'),
-          (status2['replication']['progress'] = 0x0),
+          (status2['replication']['progress'] = 0),
           (status2['status'] = '待分析'),
           finishBackgroundTask(
             projectId,
@@ -380,7 +380,7 @@ export function createStoryVideoReplicationWorkspaceController({
         finishBackgroundTask(
           projectId,
           id,
-          { status: 'succeeded', message: '第\x20' + status2['number'] + ' 集视频解析完成' },
+          { status: 'succeeded', message: '第 ' + status2['number'] + ' 集视频解析完成' },
           { refreshHome: ![] },
         ),
         syncProjectEntry(projectId),
@@ -405,7 +405,7 @@ export function createStoryVideoReplicationWorkspaceController({
           id,
           {
             status: 'failed',
-            message: '第\x20' + status2['number'] + '\x20集视频解析失败',
+            message: '第 ' + status2['number'] + ' 集视频解析失败',
             error: error?.['message'] || '视频解析失败。',
           },
           { refreshHome: ![] },
@@ -423,10 +423,10 @@ export function createStoryVideoReplicationWorkspaceController({
     if (output) return output;
     const list = Array['isArray'](args3) ? [...args3] : [],
       value2 = (async () => {
-        let enabled5 = 0x0;
+        let enabled5 = 0;
         for (const value3 of list) {
           if (!isProjectTaskLive(input)) break;
-          if (!(await analyzeEpisode(input, value3['file'], value3['episodeId'], value3))) enabled5 += 0x1;
+          if (!(await analyzeEpisode(input, value3['file'], value3['episodeId'], value3))) enabled5 += 1;
         }
         if (!isProjectTaskLive(input)) return ![];
         const storyVideoReplicationSummary = getStoryVideoReplicationSummary(input['data']);
@@ -437,9 +437,9 @@ export function createStoryVideoReplicationWorkspaceController({
           storyVideoReplicationSummary['completed'] === storyVideoReplicationSummary['total']
         )
           notifyTextTaskComplete(
-            '视频解析完成，共\x20' + storyVideoReplicationSummary['completed'] + ' 条。',
+            '视频解析完成，共 ' + storyVideoReplicationSummary['completed'] + ' 条。',
             input,
-            { step: 0x1 },
+            { step: 1 },
             { notificationMessage: '复刻视频解析完成。' },
           );
         else
@@ -454,10 +454,10 @@ export function createStoryVideoReplicationWorkspaceController({
                 ' 条请求失败。',
               'warn',
               input,
-              { step: 0x1 },
+              { step: 1 },
             );
         return (
-          storyVideoReplicationSummary['completed'] > 0x0 ||
+          storyVideoReplicationSummary['completed'] > 0 ||
           list['some'](
             (value4) =>
               value4['uploadOnly'] &&
@@ -507,7 +507,7 @@ export function createStoryVideoReplicationWorkspaceController({
       (state['hasCreatedProject'] = !![]),
       (state['assetSelectionMode'] = ![]),
       (state['selectedAssetIds'] = []),
-      (state['selectedEpisodeId'] = state['data']['episodes'][0x0]?.['id'] || ''),
+      (state['selectedEpisodeId'] = state['data']['episodes'][0]?.['id'] || ''),
       (state['selectedClipId'] = ''),
       releaseSourcePreviewUrls(),
       (state['replicationSourceFiles'] = []),

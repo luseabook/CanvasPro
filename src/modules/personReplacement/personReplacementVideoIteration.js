@@ -5,7 +5,7 @@ import {
 } from './personReplacementProject.js';
 export function setPersonReplacementVideoResultAsReference(
   args = {},
-  { shotId: shotId = '', resultIndex: resultIndex = 0x0 } = {},
+  { shotId: shotId = '', resultIndex: resultIndex = 0 } = {},
 ) {
   const value = String(shotId ?? '')['trim'](),
     item = Array['isArray'](args['shots']) ? args['shots'] : [],
@@ -18,7 +18,7 @@ export function setPersonReplacementVideoResultAsReference(
   if (
     !args2 ||
     !Number['isInteger'](count) ||
-    count < 0x0 ||
+    count < 0 ||
     count >= personReplacementVideoResults['length'] ||
     !personReplacementVideoResultRef
   )
@@ -63,7 +63,7 @@ export function reversePersonReplacementVideoIteration({
   const target = (async () => {
     const response = await enqueueMediaTask(
         { kind: 'videoReverse', src: sourceRef },
-        { wait: !![], timeout: 0x927c0 },
+        { wait: !![], timeout: 600000 },
       ),
       personReplacementVideoResultRef2 = resolvePersonReplacementVideoResultRef(resolveMediaRef(response));
     if (response?.['success'] === ![] || !personReplacementVideoResultRef2)

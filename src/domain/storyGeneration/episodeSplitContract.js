@@ -15,7 +15,7 @@ export const STORY_EPISODE_SPLIT_CAMERA_PRESETS = Object['freeze']([
 ]);
 function normalizePositiveNumber(value) {
   const count = Number(value);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function createAssetUsageResponseSchema() {
   return {
@@ -26,7 +26,7 @@ function createAssetUsageResponseSchema() {
   };
 }
 function createShotResponseSchema({
-  maxDurationSeconds: maxDurationSeconds = 0x0,
+  maxDurationSeconds: maxDurationSeconds = 0,
   requiredFields: requiredFields = null,
   compactExperimental: compactExperimental = ![],
   includeDirectorContinuity: includeDirectorContinuity = ![],
@@ -43,7 +43,7 @@ function createShotResponseSchema({
     properties: {
       durationSec: { type: 'number', minimum: 0.1, ...(args ? { maximum: args } : {}) },
       ...(includeTimeline
-        ? { startSec: { type: 'integer', minimum: 0x0 }, endSec: { type: 'integer', minimum: 0x1 } }
+        ? { startSec: { type: 'integer', minimum: 0 }, endSec: { type: 'integer', minimum: 1 } }
         : {}),
       ...(compactExperimental
         ? { assetRefs: { type: 'array', items: { type: 'string' } } }
@@ -59,17 +59,17 @@ function createShotResponseSchema({
   };
 }
 function createClipResponseSchema({
-  maxDurationSeconds: maxDurationSeconds = 0x0,
-  minimumShotsPerClip: minimumShotsPerClip = 0x2,
-  maximumShotsPerClip: maximumShotsPerClip = 0x5,
+  maxDurationSeconds: maxDurationSeconds = 0,
+  minimumShotsPerClip: minimumShotsPerClip = 2,
+  maximumShotsPerClip: maximumShotsPerClip = 5,
   requiredClipFields: requiredClipFields = null,
   requiredShotFields: requiredShotFields = null,
   compactExperimental: compactExperimental = ![],
   includeDirectorContinuity: includeDirectorContinuity = ![],
   includeTimeline: includeTimeline = ![],
 } = {}) {
-  const key = Math['max'](0x1, Math['trunc'](Number(minimumShotsPerClip) || 0x1)),
-    args2 = Math['max'](0x0, Math['trunc'](Number(maximumShotsPerClip) || 0x0));
+  const key = Math['max'](1, Math['trunc'](Number(minimumShotsPerClip) || 1)),
+    args2 = Math['max'](0, Math['trunc'](Number(maximumShotsPerClip) || 0));
   return {
     type: 'object',
     additionalProperties: ![],
@@ -99,7 +99,7 @@ function createClipResponseSchema({
   };
 }
 export function buildStoryEpisodeSplitBlueprintResponseSchema({
-  sceneMaxSeconds: sceneMaxSeconds = STORY_SCENE_MAX_SECONDS_OPTIONS[0x1],
+  sceneMaxSeconds: sceneMaxSeconds = STORY_SCENE_MAX_SECONDS_OPTIONS[1],
   enforceMaxDuration: enforceMaxDuration = !![],
   includeSceneAssetRef: includeSceneAssetRef = !![],
   includeDirectorContinuity: includeDirectorContinuity = ![],
@@ -115,7 +115,7 @@ export function buildStoryEpisodeSplitBlueprintResponseSchema({
       episodeRef: { type: 'string' },
       clipPlans: {
         type: 'array',
-        minItems: 0x1,
+        minItems: 1,
         items: {
           type: 'object',
           additionalProperties: ![],
@@ -132,7 +132,7 @@ export function buildStoryEpisodeSplitBlueprintResponseSchema({
             'targetDurationSec',
           ],
           properties: {
-            sourceBeatRefs: { type: 'array', minItems: 0x1, items: { type: 'string' } },
+            sourceBeatRefs: { type: 'array', minItems: 1, items: { type: 'string' } },
             beat: { type: 'string' },
             ...(includeSceneAssetRef ? { sceneAssetRef: { type: 'string' } } : {}),
             sceneAppearanceRef: { type: 'string' },
@@ -155,17 +155,17 @@ export function buildStoryEpisodeSplitBlueprintResponseSchema({
   };
 }
 export function buildStoryEpisodeSplitBatchResponseSchema({
-  clipCount: clipCount = 0x1,
-  maxDurationSeconds: maxDurationSeconds = 0x0,
-  minimumShotsPerClip: minimumShotsPerClip = 0x2,
-  maximumShotsPerClip: maximumShotsPerClip = 0x5,
+  clipCount: clipCount = 1,
+  maxDurationSeconds: maxDurationSeconds = 0,
+  minimumShotsPerClip: minimumShotsPerClip = 2,
+  maximumShotsPerClip: maximumShotsPerClip = 5,
   requiredClipFields: requiredClipFields = null,
   requiredShotFields: requiredShotFields = null,
   compactExperimental: compactExperimental = ![],
   includeDirectorContinuity: includeDirectorContinuity = ![],
   includeTimeline: includeTimeline = ![],
 } = {}) {
-  const index = Math['max'](0x1, Math['trunc'](Number(clipCount) || 0x1));
+  const index = Math['max'](1, Math['trunc'](Number(clipCount) || 1));
   return {
     type: 'object',
     additionalProperties: ![],
@@ -198,7 +198,7 @@ export function buildStoryEpisodeSplitSingleResponseSchema() {
     properties: {
       clips: {
         type: 'array',
-        minItems: 0x1,
+        minItems: 1,
         items: {
           type: 'object',
           additionalProperties: ![],
@@ -207,7 +207,7 @@ export function buildStoryEpisodeSplitSingleResponseSchema() {
             s: { type: 'string' },
             shots: {
               type: 'array',
-              minItems: 0x1,
+              minItems: 1,
               items: {
                 type: 'object',
                 additionalProperties: ![],
@@ -218,8 +218,8 @@ export function buildStoryEpisodeSplitSingleResponseSchema() {
                   v: { type: 'string' },
                   c: {
                     type: 'integer',
-                    minimum: 0x0,
-                    maximum: STORY_EPISODE_SPLIT_CAMERA_PRESETS['length'] - 0x1,
+                    minimum: 0,
+                    maximum: STORY_EPISODE_SPLIT_CAMERA_PRESETS['length'] - 1,
                   },
                   q: { type: 'string' },
                   o: { type: 'string' },

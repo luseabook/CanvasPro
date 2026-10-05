@@ -5,15 +5,15 @@ import {
 function isLifecycleCurrent(value, item) {
   return Boolean(
     value?.['_imageObjectUrlsDisposed'] !== !![] &&
-    (Number(value?.['_imageObjectUrlLifecycleEpoch']) || 0x0) === item,
+    (Number(value?.['_imageObjectUrlLifecycleEpoch']) || 0) === item,
   );
 }
 export function disposeImageObjectUrls(enabled) {
   if (!enabled) return;
   ((enabled['_imageObjectUrlsDisposed'] = !![]),
     (enabled['_imageObjectUrlLifecycleEpoch'] =
-      (Number(enabled['_imageObjectUrlLifecycleEpoch']) || 0x0) + 0x1),
-    (enabled['_imageDisplayLoadToken'] = (Number(enabled['_imageDisplayLoadToken']) || 0x0) + 0x1));
+      (Number(enabled['_imageObjectUrlLifecycleEpoch']) || 0) + 1),
+    (enabled['_imageDisplayLoadToken'] = (Number(enabled['_imageDisplayLoadToken']) || 0) + 1));
   const key = new Set(
     [
       enabled['_cachedThumbUrl'],
@@ -38,9 +38,9 @@ export function hydrateStoredImageThumbsInBackground(enabled2, data, options, ha
   const list = Array['from'](
     new Set((data || [])['map']((target) => String(target || '')['trim']())['filter'](Boolean)),
   );
-  if (list['length'] === 0x0) return;
+  if (list['length'] === 0) return;
   if (!enabled2['_thumbObjectUrlLoads']) enabled2['_thumbObjectUrlLoads'] = new Map();
-  const source = Number(enabled2['_imageObjectUrlLifecycleEpoch']) || 0x0,
+  const source = Number(enabled2['_imageObjectUrlLifecycleEpoch']) || 0,
     next = list['map']((sourceUrl) => {
       if (enabled2['_thumbObjectUrls']['has'](sourceUrl)) return Promise['resolve']();
       if (enabled2['_thumbObjectUrlLoads']['has'](sourceUrl))

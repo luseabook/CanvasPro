@@ -1,4 +1,4 @@
-export const DEFAULT_STORYBOARD_3D_BACKGROUND_MAX_BYTES = 0x40 * 0x400 * 0x400;
+export const DEFAULT_STORYBOARD_3D_BACKGROUND_MAX_BYTES = 64 * 1024 * 1024;
 export function validateStoryboard3DBackgroundImageFile(
   error,
   { maxBytes: maxBytes = DEFAULT_STORYBOARD_3D_BACKGROUND_MAX_BYTES } = {},
@@ -12,16 +12,16 @@ export function validateStoryboard3DBackgroundImageFile(
   if (!enabled) ok['push']({ code: 'BACKGROUND_FILE_NAME_REQUIRED', message: '背景图片缺少文件名。' });
   if (!enabled2['startsWith']('image/'))
     ok['push']({ code: 'BACKGROUND_FILE_TYPE_INVALID', message: '请选择图片文件。' });
-  if (!Number['isFinite'](count) || count <= 0x0)
+  if (!Number['isFinite'](count) || count <= 0)
     ok['push']({ code: 'BACKGROUND_FILE_EMPTY', message: '背景图片为空。' });
   return (
     Number['isFinite'](count) &&
       count > maxBytes &&
       ok['push']({
         code: 'BACKGROUND_FILE_TOO_LARGE',
-        message: '背景图片不能超过 ' + Math['round'](maxBytes / 0x400 / 0x400) + ' MB。',
+        message: '背景图片不能超过 ' + Math['round'](maxBytes / 1024 / 1024) + ' MB。',
       }),
-    { ok: ok['length'] === 0x0, errors: ok }
+    { ok: ok['length'] === 0, errors: ok }
   );
 }
 export function createStoryboard3DBackgroundImageController({
@@ -37,16 +37,16 @@ export function createStoryboard3DBackgroundImageController({
   }
   return {
     load(error2) {
-      if (value) throw new Error('Background\x20image\x20controller\x20has\x20been\x20disposed.');
+      if (value) throw new Error('Background image controller has been disposed.');
       if (
         typeof urlApi?.['createObjectURL'] !== 'function' ||
         typeof urlApi?.['revokeObjectURL'] !== 'function'
       )
-        throw new Error('Browser\x20object\x20URL\x20support\x20is\x20unavailable.');
+        throw new Error('Browser object URL support is unavailable.');
       const response = validateStoryboard3DBackgroundImageFile(error2, { maxBytes: maxBytes });
       if (!response['ok']) {
-        const error3 = new Error(response['errors']['map']((error4) => error4['message'])['join']('\x20'));
-        ((error3['code'] = response['errors'][0x0]?.['code'] || 'BACKGROUND_FILE_INVALID'),
+        const error3 = new Error(response['errors']['map']((error4) => error4['message'])['join'](' '));
+        ((error3['code'] = response['errors'][0]?.['code'] || 'BACKGROUND_FILE_INVALID'),
           (error3['details'] = response));
         throw error3;
       }

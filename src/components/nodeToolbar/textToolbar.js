@@ -34,13 +34,13 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
         typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
       return key?.['nodes']?.[enabled] || nodeData || {};
     },
-    handler3 = (index) => String(index ?? '')['replace'](/\r\n?/g, '\x0a'),
+    handler3 = (index) => String(index ?? '')['replace'](/\r\n?/g, '\n'),
     handler4 = (result) => handler3(result)['replace'](/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ''),
     handler5 = (data) => {
       const options = handler4(data);
-      return options['split']('\x0a')
+      return options['split']('\n')
         ['filter']((target) => target['trim']() !== '')
-        ['join']('\x0a');
+        ['join']('\n');
     },
     handler6 = (source) => {
       const sanitizeRichTextHtml2 = sanitizeRichTextHtml(typeof source === 'string' ? source : '');
@@ -87,7 +87,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
     handler8 = (handle) => {
       const el4 = document['createElement']('div');
       return handler3(handle)
-        ['split']('\x0a')
+        ['split']('\n')
         ['map']((state) => {
           return ((el4['textContent'] = state), el4['innerHTML']);
         })
@@ -117,7 +117,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
       try {
         (appStore['updateNodeData'](enabled4, output), Object['assign'](nodeData, output));
       } catch (value2) {
-        console['warn']('[TextToolbar]\x20Persist\x20fullscreen\x20text\x20failed:', value2);
+        console['warn']('[TextToolbar] Persist fullscreen text failed:', value2);
       }
       window['_triggerLocalCacheSave']?.();
     },
@@ -151,7 +151,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
             el6['setAttribute']('width', '16'),
             el6['setAttribute']('height', '16'));
           const el7 = document['createElementNS'](value6, 'polyline');
-          (el7['setAttribute']('points', '20\x206\x209\x2017\x204\x2012'),
+          (el7['setAttribute']('points', '20 6 9 17 4 12'),
             el6['appendChild'](el7),
             el5['appendChild'](el6),
             el5['classList']['add']('is-copied'),
@@ -163,7 +163,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
               if (value5) el5['setAttribute']('aria-label', value5);
               else el5['removeAttribute']('aria-label');
               (el5['classList']['remove']('is-copied'), (setTimeout2 = null));
-            }, 0x7d0)));
+            }, 2000)));
         })
         ['catch']((value8) => {
           (console['error']('复制失败:', value8), showError(textToolbarText('copyFailed')));
@@ -240,7 +240,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
       const el11 = document['createElement']('div');
       Object['assign'](el11['style'], {
         background: 'var(--bg-2)',
-        border: '1px\x20solid\x20var(--stroke-08)',
+        border: '1px solid var(--stroke-08)',
         borderRadius: '12px',
         width: '90%',
         maxWidth: '1000px',
@@ -274,7 +274,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
         }));
       const value17 = 'http://www.w3.org/2000/svg',
         el15 = document['createElementNS'](value17, 'svg');
-      (el15['setAttribute']('viewBox', '0\x200\x2024\x2024'),
+      (el15['setAttribute']('viewBox', '0 0 24 24'),
         el15['setAttribute']('fill', 'none'),
         el15['setAttribute']('stroke', 'currentColor'),
         el15['setAttribute']('stroke-width', '2'),
@@ -305,7 +305,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
                 width: '1px',
                 height: '14px',
                 background: 'var(--stroke-10)',
-                margin: '0\x204px',
+                margin: '0 4px',
               }),
               el19
             );
@@ -378,11 +378,11 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
                   el30['setAttribute']('x2', '21'),
                   el30['setAttribute']('y2', '18'));
                 const el31 = document['createElementNS'](value17, 'path');
-                el31['setAttribute']('d', 'M4\x206h1v4');
+                el31['setAttribute']('d', 'M4 6h1v4');
                 const el32 = document['createElementNS'](value17, 'path');
                 el32['setAttribute']('d', 'M4 10h2');
                 const el33 = document['createElementNS'](value17, 'path');
-                (el33['setAttribute']('d', 'M6\x2018H4c0-1\x202-2\x202-3s-1-1.5-2-1'),
+                (el33['setAttribute']('d', 'M6 18H4c0-1 2-2 2-3s-1-1.5-2-1'),
                   el21['appendChild'](el28),
                   el21['appendChild'](el29),
                   el21['appendChild'](el30),
@@ -461,7 +461,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
           borderRadius: '6px',
           display: 'flex',
           alignItems: 'center',
-          transition: 'background\x200.2s',
+          transition: 'background 0.2s',
         }));
       const el36 = document['createElementNS'](value17, 'svg');
       (el36['setAttribute']('viewBox', '0 0 24 24'),
@@ -517,14 +517,14 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
               el39['setAttribute']('width', '16'),
               el39['setAttribute']('height', '16'));
             const el40 = document['createElementNS'](value17, 'polyline');
-            (el40['setAttribute']('points', '20\x206\x209\x2017\x204\x2012'),
+            (el40['setAttribute']('points', '20 6 9 17 4 12'),
               el39['appendChild'](el40),
               el14['appendChild'](el39),
               setTimeout(() => {
                 el14['replaceChildren'](
                   ...list4['map']((value23) => value23['cloneNode'](!![])),
                 );
-              }, 0x7d0));
+              }, 2000));
           });
         }),
         el11['addEventListener']('click', (event7) => event7['stopPropagation']()));
@@ -543,6 +543,6 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
         el10['appendChild'](el11),
         document['body']['appendChild'](el10),
         window['_triggerLocalCacheSave']?.(),
-        setTimeout(() => rawText3['focus'](), 0x32));
+        setTimeout(() => rawText3['focus'](), 50));
     });
 }

@@ -17,17 +17,17 @@ export const krea2TextToImageModelManifest = Object['freeze']({
   description: 'KREA2 文生图工作流，支持尺寸比例、提示词强化与高清选项',
   prompt: Object['freeze']({ placeholder: '输入画面描述' }),
   extensions: Object['freeze']({
-    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 0x3c }),
+    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 60 }),
     ratioPolicy: Object['freeze']({ capability: 'dimensions' }),
   }),
   capabilities: Object['freeze']({
     inputKinds: Object['freeze'](['text']),
     outputType: 'image',
-    maxImages: 0x0,
+    maxImages: 0,
   }),
   inputSlots: Object['freeze']({
     allowedKinds: Object['freeze'](['text']),
-    maxByKind: Object['freeze']({ text: 0x1, image: 0x0, video: 0x0, audio: 0x0 }),
+    maxByKind: Object['freeze']({ text: 1, image: 0, video: 0, audio: 0 }),
   }),
   uiSchema: Object['freeze']({
     fields: Object['freeze']([
@@ -96,8 +96,8 @@ export const krea2TextToImageExecutionManifest = Object['freeze']({
     dimensionsNode: Object['freeze']({
       defaultImageSize: '2K',
       defaultAspectRatio: '9:16',
-      longSideByImageSize: Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 }),
-      align: 0x40,
+      longSideByImageSize: Object['freeze']({ '1K': 1024, '1.5K': 1536, '2K': 1920 }),
+      align: 64,
       widthNode: Object['freeze']({ nodeId: '171', fieldName: 'width', description: '宽度' }),
       heightNode: Object['freeze']({ nodeId: '171', fieldName: 'height', description: '高度' }),
     }),

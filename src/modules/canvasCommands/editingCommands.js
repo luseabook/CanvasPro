@@ -12,10 +12,10 @@ function getState(value) {
 function getStore(item) {
   return item['graphStore'] || item['store'];
 }
-function normalizeIds(options = {}, key = {}, { min: min = 0x1 } = {}) {
+function normalizeIds(options = {}, key = {}, { min: min = 1 } = {}) {
   const state = getState(key),
     index =
-      Array['isArray'](options['ids']) && options['ids']['length'] > 0x0
+      Array['isArray'](options['ids']) && options['ids']['length'] > 0
         ? options['ids']
         : options['nodeId']
           ? [options['nodeId']]
@@ -30,7 +30,7 @@ function normalizeIds(options = {}, key = {}, { min: min = 0x1 } = {}) {
   if (list['length'] < min)
     throw createCanvasCommandError(
       'MISSING_NODE_ID',
-      'Canvas command requires at least ' + min + '\x20existing\x20node' + (min === 0x1 ? '' : 's') + '.',
+      'Canvas command requires at least ' + min + ' existing node' + (min === 1 ? '' : 's') + '.',
     );
   return list;
 }
@@ -64,7 +64,7 @@ function showToast(record, payload, handle) {
 export function registerEditingCommands(scope) {
   (scope['register']({
     id: 'node.group',
-    description: 'Wrap\x20canvas\x20nodes\x20in\x20a\x20group\x20node.',
+    description: 'Wrap canvas nodes in a group node.',
     riskLevel: 'safe',
     argsSchema: {
       properties: { ids: { type: 'array', items: { type: 'string' } }, name: { type: 'string' } },
@@ -77,7 +77,7 @@ export function registerEditingCommands(scope) {
     },
     returnSchema: { aliasFields: ['groupId', 'nodeId', 'ids'] },
     validate(options2 = {}, input = {}) {
-      return validateIds(options2, input, { min: 0x1 });
+      return validateIds(options2, input, { min: 1 });
     },
     execute(ids, store) {
       const state2 = getState(store),
@@ -117,17 +117,17 @@ export function registerEditingCommands(scope) {
       },
       returnSchema: { aliasFields: ['groupIds', 'childIds'] },
       validate(options3 = {}, value3 = {}) {
-        const response = validateIds(options3, value3, { min: 0x1 });
+        const response = validateIds(options3, value3, { min: 1 });
         if (response['ok'] === ![]) return response;
         const state3 = getState(value3),
           ids2 = response['args']['ids']['filter'](
             (value4) => String(state3['nodes']?.[value4]?.['type'] || '') === 'group',
           );
-        if (ids2['length'] === 0x0)
+        if (ids2['length'] === 0)
           return {
             ok: ![],
             errorCode: 'GROUP_NOT_FOUND',
-            message: 'node.ungroup\x20requires\x20at\x20least\x20one\x20group\x20node.',
+            message: 'node.ungroup requires at least one group node.',
           };
         return { args: { ...response['args'], ids: ids2 } };
       },
@@ -139,7 +139,7 @@ export function registerEditingCommands(scope) {
             ['filter']((value5) => map2['has'](String(value5?.['parentId'] || '')))
             ['map']((value6) => value6['id']),
           handler2 = () => {
-            childIds['length'] > 0x0 && typeof store4?.['groupNodes'] === 'function'
+            childIds['length'] > 0 && typeof store4?.['groupNodes'] === 'function'
               ? store4['groupNodes'](childIds, null)
               : childIds['forEach']((value7) =>
                   store4?.['updateNodeData']?.(value7, { parentId: undefined }),
@@ -155,7 +155,7 @@ export function registerEditingCommands(scope) {
     }),
     scope['register']({
       id: 'clipboard.copy',
-      description: 'Copy\x20selected\x20canvas\x20nodes\x20and\x20their\x20internal\x20edges.',
+      description: 'Copy selected canvas nodes and their internal edges.',
       riskLevel: 'safe',
       argsSchema: {
         properties: { ids: { type: 'array', items: { type: 'string' } } },
@@ -168,7 +168,7 @@ export function registerEditingCommands(scope) {
       },
       returnSchema: { aliasFields: ['ids', 'nodeCount', 'edgeCount'] },
       validate(options4 = {}, value8 = {}) {
-        return validateIds(options4, value8, { min: 0x1 });
+        return validateIds(options4, value8, { min: 1 });
       },
       execute(selectedIds, value9) {
         const nodesById = getState(value9),
@@ -201,17 +201,17 @@ export function registerEditingCommands(scope) {
         const clipboardApi = getClipboardApi(store5),
           graph = clipboardApi['getClipboardGraph'](),
           nodes2 = graph?.['nodes']?.['length'] ? graph['nodes'] : clipboardApi['getClipboard']();
-        if (!Array['isArray'](nodes2) || nodes2['length'] === 0x0)
+        if (!Array['isArray'](nodes2) || nodes2['length'] === 0)
           return { ids: [], nodeIds: [], edgeIds: [], idMap: {} };
         const value12 = Date['now'](),
-          value13 = Math['random']()['toString'](0x24)['slice'](0x2, 0x5),
+          value13 = Math['random']()['toString'](36)['slice'](2, 5),
           ids3 = prepareClipboardGraphPaste({
-            graph: graph || { schemaVersion: 0x1, nodes: nodes2, edges: [] },
+            graph: graph || { schemaVersion: 1, nodes: nodes2, edges: [] },
             x: x['x'],
             y: x['y'],
             generateNodeId(value14, value15) {
               return (
-                String(value14 || 'node')['split']('_copy_')[0x0] +
+                String(value14 || 'node')['split']('_copy_')[0] +
                 '_copy_' +
                 value12 +
                 '_' +
@@ -229,7 +229,7 @@ export function registerEditingCommands(scope) {
           store6 = getStore(store5),
           handler3 = () => {
             (ids3['nodes']['forEach']((value17) => store6?.['addNode']?.(value17)),
-              ids3['edges']['length'] > 0x0 &&
+              ids3['edges']['length'] > 0 &&
                 (typeof store6?.['updateEdgesBatch'] === 'function'
                   ? store6['updateEdgesBatch']([], ids3['edges'])
                   : ids3['edges']['forEach']((value18) => store6?.['addEdge']?.(value18))),
@@ -237,7 +237,7 @@ export function registerEditingCommands(scope) {
           };
         if (typeof store6?.['batch'] === 'function') store6['batch'](handler3);
         else handler3();
-        if (ids3['nodes']['length'] > 0x0) store5['commit']?.();
+        if (ids3['nodes']['length'] > 0) store5['commit']?.();
         return {
           ids: ids3['newIds'],
           nodeIds: ids3['newIds'],
@@ -261,13 +261,13 @@ export function registerEditingCommands(scope) {
       },
       returnSchema: { aliasFields: ['nodeId', 'sourceNodeIds'] },
       validate(options5 = {}, value20 = {}) {
-        const response2 = validateIds(options5, value20, { min: 0x1 });
+        const response2 = validateIds(options5, value20, { min: 1 });
         if (response2['ok'] === ![]) return response2;
         const state5 = getState(value20),
           imageNodeIds = response2['args']['ids']
             ['map']((value21) => state5['nodes']?.[value21])
             ['filter'](isCollageImageNode);
-        if (imageNodeIds['length'] === 0x0)
+        if (imageNodeIds['length'] === 0)
           return {
             ok: ![],
             errorCode: 'NO_COLLAGE_IMAGES',

@@ -21,7 +21,7 @@ function clamp(index, result, data) {
   return Math.max(result, Math.min(data, index));
 }
 function roundMs(options) {
-  return Math.round(toNumber(options, 0) * 0x3e8) / 0x3e8;
+  return Math.round(toNumber(options, 0) * 1000) / 1000;
 }
 export function getMediaClipTimelineDisplayDuration(target = 0) {
   return Math.max(MEDIA_CLIP_TIMELINE_MIN_DISPLAY_SEC, toNumber(target, 0));
@@ -178,38 +178,38 @@ export function buildMediaClipTimelineTicks(value32, value33 = 0) {
   }
   return list;
 }
-export const MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX = 0x2c;
+export const MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX = 44;
 
-export const MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT = 0x7d0;
+export const MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT = 2000;
 
-export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX = 0xc;
+export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX = 12;
 
-export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT = 0x2ee0;
+export const MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT = 12000;
 
-const MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC = Object['freeze']([0.1, 0.2, 0.5, 0x1, 0x2, 0x5, 0xa, 0xf]);
+const MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC = Object['freeze']([0.1, 0.2, 0.5, 1, 2, 5, 10, 15]);
 
-export function buildMediaClipTimelineRulerMarks(value35, value36 = 0x0, value37 = {}) {
+export function buildMediaClipTimelineRulerMarks(value35, value36 = 0, value37 = {}) {
   const mediaClipTimelineDisplayDuration10 = getMediaClipTimelineDisplayDuration(value35),
-    value38 = Math['max'](MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(value36, 0x0)),
-    value39 = value38 / Math['max'](0x1, mediaClipTimelineDisplayDuration10),
-    count4 = Math['max'](0x0, Math['round'](toNumber(value37['frameRate'], 0x0))),
-    length = count4 > 0x0 ? Math['floor'](mediaClipTimelineDisplayDuration10 * count4 + 0.0001) : 0x0,
+    value38 = Math['max'](MEDIA_CLIP_TIMELINE_MIN_WIDTH_PX, toNumber(value36, 0)),
+    value39 = value38 / Math['max'](1, mediaClipTimelineDisplayDuration10),
+    count4 = Math['max'](0, Math['round'](toNumber(value37['frameRate'], 0))),
+    length = count4 > 0 ? Math['floor'](mediaClipTimelineDisplayDuration10 * count4 + 0.0001) : 0,
     value40 =
-      count4 > 0x0 &&
+      count4 > 0 &&
       value39 / count4 >= MEDIA_CLIP_TIMELINE_FRAME_MARK_MIN_SPACING_PX &&
-      length + 0x1 <= MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT;
+      length + 1 <= MEDIA_CLIP_TIMELINE_FRAME_MARK_MAX_COUNT;
   if (value40) {
-    const count5 = count4 % 0x2 === 0x0 ? count4 / 0x2 : 0x0;
-    return Array['from']({ length: length + 0x1 }, (value41, sec2) => ({
+    const count5 = count4 % 2 === 0 ? count4 / 2 : 0;
+    return Array['from']({ length: length + 1 }, (value41, sec2) => ({
       sec: sec2 / count4,
       frameIndex: sec2,
       isFrame: !![],
-      isMajor: sec2 % count4 === 0x0,
-      isMid: sec2 > 0x0 && count5 > 0x0 && sec2 % count5 === 0x0 && sec2 % count4 !== 0x0,
+      isMajor: sec2 % count4 === 0,
+      isMid: sec2 > 0 && count5 > 0 && sec2 % count5 === 0 && sec2 % count4 !== 0,
     }));
   }
   const list2 = buildMediaClipTimelineTicks(mediaClipTimelineDisplayDuration10, value38),
-    value42 = Math['max'](0.1, Number(list2[0x1]) - Number(list2[0x0]) || 0x1),
+    value42 = Math['max'](0.1, Number(list2[1]) - Number(list2[0]) || 1),
     value43 =
       MEDIA_CLIP_TIMELINE_RULER_MARK_STEPS_ASC['find']((value44) => {
         const value45 = value42 / value44;
@@ -217,20 +217,20 @@ export function buildMediaClipTimelineRulerMarks(value35, value36 = 0x0, value37
           value44 <= value42 &&
           Math['abs'](value45 - Math['round'](value45)) < 0.0001 &&
           value44 * value39 >= MEDIA_CLIP_TIMELINE_RULER_MARK_MIN_SPACING_PX &&
-          Math['ceil'](mediaClipTimelineDisplayDuration10 / value44) + 0x1 <=
+          Math['ceil'](mediaClipTimelineDisplayDuration10 / value44) + 1 <=
             MEDIA_CLIP_TIMELINE_RULER_MARK_MAX_COUNT
         );
       }) || value42,
-    map = new Set(list2['map']((value46) => value46['toFixed'](0x3))),
-    count6 = value42 / 0x2,
+    map = new Set(list2['map']((value46) => value46['toFixed'](3))),
+    count6 = value42 / 2,
     list3 = [];
-  for (let value47 = 0x0; value47 <= mediaClipTimelineDisplayDuration10 + 0.001; value47 += value43) {
+  for (let value47 = 0; value47 <= mediaClipTimelineDisplayDuration10 + 0.001; value47 += value43) {
     const sec3 = roundMs(value47),
-      isMajor = map['has'](sec3['toFixed'](0x3)),
-      value48 = count6 > 0x0 ? sec3 / count6 : 0x0;
+      isMajor = map['has'](sec3['toFixed'](3)),
+      value48 = count6 > 0 ? sec3 / count6 : 0;
     list3['push']({
       sec: sec3,
-      frameIndex: -0x1,
+      frameIndex: -1,
       isFrame: ![],
       isMajor: isMajor,
       isMid: !isMajor && count6 >= value43 && Math['abs'](value48 - Math['round'](value48)) < 0.0001,

@@ -8,15 +8,15 @@ import { compactAgentProjectMemoryForPrompt } from '../src/modules/agent/agentPr
 export const AGENT_CONTEXT_DIGEST_SYSTEM_PROMPT = [
   'You maintain a durable context digest for a creative canvas agent.',
   'Update the existing digest using only facts explicitly supported by the supplied messages.',
-  'Preserve\x20still-valid\x20goals,\x20constraints,\x20decisions,\x20completed\x20work,\x20and\x20pending\x20work.',
+  'Preserve still-valid goals, constraints, decisions, completed work, and pending work.',
   'For stories, preserve established characters, relationships, setting and viewpoint in constraints; plot developments and chosen branches in decisions; unresolved clues and the latest scene ending in pending. Treat fiction as story context, not real-world facts or completed canvas actions. Never invent events from omitted text.',
   'When newer instructions supersede older ones, keep only the newest decision.',
   'Do not invent completion, tool results, preferences, or requirements.',
-  'Project\x20memory\x20is\x20separate\x20stable\x20user-approved\x20context.\x20Use\x20it\x20to\x20interpret\x20references,\x20but\x20do\x20not\x20copy\x20it\x20into\x20the\x20conversation\x20digest\x20unless\x20new\x20messages\x20explicitly\x20change\x20the\x20current\x20task.',
+  'Project memory is separate stable user-approved context. Use it to interpret references, but do not copy it into the conversation digest unless new messages explicitly change the current task.',
   'Return one strict JSON object and no Markdown.',
-]['join']('\x0a');
+]['join']('\n');
 function createStructuredOutput() {
-  const constraints = { type: 'array', maxItems: 0xa, items: { type: 'string' } };
+  const constraints = { type: 'array', maxItems: 10, items: { type: 'string' } };
   return {
     name: 'agent_context_digest',
     fallback: 'prompt',
@@ -54,7 +54,7 @@ function buildPrompt({
       ...(response['status'] ? { status: String(response['status']) } : {}),
     })),
     outputContract: {
-      goal: 'The\x20current\x20primary\x20user\x20goal,\x20or\x20an\x20empty\x20string.',
+      goal: 'The current primary user goal, or an empty string.',
       constraints: ['Stable requirements, prohibitions, preferences, and boundaries.'],
       decisions: ['Choices already made that should guide later turns.'],
       completed: ['Work explicitly completed or verified.'],
@@ -86,12 +86,12 @@ export async function requestAgentContextDigest({
   signal: signal = null,
   onTrace: onTrace = null,
 } = {}) {
-  if (!Array['isArray'](messages) || messages['length'] === 0x0)
+  if (!Array['isArray'](messages) || messages['length'] === 0)
     return normalizeAgentContextDigest(existingDigest);
   const model = String(settings['model'] || '')['trim'](),
     provider = String(settings['provider'] || '')['trim'](),
     providerProfileId = String(settings['providerProfileId'] || '')['trim']();
-  if (!model || !provider) throw new Error('Agent\x20model\x20is\x20not\x20configured.');
+  if (!model || !provider) throw new Error('Agent model is not configured.');
   const prompt = buildPrompt({
       existingDigest: existingDigest,
       messages: messages,
@@ -106,7 +106,7 @@ export async function requestAgentContextDigest({
       prompt: prompt,
       systemPrompt: AGENT_CONTEXT_DIGEST_SYSTEM_PROMPT,
       structuredOutput: createStructuredOutput(),
-      temperature: 0x0,
+      temperature: 0,
       ...(signal ? { signal: signal } : {}),
     };
   onTrace?.({ type: 'agent_context_digest_model_selected', provider: provider, model: model });
@@ -116,7 +116,7 @@ export async function requestAgentContextDigest({
   } catch (error) {
     onTrace?.({
       type: 'agent_context_digest_json_retry',
-      reason: String(error?.['message'] || 'invalid JSON')['slice'](0x0, 0xa0),
+      reason: String(error?.['message'] || 'invalid JSON')['slice'](0, 160),
     });
     const request3 = await request({
       ...args,

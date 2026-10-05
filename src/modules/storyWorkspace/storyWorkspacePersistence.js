@@ -1,4 +1,4 @@
-export const STORY_WORKSPACE_PERSISTENCE_VERSION = 0x1;
+export const STORY_WORKSPACE_PERSISTENCE_VERSION = 1;
 function cloneJson(enabled) {
   if (!enabled || typeof enabled !== 'object') return enabled;
   return JSON['parse'](JSON['stringify'](enabled));
@@ -70,7 +70,7 @@ export function createStoryWorkspaceSnapshot(hasCreatedProject = {}) {
     },
     ui: {
       view: normalizeText(hasCreatedProject['view']) || 'home',
-      step: hasCreatedProject['step'] === 0x0 ? 0x0 : Number(hasCreatedProject['step']) || 0x1,
+      step: hasCreatedProject['step'] === 0 ? 0 : Number(hasCreatedProject['step']) || 1,
       homeTab: ['upload', 'generate', 'collaborate', 'replication']['includes'](hasCreatedProject['homeTab'])
         ? hasCreatedProject['homeTab']
         : 'upload',
@@ -86,9 +86,9 @@ export function createStoryWorkspaceSnapshot(hasCreatedProject = {}) {
         ? hasCreatedProject['scriptCharacterCount']
         : null,
       assetFilter: normalizeText(hasCreatedProject['assetFilter']) || 'character',
-      assetSplitRatio: Number(hasCreatedProject['assetSplitRatio']) || 0x32,
-      assetDetailSplitRatio: Number(hasCreatedProject['assetDetailSplitRatio']) || 0x32,
-      episodeAssetPanelRatio: Number(hasCreatedProject['episodeAssetPanelRatio']) || 0x16,
+      assetSplitRatio: Number(hasCreatedProject['assetSplitRatio']) || 50,
+      assetDetailSplitRatio: Number(hasCreatedProject['assetDetailSplitRatio']) || 50,
+      episodeAssetPanelRatio: Number(hasCreatedProject['episodeAssetPanelRatio']) || 22,
       episodeEditorPanelRatio: Number(hasCreatedProject['episodeEditorPanelRatio']) || 0x22,
       episodeAssetRailTab: normalizeEpisodeAssetRailTab(hasCreatedProject['episodeAssetRailTab']),
       assetAppearanceIndexes: cloneJson(hasCreatedProject['assetAppearanceIndexes'] || {}),
@@ -136,7 +136,7 @@ export function normalizeStoryWorkspaceSnapshot(models) {
 export function isEmptyStoryWorkspaceSnapshotPayload(next) {
   return (
     next == null ||
-    (typeof next === 'object' && !Array['isArray'](next) && Object['keys'](next)['length'] === 0x0)
+    (typeof next === 'object' && !Array['isArray'](next) && Object['keys'](next)['length'] === 0)
   );
 }
 export function parseStoryWorkspaceSnapshotPayload(current) {

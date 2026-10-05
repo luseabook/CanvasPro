@@ -1,7 +1,7 @@
 import { requireFlow, validateFlowSource } from './videoReplicationFlowContract.js';
 import { sliceFlowSpeech } from './videoReplicationFlowSpeech.js';
 import { buildReplicationFlowPrompt, resolveReplicationFlowOptions } from './videoReplicationFlowPrompt.js';
-const round = (value) => Math['round'](value * 0x3e8) / 0x3e8,
+const round = (value) => Math['round'](value * 1000) / 1000,
   EPS = 0.001;
 export function finalizeReplicationFlow(
   item,
@@ -15,7 +15,7 @@ export function finalizeReplicationFlow(
     notes: notes['map']((args) => ({ ...args, blocking: ![] })),
   };
   try {
-    (requireFlow(Number['isFinite'](durationSec) && durationSec > 0x0, '原片时长无效'),
+    (requireFlow(Number['isFinite'](durationSec) && durationSec > 0, '原片时长无效'),
       (response['source'] = validateFlowSource(item, durationSec, response['notes'])));
     const replicationFlowOptions = resolveReplicationFlowOptions({
       promptMode: promptMode,
@@ -27,7 +27,7 @@ export function finalizeReplicationFlow(
         replicationFlowOptions['maxSeconds'],
         replicationFlowOptions,
       )),
-      requireFlow(response['clips']['length'] > 0x0, '没有可用的片段提示词'),
+      requireFlow(response['clips']['length'] > 0, '没有可用的片段提示词'),
       response['notes']['push'](
         ...response['clips']['flatMap']((key) =>
           key['notes']['map']((args2) => ({ ...args2, clip: key['index'] })),
@@ -45,11 +45,11 @@ export function compileReplicationFlow(args3, maxSeconds2, { promptMode: promptM
     maxSeconds: maxSeconds2,
     promptMode: promptMode2,
   }));
-  const result = args3['shots']['at'](-0x1)['endSec'],
+  const result = args3['shots']['at'](-1)['endSec'],
     data = new Map(args3['characters']['map']((options) => [options['id'], options])),
     target = [
       ...new Set([
-        0x0,
+        0,
         result,
         ...args3['shots']['map']((source) => source['endSec']),
         ...args3['speech']['map']((next) => next['endSec']),
@@ -57,7 +57,7 @@ export function compileReplicationFlow(args3, maxSeconds2, { promptMode: promptM
       ]),
     ]['sort']((entry, record) => entry - record),
     list = [];
-  let payload = 0x0;
+  let payload = 0;
   while (payload < result - EPS) {
     const run = (handle) =>
         !args3['speech']['some'](
@@ -66,7 +66,7 @@ export function compileReplicationFlow(args3, maxSeconds2, { promptMode: promptM
       config = target['filter'](
         (scope) => scope > payload + EPS && scope <= payload + maxSeconds2 + EPS && run(scope),
       );
-    let input = config['at'](-0x1);
+    let input = config['at'](-1);
     if (input == null && run(Math['min'](payload + maxSeconds2, result)))
       input = Math['min'](payload + maxSeconds2, result);
     if (input == null) input = Math['min'](payload + maxSeconds2, result);
@@ -124,7 +124,7 @@ export function compileReplicationFlow(args3, maxSeconds2, { promptMode: promptM
       promptMode: promptMode2,
     });
     (list['push']({
-      index: list['length'] + 0x1,
+      index: list['length'] + 1,
       promptMode: promptMode2,
       sourceStartSec: payload,
       sourceEndSec: input,

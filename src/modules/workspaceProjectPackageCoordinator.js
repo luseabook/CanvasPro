@@ -14,7 +14,7 @@ function normalizeText(value) {
 }
 function createOperationId(item) {
   const key = globalThis['crypto']?.['randomUUID']?.();
-  return item + '-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 0x186a0));
+  return item + '-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 100000));
 }
 export function isWorkspaceProjectPackageFile(error) {
   return normalizeText(error?.['name'])['toLowerCase']()['endsWith'](PROJECT_PACKAGE_EXTENSION);
@@ -45,7 +45,7 @@ function subscribeProgress(options, target) {
     if (normalizeText(error3['operationId']) !== options) return;
     const next = error3['progress'] == null ? Number['NaN'] : Number(error3['progress']),
       current = { text: normalizeText(error3['message']) || '正在处理项目包...' };
-    (Number['isFinite'](next) && (current['progress'] = Math['max'](0x0, Math['min'](0x1, next))),
+    (Number['isFinite'](next) && (current['progress'] = Math['max'](0, Math['min'](1, next))),
       target?.['updateGlobalLoading']?.(current));
   });
   return typeof source === 'function' ? source : () => {};

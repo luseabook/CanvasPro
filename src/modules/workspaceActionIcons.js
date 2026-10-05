@@ -4,14 +4,14 @@ const WORKSPACE_ACTION_ICON_PATHS = Object['freeze']({
   addToLibrary:
     '<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><path d="M17 14v6m-3-3h6"/>',
   confirm: '<path d="m5 12 4 4L19 6"/>',
-  delete: '<path\x20d=\x22m6\x206\x2012\x2012M18\x206\x206\x2018\x22/>',
+  delete: '<path d="m6 6 12 12M18 6 6 18"/>',
   unlink:
     '<path d="m9 15-2 2a3.5 3.5 0 0 1-5-5l3-3m10 0 2-2a3.5 3.5 0 0 1 5 5l-3 3M3 3l18 18M9 3v3M3 9h3m12 6h3m-6 3v3"/>',
   keyframe:
-    '<path\x20d=\x22M4\x208.5A2.5\x202.5\x200\x200\x201\x206.5\x206H9l1.5-2h3L15\x206h2.5A2.5\x202.5\x200\x200\x201\x2020\x208.5v7A2.5\x202.5\x200\x200\x201\x2017.5\x2018h-11A2.5\x202.5\x200\x200\x201\x204\x2015.5z\x22/><circle\x20cx=\x2212\x22\x20cy=\x2212\x22\x20r=\x223\x22/>',
+    '<path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H9l1.5-2h3L15 6h2.5A2.5 2.5 0 0 1 20 8.5v7A2.5 2.5 0 0 1 17.5 18h-11A2.5 2.5 0 0 1 4 15.5z"/><circle cx="12" cy="12" r="3"/>',
   results:
-    '<path\x20d=\x22m12\x203\x208\x204-8\x204-8-4\x208-4Z\x22/><path\x20d=\x22m4\x2012\x208\x204\x208-4M4\x2017l8\x204\x208-4\x22/>',
-  split: '<path\x20d=\x22M8\x2018V6m0\x200L5\x209m3-3\x203\x203M16\x206v12m0\x200-3-3m3\x203\x203-3\x22/>',
+    '<path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4M4 17l8 4 8-4"/>',
+  split: '<path d="M8 18V6m0 0L5 9m3-3 3 3M16 6v12m0 0-3-3m3 3 3-3"/>',
   upload: '<path d="M12 15V4m0 0L8 8m4-4 4 4"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>',
 });
 export function renderWorkspaceActionIcon(value) {

@@ -6,12 +6,12 @@ export function createApiConfigAutoSaveController({
   onError: onError,
   onStateChange: onStateChange,
   timerHost: timerHost = globalThis['window'] || globalThis,
-  delay: delay = 0x258,
+  delay: delay = 600,
 } = {}) {
   let value = null,
-    item = 0x0,
+    item = 0,
     promise = Promise['resolve'](),
-    count = 0x0;
+    count = 0;
   function run() {
     if (value === null) return;
     (timerHost['clearTimeout'](value), (value = null));
@@ -19,7 +19,7 @@ export function createApiConfigAutoSaveController({
   function persist(options = {}) {
     run();
     const key = ++item;
-    ((count += 0x1), onStateChange?.('saving'));
+    ((count += 1), onStateChange?.('saving'));
     const promise2 = promise['then'](async () => {
       try {
         await beforePersist?.();
@@ -32,8 +32,8 @@ export function createApiConfigAutoSaveController({
       } catch (result) {
         return (key === item && (onError?.(result, options), onStateChange?.('error')), null);
       } finally {
-        count -= 0x1;
-        if (count === 0x0 && value !== null) onStateChange?.('scheduled');
+        count -= 1;
+        if (count === 0 && value !== null) onStateChange?.('scheduled');
       }
     });
     return (
@@ -46,7 +46,7 @@ export function createApiConfigAutoSaveController({
   }
   function schedule() {
     (run(),
-      (item += 0x1),
+      (item += 1),
       onStateChange?.(count ? 'saving' : 'scheduled'),
       (value = timerHost['setTimeout'](() => {
         ((value = null), persist()['catch'](() => {}));

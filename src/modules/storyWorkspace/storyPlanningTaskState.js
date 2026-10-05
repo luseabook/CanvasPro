@@ -34,10 +34,10 @@ export function getStoryEpisodeBatchTargets(list2 = [], key = [], enabled = ![])
 }
 export function getStoryEpisodeCardAction(options = {}) {
   const count = Math['max'](
-    Number(options?.['clipCount']) || 0x0,
-    Array['isArray'](options?.['clips']) ? options['clips']['length'] : 0x0,
+    Number(options?.['clipCount']) || 0,
+    Array['isArray'](options?.['clips']) ? options['clips']['length'] : 0,
   );
-  return count > 0x0 ? { kind: 'edit', label: '进入编辑' } : { kind: 'generate', label: '生成分镜脚本' };
+  return count > 0 ? { kind: 'edit', label: '进入编辑' } : { kind: 'generate', label: '生成分镜脚本' };
 }
 export function setStoryEpisodeSplitRunning(args, data, source = !![]) {
   if (!args || typeof args !== 'object') return [];

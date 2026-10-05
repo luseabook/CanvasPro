@@ -6,7 +6,7 @@ const EPSILON_SEC = 0.001,
   VISUAL_KINDS = new Set(['video', 'image']),
   CLIP_KINDS = new Set(['video', 'image', 'audio']);
 function roundSec(value) {
-  return Math.round(toNumber(value, 0) * 0x3e8) / 0x3e8;
+  return Math.round(toNumber(value, 0) * 1000) / 1000;
 }
 function roundNonNegativeSec(item) {
   return Math.max(0, roundSec(item));

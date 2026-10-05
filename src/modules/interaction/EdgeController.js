@@ -78,7 +78,7 @@ import { ANIME_REAL_MODEL_ID } from '../../manifests/index.js';
 const graphStore = appStore?.['graphStore'] || graphStore_2 || appStore,
   uiStore = appStore?.['uiStore'] || uiStore_2 || appStore,
   workspaceStore = appStore?.['workspaceStore'] || workspaceStore_2 || appStore,
-  SIDE_PLUS_EXIT_REMOVAL_DELAY_MS = 0x8c,
+  SIDE_PLUS_EXIT_REMOVAL_DELAY_MS = 140,
   SIDE_PLUS_ASSIST_PAN_PREVIEW_OWNER = 'side-plus-connect-assist-pan';
 function getStateRaw() {
   return { ...graphStore['getStateRaw'](), ...uiStore['getStateRaw'](), ...workspaceStore['getStateRaw']() };
@@ -99,7 +99,7 @@ function _buildOutEdgeMap(value) {
   }
   return map;
 }
-const _edgeIndexCache = { edges: null, edgesRev: -0x1, outMap: new Map(), incomingByTarget: new Map() };
+const _edgeIndexCache = { edges: null, edgesRev: -1, outMap: new Map(), incomingByTarget: new Map() };
 function _applyNodeCreationMenuMeta(args) {
   const label = getNodeCreationMenuItem(args?.['type']);
   if (!label) return args;
@@ -135,12 +135,12 @@ function _getEdgeIndexes(enabled7, result) {
   if (!enabled7 || typeof enabled7 !== 'object')
     return (
       (_edgeIndexCache['edges'] = null),
-      (_edgeIndexCache['edgesRev'] = -0x1),
+      (_edgeIndexCache['edgesRev'] = -1),
       (_edgeIndexCache['outMap'] = new Map()),
       (_edgeIndexCache['incomingByTarget'] = new Map()),
       _edgeIndexCache
     );
-  const data = Number['isFinite'](result) ? result : -0x1;
+  const data = Number['isFinite'](result) ? result : -1;
   if (_edgeIndexCache['edges'] === enabled7 && _edgeIndexCache['edgesRev'] === data)
     return _edgeIndexCache;
   const { outMap: outMap2, incomingByTarget: incomingByTarget2 } = _buildEdgeIndexes(enabled7);
@@ -182,13 +182,13 @@ function _resolveEdgeHoverNodeRect(x) {
   return {
     x: x['x'],
     y: x['y'],
-    width: x['width'] || (isNodeType(x, 'group') ? 0x190 : 0x104),
-    height: x['height'] || (isNodeType(x, 'group') ? 0x12c : 0x50),
+    width: x['width'] || (isNodeType(x, 'group') ? 400 : 260),
+    height: x['height'] || (isNodeType(x, 'group') ? 300 : 80),
   };
 }
 function _getNodeSpatialIndex(nodes, current, entry = _NODE_SPATIAL_INDEX_DEFAULT_KEY) {
   if (!nodes || typeof nodes !== 'object') return null;
-  const persistRev = Number['isFinite'](current) ? current : -0x1,
+  const persistRev = Number['isFinite'](current) ? current : -1,
     state = _nodeSpatialIndexCache['get'](entry);
   if (state && state['nodes'] === nodes && state['persistRev'] === persistRev)
     return state['index'];
@@ -214,7 +214,7 @@ function _svgEl(record, payload, handle, config) {
   );
 }
 function _iconAiText(scope) {
-  const el2 = _svgEl(0x12, 0x12, scope, 1.8),
+  const el2 = _svgEl(18, 18, scope, 1.8),
     el3 = document['createElementNS'](_SVG_NS, 'path');
   el3['setAttribute']('d', 'M12 20h9');
   const el4 = document['createElementNS'](_SVG_NS, 'path');
@@ -226,7 +226,7 @@ function _iconAiText(scope) {
   );
 }
 function _iconAiImage(input) {
-  const el5 = _svgEl(0x12, 0x12, input, 1.8),
+  const el5 = _svgEl(18, 18, input, 1.8),
     el6 = document['createElementNS'](_SVG_NS, 'rect');
   (el6['setAttribute']('x', '3'),
     el6['setAttribute']('y', '3'),
@@ -248,7 +248,7 @@ function _iconAiImage(input) {
   );
 }
 function _iconAiVideo(output) {
-  const el9 = _svgEl(0x12, 0x12, output, 1.8),
+  const el9 = _svgEl(18, 18, output, 1.8),
     el10 = document['createElementNS'](_SVG_NS, 'rect');
   (el10['setAttribute']('x', '2'),
     el10['setAttribute']('y', '6'),
@@ -257,14 +257,14 @@ function _iconAiVideo(output) {
     el10['setAttribute']('rx', '2'));
   const el11 = document['createElementNS'](_SVG_NS, 'path');
   return (
-    el11['setAttribute']('d', 'M17\x209l5-3v12l-5-3V9z'),
+    el11['setAttribute']('d', 'M17 9l5-3v12l-5-3V9z'),
     el9['appendChild'](el10),
     el9['appendChild'](el11),
     el9
   );
 }
 function _iconAiAudio(value2) {
-  const el12 = _svgEl(0x12, 0x12, value2, 1.8),
+  const el12 = _svgEl(18, 18, value2, 1.8),
     el13 = document['createElementNS'](_SVG_NS, 'path');
   el13['setAttribute']('d', 'M9 18V5l12-2v13');
   const el14 = document['createElementNS'](_SVG_NS, 'circle');
@@ -283,7 +283,7 @@ function _iconAiAudio(value2) {
   );
 }
 function _iconStoryboardScript(value3) {
-  const el16 = _svgEl(0x12, 0x12, value3, 1.8),
+  const el16 = _svgEl(18, 18, value3, 1.8),
     el17 = document['createElementNS'](_SVG_NS, 'rect');
   (el17['setAttribute']('x', '3'),
     el17['setAttribute']('y', '4'),
@@ -314,7 +314,7 @@ function _iconStoryboardScript(value3) {
   );
 }
 function _iconWhiteboard(value4) {
-  const el21 = _svgEl(0x12, 0x12, value4, 1.8),
+  const el21 = _svgEl(18, 18, value4, 1.8),
     el22 = document['createElementNS'](_SVG_NS, 'rect');
   (el22['setAttribute']('x', '3'),
     el22['setAttribute']('y', '4'),
@@ -322,7 +322,7 @@ function _iconWhiteboard(value4) {
     el22['setAttribute']('height', '16'),
     el22['setAttribute']('rx', '2'));
   const el23 = document['createElementNS'](_SVG_NS, 'path');
-  el23['setAttribute']('d', 'M7\x208h10');
+  el23['setAttribute']('d', 'M7 8h10');
   const el24 = document['createElementNS'](_SVG_NS, 'path');
   el24['setAttribute']('d', 'M7 15c2.2-3 4.6-3 6.8 0 1.1 1.5 2.2 1.5 3.2 0');
   const el25 = document['createElementNS'](_SVG_NS, 'path');
@@ -336,7 +336,7 @@ function _iconWhiteboard(value4) {
   );
 }
 function _iconSourceText(value5) {
-  const el26 = _svgEl(0x12, 0x12, value5, 1.8),
+  const el26 = _svgEl(18, 18, value5, 1.8),
     el27 = document['createElementNS'](_SVG_NS, 'polyline');
   el27['setAttribute']('points', '4 7 4 4 20 4 20 7');
   const el28 = document['createElementNS'](_SVG_NS, 'line');
@@ -462,9 +462,9 @@ export function isValidConnection(enabled10, enabled11) {
       const map2 = new Set(fixedInputSlotConfigFromManifest['visibleSlots'] || []),
         list7 = fixedInputSlotConfigFromManifest['slotOrderByType']?.[effectiveInputKind] || [],
         list8 = list7['filter']((value23) => map2['has'](value23)),
-        list9 = list8['length'] > 0x0 ? list8 : list7;
+        list9 = list8['length'] > 0 ? list8 : list7;
       if (
-        list9['length'] > 0x0 &&
+        list9['length'] > 0 &&
         !list9['some']((value24) => fixedInputSlotAcceptsSource(fixedInputSlotConfigFromManifest, value24, enabled10))
       )
         return ![];
@@ -561,9 +561,9 @@ export function isSidePlusPointerBlockedAt(value36, value37, value38) {
   return resolveSidePlusPointerPolicyAt(value36, value37, value38) === 'block';
 }
 export function resolveSidePlusLayerZIndex(value39) {
-  const value40 = Number['parseInt'](String(value39 ?? ''), 0xa),
-    value41 = Number['isFinite'](value40) ? value40 : 0xa;
-  return String(Math['max'](0x0, value41 - 0x1));
+  const value40 = Number['parseInt'](String(value39 ?? ''), 10),
+    value41 = Number['isFinite'](value40) ? value40 : 10;
+  return String(Math['max'](0, value41 - 1));
 }
 export function resolveSidePlusButtonPosition({
   screenX: screenX,
@@ -588,12 +588,12 @@ export function resolveSidePlusRenderState({
   isZooming: isZooming = ![],
   isViewportAnimating: isViewportAnimating = ![],
   isSpaceHeld: isSpaceHeld = ![],
-  selectedCount: selectedCount = 0x0,
+  selectedCount: selectedCount = 0,
   requestedSelectionOnly: requestedSelectionOnly = ![],
 } = {}) {
-  const count = Number(selectedCount) || 0x0,
-    value42 = count > 0x0,
-    value43 = count >= 0x2;
+  const count = Number(selectedCount) || 0,
+    value42 = count > 0,
+    value43 = count >= 2;
   if (isDraggingPlus) return { shouldClear: !![], selectionOnly: ![] };
   if (isNodeDragging) return { shouldClear: !![], selectionOnly: ![] };
   if (value42 && (isBoxSelecting || isConnecting || isSpaceHeld))
@@ -637,10 +637,10 @@ export function getGroupSidePlusAnchorCandidateIds({
   mx: mx,
   my: my,
   threshold: threshold2,
-  gap: gap = 0x24,
+  gap: gap = 36,
 } = {}) {
   if (!Number['isFinite'](mx) || !Number['isFinite'](my)) return [];
-  const value49 = Number(viewport2?.['zoom']) || 0x1,
+  const value49 = Number(viewport2?.['zoom']) || 1,
     value50 = Number(threshold2);
   if (!Number['isFinite'](value50)) return [];
   const list10 = [],
@@ -651,14 +651,14 @@ export function getGroupSidePlusAnchorCandidateIds({
     if (!isNodeType(x2, 'group')) continue;
     const enabled13 = String(x2?.['id'] || value53 || '')['trim']();
     if (!enabled13) continue;
-    const width = x2['width'] || 0x190,
-      height = x2['height'] || 0x12c,
+    const width = x2['width'] || 400,
+      height = x2['height'] || 300,
       box = getNodeScreenRect(
         { x: x2['x'], y: x2['y'], width: width, height: height },
         viewport2,
       ),
       value54 = box['right'] + gap * value49,
-      value55 = box['top'] + box['height'] / 0x2;
+      value55 = box['top'] + box['height'] / 2;
     if (Math['hypot'](mx - value54, my - value55) < value50) list10['push'](enabled13);
   }
   return list10;
@@ -674,7 +674,7 @@ export function resolveSidePlusCandidateIds({
     value56 = Array['isArray'](selectedIds) ? selectedIds['filter'](Boolean) : [],
     candidateIds2 = isMultiSelection ? new Set() : new Set(value56),
     sideAnchorHoverIds = new Set(),
-    enabled14 = !isMultiSelection && !selectionOnly && list11['length'] > 0x0;
+    enabled14 = !isMultiSelection && !selectionOnly && list11['length'] > 0;
   !isMultiSelection && !selectionOnly && hoverNodeId && !enabled14 && candidateIds2['add'](hoverNodeId);
   if (!isMultiSelection && !selectionOnly)
     for (const value57 of list11) {
@@ -684,29 +684,29 @@ export function resolveSidePlusCandidateIds({
 }
 export function computeMultiSelectionBoundsForSidePlus(value58, value59, value60 = {}) {
   const list12 = Array['isArray'](value58) ? value58 : [];
-  if (list12['length'] < 0x2) return null;
+  if (list12['length'] < 2) return null;
   const map3 =
       value60?.['movedNodeIds'] && typeof value60['movedNodeIds'][Symbol['iterator']] === 'function'
         ? new Set(value60['movedNodeIds'])
         : null,
-    value61 = Number['isFinite'](value60?.['offsetX']) ? value60['offsetX'] : 0x0,
-    value62 = Number['isFinite'](value60?.['offsetY']) ? value60['offsetY'] : 0x0;
+    value61 = Number['isFinite'](value60?.['offsetX']) ? value60['offsetX'] : 0,
+    value62 = Number['isFinite'](value60?.['offsetY']) ? value60['offsetY'] : 0;
   let minX = Infinity,
     minY = Infinity,
     maxX = -Infinity,
     maxY = -Infinity,
-    count2 = 0x0;
+    count2 = 0;
   for (const value63 of list12) {
     const box2 = value59?.[value63];
     if (!box2) continue;
     const value64 = map3?.['has'](value63) === !![],
-      value65 = box2['x'] + (value64 ? value61 : 0x0),
-      value66 = box2['y'] + (value64 ? value62 : 0x0);
-    count2 += 0x1;
-    const value67 = box2['width'] || 0x104,
-      value68 = box2['height'] || 0x64,
+      value65 = box2['x'] + (value64 ? value61 : 0),
+      value66 = box2['y'] + (value64 ? value62 : 0);
+    count2 += 1;
+    const value67 = box2['width'] || 260,
+      value68 = box2['height'] || 100,
       value69 = value65,
-      value70 = box2['type'] !== 'group' ? value66 - 0x1e : value66,
+      value70 = box2['type'] !== 'group' ? value66 - 30 : value66,
       value71 = value65 + value67,
       value72 = value66 + value68;
     ((minX = Math['min'](minX, value69)),
@@ -714,29 +714,29 @@ export function computeMultiSelectionBoundsForSidePlus(value58, value59, value60
       (maxX = Math['max'](maxX, value71)),
       (maxY = Math['max'](maxY, value72)));
   }
-  if (count2 < 0x2 || !Number['isFinite'](minX) || !Number['isFinite'](minY)) return null;
+  if (count2 < 2 || !Number['isFinite'](minX) || !Number['isFinite'](minY)) return null;
   return { minX: minX, minY: minY, maxX: maxX, maxY: maxY };
 }
 let _draftEdgeCache = {
   pathEl: null,
-  lastStartX: 0x0,
-  lastStartY: 0x0,
-  lastEndX: 0x0,
-  lastEndY: 0x0,
+  lastStartX: 0,
+  lastStartY: 0,
+  lastEndX: 0,
+  lastEndY: 0,
   lastSide: '',
   lastPathStyle: '',
-  lastZoom: 0x0,
+  lastZoom: 0,
 };
 function _resetDraftEdgeCache(pathEl = null) {
   _draftEdgeCache = {
     pathEl: pathEl,
-    lastStartX: 0x0,
-    lastStartY: 0x0,
-    lastEndX: 0x0,
-    lastEndY: 0x0,
+    lastStartX: 0,
+    lastStartY: 0,
+    lastEndX: 0,
+    lastEndY: 0,
     lastSide: '',
     lastPathStyle: '',
-    lastZoom: 0x0,
+    lastZoom: 0,
   };
 }
 function _getDraftEdgePath() {
@@ -769,7 +769,7 @@ function _renderDraftEdgeDirectly(startX, startY, endX, endY, startSide, box3) {
   const el39 = _getDraftEdgePath();
   if (!el39) return;
   const count3 = Math['hypot'](endX - startX, endY - startY);
-  if (count3 < 0x5) {
+  if (count3 < 5) {
     el39['style']['display'] = 'none';
     return;
   }
@@ -784,7 +784,7 @@ function _renderDraftEdgeDirectly(startX, startY, endX, endY, startSide, box3) {
     value74 = box3['zoom'] !== _draftEdgeCache['lastZoom'];
   if (value73) {
     const value75 = Math['abs'](endX - startX),
-      curveOffset = Math['min'](value75 * 0.75, 0x50),
+      curveOffset = Math['min'](value75 * 0.75, 80),
       connectionPathGeometry = buildConnectionPathGeometry({
         startX: startX,
         startY: startY,
@@ -803,8 +803,8 @@ function _renderDraftEdgeDirectly(startX, startY, endX, endY, startSide, box3) {
       (_draftEdgeCache['lastPathStyle'] = style));
   }
   (value74 &&
-    (el39['setAttribute']('stroke-width', '' + 0x2 / box3['zoom']),
-    (el39['style']['strokeDasharray'] = 0x6 / box3['zoom'] + '\x20' + 0x4 / box3['zoom']),
+    (el39['setAttribute']('stroke-width', '' + 2 / box3['zoom']),
+    (el39['style']['strokeDasharray'] = 6 / box3['zoom'] + ' ' + 4 / box3['zoom']),
     (_draftEdgeCache['lastZoom'] = box3['zoom'])),
     (el39['style']['display'] = 'block'));
 }
@@ -912,12 +912,12 @@ export function initConnectionHandles(value89) {
     sourceNodeIds: [],
     plusKind: 'node',
     side: 'right',
-    ax: 0x0,
-    ay: 0x0,
-    sx: 0x0,
-    sy: 0x0,
-    lastX: 0x0,
-    lastY: 0x0,
+    ax: 0,
+    ay: 0,
+    sx: 0,
+    sy: 0,
+    lastX: 0,
+    lastY: 0,
     anchorWorldX: null,
     anchorWorldY: null,
     didAssistPan: ![],
@@ -942,7 +942,7 @@ export function initConnectionHandles(value89) {
       (map8['add'](enabled16), list13['push'](enabled16));
     }
     const value94 = String(value91 || '')['trim']();
-    if (list13['length'] === 0x0 && value94) list13['push'](value94);
+    if (list13['length'] === 0 && value94) list13['push'](value94);
     return list13;
   }
   function run2({
@@ -985,64 +985,64 @@ export function initConnectionHandles(value89) {
       fixedInputSlotConfigFromManifest2?.['slotKindById']?.['refImage'] === 'image'
     )
       return;
-    const count4 = Number(box5['width'] || 0x0),
-      count5 = Number(box5['height'] || 0x0),
+    const count4 = Number(box5['width'] || 0),
+      count5 = Number(box5['height'] || 0),
       value100 =
-        (Array['isArray'](box5['videos']) && box5['videos']['length'] > 0x0) ||
+        (Array['isArray'](box5['videos']) && box5['videos']['length'] > 0) ||
         String(box5['videoUrl'] || '')['trim']() ||
         String(box5['localPath'] || '')['trim']() ||
         String(box5['thumbId'] || '')['trim']();
-    if (count4 !== 0x12c || count5 !== 0x12c || value100) return;
+    if (count4 !== 300 || count5 !== 300 || value100) return;
     const stateRaw2 = getStateRaw(),
       box6 = stateRaw2['nodes']?.[value97];
     if (!box6) return;
-    const x3 = Number(box6['x'] || 0x0) + Number(box6['width'] || 0x0) / 0x2,
-      y = Number(box6['y'] || 0x0) + Number(box6['height'] || 0x0) / 0x2,
+    const x3 = Number(box6['x'] || 0) + Number(box6['width'] || 0) / 2,
+      y = Number(box6['y'] || 0) + Number(box6['height'] || 0) / 2,
       count6 = Date['now'](),
       value101 = () => {
         const displayedMediaSizeFromNode = getDisplayedMediaSizeFromNode(value96, 'video'),
-          value102 = Number(displayedMediaSizeFromNode?.['w'] || 0x0),
-          value103 = Number(displayedMediaSizeFromNode?.['h'] || 0x0);
+          value102 = Number(displayedMediaSizeFromNode?.['w'] || 0),
+          value103 = Number(displayedMediaSizeFromNode?.['h'] || 0);
         let count7 = value102,
           count8 = value103;
-        if (!(count7 > 0x0 && count8 > 0x0)) {
+        if (!(count7 > 0 && count8 > 0)) {
           const stateRaw3 = getStateRaw(),
             value104 = stateRaw3['nodes']?.[value96];
           if (value104) {
             const value105 = Number(value104['mainVideoIndex']),
-              value106 = Number['isFinite'](value105) ? Math['max'](0x0, Math['trunc'](value105)) : 0x0,
+              value106 = Number['isFinite'](value105) ? Math['max'](0, Math['trunc'](value105)) : 0,
               value107 = Array['isArray'](value104['videos']) ? value104['videos'] : [],
               value108 = value107[value106],
-              count9 = Number(value108?.['videoWidth'] || 0x0),
-              count10 = Number(value108?.['videoHeight'] || 0x0),
-              count11 = Number(value104['selectedVideoWidth'] || 0x0),
-              count12 = Number(value104['selectedVideoHeight'] || 0x0),
-              count13 = Number(value104['videoWidth'] || 0x0),
-              count14 = Number(value104['videoHeight'] || 0x0);
-            if (count9 > 0x0 && count10 > 0x0) ((count7 = count9), (count8 = count10));
+              count9 = Number(value108?.['videoWidth'] || 0),
+              count10 = Number(value108?.['videoHeight'] || 0),
+              count11 = Number(value104['selectedVideoWidth'] || 0),
+              count12 = Number(value104['selectedVideoHeight'] || 0),
+              count13 = Number(value104['videoWidth'] || 0),
+              count14 = Number(value104['videoHeight'] || 0);
+            if (count9 > 0 && count10 > 0) ((count7 = count9), (count8 = count10));
             else {
-              if (count11 > 0x0 && count12 > 0x0) ((count7 = count11), (count8 = count12));
-              else count13 > 0x0 && count14 > 0x0 && ((count7 = count13), (count8 = count14));
+              if (count11 > 0 && count12 > 0) ((count7 = count11), (count8 = count12));
+              else count13 > 0 && count14 > 0 && ((count7 = count13), (count8 = count14));
             }
           }
         }
-        if (count7 > 0x0 && count8 > 0x0) {
+        if (count7 > 0 && count8 > 0) {
           const count15 = count7 / count8;
-          if (Number['isFinite'](count15) && count15 > 0x0) {
+          if (Number['isFinite'](count15) && count15 > 0) {
             const box7 = getAIGenerationNodeSize(count7, count8),
               width2 = box7['width'],
               height2 = box7['height'];
             (graphStore['updateNodeData'](value97, {
               width: width2,
               height: height2,
-              x: x3 - width2 / 0x2,
-              y: y - height2 / 0x2,
+              x: x3 - width2 / 2,
+              y: y - height2 / 2,
             }),
               commit());
           }
           return;
         }
-        if (Date['now']() - count6 < 0x4b0) requestAnimationFrame(value101);
+        if (Date['now']() - count6 < 1200) requestAnimationFrame(value101);
       };
     requestAnimationFrame(value101);
   }
@@ -1121,8 +1121,8 @@ export function initConnectionHandles(value89) {
       (el46['dataset']['plusKind'] = 'node'),
       el46['setAttribute']('aria-label', t('edgeController.addConnection')),
       el46['addEventListener']('pointerdown', (sx) => {
-        if (sx['button'] === 0x1 || window['_spaceHeld']) return;
-        if (sx['button'] !== 0x0) return;
+        if (sx['button'] === 1 || window['_spaceHeld']) return;
+        if (sx['button'] !== 0) return;
         window['v2ClearTrackedViewportFocus']?.('side-plus-start');
         const srcId = map5['get'](value116);
         if (!srcId) return;
@@ -1161,8 +1161,8 @@ export function initConnectionHandles(value89) {
         side: side4,
         sourceNodeIds: nodeId ? [nodeId] : [],
         plusKind: 'node',
-        ax: 0x0,
-        ay: 0x0,
+        ax: 0,
+        ay: 0,
       }),
       el46
     );
@@ -1180,11 +1180,11 @@ export function initConnectionHandles(value89) {
     viewport4 = {},
   ) {
     const count16 = Number(viewport4?.['sizeMultiplier']),
-      value126 = Number['isFinite'](count16) && count16 > 0x0 ? count16 : 0x1,
-      value127 = 0x14 * value123 * value126,
-      screenRadius2 = value127 / 0x2,
+      value126 = Number['isFinite'](count16) && count16 > 0 ? count16 : 1,
+      value127 = 20 * value123 * value126,
+      screenRadius2 = value127 / 2,
       value128 = holderUsesWorldCoordinates2 ? value127 / Math['max'](value123, Number['EPSILON']) : value127,
-      cssRadius2 = value128 / 0x2,
+      cssRadius2 = value128 / 2,
       value129 = String(viewport4?.['key'] || value119 + ':' + value120),
       value130 = viewport4?.['plusKind'] === 'multi' ? 'multi' : 'node',
       value131 = sourceNodeIds(viewport4?.['sourceNodeIds'], value119),
@@ -1211,9 +1211,9 @@ export function initConnectionHandles(value89) {
       const value133 = value124 - value121,
         value134 = value125 - value122,
         value135 = Math['hypot'](value133, value134),
-        value136 = 0x64 * value123;
+        value136 = 100 * value123;
       if (value135 < value136 && !enabled20) {
-        const value137 = Math['min'](value135, 0x2d * value123),
+        const value137 = Math['min'](value135, 45 * value123),
           value138 = Math['atan2'](value134, value133);
         ((screenX2 += Math['cos'](value138) * value137),
           (screenY2 += Math['sin'](value138) * value137),
@@ -1273,7 +1273,7 @@ export function initConnectionHandles(value89) {
         _persistRev: _persistRev,
       } = stateRaw5,
       viewport5 = getViewportPanPreview() || stateRaw5['viewport'];
-    if ((Number['isFinite'](_nodeCount) ? _nodeCount : Object['keys'](nodes6)['length']) === 0x0) {
+    if ((Number['isFinite'](_nodeCount) ? _nodeCount : Object['keys'](nodes6)['length']) === 0) {
       run8();
       return;
     }
@@ -1302,7 +1302,7 @@ export function initConnectionHandles(value89) {
       });
     el42['classList']['toggle'](
       'is-selection-plus-visible',
-      sidePlusRenderState['selectionOnly'] && selectedCount2['size'] > 0x0,
+      sidePlusRenderState['selectionOnly'] && selectedCount2['size'] > 0,
     );
     if (sidePlusRenderState['shouldClear']) {
       run8();
@@ -1337,13 +1337,13 @@ export function initConnectionHandles(value89) {
         }
       }
     }
-    const value147 = viewport5['zoom'] || 0x1,
-      gap2 = 0x24,
-      threshold3 = 0x46 * value147;
+    const value147 = viewport5['zoom'] || 1,
+      gap2 = 36,
+      threshold3 = 70 * value147;
     let value148 = Number['isFinite'](screenX3) ? screenX3 : undefined,
       value149 = Number['isFinite'](screenY3) ? screenY3 : undefined;
     selectionOnly3 && ((value148 = undefined), (value149 = undefined));
-    const isMultiSelection2 = selectedCount2['size'] >= 0x2,
+    const isMultiSelection2 = selectedCount2['size'] >= 2,
       candidateIds3 = map7['get'](nodes6, Number['isFinite'](_nodesRev) ? _nodesRev : _persistRev),
       groupAnchorIds2 =
         !isMultiSelection2 && !selectionOnly3
@@ -1372,10 +1372,10 @@ export function initConnectionHandles(value89) {
       if (shouldUseInlineMediaClipAddSlot(x4['type'])) continue;
       const value151 =
           interactionState['isDragging'] && (selectedCount2['has'](value150) || interactionState['targetNodeId'] === value150),
-        value152 = value151 && Number['isFinite'](interactionState['pendingDx']) ? interactionState['pendingDx'] : 0x0,
-        value153 = value151 && Number['isFinite'](interactionState['pendingDy']) ? interactionState['pendingDy'] : 0x0,
-        width3 = x4['width'] || (isNodeType(x4, 'group') ? 0x190 : 0x104),
-        height3 = x4['height'] || (isNodeType(x4, 'group') ? 0x12c : 0x50),
+        value152 = value151 && Number['isFinite'](interactionState['pendingDx']) ? interactionState['pendingDx'] : 0,
+        value153 = value151 && Number['isFinite'](interactionState['pendingDy']) ? interactionState['pendingDy'] : 0,
+        width3 = x4['width'] || (isNodeType(x4, 'group') ? 400 : 260),
+        height3 = x4['height'] || (isNodeType(x4, 'group') ? 300 : 80),
         box9 = getNodeScreenRect(
           {
             x: x4['x'] + value152,
@@ -1385,7 +1385,7 @@ export function initConnectionHandles(value89) {
           },
           viewport5,
         ),
-        value154 = box9['top'] + box9['height'] / 0x2,
+        value154 = box9['top'] + box9['height'] / 2,
         value155 = box9['left'] - gap2 * value147,
         value156 = box9['right'] + gap2 * value147,
         sideDistance2 = Math['hypot'](screenX3 - value155, screenY3 - value154),
@@ -1450,7 +1450,7 @@ export function initConnectionHandles(value89) {
       const enabled23 = geometryNodes[value159];
       return !!enabled23 && handler(enabled23['type']);
     });
-    if (selectedIds2['length'] >= 0x2 && sourceNodeIds3['length'] > 0x0) {
+    if (selectedIds2['length'] >= 2 && sourceNodeIds3['length'] > 0) {
       const value160 = interactionState['isDragging'] && selectedCount2['has'](interactionState['targetNodeId']),
         x5 = computeMultiSelectionBoundsForSidePlus(
           selectedIds2,
@@ -1458,24 +1458,24 @@ export function initConnectionHandles(value89) {
           value160
             ? {
                 movedNodeIds: selectedIds2,
-                offsetX: Number['isFinite'](interactionState['pendingDx']) ? interactionState['pendingDx'] : 0x0,
-                offsetY: Number['isFinite'](interactionState['pendingDy']) ? interactionState['pendingDy'] : 0x0,
+                offsetX: Number['isFinite'](interactionState['pendingDx']) ? interactionState['pendingDx'] : 0,
+                offsetY: Number['isFinite'](interactionState['pendingDy']) ? interactionState['pendingDy'] : 0,
               }
             : undefined,
         );
       if (x5) {
-        const value161 = 0x12,
+        const value161 = 18,
           box10 = getNodeScreenRect(
             {
               x: x5['minX'] - value161,
               y: x5['minY'] - value161,
-              width: x5['maxX'] - x5['minX'] + value161 * 0x2,
-              height: x5['maxY'] - x5['minY'] + value161 * 0x2,
+              width: x5['maxX'] - x5['minX'] + value161 * 2,
+              height: x5['maxY'] - x5['minY'] + value161 * 2,
             },
             viewport5,
           ),
           value162 = box10['right'] + gap2 * value147,
-          value163 = box10['top'] + box10['height'] / 0x2,
+          value163 = box10['top'] + box10['height'] / 2,
           value164 =
             Number['isFinite'](screenX3) &&
             Number['isFinite'](screenY3) &&
@@ -1485,7 +1485,7 @@ export function initConnectionHandles(value89) {
             screenY3 <= box10['bottom'];
         run10(
           map10,
-          sourceNodeIds3[0x0],
+          sourceNodeIds3[0],
           'right',
           value162,
           value163,
@@ -1549,7 +1549,7 @@ export function initConnectionHandles(value89) {
     return (run15['cancel']?.(), run13(), run17(), _clearDraftEdgeDirectly(), !![]);
   }
   function run16(pointerTarget, enabled24 = ![]) {
-    if (side2['dragging'] && !enabled24 && pointerTarget?.['buttons'] === 0x0) {
+    if (side2['dragging'] && !enabled24 && pointerTarget?.['buttons'] === 0) {
       run18();
       return;
     }
@@ -1575,9 +1575,9 @@ export function initConnectionHandles(value89) {
               store['acquire'](SIDE_PLUS_ASSIST_PAN_PREVIEW_OWNER, viewport6);
           box12 &&
             ((viewport6 = {
-              x: (Number(box12['x']) || 0x0) + value168,
-              y: (Number(box12['y']) || 0x0) + value169,
-              zoom: Number(box12['zoom']) || 0x1,
+              x: (Number(box12['x']) || 0) + value168,
+              y: (Number(box12['y']) || 0) + value169,
+              zoom: Number(box12['zoom']) || 1,
             }),
             (side2['assistPanViewport'] = viewport6),
             store['update'](SIDE_PLUS_ASSIST_PAN_PREVIEW_OWNER, viewport6),
@@ -1591,8 +1591,8 @@ export function initConnectionHandles(value89) {
         value170 = sourceNodeIds(side2['sourceNodeIds'], side2['srcId']),
         map12 = new Set(value170),
         box13 = nodes7[side2['srcId']];
-      let value171 = 0x0,
-        value172 = 0x0;
+      let value171 = 0,
+        value172 = 0;
       if (side2['plusKind'] === 'multi') {
         if (Number['isFinite'](side2['anchorWorldX']) && Number['isFinite'](side2['anchorWorldY']))
           ((value171 = side2['anchorWorldX']), (value172 = side2['anchorWorldY']));
@@ -1603,8 +1603,8 @@ export function initConnectionHandles(value89) {
       } else
         box13 &&
           ((value171 =
-            side2['side'] === 'right' ? box13['x'] + (box13['width'] || 0x0) : box13['x']),
-          (value172 = box13['y'] + (box13['height'] || 0x0) / 0x2));
+            side2['side'] === 'right' ? box13['x'] + (box13['width'] || 0) : box13['x']),
+          (value172 = box13['y'] + (box13['height'] || 0) / 2));
       const { x: x6, y: y2 } = screenToWorld(
         pointerTarget['clientX'],
         pointerTarget['clientY'],
@@ -1661,8 +1661,8 @@ export function initConnectionHandles(value89) {
       };
     if (
       !didAssistPan &&
-      Math['abs'](clientX2['clientX'] - sx2) < 0x5 &&
-      Math['abs'](clientX2['clientY'] - sy) < 0x5
+      Math['abs'](clientX2['clientX'] - sx2) < 5 &&
+      Math['abs'](clientX2['clientY'] - sy) < 5
     )
       return handler3();
     const {
@@ -1750,11 +1750,11 @@ export function initConnectionHandles(value89) {
     }
     if (plusKind === 'multi') {
       const sourceIds = sourceNodeIds4['filter']((value177) => !!nodes8[value177]);
-      if (sourceIds['length'] === 0x0) {
+      if (sourceIds['length'] === 0) {
         handler3();
         return;
       }
-      _showQuoteMenu(clientX2['clientX'], clientX2['clientY'], sourceIds[0x0], viewport7, handler3, {
+      _showQuoteMenu(clientX2['clientX'], clientX2['clientY'], sourceIds[0], viewport7, handler3, {
         sourceIds: sourceIds,
       });
       return;
@@ -1808,14 +1808,14 @@ const _RH_ANIME_REAL_MODEL = ANIME_REAL_MODEL_ID,
     if (Number['isFinite'](value185)) return value185;
     const value186 = String(value184?.['id'] || ''),
       list15 = value186['match'](/(\d{10,})/g);
-    if (list15 && list15['length']) return Number(list15[list15['length'] - 0x1]) || 0x0;
-    return 0x0;
+    if (list15 && list15['length']) return Number(list15[list15['length'] - 1]) || 0;
+    return 0;
   };
 function _finishManifestFixedInputResult(value187, value188, value189) {
   const refSlot = String(value189 || '')['trim']();
   if (!refSlot) return { ok: !![], refSlot: '' };
   const list16 = getExclusiveSlotsForFixedSlot(value187?.['exclusiveGroups'], refSlot);
-  if (list16['length'] > 0x1) {
+  if (list16['length'] > 1) {
     const map15 = new Set(list16);
     for (const value190 of Array['isArray'](value188) ? value188 : []) {
       const value191 = String(value190?.['refSlot'] || '')['trim']();
@@ -1873,7 +1873,7 @@ function _cycleManifestFixedInputWhenFull({
   if (config4?.['manifest']?.['inputSlots']?.['cycleFixedInputWhenFull'] !== !![]) return null;
   const targetInputPolicy4 = getTargetInputPolicy(tgtData4),
     count17 = Number(targetInputPolicy4?.['maxByKind']?.[enabled36]);
-  if (!Number['isFinite'](count17) || count17 <= 0x0) return null;
+  if (!Number['isFinite'](count17) || count17 <= 0) return null;
   const map18 = new Set(config4?.['visibleSlots'] || []),
     value200 = (config4?.['slotOrderByType']?.[enabled36] || [])['filter']((value201) =>
       map18['has'](value201),
@@ -1882,7 +1882,7 @@ function _cycleManifestFixedInputWhenFull({
       ['filter']((value202) => _getRhV54RefKind(nodes10?.[value202?.['sourceId']]) === enabled36)
       ['sort']((value203, value204) => _edgeTimeKey(value203) - _edgeTimeKey(value204));
   if (list17['length'] < count17) return null;
-  const enabled37 = list17[0x0];
+  const enabled37 = list17[0];
   if (!enabled37?.['id']) return null;
   const value205 = String(resolvedSlotByEdgeId?.['get'](enabled37['id']) || enabled37['refSlot'] || '');
   graphStore['removeEdge'](enabled37['id']);
@@ -1928,7 +1928,7 @@ function _applyRhPersonReplaceV3FixedInputs({
   const refSlot4 =
     enabled38 && list18['includes'](String(enabled38['refSlot'] || ''))
       ? String(enabled38['refSlot'])
-      : list18[0x0];
+      : list18[0];
   return { ok: !![], refSlot: refSlot4 };
 }
 function _applyManifestFixedInputs({
@@ -1957,8 +1957,8 @@ function _applyManifestFixedInputs({
       (value216) =>
         !map20['has'](value216) && fixedInputSlotAcceptsSource(config5, value216, srcData3),
     ),
-    slotOrder2 = list22['length'] > 0x0 ? list22 : value215;
-  if (slotOrder2['length'] === 0x0) {
+    slotOrder2 = list22['length'] > 0 ? list22 : value215;
+  if (slotOrder2['length'] === 0) {
     if (
       _canUseManifestFixedInputOverflow({
         config: config5,
@@ -2040,10 +2040,10 @@ function _applyManifestFixedInputs({
     resolvedSlotByEdgeId: resolvedSlotByEdgeId2,
   });
   if (_cycleManifestFixedInputWhenFull2) return _finishManifestFixedInputResult(config5, incomingEdges6, _cycleManifestFixedInputWhenFull2['refSlot']);
-  if (slotOrder2['length'] === 0x1)
+  if (slotOrder2['length'] === 1)
     return (
       list23['forEach']((value227) => graphStore['removeEdge'](value227['id'])),
-      _finishManifestFixedInputResult(config5, incomingEdges6, slotOrder2[0x0])
+      _finishManifestFixedInputResult(config5, incomingEdges6, slotOrder2[0])
     );
   if (value217) {
     const value228 = list23['find']((value229) => run20(value229) === value217);
@@ -2057,7 +2057,7 @@ function _applyManifestFixedInputs({
     ),
     value233 = run20(value230),
     count18 = slotOrder2['indexOf'](value233),
-    value234 = count18 >= 0x0 ? slotOrder2[(count18 + 0x1) % slotOrder2['length']] : slotOrder2[0x0];
+    value234 = count18 >= 0 ? slotOrder2[(count18 + 1) % slotOrder2['length']] : slotOrder2[0];
   let enabled39 = null;
   for (const value235 of list23) {
     if (run20(value235) !== value234) continue;
@@ -2099,7 +2099,7 @@ function _applyDreaminaVideoFixedInputs({
     const list25 = list24['filter'](
       (value240) => _getRhV54RefKind(nodes13?.[value240['sourceId']]) === 'image',
     )['sort']((value241, value242) => _edgeTimeKey(value241) - _edgeTimeKey(value242));
-    while (list25['length'] >= 0x2) {
+    while (list25['length'] >= 2) {
       const value243 = list25['shift']();
       if (value243?.['id']) graphStore['removeEdge'](value243['id']);
     }
@@ -2110,7 +2110,7 @@ function _applyDreaminaVideoFixedInputs({
     const list26 = list24['filter'](
       (value244) => _getRhV54RefKind(nodes13?.[value244['sourceId']]) === 'image',
     )['sort']((value245, value246) => _edgeTimeKey(value245) - _edgeTimeKey(value246));
-    while (list26['length'] >= 0x14) {
+    while (list26['length'] >= 20) {
       const value247 = list26['shift']();
       if (value247?.['id']) graphStore['removeEdge'](value247['id']);
     }
@@ -2120,7 +2120,7 @@ function _applyDreaminaVideoFixedInputs({
   if (_getRhV54RefKind2 === 'text') return { ok: !![], refSlot: '' };
   const targetInputPolicy5 = getTargetInputPolicy(tgtData7),
     count19 = Number(targetInputPolicy5?.['maxByKind']?.[_getRhV54RefKind2]);
-  if (!Number['isFinite'](count19) || count19 <= 0x0) return { ok: ![], refSlot: '' };
+  if (!Number['isFinite'](count19) || count19 <= 0) return { ok: ![], refSlot: '' };
   const list27 = list24['filter'](
     (value248) => _getRhV54RefKind(nodes13?.[value248['sourceId']]) === _getRhV54RefKind2,
   )['sort']((value249, value250) => _edgeTimeKey(value249) - _edgeTimeKey(value250));
@@ -2146,7 +2146,7 @@ function _applyGenericInputKindLimit({
   if (!isInputKindAllowed(targetInputPolicy6, effectiveInputKind2)) return { ok: ![] };
   const count20 = Number(targetInputPolicy6?.['maxByKind']?.[effectiveInputKind2]);
   if (!Number['isFinite'](count20)) return { ok: !![] };
-  if (count20 <= 0x0) return { ok: ![] };
+  if (count20 <= 0) return { ok: ![] };
   const value252 = (Array['isArray'](incomingEdges8) ? incomingEdges8 : [])['some'](
     (value253) => value253?.['sourceId'] === sourceId5,
   );
@@ -2211,7 +2211,7 @@ export function addEdgeWithPolicies({
     if (value263) return ![];
     return (
       graphStore['addEdge']({
-        id: 'edge-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x6),
+        id: 'edge-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 6),
         sourceId: sourceId6,
         targetId: targetId8,
         isGroupOutputLink: !![],
@@ -2280,12 +2280,12 @@ export function addEdgeWithPolicies({
       ?.['has'](targetId8);
   if (value265) return ![];
   let sourceMediaKey = '',
-    sourceMediaW = 0x0,
-    sourceMediaH = 0x0;
+    sourceMediaW = 0,
+    sourceMediaH = 0;
   if (String(srcData7['type'] || '')['includes']('video')) {
     const list29 = Array['isArray'](srcData7['videos']) ? srcData7['videos'] : [],
       value266 = Number(srcData7['mainVideoIndex']),
-      value267 = Number['isFinite'](value266) ? Math['max'](0x0, Math['trunc'](value266)) : 0x0,
+      value267 = Number['isFinite'](value266) ? Math['max'](0, Math['trunc'](value266)) : 0,
       value268 = list29[value267] || null,
       value269 = list29['find'](
         (value270) => _videoSourceKey(value270) && !_isUnavailableVideoRecord(value270),
@@ -2309,24 +2309,24 @@ export function addEdgeWithPolicies({
             String(srcData7['sourceUrl'] || '')['trim']()
           : '');
     if (value272) sourceMediaKey = value272;
-    const count21 = Number(value268?.['videoWidth'] || 0x0),
-      count22 = Number(value268?.['videoHeight'] || 0x0),
-      count23 = Number(srcData7['selectedVideoWidth'] || 0x0),
-      count24 = Number(srcData7['selectedVideoHeight'] || 0x0),
-      count25 = Number(srcData7['videoWidth'] || 0x0),
-      count26 = Number(srcData7['videoHeight'] || 0x0);
-    if (count21 > 0x0 && count22 > 0x0) ((sourceMediaW = count21), (sourceMediaH = count22));
+    const count21 = Number(value268?.['videoWidth'] || 0),
+      count22 = Number(value268?.['videoHeight'] || 0),
+      count23 = Number(srcData7['selectedVideoWidth'] || 0),
+      count24 = Number(srcData7['selectedVideoHeight'] || 0),
+      count25 = Number(srcData7['videoWidth'] || 0),
+      count26 = Number(srcData7['videoHeight'] || 0);
+    if (count21 > 0 && count22 > 0) ((sourceMediaW = count21), (sourceMediaH = count22));
     else {
-      if (count23 > 0x0 && count24 > 0x0) ((sourceMediaW = count23), (sourceMediaH = count24));
-      else count25 > 0x0 && count26 > 0x0 && ((sourceMediaW = count25), (sourceMediaH = count26));
+      if (count23 > 0 && count24 > 0) ((sourceMediaW = count23), (sourceMediaH = count24));
+      else count25 > 0 && count26 > 0 && ((sourceMediaW = count25), (sourceMediaH = count26));
     }
-    if (!(sourceMediaW > 0x0 && sourceMediaH > 0x0 && sourceMediaKey))
+    if (!(sourceMediaW > 0 && sourceMediaH > 0 && sourceMediaKey))
       try {
         const displayedVideoMetaFromNode = getDisplayedVideoMetaFromNode(sourceId6),
           value273 = String(displayedVideoMetaFromNode?.['src'] || '')['trim'](),
-          count27 = Number(displayedVideoMetaFromNode?.['w'] || 0x0),
-          count28 = Number(displayedVideoMetaFromNode?.['h'] || 0x0);
-        count27 > 0x0 && count28 > 0x0 && ((sourceMediaW = count27), (sourceMediaH = count28));
+          count27 = Number(displayedVideoMetaFromNode?.['w'] || 0),
+          count28 = Number(displayedVideoMetaFromNode?.['h'] || 0);
+        count27 > 0 && count28 > 0 && ((sourceMediaW = count27), (sourceMediaH = count28));
         if (value273)
           try {
             const uRL = new URL(value273, window['location']['origin']),
@@ -2354,12 +2354,12 @@ export function addEdgeWithPolicies({
     nodes: targetNode['nodes'] || nodes15,
   }),
     graphStore['addEdge']({
-      id: 'edge-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x6),
+      id: 'edge-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 6),
       sourceId: sourceId6,
       targetId: targetId8,
       ...(refSlot6 ? { refSlot: refSlot6 } : null),
       ...(sourceMediaKey ? { sourceMediaKey: sourceMediaKey } : null),
-      ...(sourceMediaW > 0x0 && sourceMediaH > 0x0 ? { sourceMediaW: sourceMediaW, sourceMediaH: sourceMediaH } : null),
+      ...(sourceMediaW > 0 && sourceMediaH > 0 ? { sourceMediaW: sourceMediaW, sourceMediaH: sourceMediaH } : null),
       createdAt: Date['now'](),
     }));
   try {
@@ -2367,9 +2367,9 @@ export function addEdgeWithPolicies({
       value275 =
         String(tgtData12?.['type'] || '') === 'ai-video' &&
         (_getManifestFixedInputConfig2?.['slotOrderByType']?.['video'] || [])['includes']('sourceVideo');
-    if (value275 && sourceMediaW > 0x0 && sourceMediaH > 0x0) {
+    if (value275 && sourceMediaW > 0 && sourceMediaH > 0) {
       const enabled41 =
-          (Array['isArray'](tgtData12['videos']) && tgtData12['videos']['length'] > 0x0) ||
+          (Array['isArray'](tgtData12['videos']) && tgtData12['videos']['length'] > 0) ||
           String(tgtData12['videoUrl'] || '')['trim']() ||
           String(tgtData12['localPath'] || '')['trim']() ||
           String(tgtData12['thumbId'] || '')['trim'](),
@@ -2379,17 +2379,17 @@ export function addEdgeWithPolicies({
           box16 = stateRaw8['nodes']?.[targetId8];
         if (box16) {
           const count29 = sourceMediaW / sourceMediaH;
-          if (Number['isFinite'](count29) && count29 > 0x0) {
+          if (Number['isFinite'](count29) && count29 > 0) {
             const box17 = getAIGenerationNodeSize(sourceMediaW, sourceMediaH),
               width4 = box17['width'],
               height4 = box17['height'],
-              x7 = Number(box16['x'] || 0x0) + Number(box16['width'] || 0x0) / 0x2,
-              y3 = Number(box16['y'] || 0x0) + Number(box16['height'] || 0x0) / 0x2;
+              x7 = Number(box16['x'] || 0) + Number(box16['width'] || 0) / 2,
+              y3 = Number(box16['y'] || 0) + Number(box16['height'] || 0) / 2;
             graphStore['updateNodeData'](targetId8, {
               width: width4,
               height: height4,
-              x: x7 - width4 / 0x2,
-              y: y3 - height4 / 0x2,
+              x: x7 - width4 / 2,
+              y: y3 - height4 / 2,
             });
           }
         }
@@ -2428,7 +2428,7 @@ export function initPickConnect(el50) {
           list31 = (value286['slotOrderByType']?.[_getRhV54RefKind3] || [])['filter']((value289) =>
             map23['has'](value289),
           );
-        if (_getRhV54RefKind3 !== 'text' && list31['length'] === 0x0) {
+        if (_getRhV54RefKind3 !== 'text' && list31['length'] === 0) {
           list30['push'](value287);
           continue;
         }
@@ -2604,7 +2604,7 @@ export function initPickConnect(el50) {
 }
 function _createSidePlusCreationMenu(value304) {
   const el52 = document['createElement']('div');
-  el52['className'] = 'v2-quote-menu\x20v2-node-menu-section\x20v2-node-menu-compact';
+  el52['className'] = 'v2-quote-menu v2-node-menu-section v2-node-menu-compact';
   const el53 = document['createElement']('div');
   el53['className'] = 'v2-menu-section';
   const el54 = document['createElement']('span');
@@ -2631,13 +2631,13 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
         (map24['add'](enabled45), list32['push'](enabled45));
       }
       const value316 = String(value313 || '')['trim']();
-      if (list32['length'] === 0x0 && value316) list32['push'](value316);
+      if (list32['length'] === 0 && value316) list32['push'](value316);
       return list32;
     },
     sourceId8 = handler4(value311?.['sourceIds'], value308)['filter'](
       (value317) => !!nodes19[value317],
     ),
-    value318 = sourceId8['includes'](value308) ? value308 : sourceId8[0x0],
+    value318 = sourceId8['includes'](value308) ? value308 : sourceId8[0],
     box18 = value318 ? nodes19[value318] : null;
   if (!box18) {
     value310?.();
@@ -2646,17 +2646,17 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
   const value319 = sourceId8['map']((value320) => nodes19[value320])['filter'](Boolean),
     handler5 = (value321, value322) => {
       const displayedMediaSizeFromNode2 = getDisplayedMediaSizeFromNode(value321, value322),
-        count30 = Number(displayedMediaSizeFromNode2?.['w'] || 0x0),
-        count31 = Number(displayedMediaSizeFromNode2?.['h'] || 0x0),
-        count32 = count30 > 0x0 && count31 > 0x0 ? count30 / count31 : 0x0;
-      return Number['isFinite'](count32) && count32 > 0x0 ? count32 : 0x0;
+        count30 = Number(displayedMediaSizeFromNode2?.['w'] || 0),
+        count31 = Number(displayedMediaSizeFromNode2?.['h'] || 0),
+        count32 = count30 > 0 && count31 > 0 ? count30 / count31 : 0;
+      return Number['isFinite'](count32) && count32 > 0 ? count32 : 0;
     },
     handler6 = (value323, x8, y4, value324) => {
       const count33 = Number(value324);
-      if (!(Number['isFinite'](count33) && count33 > 0x0)) return ![];
+      if (!(Number['isFinite'](count33) && count33 > 0)) return ![];
       const box19 = getAIGenerationNodeSize(
-          count33 >= 0x1 ? count33 : 0x1,
-          count33 >= 0x1 ? 0x1 : 0x1 / count33,
+          count33 >= 1 ? count33 : 1,
+          count33 >= 1 ? 1 : 1 / count33,
         ),
         width5 = box19['width'],
         height5 = box19['height'],
@@ -2667,8 +2667,8 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
         graphStore['updateNodeData'](value323, {
           width: width5,
           height: height5,
-          x: x8 - width5 / 0x2,
-          y: y4 - height5 / 0x2,
+          x: x8 - width5 / 2,
+          y: y4 - height5 / 2,
         }),
         commit(),
         !![]
@@ -2682,51 +2682,51 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
       if (!enabled47 || !box20) return;
       if (String(enabled47['type'] || '') !== 'ai-video') return;
       if (String(box20['type'] || '') !== 'ai-video') return;
-      const value328 = Number(box20['width'] || 0x0),
-        value329 = Number(box20['height'] || 0x0);
+      const value328 = Number(box20['width'] || 0),
+        value329 = Number(box20['height'] || 0);
       if (!(value328 === _AI_VIDEO_DEFAULT_SIZE['width'] && value329 === _AI_VIDEO_DEFAULT_SIZE['height']))
         return;
       const value330 =
-        (Array['isArray'](box20['videos']) && box20['videos']['length'] > 0x0) ||
+        (Array['isArray'](box20['videos']) && box20['videos']['length'] > 0) ||
         String(box20['videoUrl'] || '')['trim']() ||
         String(box20['localPath'] || '')['trim']() ||
         String(box20['thumbId'] || '')['trim']();
       if (value330) return;
-      const value331 = Number(box20['x'] || 0x0) + value328 / 0x2,
-        value332 = Number(box20['y'] || 0x0) + value329 / 0x2,
+      const value331 = Number(box20['x'] || 0) + value328 / 2,
+        value332 = Number(box20['y'] || 0) + value329 / 2,
         count34 = Date['now'](),
         value333 = () => {
           const displayedMediaSizeFromNode3 = getDisplayedMediaSizeFromNode(value325, 'video'),
-            value334 = Number(displayedMediaSizeFromNode3?.['w'] || 0x0),
-            value335 = Number(displayedMediaSizeFromNode3?.['h'] || 0x0);
+            value334 = Number(displayedMediaSizeFromNode3?.['w'] || 0),
+            value335 = Number(displayedMediaSizeFromNode3?.['h'] || 0);
           let count35 = value334,
             count36 = value335;
-          if (!(count35 > 0x0 && count36 > 0x0)) {
+          if (!(count35 > 0 && count36 > 0)) {
             const stateRaw12 = getStateRaw(),
               value336 = stateRaw12['nodes']?.[value325];
             if (value336) {
               const value337 = Number(value336['mainVideoIndex']),
-                value338 = Number['isFinite'](value337) ? Math['max'](0x0, Math['trunc'](value337)) : 0x0,
+                value338 = Number['isFinite'](value337) ? Math['max'](0, Math['trunc'](value337)) : 0,
                 value339 = Array['isArray'](value336['videos']) ? value336['videos'] : [],
                 value340 = value339[value338],
-                count37 = Number(value340?.['videoWidth'] || 0x0),
-                count38 = Number(value340?.['videoHeight'] || 0x0),
-                count39 = Number(value336['selectedVideoWidth'] || 0x0),
-                count40 = Number(value336['selectedVideoHeight'] || 0x0),
-                count41 = Number(value336['videoWidth'] || 0x0),
-                count42 = Number(value336['videoHeight'] || 0x0);
-              if (count37 > 0x0 && count38 > 0x0) ((count35 = count37), (count36 = count38));
+                count37 = Number(value340?.['videoWidth'] || 0),
+                count38 = Number(value340?.['videoHeight'] || 0),
+                count39 = Number(value336['selectedVideoWidth'] || 0),
+                count40 = Number(value336['selectedVideoHeight'] || 0),
+                count41 = Number(value336['videoWidth'] || 0),
+                count42 = Number(value336['videoHeight'] || 0);
+              if (count37 > 0 && count38 > 0) ((count35 = count37), (count36 = count38));
               else {
-                if (count39 > 0x0 && count40 > 0x0) ((count35 = count39), (count36 = count40));
-                else count41 > 0x0 && count42 > 0x0 && ((count35 = count41), (count36 = count42));
+                if (count39 > 0 && count40 > 0) ((count35 = count39), (count36 = count40));
+                else count41 > 0 && count42 > 0 && ((count35 = count41), (count36 = count42));
               }
             }
           }
-          if (count35 > 0x0 && count36 > 0x0) {
+          if (count35 > 0 && count36 > 0) {
             handler6(value326, value331, value332, count35 / count36);
             return;
           }
-          if (Date['now']() - count34 < 0x4b0) requestAnimationFrame(value333);
+          if (Date['now']() - count34 < 1200) requestAnimationFrame(value333);
         };
       requestAnimationFrame(value333);
     },
@@ -2804,7 +2804,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
     list34 = list33['filter']((value342) => map25['has'](value342['type']));
   (list34['forEach']((type2) => {
     const el56 = document['createElement']('button');
-    el56['className'] = 'v2-menu-row' + (type2['desc'] ? '\x20has-desc' : '');
+    el56['className'] = 'v2-menu-row' + (type2['desc'] ? ' has-desc' : '');
     const el57 = document['createElement']('div');
     ((el57['className'] = 'v2-menu-ico'), el57['replaceChildren']());
     if (type2['iconEl']) el57['appendChild'](type2['iconEl']['cloneNode'](!![]));
@@ -2838,59 +2838,59 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
           ((box18['width'] && box18['height']) ||
             (box18['videoWidth'] && box18['videoHeight']))
         ) {
-          let count43 = 0x0;
+          let count43 = 0;
           if (type2['type'] === 'ai-video' && String(box18['type'] || '') !== 'ai-video') {
-            const value343 = Number(box18['mainVideoIndex']) || 0x0,
-              value344 = Math['max'](0x0, Math['trunc'](value343)),
+            const value343 = Number(box18['mainVideoIndex']) || 0,
+              value344 = Math['max'](0, Math['trunc'](value343)),
               list35 = Array['isArray'](box18['videos']) ? box18['videos'] : [],
               value345 = String(box18['localPath'] || '')['trim'](),
               value346 = String(box18['videoUrl'] || '')['trim'](),
-              count44 = Number(box18['selectedVideoWidth'] || 0x0),
-              count45 = Number(box18['selectedVideoHeight'] || 0x0);
+              count44 = Number(box18['selectedVideoWidth'] || 0),
+              count45 = Number(box18['selectedVideoHeight'] || 0);
             let value347 = value344;
             if (list35['length']) {
-              let count46 = -0x1;
+              let count46 = -1;
               value345 &&
                 (count46 = list35['findIndex'](
                   (value348) => String(value348?.['localPath'] || '')['trim']() === value345,
                 ));
-              count46 < 0x0 &&
+              count46 < 0 &&
                 value346 &&
                 (count46 = list35['findIndex'](
                   (value349) => String(value349?.['videoUrl'] || '')['trim']() === value346,
                 ));
-              if (count46 >= 0x0) value347 = count46;
+              if (count46 >= 0) value347 = count46;
               else {
-                if (value344 >= list35['length']) value347 = 0x0;
+                if (value344 >= list35['length']) value347 = 0;
               }
-            } else value347 = 0x0;
-            const box21 = list35[value347] || list35[0x0] || null,
-              count47 = box21 ? Number(box21['videoWidth'] || box21['width'] || 0x0) : 0x0,
-              count48 = box21 ? Number(box21['videoHeight'] || box21['height'] || 0x0) : 0x0;
+            } else value347 = 0;
+            const box21 = list35[value347] || list35[0] || null,
+              count47 = box21 ? Number(box21['videoWidth'] || box21['width'] || 0) : 0,
+              count48 = box21 ? Number(box21['videoHeight'] || box21['height'] || 0) : 0;
             count43 =
-              (count44 > 0x0 && count45 > 0x0 ? count44 / count45 : 0x0) ||
+              (count44 > 0 && count45 > 0 ? count44 / count45 : 0) ||
               handler5(value318, 'video') ||
-              (count47 > 0x0 && count48 > 0x0 ? count47 / count48 : 0x0) ||
+              (count47 > 0 && count48 > 0 ? count47 / count48 : 0) ||
               (box18['videoWidth'] && box18['videoHeight']
                 ? box18['videoWidth'] / box18['videoHeight']
-                : 0x0) ||
-              (box18['width'] && box18['height'] ? box18['width'] / box18['height'] : 0x0);
+                : 0) ||
+              (box18['width'] && box18['height'] ? box18['width'] / box18['height'] : 0);
           } else
             count43 =
               handler5(value318, 'image') ||
-              (box18['width'] && box18['height'] ? box18['width'] / box18['height'] : 0x0);
-          if (!(Number['isFinite'](count43) && count43 > 0x0)) count43 = 0x1;
+              (box18['width'] && box18['height'] ? box18['width'] / box18['height'] : 0);
+          if (!(Number['isFinite'](count43) && count43 > 0)) count43 = 1;
           const box22 = getAIGenerationNodeSize(
-            count43 >= 0x1 ? count43 : 0x1,
-            count43 >= 0x1 ? 0x1 : 0x1 / count43,
+            count43 >= 1 ? count43 : 1,
+            count43 >= 1 ? 1 : 1 / count43,
           );
           ((width6 = box22['width']), (height6 = box22['height']));
         }
         let id2 = {
           id: id,
           type: type2['type'],
-          x: x9['x'] - width6 / 0x2,
-          y: x9['y'] - height6 / 0x2,
+          x: x9['x'] - width6 / 2,
+          y: x9['y'] - height6 / 2,
           width: width6,
           height: height6,
           name: type2['defaultName'] || type2['label'],
@@ -2953,16 +2953,16 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
           enabled48 = !![];
           if (!enabled49) enabled49 = sourceId9;
         }
-        if (!enabled48 && sourceId8['length'] === 0x1) {
+        if (!enabled48 && sourceId8['length'] === 1) {
           const id3 = generateId('edge');
           (graphStore['addEdge']({
             id: id3,
-            sourceId: sourceId8[0x0],
+            sourceId: sourceId8[0],
             targetId: id,
             createdAt: Date['now'](),
           }),
             (enabled48 = !![]),
-            (enabled49 = sourceId8[0x0]));
+            (enabled49 = sourceId8[0]));
         }
         (graphStore['setSelectedNodes']([id]),
           commit(),
@@ -3108,7 +3108,7 @@ function _showLeftQuoteMenu(value353, value354, targetId10, value355, value356) 
         let id5 = {
           id: id4,
           type: type3['type'],
-          x: x10['x'] - 0x96,
+          x: x10['x'] - 150,
           y: x10['y'],
           width: type3['width'] ?? type3['w'],
           height: type3['height'] ?? type3['h'],

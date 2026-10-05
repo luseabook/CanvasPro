@@ -1,13 +1,13 @@
 import * as threeRuntime from '../panoramaSceneNode/threeRuntime.js';
 const TRANSFORM_TOOLS = new Set(['move', 'rotate', 'scale']),
   AXIS_NAMES = ['x', 'y', 'z'];
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 function cleanNumber(index) {
   const finiteNumber2 = finiteNumber(index);
-  return Math['abs'](finiteNumber2) < 1e-12 ? 0x0 : finiteNumber2;
+  return Math['abs'](finiteNumber2) < 1e-12 ? 0 : finiteNumber2;
 }
 function cloneVector(result, data) {
   const list = Array['isArray'](result) ? result : data;
@@ -15,9 +15,9 @@ function cloneVector(result, data) {
 }
 function cloneTransform(box = {}) {
   return {
-    position: cloneVector(box['position'], [0x0, 0x0, 0x0]),
-    rotation: cloneVector(box['rotation'], [0x0, 0x0, 0x0]),
-    scale: cloneVector(box['scale'], [0x1, 0x1, 0x1])['map']((source) => Math['max'](0.001, source)),
+    position: cloneVector(box['position'], [0, 0, 0]),
+    rotation: cloneVector(box['rotation'], [0, 0, 0]),
+    scale: cloneVector(box['scale'], [1, 1, 1])['map']((source) => Math['max'](0.001, source)),
   };
 }
 function cloneTransforms(options2 = {}) {
@@ -25,7 +25,7 @@ function cloneTransforms(options2 = {}) {
     Object['entries'](options2)['map'](([next, current]) => [next, cloneTransform(current)]),
   );
 }
-function toThreeVector3(box2, box3 = { x: 0x0, y: 0x0, z: 0x0 }) {
+function toThreeVector3(box2, box3 = { x: 0, y: 0, z: 0 }) {
   return new threeRuntime['Vector3'](
     finiteNumber(box2?.['x'], box3['x']),
     finiteNumber(box2?.['y'], box3['y']),
@@ -37,7 +37,7 @@ function toThreeQuaternion(box4) {
     finiteNumber(box4?.['x']),
     finiteNumber(box4?.['y']),
     finiteNumber(box4?.['z']),
-    finiteNumber(box4?.['w'], 0x1),
+    finiteNumber(box4?.['w'], 1),
   );
   return entry['lengthSq']() > 1e-12 ? entry['normalize']() : new threeRuntime['Quaternion']();
 }
@@ -57,9 +57,9 @@ export function resolveStoryboard3DTransformConstraint(options3 = {}) {
   const state = String(options3['handleKey'] || '')['toLowerCase']();
   if (options3['mode'] === 'scale-uniform' || state === 'scale-uniform') return 'xyz';
   const config = state['match'](/(?:scale-)?plane-([xyz]{2})$/);
-  if (config) return normalizeConstraint(config[0x1]);
+  if (config) return normalizeConstraint(config[1]);
   const scope = state['match'](/(?:axis|scale|rotate)-([xyz])$/);
-  if (scope) return scope[0x1];
+  if (scope) return scope[1];
   return 'xyz';
 }
 function normalizeSettings(groundLock = {}) {
@@ -82,7 +82,7 @@ function normalizeSettings(groundLock = {}) {
     ),
     rotationSnap: Math['max'](
       0.0001,
-      finiteNumber(groundLock['rotationSnap'] ?? groundLock['snap']?.['rotation'], Math['PI'] / 0xc),
+      finiteNumber(groundLock['rotationSnap'] ?? groundLock['snap']?.['rotation'], Math['PI'] / 12),
     ),
     scaleSnap: Math['max'](
       0.0001,
@@ -92,15 +92,15 @@ function normalizeSettings(groundLock = {}) {
 }
 function transformsShareOrientation(value3) {
   const list3 = Object['values'](value3);
-  if (list3['length'] < 0x2) return !![];
+  if (list3['length'] < 2) return !![];
   const value4 = new threeRuntime['Quaternion']()['setFromEuler'](
-    new threeRuntime['Euler'](...list3[0x0]['rotation'], 'XYZ'),
+    new threeRuntime['Euler'](...list3[0]['rotation'], 'XYZ'),
   );
-  return list3['slice'](0x1)['every']((args) => {
+  return list3['slice'](1)['every']((args) => {
     const value5 = new threeRuntime['Quaternion']()['setFromEuler'](
       new threeRuntime['Euler'](...args['rotation'], 'XYZ'),
     );
-    return Math['abs'](0x1 - Math['abs'](value4['dot'](value5))) < 0.00001;
+    return Math['abs'](1 - Math['abs'](value4['dot'](value5))) < 0.00001;
   });
 }
 export function createStoryboard3DTransformSession({
@@ -112,7 +112,7 @@ export function createStoryboard3DTransformSession({
 } = {}) {
   const activeTool2 = TRANSFORM_TOOLS['has'](activeTool) ? activeTool : 'move',
     initialTransforms2 = cloneTransforms(initialTransforms);
-  if (Object['keys'](initialTransforms2)['length'] === 0x0) return null;
+  if (Object['keys'](initialTransforms2)['length'] === 0) return null;
   return {
     sceneId: String(sceneId || ''),
     activeTool: activeTool2,
@@ -121,7 +121,7 @@ export function createStoryboard3DTransformSession({
     dragState: dragState || {},
     constraint: resolveStoryboard3DTransformConstraint(dragState),
     pivot: toThreeVector3(dragState?.['pivot']),
-    axisWorld: toThreeVector3(dragState?.['axisWorld'] || dragState?.['axis'], { x: 0x1, y: 0x0, z: 0x0 })[
+    axisWorld: toThreeVector3(dragState?.['axisWorld'] || dragState?.['axis'], { x: 1, y: 0, z: 0 })[
       'normalize'
     ](),
     gizmoQuaternion: toThreeQuaternion(dragState?.['gizmoQuaternion']),
@@ -144,7 +144,7 @@ function updateMoveSession(value9, value10, { precision: precision2, toggleSnap:
       AXIS_NAMES['forEach']((value11) => {
         box5[value11] = map['has'](value11)
           ? snapDelta(box5[value11], value9['settings']['translationSnap'])
-          : 0x0;
+          : 0;
       }),
       box5['applyQuaternion'](value9['gizmoQuaternion']));
   }
@@ -156,7 +156,7 @@ function updateMoveSession(value9, value10, { precision: precision2, toggleSnap:
       );
       const value16 = value9['settings']['groundPositions'][value12];
       if (value9['settings']['groundLock'] && Number['isFinite'](value16))
-        cloneTransform2['position'][0x1] = value16;
+        cloneTransform2['position'][1] = value16;
       return [value12, cloneTransform2];
     }),
   );
@@ -190,15 +190,15 @@ function updateRotateSession(value17, value18, { precision: precision3, toggleSn
   );
 }
 function updateScaleSession(value23, value24, { precision: precision4, toggleSnap: toggleSnap4 }) {
-  let value25 = Math['max'](0.001, finiteNumber(value24, 0x1));
-  if (precision4) value25 = 0x1 + (value25 - 0x1) * 0.1;
+  let value25 = Math['max'](0.001, finiteNumber(value24, 1));
+  if (precision4) value25 = 1 + (value25 - 1) * 0.1;
   resolveSnapEnabled(value23['settings'], toggleSnap4) &&
-    (value25 = 0x1 + snapDelta(value25 - 0x1, value23['settings']['scaleSnap']));
+    (value25 = 1 + snapDelta(value25 - 1, value23['settings']['scaleSnap']));
   value25 = Math['max'](0.001, value25);
   const value26 =
       value23['settings']['uniformScale'] || value23['forcedUniformScale'] ? 'xyz' : value23['constraint'],
     map2 = new Set(value26 || 'xyz'),
-    value27 = Object['keys'](value23['initialTransforms'])['length'] > 0x1,
+    value27 = Object['keys'](value23['initialTransforms'])['length'] > 1,
     value28 = value23['gizmoQuaternion']['clone']()['invert']();
   return Object['fromEntries'](
     Object['entries'](value23['initialTransforms'])['map'](([value29, args3]) => {

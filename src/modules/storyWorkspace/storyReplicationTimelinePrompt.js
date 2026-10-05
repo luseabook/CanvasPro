@@ -12,15 +12,15 @@ function speechParts(item, key, list, index = []) {
     ['filter'](Boolean)
     ['map']((result) => {
       const data = result['match'](/^([^：:\r\n]+)[：:]([\s\S]*)$/u),
-        options = data?.[0x1]['trim']() || '',
+        options = data?.[1]['trim']() || '',
         enabled = options['match'](/^(?:旁白|内心独白|独白|解说|画外音)[（(](.+)[）)]$/u),
         target = list['some'](
           (source) =>
             source['kind'] === 'character' &&
             [source['name'], source['replicationSource']?.['name']]['includes'](options),
         ),
-        enabled2 = enabled?.[0x1] || (target ? options : options['replace'](/[（(].*$/u, '')),
-        text2 = text(data ? data[0x2] : result)['replace'](/^“([\s\S]*)”$/u, '$1'),
+        enabled2 = enabled?.[1] || (target ? options : options['replace'](/[（(].*$/u, '')),
+        text2 = text(data ? data[2] : result)['replace'](/^“([\s\S]*)”$/u, '$1'),
         next = index['flatMap']((current) => current[key] || [])['filter'](
           (enabled3) => enabled3['text'] === text2 && !enabled3['uncertain'],
         ),
@@ -30,9 +30,9 @@ function speechParts(item, key, list, index = []) {
           (handle) =>
             handle['kind'] === 'character' &&
             ([handle['name'], handle['replicationSource']?.['name']]['includes'](enabled2) ||
-              (record && list2['length'] === 0x1 && handle['replicationSource']?.['ref'] === list2[0x0])),
+              (record && list2['length'] === 1 && handle['replicationSource']?.['ref'] === list2[0])),
         ),
-        state = payload['length'] === 0x1 ? payload[0x0] : null,
+        state = payload['length'] === 1 ? payload[0] : null,
         config = state ? state['name'] : record ? '' : enabled2,
         scope =
           !enabled && data
@@ -43,7 +43,7 @@ function speechParts(item, key, list, index = []) {
         kind: key,
         speakerId: state?.['id'] || '',
         speakerLabel: input,
-        text: /^“[\s\S]*”$/u['test'](text2) ? text2['slice'](0x1, -0x1) : text2,
+        text: /^“[\s\S]*”$/u['test'](text2) ? text2['slice'](1, -1) : text2,
       };
     });
 }
@@ -55,14 +55,14 @@ export function buildStoryReplicationTimelinePrompt({
   continuityLines: continuityLines,
   visualStyle: visualStyle,
 }) {
-  let output = 0x0;
+  let output = 0;
   const value2 = shots['map']((args, value3) => {
       const value4 = output;
       return (
         (output += args['durationSec']),
         {
           ...args,
-          id: 'shot-' + (value3 + 0x1),
+          id: 'shot-' + (value3 + 1),
           startSec: value4,
           endSec: output,
           sound: text(args['audio'])
@@ -89,8 +89,8 @@ export function buildStoryReplicationTimelinePrompt({
           return value7['map'](({ part: part, line: line }, value9) => ({
             id: value5['id'] + '-' + value6 + '-' + value9,
             asrTimed: !![],
-            startSec: Math['max'](0x0, line['startSec'] - (clip['sourceStartSec'] || 0x0)),
-            endSec: Math['min'](output, line['endSec'] - (clip['sourceStartSec'] || 0x0)),
+            startSec: Math['max'](0, line['startSec'] - (clip['sourceStartSec'] || 0)),
+            endSec: Math['min'](output, line['endSec'] - (clip['sourceStartSec'] || 0)),
             parts: [part],
           }));
         const { startSec: startSec, endSec: endSec } = resolveReplicationSpeechTiming({
@@ -106,18 +106,18 @@ export function buildStoryReplicationTimelinePrompt({
   for (const value10 of value2) {
     const list4 = list3['filter']((value11) => value11['id']['startsWith'](value10['id'] + '-'));
     if (list4['every']((value12) => value12['asrTimed'])) continue;
-    if (list4['length'] < 0x2) continue;
+    if (list4['length'] < 2) continue;
     const value13 = (clip['replicationSpeechEvents'] || [])['filter'](
         (value14) =>
-          value14['endSec'] > value10['startSec'] + (clip['sourceStartSec'] || 0x0) &&
-          value14['startSec'] < value10['endSec'] + (clip['sourceStartSec'] || 0x0),
+          value14['endSec'] > value10['startSec'] + (clip['sourceStartSec'] || 0) &&
+          value14['startSec'] < value10['endSec'] + (clip['sourceStartSec'] || 0),
       ),
       orderReplicationShotSpeech2 = orderReplicationShotSpeech(
         list4['flatMap']((value15) => value15['parts']),
         value13,
       );
     if (!orderReplicationShotSpeech2) continue;
-    for (const value16 of list4) list3['splice'](list3['indexOf'](value16), 0x1);
+    for (const value16 of list4) list3['splice'](list3['indexOf'](value16), 1);
     list3['push']({
       id: value10['id'] + '-ordered',
       startSec: value10['startSec'],
@@ -139,12 +139,12 @@ export function buildStoryReplicationTimelinePrompt({
           (value22['replicationSource']?.['ref'] === error['id'] ||
             value22['replicationSource']?.['name'] === error['name']),
       );
-      return { ...error, name: value21['length'] === 0x1 ? value21[0x0]['name'] : error['name'] };
+      return { ...error, name: value21['length'] === 1 ? value21[0]['name'] : error['name'] };
     }),
     replicationFlowPrompt = buildReplicationFlowPrompt(
       { characters: value20, speech: [...args2['values']()], contentType: clip['replicationContentType'] },
       {
-        start: 0x0,
+        start: 0,
         end: output,
         shots: value2,
         used: [],

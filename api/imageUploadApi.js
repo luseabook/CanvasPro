@@ -25,7 +25,7 @@ import {
   hasRunningHubUploadFailureCode,
 } from './runningHubUploadResponse.js';
 function _createLimiter(value) {
-  let item = 0x0;
+  let item = 0;
   const list = [];
   return function run(key) {
     return new Promise((handler, handler2) => {
@@ -51,31 +51,31 @@ function _createLimiter(value) {
     });
   };
 }
-const _runLimited = _createLimiter(0x3),
+const _runLimited = _createLimiter(3),
   _inflight = new Map(),
-  DEFAULT_IMAGE_UPLOAD_RETRIES = 0x1,
-  DEFAULT_IMAGE_UPLOAD_RETRY_DELAY_MS = 0x1f4,
+  DEFAULT_IMAGE_UPLOAD_RETRIES = 1,
+  DEFAULT_IMAGE_UPLOAD_RETRY_DELAY_MS = 500,
   DEFAULT_IMAGE_UPLOAD_PROVIDER = 'freeImageHost';
 function sleep(data) {
   const count = Number(data);
-  return count > 0x0
+  return count > 0
     ? new Promise((options) => setTimeout(options, count))
     : Promise['resolve']();
 }
 function normalizeRetryCount(target, source = DEFAULT_IMAGE_UPLOAD_RETRIES) {
   const count2 = Number(target);
-  return Number['isFinite'](count2) && count2 >= 0x0
-    ? Math['min'](0x5, Math['trunc'](count2))
+  return Number['isFinite'](count2) && count2 >= 0
+    ? Math['min'](5, Math['trunc'](count2))
     : source;
 }
 function normalizeDelayMs(next, current = DEFAULT_IMAGE_UPLOAD_RETRY_DELAY_MS) {
   const count3 = Number(next);
-  return Number['isFinite'](count3) && count3 >= 0x0 ? Math['trunc'](count3) : current;
+  return Number['isFinite'](count3) && count3 >= 0 ? Math['trunc'](count3) : current;
 }
 function getErrorStatus(response) {
   const entry = response?.['status'] ?? response?.['statusCode'] ?? response?.['httpStatus'],
     record = Number(entry);
-  return Number['isFinite'](record) ? record : 0x0;
+  return Number['isFinite'](record) ? record : 0;
 }
 function isMissingUploadUrlError(error) {
   const payload = String(error?.['message'] || error || '');
@@ -89,12 +89,12 @@ function isMissingUploadUrlError(error) {
 function isRetryableImageUploadError(handle) {
   if (handle?.['retryable'] === !![] || isMissingUploadUrlError(handle)) return !![];
   const errorStatus = getErrorStatus(handle);
-  return errorStatus === 0x198 || errorStatus === 0x1a9 || errorStatus === 0x1ad || errorStatus >= 0x1f4;
+  return errorStatus === 408 || errorStatus === 425 || errorStatus === 429 || errorStatus >= 500;
 }
 function _buildKey(state, config, scope) {
   const {
       compress: compress = !![],
-      maxDim: maxDim = 0x800,
+      maxDim: maxDim = 2048,
       quality: quality = 0.9,
       provider: provider = DEFAULT_IMAGE_UPLOAD_PROVIDER,
       preferFree: preferFree = ![],
@@ -104,12 +104,12 @@ function _buildKey(state, config, scope) {
       uploadRetries: uploadRetries = DEFAULT_IMAGE_UPLOAD_RETRIES,
       retryDelayMs: retryDelayMs = DEFAULT_IMAGE_UPLOAD_RETRY_DELAY_MS,
     } = scope || {},
-    input = Math['round'](quality * 0x3e8),
-    output = config ? 0x1 : 0x0,
-    value2 = compress ? 0x1 : 0x0,
-    value3 = preferFree ? 0x1 : 0x0,
-    enabled = scope?.['forceProviderUpload'] === !![] ? 0x1 : 0x0,
-    isConfiguredObjectStorageEnabled2 = isConfiguredObjectStorageEnabled() && !enabled ? 0x1 : 0x0;
+    input = Math['round'](quality * 1000),
+    output = config ? 1 : 0,
+    value2 = compress ? 1 : 0,
+    value3 = preferFree ? 1 : 0,
+    enabled = scope?.['forceProviderUpload'] === !![] ? 1 : 0,
+    isConfiguredObjectStorageEnabled2 = isConfiguredObjectStorageEnabled() && !enabled ? 1 : 0;
   return [
     state,
     provider,
@@ -204,11 +204,11 @@ async function normalizeCustomProviderImageBlob(value17, value18, value19 = {}) 
 async function _processSingle(value20, apiKey, fileName) {
   const {
     compress: compress = !![],
-    maxDim: maxDim = 0x800,
+    maxDim: maxDim = 2048,
     quality: quality = 0.9,
     provider: provider = DEFAULT_IMAGE_UPLOAD_PROVIDER,
     fallbackCompressOnError: fallbackCompressOnError = ![],
-    fallbackMaxDim: fallbackMaxDim = 0x800,
+    fallbackMaxDim: fallbackMaxDim = 2048,
     fallbackQuality: fallbackQuality = 0.9,
   } = fileName || {};
   if (isProviderAssetIdentifier(value20)) return value20;
@@ -243,7 +243,7 @@ async function _processSingle(value20, apiKey, fileName) {
     handler3 = async (value22) => {
       const retryCount = normalizeRetryCount(fileName?.['uploadRetries']),
         delayMs = normalizeDelayMs(fileName?.['retryDelayMs']);
-      for (let value23 = 0x0; ; value23++) {
+      for (let value23 = 0; ; value23++) {
         try {
           const enabled3 = String((await run3(value22)) || '')['trim']();
           if (!enabled3) {
@@ -254,7 +254,7 @@ async function _processSingle(value20, apiKey, fileName) {
           return enabled3;
         } catch (value24) {
           if (value23 >= retryCount || !isRetryableImageUploadError(value24)) throw value24;
-          await sleep(delayMs * (value23 + 0x1));
+          await sleep(delayMs * (value23 + 1));
         }
       }
     };
@@ -284,8 +284,8 @@ async function uploadToTelegraph(value27) {
   const value28 = 'https://telegra.ph/upload',
     value29 = '/api/v2/proxy/upload?apiUrl=' + encodeURIComponent(value28),
     post2 = await post(value29, formData, { provider: 'telegraph' });
-  if (Array['isArray'](post2) && post2[0x0]?.['src'])
-    return 'https://telegra.ph' + post2[0x0]['src'];
+  if (Array['isArray'](post2) && post2[0]?.['src'])
+    return 'https://telegra.ph' + post2[0]['src'];
   throw new Error('Telegraph 返回格式异常');
 }
 function isFreeImageHostProvider(value30) {
@@ -352,7 +352,7 @@ export async function uploadToRunningHub(value38, enabled4, value39 = {}) {
   if (hasRunningHubUploadFailureCode(post4))
     throw new Error('RunningHUB 上传失败: ' + getRunningHubUploadErrorMessage(post4));
   const runningHubUploadUrl = getRunningHubUploadUrl(post4);
-  if (!runningHubUploadUrl) throw new Error('RunningHUB\x20上传失败:\x20未返回可用文件\x20URL，请重试');
+  if (!runningHubUploadUrl) throw new Error('RunningHUB 上传失败: 未返回可用文件 URL，请重试');
   return runningHubUploadUrl;
 }
 async function _processInputImagesOrdered(list3, value43, value44 = {}) {
@@ -362,11 +362,11 @@ async function _processInputImagesOrdered(list3, value43, value44 = {}) {
         : value44 || {},
     {
       compress: compress = !![],
-      maxDim: maxDim = 0x800,
+      maxDim: maxDim = 2048,
       quality: quality = 0.9,
       provider: provider = DEFAULT_IMAGE_UPLOAD_PROVIDER,
     } = args;
-  if (!list3 || list3['length'] === 0x0) return [];
+  if (!list3 || list3['length'] === 0) return [];
   const value45 = {
       ...args,
       compress: compress,
@@ -379,7 +379,7 @@ async function _processInputImagesOrdered(list3, value43, value44 = {}) {
     isConfiguredObjectStorageEnabled4 = isConfiguredObjectStorageEnabled() && !enabled5,
     value47 = new Array(list3['length'])['fill'](''),
     list4 = [];
-  for (let value48 = 0x0; value48 < list3['length']; value48++) {
+  for (let value48 = 0; value48 < list3['length']; value48++) {
     const enabled6 = String(list3[value48] || '')['trim']();
     if (!enabled6) continue;
     if (isProviderAssetIdentifier(enabled6)) {
@@ -418,7 +418,7 @@ async function _processInputImagesOrdered(list3, value43, value44 = {}) {
           }),
     );
   }
-  if (list4['length'] > 0x0) {
+  if (list4['length'] > 0) {
     if (value46) await Promise['all'](list4);
     else await Promise['allSettled'](list4);
   }

@@ -23,10 +23,10 @@ export function createStoryAssetPromptDragController({
       el5 = response['element'];
     if (!el5 || !documentObject?.['createElement']) return null;
     const box = el5['getBoundingClientRect']?.() || el4?.['getBoundingClientRect']?.() || {},
-      item = Math['max'](0x1, Number(box['width']) || 0x80),
-      key = Math['max'](0x1, Number(box['height']) || item),
-      index = Math['min'](0xa0, Math['max'](0x60, item)),
-      result = Math['max'](0x36, Math['round']((index * key) / item)),
+      item = Math['max'](1, Number(box['width']) || 128),
+      key = Math['max'](1, Number(box['height']) || item),
+      index = Math['min'](160, Math['max'](96, item)),
+      result = Math['max'](54, Math['round']((index * key) / item)),
       el6 = documentObject['createElement']('div');
     ((el6['className'] = 'story-asset-drag-preview'),
       (el6['dataset']['storyAssetDragMediaType'] = response['mediaType']),
@@ -42,12 +42,12 @@ export function createStoryAssetPromptDragController({
     else {
       if (response['mediaType'] === 'video') {
         const box2 = documentObject['createElement']('canvas'),
-          data = Math['max'](0x1, Math['trunc'](Number(el5['videoWidth']) || item)),
-          options = Math['max'](0x1, Math['trunc'](Number(el5['videoHeight']) || key));
+          data = Math['max'](1, Math['trunc'](Number(el5['videoWidth']) || item)),
+          options = Math['max'](1, Math['trunc'](Number(el5['videoHeight']) || key));
         ((box2['width'] = data), (box2['height'] = options));
         try {
           const ctx = box2['getContext']?.('2d');
-          ctx?.['drawImage']?.(el5, 0x0, 0x0, data, options);
+          ctx?.['drawImage']?.(el5, 0, 0, data, options);
           if (ctx) enabled = box2;
         } catch {
           enabled = null;
@@ -57,7 +57,7 @@ export function createStoryAssetPromptDragController({
             (enabled['muted'] = !![]),
             enabled['removeAttribute']?.('controls'));
           try {
-            enabled['currentTime'] = Number(el5['currentTime']) || 0x0;
+            enabled['currentTime'] = Number(el5['currentTime']) || 0;
           } catch {}
         }
       } else typeof el5['cloneNode'] === 'function' && (enabled = el5['cloneNode'](!![]));
@@ -67,24 +67,24 @@ export function createStoryAssetPromptDragController({
   }
   function run2(event2) {
     if (!el) return;
-    const target = Number(event2?.['clientX']) || 0x0,
-      source = Number(event2?.['clientY']) || 0x0,
+    const target = Number(event2?.['clientX']) || 0,
+      source = Number(event2?.['clientY']) || 0,
       box3 = el['getBoundingClientRect']?.() || {},
-      next = Math['max'](0x1, Number(box3['width']) || Number['parseFloat'](el['style']['width']) || 0x1),
+      next = Math['max'](1, Number(box3['width']) || Number['parseFloat'](el['style']['width']) || 1),
       current = Math['max'](
-        0x1,
-        Number(box3['height']) || Number['parseFloat'](el['style']['height']) || 0x1,
+        1,
+        Number(box3['height']) || Number['parseFloat'](el['style']['height']) || 1,
       ),
       entry = Number(windowObject?.['innerWidth']) || Number['POSITIVE_INFINITY'],
       record = Number(windowObject?.['innerHeight']) || Number['POSITIVE_INFINITY'],
-      payload = 0x8;
+      payload = 8;
     let handle = target + STORY_ASSET_DRAG_PREVIEW_POINTER_GAP,
       state = source + STORY_ASSET_DRAG_PREVIEW_POINTER_GAP;
     (handle + next > entry - payload && (handle = target - next - STORY_ASSET_DRAG_PREVIEW_POINTER_GAP),
       state + current > record - payload && (state = source - current - STORY_ASSET_DRAG_PREVIEW_POINTER_GAP),
       (handle = Math['max'](payload, handle)),
       (state = Math['max'](payload, state)),
-      (el['style']['transform'] = 'translate3d(' + handle + 'px,\x20' + state + 'px, 0)'));
+      (el['style']['transform'] = 'translate3d(' + handle + 'px, ' + state + 'px, 0)'));
   }
   function hideCaret() {
     (el3?.['classList']?.['remove']('is-story-asset-drop-caret-active'), (el3 = null));
@@ -107,8 +107,8 @@ export function createStoryAssetPromptDragController({
     if (config) return config;
     return (
       documentObject['elementFromPoint']?.(
-        Number(event3['clientX']) || 0x0,
-        Number(event3['clientY']) || 0x0,
+        Number(event3['clientX']) || 0,
+        Number(event3['clientY']) || 0,
       )?.['closest']?.('[data-story-clip-prompt-surface]') || null
     );
   }
@@ -124,17 +124,17 @@ export function createStoryAssetPromptDragController({
       scope = windowObject?.['getComputedStyle']?.(el9),
       input =
         Number['parseFloat'](scope?.['lineHeight']) ||
-        (Number['parseFloat'](scope?.['fontSize']) || 0xe) * 1.5,
-      output = Math['max'](0x10, Math['min'](0x24, Number(box4?.['height']) || input)),
+        (Number['parseFloat'](scope?.['fontSize']) || 14) * 1.5,
+      output = Math['max'](16, Math['min'](36, Number(box4?.['height']) || input)),
       value2 = Number['isFinite'](Number(box4?.['left']))
         ? Number(box4['left'])
-        : Number(event4['clientX']) || 0x0,
+        : Number(event4['clientX']) || 0,
       value3 =
-        Number(box4?.['height']) > 0x0
+        Number(box4?.['height']) > 0
           ? Number(box4['top'])
-          : (Number(event4['clientY']) || 0x0) - output / 0x2,
-      value4 = Number(box5?.['top']) + 0x4,
-      value5 = Number(box5?.['bottom']) - output - 0x4,
+          : (Number(event4['clientY']) || 0) - output / 2,
+      value4 = Number(box5?.['top']) + 4,
+      value5 = Number(box5?.['bottom']) - output - 4,
       value6 =
         Number['isFinite'](value4) && Number['isFinite'](value5) && value5 >= value4
           ? Math['max'](value4, Math['min'](value5, value3))
@@ -156,18 +156,18 @@ export function createStoryAssetPromptDragController({
     const element = pointerId['target']?.['closest']?.('[data-story-reference-asset]'),
       assetId = normalizeText(element?.['dataset']?.['storyReferenceAsset']),
       assetIndex = Math['max'](
-        0x0,
-        Math['trunc'](Number(element?.['dataset']?.['storyReferenceAssetIndex']) || 0x0),
+        0,
+        Math['trunc'](Number(element?.['dataset']?.['storyReferenceAssetIndex']) || 0),
       );
-    if (!element || !assetId || pointerId['button'] !== 0x0) return ((event = null), ![]);
+    if (!element || !assetId || pointerId['button'] !== 0) return ((event = null), ![]);
     return (
       (event = {
         assetId: assetId,
         assetIndex: assetIndex,
         element: element,
         pointerId: pointerId['pointerId'],
-        startX: Number(pointerId['clientX']) || 0x0,
-        startY: Number(pointerId['clientY']) || 0x0,
+        startX: Number(pointerId['clientX']) || 0,
+        startY: Number(pointerId['clientY']) || 0,
         active: ![],
       }),
       (element['draggable'] = ![]),
@@ -179,9 +179,9 @@ export function createStoryAssetPromptDragController({
     const event6 = event;
     if (!event6 || event6['pointerId'] !== event5['pointerId']) return ![];
     if (!event6['active']) {
-      const value7 = (Number(event5['clientX']) || 0x0) - event6['startX'],
-        value8 = (Number(event5['clientY']) || 0x0) - event6['startY'];
-      if (Math['hypot'](value7, value8) < 0x8) return ![];
+      const value7 = (Number(event5['clientX']) || 0) - event6['startX'],
+        value8 = (Number(event5['clientY']) || 0) - event6['startY'];
+      if (Math['hypot'](value7, value8) < 8) return ![];
       ((event6['active'] = !![]),
         event6['element']?.['classList']['add']('is-story-asset-dragging'),
         hideHoverPreview(),

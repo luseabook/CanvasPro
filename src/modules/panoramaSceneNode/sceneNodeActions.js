@@ -59,10 +59,10 @@ function normalizeSceneStateByNode(index, result) {
   if (isPanorama360NodeType(index?.['type'])) return normalizePanorama360State(result);
   return normalizeSceneOnlyPanoramaSceneState(result);
 }
-const EQUIRECTANGULAR_RATIO = 0x2,
+const EQUIRECTANGULAR_RATIO = 2,
   EQUIRECTANGULAR_RATIO_TOLERANCE = 0.02,
   MANNEQUIN_FORWARD_PLACEMENT_DISTANCE = 3.2,
-  CUBE_FORWARD_PLACEMENT_DISTANCE = 0x3,
+  CUBE_FORWARD_PLACEMENT_DISTANCE = 3,
   _panorama360SyncVersionByNodeId = new Map(),
   _panorama360SyncInflightByNodeId = new Map();
 function isNearEquirectangularRatio(box) {
@@ -71,8 +71,8 @@ function isNearEquirectangularRatio(box) {
   if (
     !Number['isFinite'](count) ||
     !Number['isFinite'](count2) ||
-    count <= 0x0 ||
-    count2 <= 0x0
+    count <= 0 ||
+    count2 <= 0
   )
     return !![];
   const data = count / count2;
@@ -101,7 +101,7 @@ function cloneSceneState(next) {
 function pickViewYaw(current) {
   if (Number['isFinite'](current?.['yaw'])) return current['yaw'];
   if (Number['isFinite'](current?.['rotation']?.['y'])) return current['rotation']['y'];
-  return 0x0;
+  return 0;
 }
 function pickFacingCameraYaw(entry) {
   const viewYaw = pickViewYaw(entry) + Math['PI'];
@@ -109,9 +109,9 @@ function pickFacingCameraYaw(entry) {
 }
 function sanitizeObjectPose(box2 = {}) {
   const record = {
-      x: Number['isFinite'](box2?.['rotation']?.['x']) ? box2['rotation']['x'] : 0x0,
-      y: Number['isFinite'](box2?.['rotation']?.['y']) ? box2['rotation']['y'] : 0x0,
-      z: Number['isFinite'](box2?.['rotation']?.['z']) ? box2['rotation']['z'] : 0x0,
+      x: Number['isFinite'](box2?.['rotation']?.['x']) ? box2['rotation']['x'] : 0,
+      y: Number['isFinite'](box2?.['rotation']?.['y']) ? box2['rotation']['y'] : 0,
+      z: Number['isFinite'](box2?.['rotation']?.['z']) ? box2['rotation']['z'] : 0,
     },
     payload =
       Number['isFinite'](Number(box2?.['quaternion']?.['x'])) &&
@@ -123,30 +123,30 @@ function sanitizeObjectPose(box2 = {}) {
       : null,
     rotation = payload ? eulerFromQuaternionXYZ(quaternion) : record,
     scale = Number['isFinite'](box2?.['scale'])
-      ? Math['max'](0.01, Number(box2['scale']) || 0x1)
+      ? Math['max'](0.01, Number(box2['scale']) || 1)
       : box2?.['scale'] &&
           Number['isFinite'](box2['scale']['x']) &&
           Number['isFinite'](box2['scale']['y']) &&
           Number['isFinite'](box2['scale']['z'])
         ? {
-            x: Math['max'](0.01, Number(box2['scale']['x']) || 0x1),
-            y: Math['max'](0.01, Number(box2['scale']['y']) || 0x1),
-            z: Math['max'](0.01, Number(box2['scale']['z']) || 0x1),
+            x: Math['max'](0.01, Number(box2['scale']['x']) || 1),
+            y: Math['max'](0.01, Number(box2['scale']['y']) || 1),
+            z: Math['max'](0.01, Number(box2['scale']['z']) || 1),
           }
         : null;
   return {
     position: {
-      x: Number['isFinite'](box2?.['position']?.['x']) ? box2['position']['x'] : 0x0,
-      y: Number['isFinite'](box2?.['position']?.['y']) ? box2['position']['y'] : 0x0,
-      z: Number['isFinite'](box2?.['position']?.['z']) ? box2['position']['z'] : 0x0,
+      x: Number['isFinite'](box2?.['position']?.['x']) ? box2['position']['x'] : 0,
+      y: Number['isFinite'](box2?.['position']?.['y']) ? box2['position']['y'] : 0,
+      z: Number['isFinite'](box2?.['position']?.['z']) ? box2['position']['z'] : 0,
     },
     rotation: rotation,
     quaternion: quaternion,
-    fov: Number['isFinite'](box2?.['fov']) ? box2['fov'] : 0x3a,
+    fov: Number['isFinite'](box2?.['fov']) ? box2['fov'] : 58,
     scale: scale,
   };
 }
-function normalizeQuaternion(box3, args = { x: 0x0, y: 0x0, z: 0x0, w: 0x1 }) {
+function normalizeQuaternion(box3, args = { x: 0, y: 0, z: 0, w: 1 }) {
   const x2 = Number(box3?.['x']),
     y2 = Number(box3?.['y']),
     z2 = Number(box3?.['z']),
@@ -168,15 +168,15 @@ function normalizeQuaternion(box3, args = { x: 0x0, y: 0x0, z: 0x0, w: 0x1 }) {
   };
 }
 function quaternionFromEulerYXZ(box4) {
-  const handle = Number(box4?.['x']) || 0x0,
-    state = Number(box4?.['y']) || 0x0,
-    config = Number(box4?.['z']) || 0x0,
-    y3 = Math['cos'](handle / 0x2),
-    scope = Math['cos'](state / 0x2),
-    input = Math['cos'](config / 0x2),
-    x3 = Math['sin'](handle / 0x2),
-    output = Math['sin'](state / 0x2),
-    value2 = Math['sin'](config / 0x2);
+  const handle = Number(box4?.['x']) || 0,
+    state = Number(box4?.['y']) || 0,
+    config = Number(box4?.['z']) || 0,
+    y3 = Math['cos'](handle / 2),
+    scope = Math['cos'](state / 2),
+    input = Math['cos'](config / 2),
+    x3 = Math['sin'](handle / 2),
+    output = Math['sin'](state / 2),
+    value2 = Math['sin'](config / 2);
   return normalizeQuaternion({
     x: x3 * scope * input + y3 * output * value2,
     y: y3 * output * input - x3 * scope * value2,
@@ -195,28 +195,28 @@ function eulerFromQuaternionYXZ(value3) {
     value10 = box5['x'] * box5['w'],
     value11 = box5['y'] * box5['w'],
     value12 = box5['z'] * box5['w'],
-    value13 = 0x1 - 0x2 * (value5 + value6),
-    value14 = 0x2 * (value8 + value11),
-    value15 = 0x2 * (value7 + value12),
-    value16 = 0x1 - 0x2 * (value4 + value6),
-    value17 = 0x2 * (value9 - value10),
-    value18 = 0x2 * (value8 - value11),
-    value19 = 0x1 - 0x2 * (value4 + value5),
-    x4 = Math['asin'](-clamp(value17, -0x1, 0x1));
+    value13 = 1 - 2 * (value5 + value6),
+    value14 = 2 * (value8 + value11),
+    value15 = 2 * (value7 + value12),
+    value16 = 1 - 2 * (value4 + value6),
+    value17 = 2 * (value9 - value10),
+    value18 = 2 * (value8 - value11),
+    value19 = 1 - 2 * (value4 + value5),
+    x4 = Math['asin'](-clamp(value17, -1, 1));
   if (Math['abs'](value17) < 0.9999999)
     return { x: x4, y: Math['atan2'](value14, value19), z: Math['atan2'](value15, value16) };
-  return { x: x4, y: Math['atan2'](-value18, value13), z: 0x0 };
+  return { x: x4, y: Math['atan2'](-value18, value13), z: 0 };
 }
 function quaternionFromEulerXYZ(box6) {
-  const value20 = Number(box6?.['x']) || 0x0,
-    value21 = Number(box6?.['y']) || 0x0,
-    value22 = Number(box6?.['z']) || 0x0,
-    y4 = Math['cos'](value20 / 0x2),
-    value23 = Math['cos'](value21 / 0x2),
-    value24 = Math['cos'](value22 / 0x2),
-    x5 = Math['sin'](value20 / 0x2),
-    value25 = Math['sin'](value21 / 0x2),
-    value26 = Math['sin'](value22 / 0x2);
+  const value20 = Number(box6?.['x']) || 0,
+    value21 = Number(box6?.['y']) || 0,
+    value22 = Number(box6?.['z']) || 0,
+    y4 = Math['cos'](value20 / 2),
+    value23 = Math['cos'](value21 / 2),
+    value24 = Math['cos'](value22 / 2),
+    x5 = Math['sin'](value20 / 2),
+    value25 = Math['sin'](value21 / 2),
+    value26 = Math['sin'](value22 / 2);
   return normalizeQuaternion({
     x: x5 * value23 * value24 + y4 * value25 * value26,
     y: y4 * value25 * value24 - x5 * value23 * value26,
@@ -235,28 +235,28 @@ function eulerFromQuaternionXYZ(value27) {
     value34 = box7['x'] * box7['w'],
     value35 = box7['y'] * box7['w'],
     value36 = box7['z'] * box7['w'],
-    value37 = 0x1 - 0x2 * (value29 + value30),
-    value38 = 0x2 * (value31 - value36),
-    value39 = 0x2 * (value32 + value35),
-    value40 = 0x2 * (value33 - value34),
-    value41 = 0x1 - 0x2 * (value28 + value29),
-    value42 = 0x2 * (value33 + value34),
-    value43 = 0x1 - 0x2 * (value28 + value30),
-    y5 = Math['asin'](clamp(value39, -0x1, 0x1));
+    value37 = 1 - 2 * (value29 + value30),
+    value38 = 2 * (value31 - value36),
+    value39 = 2 * (value32 + value35),
+    value40 = 2 * (value33 - value34),
+    value41 = 1 - 2 * (value28 + value29),
+    value42 = 2 * (value33 + value34),
+    value43 = 1 - 2 * (value28 + value30),
+    y5 = Math['asin'](clamp(value39, -1, 1));
   if (Math['abs'](value39) < 0.9999999)
     return { x: Math['atan2'](-value40, value41), y: y5, z: Math['atan2'](-value38, value37) };
-  return { x: Math['atan2'](value42, value43), y: y5, z: 0x0 };
+  return { x: Math['atan2'](value42, value43), y: y5, z: 0 };
 }
 function sanitizeCameraPose(options2 = {}) {
   const position = {
-      x: Number['isFinite'](options2?.['position']?.['x']) ? options2['position']['x'] : 0x0,
-      y: Number['isFinite'](options2?.['position']?.['y']) ? options2['position']['y'] : 0x0,
-      z: Number['isFinite'](options2?.['position']?.['z']) ? options2['position']['z'] : 0x0,
+      x: Number['isFinite'](options2?.['position']?.['x']) ? options2['position']['x'] : 0,
+      y: Number['isFinite'](options2?.['position']?.['y']) ? options2['position']['y'] : 0,
+      z: Number['isFinite'](options2?.['position']?.['z']) ? options2['position']['z'] : 0,
     },
     value44 = {
-      x: Number['isFinite'](options2?.['rotation']?.['x']) ? options2['rotation']['x'] : 0x0,
-      y: Number['isFinite'](options2?.['rotation']?.['y']) ? options2['rotation']['y'] : 0x0,
-      z: Number['isFinite'](options2?.['rotation']?.['z']) ? options2['rotation']['z'] : 0x0,
+      x: Number['isFinite'](options2?.['rotation']?.['x']) ? options2['rotation']['x'] : 0,
+      y: Number['isFinite'](options2?.['rotation']?.['y']) ? options2['rotation']['y'] : 0,
+      z: Number['isFinite'](options2?.['rotation']?.['z']) ? options2['rotation']['z'] : 0,
     },
     value45 =
       Number['isFinite'](Number(options2?.['quaternion']?.['x'])) &&
@@ -281,11 +281,11 @@ function sanitizeCameraPose(options2 = {}) {
 function normalizeCameraSlot(value46) {
   const count4 = Number(value46);
   if (!Number['isInteger'](count4)) return null;
-  if (count4 < 0x1 || count4 > PANORAMA_SCENE_CAMERA_LIMIT) return null;
+  if (count4 < 1 || count4 > PANORAMA_SCENE_CAMERA_LIMIT) return null;
   return count4;
 }
 function toCameraSlotLabel(value47) {
-  return String(Number(value47) || 0x1);
+  return String(Number(value47) || 1);
 }
 function resolveCameraSlotEntries(list = []) {
   const list2 = Array['isArray'](list) ? list : [],
@@ -297,7 +297,7 @@ function resolveCameraSlotEntries(list = []) {
     (map['add'](slot), list3['push']({ camera: camera, slot: slot }));
   });
   const run = () => {
-    for (let value48 = 0x1; value48 <= PANORAMA_SCENE_CAMERA_LIMIT; value48 += 0x1) {
+    for (let value48 = 1; value48 <= PANORAMA_SCENE_CAMERA_LIMIT; value48 += 1) {
       if (!map['has'](value48)) return (map['add'](value48), value48);
     }
     return null;
@@ -314,7 +314,7 @@ function resolveCameraSlotEntries(list = []) {
 }
 function resolveFirstFreeCameraSlot(list4 = []) {
   const map2 = new Set(resolveCameraSlotEntries(list4)['map']((value52) => value52['slot']));
-  for (let value53 = 0x1; value53 <= PANORAMA_SCENE_CAMERA_LIMIT; value53 += 0x1) {
+  for (let value53 = 1; value53 <= PANORAMA_SCENE_CAMERA_LIMIT; value53 += 1) {
     if (!map2['has'](value53)) return value53;
   }
   return null;
@@ -327,9 +327,9 @@ function resolveCameraBySlot(list5 = [], value54) {
   );
   return camera3 ? { camera: camera3['camera'], slot: camera3['slot'] } : null;
 }
-function normalizeScaleVector(box8, value56 = 0x1) {
+function normalizeScaleVector(box8, value56 = 1) {
   if (Number['isFinite'](box8)) {
-    const x6 = Math['max'](0.01, Number(box8) || Number(value56) || 0x1);
+    const x6 = Math['max'](0.01, Number(box8) || Number(value56) || 1);
     return { x: x6, y: x6, z: x6 };
   }
   if (
@@ -339,38 +339,38 @@ function normalizeScaleVector(box8, value56 = 0x1) {
     Number['isFinite'](box8['z'])
   )
     return {
-      x: Math['max'](0.01, Number(box8['x']) || 0x1),
-      y: Math['max'](0.01, Number(box8['y']) || 0x1),
-      z: Math['max'](0.01, Number(box8['z']) || 0x1),
+      x: Math['max'](0.01, Number(box8['x']) || 1),
+      y: Math['max'](0.01, Number(box8['y']) || 1),
+      z: Math['max'](0.01, Number(box8['z']) || 1),
     };
-  const x7 = Math['max'](0.01, Number(value56) || 0x1);
+  const x7 = Math['max'](0.01, Number(value56) || 1);
   return { x: x7, y: x7, z: x7 };
 }
-function composeCompatibleScale(value57, value58 = 0x1) {
+function composeCompatibleScale(value57, value58 = 1) {
   if (value57 == null) return value58;
-  if (Number['isFinite'](value57)) return Math['max'](0.01, Math['min'](0x8, Number(value57) || 0x1));
+  if (Number['isFinite'](value57)) return Math['max'](0.01, Math['min'](8, Number(value57) || 1));
   const box9 = normalizeScaleVector(value57, value58),
     value59 = 0.0001;
   if (
     Math['abs'](box9['x'] - box9['y']) < value59 &&
     Math['abs'](box9['y'] - box9['z']) < value59
   )
-    return Math['max'](0.01, Math['min'](0x8, (box9['x'] + box9['y'] + box9['z']) / 0x3));
+    return Math['max'](0.01, Math['min'](8, (box9['x'] + box9['y'] + box9['z']) / 3));
   return {
-    x: Math['max'](0.01, Math['min'](0x8, box9['x'])),
-    y: Math['max'](0.01, Math['min'](0x8, box9['y'])),
-    z: Math['max'](0.01, Math['min'](0x8, box9['z'])),
+    x: Math['max'](0.01, Math['min'](8, box9['x'])),
+    y: Math['max'](0.01, Math['min'](8, box9['y'])),
+    z: Math['max'](0.01, Math['min'](8, box9['z'])),
   };
 }
 function clamp(value60, value61, value62) {
   return Math['min'](value62, Math['max'](value61, value60));
 }
 function computeCollapsedDimensions(value63, value64) {
-  const value65 = Math['max'](0xb4, Number(value63) || PANORAMA_SCENE_DEFAULT_SIZE['width']),
-    value66 = Math['max'](0x8c, Number(value64) || PANORAMA_SCENE_DEFAULT_SIZE['height']),
+  const value65 = Math['max'](180, Number(value63) || PANORAMA_SCENE_DEFAULT_SIZE['width']),
+    value66 = Math['max'](140, Number(value64) || PANORAMA_SCENE_DEFAULT_SIZE['height']),
     value67 = Math['min'](value65, value66),
     value68 =
-      value67 > PANORAMA_SCENE_COLLAPSED_MAX_SIZE ? PANORAMA_SCENE_COLLAPSED_MAX_SIZE / value67 : 0x1;
+      value67 > PANORAMA_SCENE_COLLAPSED_MAX_SIZE ? PANORAMA_SCENE_COLLAPSED_MAX_SIZE / value67 : 1;
   return { width: Math['round'](value65 * value68), height: Math['round'](value66 * value68) };
 }
 function getSelectedObject(value69) {
@@ -387,9 +387,9 @@ function getSceneObjectList(value71, value72) {
   return Array['isArray'](value71?.['mannequins']) ? value71['mannequins'] : [];
 }
 function getSceneObjectHeightOffset(value73) {
-  if (value73 === 'cube') return 0x0;
+  if (value73 === 'cube') return 0;
   if (value73 === 'mannequin') return 1.1;
-  return 0x0;
+  return 0;
 }
 function getSelectionPoolByType(value74, value75) {
   if (value75 === 'cube') return Array['isArray'](value74?.['cubes']) ? value74['cubes'] : [];
@@ -425,7 +425,7 @@ function collectSelectionObjects(value81) {
     value81,
     value81?.['selection']?.['selectedObjects'] || [],
   );
-  if (list9['length'] > 0x0) return list9;
+  if (list9['length'] > 0) return list9;
   const objectType2 =
     value81?.['selection']?.['selectedObjectType'] === 'cube' ||
     value81?.['selection']?.['selectedObjectType'] === 'mannequin'
@@ -459,7 +459,7 @@ function setSelectionFromObjects(
   } = {},
 ) {
   const list11 = normalizeSelectionObjectsInput(value83, value84);
-  if (list11['length'] === 0x0) {
+  if (list11['length'] === 0) {
     clearSelection(value83);
     return;
   }
@@ -473,12 +473,12 @@ function setSelectionFromObjects(
         map4 = new Set(list12),
         value89 =
           list11['every']((value90) => value90['objectType'] === 'mannequin') &&
-          args2['memberIds']['length'] > 0x0 &&
+          args2['memberIds']['length'] > 0 &&
           args2['memberIds']['length'] === list12['length'] &&
           args2['memberIds']['every']((value91) => map4['has'](value91));
       if (value89) {
         ((value83['selection']['selectedObjectType'] = 'mannequin'),
-          (value83['selection']['selectedObjectId'] = args2['memberIds'][0x0] || null),
+          (value83['selection']['selectedObjectId'] = args2['memberIds'][0] || null),
           (value83['selection']['selectedObjectIds'] = [...args2['memberIds']]),
           (value83['selection']['selectedObjects'] = args2['memberIds']['map']((objectId3) => ({
             objectType: 'mannequin',
@@ -494,7 +494,7 @@ function setSelectionFromObjects(
     value93 =
       value92 && list11['some']((value94) => value94['objectType'] === value92)
         ? value92
-        : list11[0x0]['objectType'],
+        : list11[0]['objectType'],
     value95 = list11['filter']((value96) => value96['objectType'] === value93)['map'](
       (value97) => value97['objectId'],
     ),
@@ -504,7 +504,7 @@ function setSelectionFromObjects(
         (value99) => value99['objectType'] === value93 && value99['objectId'] === preferredActiveId,
       )
         ? preferredActiveId
-        : value95[0x0] || null;
+        : value95[0] || null;
   ((value83['selection']['selectedObjectType'] = value93),
     (value83['selection']['selectedObjectId'] = value98),
     (value83['selection']['selectedObjectIds'] = value95),
@@ -537,14 +537,14 @@ function finalizeSelectedObjectRemoval(value101, value102, value103) {
 }
 function pruneGroups(list13, list14 = []) {
   if (!Array['isArray'](list13)) return [];
-  if (!Array['isArray'](list14) || list14['length'] === 0x0) return list13;
+  if (!Array['isArray'](list14) || list14['length'] === 0) return list13;
   const map5 = new Set(list14);
   return list13['map']((args3) => ({
     ...args3,
     memberIds: Array['isArray'](args3['memberIds'])
       ? args3['memberIds']['filter']((value105) => !map5['has'](value105))
       : [],
-  }))['filter']((value106) => value106['memberIds']['length'] > 0x0);
+  }))['filter']((value106) => value106['memberIds']['length'] > 0);
 }
 function resolveGroupByMember(value107, value108, enabled2) {
   if (value108 !== 'mannequin' || !enabled2) return null;
@@ -558,11 +558,11 @@ function createNodeActionContext(storeInstance2 = {}) {
       storeInstance2['getCurrentProjectId'] || (() => window['currentProjectId'] || 'default_v2_project'),
   };
 }
-const DEFAULT_NODE_SPAWN_SPACING = 0x78,
+const DEFAULT_NODE_SPAWN_SPACING = 120,
   PANORAMA_360_IMAGE_SOURCE_TYPES = new Set(['source-image', 'ai-image', 'image']);
 function resolveNodeSpawnSpacing() {
   const value110 = Number(globalThis?.['window']?.['v2NodeSpacing']);
-  return Number['isFinite'](value110) ? Math['max'](0x0, value110) : DEFAULT_NODE_SPAWN_SPACING;
+  return Number['isFinite'](value110) ? Math['max'](0, value110) : DEFAULT_NODE_SPAWN_SPACING;
 }
 function shouldAvoidNodeOverlap() {
   return globalThis?.['window']?.['v2NodeAvoidOverlap'] !== ![];
@@ -580,25 +580,25 @@ function pickFirstNonEmptyString(...args4) {
 function inferFileNameFromPath(value114) {
   const enabled3 = String(value114 || '')['trim']();
   if (!enabled3) return '';
-  const value115 = enabled3['split']('?')[0x0]['split']('#')[0x0],
+  const value115 = enabled3['split']('?')[0]['split']('#')[0],
     list16 = value115['split'](/[\\/]/)['filter'](Boolean);
-  return list16['length'] > 0x0 ? list16[list16['length'] - 0x1] : '';
+  return list16['length'] > 0 ? list16[list16['length'] - 1] : '';
 }
 function resolveMainImageEntry(value116) {
   const list17 = Array['isArray'](value116?.['images']) ? value116['images'] : [];
-  if (list17['length'] <= 0x0) return null;
+  if (list17['length'] <= 0) return null;
   const value117 = Number(value116?.['mainImageIndex']),
     value118 = Number['isFinite'](value117)
-      ? Math['max'](0x0, Math['min'](list17['length'] - 0x1, Math['trunc'](value117)))
-      : 0x0;
-  return list17[value118] || list17[0x0] || null;
+      ? Math['max'](0, Math['min'](list17['length'] - 1, Math['trunc'](value117)))
+      : 0;
+  return list17[value118] || list17[0] || null;
 }
 function resolveMainImageIndex(value119) {
   const list18 = Array['isArray'](value119?.['images']) ? value119['images'] : [];
-  if (list18['length'] <= 0x0) return 0x0;
+  if (list18['length'] <= 0) return 0;
   const value120 = Number(value119?.['mainImageIndex']);
-  if (!Number['isFinite'](value120)) return 0x0;
-  return Math['max'](0x0, Math['min'](list18['length'] - 0x1, Math['trunc'](value120)));
+  if (!Number['isFinite'](value120)) return 0;
+  return Math['max'](0, Math['min'](list18['length'] - 1, Math['trunc'](value120)));
 }
 function resolvePanoramaThumbnailUrl(enabled4) {
   if (!enabled4 || typeof enabled4 !== 'object') return '';
@@ -650,7 +650,7 @@ function buildPanoramaSourceSignature(enabled6) {
     localPath: String(enabled6['localPath'] || '')['trim'](),
     imageUrl: String(enabled6['imageUrl'] || '')['trim'](),
     fileName: String(enabled6['fileName'] || '')['trim'](),
-    mainImageIndex: Number(enabled6['mainImageIndex'] || 0x0) || 0x0,
+    mainImageIndex: Number(enabled6['mainImageIndex'] || 0) || 0,
   });
 }
 function hasPersistentPanoramaLocalPath(value121) {
@@ -660,26 +660,26 @@ function hasPersistentPanoramaLocalPath(value121) {
 }
 function bumpPanorama360SyncVersion(value122) {
   const value123 = String(value122 || '')['trim'](),
-    value124 = Number(_panorama360SyncVersionByNodeId['get'](value123) || 0x0) + 0x1;
+    value124 = Number(_panorama360SyncVersionByNodeId['get'](value123) || 0) + 1;
   return (_panorama360SyncVersionByNodeId['set'](value123, value124), value124);
 }
 function isPanorama360SyncCurrent(value125, value126) {
   return (
-    Number(_panorama360SyncVersionByNodeId['get'](String(value125 || '')['trim']()) || 0x0) ===
-    Number(value126 || 0x0)
+    Number(_panorama360SyncVersionByNodeId['get'](String(value125 || '')['trim']()) || 0) ===
+    Number(value126 || 0)
   );
 }
 function getPanoramaIncomingEdgeSortValue(value127) {
   const count5 = Number(value127?.['createdAt']);
-  if (Number['isFinite'](count5) && count5 > 0x0) return count5;
+  if (Number['isFinite'](count5) && count5 > 0) return count5;
   const count6 = Number(value127?.['updatedAt']);
-  if (Number['isFinite'](count6) && count6 > 0x0) return count6;
-  return 0x0;
+  if (Number['isFinite'](count6) && count6 > 0) return count6;
+  return 0;
 }
 function comparePanoramaIncomingCandidatesDesc(value128, value129) {
   const panoramaIncomingEdgeSortValue =
     getPanoramaIncomingEdgeSortValue(value129['edge']) - getPanoramaIncomingEdgeSortValue(value128['edge']);
-  if (panoramaIncomingEdgeSortValue !== 0x0) return panoramaIncomingEdgeSortValue;
+  if (panoramaIncomingEdgeSortValue !== 0) return panoramaIncomingEdgeSortValue;
   return String(value129['edge']?.['id'] || '')['localeCompare'](String(value128['edge']?.['id'] || ''));
 }
 function buildPanoramaUploadSourceNodeData({
@@ -697,20 +697,20 @@ function buildPanoramaUploadSourceNodeData({
     box10 = buildSourceMediaNodePayload({
       id: '__seed__',
       type: 'source-image',
-      x: 0x0,
-      y: 0x0,
+      x: 0,
+      y: 0,
       src: imageUrl2 || '',
       localPath: localPath2 || '',
       ...(imageStorageFields || {}),
       fileName: fileName2 || '',
-      ...(naturalWidth > 0x0 && naturalHeight > 0x0 ? { naturalWidth: naturalWidth, naturalHeight: naturalHeight } : null),
+      ...(naturalWidth > 0 && naturalHeight > 0 ? { naturalWidth: naturalWidth, naturalHeight: naturalHeight } : null),
     }),
     nodeSpawnSpacing = resolveNodeSpawnSpacing(),
-    value130 = Number(anchorNode['x']) || 0x0,
-    value131 = Number(anchorNode['y']) || 0x0,
+    value130 = Number(anchorNode['x']) || 0,
+    value131 = Number(anchorNode['y']) || 0,
     value132 = Number(anchorNode['height']) || box10['height'],
     x8 = value130 - box10['width'] - nodeSpawnSpacing,
-    y6 = value131 + Math['round']((value132 - box10['height']) / 0x2),
+    y6 = value131 + Math['round']((value132 - box10['height']) / 2),
     value133 = storeInstance3['getStateRaw']?.()['nodes'] || {},
     x9 = shouldAvoidNodeOverlap()
       ? findAvailablePosition(
@@ -825,7 +825,7 @@ export function setPanoramaSceneInteractionOptions({
       Object['prototype']['hasOwnProperty']['call'](patch, 'navigationMode') &&
         (cloneSceneState8['ui']['navigationMode'] = patch['navigationMode'] === 'fly' ? 'fly' : 'orbit'),
       Number['isFinite'](Number(patch['flySpeed'])) &&
-        (cloneSceneState8['ui']['flySpeed'] = Math['max'](0.25, Math['min'](0x28, Number(patch['flySpeed'])))),
+        (cloneSceneState8['ui']['flySpeed'] = Math['max'](0.25, Math['min'](40, Number(patch['flySpeed'])))),
       Object['prototype']['hasOwnProperty']['call'](patch, 'showTimeline') &&
         (cloneSceneState8['ui']['showTimeline'] = patch['showTimeline'] === !![]),
       cloneSceneState8
@@ -899,7 +899,7 @@ export function setPanoramaSceneSelectionBatch({
             ['filter'](Boolean),
         ),
       ];
-    if (!objectType7 || preferredActiveId3['length'] === 0x0) return (clearSelection(cloneSceneState11), cloneSceneState11);
+    if (!objectType7 || preferredActiveId3['length'] === 0) return (clearSelection(cloneSceneState11), cloneSceneState11);
     let preferredGroupId3 = groupId ? String(groupId) : null;
     if (preferredGroupId3) {
       const preferredActiveId4 = (cloneSceneState11['groups'] || [])['find']((value147) => value147['id'] === preferredGroupId3);
@@ -912,7 +912,7 @@ export function setPanoramaSceneSelectionBatch({
             {
               preferredGroupId: preferredGroupId3,
               preferredActiveType: 'mannequin',
-              preferredActiveId: preferredActiveId4['memberIds'][0x0] || null,
+              preferredActiveId: preferredActiveId4['memberIds'][0] || null,
             },
           ),
           cloneSceneState11
@@ -922,7 +922,7 @@ export function setPanoramaSceneSelectionBatch({
       setSelectionFromObjects(
         cloneSceneState11,
         preferredActiveId3['map']((objectId8) => ({ objectType: objectType7, objectId: objectId8 })),
-        { preferredActiveType: objectType7, preferredActiveId: preferredActiveId3[0x0] || null },
+        { preferredActiveType: objectType7, preferredActiveId: preferredActiveId3[0] || null },
       ),
       cloneSceneState11
     );
@@ -1207,11 +1207,11 @@ export async function uploadPanoramaSceneImage({
   try {
     let box11 = null;
     try {
-      box11 = await createFastImagePreviewImpl(file, { maxDimension: 0x400 });
+      box11 = await createFastImagePreviewImpl(file, { maxDimension: 1024 });
     } catch {}
     const imageUrl3 = String(box11?.['thumbnailDataUrl'] || '')['trim'](),
       value161 =
-        Number(box11?.['width']) > 0x0 && Number(box11?.['height']) > 0x0
+        Number(box11?.['width']) > 0 && Number(box11?.['height']) > 0
           ? { width: Number(box11['width']), height: Number(box11['height']) }
           : null;
     imageUrl3 &&
@@ -1233,7 +1233,7 @@ export async function uploadPanoramaSceneImage({
           cloneSceneState19
         );
       });
-    box11?.['image'] && ((box11['image']['width'] = 0x0), (box11['image']['height'] = 0x0));
+    box11?.['image'] && ((box11['image']['width'] = 0), (box11['image']['height'] = 0));
     const response = await uploadFileImpl(file, getCurrentProjectId()),
       fileName3 = response['filename'] || file['name'],
       localPath3 = pickResultLocalPath(response),
@@ -1247,7 +1247,7 @@ export async function uploadPanoramaSceneImage({
         panoramaSceneText('upload.ratioWarning', {
           width: width['width'],
           height: width['height'],
-          ratio: ratio['toFixed'](0x3),
+          ratio: ratio['toFixed'](3),
         }),
       );
     }
@@ -1347,7 +1347,7 @@ export function syncPanorama360FromIncomingImageEdge({
       })
       ['filter'](Boolean)
       ['sort'](comparePanoramaIncomingCandidatesDesc),
-    sourceNodeId = value169[0x0] || null;
+    sourceNodeId = value169[0] || null;
   if (!sourceNodeId?.['payload']) return (bumpPanorama360SyncVersion(value165), null);
   const sourceSignature = buildPanoramaSourceSignature(sourceNodeId['payload']),
     sceneState4 = getSceneState(storeInstance, value165),
@@ -1505,7 +1505,7 @@ export function addPanoramaSceneMannequin({
       sceneMode: sceneMode['mode'],
       sceneViewTarget: sceneMode?.['viewport']?.['sceneView']?.['target'],
       pose: viewPose3,
-      groundY: 0x0,
+      groundY: 0,
       forwardDistance: MANNEQUIN_FORWARD_PLACEMENT_DISTANCE,
     }),
     y7 = pickFacingCameraYaw(viewPose3),
@@ -1524,8 +1524,8 @@ export function addPanoramaSceneMannequin({
           poseId: poseId2?.['id'] || DEFAULT_MANNEQUIN_POSE_ID,
           bonePose: normalizeBonePose(poseId2?.['bones']),
           position: position3,
-          rotation: { x: 0x0, y: y7, z: 0x0 },
-          scale: 0x1,
+          rotation: { x: 0, y: y7, z: 0 },
+          scale: 1,
         }),
         (cloneSceneState26['gridPlacement']['gender'] = gender === 'female' ? 'female' : 'male'),
         (cloneSceneState26['gridPlacement']['colorKey'] = colorKey),
@@ -1557,10 +1557,10 @@ export function addPanoramaSceneCube({
       sceneMode: sceneMode2['mode'],
       sceneViewTarget: sceneMode2?.['viewport']?.['sceneView']?.['target'],
       pose: viewPose4,
-      groundY: 0x0,
+      groundY: 0,
       forwardDistance: forwardDistance,
     }),
-    position4 = { x: x10['x'], y: 0x0, z: x10['z'] },
+    position4 = { x: x10['x'], y: 0, z: x10['z'] },
     id3 = generateId('cube');
   return (
     writeSceneState(storeInstance, nodeId27, (value181) => {
@@ -1571,8 +1571,8 @@ export function addPanoramaSceneCube({
           assetId: assetId2?.['id'] || null,
           colorKey: colorKey2,
           position: position4,
-          rotation: { x: 0x0, y: 0x0, z: 0x0 },
-          scale: 0x1,
+          rotation: { x: 0, y: 0, z: 0 },
+          scale: 1,
         }),
         setSingleSelection(cloneSceneState27, 'cube', id3),
         cloneSceneState27
@@ -1593,7 +1593,7 @@ export function addPanoramaSceneMannequinGrid({
       sceneMode: sceneMode3['mode'],
       sceneViewTarget: sceneMode3?.['viewport']?.['sceneView']?.['target'],
       pose: viewPose5,
-      groundY: 0x0,
+      groundY: 0,
       forwardDistance: MANNEQUIN_FORWARD_PLACEMENT_DISTANCE,
     }),
     list19 = computeGridPlacement({
@@ -1604,7 +1604,7 @@ export function addPanoramaSceneMannequinGrid({
       origin: origin,
       yaw: yaw,
     });
-  if (list19['length'] === 0x0) return [];
+  if (list19['length'] === 0) return [];
   const preferredActiveId5 = [],
     id4 = generateId('mannequin-group');
   return (
@@ -1620,8 +1620,8 @@ export function addPanoramaSceneMannequinGrid({
             poseId: DEFAULT_MANNEQUIN_POSE_ID,
             bonePose: {},
             position: position5,
-            rotation: { x: 0x0, y: yaw, z: 0x0 },
-            scale: 0x1,
+            rotation: { x: 0, y: yaw, z: 0 },
+            scale: 1,
           }));
       }
       return (
@@ -1638,7 +1638,7 @@ export function addPanoramaSceneMannequinGrid({
           {
             preferredGroupId: id4,
             preferredActiveType: 'mannequin',
-            preferredActiveId: preferredActiveId5[0x0] || null,
+            preferredActiveId: preferredActiveId5[0] || null,
           },
         ),
         gender2
@@ -1782,13 +1782,13 @@ export function addPanoramaSceneCameraKeyframe({
 }) {
   const sceneState7 = getSceneState(storeInstance, nodeId32),
     cameraTimeline2 = normalizeCameraTimeline(sceneState7['cameraTimeline']),
-    compositionPoint = normalizeCompositionPoint(viewPose?.['position'], { x: 0x0, y: 1.6, z: 0x6 }),
+    compositionPoint = normalizeCompositionPoint(viewPose?.['position'], { x: 0, y: 1.6, z: 6 }),
     x11 = normalizeCompositionPoint(keyframe?.['position'], compositionPoint),
-    box12 = normalizeCompositionPoint(viewPose?.['forward'], { x: 0x0, y: 0x0, z: -0x1 }),
+    box12 = normalizeCompositionPoint(viewPose?.['forward'], { x: 0, y: 0, z: -1 }),
     value192 = {
-      x: x11['x'] + box12['x'] * 0x5,
-      y: x11['y'] + box12['y'] * 0x5,
-      z: x11['z'] + box12['z'] * 0x5,
+      x: x11['x'] + box12['x'] * 5,
+      y: x11['y'] + box12['y'] * 5,
+      z: x11['z'] + box12['z'] * 5,
     },
     target2 = normalizeCompositionPoint(keyframe?.['target'], value192),
     value193 = Number(keyframe['fov'] ?? viewPose?.['fov']),
@@ -1799,7 +1799,7 @@ export function addPanoramaSceneCameraKeyframe({
         : cameraTimeline2['currentTime'],
       position: x11,
       target: target2,
-      fov: Number['isFinite'](value193) ? value193 : 0x37,
+      fov: Number['isFinite'](value193) ? value193 : 55,
       easing: keyframe['easing'] || 'ease-in-out',
     };
   return (
@@ -1881,17 +1881,17 @@ export function composePanoramaScene({
         const id9 = generateId('scene-asset');
         assetIds['push'](id9);
         const value200 = {
-          x: ((value199 % 0x4) - Math['min'](1.5, (list21['length'] - 0x1) / 0x2)) * 2.2,
-          y: 0x0,
-          z: Math['floor'](value199 / 0x4) * 2.2,
+          x: ((value199 % 4) - Math['min'](1.5, (list21['length'] - 1) / 2)) * 2.2,
+          y: 0,
+          z: Math['floor'](value199 / 4) * 2.2,
         };
         cloneSceneState34['cubes']['push']({
           id: id9,
           assetId: assetId3['id'],
           colorKey: colorKey3?.['colorKey'] || assetId3['colorKey'] || 'blue',
           position: normalizeCompositionPoint(colorKey3?.['position'], value200),
-          rotation: normalizeCompositionPoint(colorKey3?.['rotation'], { x: 0x0, y: 0x0, z: 0x0 }),
-          scale: colorKey3?.['scale'] ?? 0x1,
+          rotation: normalizeCompositionPoint(colorKey3?.['rotation'], { x: 0, y: 0, z: 0 }),
+          scale: colorKey3?.['scale'] ?? 1,
         });
       });
       const list22 = Array['isArray'](mannequins) ? mannequins : [];
@@ -1910,17 +1910,17 @@ export function composePanoramaScene({
           customPoseId: null,
           bonePose: normalizeBonePose(poseId4?.['bones']),
           position: normalizeCompositionPoint(bones?.['position'], {
-            x: (value201 - (list22['length'] - 0x1) / 0x2) * 1.5,
-            y: 0x0,
-            z: 0x0,
+            x: (value201 - (list22['length'] - 1) / 2) * 1.5,
+            y: 0,
+            z: 0,
           }),
-          rotation: normalizeCompositionPoint(bones?.['rotation'], { x: 0x0, y: Math['PI'], z: 0x0 }),
-          scale: bones?.['scale'] ?? 0x1,
+          rotation: normalizeCompositionPoint(bones?.['rotation'], { x: 0, y: Math['PI'], z: 0 }),
+          scale: bones?.['scale'] ?? 1,
         });
       });
       cameraTimeline && (cloneSceneState34['cameraTimeline'] = normalizeCameraTimeline(cameraTimeline));
-      const value202 = mannequinIds['at'](-0x1),
-        value203 = assetIds['at'](-0x1);
+      const value202 = mannequinIds['at'](-1),
+        value203 = assetIds['at'](-1);
       if (value202) setSingleSelection(cloneSceneState34, 'mannequin', value202);
       else value203 && setSingleSelection(cloneSceneState34, 'cube', value203);
       return cloneSceneState34;
@@ -1941,7 +1941,7 @@ export function updatePanoramaSceneObjectTransform({
     position7 = pose3 ? sanitizeObjectPose(pose3) : null;
   (writeSceneState(storeInstance, nodeId36, (value204) => {
     const cloneSceneState35 = cloneSceneState(value204);
-    if (list23['length'] > 0x0) {
+    if (list23['length'] > 0) {
       const map6 = new Map(),
         map7 = new Map();
       list23['forEach']((enabled12) => {
@@ -1951,7 +1951,7 @@ export function updatePanoramaSceneObjectTransform({
           map6['set'](String(enabled12['objectId']), sanitizeObjectPose2);
         else enabled12['objectType'] === 'cube' && map7['set'](String(enabled12['objectId']), sanitizeObjectPose2);
       });
-      map6['size'] > 0x0 &&
+      map6['size'] > 0 &&
         (cloneSceneState35['mannequins'] = cloneSceneState35['mannequins']['map']((box15) => {
           const position8 = map6['get'](box15['id']);
           if (!position8) return box15;
@@ -1964,7 +1964,7 @@ export function updatePanoramaSceneObjectTransform({
             scale: scale2,
           };
         }));
-      map7['size'] > 0x0 &&
+      map7['size'] > 0 &&
         (cloneSceneState35['cubes'] = cloneSceneState35['cubes']['map']((box16) => {
           const position9 = map7['get'](box16['id']);
           if (!position9) return box16;
@@ -1988,7 +1988,7 @@ export function updatePanoramaSceneObjectTransform({
             {
               preferredGroupId: preferredGroupId4['id'],
               preferredActiveType: 'mannequin',
-              preferredActiveId: preferredGroupId4['memberIds'][0x0] || null,
+              preferredActiveId: preferredGroupId4['memberIds'][0] || null,
             },
           );
       }
@@ -2079,7 +2079,7 @@ export function deleteSelectedPanoramaSceneObject({
       commit());
     return;
   }
-  if (list24['length'] > 0x1) {
+  if (list24['length'] > 1) {
     (writeSceneState(storeInstance, nodeId38, (value214) => {
       const cloneSceneState37 = cloneSceneState(value214),
         map9 = new Set(
@@ -2092,11 +2092,11 @@ export function deleteSelectedPanoramaSceneObject({
             (value218) => value218['objectId'],
           ),
         );
-      map9['size'] > 0x0 &&
+      map9['size'] > 0 &&
         (cloneSceneState37['cubes'] = cloneSceneState37['cubes']['filter'](
           (value219) => !map9['has'](value219['id']),
         ));
-      if (map10['size'] > 0x0) {
+      if (map10['size'] > 0) {
         const value220 = [...map10];
         ((cloneSceneState37['mannequins'] = cloneSceneState37['mannequins']['filter'](
           (value221) => !map10['has'](value221['id']),
@@ -2109,8 +2109,8 @@ export function deleteSelectedPanoramaSceneObject({
     return;
   }
   const enabled14 =
-    list24['length'] === 0x1
-      ? list24[0x0]
+    list24['length'] === 1
+      ? list24[0]
       : objectType9 && objectId12
         ? { objectType: objectType9, objectId: objectId12 }
         : objectId13
@@ -2164,13 +2164,13 @@ function buildSavedCapturePatch(fileName4, box19 = {}) {
       captureSaveError: null,
     },
     count7 = Number(
-      fileName4?.['originalWidth'] || box19['originalWidth'] || box19['width'] || 0x0,
+      fileName4?.['originalWidth'] || box19['originalWidth'] || box19['width'] || 0,
     ),
     count8 = Number(
-      fileName4?.['originalHeight'] || box19['originalHeight'] || box19['height'] || 0x0,
+      fileName4?.['originalHeight'] || box19['originalHeight'] || box19['height'] || 0,
     );
-  if (count7 > 0x0) value227['originalWidth'] = count7;
-  if (count8 > 0x0) value227['originalHeight'] = count8;
+  if (count7 > 0) value227['originalWidth'] = count7;
+  if (count8 > 0) value227['originalHeight'] = count8;
   return value227;
 }
 export async function capturePanoramaSceneViewport({
@@ -2200,8 +2200,8 @@ export async function capturePanoramaSceneViewport({
       width2 = buildSourceMediaNodePayload({
         id: '__seed__',
         type: 'source-image',
-        x: 0x0,
-        y: 0x0,
+        x: 0,
+        y: 0,
         name: panoramaSceneText('capture.nodeName'),
         fileName: fileName5,
       }),
@@ -2375,15 +2375,15 @@ export function focusPanoramaSceneSelection({
           }
         : null,
     target3 = value236 || {
-      x: Number(value235['position']?.['x']) || 0x0,
-      y: (Number(value235['position']?.['y']) || 0x0) + sceneObjectHeightOffset,
-      z: Number(value235['position']?.['z']) || 0x0,
+      x: Number(value235['position']?.['x']) || 0,
+      y: (Number(value235['position']?.['y']) || 0) + sceneObjectHeightOffset,
+      z: Number(value235['position']?.['z']) || 0,
     };
   if (args11['mode'] === 'panorama') {
     const value237 = target3['x'],
       value238 = target3['y'] - 1.6,
       value239 = target3['z'],
-      value240 = Math['hypot'](value237, value238, value239) || 0x1;
+      value240 = Math['hypot'](value237, value238, value239) || 1;
     return (
       applyPanoramaSceneViewCommit({
         nodeId: nodeId42,

@@ -23,8 +23,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
   const index = String(item ?? '')['trim']();
@@ -51,7 +51,7 @@ function renderSmartClipSettingLabel(record, payload) {
     escapeHtml(record) +
     '<span class="rh-tip" data-tooltip="' +
     escapeHtml(payload) +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     escapeHtml(payload) +
     '">!</span></span>'
   );
@@ -70,7 +70,7 @@ function renderSmartClipModeOptions(handle) {
       state +
       '" aria-pressed="' +
       (handle === state) +
-      '\x22>' +
+      '">' +
       escapeHtml(config) +
       '</button>',
   )['join']('');
@@ -85,7 +85,7 @@ function renderSmartClipSettingsPanel(scope) {
     escapeHtml(smartClipPanelText('title')) +
     '</strong>\n    <div class="person-replacement-smart-clip-setting-row">\n      ' +
     renderSmartClipSettingLabel(smartClipPanelText('mode'), smartClipPanelText('modeTip')) +
-    '\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-smart-clip-option-group\x22\x20role=\x22group\x22\x20aria-label=\x22' +
+    '\n      <div class="person-replacement-smart-clip-option-group" role="group" aria-label="' +
     escapeHtml(smartClipPanelText('mode')) +
     '">\n        ' +
     renderSmartClipModeOptions(input) +
@@ -96,19 +96,19 @@ function renderSmartClipSettingsPanel(scope) {
     '">\n        ' +
     SMART_CLIP_FPS_OPTIONS['map'](
       (fps) =>
-        '<button\x20type=\x22button\x22\x20class=\x22person-replacement-smart-clip-option\x20person-replacement-smart-clip-fps-option\x20' +
+        '<button type="button" class="person-replacement-smart-clip-option person-replacement-smart-clip-fps-option ' +
         (output === fps ? 'is-active' : '') +
-        '\x22\x20data-person-replacement-action=\x22set-smart-clip-fps\x22\x20data-smart-clip-fps=\x22' +
+        '" data-person-replacement-action="set-smart-clip-fps" data-smart-clip-fps="' +
         fps +
-        '\x22\x20aria-pressed=\x22' +
+        '" aria-pressed="' +
         (output === fps) +
-        '\x22>' +
+        '">' +
         escapeHtml(smartClipPanelText('fpsValue', { fps: fps })) +
         '</button>',
     )['join']('') +
     '\n      </div>\n    </div>\n    <p class="person-replacement-smart-clip-settings-hint">' +
     escapeHtml(smartClipPanelText('hintDefault')) +
-    '</p>\x0a\x20\x20</div>'
+    '</p>\n  </div>'
   );
 }
 function renderSmartClipSettings(value2) {
@@ -137,20 +137,20 @@ function renderStepNavigation(value4) {
           error['allowed'] ? '' : 'is-locked',
         ]
           ['filter'](Boolean)
-          ['join']('\x20');
+          ['join'](' ');
       return (
         '<button type="button" class="' +
         value6 +
         '" data-person-replacement-action="select-step" data-person-replacement-step="' +
         value5['id'] +
-        '\x22\x20aria-current=\x22' +
+        '" aria-current="' +
         (value4['workspace']['step'] === value5['id'] ? 'step' : 'false') +
         '" aria-keyshortcuts="' +
         value5['id'] +
         '" aria-disabled="' +
         !error['allowed'] +
-        '\x22' +
-        (error['allowed'] ? '' : '\x20title=\x22' + escapeHtml(error['message']) + '\x22') +
+        '"' +
+        (error['allowed'] ? '' : ' title="' + escapeHtml(error['message']) + '"') +
         '><span>' +
         value5['id'] +
         '</span>' +
@@ -158,11 +158,11 @@ function renderStepNavigation(value4) {
         '</button>'
       );
     })['join']('') +
-    '\x0a\x20\x20</nav>'
+    '\n  </nav>'
   );
 }
 function getStepGuidance(value7, handler) {
-  const count = Math['trunc'](clamp(value7['workspace']?.['step'], 0x1, 0x5, 0x1)),
+  const count = Math['trunc'](clamp(value7['workspace']?.['step'], 1, 5, 1)),
     personReplacementStepCompletion2 = getPersonReplacementStepCompletion(value7),
     value8 = (Array['isArray'](value7['characters']) ? value7['characters'] : [])['filter']((value9) =>
       getPersonReplacementCharacterBaseImageRef(value9),
@@ -173,7 +173,7 @@ function getStepGuidance(value7, handler) {
     value12 = value8 + value10,
     list2 = Array['isArray'](value7['shots']) ? value7['shots'] : [],
     count2 = list2['filter']((value13) => normalizeText(value13?.['resultVideoRef']))['length'],
-    count3 = Math['max'](0x0, Math['trunc'](Number(handler(value7)) || 0x0)),
+    count3 = Math['max'](0, Math['trunc'](Number(handler(value7)) || 0)),
     value14 = Boolean(normalizeText(value7['audio']?.['replacementAudioRef'])),
     value15 = Boolean(
       value7['output']?.['originalMasterRef'] &&
@@ -181,27 +181,27 @@ function getStepGuidance(value7, handler) {
     ),
     enabled = value7['output']?.['composeStatus'] === 'succeeded' && value15,
     value16 = value15 && !enabled;
-  if (count === 0x1)
+  if (count === 1)
     return personReplacementStepCompletion2['assetSettingsComplete']
-      ? { title: '替换素材已应用', detail: '已应用 ' + value12 + '\x20个替换素材，可以继续进入图像替换' }
+      ? { title: '替换素材已应用', detail: '已应用 ' + value12 + ' 个替换素材，可以继续进入图像替换' }
       : { title: '请添加人物或场景素材', detail: '至少添加 1 个人物或场景素材，才能进入图像替换' };
-  if (count === 0x2)
+  if (count === 2)
     return personReplacementStepCompletion2['imageReplacementComplete']
       ? { title: '图像替换输入已应用', detail: '可以继续生成替换图，或进入视频替换' }
       : { title: '请绑定替换人物或场景', detail: '可先进入视频替换；添加人物或场景绑定后才能继续声音克隆' };
-  if (count === 0x3) {
+  if (count === 3) {
     if (!personReplacementStepCompletion2['imageReplacementComplete'])
       return { title: '请绑定替换人物或场景', detail: '至少绑定 1 个人物或场景，才能进入声音克隆' };
-    if (count2 > 0x0)
+    if (count2 > 0)
       return {
         title: '替换视频已生成',
         detail: '已生成 ' + count2 + '/' + list2['length'] + ' 个片段，可以继续进入声音克隆',
       };
     return { title: '视频替换已就绪', detail: '可以生成替换视频，也可以继续进入声音克隆' };
   }
-  if (count === 0x4) {
+  if (count === 4) {
     if (value14) return { title: '替换音轨已应用', detail: '可以继续进入合成视频，检查并生成最终视频' };
-    if (count3 > 0x0)
+    if (count3 > 0)
       return {
         title: '声音参考已应用',
         detail: '已应用 ' + count3 + ' 个声音参考，可以继续克隆声音或进入合成视频',
@@ -211,7 +211,7 @@ function getStepGuidance(value7, handler) {
   if (value16)
     return { title: '旧合成视频仍可查看', detail: '图像或片段已更新，重新生成对应替换视频后再合成' };
   if (enabled) return { title: '完整画面已就绪', detail: '可以切换原声或替换声预览，导出时再封装当前音轨' };
-  if (count2 > 0x0)
+  if (count2 > 0)
     return {
       title: '替换片段可以合成',
       detail: '已有 ' + count2 + '/' + list2['length'] + ' 个片段可用于合成',
@@ -219,32 +219,32 @@ function getStepGuidance(value7, handler) {
   return { title: '请先生成替换视频', detail: '返回视频替换生成至少一个片段后，即可创建合成预览' };
 }
 function getCurrentCanvasSyncMenuCopy(value17) {
-  const value18 = Math['trunc'](Number(value17) || 0x1),
+  const value18 = Math['trunc'](Number(value17) || 1),
     value19 = {
-      0x1: ['同步素材设定到画布', '同步当前人物素材与分组'],
-      0x2: ['同步图像替换到画布', '同步当前关键帧、素材、提示词与替换结果图'],
-      0x3: ['同步视频替换到画布', '同步当前原视频、替换图与替换视频'],
-      0x4: ['同步声音克隆到画布', '同步当前原音频、参考音频与替换音频'],
-      0x5: ['同步所有片段到画布', '按镜头顺序同步已有的替换视频片段'],
+      1: ['同步素材设定到画布', '同步当前人物素材与分组'],
+      2: ['同步图像替换到画布', '同步当前关键帧、素材、提示词与替换结果图'],
+      3: ['同步视频替换到画布', '同步当前原视频、替换图与替换视频'],
+      4: ['同步声音克隆到画布', '同步当前原音频、参考音频与替换音频'],
+      5: ['同步所有片段到画布', '按镜头顺序同步已有的替换视频片段'],
     },
-    [label, detail] = value19[value18] || value19[0x5];
+    [label, detail] = value19[value18] || value19[5];
   return { label: label, detail: detail };
 }
 function renderProjectToolbarActions(value20, value21 = {}) {
-  const value22 = value20['workspace']['step'] === 0x5,
+  const value22 = value20['workspace']['step'] === 5,
     currentCanvasSyncMenuCopy = getCurrentCanvasSyncMenuCopy(value20['workspace']['step']),
     value23 = value21['canvasSyncPending'] === !![],
     value24 = value21['exportOutputPending'] === !![],
     value25 =
       '<div class="story-canvas-sync-menu-wrap' +
-      (value23 ? '\x20is-loading' : '') +
+      (value23 ? ' is-loading' : '') +
       '" data-person-replacement-output-menu="canvas" data-person-replacement-canvas-sync-pending="' +
       value23 +
       '">\n    <button type="button" class="story-workbench-action-button story-canvas-sync-trigger story-menu-trigger' +
       (value23 ? ' is-loading' : '') +
-      '\x22\x20data-person-replacement-action=\x22toggle-output-menu\x22\x20data-person-replacement-output-menu-trigger=\x22canvas\x22\x20aria-haspopup=\x22menu\x22\x20aria-expanded=\x22false\x22\x20aria-busy=\x22' +
+      '" data-person-replacement-action="toggle-output-menu" data-person-replacement-output-menu-trigger="canvas" aria-haspopup="menu" aria-expanded="false" aria-busy="' +
       value23 +
-      '\x22' +
+      '"' +
       (value23 ? ' disabled' : '') +
       '>\n      ' +
       (value23
@@ -255,13 +255,13 @@ function renderProjectToolbarActions(value20, value21 = {}) {
       '</span>' +
       (value23 ? '' : '<span class="story-canvas-sync-chevron" aria-hidden="true"></span>') +
       '\n    </button>\n    <div class="story-canvas-sync-menu" role="menu" aria-label="同步人物替换项目到画布" aria-hidden="true">\n      <button type="button" class="story-canvas-sync-option" data-person-replacement-output-menu-item data-person-replacement-action="sync-all-clips-to-canvas" role="menuitem"' +
-      (value23 ? '\x20aria-disabled=\x22true\x22\x20disabled' : '') +
+      (value23 ? ' aria-disabled="true" disabled' : '') +
       '>\n        <strong>' +
       currentCanvasSyncMenuCopy['label'] +
       '</strong><small>' +
       currentCanvasSyncMenuCopy['detail'] +
       '</small>\n      </button>\n      <button type="button" class="story-canvas-sync-option" data-person-replacement-output-menu-item data-person-replacement-action="sync-project-to-canvas" role="menuitem"' +
-      (value23 ? '\x20aria-disabled=\x22true\x22\x20disabled' : '') +
+      (value23 ? ' aria-disabled="true" disabled' : '') +
       '>\n        <strong>同步整个项目到画布</strong><small>按当前进度同步素材、图像、视频、音频与合成节点</small>\n      </button>\n    </div>\n  </div>',
     value26 = value22
       ? '<div class="story-canvas-sync-menu-wrap story-clip-export-menu-wrap' +
@@ -272,34 +272,34 @@ function renderProjectToolbarActions(value20, value21 = {}) {
         (value24 ? ' is-loading' : '') +
         '" data-person-replacement-action="toggle-output-menu" data-person-replacement-output-menu-trigger="export" aria-haspopup="menu" aria-expanded="false" aria-busy="' +
         value24 +
-        '\x22' +
+        '"' +
         (value24 ? ' disabled' : '') +
         '>\n        ' +
         (value24
-          ? '<span\x20class=\x22storyboard-script-loading-spinner\x20person-replacement-export-spinner\x22\x20aria-hidden=\x22true\x22></span>'
+          ? '<span class="storyboard-script-loading-spinner person-replacement-export-spinner" aria-hidden="true"></span>'
           : '') +
         '<span>' +
         (value24 ? '导出中…' : '导出') +
         '</span>' +
         (value24 ? '' : '<span class="story-canvas-sync-chevron" aria-hidden="true"></span>') +
         '\n      </button>\n      <div class="story-canvas-sync-menu story-clip-export-menu" role="menu" aria-label="导出人物替换结果" aria-hidden="true">\n        <div class="person-replacement-export-menu-group" data-person-replacement-export-group>\n          <button type="button" class="story-canvas-sync-option person-replacement-export-menu-group-trigger" data-person-replacement-output-menu-item data-person-replacement-export-submenu-trigger="video" role="menuitem" aria-haspopup="menu" aria-expanded="false"' +
-        (value24 ? '\x20aria-disabled=\x22true\x22\x20disabled' : '') +
-        '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span><strong>导出视频</strong><small>导出成片或全部替换素材</small></span><i\x20aria-hidden=\x22true\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-export-submenu\x22\x20data-person-replacement-export-submenu=\x22video\x22\x20role=\x22menu\x22\x20aria-label=\x22导出视频\x22\x20aria-hidden=\x22true\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-canvas-sync-option\x22\x20data-person-replacement-action=\x22export-final-video\x22\x20role=\x22menuitem\x22' +
         (value24 ? ' aria-disabled="true" disabled' : '') +
-        '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>完整视频（当前音轨）</strong><small>将完整替换画面与下方选择的音轨封装后导出</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-canvas-sync-option\x22\x20data-person-replacement-action=\x22export-all-clips-and-images\x22\x20role=\x22menuitem\x22' +
+        '>\n            <span><strong>导出视频</strong><small>导出成片或全部替换素材</small></span><i aria-hidden="true"></i>\n          </button>\n          <div class="person-replacement-export-submenu" data-person-replacement-export-submenu="video" role="menu" aria-label="导出视频" aria-hidden="true">\n            <button type="button" class="story-canvas-sync-option" data-person-replacement-action="export-final-video" role="menuitem"' +
+        (value24 ? ' aria-disabled="true" disabled' : '') +
+        '>\n              <strong>完整视频（当前音轨）</strong><small>将完整替换画面与下方选择的音轨封装后导出</small>\n            </button>\n            <button type="button" class="story-canvas-sync-option" data-person-replacement-action="export-all-clips-and-images" role="menuitem"' +
         (value24 ? ' aria-disabled="true" disabled' : '') +
         '>\n              <strong>所有替换结果</strong><small>导出替换视频、替换音频及对应替换图</small>\n            </button>\n          </div>\n        </div>\n        <div class="person-replacement-export-menu-group" data-person-replacement-export-group>\n          <button type="button" class="story-canvas-sync-option person-replacement-export-menu-group-trigger" data-person-replacement-output-menu-item data-person-replacement-export-submenu-trigger="project" role="menuitem" aria-haspopup="menu" aria-expanded="false"' +
         (value24 ? ' aria-disabled="true" disabled' : '') +
         '>\n            <span><strong>导出项目</strong><small>导出到剪辑软件继续处理</small></span><i aria-hidden="true"></i>\n          </button>\n          <div class="person-replacement-export-submenu" data-person-replacement-export-submenu="project" role="menu" aria-label="导出项目" aria-hidden="true">\n            <button type="button" class="story-canvas-sync-option" data-person-replacement-action="export-premiere-xml" role="menuitem"' +
         (value24 ? ' aria-disabled="true" disabled' : '') +
-        '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>Premiere\x20XML</strong><small>原片与替换片段、对应音频分四轨，包含素材</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-canvas-sync-option\x22\x20data-person-replacement-action=\x22export-jianying-draft\x22\x20role=\x22menuitem\x22' +
-        (value24 ? '\x20aria-disabled=\x22true\x22\x20disabled' : '') +
-        '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong>剪映草稿</strong><small>保留完整替换片段和轨道空位，包含素材</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>'
+        '>\n              <strong>Premiere XML</strong><small>原片与替换片段、对应音频分四轨，包含素材</small>\n            </button>\n            <button type="button" class="story-canvas-sync-option" data-person-replacement-action="export-jianying-draft" role="menuitem"' +
+        (value24 ? ' aria-disabled="true" disabled' : '') +
+        '>\n              <strong>剪映草稿</strong><small>保留完整替换片段和轨道空位，包含素材</small>\n            </button>\n          </div>\n        </div>\n      </div>\n    </div>'
       : '';
   return (
     '<div class="person-replacement-toolbar-actions' +
-    (value22 ? '\x20person-replacement-preview-actions\x20person-replacement-preview-actions--toolbar' : '') +
-    '\x22>' +
+    (value22 ? ' person-replacement-preview-actions person-replacement-preview-actions--toolbar' : '') +
+    '">' +
     value25 +
     value26 +
     '</div>'
@@ -331,9 +331,9 @@ function renderSourceQueue(enabled2) {
           mediaUrl = normalizeMediaUrl(value29['thumbnailRef']),
           text2 = normalizeText(enabled2['sourcePreviewRefs']?.[value29['id']]),
           mediaUrl2 = normalizeMediaUrl(text2 || value29['videoRef']),
-          value32 = value29['fileName'] || '视频 ' + (value30 + 0x1);
+          value32 = value29['fileName'] || '视频 ' + (value30 + 1);
         return (
-          '<article\x20class=\x22person-replacement-import-item\x20workspace-video-import-item\x22\x20data-person-replacement-import-source=\x22' +
+          '<article class="person-replacement-import-item workspace-video-import-item" data-person-replacement-import-source="' +
           escapeHtml(value29['id']) +
           '">\n        <div class="person-replacement-import-thumbnail workspace-video-import-thumbnail">\n          ' +
           (mediaUrl
@@ -351,7 +351,7 @@ function renderSourceQueue(enabled2) {
                 escapeHtml(value32) +
                 ' 视频缩略图" draggable="false"></video>'
               : '<span class="workspace-video-import-placeholder">' + renderVideoIcon() + '</span>') +
-          '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-import-status\x20workspace-video-import-status\x22>' +
+          '\n          <span class="person-replacement-import-status workspace-video-import-status">' +
           escapeHtml(value31) +
           '</span>\n          <button type="button" class="person-replacement-import-remove workspace-video-import-remove" data-person-replacement-action="remove-source" data-source-id="' +
           escapeHtml(value29['id']) +
@@ -363,14 +363,14 @@ function renderSourceQueue(enabled2) {
         );
       })
       ['join']('') +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 function normalizeProjectTimestamp(value33) {
   const count4 = Number(value33);
-  if (Number['isFinite'](count4) && count4 > 0x0) return count4;
+  if (Number['isFinite'](count4) && count4 > 0) return count4;
   const value34 = Date['parse'](value33 || '');
-  return Number['isFinite'](value34) ? value34 : 0x0;
+  return Number['isFinite'](value34) ? value34 : 0;
 }
 function buildPersonProjectHomeEntry(personReplacementProject = {}) {
   const id = normalizeText(personReplacementProject['id']),
@@ -393,13 +393,13 @@ function getPersonProjectCoverImageUrls(options2 = {}) {
     ['flatMap']((value35) => [value35?.['replacementImageRef'], value35?.['keyframeRef']])
     ['map'](normalizeMediaUrl)
     ['filter']((value36, value37, list3) => value36 && list3['indexOf'](value36) === value37)
-    ['slice'](0x0, 0x3);
+    ['slice'](0, 3);
 }
 function getHomeProjectPresentation(query) {
   const list4 = Array['isArray'](query['libraryProjects']) ? query['libraryProjects'] : [],
     projectEntries = list4['map'](buildPersonProjectHomeEntry)['filter']((value38) => value38['id']),
     showArchived = query['workspace']['showArchivedProjects'] === !![],
-    archivedProjectCount = projectEntries['filter']((value39) => value39['archivedAt'] > 0x0)['length'],
+    archivedProjectCount = projectEntries['filter']((value39) => value39['archivedAt'] > 0)['length'],
     visibleProjects = getWorkspaceProjectHomeEntries(projectEntries, {
       query: query['workspace']['projectSearchQuery'],
       sortOrder: query['workspace']['projectSortOrder'],
@@ -428,7 +428,7 @@ function renderHomeProjectResults(
             isDeleteConfirming: isDeleteConfirming['workspace']['pendingDeleteProjectId'] === itemCount['id'],
             isMenuOpen: isDeleteConfirming['workspace']['openProjectMenuId'] === itemCount['id'],
             fallbackTitle: '未命名人物替换项目',
-            itemCount: itemCount['personReplacementProject']?.['shots']?.['length'] || 0x0,
+            itemCount: itemCount['personReplacementProject']?.['shots']?.['length'] || 0,
             itemLabel: '个片段',
             coverImageUrls: getPersonProjectCoverImageUrls(itemCount['personReplacementProject']),
             emptyCoverLabel: '人物替换项目',
@@ -447,7 +447,7 @@ function renderHomeProjectResults(
           ? ''
           : '<button type="button" class="story-project-create-tile" data-person-replacement-action="choose-source-videos" aria-label="新建人物替换项目"><span aria-hidden="true">+</span><strong>新建人物替换项目</strong></button>') +
         '\n    </div>'
-    : '<div\x20class=\x22story-project-empty\x22>\x0a\x20\x20\x20\x20\x20\x20<strong>还没有人物替换项目</strong>\x0a\x20\x20\x20\x20\x20\x20<span>加入视频并开始处理后，项目会保存在当前用户项目数据中。</span>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20story-project-empty-action\x22\x20data-person-replacement-action=\x22choose-source-videos\x22>创建第一个项目</button>\x0a\x20\x20\x20\x20</div>';
+    : '<div class="story-project-empty">\n      <strong>还没有人物替换项目</strong>\n      <span>加入视频并开始处理后，项目会保存在当前用户项目数据中。</span>\n      <button type="button" class="story-primary-button story-project-empty-action" data-person-replacement-action="choose-source-videos">创建第一个项目</button>\n    </div>';
 }
 function renderHome(value40) {
   const homeProjectPresentation2 = getHomeProjectPresentation(value40),
@@ -468,14 +468,14 @@ function renderHome(value40) {
     (value43 ? 'has-sources' : '') +
     '" data-person-replacement-video-drop>\n            ' +
     (value43 ||
-      '<strong>导入原始视频</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>可一次选择或拖入一个或多个视频，单个视频最大支持\x20300\x20MB。</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-upload-actions\x22><button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-person-replacement-action=\x22choose-source-videos\x22' +
+      '<strong>导入原始视频</strong>\n            <p>可一次选择或拖入一个或多个视频，单个视频最大支持 300 MB。</p>\n            <div class="story-upload-actions"><button type="button" class="story-secondary-button" data-person-replacement-action="choose-source-videos"' +
         value44 +
         '>选择视频</button></div>') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-model-bar\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-home-model-controls\x20person-replacement-home-source-controls\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-person-replacement-action=\x22choose-source-videos\x22' +
+    '\n          </div>\n        </div>\n        <div class="story-home-model-bar">\n          <div class="story-home-model-controls person-replacement-home-source-controls">\n            <button type="button" class="story-secondary-button" data-person-replacement-action="choose-source-videos"' +
     value44 +
     '>加入视频</button>\n            <span class="person-replacement-home-flow-hint">处理时切分镜头并抽帧检测；跳过时保留整段视频并抽帧检测。</span>\n          </div>\n          <div class="person-replacement-home-process-actions">\n            <button type="button" class="story-secondary-button" data-person-replacement-action="process-sources" data-processing-mode="skip" ' +
     (value41 ? '' : 'disabled') +
-    '>跳过处理</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '>跳过处理</button>\n            ' +
     renderSmartClipSettings(value40) +
     '\n            <button type="button" class="story-primary-button story-home-generate" data-person-replacement-action="process-sources" data-processing-mode="cut" ' +
     (value41 ? '' : 'disabled') +
@@ -485,15 +485,15 @@ function renderHome(value40) {
     escapeHtml(value40['workspace']['projectSearchQuery'] || '') +
     '" placeholder="搜索项目名称" autocomplete="off" aria-label="搜索人物替换项目"></label>\n          ' +
     renderWorkspaceProjectSortControl(value40['workspace']['projectSortOrder']) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-project-archive-toggle\x20' +
+    '\n          <button type="button" class="story-project-archive-toggle ' +
     (showArchivedProjects2 ? 'is-active' : '') +
     '" data-story-action="toggle-archived-projects" aria-pressed="' +
     showArchivedProjects2 +
-    '\x22>' +
+    '">' +
     (showArchivedProjects2 ? '返回项目' : '已归档 ' + archivedProjectCount2) +
     '</button>\n        </div>\n      </div>\n      ' +
     renderHomeProjectResults(value40, homeProjectPresentation2) +
-    '\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</main>'
+    '\n    </section>\n  </main>'
   );
 }
 function syncHome(el, value45) {
@@ -515,7 +515,7 @@ function renderStepFooter(
   value47,
   { nextLabel: nextLabel = '下一步', hidePrevious: hidePrevious = ![] } = {},
 ) {
-  const error2 = getPersonReplacementStepGate(value46, value46['workspace']['step'] + 0x1),
+  const error2 = getPersonReplacementStepGate(value46, value46['workspace']['step'] + 1),
     value48 = value46['workspace']['step'] < PERSON_REPLACEMENT_STEPS['length'] && !error2['allowed'],
     isPersonReplacementSourceProcessing3 = isPersonReplacementSourceProcessing(value46),
     value49 = value48 || isPersonReplacementSourceProcessing3,
@@ -523,23 +523,23 @@ function renderStepFooter(
   return (
     '<footer class="story-page-footer person-replacement-step-footer">\n    <div><strong data-person-replacement-guidance-role="footer-title">' +
     escapeHtml(stepGuidance['title']) +
-    '</strong><small\x20data-person-replacement-guidance-role=\x22footer-detail\x22>' +
+    '</strong><small data-person-replacement-guidance-role="footer-detail">' +
     escapeHtml(stepGuidance['detail']) +
     '</small></div>\n    <div class="story-page-footer-actions">\n      ' +
     (hidePrevious
       ? ''
-      : '<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20button-press-feedback\x22\x20data-person-replacement-action=\x22previous-step\x22><span>上一步</span></button>') +
+      : '<button type="button" class="story-secondary-button button-press-feedback" data-person-replacement-action="previous-step"><span>上一步</span></button>') +
     '\n      <button type="button" class="story-next-button' +
-    (isPersonReplacementSourceProcessing3 ? '\x20is-processing' : value48 ? ' is-locked' : '') +
+    (isPersonReplacementSourceProcessing3 ? ' is-processing' : value48 ? ' is-locked' : '') +
     '" data-person-replacement-action="next-step" aria-disabled="' +
     value49 +
-    '\x22\x20aria-busy=\x22' +
+    '" aria-busy="' +
     isPersonReplacementSourceProcessing3 +
-    '\x22' +
+    '"' +
     (value49
       ? ' title="' +
         escapeHtml(isPersonReplacementSourceProcessing3 ? '视频处理中，请稍候' : error2['message']) +
-        '\x22'
+        '"'
       : '') +
     '><span>' +
     escapeHtml(nextLabel) +
@@ -579,7 +579,7 @@ function syncStatus(el7, value51, value52) {
   if (el9) el9['textContent'] = stepGuidance2['detail'];
   const el10 = el7['querySelector']?.('[data-person-replacement-action="next-step"]');
   if (el10) {
-    const error3 = getPersonReplacementStepGate(value51, value51['workspace']['step'] + 0x1),
+    const error3 = getPersonReplacementStepGate(value51, value51['workspace']['step'] + 1),
       value53 = value51['workspace']['step'] < PERSON_REPLACEMENT_STEPS['length'] && !error3['allowed'],
       value54 = value53 || isPersonReplacementSourceProcessing4;
     (el10['classList']?.['toggle']?.('is-locked', value53 && !isPersonReplacementSourceProcessing4),
@@ -593,7 +593,7 @@ function syncStatus(el7, value51, value52) {
           )
         : el10['removeAttribute']?.('title'));
   }
-  const el11 = el7['querySelector']?.('[data-person-replacement-next-indicator=\x22arrow\x22]'),
+  const el11 = el7['querySelector']?.('[data-person-replacement-next-indicator="arrow"]'),
     el12 = el7['querySelector']?.('[data-person-replacement-next-indicator="spinner"]');
   if (el11) el11['hidden'] = isPersonReplacementSourceProcessing4;
   if (el12) el12['hidden'] = !isPersonReplacementSourceProcessing4;
@@ -605,8 +605,8 @@ function syncStatus(el7, value51, value52) {
   let el15 = el13['querySelector']?.('[data-workspace-project-status]'),
     el16 = el13['querySelector']?.('[data-workspace-project-inline-status].has-task-error');
   const personReplacementProjectTaskSummary = getPersonReplacementProjectTaskSummary(value51),
-    enabled3 = personReplacementProjectTaskSummary['activeCount'] > 0x0,
-    enabled4 = !enabled3 && personReplacementProjectTaskSummary['failedCount'] > 0x0;
+    enabled3 = personReplacementProjectTaskSummary['activeCount'] > 0,
+    enabled4 = !enabled3 && personReplacementProjectTaskSummary['failedCount'] > 0;
   (el13['classList']?.['toggle']?.('is-generating', enabled3),
     el13['classList']?.['toggle']?.('has-task-error', enabled4));
   if (enabled3) {
@@ -638,7 +638,7 @@ function syncStatus(el7, value51, value52) {
     el16['setAttribute']?.('aria-live', 'polite'));
 }
 export function createPersonReplacementShellPresentation({
-  resolveVoiceReferenceCount: resolveVoiceReferenceCount = () => 0x0,
+  resolveVoiceReferenceCount: resolveVoiceReferenceCount = () => 0,
 } = {}) {
   return Object['freeze']({
     renderCanvasSyncLoadingOverlay: renderCanvasSyncLoadingOverlay,

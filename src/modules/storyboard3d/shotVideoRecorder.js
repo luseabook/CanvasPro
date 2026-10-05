@@ -24,7 +24,7 @@ export function recordDirectorCanvas({
       index,
       result,
       data = ![],
-      enabled = 0x0,
+      enabled = 0,
       options = null;
     const list = [],
       handler3 = () => {
@@ -41,7 +41,7 @@ export function recordDirectorCanvas({
           if (!enabled) handler2(new Error('录制没有产生视频数据。'));
           else
             handler({
-              blob: new Blob(list, { type: type['split'](';')[0x0] }),
+              blob: new Blob(list, { type: type['split'](';')[0] }),
               duration: duration,
               fps: fps,
             });
@@ -54,42 +54,42 @@ export function recordDirectorCanvas({
       },
       target = () => handler5(new DOMException('已取消录制', 'AbortError'));
     try {
-      (drawFrame(0x0),
+      (drawFrame(0),
         (item = canvas['captureStream'](fps)),
         (key = new run(item, {
           mimeType: type,
           videoBitsPerSecond: Math['min'](
-            0x1e84800,
-            Math['max'](0x3d0900, canvas['width'] * canvas['height'] * fps * 0.12),
+            32000000,
+            Math['max'](4000000, canvas['width'] * canvas['height'] * fps * 0.12),
           ),
         })),
         (key['ondataavailable'] = (enabled2) => {
           if (!enabled2['data']?.['size']) return;
           (list['push'](enabled2['data']), (enabled += enabled2['data']['size']));
-          if (enabled > 0x200 * 0x400 * 0x400)
-            handler5(new Error('视频超过\x20512\x20MB，请分镜头录制或降低分辨率。'));
+          if (enabled > 512 * 1024 * 1024)
+            handler5(new Error('视频超过 512 MB，请分镜头录制或降低分辨率。'));
         }),
         (key['onerror'] = (entry) => handler5(entry['error'] || new Error('视频编码失败。'))),
         (key['onstop'] = () => handler4(options)),
         signal?.['addEventListener']('abort', target, { once: !![] }));
       const run2 = (record) => {
         if (windowObject['requestAnimationFrame']) result = windowObject['requestAnimationFrame'](record);
-        else index = windowObject['setTimeout'](record, 0x3e8 / fps);
+        else index = windowObject['setTimeout'](record, 1000 / fps);
       };
-      let payload = 0x0;
-      const run3 = () => item['getVideoTracks']?.()[0x0]?.['requestFrame']?.(),
+      let payload = 0;
+      const run3 = () => item['getVideoTracks']?.()[0]?.['requestFrame']?.(),
         handler6 = () => {
           if (data || options) return;
-          const current2 = Math['min'](duration, (windowObject['performance']['now']() - payload) / 0x3e8);
+          const current2 = Math['min'](duration, (windowObject['performance']['now']() - payload) / 1000);
           try {
             (drawFrame(current2),
               run3(),
               onProgress?.({ stage: 'recording', current: current2, total: duration }));
             if (current2 >= duration)
               run2(() => {
-                index = windowObject['setTimeout'](() => handler5(), 0x3e8 / fps);
+                index = windowObject['setTimeout'](() => handler5(), 1000 / fps);
               });
-            else index = windowObject['setTimeout'](handler6, 0x3e8 / fps);
+            else index = windowObject['setTimeout'](handler6, 1000 / fps);
           } catch (handle) {
             handler5(handle);
           }
@@ -97,7 +97,7 @@ export function recordDirectorCanvas({
       ((key['onstart'] = () => {
         if (data || options) return;
         try {
-          (drawFrame(0x0), run3());
+          (drawFrame(0), run3());
         } catch (state) {
           handler5(state);
           return;
@@ -106,7 +106,7 @@ export function recordDirectorCanvas({
           ((payload = windowObject['performance']['now']()), handler6());
         });
       }),
-        key['start'](0x3e8));
+        key['start'](1000));
     } catch (config) {
       handler5(config);
     }
@@ -146,7 +146,7 @@ export async function renderStoryboard3DShotVideo({
       scenes: scenes['scenes'],
       aspectRatio: aspectRatio['aspectRatio'],
     });
-  if (new Set(plan['segments']['map']((value7) => value7['scene']['id']))['size'] > 0x1)
+  if (new Set(plan['segments']['map']((value7) => value7['scene']['id']))['size'] > 1)
     return recordDirectorSceneSequence({
       snapshot: scenes,
       plan: plan,
@@ -226,13 +226,13 @@ async function recordDirectorSceneSequence({
         }),
         storyboard3DSceneRuntime2['resize'](dimensions['width'], dimensions['height']),
         await storyboard3DSceneRuntime2['waitForCaptureReady']({ signal: signal3 }),
-        onProgress3?.({ stage: 'preparing', current: 0x0, total: plan2['duration'] }));
+        onProgress3?.({ stage: 'preparing', current: 0, total: plan2['duration'] }));
     }
     const list2 = [...map2],
       handler7 = (value9) =>
         value9 < list2['length']
-          ? list2[value9][0x1]['withCleanCaptureCanvas']((value10) => {
-              return (map3['set'](list2[value9][0x0], value10), handler7(value9 + 0x1));
+          ? list2[value9][1]['withCleanCaptureCanvas']((value10) => {
+              return (map3['set'](list2[value9][0], value10), handler7(value9 + 1));
             })
           : recordDirectorCanvas({
               canvas: canvas3,
@@ -244,21 +244,21 @@ async function recordDirectorSceneSequence({
               drawFrame: (value11) => {
                 const value12 =
                     plan2['segments']['find']((value13) => value11 < value13['end']) ||
-                    plan2['segments']['at'](-0x1),
+                    plan2['segments']['at'](-1),
                   value14 = map2['get'](value12['scene']['id']);
                 (value14['previewTimelineSample'](sampleDirectorVideoPlan(plan2, value11, value12['scene'])),
                   value14['renderNow'](),
-                  ctx['clearRect'](0x0, 0x0, canvas3['width'], canvas3['height']),
+                  ctx['clearRect'](0, 0, canvas3['width'], canvas3['height']),
                   ctx['drawImage'](
                     map3['get'](value12['scene']['id']),
-                    0x0,
-                    0x0,
+                    0,
+                    0,
                     canvas3['width'],
                     canvas3['height'],
                   ));
               },
             });
-    return { ...(await handler7(0x0)), width: dimensions['width'], height: dimensions['height'] };
+    return { ...(await handler7(0)), width: dimensions['width'], height: dimensions['height'] };
   } finally {
     for (const value15 of map2['values']()) value15['dispose']();
   }

@@ -90,7 +90,7 @@ test('canvasCollaborationApi: rejects insecure endpoints and normalizes media ty
 test('canvasCollaborationApi: reads collaboration media and corrects its detected type', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () =>
-    new Response(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), {
+    new Response(new Uint8Array([137, 80, 78, 71, 0x0d, 0x0a, 26, 0x0a]), {
       status: 200,
       headers: { 'content-type': 'application/octet-stream' },
     });

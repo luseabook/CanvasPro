@@ -111,8 +111,8 @@ export const runningHubQwenAudioEntries = Object['freeze']([
       name: '千问3 语音合成 ' + (docId ? 'Instruct-Flash' : 'Flash'),
       endpoint: '/openapi/v2/alibaba/qwen3-tts-' + (docId ? 'instruct-flash' : 'flash'),
       docId: docId ? 0x1d8b7a75 : 0x1d8b7a76,
-      order: docId ? 0xc9 : 0xc8,
-      promptMaxLength: 0x258,
+      order: docId ? 201 : 200,
+      promptMaxLength: 600,
       promptPlaceholder: '输入朗读文本，最多 600 字符（汉字按 2 字符计）',
       fields: [
         audioSelect(
@@ -126,7 +126,7 @@ export const runningHubQwenAudioEntries = Object['freeze']([
         ...(docId
           ? [
               audioTextarea('instructions', '声音指令', '用中文或英文描述语气、语速、情感和音色。', {
-                maxLength: 0x7d0,
+                maxLength: 2000,
               }),
               audioToggle('optimizeInstructions', '优化声音指令', ![], {
                 hideWhen: { field: 'instructions', value: '' },
@@ -150,7 +150,7 @@ export const runningHubQwenAudioEntries = Object['freeze']([
     name: 'Qwen3 TTS 声音设计',
     endpoint: '/openapi/v2/rhart-audio/qwen3-tts/voice-design',
     docId: 0x1e492f9b,
-    order: 0xca,
+    order: 202,
     promptField: null,
     promptRequired: ![],
     promptPlaceholder: '输入台词；选择随机台词时可留空',

@@ -5,13 +5,13 @@ export function connectionQuality(response) {
   if (response['status'] === 'blocked') return { level: 'offline', label: '协作已暂停', value: '暂停' };
   if (!Number['isFinite'](response['latencyMs']))
     return { level: 'connecting', label: '协作连接中，正在测量延迟', value: '…' };
-  const value = Math['max'](0x0, Math['round'](response['latencyMs'])),
-    level = value < 0x64 ? 'good' : value < 0xfa ? 'fair' : 'poor';
+  const value = Math['max'](0, Math['round'](response['latencyMs'])),
+    level = value < 100 ? 'good' : value < 250 ? 'fair' : 'poor';
   return {
     level: level,
     label:
       '协作中，延迟 ' + value + ' ms，' + (level === 'good' ? '良好' : level === 'fair' ? '一般' : '较高'),
-    value: value + '\x20ms',
+    value: value + ' ms',
   };
 }
 export function createCollaborationConnectionIndicator(el = document) {
@@ -19,7 +19,7 @@ export function createCollaborationConnectionIndicator(el = document) {
   ((element['className'] = 'collaboration-connection'), element['setAttribute']('role', 'img'));
   const el2 = el['createElement']('span');
   ((el2['className'] = 'collaboration-signal'), el2['setAttribute']('aria-hidden', 'true'));
-  for (let count = 0x0; count < 0x3; count++) el2['append'](el['createElement']('i'));
+  for (let count = 0; count < 3; count++) el2['append'](el['createElement']('i'));
   const el3 = el['createElement']('span');
   return (
     (el3['className'] = 'collaboration-latency'),

@@ -3,7 +3,7 @@ import { mkdirSync, realpathSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-function normalizeText(value, maxLength = 0x400) {
+function normalizeText(value, maxLength = 1024) {
   return String(value || '')
     .replace(/\0/g, '')
     .trim()

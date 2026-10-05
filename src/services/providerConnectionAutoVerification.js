@@ -30,7 +30,7 @@ export function getProviderConnectionFailureDetail(options3 = {}) {
       options3['summary'] ||
       options3['error'] ||
       options3['detail'] ||
-      'API\x20连接验证未通过',
+      'API 连接验证未通过',
   );
 }
 export async function verifyProviderConnectionOnce(options4 = {}, item = {}) {
@@ -56,7 +56,7 @@ export async function verifyProviderConnectionOnce(options4 = {}, item = {}) {
         providerResults: { [text4]: label },
       },
     );
-  if (currentProviderConnectionResults['staleProviderIds']['length'] > 0x0)
+  if (currentProviderConnectionResults['staleProviderIds']['length'] > 0)
     return {
       ok: ![],
       stale: !![],

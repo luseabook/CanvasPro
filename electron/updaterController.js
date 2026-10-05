@@ -7,7 +7,7 @@ export const UPDATER_STATES = Object.freeze({
   INSTALLING: 'installing',
   ERROR: 'error',
 });
-const DEFAULT_DOWNLOAD_RETRY_DELAYS_MS = [0xbb8, 0x2710];
+const DEFAULT_DOWNLOAD_RETRY_DELAYS_MS = [3000, 10000];
 function normalizeRetryDelays(value) {
   return (Array.isArray(value) ? value : DEFAULT_DOWNLOAD_RETRY_DELAYS_MS)
     .map((item) => Number(item))

@@ -12,7 +12,7 @@ function asObject(value) {
 }
 function normalizeTextGenerationResultItem(item) {
   const metadata = asObject(item);
-  if (!metadata) throw new Error('[textGenerationResult]\x20item\x20must\x20be\x20an\x20object');
+  if (!metadata) throw new Error('[textGenerationResult] item must be an object');
   const key = {
       ...metadata,
       outputType: 'text',
@@ -56,8 +56,8 @@ export function buildTextGenerationTimeoutOutput(options) {
     detail ? '' : '',
     detail ? t('aigenText.result.errorDetail', { detail: detail }) : '',
   ]
-    ['filter']((target, source, next) => target || next[source - 0x1] !== '')
-    ['join']('\x0a')
+    ['filter']((target, source, next) => target || next[source - 1] !== '')
+    ['join']('\n')
     ['trim']();
 }
 export function normalizeTextGenerationResult(text) {
@@ -65,9 +65,9 @@ export function normalizeTextGenerationResult(text) {
     collectionField: 'texts',
     singleItemFields: ['outputText', 'text', 'output', 'content', 'message'],
   });
-  if (items['length'] === 0x0 && typeof text === 'string')
+  if (items['length'] === 0 && typeof text === 'string')
     return { outputType: 'text', items: [normalizeTextGenerationResultItem({ text: text })] };
-  if (items['length'] === 0x0) return { outputType: 'text', items: [] };
+  if (items['length'] === 0) return { outputType: 'text', items: [] };
   return {
     outputType: 'text',
     items: items['map']((current) => normalizeTextGenerationResultItem(current)),
@@ -83,14 +83,14 @@ export function getTextGenerationResultError(entry) {
 }
 export function buildTextGenerationResultPatch(
   record,
-  { startedAt: startedAt = 0x0, duration: duration = null } = {},
+  { startedAt: startedAt = 0, duration: duration = null } = {},
 ) {
   const payload =
       record?.['outputType'] === 'text' && Array['isArray'](record['items'])
         ? record
         : normalizeTextGenerationResult(record),
     handle =
-      payload['items']['length'] > 0x0 ? payload : { outputType: 'text', items: [{ outputText: '' }] };
+      payload['items']['length'] > 0 ? payload : { outputType: 'text', items: [{ outputText: '' }] };
   return buildGenerationSingleResultPatch(handle, {
     startedAt: startedAt,
     duration: duration,
@@ -111,7 +111,7 @@ export function buildTextGenerationResultPatch(
 }
 export function buildTextGenerationFailurePatch({
   error: error = '',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   duration: duration = null,
 } = {}) {
   const error3 = getErrorMessage(error, t('aigenText.task.generationFailed')),

@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:net';
 import { describeSystemCommandFailure, resolveWindowsSystemToolPath } from './windowsSystemTools.js';
 function createEnumerationError({ port: port, command: command, cause: cause }) {
-  const error = new Error('Failed\x20to\x20inspect\x20listeners\x20on\x20port\x20' + port);
+  const error = new Error('Failed to inspect listeners on port ' + port);
   return (
     (error['code'] = 'AIC_STARTUP_PORT_ENUMERATION_FAILED'),
     (error['details'] = {
@@ -22,9 +22,9 @@ function parseWindowsNetstatPids(output, port, processId) {
         ['map']((line) => line['trim']())
         ['filter']((line) => /\bLISTENING\b/i['test'](line))
         ['map']((line) => line['split'](/\s+/))
-        ['filter']((columns) => columns['length'] >= 0x5 && columns[0x1]?.['endsWith'](':' + port))
-        ['map']((columns) => Number['parseInt'](columns[0x4], 0xa))
-        ['filter']((pid) => Number['isInteger'](pid) && pid > 0x0 && pid !== processId),
+        ['filter']((columns) => columns['length'] >= 5 && columns[1]?.['endsWith'](':' + port))
+        ['map']((columns) => Number['parseInt'](columns[4], 10))
+        ['filter']((pid) => Number['isInteger'](pid) && pid > 0 && pid !== processId),
     ),
   ];
 }
@@ -53,10 +53,10 @@ export function collectListeningPortPids(
     });
     return String(lsofOutput || '')
       ['split'](/\r?\n/)
-      ['map']((line) => Number['parseInt'](line['trim'](), 0xa))
-      ['filter']((pid) => Number['isInteger'](pid) && pid > 0x0 && pid !== processId);
+      ['map']((line) => Number['parseInt'](line['trim'](), 10))
+      ['filter']((pid) => Number['isInteger'](pid) && pid > 0 && pid !== processId);
   } catch (cause) {
-    if (platform !== 'win32' && Number(cause?.['status']) === 0x1) return [];
+    if (platform !== 'win32' && Number(cause?.['status']) === 1) return [];
     throw createEnumerationError({ port: port, command: command, cause: cause });
   }
 }

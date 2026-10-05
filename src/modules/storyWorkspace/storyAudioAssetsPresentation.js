@@ -5,7 +5,7 @@ import { getStoryAudioUrl, getStoryAudioBoundCharacters } from './storyAudioAsse
 const escape = (value) =>
   String(value ?? '')['replace'](
     /[&<>"']/gu,
-    (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\x22': '&quot;', '\x27': '&#39;' })[item],
+    (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[item],
   );
 export const renderStoryAudioArtwork = () =>
   '<span class="story-audio-artwork">' + renderWorkspaceAssetTabIcon('audio') + '<span>音频</span></span>';
@@ -29,7 +29,7 @@ export function renderStoryAudioActions(key, list, index = ![]) {
 }
 export function renderStoryAudioDetail(characters, name) {
   if (!name)
-    return '<aside\x20class=\x22story-asset-detail\x20story-empty-panel\x22><strong>暂无音频素材</strong><p>请从总素材加入或上传音频。</p></aside>';
+    return '<aside class="story-asset-detail story-empty-panel"><strong>暂无音频素材</strong><p>请从总素材加入或上传音频。</p></aside>';
   return renderWorkspaceAudioAssetDetail({
     name: name['name'],
     audioUrl: getStoryAudioUrl(name),
@@ -38,10 +38,10 @@ export function renderStoryAudioDetail(characters, name) {
     selectedCharacterId: characters['audioTargetCharacterId'] || '',
     boundNames: getStoryAudioBoundCharacters(characters['data'], name)['map']((error) => error['name']),
     isLibrary: name['isLibraryAsset'],
-    detailAttributes: 'data-story-audio-detail=\x22' + escape(name['id']) + '\x22',
+    detailAttributes: 'data-story-audio-detail="' + escape(name['id']) + '"',
     playerAttributes: { 'data-story-audio-player': '' },
     selectAttributes: 'data-story-audio-character',
-    bindAttributes: 'data-story-audio-action=\x22bind\x22',
-    membershipAttributes: 'data-story-audio-action="' + (name['isLibraryAsset'] ? 'add' : 'remove') + '\x22',
+    bindAttributes: 'data-story-audio-action="bind"',
+    membershipAttributes: 'data-story-audio-action="' + (name['isLibraryAsset'] ? 'add' : 'remove') + '"',
   });
 }

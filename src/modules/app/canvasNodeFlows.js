@@ -11,11 +11,11 @@ import { desktopBridge } from '../../services/desktopBridge.js';
 import { buildClipboardMediaSignature, clipboardImageBlobFromBase64 } from '../clipboardMediaSignature.js';
 function getMimeExtension(value, item = 'bin') {
   const list = String(value || '')
-    ['split'](';')[0x0]
+    ['split'](';')[0]
     ['trim']()
     ['toLowerCase']();
   if (!list['includes']('/')) return item;
-  const key = list['split']('/')[0x1] || item;
+  const key = list['split']('/')[1] || item;
   return key['replace'](/[^a-z0-9]/g, '') || item;
 }
 async function buildSystemClipboardSignature({
@@ -23,12 +23,12 @@ async function buildSystemClipboardSignature({
   pastedText: pastedText,
   pastedFiles: pastedFiles,
 }) {
-  if (Array['isArray'](pastedFiles) && pastedFiles['length'] > 0x0) {
+  if (Array['isArray'](pastedFiles) && pastedFiles['length'] > 0) {
     const index = pastedFiles['map']((error) =>
       String(error?.['path'] || error?.['name'] || ''),
     )
       ['filter'](Boolean)
-      ['slice'](0x0, 0x8)
+      ['slice'](0, 8)
       ['join']('|');
     return 'files:' + index + '|len:' + pastedFiles['length'];
   }
@@ -36,7 +36,7 @@ async function buildSystemClipboardSignature({
     return await buildClipboardMediaSignature(pastedMedia['blob'], pastedMedia['mimeType']);
   const list2 = String(pastedText || '');
   if (!list2['trim']()) return '';
-  const result = list2['slice'](0x0, 0x100);
+  const result = list2['slice'](0, 256);
   return 'text:' + result + '|len:' + list2['length'];
 }
 function resolvePastedMediaDescriptor(data, error2 = {}) {
@@ -63,18 +63,18 @@ function resolvePastedMediaDescriptor(data, error2 = {}) {
   return null;
 }
 function centerNodeAtWorldPosition(box, x2, y2) {
-  const options = Number(box?.['width']) || 0x0,
-    target = Number(box?.['height']) || 0x0;
-  return { ...box, x: x2 - options / 0x2, y: y2 - target / 0x2 };
+  const options = Number(box?.['width']) || 0,
+    target = Number(box?.['height']) || 0;
+  return { ...box, x: x2 - options / 2, y: y2 - target / 2 };
 }
 function normalizeSpawnDirection(source) {
   return source === 'left' || source === 'down' ? source : 'right';
 }
 function toFinitePositiveNumber(next, current) {
   const count = Number(next);
-  return Number['isFinite'](count) && count > 0x0 ? count : current;
+  return Number['isFinite'](count) && count > 0 ? count : current;
 }
-function getCssPixelValue(entry, record = 0x0) {
+function getCssPixelValue(entry, record = 0) {
   const dom = globalThis['document'];
   if (!dom) return record;
   try {
@@ -87,8 +87,8 @@ function getCssPixelValue(entry, record = 0x0) {
 }
 function getVisibleCanvasCenterScreenPosition(options2 = {}) {
   const state = globalThis['window'] || {},
-    toFinitePositiveNumber2 = toFinitePositiveNumber(state['innerWidth'], 0x0),
-    toFinitePositiveNumber3 = toFinitePositiveNumber(state['innerHeight'], 0x0);
+    toFinitePositiveNumber2 = toFinitePositiveNumber(state['innerWidth'], 0),
+    toFinitePositiveNumber3 = toFinitePositiveNumber(state['innerHeight'], 0);
   let config = toFinitePositiveNumber2;
   try {
     const el = globalThis['document'],
@@ -100,10 +100,10 @@ function getVisibleCanvasCenterScreenPosition(options2 = {}) {
       const el3 = el['querySelector']?.('.agent-sidebar.is-open'),
         count2 = Number(el3?.['getBoundingClientRect']?.()?.['width']),
         scope =
-          Number['isFinite'](count2) && count2 > 0x0
+          Number['isFinite'](count2) && count2 > 0
             ? count2
-            : getCssPixelValue('--agent-sidebar-width', 0x0);
-      config = Math['max'](0x1, toFinitePositiveNumber2 - scope);
+            : getCssPixelValue('--agent-sidebar-width', 0);
+      config = Math['max'](1, toFinitePositiveNumber2 - scope);
     }
   } catch {}
   return getViewportScreenCenter(options2, config, toFinitePositiveNumber3);
@@ -135,7 +135,7 @@ async function readElectronClipboardContents() {
         Array['isArray'](response['files']) &&
         (output['pastedFiles'] = response['files']);
     }
-    if (output['pastedFiles']['length'] === 0x0 && typeof enabled3['readImage'] === 'function') {
+    if (output['pastedFiles']['length'] === 0 && typeof enabled3['readImage'] === 'function') {
       const response2 = await enabled3['readImage']();
       output['imageReadSucceeded'] = response2?.['ok'] === !![] || response2?.['reason'] === 'no-image';
       if (response2?.['reason'] && response2['reason'] !== 'no-image') output['failed'] = !![];
@@ -171,7 +171,7 @@ async function readSystemClipboardContents() {
     const value3 = globalThis?.['navigator']?.['clipboard'],
       value4 = typeof value3?.['read'] === 'function',
       value5 = typeof value3?.['readText'] === 'function';
-    if (pastedFiles2['length'] === 0x0 && !pastedMedia2 && value4) {
+    if (pastedFiles2['length'] === 0 && !pastedMedia2 && value4) {
       const value6 = await value3['read']();
       for (const value7 of value6) {
         const mimeType2 = value7['types']['find'](
@@ -192,7 +192,7 @@ async function readSystemClipboardContents() {
     }
     !pastedText2 &&
       !pastedMedia2 &&
-      pastedFiles2['length'] === 0x0 &&
+      pastedFiles2['length'] === 0 &&
       value5 &&
       (pastedText2 = await value3['readText']());
   } catch (value9) {
@@ -274,16 +274,16 @@ export function createAppCanvasNodeFlows({
       box5 = createPanoramaNodeDataByType?.({
         type: type2,
         id: id2,
-        x: x4 - width3 / 0x2,
-        y: y4 - height3 / 0x2,
+        x: x4 - width3 / 2,
+        y: y4 - height3 / 2,
         width: width3,
         height: height3,
         name: name2,
       }) || {
         id: id2,
         type: type2,
-        x: x4 - width3 / 0x2,
-        y: y4 - height3 / 0x2,
+        x: x4 - width3 / 2,
+        y: y4 - height3 / 2,
         width: width3,
         height: height3,
         name: name2,
@@ -295,8 +295,8 @@ export function createAppCanvasNodeFlows({
     if (value14['placement'] === 'viewport-center-sequence') {
       const { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
         spawnDirection = normalizeSpawnDirection(direction),
-        value15 = x4 - width3 / 0x2,
-        value16 = y4 - height3 / 0x2,
+        value15 = x4 - width3 / 2,
+        value16 = y4 - height3 / 2,
         value17 = run2()['nodes'] || {},
         value18 = String(value14['sequenceKey'] || '')['trim'](),
         value19 = avoidOverlap ? value17 : getSequenceNodes(value17, value18),
@@ -331,10 +331,10 @@ export function createAppCanvasNodeFlows({
     if (value22['placement'] === 'viewport-center-sequence') {
       const { spacing: spacing2, direction: direction2, avoidOverlap: avoidOverlap2 } = getNodeSpawnPrefs(),
         spawnDirection2 = normalizeSpawnDirection(direction2),
-        value25 = Number(box7['width']) || 0x12c,
-        value26 = Number(box7['height']) || 0xc8,
-        value27 = value20 - value25 / 0x2,
-        value28 = value21 - value26 / 0x2,
+        value25 = Number(box7['width']) || 300,
+        value26 = Number(box7['height']) || 200,
+        value27 = value20 - value25 / 2,
+        value28 = value21 - value26 / 2,
         value29 = run2()['nodes'] || {},
         value30 = String(value22['sequenceKey'] || '')['trim'](),
         value31 = avoidOverlap2 ? value29 : getSequenceNodes(value29, value30),
@@ -396,13 +396,13 @@ export function createAppCanvasNodeFlows({
     );
   }
   async function run8(list3, value42, value43, enabled9) {
-    if (!Array['isArray'](list3) || list3['length'] === 0x0) return 0x0;
-    let value44 = 0x0;
+    if (!Array['isArray'](list3) || list3['length'] === 0) return 0;
+    let value44 = 0;
     for (const value45 of list3) {
       if (!enabled9['isImportCurrent']()) break;
-      const value46 = value44 * 0x1e,
+      const value46 = value44 * 30,
         value47 = await run7(value45, value42 + value46, value43 + value46, enabled9);
-      if (value47) value44 += 0x1;
+      if (value47) value44 += 1;
     }
     return value44;
   }
@@ -412,8 +412,8 @@ export function createAppCanvasNodeFlows({
     (graphStore['addNode']({
       id: id3,
       type: 'source-text',
-      x: x6 - width4 / 0x2,
-      y: y6 - height4 / 0x2,
+      x: x6 - width4 / 2,
+      y: y6 - height4 / 2,
       width: width4,
       height: height4,
       name: t('canvasNodeFlows.paste.nodeName.text'),
@@ -441,7 +441,7 @@ export function createAppCanvasNodeFlows({
       } = await readSystemClipboardContents();
     if (!enabled10['isImportCurrent']()) return;
     const enabled11 = String(pastedText3 || '')['trim'](),
-      enabled12 = (Array['isArray'](pastedFiles3) && pastedFiles3['length'] > 0x0) || !!pastedMedia3 || !!enabled11,
+      enabled12 = (Array['isArray'](pastedFiles3) && pastedFiles3['length'] > 0) || !!pastedMedia3 || !!enabled11,
       enabled13 = enabled12
         ? await buildSystemClipboardSignature({
             pastedFiles: pastedFiles3,
@@ -450,15 +450,15 @@ export function createAppCanvasNodeFlows({
           })
         : '';
     if (!enabled10['isImportCurrent']()) return;
-    const value50 = list4 && list4['length'] > 0x0,
-      count3 = Number(value49?.['copiedAt']) || 0x0,
-      count4 = Number(value49?.['systemCopiedAt']) || 0x0,
+    const value50 = list4 && list4['length'] > 0,
+      count3 = Number(value49?.['copiedAt']) || 0,
+      count4 = Number(value49?.['systemCopiedAt']) || 0,
       enabled14 = String(value49?.['systemSignatureAtCopy'] || ''),
       enabled15 = String(value49?.['systemSignature'] || '');
     enabled13 && observeSystemClipboardSignature(enabled13);
     if (value50) {
-      const enabled16 = count4 > count3 && count3 > 0x0,
-        value51 = count3 > count4 && count4 > 0x0,
+      const enabled16 = count4 > count3 && count3 > 0,
+        value51 = count3 > count4 && count4 > 0,
         value52 = !!enabled14 && !!enabled13,
         value53 = value52 ? enabled14 === enabled13 : ![],
         enabled17 = value52 ? enabled14 !== enabled13 : ![],
@@ -469,12 +469,12 @@ export function createAppCanvasNodeFlows({
         return;
       }
     }
-    if (Array['isArray'](pastedFiles3) && pastedFiles3['length'] > 0x0) {
+    if (Array['isArray'](pastedFiles3) && pastedFiles3['length'] > 0) {
       const count5 = await run8(pastedFiles3, x7, y7, enabled10);
       if (!enabled10['isImportCurrent']()) return;
-      if (count5 > 0x0) {
+      if (count5 > 0) {
         showToast?.(
-          count5 === 0x1
+          count5 === 1
             ? t('canvasNodeFlows.paste.filePasted')
             : t('canvasNodeFlows.paste.filesPasted', { count: count5 }),
           'success',
@@ -506,7 +506,7 @@ export function createAppCanvasNodeFlows({
         showToast?.(t('canvasNodeFlows.paste.textPasted'), 'success'));
       return;
     }
-    if (list4 && list4['length'] > 0x0 && !clipboardReadFailed2) {
+    if (list4 && list4['length'] > 0 && !clipboardReadFailed2) {
       executeCommand('paste', { x: x7, y: y7 });
       return;
     }

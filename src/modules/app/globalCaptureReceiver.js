@@ -1,4 +1,4 @@
-export function createGlobalCaptureReceiver({ api: api, handle: handle, capacity: capacity = 0x40 } = {}) {
+export function createGlobalCaptureReceiver({ api: api, handle: handle, capacity: capacity = 64 } = {}) {
   const receiverId = globalThis['crypto']['randomUUID'](),
     pendingEvents = new Map();
   let disposed = ![];
@@ -22,11 +22,11 @@ export function createGlobalCaptureReceiver({ api: api, handle: handle, capacity
       const evictKey = [...pendingEvents]['find'](
         ([, candidate]) =>
           !candidate['pending'] && (candidate['acknowledged'] || candidate['expiresAt'] <= Date['now']()),
-      )?.[0x0];
+      )?.[0];
       if (!evictKey) return;
       pendingEvents['delete'](evictKey);
     }
-    const entry = { pending: !![], expiresAt: Number(payload['expiresAt']) || Date['now']() + 0x7530 };
+    const entry = { pending: !![], expiresAt: Number(payload['expiresAt']) || Date['now']() + 30000 };
     pendingEvents['set'](eventId, entry);
     try {
       const claimResult = await api['claimEvent']({ eventId: eventId, receiverId: receiverId });

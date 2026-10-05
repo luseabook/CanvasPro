@@ -4,8 +4,8 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(key) {
   return String(key ?? '')['trim']();
@@ -28,18 +28,18 @@ function renderWorkflowLoading(index) {
 }
 function renderOutlineField(result, data, options, { singleLine: singleLine = ![] } = {}) {
   const source = singleLine
-    ? '<input\x20type=\x22text\x22\x20value=\x22' +
+    ? '<input type="text" value="' +
       escapeHtml(data || '') +
       '" data-story-outline-field="' +
       escapeHtml(options) +
-      '\x22>'
+      '">'
     : '<textarea data-story-outline-field="' +
       escapeHtml(options) +
-      '\x22>' +
+      '">' +
       escapeHtml(data || '') +
       '</textarea>';
   return (
-    '<label\x20class=\x22story-outline-field\x22><span>' +
+    '<label class="story-outline-field"><span>' +
     escapeHtml(result) +
     '</span>' +
     source +
@@ -60,10 +60,10 @@ function renderSummaryCharacterField(
       escapeHtml(entry) +
       '" aria-label="' +
       escapeHtml(record) +
-      '\x22',
+      '"',
     handle = multiline
       ? '<textarea ' + payload + '>' + escapeHtml(value) + '</textarea>'
-      : '<input type="text" value="' + escapeHtml(value) + '\x22\x20' + payload + '>';
+      : '<input type="text" value="' + escapeHtml(value) + '" ' + payload + '>';
   return '<label><b>' + escapeHtml(record) + '：</b>' + handle + '</label>';
 }
 function renderSummaryCharacters(list = []) {
@@ -72,7 +72,7 @@ function renderSummaryCharacters(list = []) {
     '<div class="story-summary-characters">\n    <span class="story-summary-label">人物小传</span>\n    ' +
     list['map'](
       (value2, state) =>
-        '<article\x20class=\x22story-summary-character\x22>\x0a\x20\x20\x20\x20\x20\x20<input\x20class=\x22story-summary-character-name\x22\x20type=\x22text\x22\x20value=\x22' +
+        '<article class="story-summary-character">\n      <input class="story-summary-character-name" type="text" value="' +
         escapeHtml(value2['name'] || '') +
         '" placeholder="未命名角色" data-story-summary-character-index="' +
         state +
@@ -98,11 +98,11 @@ function renderSummaryCharacters(list = []) {
         renderSummaryCharacterField(value2, state, 'personality', '性格特点') +
         '\n        ' +
         renderSummaryCharacterField(value2, state, 'relationships', '角色关系') +
-        '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '\n        ' +
         renderSummaryCharacterField(value2, state, 'arc', '成长弧线') +
         '\n      </div>\n    </article>',
     )['join']('') +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 function renderStoryContract(options2 = {}) {
@@ -115,7 +115,7 @@ function renderStoryContract(options2 = {}) {
           escapeHtml(scope) +
           '：</b><textarea data-story-contract-field="' +
           escapeHtml(config) +
-          '\x22>' +
+          '">' +
           escapeHtml(options2?.[config] || '') +
           '</textarea></label>',
       )
@@ -131,26 +131,26 @@ function renderPlotBeats(list2 = []) {
       (input, output) =>
         '<article class="story-summary-character">\n      <input class="story-summary-character-name" type="text" value="' +
         escapeHtml(input?.['stage'] || '') +
-        '\x22\x20data-story-plot-beat-index=\x22' +
+        '" data-story-plot-beat-index="' +
         output +
         '" data-story-plot-beat-field="stage" aria-label="剧情阶段">\n      <div class="story-summary-character-fields">\n        <label><b>关键事件：</b><textarea data-story-plot-beat-index="' +
         output +
         '" data-story-plot-beat-field="event">' +
         escapeHtml(input?.['event'] || '') +
-        '</textarea></label>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<label><b>造成结果：</b><textarea\x20data-story-plot-beat-index=\x22' +
+        '</textarea></label>\n        <label><b>造成结果：</b><textarea data-story-plot-beat-index="' +
         output +
         '" data-story-plot-beat-field="consequence">' +
         escapeHtml(input?.['consequence'] || '') +
-        '</textarea></label>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</article>',
+        '</textarea></label>\n      </div>\n    </article>',
     )['join']('') +
     '\n  </div>'
   );
 }
 function renderContinuityFacts(list3 = []) {
   return (
-    '<label\x20class=\x22story-outline-field\x22>\x0a\x20\x20\x20\x20<span>连续性事实</span>\x0a\x20\x20\x20\x20<textarea\x20data-story-continuity-facts\x20placeholder=\x22每行一条，例如关系阶段、承诺、秘密、身份、线索、能力或物品归属\x22>' +
-    escapeHtml((Array['isArray'](list3) ? list3 : [])['join']('\x0a')) +
-    '</textarea>\x0a\x20\x20</label>'
+    '<label class="story-outline-field">\n    <span>连续性事实</span>\n    <textarea data-story-continuity-facts placeholder="每行一条，例如关系阶段、承诺、秘密、身份、线索、能力或物品归属">' +
+    escapeHtml((Array['isArray'](list3) ? list3 : [])['join']('\n')) +
+    '</textarea>\n  </label>'
   );
 }
 function renderSummary(response = {}) {
@@ -163,7 +163,7 @@ function renderSummary(response = {}) {
       ? '<div class="story-inline-empty">故事蓝图已修改，现有分集大纲和正文仍然保留；点击“重新运行”后更新下游内容。</div>'
       : '') +
     '\n    <div class="story-summary-meta-grid">\n      <label><span>分集目标</span><strong>' +
-    Math['max'](0x1, Math['trunc'](Number(response['episodeCount']) || 0x1)) +
+    Math['max'](1, Math['trunc'](Number(response['episodeCount']) || 1)) +
     ' 集</strong></label>\n      <label><span>故事类型</span><input type="text" value="' +
     escapeHtml(response['storyType'] || '') +
     '" data-story-outline-field="story-type"></label>\n      <label><span>目标受众</span><input type="text" value="' +
@@ -201,18 +201,18 @@ function renderInlineRegenerationControl({
   const text = normalizeText(target);
   if (!text) return '';
   const escapeHtml2 = escapeHtml(text),
-    text2 = normalizeText(episodeId) ? '\x20data-story-episode-id=\x22' + escapeHtml(episodeId) + '\x22' : '';
+    text2 = normalizeText(episodeId) ? ' data-story-episode-id="' + escapeHtml(episodeId) + '"' : '';
   if (!isConfirming)
     return (
       '<span class="story-inline-regeneration-control is-' +
       escapeHtml(placement) +
       '">\n      <button type="button" class="story-inline-regeneration-button story-regenerate-button" data-story-action="request-inline-regeneration" data-story-regeneration-target="' +
       escapeHtml2 +
-      '\x22' +
+      '"' +
       text2 +
       ' aria-label="' +
       escapeHtml(confirmLabel) +
-      '\x22\x20' +
+      '" ' +
       (disabled ? 'disabled' : '') +
       '>' +
       escapeHtml(confirmLabel) +
@@ -229,87 +229,87 @@ function renderInlineRegenerationControl({
     escapeHtml(prompt) +
     '</span>\n    <button type="button" class="story-inline-regeneration-button story-regenerate-button is-confirm" data-story-action="confirm-inline-regeneration" data-story-regeneration-target="' +
     escapeHtml2 +
-    '\x22' +
+    '"' +
     text2 +
     ' aria-label="' +
     escapeHtml(confirmLabel) +
-    '\x22\x20' +
+    '" ' +
     (disabled ? 'disabled' : '') +
     '>确认</button>\n    <button type="button" class="story-inline-regeneration-button story-regenerate-button is-cancel" data-story-action="cancel-inline-regeneration" aria-label="取消重新生成">取消</button>\n  </span>'
   );
 }
-function renderEpisodeScriptBody(episodeId2 = {}, value3 = 0x1) {
+function renderEpisodeScriptBody(episodeId2 = {}, value3 = 1) {
   if (!episodeId2['scriptFullText']) return '';
   return (
     '<label class="story-episode-full-script">\n    <span>完整分场剧本</span>\n    <textarea data-story-episode-script="' +
     escapeHtml(episodeId2['id']) +
-    '\x22>' +
+    '">' +
     escapeHtml(episodeId2['scriptFullText']) +
     '</textarea>\n  </label>\n  ' +
     (episodeId2['allowRegeneration']
-      ? '<div\x20class=\x22story-episode-completed-actions\x22>\x0a\x20\x20\x20\x20' +
+      ? '<div class="story-episode-completed-actions">\n    ' +
         renderInlineRegenerationControl({
           target: 'episode-script:' + episodeId2['id'],
           prompt:
             '是否重新生成第 ' +
             value3 +
             ' 集正文？本集及后续正文将更新，共享素材与已有视频保留，受影响分镜需重新生成',
-          confirmLabel: '重新生成第 ' + value3 + '\x20集正文',
+          confirmLabel: '重新生成第 ' + value3 + ' 集正文',
           episodeId: episodeId2['id'],
           placement: 'episode',
           ...episodeId2['regeneration'],
         }) +
-        '\x0a\x20\x20</div>'
+        '\n  </div>'
       : '')
   );
 }
 function renderEpisodeItem(el = {}) {
-  const value4 = Math['max'](0x0, Math['trunc'](Number(el['index']) || 0x0)),
-    value5 = Math['max'](0x1, Math['trunc'](Number(el['number']) || value4 + 0x1)),
+  const value4 = Math['max'](0, Math['trunc'](Number(el['index']) || 0)),
+    value5 = Math['max'](1, Math['trunc'](Number(el['number']) || value4 + 1)),
     value6 = el['isGenerating']
       ? { className: 'is-generating', label: '正在生成' }
       : el['isComplete']
         ? { className: 'is-complete', label: '已生成' }
         : null,
-    value7 = el['canSelect'] ? ' data-story-select-script-episode="' + escapeHtml(el['id']) + '\x22' : '';
+    value7 = el['canSelect'] ? ' data-story-select-script-episode="' + escapeHtml(el['id']) + '"' : '';
   return (
     '<details class="story-episode-outline-item ' +
     (el['isComplete'] ? 'is-complete' : 'is-pending') +
     (el['isSelected'] ? ' is-checked' : '') +
-    '\x22\x20data-story-outline-section=\x22episode-' +
+    '" data-story-outline-section="episode-' +
     escapeHtml(el['id']) +
-    '\x22\x20' +
+    '" ' +
     (el['isOpen'] ? 'open' : '') +
     '>\n    <summary' +
     value7 +
-    '>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-episode-outline-number\x22>' +
-    (value4 + 0x1) +
+    '>\n      <span class="story-episode-outline-number">' +
+    (value4 + 1) +
     '.</span>\n      <strong>第 ' +
     value5 +
-    '\x20集' +
+    ' 集' +
     (el['isComplete'] && el['title'] ? ' · ' + escapeHtml(el['title']) : '') +
     '</strong>\n      ' +
     (value6
-      ? '<span\x20class=\x22story-episode-script-status\x20' +
+      ? '<span class="story-episode-script-status ' +
         value6['className'] +
-        '\x22>' +
+        '">' +
         value6['label'] +
         '</span>'
       : '') +
     '\n    </summary>\n    <div class="story-episode-outline-body">\n      ' +
     (el['isGenerating']
-      ? renderWorkflowLoading(el['generationMessage'] || '正在生成第 ' + value5 + '\x20集完整剧本')
+      ? renderWorkflowLoading(el['generationMessage'] || '正在生成第 ' + value5 + ' 集完整剧本')
       : el['isComplete']
         ? renderEpisodeScriptBody(el, value5)
         : '<label class="story-episode-synopsis-field">\n              <span>分集简介</span>\n              <textarea data-story-episode-synopsis="' +
           escapeHtml(el['id']) +
-          '\x22>' +
+          '">' +
           escapeHtml(el['synopsis'] || '') +
           '</textarea>\n            </label>\n            ' +
           (el['hook']
-            ? '<label\x20class=\x22story-episode-synopsis-field\x20story-episode-hook-field\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>结尾钩子</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<textarea\x20rows=\x221\x22\x20data-story-episode-hook=\x22' +
+            ? '<label class="story-episode-synopsis-field story-episode-hook-field">\n              <span>结尾钩子</span>\n              <textarea rows="1" data-story-episode-hook="' +
               escapeHtml(el['id']) +
-              '\x22>' +
+              '">' +
               escapeHtml(el['hook']) +
               '</textarea>\n            </label>'
             : '') +
@@ -317,7 +317,7 @@ function renderEpisodeItem(el = {}) {
           (el['canGenerate']
             ? '<div class="story-episode-script-action">\n              <button type="button" class="story-secondary-button" data-story-action="generate-episode-script" data-story-episode-id="' +
               escapeHtml(el['id']) +
-              '\x22\x20' +
+              '" ' +
               (el['disabled'] ? 'disabled' : '') +
               '>生成此集</button>\n            </div>'
             : '')) +
@@ -337,7 +337,7 @@ function renderEpisodeSection(enabled = {}) {
         ? '完整分集剧本已全部完成'
         : '分集大纲已完成，请按顺序生成正文';
   return (
-    '<section\x20class=\x22story-script-episodes-section\x22>\x0a\x20\x20\x20\x20<header\x20class=\x22story-script-episodes-heading\x22>\x0a\x20\x20\x20\x20\x20\x20<div><h2>共\x20' +
+    '<section class="story-script-episodes-section">\n    <header class="story-script-episodes-heading">\n      <div><h2>共 ' +
     list4['length'] +
     ' 集</h2><p>' +
     value8 +
@@ -350,7 +350,7 @@ function renderEpisodeSection(enabled = {}) {
         (list4['filter']((value9) => value9['canSelect'])['every']((value10) => value10['isSelected'])
           ? '取消全选'
           : '全选') +
-        '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '</button>\n            ' +
         (enabled['batchGenerating']
           ? '<button type="button" class="story-primary-button" data-story-action="cancel-episode-scripts-batch" aria-label="取消尚未开始的分集" ' +
             (enabled['batchCancelRequested'] ? 'disabled' : '') +
@@ -359,10 +359,10 @@ function renderEpisodeSection(enabled = {}) {
             '</button>'
           : '<button type="button" class="story-primary-button" data-story-action="generate-episode-scripts-batch" data-story-script-batch-scope="' +
             (enabled['selectionMode'] ? 'selected' : 'all') +
-            '\x22\x20' +
+            '" ' +
             (enabled['busy'] || !enabled['batchCount'] ? 'disabled' : '') +
             '>批量生成' +
-            (enabled['batchCount'] ? '\x20(' + enabled['batchCount'] + ')' : '') +
+            (enabled['batchCount'] ? ' (' + enabled['batchCount'] + ')' : '') +
             '</button>') +
         '\n          </div>') +
     '\n    </header>\n    <div class="story-episode-outline-list">\n      ' +
@@ -379,7 +379,7 @@ function renderOutlineNavigation(options3 = {}) {
     '<aside class="story-outline-nav-shell" data-story-outline-nav aria-label="剧本目录">\n    <button type="button" class="story-outline-nav-trigger" data-story-outline-nav-toggle aria-expanded="false">目录</button>\n    <nav class="story-outline-nav-panel" aria-label="剧本内容导航">\n      <strong>剧本目录</strong>\n      ' +
     (options3['isUploadedOriginal']
       ? ''
-      : '<button\x20type=\x22button\x22\x20class=\x22story-outline-nav-section\x22\x20data-story-outline-nav-target=\x22summary\x22>剧本摘要</button>') +
+      : '<button type="button" class="story-outline-nav-section" data-story-outline-nav-target="summary">剧本摘要</button>') +
     '\n      ' +
     (value11
       ? '<div class="story-outline-nav-group">\n        <button type="button" class="story-outline-nav-section" data-story-outline-nav-target="episodes">分集剧本</button>\n        ' +
@@ -388,8 +388,8 @@ function renderOutlineNavigation(options3 = {}) {
             list5['map']((value12) => {
               const value13 =
                 value12['isComplete'] && value12['title']
-                  ? '第\x20' + value12['number'] + '\x20集\x20·\x20' + value12['title']
-                  : '第\x20' + value12['number'] + '\x20集';
+                  ? '第 ' + value12['number'] + ' 集 · ' + value12['title']
+                  : '第 ' + value12['number'] + ' 集';
               return (
                 '<button type="button" data-story-outline-nav-target="episode-' +
                 escapeHtml(value12['id']) +
@@ -415,7 +415,7 @@ function renderPlanningPage(prompt2 = {}) {
         ? '参考剧本'
         : '原始创意',
     value16 =
-      (Array['isArray'](value14['episodes']) && value14['episodes']['length'] > 0x0) ||
+      (Array['isArray'](value14['episodes']) && value14['episodes']['length'] > 0) ||
       value14['isOutlineGenerating'];
   return (
     '<div class="story-outline-page story-content-page story-script-workflow-page">\n    ' +
@@ -424,7 +424,7 @@ function renderPlanningPage(prompt2 = {}) {
     (prompt2['originalOpen'] ? 'open' : '') +
     '>\n        <summary><span class="story-script-accordion-summary-row"><span class="story-script-accordion-title">' +
     value15 +
-    '</span></span></summary>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-original-creative\x22>' +
+    '</span></span></summary>\n        <div class="story-original-creative">' +
     escapeHtml(prompt2['originalCreative'] || '未记录原始创意') +
     '</div>\n        ' +
     (prompt2['isUploadedRewrite']
@@ -451,11 +451,11 @@ function renderPlanningPage(prompt2 = {}) {
         '\n        </span></summary>\n        ' +
         renderSummary(prompt2['summary']) +
         '\n      </details>') +
-    '\x0a\x20\x20\x20\x20\x20\x20' +
+    '\n      ' +
     (value16
       ? '<details class="story-script-accordion" data-story-outline-section="episodes" ' +
         (prompt2['episodesOpen'] ? 'open' : '') +
-        '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<summary><span\x20class=\x22story-script-accordion-summary-row\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-script-accordion-title\x22>分集剧本</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '>\n        <summary><span class="story-script-accordion-summary-row">\n          <span class="story-script-accordion-title">分集剧本</span>\n          ' +
         (!prompt2['isUploadedOriginal'] &&
         value14['episodes']?.['length'] &&
         ['completed', 'stale']['includes'](prompt2['outlineStatus'])
@@ -469,7 +469,7 @@ function renderPlanningPage(prompt2 = {}) {
               ...prompt2['outlineRegeneration'],
             })
           : '') +
-        '\x0a\x20\x20\x20\x20\x20\x20\x20\x20</span></summary>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '\n        </span></summary>\n        ' +
         renderEpisodeSection(value14) +
         '\n      </details>'
       : '') +
@@ -494,12 +494,12 @@ function renderAssetBreakdown(options5 = {}) {
         '">\n          <h2 class="story-asset-breakdown-episode-heading">\n            <span>第 ' +
         value17['number'] +
         ' 集</span>\n            ' +
-        (count === 0x0
+        (count === 0
           ? '<span class="story-asset-breakdown-inline-status" data-story-asset-breakdown-inline-status role="status" aria-live="polite">\n              <span class="storyboard-script-loading-spinner" aria-hidden="true"></span>\n              <span>剧情解析中</span>\n            </span>'
           : '') +
         '\n          </h2>\n          <p>' +
         escapeHtml(value17['synopsis'] || '本集剧情大纲待补充。') +
-        '</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</article>',
+        '</p>\n        </article>',
     )['join']('') +
     '\n      </div>\n      <div class="story-asset-breakdown-status" data-story-asset-breakdown-status role="status" aria-live="polite">\n        <span class="storyboard-script-loading-spinner" aria-hidden="true"></span>\n        <span>剧情解析中</span>\n      </div>\n    </section>\n  </div>'
   );

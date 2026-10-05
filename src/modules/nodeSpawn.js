@@ -22,8 +22,8 @@ export function getNodeSpawnPrefs() {
 export function calcSpawnStartFromAnchor(box, options, target) {
   const startX = box?.x || 0,
     startY = box?.y || 0,
-    source = box?.width || 0x12c,
-    next = box?.height || 0x12c;
+    source = box?.width || 300,
+    next = box?.height || 300;
   return {
     startX: startX + (target === 'right' ? source + options : 0),
     startY: startY + (target === 'down' ? next + options : 0),
@@ -34,10 +34,10 @@ export function calcSafeSpawnPosNearNode(current, box2, entry, record) {
     spawnDirection = normalizeSpawnDirection(direction),
     payload = box2?.x || 0,
     handle = box2?.y || 0,
-    state = box2?.width || 0x12c,
-    config = box2?.height || 0x12c,
-    scope = Number(entry) || 0x12c,
-    input = Number(record) || 0x12c,
+    state = box2?.width || 300,
+    config = box2?.height || 300,
+    scope = Number(entry) || 300,
+    input = Number(record) || 300,
     x =
       spawnDirection === 'left'
         ? payload - spacing2 - scope
@@ -62,8 +62,8 @@ export function createBatchSpawnLayoutNearNode({
     direction2 = normalizeSpawnDirection(nodeSpawnPrefs.direction),
     output = nodeSpawnPrefs.avoidOverlap !== false,
     clampPositiveInteger2 = clampPositiveInteger(itemCount, 1),
-    value2 = Math.max(1, toFiniteNumber(itemWidth, 0x12c)),
-    value3 = Math.max(1, toFiniteNumber(itemHeight, 0x12c)),
+    value2 = Math.max(1, toFiniteNumber(itemWidth, 300)),
+    value3 = Math.max(1, toFiniteNumber(itemHeight, 300)),
     itemGap2 = Math.max(0, toFiniteNumber(itemGap, spacing3)),
     value4 = Math.max(0, toFiniteNumber(padding, 0)),
     value5 = Math.max(0, toFiniteNumber(titleHeight, 0)),
@@ -77,8 +77,8 @@ export function createBatchSpawnLayoutNearNode({
     groupHeight = rows * value3 + (rows - 1) * itemGap2 + value4 * 2 + value5,
     toFiniteNumber2 = toFiniteNumber(anchorNode?.x, 0),
     toFiniteNumber3 = toFiniteNumber(anchorNode?.y, 0),
-    toFiniteNumber4 = toFiniteNumber(anchorNode?.width, 0x12c),
-    toFiniteNumber5 = toFiniteNumber(anchorNode?.height, 0x12c);
+    toFiniteNumber4 = toFiniteNumber(anchorNode?.width, 300),
+    toFiniteNumber5 = toFiniteNumber(anchorNode?.height, 300);
   let groupX = toFiniteNumber2 + toFiniteNumber4 + spacing3,
     groupY = toFiniteNumber3;
   if (direction2 === 'down')
@@ -121,34 +121,34 @@ export function createBatchSpawnLayoutNearNode({
 export function createDuplicateSpawnOffsets({
   nodes: nodes = {},
   sourceNodes: sourceNodes = [],
-  copies: copies = 0x1,
+  copies: copies = 1,
 } = {}) {
   const args = (Array['isArray'](sourceNodes) ? sourceNodes : [])['filter'](
     (value9) => value9 && typeof value9 === 'object',
   );
-  if (args['length'] === 0x0) return [];
+  if (args['length'] === 0) return [];
   const nodeSpawnPrefs2 = getNodeSpawnPrefs(),
-    value10 = Math['max'](0x0, toFiniteNumber(nodeSpawnPrefs2['spacing'], 0x78)),
+    value10 = Math['max'](0, toFiniteNumber(nodeSpawnPrefs2['spacing'], 120)),
     spawnDirection2 = normalizeSpawnDirection(nodeSpawnPrefs2['direction']),
     value11 = nodeSpawnPrefs2['avoidOverlap'] !== ![],
-    clampPositiveInteger3 = clampPositiveInteger(copies, 0x1),
-    value12 = Math['min'](...args['map']((box4) => toFiniteNumber(box4['x'], 0x0))),
-    value13 = Math['min'](...args['map']((box5) => toFiniteNumber(box5['y'], 0x0))),
+    clampPositiveInteger3 = clampPositiveInteger(copies, 1),
+    value12 = Math['min'](...args['map']((box4) => toFiniteNumber(box4['x'], 0))),
+    value13 = Math['min'](...args['map']((box5) => toFiniteNumber(box5['y'], 0))),
     value14 = Math['max'](
       ...args['map'](
-        (box6) => toFiniteNumber(box6['x'], 0x0) + Math['max'](0x1, toFiniteNumber(box6['width'], 0x64)),
+        (box6) => toFiniteNumber(box6['x'], 0) + Math['max'](1, toFiniteNumber(box6['width'], 100)),
       ),
     ),
     value15 = Math['max'](
       ...args['map'](
-        (box7) => toFiniteNumber(box7['y'], 0x0) + Math['max'](0x1, toFiniteNumber(box7['height'], 0x64)),
+        (box7) => toFiniteNumber(box7['y'], 0) + Math['max'](1, toFiniteNumber(box7['height'], 100)),
       ),
     ),
-    value16 = Math['max'](0x1, value14 - value12),
-    value17 = Math['max'](0x1, value15 - value13),
+    value16 = Math['max'](1, value14 - value12),
+    value17 = Math['max'](1, value15 - value13),
     value18 = value11 ? { ...(nodes || {}) } : {},
     value19 = [];
-  for (let value20 = 0x1; value20 <= clampPositiveInteger3; value20 += 0x1) {
+  for (let value20 = 1; value20 <= clampPositiveInteger3; value20 += 1) {
     let value21 = value12,
       value22 = value13;
     if (spawnDirection2 === 'down') value22 += (value17 + value10) * value20;

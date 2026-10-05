@@ -8,7 +8,7 @@ import {
 } from './windowsTaskbarIdentity.js';
 import { APP_WINDOW_MIN_HEIGHT, APP_WINDOW_MIN_WIDTH } from './appWindowSizePolicy.js';
 
-const IDENTITY_TIMEOUT_MS = 0x1770;
+const IDENTITY_TIMEOUT_MS = 6000;
 const IDENTITY = {
   appId: 'cn.1e1e.canvas',
   iconPath: 'C:\\app\\icon.ico',
@@ -43,7 +43,7 @@ function createLogDouble() {
 
 function createHelperDouble({ stdinWritable = true } = {}) {
   const handlers = new Map();
-  const state = { killed: 0x0, unrefed: 0x0, stdinEnded: 0x0, stdoutDestroyed: 0x0 };
+  const state = { killed: 0, unrefed: 0, stdinEnded: 0, stdoutDestroyed: 0 };
   const writes = [];
   const add = (event, listener) => {
     const list = handlers.get(event) || [];
@@ -57,7 +57,7 @@ function createHelperDouble({ stdinWritable = true } = {}) {
       list.filter((entry) => entry !== listener),
     );
   };
-  const stdin = { write: (chunk) => writes.push(chunk), end: () => (state.stdinEnded += 0x1) };
+  const stdin = { write: (chunk) => writes.push(chunk), end: () => (state.stdinEnded += 1) };
   if (!stdinWritable) delete stdin.write;
   return {
     state: state,
@@ -65,14 +65,14 @@ function createHelperDouble({ stdinWritable = true } = {}) {
     stdout: {
       on: (event, listener) => add(event, listener),
       removeListener: (event, listener) => remove(event, listener),
-      destroy: () => (state.stdoutDestroyed += 0x1),
+      destroy: () => (state.stdoutDestroyed += 1),
     },
     stdin: stdin,
     on: (event, listener) => add(event, listener),
     once: (event, listener) => add(event, listener),
     removeListener: (event, listener) => remove(event, listener),
-    kill: () => (state.killed += 0x1),
-    unref: () => (state.unrefed += 0x1),
+    kill: () => (state.killed += 1),
+    unref: () => (state.unrefed += 1),
     emit(event, ...args) {
       for (const listener of (handlers.get(event) || []).slice()) listener(...args);
     },
@@ -94,7 +94,7 @@ function createSpawnDouble(helper, { throwError = null } = {}) {
 function decode(script, marker) {
   const encoded = new RegExp(marker + ' "([^"]*)"').exec(script);
   assert.ok(encoded, `missing marker ${marker}`);
-  return Buffer.from(encoded[0x1], 'base64').toString('utf8');
+  return Buffer.from(encoded[1], 'base64').toString('utf8');
 }
 
 test('configureWindowsTaskbarIdentity returns false off win32 and leaves the window untouched', () => {
@@ -105,7 +105,7 @@ test('configureWindowsTaskbarIdentity returns false off win32 and leaves the win
       false,
     );
   }
-  assert.equal(targetWindow.calls.length, 0x0);
+  assert.equal(targetWindow.calls.length, 0);
 });
 
 test('configureWindowsTaskbarIdentity needs both setIcon and setAppDetails', () => {
@@ -132,7 +132,7 @@ test('configureWindowsTaskbarIdentity requires every identity field', () => {
       }),
       false,
     );
-    assert.equal(targetWindow.calls.length, 0x0);
+    assert.equal(targetWindow.calls.length, 0);
   }
 });
 
@@ -149,7 +149,7 @@ test('configureWindowsTaskbarIdentity sets the icon and the four app details in 
       details: {
         appId: IDENTITY.appId,
         appIconPath: IDENTITY.iconPath,
-        appIconIndex: 0x0,
+        appIconIndex: 0,
         relaunchCommand: IDENTITY.executablePath,
         relaunchDisplayName: IDENTITY.displayName,
       },
@@ -163,7 +163,7 @@ test('configureWindowsTaskbarIdentity swallows a throwing window', () => {
     configureWindowsTaskbarIdentity({ window: targetWindow, platform: 'win32', ...IDENTITY }),
     false,
   );
-  assert.equal(targetWindow.calls.length, 0x1);
+  assert.equal(targetWindow.calls.length, 1);
 });
 
 test('installWindowsTaskbarIdentity returns false off win32 or without window events', () => {
@@ -184,12 +184,12 @@ test('installWindowsTaskbarIdentity applies once and re-applies on every show ev
   const subscribed = [];
   targetWindow.on = (event, listener) => subscribed.push({ event: event, listener: listener });
   assert.equal(installWindowsTaskbarIdentity({ window: targetWindow, platform: 'win32', ...IDENTITY }), true);
-  assert.equal(subscribed.length, 0x1);
-  assert.equal(subscribed[0x0].event, 'show');
-  assert.equal(targetWindow.calls.length, 0x2);
-  subscribed[0x0].listener();
-  assert.equal(targetWindow.calls.length, 0x4);
-  assert.equal(targetWindow.calls[0x2].method, 'setIcon');
+  assert.equal(subscribed.length, 1);
+  assert.equal(subscribed[0].event, 'show');
+  assert.equal(targetWindow.calls.length, 2);
+  subscribed[0].listener();
+  assert.equal(targetWindow.calls.length, 4);
+  assert.equal(targetWindow.calls[2].method, 'setIcon');
 });
 
 test('buildWindowsChromeShellTaskbarIdentityScript returns an empty string without every path', () => {
@@ -209,8 +209,8 @@ test('buildWindowsChromeShellTaskbarIdentityScript returns an empty string witho
 
 test('the script carries the default timeout and the shared window size floors', () => {
   const script = buildWindowsChromeShellTaskbarIdentityScript(SCRIPT_INPUT);
-  assert.equal(script[0x0], '$');
-  assert.equal(script[script.length - 0x1], '}');
+  assert.equal(script[0], '$');
+  assert.equal(script[script.length - 1], '}');
   assert.ok(
     script.startsWith('$timeoutMs = ' + IDENTITY_TIMEOUT_MS + '\n$minimumWidth = ' + APP_WINDOW_MIN_WIDTH),
   );
@@ -229,8 +229,8 @@ test('the script rounds explicit minimums and keeps the floor when they are unus
   );
   const floored = buildWindowsChromeShellTaskbarIdentityScript({
     ...SCRIPT_INPUT,
-    minWidth: 0x0,
-    minHeight: -0x5,
+    minWidth: 0,
+    minHeight: -5,
   });
   assert.ok(
     floored.includes(
@@ -246,11 +246,11 @@ test('the script normalizes the timeout and falls back on unusable values', () =
     ),
   );
   assert.ok(
-    buildWindowsChromeShellTaskbarIdentityScript({ ...SCRIPT_INPUT, timeoutMs: 0x0 }).startsWith(
+    buildWindowsChromeShellTaskbarIdentityScript({ ...SCRIPT_INPUT, timeoutMs: 0 }).startsWith(
       '$timeoutMs = 0\n',
     ),
   );
-  for (const timeoutMs of [undefined, -0x1, Number.NaN, 'soon']) {
+  for (const timeoutMs of [undefined, -1, Number.NaN, 'soon']) {
     assert.ok(
       buildWindowsChromeShellTaskbarIdentityScript({ ...SCRIPT_INPUT, timeoutMs: timeoutMs }).startsWith(
         '$timeoutMs = ' + IDENTITY_TIMEOUT_MS,
@@ -304,7 +304,7 @@ test('prepareWindowsChromeShellTaskbarIdentity is a no-op off win32 or without a
     }),
     null,
   );
-  assert.equal(spawn.calls.length, 0x0);
+  assert.equal(spawn.calls.length, 0);
   assert.equal(
     await prepareWindowsChromeShellTaskbarIdentity({
       browserPath: SCRIPT_INPUT.browserPath,
@@ -313,7 +313,7 @@ test('prepareWindowsChromeShellTaskbarIdentity is a no-op off win32 or without a
     }),
     null,
   );
-  assert.equal(spawn.calls.length, 0x0);
+  assert.equal(spawn.calls.length, 0);
 });
 
 test('the helper is spawned hidden, detached and without a stderr pipe', async () => {
@@ -328,9 +328,9 @@ test('the helper is spawned hidden, detached and without a stderr pipe', async (
   });
   helper.emit('data', 'READY\n');
   const prepared = await pending;
-  assert.equal(spawn.calls.length, 0x1);
-  assert.equal(spawn.calls[0x0].command, 'powershell.exe');
-  assert.deepEqual(spawn.calls[0x0].args, [
+  assert.equal(spawn.calls.length, 1);
+  assert.equal(spawn.calls[0].command, 'powershell.exe');
+  assert.deepEqual(spawn.calls[0].args, [
     '-NoLogo',
     '-NoProfile',
     '-ExecutionPolicy',
@@ -338,7 +338,7 @@ test('the helper is spawned hidden, detached and without a stderr pipe', async (
     '-Command',
     buildWindowsChromeShellTaskbarIdentityScript(SCRIPT_INPUT),
   ]);
-  assert.deepEqual(spawn.calls[0x0].options, {
+  assert.deepEqual(spawn.calls[0].options, {
     stdio: ['pipe', 'pipe', 'ignore'],
     windowsHide: true,
     detached: false,
@@ -346,7 +346,7 @@ test('the helper is spawned hidden, detached and without a stderr pipe', async (
   assert.equal(prepared.helper, helper);
   assert.equal(typeof prepared.cancel, 'function');
   assert.equal(typeof prepared.attach, 'function');
-  assert.equal(log.events.length, 0x0);
+  assert.equal(log.events.length, 0);
 });
 
 test('READY is only accepted on a line boundary and may arrive split across chunks', async () => {
@@ -363,7 +363,7 @@ test('READY is only accepted on a line boundary and may arrive split across chun
   helper.emit('data', 'REA');
   helper.emit('data', 'DY\n');
   assert.ok(await pending);
-  assert.equal(log.events.length, 0x0);
+  assert.equal(log.events.length, 0);
 });
 
 test('a helper that exits before READY is killed and reported', async () => {
@@ -377,11 +377,11 @@ test('a helper that exits before READY is killed and reported', async () => {
     logEvent: log.logEvent,
   });
   helper.emit('data', 'NOTREADY\n');
-  helper.emit('exit', 0x2, null);
+  helper.emit('exit', 2, null);
   assert.equal(await pending, null);
-  assert.equal(helper.state.killed, 0x1);
-  assert.equal(log.events.length, 0x1);
-  assert.deepEqual(log.events[0x0], {
+  assert.equal(helper.state.killed, 1);
+  assert.equal(log.events.length, 1);
+  assert.deepEqual(log.events[0], {
     type: 'chrome_shell.taskbar_identity_not_ready',
     level: 'warn',
     source: 'main',
@@ -401,9 +401,9 @@ test('a helper error before READY is killed and reported', async () => {
   });
   helper.emit('error', new Error('EPIPE'));
   assert.equal(await pending, null);
-  assert.equal(helper.state.killed, 0x1);
-  assert.equal(log.events.length, 0x1);
-  assert.equal(log.events[0x0].type, 'chrome_shell.taskbar_identity_not_ready');
+  assert.equal(helper.state.killed, 1);
+  assert.equal(log.events.length, 1);
+  assert.equal(log.events[0].type, 'chrome_shell.taskbar_identity_not_ready');
 });
 
 test('a non-zero helper exit after READY is reported as a timeout with the exit context', async () => {
@@ -418,16 +418,16 @@ test('a non-zero helper exit after READY is reported as a timeout with the exit 
   });
   helper.emit('data', 'READY\n');
   const prepared = await pending;
-  helper.emit('exit', 0x3, 'SIGTERM');
+  helper.emit('exit', 3, 'SIGTERM');
   assert.ok(prepared);
-  assert.deepEqual(log.events[0x0], {
+  assert.deepEqual(log.events[0], {
     type: 'chrome_shell.taskbar_identity_timeout',
     level: 'warn',
     source: 'main',
     message: 'Windows Chrome shell taskbar identity was not applied',
-    context: { code: 0x3, signal: 'SIGTERM' },
+    context: { code: 3, signal: 'SIGTERM' },
   });
-  assert.equal(helper.state.killed, 0x0);
+  assert.equal(helper.state.killed, 0);
 });
 
 test('a clean helper exit after READY is not reported', async () => {
@@ -442,8 +442,8 @@ test('a clean helper exit after READY is not reported', async () => {
   });
   helper.emit('data', 'READY\n');
   assert.ok(await pending);
-  helper.emit('exit', 0x0, null);
-  assert.equal(log.events.length, 0x0);
+  helper.emit('exit', 0, null);
+  assert.equal(log.events.length, 0);
 });
 
 test('a throwing spawn is reported as a spawn error with the cause', async () => {
@@ -457,8 +457,8 @@ test('a throwing spawn is reported as a spawn error with the cause', async () =>
     logEvent: log.logEvent,
   });
   assert.equal(prepared, null);
-  assert.equal(spawn.calls.length, 0x1);
-  assert.deepEqual(log.events[0x0], {
+  assert.equal(spawn.calls.length, 1);
+  assert.deepEqual(log.events[0], {
     type: 'chrome_shell.taskbar_identity_spawn_error',
     level: 'warn',
     source: 'main',
@@ -478,8 +478,8 @@ test('cancel closes stdin first and then kills the helper', async () => {
   helper.emit('data', 'READY\n');
   const prepared = await pending;
   prepared.cancel();
-  assert.equal(helper.state.stdinEnded, 0x1);
-  assert.equal(helper.state.killed, 0x1);
+  assert.equal(helper.state.stdinEnded, 1);
+  assert.equal(helper.state.killed, 1);
 });
 
 test('attach streams the browser pid, detaches stdin/stdout and releases the handle', async () => {
@@ -492,12 +492,12 @@ test('attach streams the browser pid, detaches stdin/stdout and releases the han
   });
   helper.emit('data', 'READY\n');
   const prepared = await pending;
-  assert.equal(prepared.attach({ pid: 0x10e1 }), true);
+  assert.equal(prepared.attach({ pid: 4321 }), true);
   assert.deepEqual(helper.writes, ['4321\n']);
-  assert.equal(helper.state.stdinEnded, 0x1);
-  assert.equal(helper.state.stdoutDestroyed, 0x1);
-  assert.equal(helper.state.unrefed, 0x1);
-  assert.equal(helper.state.killed, 0x0);
+  assert.equal(helper.state.stdinEnded, 1);
+  assert.equal(helper.state.stdoutDestroyed, 1);
+  assert.equal(helper.state.unrefed, 1);
+  assert.equal(helper.state.killed, 0);
 });
 
 test('attach rounds a fractional pid and rejects unusable pids by cancelling', async () => {
@@ -513,11 +513,11 @@ test('attach rounds a fractional pid and rejects unusable pids by cancelling', a
   assert.equal(prepared.attach({ pid: 12.7 }), true);
   assert.deepEqual(helper.writes, ['13\n']);
   const killedBefore = helper.state.killed;
-  for (const pid of [0x0, -0x1, Number.NaN, 'not-a-pid', undefined]) {
+  for (const pid of [0, -1, Number.NaN, 'not-a-pid', undefined]) {
     assert.equal(prepared.attach({ pid: pid }), false);
   }
-  assert.equal(helper.state.killed, killedBefore + 0x5);
-  assert.equal(helper.state.stdinEnded, 0x6);
+  assert.equal(helper.state.killed, killedBefore + 5);
+  assert.equal(helper.state.stdinEnded, 6);
 });
 
 test('attach cancels when the helper stdin is not writable', async () => {
@@ -530,7 +530,7 @@ test('attach cancels when the helper stdin is not writable', async () => {
   });
   helper.emit('data', 'READY\n');
   const prepared = await pending;
-  assert.equal(prepared.attach({ pid: 0x10e1 }), false);
-  assert.equal(helper.state.stdinEnded, 0x1);
-  assert.equal(helper.state.killed, 0x1);
+  assert.equal(prepared.attach({ pid: 4321 }), false);
+  assert.equal(helper.state.stdinEnded, 1);
+  assert.equal(helper.state.killed, 1);
 });

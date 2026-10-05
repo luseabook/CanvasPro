@@ -34,10 +34,10 @@ function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
 export function syncPersonReplacementImageStageFrame(el) {
-  const count = Math['max'](0x0, Number(el?.['naturalWidth']) || 0x0),
-    count2 = Math['max'](0x0, Number(el?.['naturalHeight']) || 0x0),
+  const count = Math['max'](0, Number(el?.['naturalWidth']) || 0),
+    count2 = Math['max'](0, Number(el?.['naturalHeight']) || 0),
     el2 = el?.['closest']?.('[data-person-replacement-keyframe-stage]');
-  if (!(count > 0x0 && count2 > 0x0) || !el2?.['style']) return ![];
+  if (!(count > 0 && count2 > 0) || !el2?.['style']) return ![];
   (el2['style']['setProperty']('--frame-aspect', count + ' / ' + count2),
     el2['style']['setProperty']('--frame-width', String(count)),
     el2['style']['setProperty']('--frame-height', String(count2)),
@@ -45,9 +45,9 @@ export function syncPersonReplacementImageStageFrame(el) {
     el['setAttribute']?.('height', String(count2)));
   const el3 = el2['parentElement'],
     box = el3?.['getBoundingClientRect']?.(),
-    count3 = Math['max'](0x0, Number(el3?.['clientWidth']) || Number(box?.['width']) || 0x0),
-    count4 = Math['max'](0x0, Number(el3?.['clientHeight']) || Number(box?.['height']) || 0x0);
-  if (count3 > 0x0 && count4 > 0x0) {
+    count3 = Math['max'](0, Number(el3?.['clientWidth']) || Number(box?.['width']) || 0),
+    count4 = Math['max'](0, Number(el3?.['clientHeight']) || Number(box?.['height']) || 0);
+  if (count3 > 0 && count4 > 0) {
     const item = count / count2,
       key = count3 / count4,
       index = key > item ? count4 * item : count3,
@@ -60,7 +60,7 @@ export function syncPersonReplacementImageStageFrame(el) {
 function resolveSelectedShot(options = {}) {
   const list = Array['isArray'](options?.['shots']) ? options['shots'] : [],
     text = normalizeText(options?.['workspace']?.['selectedShotId']);
-  return list['find']((data) => normalizeText(data?.['id']) === text) || list[0x0] || null;
+  return list['find']((data) => normalizeText(data?.['id']) === text) || list[0] || null;
 }
 function buildIdentityPresentation({
   project: project = {},
@@ -125,7 +125,7 @@ function buildResultPresentation(options3 = {}, current = null) {
     resultPrompt: Object['prototype']['hasOwnProperty']['call'](active || {}, 'userPrompt')
       ? normalizeText(active?.['userPrompt'])
       : '',
-    hasHistory: results['length'] > 0x1,
+    hasHistory: results['length'] > 1,
     downstream: {
       shotHasDerivedArtifacts: shotHasDerivedArtifacts,
       projectHasDerivedArtifacts: projectHasDerivedArtifacts,
@@ -174,8 +174,8 @@ function escapeHtml(record) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeMediaUrl(payload) {
   const text3 = normalizeText(payload);
@@ -200,17 +200,17 @@ function renderPromptEnhancementControl(
           text4 +
           '，可在画布 Agent 面板更换。按钮高亮表示已开启，再次点击关闭。';
   return (
-    '<div\x20class=\x22person-replacement-prompt-controls\x22>' +
+    '<div class="person-replacement-prompt-controls">' +
     renderPersonReplacementPromptModeControl(options4, { pendingShotIds: pendingShotIds }) +
     '<button type="button" class="story-secondary-button person-replacement-toggle-button person-replacement-prompt-enhancement-toggle" data-person-replacement-action="toggle-prompt-enhancement" aria-pressed="' +
     handle +
-    '\x22\x20data-auto-tooltip=\x22' +
+    '" data-auto-tooltip="' +
     escapeHtml(config) +
     '" data-tooltip="' +
     escapeHtml(
       isPersonReplacementManualPromptMode2 ? PERSON_REPLACEMENT_MANUAL_ENHANCEMENT_TOOLTIP : config,
     ) +
-    '\x22\x20' +
+    '" ' +
     (disabled ? 'disabled' : '') +
     '>AI 提示词增强</button></div>'
   );
@@ -227,7 +227,7 @@ function renderImageReplacementGenerateButton(
     scope = args['workspace']['shotSelectionMode'] === !![],
     enabled2 = Array['isArray'](args['workspace']['selectedShotIds'])
       ? args['workspace']['selectedShotIds']['length']
-      : 0x0,
+      : 0,
     map4 = new Set(
       Array['isArray'](args['workspace']['selectedShotIds'])
         ? args['workspace']['selectedShotIds']['map'](normalizeText)['filter'](Boolean)
@@ -241,17 +241,17 @@ function renderImageReplacementGenerateButton(
       });
       return (
         !personReplacementImagePresentation['gate']['sceneOnly'] &&
-        personReplacementImagePresentation['gate']['duplicateRoleLabels']['length'] > 0x0
+        personReplacementImagePresentation['gate']['duplicateRoleLabels']['length'] > 0
       );
     }),
     value2 = Boolean(presentation['generation']?.['loading']),
-    value3 = enabled2 ? '\x20(' + enabled2 + ')' : '',
+    value3 = enabled2 ? ' (' + enabled2 + ')' : '',
     value4 = scope
       ? shotBatchGenerationActive
         ? shotBatchCancelRequested
           ? '正在停止' + value3
           : '取消运行' + value3
-        : '' + (enabled2 > 0x1 ? '批量生成替换图' : '生成替换图') + value3
+        : '' + (enabled2 > 1 ? '批量生成替换图' : '生成替换图') + value3
       : value2
         ? '生成中'
         : '生成替换图',
@@ -313,7 +313,7 @@ function renderImageReplacementPage(
       sourceShot: sourceShot,
     }),
     mediaUrl = normalizeMediaUrl(personReplacementSourcePlaybackRef),
-    value14 = /^aic-local-preview:/iu['test'](mediaUrl) ? 'crossorigin=\x22anonymous\x22\x20' : '',
+    value14 = /^aic-local-preview:/iu['test'](mediaUrl) ? 'crossorigin="anonymous" ' : '',
     value15 = Boolean(
       enabled3 && mediaUrl && normalizeText(smartDetectOpen['cutEditorBufferedMediaRef']) === mediaUrl,
     ),
@@ -333,7 +333,7 @@ function renderImageReplacementPage(
       ) || '画布 Agent 当前模型',
     value18 = value17
       ? {
-          title: 'AI\x20提示词增强中',
+          title: 'AI 提示词增强中',
           description:
             description?.['replacementPromptMode'] === 'positioning'
               ? '正在使用' + text5 + '识别选框中的原人物特征，完成后将自动开始生成替换图。'
@@ -359,8 +359,8 @@ function renderImageReplacementPage(
         })
       : '',
     box2 = enabled3 ? sourceShot?.['frame'] : description?.['frame'],
-    value22 = Math['max'](0x1, Number(box2?.['width']) || 0x10),
-    value23 = Math['max'](0x1, Number(box2?.['height']) || 0x9),
+    value22 = Math['max'](1, Number(box2?.['width']) || 16),
+    value23 = Math['max'](1, Number(box2?.['height']) || 9),
     value24 =
       '--frame-aspect:' +
       value22 +
@@ -387,7 +387,7 @@ function renderImageReplacementPage(
       )
         ? '<p class="person-replacement-limit-warning" role="alert"' +
           (presentation2['gate']['blockers']['includes']('reference-review')
-            ? '\x20data-person-replacement-reference-review-warning'
+            ? ' data-person-replacement-reference-review-warning'
             : '') +
           '>' +
           escapeHtml(presentation2['gate']['message']) +
@@ -409,11 +409,11 @@ function renderImageReplacementPage(
       '</strong><span>' +
       escapeHtml(value29) +
       '</span></div>',
-    enabled5 = people['length'] > 0x0,
+    enabled5 = people['length'] > 0,
     value31 = enabled5
-      ? '<button\x20type=\x22button\x22\x20class=\x22person-replacement-secondary-button\x20person-replacement-clear-people-button\x22\x20data-person-replacement-action=\x22clear-shot-people\x22\x20data-shot-id=\x22' +
+      ? '<button type="button" class="person-replacement-secondary-button person-replacement-clear-people-button" data-person-replacement-action="clear-shot-people" data-shot-id="' +
         escapeHtml(description?.['id'] || '') +
-        '\x22\x20aria-label=\x22清空全部人物框\x22>清空</button>'
+        '" aria-label="清空全部人物框">清空</button>'
       : '<button type="button" class="person-replacement-secondary-button person-replacement-clear-people-button" aria-hidden="true" tabindex="-1" disabled>清空</button>',
     value32 =
       'person-replacement-keyframe-display person-replacement-middle-preview-slide' +
@@ -431,12 +431,12 @@ function renderImageReplacementPage(
     value35 =
       '<div class="person-replacement-keyframe-tools' +
       (value33 ? ' is-layout-placeholder' : '') +
-      '\x22' +
-      (value33 ? '\x20aria-hidden=\x22true\x22\x20inert' : '') +
+      '"' +
+      (value33 ? ' aria-hidden="true" inert' : '') +
       '>' +
       value34 +
       '</div>',
-    value36 = runtimePreviewRef['shots']['length'] > 0x1,
+    value36 = runtimePreviewRef['shots']['length'] > 1,
     value37 = value36
       ? '' +
         renderPersonReplacementPreviewArrow('previous', {
@@ -455,27 +455,27 @@ function renderImageReplacementPage(
       enabled3 && personReplacementSourcePlaybackRef
         ? '<div class="' +
           value32 +
-          '\x22>' +
+          '">' +
           value35 +
-          '<div\x20class=\x22person-replacement-keyframe-stage-shell\x22><div\x20class=\x22person-replacement-shot-clip-stage\x22\x20data-person-replacement-shot-cut-preview-stage\x20data-person-replacement-video-playback-stage=\x22cut-editor\x22\x20data-shot-id=\x22' +
+          '<div class="person-replacement-keyframe-stage-shell"><div class="person-replacement-shot-clip-stage" data-person-replacement-shot-cut-preview-stage data-person-replacement-video-playback-stage="cut-editor" data-shot-id="' +
           escapeHtml(sourceShot?.['id'] || '') +
           '" style="' +
           value24 +
-          '\x22><video\x20aria-label=\x22镜头切口预览\x22\x20' +
+          '"><video aria-label="镜头切口预览" ' +
           value14 +
-          'preload=\x22' +
+          'preload="' +
           (value15 ? 'none' : 'auto') +
           '" playsinline ' +
           (value8 ? '' : 'muted ') +
-          (value15 ? '' : 'src="' + escapeHtml(mediaUrl) + '\x22\x20') +
-          (mediaUrl2 ? 'poster="' + escapeHtml(mediaUrl2) + '\x22' : '') +
+          (value15 ? '' : 'src="' + escapeHtml(mediaUrl) + '" ') +
+          (mediaUrl2 ? 'poster="' + escapeHtml(mediaUrl2) + '"' : '') +
           ' data-person-replacement-shot-cut-video data-source-id="' +
           escapeHtml(sourceShot?.['sourceId'] || '') +
           '"></video></div></div></div>'
         : value6
           ? '<div class="' +
             value32 +
-            '\x22' +
+            '"' +
             (value36 ? ' data-person-replacement-shot-wheel="true"' : '') +
             '>' +
             value35 +
@@ -483,7 +483,7 @@ function renderImageReplacementPage(
             escapeHtml(description?.['id'] || '') +
             '" tabindex="0" aria-keyshortcuts="Control D Delete" style="' +
             value24 +
-            '\x22' +
+            '"' +
             value38 +
             '><img src="' +
             escapeHtml(normalizeMediaUrl(value6)) +
@@ -493,12 +493,12 @@ function renderImageReplacementPage(
             value22 +
             '" height="' +
             value23 +
-            '\x22>' +
+            '">' +
             (people['length'] ? value25['detectionBoxesHtml'] : value30) +
             '</div></div>' +
             value37 +
             '</div>'
-          : '<div\x20class=\x22person-replacement-inline-empty\x22>视频仍在抽帧或没有可用首帧</div>',
+          : '<div class="person-replacement-inline-empty">视频仍在抽帧或没有可用首帧</div>',
     box3 = normalizePersonReplacementLayout(runtimePreviewRef['workspace']['replacementLayout']),
     value40 =
       '--person-replacement-left-width:' +
@@ -514,7 +514,7 @@ function renderImageReplacementPage(
       model: smartDetectOpen['promptEnhancementModel'],
     });
   return (
-    '<div\x20class=\x22person-replacement-production-page\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-four-panel-layout\x22\x20data-person-replacement-layout\x20style=\x22' +
+    '<div class="person-replacement-production-page">\n    <div class="person-replacement-four-panel-layout" data-person-replacement-layout style="' +
     value40 +
     '">\n       ' +
     value25['targetAssetRailHtml'] +
@@ -528,9 +528,9 @@ function renderImageReplacementPage(
     renderLayoutSplitter2('right', box3) +
     '\n      <aside class="person-replacement-generation-panel person-replacement-image-generation-panel">\n        <div class="person-replacement-generation-preview ' +
     (value16 ? 'img-preview-loading' : '') +
-    '\x22\x20aria-busy=\x22' +
+    '" aria-busy="' +
     value16 +
-    '\x22' +
+    '"' +
     (value20
       ? ' data-person-replacement-image-result-wheel="true" aria-label="滚动鼠标滚轮切换生成结果"'
       : '') +
@@ -539,16 +539,16 @@ function renderImageReplacementPage(
       ? '<img src="' +
         escapeHtml(normalizeMediaUrl(presentation2['result']['activeRef'])) +
         '" alt="替换结果 ' +
-        (value19 + 0x1) +
+        (value19 + 1) +
         '" width="' +
         value22 +
         '" height="' +
         value23 +
-        '\x22>'
+        '">'
       : '<span>生成结果显示在这里</span>') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n          </div>\n          ' +
     (value16 ? renderWorkspaceAssetLoadingOverlay(value18) : '') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-asset-preview-actions\x20person-replacement-result-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n          <div class="story-asset-preview-actions person-replacement-result-actions">\n            ' +
     renderWorkspaceImageDownloadButton({
       action: 'download-replacement-image',
       enabled: Boolean(presentation2['result']['activeRef']),
@@ -562,12 +562,12 @@ function renderImageReplacementPage(
     value21 +
     '\n          ' +
     (list2['length']
-      ? '<div\x20class=\x22person-replacement-image-result-meta\x22\x20aria-label=\x22生成结果\x20' +
-        (value19 + 0x1) +
+      ? '<div class="person-replacement-image-result-meta" aria-label="生成结果 ' +
+        (value19 + 1) +
         '/' +
         list2['length'] +
         '"><span>' +
-        (value19 + 0x1) +
+        (value19 + 1) +
         '/' +
         list2['length'] +
         '</span></div>'
@@ -577,9 +577,9 @@ function renderImageReplacementPage(
     '\n        <div class="story-asset-detail-copy person-replacement-generation-copy"><div class="story-asset-prompt-field person-replacement-prompt-field"><div class="person-replacement-prompt-field-heading">' +
     value25['promptReferenceInputsHtml'] +
     renderPromptEnhancementControl2 +
-    '</div><div\x20class=\x22prompt-input-wrapper\x20is-resizable\x20person-replacement-prompt-input-wrapper\x22><div\x20class=\x22prompt-textarea\x20custom-textarea\x20story-asset-prompt-editor\x20person-replacement-prompt-editor\x22\x20contenteditable=\x22true\x22\x20role=\x22textbox\x22\x20aria-label=\x22图像替换提示词\x22\x20data-placeholder=\x22描述替换效果，输入\x20@\x20引用左侧素材图\x22\x20data-person-replacement-field=\x22image-prompt\x22\x20data-shot-id=\x22' +
+    '</div><div class="prompt-input-wrapper is-resizable person-replacement-prompt-input-wrapper"><div class="prompt-textarea custom-textarea story-asset-prompt-editor person-replacement-prompt-editor" contenteditable="true" role="textbox" aria-label="图像替换提示词" data-placeholder="描述替换效果，输入 @ 引用左侧素材图" data-person-replacement-field="image-prompt" data-shot-id="' +
     escapeHtml(description?.['id'] || '') +
-    '\x22>' +
+    '">' +
     renderPersonReplacementPromptHtml(presentation2['result']['activePrompt']) +
     '</div></div></div>' +
     (presentation2['gate']['overflowPersonIds']['length']
@@ -664,7 +664,7 @@ export function syncPersonReplacementImageGenerationLoading(el4, value45) {
   }
 }
 export function syncPersonReplacementImagePromptGate(el8, value46, args2 = {}) {
-  const el9 = el8?.['querySelector']?.('[data-person-replacement-action=\x22generate-replacement-image\x22]'),
+  const el9 = el8?.['querySelector']?.('[data-person-replacement-action="generate-replacement-image"]'),
     el10 = el8?.['ownerDocument'];
   if (!el9 || !el10?.['createElement']) return;
   const presentation3 = buildReadonlyImagePresentation(value46, args2['shotBatchGeneratingShotIds']),

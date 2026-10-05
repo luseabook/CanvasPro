@@ -51,7 +51,7 @@ export function createTaskCardView(options) {
           (el11['textContent'] =
             { image: '▧', video: '▷', audio: '♫', text: '≡' }[response['thumbnail']?.['kind']] || '▧'),
           (el12['textContent'] =
-            response['thumbnail']?.['count'] > 0x1 ? String(response['thumbnail']['count']) : ''),
+            response['thumbnail']?.['count'] > 1 ? String(response['thumbnail']['count']) : ''),
           (el12['hidden'] = !el12['textContent']),
           (el2['textContent'] = response['title']),
           (el3['textContent'] = response['context']),
@@ -71,10 +71,10 @@ export function createTaskCardView(options) {
           ? ((el7['hidden'] = !![]), el6['removeAttribute']('aria-valuenow'), startLoading(el6))
           : (stopLoading(el6),
             (el7['hidden'] = ![]),
-            (el7['style']['width'] = Math['round']((response['progress'] || 0x0) * 0x64) + '%'),
+            (el7['style']['width'] = Math['round']((response['progress'] || 0) * 100) + '%'),
             el6['setAttribute'](
               'aria-valuenow',
-              String(Math['round']((response['progress'] || 0x0) * 0x64)),
+              String(Math['round']((response['progress'] || 0) * 100)),
             ));
         const list2 = response['actions']['map']((target) => {
           let el13 = map2['get'](target['id']);

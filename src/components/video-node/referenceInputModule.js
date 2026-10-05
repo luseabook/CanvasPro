@@ -20,7 +20,7 @@ import { resolveCanvasImageLowZoomUrl } from '../../services/canvasMediaLocalSer
 import { createPromptAttachmentButtonHTML } from '../refAttachmentButton.js';
 import { t } from '../../i18n/index.js';
 const RH_V54_FPS_OPTIONS = Object.freeze([16, 24, 30]),
-  RH_MIN_VIDEO_RESOLUTION = 0x340;
+  RH_MIN_VIDEO_RESOLUTION = 832;
 function referenceInputText(value, item = {}) {
   return t('videoNode.referenceInput.' + value, item);
 }
@@ -350,12 +350,12 @@ function getFixedInputRatioMediaSize(nodeId, value38 = {}) {
     includeNodeFrame: true,
   });
 }
-function calcFixedInputDisplaySize(value40, value41, value42 = 0x12c) {
+function calcFixedInputDisplaySize(value40, value41, value42 = 300) {
   const count5 = Number(value40),
     count6 = Number(value41);
   if (!(Number.isFinite(count5) && count5 > 0)) return null;
   if (!(Number.isFinite(count6) && count6 > 0)) return null;
-  const height = Math.max(1, Math.round(Number(value42) || 0x12c));
+  const height = Math.max(1, Math.round(Number(value42) || 300));
   if (count5 >= count6) return { width: Math.round((count5 / count6) * height), height: height };
   return { width: height, height: Math.round((count6 / count5) * height) };
 }
@@ -748,7 +748,7 @@ export function createVideoNodeReferenceInputModule(value43) {
       const box = getFixedInputRatioMediaSize(enabled17[enabled18], value70),
         box2 = calcFixedInputDisplaySize(box?.width, box?.height);
       if (!box2) return;
-      const duration = 0x118,
+      const duration = 280,
         handler = (value71) => {
           const el10 =
             typeof document !== 'undefined' && typeof document.getElementById === 'function'
@@ -767,8 +767,8 @@ export function createVideoNodeReferenceInputModule(value43) {
           }, value71 + 80);
         },
         box3 = store.getState?.().nodes?.[this.nodeId] || this._data || {},
-        value72 = Number(box3.width) || 0x12c,
-        value73 = Number(box3.height) || 0x12c,
+        value72 = Number(box3.width) || 300,
+        value73 = Number(box3.height) || 300,
         value74 = Number.isFinite(Number(box3.x)) ? Number(box3.x) : 0,
         value75 = Number.isFinite(Number(box3.y)) ? Number(box3.y) : 0,
         width = box2.width,

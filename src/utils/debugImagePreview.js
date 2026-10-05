@@ -25,12 +25,12 @@ export function resolveDebugImageSource(enabled) {
   return localPathToUrl(enabled);
 }
 export function buildDebugJsonPreview(value, { imageContext: imageContext = ![] } = {}) {
-  const content = JSON['stringify'](value, null, 0x2) ?? '',
+  const content = JSON['stringify'](value, null, 2) ?? '',
     images = [];
-  let end = 0x0;
-  function run(list, path, item = ![], label = 0x0) {
+  let end = 0;
+  function run(list, path, item = ![], label = 0) {
     if (Array['isArray'](list))
-      list['forEach']((key, index) => run(key, path + '[' + index + ']', item, index + 0x1));
+      list['forEach']((key, index) => run(key, path + '[' + index + ']', item, index + 1));
     else {
       if (list && typeof list === 'object')
         Object['entries'](list)['forEach'](([result, data]) => {
@@ -49,7 +49,7 @@ export function buildDebugJsonPreview(value, { imageContext: imageContext = ![] 
           start = content['indexOf'](list3, end);
         end = start + list3['length'];
         const src = item ? resolveDebugImageSource(list) : '';
-        if (src && start >= 0x0)
+        if (src && start >= 0)
           images['push']({
             start: start,
             end: end,

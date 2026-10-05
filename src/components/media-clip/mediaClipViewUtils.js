@@ -59,8 +59,8 @@ export function getMediaClipWaveformViewport(options2 = {}) {
     current = Math.max(0.001, next - source),
     entry = Math.max(1, count / current);
   return {
-    widthPct: Math.round(entry * 0x186a0) / 0x3e8,
-    marginLeftPct: Math.round((source / current) * 0x186a0) / 0x3e8,
+    widthPct: Math.round(entry * 100000) / 1000,
+    marginLeftPct: Math.round((source / current) * 100000) / 1000,
   };
 }
 export function formatWaveformPct(record = 0) {

@@ -10,20 +10,20 @@ function renderAttributes(options = {}) {
   return Object['entries'](options || {})
     ['filter'](([, item]) => item !== ![] && item != null)
     ['map'](([key, index]) =>
-      index === !![] ? escapeHtml(key) : escapeHtml(key) + '=\x22' + escapeHtml(index) + '\x22',
+      index === !![] ? escapeHtml(key) : escapeHtml(key) + '="' + escapeHtml(index) + '"',
     )
-    ['join']('\x20');
+    ['join'](' ');
 }
 const PLAY_ICON =
     '<svg class="story-video-play-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>',
   PAUSE_ICON =
     '<svg class="story-video-pause-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 5h4v14H6zm8 0h4v14h-4z"></path></svg>',
   HIGH_VOLUME_ICON =
-    '<svg\x20width=\x2217\x22\x20height=\x2217\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M11\x205\x206\x209H2v6h4l5\x204z\x22></path><path\x20d=\x22M15.5\x208.5a5\x205\x200\x200\x201\x200\x207\x22></path><path\x20d=\x22M18\x206a8.5\x208.5\x200\x200\x201\x200\x2012\x22></path></svg>';
-function clampVolume(result, data = 0x0) {
+    '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18 6a8.5 8.5 0 0 1 0 12"></path></svg>';
+function clampVolume(result, data = 0) {
   const target = Number(result);
   if (!Number['isFinite'](target)) return data;
-  return Math['min'](0x1, Math['max'](0x0, target));
+  return Math['min'](1, Math['max'](0, target));
 }
 function resolveVolumeMediaElements(handler) {
   const source = typeof handler === 'function' ? handler() : [];
@@ -35,33 +35,33 @@ export function bindWorkspaceVideoVolumeControls({
   volumeSlider: volumeSlider,
   volumeToggle: volumeToggle,
   getMediaElements: getMediaElements = () => [],
-  defaultVolume: defaultVolume = 0x1,
+  defaultVolume: defaultVolume = 1,
   getToggleLabel: getToggleLabel,
   onChange: onChange,
 } = {}) {
   let current = ![];
   const list = resolveVolumeMediaElements(getMediaElements),
-    entry = list['find']((record) => record['muted'] !== !![] && clampVolume(record['volume']) > 0x0),
-    payload = list['find']((handle) => clampVolume(handle['volume']) > 0x0),
-    clampVolume2 = clampVolume(Number(volumeSlider?.['value']) / 0x64);
+    entry = list['find']((record) => record['muted'] !== !![] && clampVolume(record['volume']) > 0),
+    payload = list['find']((handle) => clampVolume(handle['volume']) > 0),
+    clampVolume2 = clampVolume(Number(volumeSlider?.['value']) / 100);
   let clampVolume3 =
-    clampVolume(entry?.['volume'] ?? payload?.['volume'] ?? clampVolume2, clampVolume(defaultVolume, 0x1)) ||
-    clampVolume(defaultVolume, 0x1) ||
-    0x1;
+    clampVolume(entry?.['volume'] ?? payload?.['volume'] ?? clampVolume2, clampVolume(defaultVolume, 1)) ||
+    clampVolume(defaultVolume, 1) ||
+    1;
   const run = () => {
       const mediaElements = resolveVolumeMediaElements(getMediaElements),
         volume = mediaElements['find'](
-          (state) => state['muted'] !== !![] && clampVolume(state['volume']) > 0x0,
+          (state) => state['muted'] !== !![] && clampVolume(state['volume']) > 0,
         );
-      return { mediaElements: mediaElements, volume: volume ? clampVolume(volume['volume']) : 0x0 };
+      return { mediaElements: mediaElements, volume: volume ? clampVolume(volume['volume']) : 0 };
     },
     sync = () => {
       if (current) return;
       const config = run(),
-        count = config['mediaElements']['length'] > 0x0 ? config['volume'] : clampVolume2;
-      if (count > 0x0) clampVolume3 = count;
-      const count2 = Math['round'](count * 0x64),
-        scope = count2 === 0x0;
+        count = config['mediaElements']['length'] > 0 ? config['volume'] : clampVolume2;
+      if (count > 0) clampVolume3 = count;
+      const count2 = Math['round'](count * 100),
+        scope = count2 === 0;
       volumeSlider &&
         ((volumeSlider['value'] = String(count2)),
         volumeSlider['style']?.['setProperty']?.('--story-video-volume-progress', count2 + '%'),
@@ -78,8 +78,8 @@ export function bindWorkspaceVideoVolumeControls({
     },
     setVolumePercent = (output) => {
       if (current) return ![];
-      const clampVolume4 = clampVolume(Number(output) / 0x64);
-      if (clampVolume4 > 0x0) clampVolume3 = clampVolume4;
+      const clampVolume4 = clampVolume(Number(output) / 100);
+      if (clampVolume4 > 0) clampVolume3 = clampVolume4;
       for (const value2 of resolveVolumeMediaElements(getMediaElements)) {
         ((value2['volume'] = clampVolume4), (value2['muted'] = ![]));
       }
@@ -88,11 +88,11 @@ export function bindWorkspaceVideoVolumeControls({
     toggleMuted = () => {
       if (current) return ![];
       const value3 = run();
-      if (value3['volume'] > 0x0) {
+      if (value3['volume'] > 0) {
         clampVolume3 = value3['volume'];
         for (const value4 of value3['mediaElements']) value4['muted'] = !![];
       } else {
-        const value5 = clampVolume3 || 0x1;
+        const value5 = clampVolume3 || 1;
         for (const value6 of value3['mediaElements']) {
           ((value6['volume'] = value5), (value6['muted'] = ![]));
         }
@@ -159,7 +159,7 @@ export function renderWorkspaceVideoPlaybackControls({
   volumeToggleLabel: volumeToggleLabel = '静音' + label,
   slots: slots = {},
 } = {}) {
-  const value15 = ['video-controls', 'story-video-controls', className]['filter'](Boolean)['join']('\x20'),
+  const value15 = ['video-controls', 'story-video-controls', className]['filter'](Boolean)['join'](' '),
     renderAttributes2 = renderAttributes(controlsAttributes),
     renderAttributes3 = renderAttributes(playAttributes),
     renderAttributes4 = renderAttributes(currentTimeAttributes),
@@ -170,54 +170,54 @@ export function renderWorkspaceVideoPlaybackControls({
     renderAttributes9 = renderAttributes(volumeToggleAttributes),
     value16 = disabled ? ' disabled' : '',
     value17 = disabled ? '-1' : '0',
-    value18 = playTitle ? ' title="' + escapeHtml(playTitle) + '\x22' : '';
+    value18 = playTitle ? ' title="' + escapeHtml(playTitle) + '"' : '';
   return (
     '<div class="' +
     escapeHtml(value15) +
-    '\x22' +
-    (renderAttributes2 ? '\x20' + renderAttributes2 : '') +
+    '"' +
+    (renderAttributes2 ? ' ' + renderAttributes2 : '') +
     '>\n    <button type="button" class="video-play-btn story-video-play-btn"' +
-    (renderAttributes3 ? '\x20' + renderAttributes3 : '') +
+    (renderAttributes3 ? ' ' + renderAttributes3 : '') +
     ' aria-label="' +
     escapeHtml(playLabel) +
-    '\x22' +
+    '"' +
     value18 +
     value16 +
     '>\n      ' +
     PLAY_ICON +
-    '\x0a\x20\x20\x20\x20\x20\x20' +
+    '\n      ' +
     PAUSE_ICON +
     '\n    </button>\n    ' +
     (slots['afterPlay'] || '') +
-    '\x0a\x20\x20\x20\x20<span\x20class=\x22video-time-current\x22' +
-    (renderAttributes4 ? '\x20' + renderAttributes4 : '') +
+    '\n    <span class="video-time-current"' +
+    (renderAttributes4 ? ' ' + renderAttributes4 : '') +
     '>0:00</span>\n    <div class="media-progress-bar"' +
-    (renderAttributes5 ? '\x20' + renderAttributes5 : '') +
+    (renderAttributes5 ? ' ' + renderAttributes5 : '') +
     ' role="slider" aria-disabled="' +
     disabled +
-    '\x22\x20tabindex=\x22' +
+    '" tabindex="' +
     value17 +
     '" aria-label="' +
     escapeHtml(progressLabel) +
     '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">\n      <div class="media-progress-fill"' +
-    (renderAttributes6 ? '\x20' + renderAttributes6 : '') +
+    (renderAttributes6 ? ' ' + renderAttributes6 : '') +
     '><div class="media-progress-knob"></div></div>\n    </div>\n    <span class="video-time-total"' +
-    (renderAttributes7 ? '\x20' + renderAttributes7 : '') +
+    (renderAttributes7 ? ' ' + renderAttributes7 : '') +
     '>0:00</span>\n    ' +
     (slots['beforeVolume'] || '') +
-    '\x0a\x20\x20\x20\x20<div\x20class=\x22story-video-volume-control\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-video-volume-toggle\x22' +
-    (renderAttributes9 ? '\x20' + renderAttributes9 : '') +
+    '\n    <div class="story-video-volume-control">\n      <button type="button" class="story-video-volume-toggle"' +
+    (renderAttributes9 ? ' ' + renderAttributes9 : '') +
     ' aria-label="' +
     escapeHtml(volumeToggleLabel) +
-    '\x22\x20aria-pressed=\x22false\x22' +
+    '" aria-pressed="false"' +
     value16 +
-    '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '>\n        ' +
     HIGH_VOLUME_ICON +
     '\n      </button>\n      <input type="range" class="story-video-volume-slider"' +
-    (renderAttributes8 ? '\x20' + renderAttributes8 : '') +
+    (renderAttributes8 ? ' ' + renderAttributes8 : '') +
     ' min="0" max="100" step="1" value="100" aria-label="' +
     escapeHtml(volumeLabel) +
-    '\x22\x20aria-valuetext=\x22100%\x22' +
+    '" aria-valuetext="100%"' +
     value16 +
     '>\n    </div>\n    ' +
     (slots['afterVolume'] || '') +
@@ -250,11 +250,11 @@ export function createWorkspaceVideoPlaybackControls(
   const root = el4['createElement']('div');
   ((root['className'] = ['video-controls', 'story-video-controls', className]
     ['filter'](Boolean)
-    ['join']('\x20')),
+    ['join'](' ')),
     applyElementAttributes(root, controlsAttributes));
   const playButton = el4['createElement']('button');
   ((playButton['type'] = 'button'),
-    (playButton['className'] = 'video-play-btn\x20story-video-play-btn'),
+    (playButton['className'] = 'video-play-btn story-video-play-btn'),
     (playButton['innerHTML'] = '' + PLAY_ICON + PAUSE_ICON),
     playButton['setAttribute']('aria-label', playLabel));
   if (playTitle) playButton['setAttribute']('title', playTitle);

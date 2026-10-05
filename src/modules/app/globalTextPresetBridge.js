@@ -21,8 +21,8 @@ const COPY_FAILURE_REASONS = new Set([
     'ai-image': { type: 'ai-image', textField: 'prompt', nameKey: 'globalCapture.nodeNames.aiImage' },
     'ai-video': { type: 'ai-video', textField: 'prompt', nameKey: 'globalCapture.nodeNames.aiVideo' },
   }),
-  DEFAULT_MOUNT_ATTEMPTS = 0x1e,
-  DEFAULT_MOUNT_DELAY_MS = 0x10;
+  DEFAULT_MOUNT_ATTEMPTS = 30,
+  DEFAULT_MOUNT_DELAY_MS = 16;
 
 function getCommandFailureMessage(commandResult) {
   return String(commandResult?.['message'] || commandResult?.['errorCode'] || commandResult?.['error'] || '')[
@@ -57,7 +57,7 @@ export async function waitForGlobalCaptureNodeMounted({
 } = {}) {
   const normalizedNodeId = String(nodeId || '')['trim']();
   if (!normalizedNodeId || typeof isNodeMounted !== 'function') return ![];
-  for (let attempt = 0x0; attempt < attempts; attempt += 0x1) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
     if (isNodeMounted(normalizedNodeId) === !![]) return !![];
     await waitForNextFrame(scheduleFrame);
   }
@@ -199,7 +199,7 @@ export function installGlobalTextPresetBridge({
       );
     } catch (error) {
       return (
-        consoleObject['error']?.('[globalCapture]\x20failed\x20to\x20handle\x20selected\x20text', error),
+        consoleObject['error']?.('[globalCapture] failed to handle selected text', error),
         showToast?.(
           resolveText('globalCapture.actionFailed', { reason: String(error?.['message'] || error || '') }),
           'error',

@@ -65,7 +65,7 @@ test('buildHardwareH264EncoderArgs keeps the crf inside 0..51', () => {
     const args = buildHardwareH264EncoderArgs(NVENC, { crf: crf });
     return args[args.indexOf('-cq') + 1];
   };
-  assert.equal(cqOf(0x17), '23');
+  assert.equal(cqOf(23), '23');
   assert.equal(cqOf(18), '18');
   assert.equal(cqOf(999), '51');
   assert.equal(cqOf(-5), '0');
@@ -263,7 +263,7 @@ test('probeFfmpegH264Encoder selects the first platform encoder that probes succ
   assert.equal(calls.length, 3);
   assert.deepEqual(calls[0].args, ['-hide_banner', '-encoders']);
   assert.equal(calls[0].options.cwd, process.cwd());
-  assert.equal(calls[0].options.timeoutMs, 0x3a98);
+  assert.equal(calls[0].options.timeoutMs, 15000);
   assert.deepEqual(calls[1].args.slice(0, 10), [
     '-hide_banner',
     '-loglevel',

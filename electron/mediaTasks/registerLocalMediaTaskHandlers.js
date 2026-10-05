@@ -2,8 +2,8 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { finalizeVideoPlaybackProxyMigrationResult } from '../videoPlaybackProxy.js';
-const VIDEO_POSTER_TIMEOUT_MS = 0xea60,
-  AUDIO_WAVEFORM_TIMEOUT_MS = 0x1e * 0x3c * 0x3e8;
+const VIDEO_POSTER_TIMEOUT_MS = 60000,
+  AUDIO_WAVEFORM_TIMEOUT_MS = 30 * 60 * 1000;
 function runVideoTranscode(deps, task, queue, args, options = {}) {
   if (typeof deps['runFfmpegTask'] === 'function')
     return deps['runFfmpegTask'](task, queue, args, options);
@@ -48,7 +48,7 @@ function createVideoPosterHandler(deps) {
           mediaTaskId: task['id'],
           mediaTaskKind: task['kind'],
           mediaTaskStatus: 'complete',
-          mediaTaskProgress: 0x1,
+          mediaTaskProgress: 1,
           mediaTaskError: '',
         },
         { expectedMediaTaskId: task['id'] },
@@ -93,7 +93,7 @@ function createAudioWaveformHandler(deps) {
           mediaTaskId: task['id'],
           mediaTaskKind: task['kind'],
           mediaTaskStatus: 'complete',
-          mediaTaskProgress: 0x1,
+          mediaTaskProgress: 1,
           mediaTaskError: '',
         },
         { expectedMediaTaskId: task['id'] },
@@ -109,7 +109,7 @@ function createVideoFirstFrameHandler(deps) {
       sourceAbs = deps['resolveMediaTaskSource'](source),
       stat = statSync(sourceAbs),
       cacheKey = source['replace'](/^\/+/, '') + '|' + stat['mtimeMs'] + '|' + stat['size'],
-      digest = createHash('sha1')['update'](cacheKey)['digest']('hex')['slice'](0x0, 0xc),
+      digest = createHash('sha1')['update'](cacheKey)['digest']('hex')['slice'](0, 12),
       thumbDir = path['join'](deps['getOutputDir'](), 'VideoThumbs');
     mkdirSync(thumbDir, { recursive: true });
     const filename = 'vthumb_' + digest + '.jpg',
@@ -138,12 +138,12 @@ function createVideoFirstFrameHandler(deps) {
 }
 function readCutRange(task) {
   const start = Math['max'](
-      0x0,
-      Number(task['payload']['args']?.['start'] ?? task['payload']['start'] ?? 0x0) || 0x0,
+      0,
+      Number(task['payload']['args']?.['start'] ?? task['payload']['start'] ?? 0) || 0,
     ),
     end = Math['max'](
-      0x0,
-      Number(task['payload']['args']?.['end'] ?? task['payload']['end'] ?? 0x0) || 0x0,
+      0,
+      Number(task['payload']['args']?.['end'] ?? task['payload']['end'] ?? 0) || 0,
     );
   return { start: start, end: end };
 }
@@ -159,7 +159,7 @@ function createVideoCutHandler(deps) {
             task['payload']['frameRate'],
         ),
       ),
-      fps = [0x10, 0x18, 0x1e]['includes'](requestedFps) ? requestedFps : 0x0,
+      fps = [16, 24, 30]['includes'](requestedFps) ? requestedFps : 0,
       cutDir = path['join'](deps['getOutputDir'](), 'CutVideo');
     mkdirSync(cutDir, { recursive: true });
     const filename = deps['createOutputFilename']('cut', 'mp4'),
@@ -254,7 +254,7 @@ function createVideoAudioSeparateHandler(deps) {
       deps['getRuntimeToolOrFallback']('ffmpeg'),
       ['-y', '-i', sourceAbs, '-map', '0:v:0', '-an', '-c:v', 'copy', videoAbs],
       {
-        durationSec: meta['duration'] || 0x0,
+        durationSec: meta['duration'] || 0,
         initialProgress: 0.05,
         progressMessage: 'Extracting video',
       },
@@ -265,7 +265,7 @@ function createVideoAudioSeparateHandler(deps) {
         deps['getRuntimeToolOrFallback']('ffmpeg'),
         ['-y', '-i', sourceAbs, '-map', '0:a:0', '-vn', '-c:a', 'libmp3lame', '-b:a', '192k', audioAbs],
         {
-          durationSec: meta['duration'] || 0x0,
+          durationSec: meta['duration'] || 0,
           initialProgress: 0.55,
           progressMessage: 'Extracting audio',
         },
@@ -288,9 +288,9 @@ function createVideoComposeHandler(deps) {
           : [],
       absList = srcs['map']((src) => deps['resolveMediaTaskSource'](src)),
       includeAudio = task['payload']['args']?.['includeAudio'] !== false;
-    if (absList['length'] < 0x1 || (absList['length'] < 0x2 && includeAudio))
+    if (absList['length'] < 1 || (absList['length'] < 2 && includeAudio))
       throw new Error('Invalid video compose sources');
-    const meta = await deps['ffprobeVideoMeta'](queue, task, absList[0x0]);
+    const meta = await deps['ffprobeVideoMeta'](queue, task, absList[0]);
     if (!meta['width'] || !meta['height'])
       throw new Error('FFprobe failed: missing width/height');
     const audioFlags = includeAudio
@@ -302,7 +302,7 @@ function createVideoComposeHandler(deps) {
     const filename = deps['createOutputFilename']('compose', 'mp4'),
       outAbs = path['join'](composeDir, filename),
       outRel = deps['toOutputLocalPath']('ComposeVideo', filename),
-      fps = Math['max'](0x1, Math['round'](meta['fps'] || 0x1e)),
+      fps = Math['max'](1, Math['round'](meta['fps'] || 30)),
       filters = [];
     absList['forEach']((_source, index) => {
       (filters['push'](
@@ -361,7 +361,7 @@ function createVideoComposeHandler(deps) {
       ),
       await runVideoTranscode(deps, task, queue, args, {
         durationSec:
-          Number(task['payload']['args']?.['duration'] || 0x0) || meta['duration'] || 0x0,
+          Number(task['payload']['args']?.['duration'] || 0) || meta['duration'] || 0,
         progressMessage: 'Composing video',
       }),
       { success: true, filename: filename, path: outRel, localPath: outRel, url: '/' + outRel }
@@ -383,7 +383,7 @@ function createVideoAudioMuxHandler(deps) {
     const filename = deps['createOutputFilename']('mux', 'mp4'),
       outAbs = path['join'](muxDir, filename),
       outRel = deps['toOutputLocalPath']('MuxVideo', filename),
-      durationSec = Math['max'](0x0, Number(meta['duration']) || 0x0),
+      durationSec = Math['max'](0, Number(meta['duration']) || 0),
       ffmpegArgs = [
         '-y',
         '-i',
@@ -400,7 +400,7 @@ function createVideoAudioMuxHandler(deps) {
         'aac',
         '-af',
         'apad',
-        ...(durationSec > 0x0 ? ['-t', String(durationSec)] : ['-shortest']),
+        ...(durationSec > 0 ? ['-t', String(durationSec)] : ['-shortest']),
         '-movflags',
         '+faststart',
         outAbs,

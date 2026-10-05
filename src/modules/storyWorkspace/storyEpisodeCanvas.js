@@ -8,8 +8,8 @@ function normalizeText(item) {
   return String(item || '')['trim']();
 }
 export function buildStoryEpisodeCanvasName(options = {}) {
-  const count = Number(options['number'] || 0x0);
-  return [count > 0x0 ? '第\x20' + count + '\x20集' : '分集', normalizeText(options['title'])]
+  const count = Number(options['number'] || 0);
+  return [count > 0 ? '第 ' + count + ' 集' : '分集', normalizeText(options['title'])]
     ['filter'](Boolean)
     ['join'](' · ');
 }
@@ -29,14 +29,14 @@ export function buildStoryClipCanvasNodeData({
       asObject2['activeIndex'],
     ),
     key = items[activeIndex] || {},
-    count2 = Number(episode['number'] || 0x0),
-    count3 = Number(clip['number'] || 0x0),
+    count2 = Number(episode['number'] || 0),
+    count3 = Number(clip['number'] || 0),
     message = normalizeText(generationValidation?.['message'] || generationValidation);
   return {
     type: 'ai-video',
     name: [
-      count2 > 0x0 ? '第\x20' + count2 + '\x20集' : '分集',
-      count3 > 0x0 ? '片段 ' + count3 : '视频片段',
+      count2 > 0 ? '第 ' + count2 + ' 集' : '分集',
+      count3 > 0 ? '片段 ' + count3 : '视频片段',
       normalizeText(clip['title']),
       message ? '⚠ 时长需调整' : '',
     ]
@@ -117,7 +117,7 @@ export function createStoryEpisodeCanvasAdapter({
   updateNodeData: updateNodeData,
   deleteNodes: deleteNodes2 = null,
   focusNodes: focusNodes2 = null,
-  getVideoNodeSize: getVideoNodeSize = () => ({ width: 0x400, height: 0x240 }),
+  getVideoNodeSize: getVideoNodeSize = () => ({ width: 1024, height: 576 }),
   commit: commit = () => {},
 } = {}) {
   if (
@@ -127,7 +127,7 @@ export function createStoryEpisodeCanvasAdapter({
     typeof getGraphState !== 'function' ||
     typeof updateNodeData !== 'function'
   )
-    throw new Error('story\x20episode\x20canvas\x20adapter\x20dependencies\x20are\x20incomplete');
+    throw new Error('story episode canvas adapter dependencies are incomplete');
   const run = (record) => asObject(getGraphState()?.['nodes'])[normalizeText(record)] || null;
   return {
     canvasExists(payload) {
@@ -161,8 +161,8 @@ export function createStoryEpisodeCanvasAdapter({
       const box = asObject(getVideoNodeSize()),
         type2 = createNodeAtCursor(
           'ai-video',
-          Number(box['width'] || 0x400),
-          Number(box['height'] || 0x240),
+          Number(box['width'] || 1024),
+          Number(box['height'] || 576),
           error['name'],
           { placement: 'viewport-center-sequence', sequenceKey: sequenceKey, skipCommit: !![] },
         );
@@ -266,7 +266,7 @@ export async function createStoryEpisodeCanvas({
               clip2?.['durationSec'] || clip2?.['durationSeconds'] || clip2?.['duration'],
             ),
             message2 = normalizeText(error2?.['message'] || error2);
-          if (!(duration > 0x0) || !/时长|duration/iu['test'](message2)) throw error2;
+          if (!(duration > 0) || !/时长|duration/iu['test'](message2)) throw error2;
           return {
             clip: clip2,
             modelId: modelId,
@@ -297,9 +297,9 @@ export async function createStoryEpisodeCanvas({
     nodes3 = [],
     bindings = [],
     nodes4 = value10 ? { ...args4 } : {};
-  let createdCount = 0x0,
-    updatedCount = 0x0,
-    deletedCount = 0x0;
+  let createdCount = 0,
+    updatedCount = 0,
+    deletedCount = 0;
   const list9 = list8['map'](({ clip: clip3 }, clipIndex) =>
       buildStoryClipCanvasBindingKey({ episode: episode, clip: clip3, clipIndex: clipIndex }),
     ),
@@ -330,7 +330,7 @@ export async function createStoryEpisodeCanvas({
         delete nodes4[value14];
       });
     }
-    for (let value15 = 0x0; value15 < list8['length']; value15 += 0x1) {
+    for (let value15 = 0; value15 < list8['length']; value15 += 1) {
       const modelId2 = list8[value15],
         { clip: clip4 } = modelId2,
         key2 = list9[value15],
@@ -352,12 +352,12 @@ export async function createStoryEpisodeCanvas({
               sequenceKey: sequenceKey2,
             }),
           ),
-          (updatedCount += 0x1))
+          (updatedCount += 1))
         : (nodes3['push'](
             await adapter2['createVideoNode'](error3, { canvasId: canvasId2, sequenceKey: sequenceKey2 }),
           ),
-          (createdCount += 0x1));
-      const value17 = nodes3['at'](-0x1),
+          (createdCount += 1));
+      const value17 = nodes3['at'](-1),
         nodeId = normalizeText(value17?.['id'] || (value16 ? text9 : ''));
       if (!nodeId) throw new Error('同步本集到项目画布失败：' + (error3['name'] || key2));
       ((nodes4[key2] = nodeId),
@@ -374,7 +374,7 @@ export async function createStoryEpisodeCanvas({
         nodes3['length'] &&
         (await adapter2['focusNodes'](
           bindings['map']((value18) => value18['nodeId']),
-          { padding: 0x50, durationMs: 0x0, maxZoom: 0.2 },
+          { padding: 80, durationMs: 0, maxZoom: 0.2 },
         )));
   } catch (value19) {
     await rollbackStoryEpisodeCanvasMutation({

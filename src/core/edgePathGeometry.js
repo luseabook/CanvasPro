@@ -3,14 +3,14 @@ export const CONNECTION_LINE_STYLES = Object['freeze']({
   ORTHOGONAL: 'orthogonal',
   STRAIGHT: 'straight',
 });
-const CONNECTION_ROUTE_CLEARANCE = 0x3c;
+const CONNECTION_ROUTE_CLEARANCE = 60;
 export function normalizeConnectionLineStyle(value) {
   const item = String(value || '')['trim']();
   return item === CONNECTION_LINE_STYLES['ORTHOGONAL'] || item === CONNECTION_LINE_STYLES['STRAIGHT']
     ? item
     : CONNECTION_LINE_STYLES['CURVE'];
 }
-function normalizeNumber(key, index = 0x0) {
+function normalizeNumber(key, index = 0) {
   const result = Number(key);
   return Number['isFinite'](result) ? result : index;
 }
@@ -25,22 +25,22 @@ export function resolveConnectionEndpoints({
 } = {}) {
   const number = normalizeNumber(sourceX),
     number2 = normalizeNumber(sourceY),
-    data = Math['max'](0x0, normalizeNumber(sourceWidth)),
-    options = Math['max'](0x0, normalizeNumber(sourceHeight)),
+    data = Math['max'](0, normalizeNumber(sourceWidth)),
+    options = Math['max'](0, normalizeNumber(sourceHeight)),
     number3 = normalizeNumber(targetX),
     number4 = normalizeNumber(targetY),
-    target = Math['max'](0x0, normalizeNumber(targetHeight)),
+    target = Math['max'](0, normalizeNumber(targetHeight)),
     startX = number + data,
-    startY = number2 + options / 0x2,
+    startY = number2 + options / 2,
     endX = number3,
-    endY = number4 + target / 0x2;
+    endY = number4 + target / 2;
   let orthogonalRouteY = null;
   if (endX < startX) {
     const source = number2 + options,
       next = number4 + target;
-    if (source <= number4) orthogonalRouteY = (source + number4) / 0x2;
+    if (source <= number4) orthogonalRouteY = (source + number4) / 2;
     else {
-      if (next <= number2) orthogonalRouteY = (next + number2) / 0x2;
+      if (next <= number2) orthogonalRouteY = (next + number2) / 2;
       else {
         const current = Math['min'](number2, number4) - CONNECTION_ROUTE_CLEARANCE,
           entry = Math['max'](source, next) + CONNECTION_ROUTE_CLEARANCE,
@@ -77,13 +77,13 @@ export function buildConnectionPathGeometry({
     endY3 = normalizeNumber(endY2),
     pathStyle = normalizeConnectionLineStyle(style),
     endpointSignature =
-      startX3['toFixed'](0x1) +
+      startX3['toFixed'](1) +
       ',' +
-      startY3['toFixed'](0x1) +
+      startY3['toFixed'](1) +
       ',' +
-      endX3['toFixed'](0x1) +
+      endX3['toFixed'](1) +
       ',' +
-      endY3['toFixed'](0x1);
+      endY3['toFixed'](1);
   if (pathStyle === CONNECTION_LINE_STYLES['STRAIGHT'])
     return {
       pathStyle: pathStyle,
@@ -97,7 +97,7 @@ export function buildConnectionPathGeometry({
         { x: startX3, y: startY3 },
         { x: endX3, y: endY3 },
       ],
-      d: 'M\x20' + startX3 + '\x20' + startY3 + ' L ' + endX3 + '\x20' + endY3,
+      d: 'M ' + startX3 + ' ' + startY3 + ' L ' + endX3 + ' ' + endY3,
       endpointSignature: endpointSignature,
     };
   if (pathStyle === CONNECTION_LINE_STYLES['ORTHOGONAL']) {
@@ -107,7 +107,7 @@ export function buildConnectionPathGeometry({
         x2 = endX3 - CONNECTION_ROUTE_CLEARANCE,
         y = Number['isFinite'](Number(orthogonalRouteY2))
           ? Number(orthogonalRouteY2)
-          : (startY3 + endY3) / 0x2;
+          : (startY3 + endY3) / 2;
       return {
         pathStyle: pathStyle,
         startX: startX3,
@@ -125,9 +125,9 @@ export function buildConnectionPathGeometry({
           { x: endX3, y: endY3 },
         ],
         d:
-          'M\x20' +
+          'M ' +
           startX3 +
-          '\x20' +
+          ' ' +
           startY3 +
           ' H ' +
           x +
@@ -142,7 +142,7 @@ export function buildConnectionPathGeometry({
         endpointSignature: endpointSignature,
       };
     }
-    const x3 = (startX3 + endX3) / 0x2;
+    const x3 = (startX3 + endX3) / 2;
     return {
       pathStyle: pathStyle,
       startX: startX3,
@@ -157,13 +157,13 @@ export function buildConnectionPathGeometry({
         { x: x3, y: endY3 },
         { x: endX3, y: endY3 },
       ],
-      d: 'M\x20' + startX3 + '\x20' + startY3 + ' H ' + x3 + '\x20V\x20' + endY3 + '\x20H\x20' + endX3,
+      d: 'M ' + startX3 + ' ' + startY3 + ' H ' + x3 + ' V ' + endY3 + ' H ' + endX3,
       endpointSignature: endpointSignature,
     };
   }
-  const state = Math['max'](Math['abs'](endX3 - startX3) * 0.5, 0x3c),
-    config = Number['isFinite'](Number(curveOffset)) ? Math['max'](0x0, Number(curveOffset)) : state,
-    scope = startSide === 'left' ? -0x1 : 0x1,
+  const state = Math['max'](Math['abs'](endX3 - startX3) * 0.5, 60),
+    config = Number['isFinite'](Number(curveOffset)) ? Math['max'](0, Number(curveOffset)) : state,
+    scope = startSide === 'left' ? -1 : 1,
     control1X = startX3 + scope * config,
     control2X = endX3 - scope * config;
   return {
@@ -180,21 +180,21 @@ export function buildConnectionPathGeometry({
     endSide: endSide,
     hitPoints: null,
     d:
-      'M\x20' +
+      'M ' +
       startX3 +
-      '\x20' +
+      ' ' +
       startY3 +
       ' C ' +
       control1X +
-      '\x20' +
+      ' ' +
       startY3 +
-      ',\x20' +
+      ', ' +
       control2X +
-      '\x20' +
+      ' ' +
       endY3 +
-      ',\x20' +
+      ', ' +
       endX3 +
-      '\x20' +
+      ' ' +
       endY3,
     endpointSignature: endpointSignature,
   };

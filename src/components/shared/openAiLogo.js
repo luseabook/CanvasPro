@@ -4,7 +4,7 @@ export function renderOpenAiLogoHtml(value = '') {
   const item = String(value)
     ['split'](/\s+/)
     ['filter']((key) => /^[a-zA-Z0-9_-]+$/['test'](key))
-    ['join']('\x20');
+    ['join'](' ');
   return (
     '<svg xmlns="http://www.w3.org/2000/svg" class="' +
     item +

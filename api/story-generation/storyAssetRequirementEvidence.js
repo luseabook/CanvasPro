@@ -1,20 +1,20 @@
-export const STORY_ASSET_REQUIREMENT_EVIDENCE_SCHEMA_VERSION = 0x1;
+export const STORY_ASSET_REQUIREMENT_EVIDENCE_SCHEMA_VERSION = 1;
 const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
     hard: 'hard-required',
     optional: 'optional-candidate',
     ignored: 'ignored',
   }),
   STORY_ASSET_REQUIREMENT_TIER_PRIORITY = Object['freeze']({
-    [STORY_ASSET_REQUIREMENT_TIERS['ignored']]: 0x0,
-    [STORY_ASSET_REQUIREMENT_TIERS['optional']]: 0x1,
-    [STORY_ASSET_REQUIREMENT_TIERS['hard']]: 0x2,
+    [STORY_ASSET_REQUIREMENT_TIERS['ignored']]: 0,
+    [STORY_ASSET_REQUIREMENT_TIERS['optional']]: 1,
+    [STORY_ASSET_REQUIREMENT_TIERS['hard']]: 2,
   }),
-  STORY_TITLE_NUMBER_PATTERN = '(?:\x5cd+|[零〇一二三四五六七八九十百千万两廿卅]+)',
+  STORY_TITLE_NUMBER_PATTERN = '(?:\\d+|[零〇一二三四五六七八九十百千万两廿卅]+)',
   STORY_STRUCTURAL_TITLE_PREFIX_PATTERN = new RegExp(
     [
       '(?:',
-      '第\\s*' + STORY_TITLE_NUMBER_PATTERN + '\x5cs*(?:集|章|节|幕|回|场)',
-      '|(?:episode|ep|chapter|scene)\x5cs*[-_]?\x5cs*\x5cd+',
+      '第\\s*' + STORY_TITLE_NUMBER_PATTERN + '\\s*(?:集|章|节|幕|回|场)',
+      '|(?:episode|ep|chapter|scene)\\s*[-_]?\\s*\\d+',
       '|(?:本集|本章|本节|本幕|本回|本场)(?:标题)?',
       '|(?:集|章|章节|幕|场)标题',
       ')',
@@ -33,7 +33,7 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
     /^(?:无|没有|未发现|未识别)(?:相应|对应|相关)?(?:实体|角色|人物|场景|地点|道具)?$/u,
   STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN =
     /(?:却|忽(?:的|然)?|猛地|缓缓|正在|已经|很是|立刻|随即|转身|起身|坐下|说道|问道|答道|笑道|哭道|走向|看向|望着|盯着|拿起|放下|点头|摇头|皱眉)/u,
-  STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS = 0xa0,
+  STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS = 160,
   STORY_ASSET_CROSS_KIND_WINNER_MIN_CONFIDENCE = 0.75,
   STORY_ASSET_CROSS_KIND_WINNER_MIN_MARGIN = 0.15,
   STORY_PROP_DIRECT_OBJECT_ACTION_PATTERN =
@@ -42,7 +42,7 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
     /(?:把|将)\s*((?:《[^》\r\n]{1,24}》|(?:一(?:个|只|把|张|本|册|枚|块|台|部|支|瓶|盒|箱|套|卷|件|份)\s*)?[\p{L}\p{N}·•._-]{2,24}?))\s*(?:放入|放进|塞入|装入|递出|递给|交出|交给|拿起|取出|使用)/gu,
   STORY_PROP_CANDIDATE_NOISE_PATTERN = new RegExp(
     [
-      '^(?:编号|标记|时间戳|坐标)(?:[-_：:]?\x5cp{L}*\x5cd*)?$',
+      '^(?:编号|标记|时间戳|坐标)(?:[-_：:]?\\p{L}*\\d*)?$',
       '(?:^|[-_])(?:MID|MARK|MARKER|SCENE|EPISODE|EP)[-_]?\\d+(?:$|[-_])',
       '^G?\\d+[-_](?:MID|MARK)',
     ]['join']('|'),
@@ -63,7 +63,7 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
       '^(?:[零〇一二三四五六七八九十百千万两\\d]+(?:样|件|个)?)?(?:东西|物件)$',
       '^(?:(?:里面|其中)的|这些|那些)?(?:材料|内容)$',
       '^(?:握了握|拿了拿|看了看|翻了翻)$',
-      '^(?:[\x5cp{L}\x5cp{N}·•._-]{1,12}的)?(?:手|手指|手腕|手臂|肩|肩膀|头|脸|眼睛|嘴|腿|脚)$',
+      '^(?:[\\p{L}\\p{N}·•._-]{1,12}的)?(?:手|手指|手腕|手臂|肩|肩膀|头|脸|眼睛|嘴|腿|脚)$',
       '(?:记忆提|分别)$',
     ]['join']('|'),
     'u',
@@ -82,7 +82,7 @@ function getLocalCandidateConfidence(key, index, result) {
     ['filter']((response) => response?.['kind'] === index && normalizeText(response?.['text']) === result)
     ['map']((data) => Number(data?.['probability']))
     ['filter'](Number['isFinite']);
-  return list2['length'] ? Math['max'](...list2) : 0x0;
+  return list2['length'] ? Math['max'](...list2) : 0;
 }
 function stripLocalCandidateSummary(options = '') {
   return normalizeText(options)
@@ -94,8 +94,8 @@ function isUsableLocalCandidateName(target, source) {
   const args = normalizeText(source),
     count = [...args]['length'];
   if (
-    count < 0x2 ||
-    count > 0x30 ||
+    count < 2 ||
+    count > 48 ||
     /[\r\n]/u['test'](args) ||
     STORY_ASSET_LOCAL_CANDIDATE_PLACEHOLDER_PATTERN['test'](args)
   )
@@ -103,7 +103,7 @@ function isUsableLocalCandidateName(target, source) {
   if (target === 'prop' && isNoisyStoryPropCandidateName(args)) return ![];
   if (target !== 'character') return !![];
   return (
-    count <= 0x8 &&
+    count <= 8 &&
     /^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](args) &&
     !STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args)
   );
@@ -111,8 +111,8 @@ function isUsableLocalCandidateName(target, source) {
 function isNoisyStoryPropCandidateName(next = '') {
   const args2 = normalizeText(next)['replace'](STORY_PROP_LEADING_MEASURE_PATTERN, '')['trim']();
   if (
-    [...args2]['length'] < 0x2 ||
-    [...args2]['length'] > 0x18 ||
+    [...args2]['length'] < 2 ||
+    [...args2]['length'] > 24 ||
     STORY_PROP_CANDIDATE_NOISE_PATTERN['test'](args2) ||
     /(?:中段标记|场次标记|剧情标记|唯一标记|核对编号)$/u['test'](args2)
   )
@@ -126,26 +126,26 @@ function normalizeStoryPropActionCandidate(current = '') {
     ['replace'](/^[《“”"'‘’]+|[》“”"'‘’]+$/gu, '')
     ['replace'](STORY_PROP_TRAILING_PREDICATE_PATTERN, '')
     ['trim']();
-  for (let count2 = 0x0; count2 < 0x3; count2 += 0x1) {
+  for (let count2 = 0; count2 < 3; count2 += 1) {
     const entry = text;
     text = text['replace'](STORY_PROP_TRAILING_ACTION_FRAGMENT_PATTERN, '')
       ['replace'](STORY_PROP_LEADING_STATE_PATTERN, '')
       ['trim']();
     if (text === entry) break;
   }
-  const text2 = normalizeText(text['match'](STORY_PROP_PACKAGING_DESCRIPTION_PATTERN)?.[0x1] || text);
+  const text2 = normalizeText(text['match'](STORY_PROP_PACKAGING_DESCRIPTION_PATTERN)?.[1] || text);
   if (!text2 || /[和及、]/u['test'](text2) || STORY_PROP_NON_ASSET_FRAGMENT_PATTERN['test'](text2)) return '';
   return isNoisyStoryPropCandidateName(text2) ? '' : text2;
 }
 function createStoryPropActionEvidence(list3, record, payload) {
-  const count3 = list3['indexOf'](payload, Math['max'](0x0, record)),
-    handle = count3 >= 0x0 ? count3 : Math['max'](0x0, record),
-    state = Math['max'](0x0, handle - 0x30);
+  const count3 = list3['indexOf'](payload, Math['max'](0, record)),
+    handle = count3 >= 0 ? count3 : Math['max'](0, record),
+    state = Math['max'](0, handle - 48);
   return list3['slice'](
     state,
     Math['min'](list3['length'], state + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
   )
-    ['replace'](/\s+/gu, '\x20')
+    ['replace'](/\s+/gu, ' ')
     ['trim']();
 }
 export function createStoryAssetActionPropCandidates(list4 = []) {
@@ -159,9 +159,9 @@ export function createStoryAssetActionPropCandidates(list4 = []) {
       const list5 = [
         ...args3['matchAll'](STORY_PROP_DIRECT_OBJECT_ACTION_PATTERN),
         ...args3['matchAll'](STORY_PROP_BA_ACTION_PATTERN),
-      ]['sort']((config, scope) => (Number(config['index']) || 0x0) - (Number(scope['index']) || 0x0));
+      ]['sort']((config, scope) => (Number(config['index']) || 0) - (Number(scope['index']) || 0));
       list5['forEach']((input) => {
-        const storyPropActionCandidate = normalizeStoryPropActionCandidate(input[0x1]);
+        const storyPropActionCandidate = normalizeStoryPropActionCandidate(input[1]);
         if (!storyPropActionCandidate) return;
         const nameKey = normalizeNameKey(storyPropActionCandidate),
           name = map['get'](nameKey),
@@ -171,10 +171,10 @@ export function createStoryAssetActionPropCandidates(list4 = []) {
           name: name?.['name'] || storyPropActionCandidate,
           evidence:
             name?.['evidence'] ||
-            createStoryPropActionEvidence(args3, Number(input['index']) || 0x0, storyPropActionCandidate),
+            createStoryPropActionEvidence(args3, Number(input['index']) || 0, storyPropActionCandidate),
           sourceSceneRefs: sourceSceneRefs,
           sourceChapterIds: sourceChapterIds,
-          confidence: 0x1,
+          confidence: 1,
         });
       });
     }),
@@ -186,15 +186,15 @@ function createLocalCandidateEvidence(dom2, dom3, output, list6) {
     value2 = (Array['isArray'](dom2?.['localEntityEvidence']) ? dom2['localEntityEvidence'] : [])['find'](
       (response2) => response2?.['kind'] === output && normalizeText(response2?.['text']) === list6,
     ),
-    value3 = Math['max'](0x0, Math['trunc'](Number(value2?.['start']) || 0x0)),
+    value3 = Math['max'](0, Math['trunc'](Number(value2?.['start']) || 0)),
     count4 = list7['slice'](value3, value3 + list6['length']) === list6 ? value3 : list7['indexOf'](list6);
-  if (count4 < 0x0) return '';
-  const value4 = Math['max'](0x0, count4 - 0x38);
+  if (count4 < 0) return '';
+  const value4 = Math['max'](0, count4 - 56);
   return list7['slice'](
     value4,
     Math['min'](list7['length'], value4 + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
   )
-    ['replace'](/\s+/gu, '\x20')
+    ['replace'](/\s+/gu, ' ')
     ['trim']();
 }
 function collectVerifiedLocalCandidates(options2 = {}, value5 = null) {
@@ -215,17 +215,17 @@ function resolveStoryAssetCandidateWinnerKindsByName(list8 = []) {
   return (
     list8['forEach'](({ key: key2, kind: kind2, confidence: confidence }) => {
       const map3 = map2['get'](key2) || new Map();
-      (map3['set'](kind2, Math['max'](Number(map3['get'](kind2)) || 0x0, Number(confidence) || 0x0)),
+      (map3['set'](kind2, Math['max'](Number(map3['get'](kind2)) || 0, Number(confidence) || 0)),
         map2['set'](key2, map3));
     }),
     new Map(
       [...map2]['flatMap'](([value8, map4]) => {
-        if (map4['size'] === 0x1) return [[value8, [...map4['keys']()][0x0]]];
+        if (map4['size'] === 1) return [[value8, [...map4['keys']()][0]]];
         const value9 = [...map4]
             ['map'](([kind3, confidence2]) => ({ kind: kind3, confidence: confidence2 }))
             ['sort']((value10, value11) => value11['confidence'] - value10['confidence']),
-          value12 = value9[0x0],
-          value13 = value9[0x1];
+          value12 = value9[0],
+          value13 = value9[1];
         if (
           value12['confidence'] >= STORY_ASSET_CROSS_KIND_WINNER_MIN_CONFIDENCE &&
           value12['confidence'] - value13['confidence'] + Number['EPSILON'] >=
@@ -259,24 +259,24 @@ function filterCandidatesByHardRequiredKinds(list11 = [], map6 = new Map()) {
   return list11['filter']((event) => {
     const map7 = map6['get'](event['key']);
     if (!map7) return !![];
-    return map7['size'] === 0x1 && map7['has'](event['kind']);
+    return map7['size'] === 1 && map7['has'](event['kind']);
   });
 }
 function createAnchorFirstIndexOrder(value18) {
-  const enabled = Math['max'](0x0, Math['trunc'](Number(value18) || 0x0));
+  const enabled = Math['max'](0, Math['trunc'](Number(value18) || 0));
   if (!enabled) return [];
   const list12 = [],
     map8 = new Set(),
     handler = (value19) => {
-      const value20 = Math['max'](0x0, Math['min'](enabled - 0x1, Math['trunc'](value19)));
+      const value20 = Math['max'](0, Math['min'](enabled - 1, Math['trunc'](value19)));
       if (map8['has'](value20)) return;
       (map8['add'](value20), list12['push'](value20));
     };
-  (handler(0x0), handler(Math['floor']((enabled - 0x1) / 0x2)), handler(enabled - 0x1));
+  (handler(0), handler(Math['floor']((enabled - 1) / 2)), handler(enabled - 1));
   while (list12['length'] < enabled) {
-    let value21 = -0x1,
-      value22 = -0x1;
-    for (let value23 = 0x0; value23 < enabled; value23 += 0x1) {
+    let value21 = -1,
+      value22 = -1;
+    for (let value23 = 0; value23 < enabled; value23 += 1) {
       if (map8['has'](value23)) continue;
       const value24 = Math['min'](...list12['map']((value25) => Math['abs'](value25 - value23)));
       value24 > value22 && ((value21 = value23), (value22 = value24));
@@ -301,7 +301,7 @@ function createFairSourceRefOrder(list13 = [], list14 = []) {
     createAnchorFirstIndexOrder(list15['length'])['map']((value31) => list15[value31])
   );
 }
-function selectFairSourceRefs(list16 = [], value32 = [], value33 = 0x3) {
+function selectFairSourceRefs(list16 = [], value32 = [], value33 = 3) {
   const map11 = new Map(
       (Array['isArray'](value32) ? value32 : [])['map']((value34, value35) => [
         normalizeText(value34?.['ref']),
@@ -314,7 +314,7 @@ function selectFairSourceRefs(list16 = [], value32 = [], value33 = 0x3) {
         (map11['get'](value37) ?? Number['MAX_SAFE_INTEGER']),
     );
   return createAnchorFirstIndexOrder(list17['length'])
-    ['slice'](0x0, Math['max'](0x1, Math['trunc'](Number(value33) || 0x0)))
+    ['slice'](0, Math['max'](1, Math['trunc'](Number(value33) || 0)))
     ['map']((value38) => list17[value38]);
 }
 function mergeStoryAssetOptionalCandidates(list18 = [], value39 = []) {
@@ -340,7 +340,7 @@ function mergeStoryAssetOptionalCandidates(list18 = [], value39 = []) {
     }),
     [...map12['values']()]['map']((args5) => ({
       ...args5,
-      sourceSceneRefs: selectFairSourceRefs(args5['sourceSceneRefs'], value39, 0x3),
+      sourceSceneRefs: selectFairSourceRefs(args5['sourceSceneRefs'], value39, 3),
     }))
   );
 }
@@ -354,10 +354,10 @@ function selectBudgetedStoryAssetOptionalCandidates(
   } = {},
 ) {
   const value41 = Number['isFinite'](Number(maxItems))
-      ? Math['max'](0x0, Math['trunc'](Number(maxItems)))
+      ? Math['max'](0, Math['trunc'](Number(maxItems)))
       : Number['POSITIVE_INFINITY'],
     value42 = Number['isFinite'](Number(maxCharacters))
-      ? Math['max'](0x0, Math['trunc'](Number(maxCharacters)))
+      ? Math['max'](0, Math['trunc'](Number(maxCharacters)))
       : Number['POSITIVE_INFINITY'];
   if (!Number['isFinite'](value41) && !Number['isFinite'](value42)) return list19;
   const map13 = new Map(
@@ -368,14 +368,14 @@ function selectBudgetedStoryAssetOptionalCandidates(
     ),
     map14 = new Map();
   (list19['forEach']((value44) => {
-    const text6 = normalizeText(value44['sourceSceneRefs']?.[0x0]),
+    const text6 = normalizeText(value44['sourceSceneRefs']?.[0]),
       list20 = map14['get'](text6) || [];
     (list20['push'](value44), map14['set'](text6, list20));
   }),
     map14['forEach']((list21) =>
       list21['sort'](
         (error, error2) =>
-          Number(error2['confidence'] || 0x0) - Number(error['confidence'] || 0x0) ||
+          Number(error2['confidence'] || 0) - Number(error['confidence'] || 0) ||
           String(error2['evidence'] || '')['length'] - String(error['evidence'] || '')['length'] ||
           String(error['name'] || '')['localeCompare'](String(error2['name'] || ''), 'zh-CN'),
       ),
@@ -383,7 +383,7 @@ function selectBudgetedStoryAssetOptionalCandidates(
   const fairSourceRefOrder = createFairSourceRefOrder(value40, list19),
     list22 = [],
     map15 = new Set();
-  let value45 = 0x2,
+  let value45 = 2,
     value46 = !![];
   while (value46 && list22['length'] < value41) {
     value46 = ![];
@@ -401,7 +401,7 @@ function selectBudgetedStoryAssetOptionalCandidates(
             name3['sourceSceneRefs']['map']((value50) => map13['get'](value50)),
           ),
         },
-        value51 = JSON['stringify'](value49)['length'] + (list22['length'] ? 0x1 : 0x0);
+        value51 = JSON['stringify'](value49)['length'] + (list22['length'] ? 1 : 0);
       if (value45 + value51 > value42) continue;
       (map15['add'](name3['key']), list22['push'](name3), (value45 += value51));
       if (list22['length'] >= value41) break;
@@ -418,41 +418,41 @@ function getEvidenceBucketName(value52) {
   return 'ignored';
 }
 function getBoundedClausePrefix(list23, value53) {
-  const list24 = list23['slice'](Math['max'](0x0, value53 - 0x60), value53);
-  let value54 = -0x1;
-  for (let count5 = list24['length'] - 0x1; count5 >= 0x0; count5 -= 0x1) {
+  const list24 = list23['slice'](Math['max'](0, value53 - 96), value53);
+  let value54 = -1;
+  for (let count5 = list24['length'] - 1; count5 >= 0; count5 -= 1) {
     if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list24[count5])) {
       value54 = count5;
       break;
     }
   }
-  return list24['slice'](value54 + 0x1);
+  return list24['slice'](value54 + 1);
 }
 function getBoundedClauseSuffix(list25, value55) {
-  const list26 = list25['slice'](value55, Math['min'](list25['length'], value55 + 0x40));
-  for (let value56 = 0x0; value56 < list26['length']; value56 += 0x1) {
-    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list26[value56])) return list26['slice'](0x0, value56);
+  const list26 = list25['slice'](value55, Math['min'](list25['length'], value55 + 64));
+  for (let value56 = 0; value56 < list26['length']; value56 += 1) {
+    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list26[value56])) return list26['slice'](0, value56);
   }
   return list26;
 }
 function getStoryTitleContext(list27, value57, value58) {
-  return list27['slice'](Math['max'](0x0, value57 - 0x30), Math['min'](list27['length'], value58 + 0x40))[
+  return list27['slice'](Math['max'](0, value57 - 48), Math['min'](list27['length'], value58 + 64))[
     'trim'
   ]();
 }
 function isStructuralStoryTitle(list28, value59) {
-  const value60 = list28['slice'](Math['max'](0x0, value59 - 0x40), value59);
+  const value60 = list28['slice'](Math['max'](0, value59 - 64), value59);
   return STORY_STRUCTURAL_TITLE_PREFIX_PATTERN['test'](value60);
 }
 function hasHardStoryPropEvidence(list29, value61, value62) {
   const list30 = getBoundedClausePrefix(list29, value61),
     list31 = getBoundedClauseSuffix(list29, value62)['replace'](/^[\s，,:：]+/u, '');
   return (
-    STORY_PROP_DECLARATION_PATTERN['test'](list29['slice'](Math['max'](0x0, value61 - 0x78), value61)) ||
+    STORY_PROP_DECLARATION_PATTERN['test'](list29['slice'](Math['max'](0, value61 - 120), value61)) ||
     STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list30) ||
-    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list31['slice'](0x0, 0x20)) ||
-    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list30['slice'](-0x18)) ||
-    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list31['slice'](0x0, 0x18))
+    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list31['slice'](0, 32)) ||
+    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list30['slice'](-24)) ||
+    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list31['slice'](0, 24))
   );
 }
 function mergeEvidenceEntry(map16, error3) {
@@ -504,7 +504,7 @@ function mergeEvidenceEntry(map16, error3) {
   ])),
     (args6['contexts'] = normalizeStringArray([...args6['contexts'], ...(error3?.['contexts'] || [])])[
       'slice'
-    ](0x0, 0x3)));
+    ](0, 3)));
 }
 export function createStoryAssetRequirementEvidencePlan(list32 = []) {
   const map17 = new Map();
@@ -558,10 +558,10 @@ export function createStoryAssetRequirementEvidencePlan(list32 = []) {
       });
     });
     for (const value64 of text8['matchAll'](/《([^》\r\n]{1,48})》/gu)) {
-      const name9 = normalizeText(value64[0x1]);
+      const name9 = normalizeText(value64[1]);
       if (!name9) continue;
-      const value65 = Number(value64['index']) || 0x0,
-        value66 = value65 + String(value64[0x0] || '')['length'],
+      const value65 = Number(value64['index']) || 0,
+        value66 = value65 + String(value64[0] || '')['length'],
         tier3 = isStructuralStoryTitle(text8, value65),
         value67 = !tier3 && hasHardStoryPropEvidence(text8, value65, value66);
       mergeEvidenceEntry(map17, {
@@ -722,5 +722,5 @@ export function getUntrustedUploadFallbackStoryCharacterNames(
 }
 export function isNarrativeStoryCharacterFragment(value90 = '') {
   const args8 = normalizeText(value90);
-  return [...args8]['length'] > 0x8 || STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args8);
+  return [...args8]['length'] > 8 || STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args8);
 }

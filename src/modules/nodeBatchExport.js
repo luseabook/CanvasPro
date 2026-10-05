@@ -68,9 +68,9 @@ function getNodeName(error, data = '') {
   return firstNonEmpty(error?.['name'], error?.['label'], error?.['title'], error?.['fileName'], data);
 }
 function pickPrimaryItem(list, options) {
-  if (!Array['isArray'](list) || list['length'] <= 0x0) return null;
-  const target = Number['isFinite'](Number(options)) ? Math['max'](0x0, Math['trunc'](Number(options))) : 0x0;
-  return list[Math['min'](target, list['length'] - 0x1)] || list[0x0] || null;
+  if (!Array['isArray'](list) || list['length'] <= 0) return null;
+  const target = Number['isFinite'](Number(options)) ? Math['max'](0, Math['trunc'](Number(options))) : 0;
+  return list[Math['min'](target, list['length'] - 1)] || list[0] || null;
 }
 function collectSources(...list2) {
   return list2['filter']((source) => source && typeof source === 'object' && !Array['isArray'](source));
@@ -206,7 +206,7 @@ export function collectSelectedNodeExportItems({
 export function hasBatchExportableSelection(nodes2 = {}, selectedNodeIds2 = []) {
   return (
     collectSelectedNodeExportItems({ nodes: nodes2, selectedNodeIds: selectedNodeIds2 })['items']['length'] >
-    0x0
+    0
   );
 }
 function resolveTextDownloadFilename(value11) {
@@ -215,7 +215,7 @@ function resolveTextDownloadFilename(value11) {
       ['replace'](/[. ]+$/g, '')
       ['trim'](),
     list3 = (value12 || 'text')['replace'](/\.txt$/i, ''),
-    value13 = list3['slice'](0x0, 0x9c)['replace'](/[. ]+$/g, '');
+    value13 = list3['slice'](0, 156)['replace'](/[. ]+$/g, '');
   return (value13 || 'text') + '.txt';
 }
 function normalizeDownloadFailureMessage(error2, value14) {
@@ -235,7 +235,7 @@ export async function downloadNodeOutput({
       nodes: { [nodeId7]: node },
       selectedNodeIds: [nodeId7],
     }),
-    nodeName = items2[0x0] || null;
+    nodeName = items2[0] || null;
   if (!nodeName)
     return (
       show(showToast, t('nodeBatchExport.toasts.noExportable'), 'warn'),
@@ -305,7 +305,7 @@ export async function downloadNodeOutput({
       );
     }
     return (
-      show(showToast, t('nodeBatchExport.toasts.completed', { count: 0x1 }), 'success'),
+      show(showToast, t('nodeBatchExport.toasts.completed', { count: 1 }), 'success'),
       {
         success: !![],
         canceled: ![],
@@ -355,15 +355,15 @@ export async function exportSelectedNodesBatch({
       nodes: state?.['nodes'] || {},
       selectedNodeIds: selectedNodeIds3,
     });
-  if (items3['length'] <= 0x0)
+  if (items3['length'] <= 0)
     return (
       show(showToast, t('nodeBatchExport.toasts.noExportable'), 'warn'),
-      skipped3['length'] > 0x0 && consoleObject?.['info']?.('[node-batch-export]\x20skipped', skipped3),
+      skipped3['length'] > 0 && consoleObject?.['info']?.('[node-batch-export] skipped', skipped3),
       {
         success: ![],
         canceled: ![],
         code: 'NO_EXPORTABLE_ITEMS',
-        exportedCount: 0x0,
+        exportedCount: 0,
         skipped: skipped3,
         counts: {},
       }
@@ -372,7 +372,7 @@ export async function exportSelectedNodesBatch({
   if (typeof run2 !== 'function')
     return (
       show(showToast, t('nodeBatchExport.toasts.unsupported'), 'error'),
-      { success: ![], canceled: ![], code: 'UNSUPPORTED', exportedCount: 0x0, skipped: skipped3, counts: {} }
+      { success: ![], canceled: ![], code: 'UNSUPPORTED', exportedCount: 0, skipped: skipped3, counts: {} }
     );
   setBatchExportPending(!![]);
   try {
@@ -389,7 +389,7 @@ export async function exportSelectedNodesBatch({
             });
             return {
               ...nodeName2,
-              filenameBase: filenameBase['slice'](0x0, filenameBase['lastIndexOf']('.')),
+              filenameBase: filenameBase['slice'](0, filenameBase['lastIndexOf']('.')),
             };
           })
         : items3,
@@ -398,19 +398,19 @@ export async function exportSelectedNodesBatch({
     const skipped4 = mergeSkipped(skipped3, exported?.['skipped']);
     if (exported?.['success'])
       return (
-        skipped4['length'] > 0x0
+        skipped4['length'] > 0
           ? (consoleObject?.['info']?.('[node-batch-export] skipped', skipped4),
             show(
               showToast,
               t('nodeBatchExport.toasts.completedWithSkipped', {
-                exported: exported['exportedCount'] || 0x0,
+                exported: exported['exportedCount'] || 0,
                 skipped: skipped4['length'],
               }),
               'success',
             ))
           : show(
               showToast,
-              t('nodeBatchExport.toasts.completed', { count: exported['exportedCount'] || 0x0 }),
+              t('nodeBatchExport.toasts.completed', { count: exported['exportedCount'] || 0 }),
               'success',
             ),
         { ...exported, skipped: skipped4 }
@@ -432,7 +432,7 @@ export async function exportSelectedNodesBatch({
         }),
         'error',
       ),
-      { success: ![], canceled: ![], error: message3, exportedCount: 0x0, skipped: skipped3, counts: {} }
+      { success: ![], canceled: ![], error: message3, exportedCount: 0, skipped: skipped3, counts: {} }
     );
   } finally {
     setBatchExportPending(![]);

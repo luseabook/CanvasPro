@@ -17,7 +17,7 @@ export function buildSubmitRandomizedSeedPatch({
         item?.['randomizeOnSubmit'] === !![] && key && String(item?.['variant'] || '') === 'randomSeedRow'
       );
     });
-  if (list2['length'] === 0x0) return null;
+  if (list2['length'] === 0) return null;
   let generationParams = {
       ...getPlainObject(nodeData?.['generationParams']),
       ...getPlainObject(payload?.['generationParams']),
@@ -45,11 +45,11 @@ export function buildSubmitRandomizedSeedPatch({
     }
     const result = Number(index?.['randomSeedMin'] ?? index?.['min']),
       data = Number(index?.['randomSeedMax'] ?? index?.['max']),
-      options = Number['isFinite'](result) ? Math['trunc'](result) : 0x0,
+      options = Number['isFinite'](result) ? Math['trunc'](result) : 0,
       target = Number['isFinite'](data) ? Math['trunc'](data) : 0x7fffffff,
       source = Math['min'](options, target),
       next = Math['max'](options, target),
-      current = String(source + Math['floor'](random() * (next - source + 0x1)));
+      current = String(source + Math['floor'](random() * (next - source + 1)));
     ((generationParams = {
       ...generationParams,
       [seedField]: current,

@@ -38,7 +38,7 @@ function normalizeConnectionVerification(response) {
   const verifiedAt2 = Number(response['verifiedAt']);
   return {
     status: PASSED_OBJECT_STORAGE_CONNECTION_STATUS,
-    ...(Number['isFinite'](verifiedAt2) && verifiedAt2 > 0x0 ? { verifiedAt: verifiedAt2 } : {}),
+    ...(Number['isFinite'](verifiedAt2) && verifiedAt2 > 0 ? { verifiedAt: verifiedAt2 } : {}),
   };
 }
 function getNormalizedProfileIdentity(options = {}) {

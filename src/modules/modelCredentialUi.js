@@ -22,7 +22,7 @@ const CREDENTIAL_BUTTON_CLASS = 'is-credential-required',
   CREDENTIAL_BADGE_SELECTOR = '[data-model-credential-badge]',
   CREDENTIAL_MENU_ITEM_SELECTOR = ['.node-menu-item[data-value]', '.node-menu-item[data-credential-model]'][
     'join'
-  ](',\x20'),
+  ](', '),
   CREDENTIAL_STATUS_EVENTS = Object['freeze']([
     API_CONFIG_CHANGED_EVENT,
     CLI_PROVIDER_STATUS_CHANGED_EVENT,
@@ -37,9 +37,9 @@ function getCredentialStatusRevision(el = globalThis['window']) {
   if (!el?.['addEventListener']) return null;
   let enabled = CREDENTIAL_STATUS_REVISIONS['get'](el);
   if (!enabled) {
-    enabled = { revision: 0x0 };
+    enabled = { revision: 0 };
     const value = () => {
-      enabled['revision'] += 0x1;
+      enabled['revision'] += 1;
     };
     (CREDENTIAL_STATUS_EVENTS['forEach']((item) => {
       el['addEventListener'](item, value, !![]);
@@ -67,7 +67,7 @@ function bindModelCredentialStatusEvents(key, el2 = globalThis['window']) {
   return () => {
     if (!enabled2) return;
     ((enabled2 = ![]), store['listeners']['delete'](key));
-    if (store['listeners']['size'] > 0x0) return;
+    if (store['listeners']['size'] > 0) return;
     (CREDENTIAL_STATUS_EVENTS['forEach']((data) => {
       el2['removeEventListener']?.(data, store['dispatch']);
     }),
@@ -255,8 +255,8 @@ function getMenuItemProviderProfileId(item2, scope, modelId, providerId2, input)
         : scope['getProviderProfileId']?.({ item: item2, modelId: modelId, providerId: providerId2 }),
     value2 = output || item2['dataset']?.['providerProfileId'] || '',
     list = getModelProviderProfileIds(modelId);
-  if (list['length'] === 0x0) return value2;
-  if (list['length'] === 0x1) return list[0x0];
+  if (list['length'] === 0) return value2;
+  if (list['length'] === 1) return list[0];
   return resolveReadyModelProviderProfileId(modelId, value2, (providerProfileId) => {
     const response4 = getModelGenerationReadiness({
       modelId: modelId,
@@ -275,7 +275,7 @@ function getMenuCredentialSyncDescriptor(el13, value3) {
   const list2 = value3['getProviderProfileId'];
   if (
     typeof list2 === 'function' &&
-    list2['length'] > 0x0 &&
+    list2['length'] > 0 &&
     typeof value3['getCredentialSyncKey'] !== 'function'
   )
     return { cacheKey: null, items: items };
@@ -284,7 +284,7 @@ function getMenuCredentialSyncDescriptor(el13, value3) {
   try {
     const value6 = list2?.();
     ((value5 = String(value6 || '')),
-      (typeof list2 !== 'function' || list2['length'] === 0x0) && (sharedProviderProfileId = value5));
+      (typeof list2 !== 'function' || list2['length'] === 0) && (sharedProviderProfileId = value5));
   } catch {
     return { cacheKey: null, items: items };
   }

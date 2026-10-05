@@ -22,15 +22,15 @@ const DEFAULT_RATIO_LABEL = '1:1',
     DEFAULT_RATIO_OPTIONS.filter((item) => item.label !== '5:4' && item.label !== '4:5'),
   ),
   DIMENSION_QUALITY_PIXEL_MAP = Object.freeze({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   DIMENSION_DEFAULT_QUALITY = '2K',
   DIMENSION_ALIGN = 8,
-  DIMENSION_MIN = 0x200,
-  DIMENSION_MAX = 0x2000;
+  DIMENSION_MIN = 512,
+  DIMENSION_MAX = 8192;
 function isFinitePositive(value) {
   const count = Number(value);
   return Number.isFinite(count) && count > 0;

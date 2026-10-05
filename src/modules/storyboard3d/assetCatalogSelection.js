@@ -1,6 +1,6 @@
-export const STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT = 0x64;
-const MIN_CANDIDATE_LIMIT = 0x14,
-  MAX_CANDIDATE_LIMIT = 0x78;
+export const STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT = 100;
+const MIN_CANDIDATE_LIMIT = 20,
+  MAX_CANDIDATE_LIMIT = 120;
 function normalizeText(value) {
   return String(value || '')
     ['normalize']('NFKC')
@@ -11,9 +11,9 @@ function createSearchTokens(item) {
   const text = normalizeText(item),
     key = new Set(text['match'](/[a-z0-9]+/g) || []);
   for (const list of text['match'](/[\p{Script=Han}]+/gu) || []) {
-    if (list['length'] <= 0x4) key['add'](list);
-    for (const index of [0x2, 0x3, 0x4]) {
-      for (let result = 0x0; result <= list['length'] - index; result += 0x1) {
+    if (list['length'] <= 4) key['add'](list);
+    for (const index of [2, 3, 4]) {
+      for (let result = 0; result <= list['length'] - index; result += 1) {
         key['add'](list['slice'](result, result + index));
       }
     }
@@ -36,32 +36,32 @@ function normalizeAssetFields(error = {}) {
   };
 }
 function countTokenMatches(map, enabled) {
-  if (!enabled) return 0x0;
+  if (!enabled) return 0;
   const list2 = createSearchTokens(enabled);
-  let data = 0x0;
+  let data = 0;
   return (
     list2['forEach']((options) => {
-      if (map['has'](options)) data += 0x1;
+      if (map['has'](options)) data += 1;
     }),
     data
   );
 }
 function scoreAsset(target, list3, source) {
   const error2 = normalizeAssetFields(target);
-  let next = 0x0;
-  if (list3 && error2['name'] === list3) next += 0xf0;
-  if (list3['length'] >= 0x2 && error2['name']['includes'](list3)) next += 0xa0;
-  if (error2['name']['length'] >= 0x2 && list3['includes'](error2['name'])) next += 0x78;
+  let next = 0;
+  if (list3 && error2['name'] === list3) next += 240;
+  if (list3['length'] >= 2 && error2['name']['includes'](list3)) next += 160;
+  if (error2['name']['length'] >= 2 && list3['includes'](error2['name'])) next += 120;
   return (
-    list3['length'] >= 0x2 && error2['tags']['some']((list4) => list4['includes'](list3)) && (next += 0x8c),
-    (next += countTokenMatches(source, error2['name']) * 0x1c),
+    list3['length'] >= 2 && error2['tags']['some']((list4) => list4['includes'](list3)) && (next += 140),
+    (next += countTokenMatches(source, error2['name']) * 28),
     (next += error2['tags']['reduce'](
-      (current, entry) => current + countTokenMatches(source, entry) * 0x16,
-      0x0,
+      (current, entry) => current + countTokenMatches(source, entry) * 22,
+      0,
     )),
-    (next += countTokenMatches(source, error2['category']) * 0xa),
-    (next += countTokenMatches(source, error2['familyId']) * 0x8),
-    (next += countTokenMatches(source, error2['id']) * 0x6),
+    (next += countTokenMatches(source, error2['category']) * 10),
+    (next += countTokenMatches(source, error2['familyId']) * 8),
+    (next += countTokenMatches(source, error2['id']) * 6),
     next
   );
 }
@@ -78,11 +78,11 @@ function interleaveFallbackAssets(list5) {
   });
   const list6 = [...map2['values']()],
     list7 = [];
-  while (list6['length'] > 0x0) {
-    for (let count = list6['length'] - 0x1; count >= 0x0; count -= 0x1) {
+  while (list6['length'] > 0) {
+    for (let count = list6['length'] - 1; count >= 0; count -= 1) {
       const handle = list6[count]['shift']();
       if (handle) list7['push'](handle);
-      if (list6[count]['length'] === 0x0) list6['splice'](count, 0x1);
+      if (list6[count]['length'] === 0) list6['splice'](count, 1);
     }
   }
   return list7;
@@ -114,9 +114,9 @@ export function selectRelevantStoryboard3DAssets(
         return (map3['add'](event['key']), !![]);
       });
   if (list9['length'] <= config) return list9['map']((scope) => scope['asset']);
-  const args = list9['filter']((input) => input['score'] > 0x0)['sort'](
+  const args = list9['filter']((input) => input['score'] > 0)['sort'](
       (output, value2) => value2['score'] - output['score'] || output['index'] - value2['index'],
     ),
-    args2 = interleaveFallbackAssets(list9['filter']((value3) => value3['score'] <= 0x0));
-  return [...args, ...args2]['slice'](0x0, config)['map']((value4) => value4['asset']);
+    args2 = interleaveFallbackAssets(list9['filter']((value3) => value3['score'] <= 0));
+  return [...args, ...args2]['slice'](0, config)['map']((value4) => value4['asset']);
 }

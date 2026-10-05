@@ -22,19 +22,19 @@ export function playAssetCreateFly({
   if (item?.['id']) item['removeAttribute']('id');
   (el['appendChild'](item), documentObject['body']['appendChild'](el));
   if (typeof el['animate'] !== 'function') return (el['remove'](), null);
-  const key = box['left'] + box['width'] / 0x2,
-    index = box['top'] + box['height'] / 0x2,
-    result = box2['left'] + box2['width'] / 0x2,
-    data = box2['top'] + box2['height'] / 0x2,
+  const key = box['left'] + box['width'] / 2,
+    index = box['top'] + box['height'] / 2,
+    result = box2['left'] + box2['width'] / 2,
+    data = box2['top'] + box2['height'] / 2,
     options = el['animate'](
       [
-        { transform: 'translate(0,0) scale(1)', opacity: 0x1 },
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
         {
-          transform: 'translate(' + (result - key) + 'px,' + (data - index) + 'px)\x20scale(0.12)',
+          transform: 'translate(' + (result - key) + 'px,' + (data - index) + 'px) scale(0.12)',
           opacity: 0.2,
         },
       ],
-      { duration: 0x208, easing: 'cubic-bezier(0.2,\x200,\x200,\x201)' },
+      { duration: 520, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
     );
   return (
     (options['onfinish'] = () => {
@@ -46,7 +46,7 @@ export function playAssetCreateFly({
               { transform: 'scale(1.08)', filter: 'brightness(1.2)' },
               { transform: 'scale(1)', filter: 'brightness(1)' },
             ],
-            { duration: 0x104, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
+            { duration: 260, easing: 'cubic-bezier(0.2, 0, 0, 1)' },
           ));
     }),
     el

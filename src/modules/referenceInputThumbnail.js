@@ -23,7 +23,7 @@ function normalizeClassName(result) {
     ['split'](/\s+/)
     ['map']((data) => data['replace'](/[^A-Za-z0-9_-]/g, ''))
     ['filter'](Boolean)
-    ['join']('\x20');
+    ['join'](' ');
 }
 function normalizeVideoMediaKey(options) {
   return normalizeText(options)['replace'](/^\/+/, '');
@@ -48,16 +48,16 @@ function getVideoThumbnailUrl(source) {
 }
 export function resolveReferenceVideoItemByEdge(options2 = {}, next = null) {
   const item2 = Array['isArray'](options2?.['videos']) ? options2['videos'] : [];
-  if (!item2['length']) return { item: null, index: -0x1, matchedByKey: ![] };
+  if (!item2['length']) return { item: null, index: -1, matchedByKey: ![] };
   const videoMediaKey = normalizeVideoMediaKey(next?.['sourceMediaKey']);
   let index2 = videoMediaKey
     ? item2['findIndex']((current) => getVideoItemMediaKey(current) === videoMediaKey)
-    : -0x1;
-  const matchedByKey = index2 >= 0x0;
+    : -1;
+  const matchedByKey = index2 >= 0;
   if (!matchedByKey) {
     const entry = Number(options2?.['mainVideoIndex']),
-      record = Number['isFinite'](entry) ? Math['max'](0x0, Math['trunc'](entry)) : 0x0;
-    index2 = Math['max'](0x0, Math['min'](item2['length'] - 0x1, record));
+      record = Number['isFinite'](entry) ? Math['max'](0, Math['trunc'](entry)) : 0;
+    index2 = Math['max'](0, Math['min'](item2['length'] - 1, record));
   }
   return { item: item2[index2] || null, index: index2, matchedByKey: matchedByKey };
 }
@@ -69,11 +69,11 @@ export function resolveReferenceVideoThumbnail(options3 = {}, payload = null) {
     handle = Number(options3?.['mainVideoIndex']),
     index3 = item3['length']
       ? Math['max'](
-          0x0,
-          Math['min'](item3['length'] - 0x1, Number['isFinite'](handle) ? Math['trunc'](handle) : 0x0),
+          0,
+          Math['min'](item3['length'] - 1, Number['isFinite'](handle) ? Math['trunc'](handle) : 0),
         )
-      : -0x1,
-    thumbUrl2 = index3 >= 0x0 ? getVideoThumbnailUrl(item3[index3]) : '';
+      : -1,
+    thumbUrl2 = index3 >= 0 ? getVideoThumbnailUrl(item3[index3]) : '';
   if (thumbUrl2 && !selected['matchedByKey'])
     return {
       thumbUrl: thumbUrl2,
@@ -152,7 +152,7 @@ export function createReferenceInputThumbnailHtml({
       normalizeClassName(additionalClassName),
     ]
       ['filter'](Boolean)
-      ['join']('\x20'),
+      ['join'](' '),
     text = normalizeText(thumbnailUrl);
   if (!text && kind2 === 'video' && normalizeText(videoUrl))
     return (
@@ -160,7 +160,7 @@ export function createReferenceInputThumbnailHtml({
       escapeHtmlAttr(videoUrl) +
       '" class="' +
       value4 +
-      '\x22\x20muted\x20playsinline\x20preload=\x22metadata\x22\x20draggable=\x22false\x22\x20aria-hidden=\x22true\x22></video>' +
+      '" muted playsinline preload="metadata" draggable="false" aria-hidden="true"></video>' +
       String(extraHtml || '')
     );
   if (!text) return createMediaFallbackHtml(kind2, value4);
@@ -169,7 +169,7 @@ export function createReferenceInputThumbnailHtml({
     escapeHtmlAttr(text) +
     '" class="' +
     value4 +
-    '\x20is-pending\x22\x20draggable=\x22false\x22\x20alt=\x22\x22>' +
+    ' is-pending" draggable="false" alt="">' +
     String(extraHtml || '')
   );
 }

@@ -105,7 +105,7 @@ export async function ensurePersistedPanoramaInputPng({
   if (!preferredSourceUrl) throw new Error(panoramaSceneText('errors.panoramaImageInputMissing'));
   let fetchRemoteBlob2 = null;
   try {
-    fetchRemoteBlob2 = await fetchRemoteBlob(preferredSourceUrl, { timeout: 0x7530 });
+    fetchRemoteBlob2 = await fetchRemoteBlob(preferredSourceUrl, { timeout: 30000 });
   } catch (error) {
     throw new Error(
       panoramaSceneText('errors.readPanoramaInputFailed', {

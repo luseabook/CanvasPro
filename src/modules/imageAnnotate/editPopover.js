@@ -4,7 +4,7 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
   const el = returnFocus['ownerDocument'],
     viewportWidth = el['defaultView'];
   let beginModalInteraction2 = null;
-  ((submenu['tabIndex'] = -0x1),
+  ((submenu['tabIndex'] = -1),
     (submenu['hidden'] = !![]),
     el['body']['append'](submenu),
     returnFocus['setAttribute']('aria-expanded', 'false'),
@@ -17,8 +17,8 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
         anchorRect: anchorRect,
         position: 'fixed',
         horizontalPlacement: 'center',
-        verticalPlacement: anchorRect['top'] > submenu['offsetHeight'] + 0x14 ? 'above' : 'below',
-        verticalGap: 0x8,
+        verticalPlacement: anchorRect['top'] > submenu['offsetHeight'] + 20 ? 'above' : 'below',
+        verticalGap: 8,
         viewportWidth: viewportWidth['innerWidth'],
         viewportHeight: viewportWidth['innerHeight'],
       });

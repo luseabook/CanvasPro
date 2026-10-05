@@ -35,7 +35,7 @@ import { localPathToUrl, pickResultLocalPath, urlToLocalPath } from '../src/util
 import { requester } from './requester.js';
 import { runTaskSingleFlight } from './taskSingleFlight.js';
 import { ApiError, ErrorType, parseError, parseTaskError, parseNetworkError } from './errors/index.js';
-const GENERATION_TIMEOUT = 10 * 60 * 0x3e8;
+const GENERATION_TIMEOUT = 10 * 60 * 1000;
 export async function cancelRunningHubVideoTask({ apiKey: apiKey, taskId: taskId } = {}) {
   return cancelRunningHubTask({ apiKey: apiKey, taskId: taskId });
 }
@@ -120,15 +120,15 @@ async function pollRunningHubVideoTask(taskId2, index, provider2, result) {
     apiKey2 = isModelApiModel2
       ? providerConfig2.modelApiKey || index.apiKey
       : providerConfig2.apiKey || index.apiKey;
-  for (let count = 0; count < 0x4b0; count++) {
+  for (let count = 0; count < 1200; count++) {
     if (result?.signal?.aborted) throw new Error('CANCELLED');
-    await new Promise((data) => setTimeout(data, 0x7d0));
+    await new Promise((data) => setTimeout(data, 2000));
     try {
       const raw = await requester({
         url: url2 ? '/api/v2/proxy/image' : '/api/v2/runninghubwf/query',
         method: 'POST',
         provider: provider2,
-        timeout: 0x7530,
+        timeout: 30000,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(
           url2
@@ -138,7 +138,7 @@ async function pollRunningHubVideoTask(taskId2, index, provider2, result) {
       });
       if (url2) {
         const count2 = typeof raw?.code === 'number' ? raw.code : null;
-        if (count2 === 0x324 || count2 === 0x32d) continue;
+        if (count2 === 804 || count2 === 813) continue;
         if (count2 !== null && count2 !== 0) throw parseError(provider2, raw, 200);
         if (extractVideoUrls(raw, result?.responseMapping).length > 0) return raw;
       }
@@ -168,7 +168,7 @@ async function pollRunningHubVideoTask(taskId2, index, provider2, result) {
           }
           continue;
         }
-        if (count3 === 0x324 || count3 === 0x32d) continue;
+        if (count3 === 804 || count3 === 813) continue;
         if (count3 !== null && count3 !== 0) throw parseError(provider2, raw, 200);
       }
       const response2 = raw.data && Object.keys(raw.data).length > 0 ? raw.data : raw;
@@ -454,9 +454,9 @@ function shouldRethrowVideoPollingError(value27) {
 }
 async function pollVideoTask(value28, provider5, value29, signal = {}) {
   const providerConfig4 = getProviderConfig(provider5);
-  for (let count4 = 0; count4 < 0x258; count4++) {
+  for (let count4 = 0; count4 < 600; count4++) {
     if (signal?.signal?.aborted) throw new Error('CANCELLED');
-    await new Promise((value30) => setTimeout(value30, 0x7d0));
+    await new Promise((value30) => setTimeout(value30, 2000));
     if (signal?.signal?.aborted) throw new Error('CANCELLED');
     const encodeURIComponent2 = encodeURIComponent(String(value28)),
       value31 =
@@ -475,7 +475,7 @@ async function pollVideoTask(value28, provider5, value29, signal = {}) {
           method: 'GET',
           headers: { Authorization: 'Bearer ' + value29 },
           provider: provider5,
-          timeout: 0x7530,
+          timeout: 30000,
           signal: signal?.signal,
         }),
         raw2 = normalizeAsyncVideoTaskInfo(requester2),
@@ -822,7 +822,7 @@ function extractVideoUrls(response9, value64 = null) {
         map4 = new Set();
       let count5 = 0;
       const run = (enabled15, count6) => {
-        if (count5 > 0x1f40) return;
+        if (count5 > 8000) return;
         if (count6 > 6) return;
         count5++;
         if (!enabled15) return;
@@ -959,7 +959,7 @@ async function _trySaveOutputByClientDownload(value88, value89) {
   if (!(value90.startsWith('http://') || value90.startsWith('https://')))
     return { localPath: null, error: 'invalid url' };
   const signal2 = new AbortController(),
-    setTimeout2 = setTimeout(() => signal2.abort(), 0x1d4c0);
+    setTimeout2 = setTimeout(() => signal2.abort(), 120000);
   let body = null;
   try {
     body = await fetchRemoteBlob(value90, { signal: signal2.signal });
@@ -980,7 +980,7 @@ async function _trySaveOutputByClientDownload(value88, value89) {
       url: '/api/v2/save_output?' + uRLSearchParams.toString(),
       method: 'POST',
       provider: 'local',
-      timeout: 8 * 60 * 0x3e8,
+      timeout: 8 * 60 * 1000,
       headers: { 'Content-Type': 'application/octet-stream' },
       body: body,
     });
@@ -1001,12 +1001,12 @@ async function trySaveOutputFromUrl(value91, dedupeKey = {}) {
       url: '/api/v2/save_output_from_url',
       method: 'POST',
       provider: 'local',
-      timeout: 8 * 60 * 0x3e8,
+      timeout: 8 * 60 * 1000,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         url: url3,
         ext: ext2,
-        maxBytes: 0x400 * 0x400 * 0x400,
+        maxBytes: 1024 * 1024 * 1024,
         dedupeKey: dedupeKey?.dedupeKey,
       }),
     });
@@ -1015,7 +1015,7 @@ async function trySaveOutputFromUrl(value91, dedupeKey = {}) {
     const error11 = error10 instanceof Error ? String(error10.message || '') : String(error10 || ''),
       count8 = error10 instanceof ApiError ? error10.status : null,
       value92 =
-        count8 === 0x190 || count8 === 0x191 || count8 === 0x193 || count8 === 0x1f6 || count8 === 0x1f8;
+        count8 === 400 || count8 === 401 || count8 === 403 || count8 === 502 || count8 === 504;
     if (value92) {
       const _trySaveOutputByClientDownload2 = await _trySaveOutputByClientDownload(url3, ext2);
       if (_trySaveOutputByClientDownload2.localPath) return _trySaveOutputByClientDownload2;
@@ -1264,8 +1264,8 @@ export const __test__ = {
 };
 
 const VIDEO_RESULT_SAVE_TIMEOUT_MS = SAVE_OUTPUT_FROM_URL_TIMEOUT_MS;
-const VIDEO_RESULT_SAVE_RETRIES = 0x3;
-const VIDEO_RESULT_SAVE_RETRY_DELAY_MS = 0x3e8;
+const VIDEO_RESULT_SAVE_RETRIES = 3;
+const VIDEO_RESULT_SAVE_RETRY_DELAY_MS = 1000;
 
 function resolveVideoRuntimeProviderKey(options4 = {}, value106 = '') {
   const runningHubTaskProviderProfileId = getRunningHubTaskProviderProfileId(options4),
@@ -1300,7 +1300,7 @@ function normalizeVideoSubmitDiagnosticToken(value108) {
   return String(value108)
     ['trim']()
     ['replace'](/[^a-zA-Z0-9._:-]/g, '')
-    ['slice'](0x0, 0x50);
+    ['slice'](0, 80);
 }
 
 function getVideoSubmitDiagnosticCandidates(value109) {
@@ -1413,7 +1413,7 @@ function buildVideoSubmitMissingResultError(
         ? Object['keys'](value123)
             ['map']((value126) => normalizeVideoSubmitDiagnosticToken(value126))
             ['filter'](Boolean)
-            ['slice'](0x0, 0xc)
+            ['slice'](0, 12)
         : [],
     list28 = [
       videoSubmitDiagnosticToken4 ? '状态：' + videoSubmitDiagnosticToken4 : '',
@@ -1422,7 +1422,7 @@ function buildVideoSubmitMissingResultError(
       list27['length'] ? '响应字段：' + list27['join'](',') : '',
     ]['filter'](Boolean),
     value127 = expectsTaskId
-      ? '任务创建响应异常：服务端未返回任务\x20ID'
+      ? '任务创建响应异常：服务端未返回任务 ID'
       : '视频生成响应异常：服务端未返回视频结果';
   return new ApiError({
     type: 'PARSE_ERROR',
@@ -1458,15 +1458,15 @@ function normalizeDreaminaVideoTaskResult(value128, value129, { allowPending: al
       };
     });
   return {
-    isBatch: list29['length'] > 0x1,
+    isBatch: list29['length'] > 1,
     dreaminaSnapshot: dreaminaTaskSnapshot,
     videos: list29,
     videoUrl:
-      localPathToUrl(pickResultLocalPath(value130[0x0])) ||
-      value130[0x0]?.['localUrl'] ||
-      value130[0x0]?.['url'] ||
+      localPathToUrl(pickResultLocalPath(value130[0])) ||
+      value130[0]?.['localUrl'] ||
+      value130[0]?.['url'] ||
       '',
-    localPath: pickResultLocalPath(value130[0x0]),
+    localPath: pickResultLocalPath(value130[0]),
   };
 }
 
@@ -1516,7 +1516,7 @@ function isAgnesTaskNotExistError(value138) {
   return (
     value139['includes']('task_not_exist') ||
     value139['includes']('task not exist') ||
-    value139['includes']('task\x20not\x20found') ||
+    value139['includes']('task not found') ||
     value139['includes']('video not found') ||
     value139['includes']('任务不存在') ||
     value139['includes']('任务或视频未找到')
@@ -1535,12 +1535,12 @@ function shouldTryManifestPollFallback({
   pollUrl: pollUrl,
   taskId: taskId7,
 } = {}) {
-  if (pollIndex >= pollUrls['length'] - 0x1 || !(err instanceof ApiError)) return ![];
+  if (pollIndex >= pollUrls['length'] - 1 || !(err instanceof ApiError)) return ![];
   const value141 = String(providerId2 || '')
     ['trim']()
     ['toLowerCase']();
   if (value141 === 'agnes' && isAgnesVideoId(taskId7)) return ![];
-  if (Number(err['status'] || err['code'] || 0x0) === 0x194) return !![];
+  if (Number(err['status'] || err['code'] || 0) === 404) return !![];
   return (
     value141 === 'agnes' && String(pollUrl || '')['includes']('/agnesapi?') && isAgnesTaskNotExistError(err)
   );
@@ -1548,17 +1548,17 @@ function shouldTryManifestPollFallback({
 
 function resolveVideoPollIntervalMs(options6 = {}) {
   const value142 = Number(
-    options6?.['taskPolling']?.['pollIntervalMs'] || options6?.['pollIntervalMs'] || 0x7d0,
+    options6?.['taskPolling']?.['pollIntervalMs'] || options6?.['pollIntervalMs'] || 2000,
   );
-  if (!Number['isFinite'](value142)) return 0x7d0;
-  return Math['min'](0x7530, Math['max'](0x3e8, Math['trunc'](value142)));
+  if (!Number['isFinite'](value142)) return 2000;
+  return Math['min'](30000, Math['max'](1000, Math['trunc'](value142)));
 }
 
-function resolveVideoPollAttempts(options7 = {}, value143 = 0x7d0) {
+function resolveVideoPollAttempts(options7 = {}, value143 = 2000) {
   const count10 = Number(options7?.['taskPolling']?.['maxWaitMs'] || options7?.['maxWaitMs']);
-  if (!Number['isFinite'](count10) || count10 <= 0x0) return 0x258;
-  const value144 = Math['min'](0x2 * 0x3c * 0x3c * 0x3e8, Math['max'](0x3c * 0x3e8, Math['trunc'](count10)));
-  return Math['max'](0x1, Math['ceil'](value144 / Math['max'](0x1, value143)));
+  if (!Number['isFinite'](count10) || count10 <= 0) return 600;
+  const value144 = Math['min'](2 * 60 * 60 * 1000, Math['max'](60 * 1000, Math['trunc'](count10)));
+  return Math['max'](1, Math['ceil'](value144 / Math['max'](1, value143)));
 }
 
 function resolveVideoTransportErrorPolicy(options8 = {}) {
@@ -1568,12 +1568,12 @@ function resolveVideoTransportErrorPolicy(options8 = {}) {
     new Set(
       (Array['isArray'](value145) ? value145 : [])
         ['map']((value146) => Number(value146))
-        ['filter']((count11) => Number['isInteger'](count11) && count11 >= 0x190 && count11 <= 0x257),
+        ['filter']((count11) => Number['isInteger'](count11) && count11 >= 400 && count11 <= 599),
     );
   return {
     maxConsecutiveErrors: Math['min'](
-      0xa,
-      Math['max'](0x1, Math['trunc'](Number(enabled21['maxConsecutiveErrors']) || 0x3)),
+      10,
+      Math['max'](1, Math['trunc'](Number(enabled21['maxConsecutiveErrors']) || 3)),
     ),
     retryableStatuses: run2(enabled21['retryableStatuses']),
     terminalStatuses: run2(enabled21['terminalStatuses']),
@@ -1594,7 +1594,7 @@ function resolveAsyncVideoTaskStatuses(value149, value150) {
           ['toLowerCase'](),
       )['filter']((value153) => /^[a-z][a-z0-9_-]{0,63}$/['test'](value153))
     : [];
-  return value151['length'] > 0x0 ? new Set(value151) : value150;
+  return value151['length'] > 0 ? new Set(value151) : value150;
 }
 
 function isAsyncVideoTaskSuccessStatus(value154, value155 = null) {
@@ -1620,7 +1620,7 @@ function _canFetchOutputUrl(value157) {
   );
 }
 
-async function _fetchOutputBlob(value159, value160, value161 = 0x1d4c0) {
+async function _fetchOutputBlob(value159, value160, value161 = 120000) {
   if (_isRelativeApiUrl(value159))
     return await requester({
       url: value159,
@@ -1658,9 +1658,9 @@ async function pollComfyUiVideoTask(value167, value168 = {}) {
   const value169 = String(value167 || '')['trim'](),
     args13 = value168?.['taskPolling'] || {},
     args14 = String(args13['baseUrl'] || '')['trim']();
-  for (let count12 = 0x0; count12 < 0x258; count12++) {
+  for (let count12 = 0; count12 < 600; count12++) {
     if (value168?.['signal']?.['aborted']) throw new Error('CANCELLED');
-    await new Promise((value170) => setTimeout(value170, 0x7d0));
+    await new Promise((value170) => setTimeout(value170, 2000));
     if (value168?.['signal']?.['aborted']) throw new Error('CANCELLED');
     const uRLSearchParams2 = new URLSearchParams({
         promptId: value169,
@@ -1671,17 +1671,17 @@ async function pollComfyUiVideoTask(value167, value168 = {}) {
         url: '/api/v2/comfyui/history?' + uRLSearchParams2['toString'](),
         method: 'GET',
         provider: 'comfyui',
-        timeout: 0x7530,
+        timeout: 30000,
         signal: value168?.['signal'],
       }),
       value171 =
         typeof value168?.['resultExtractor'] === 'function'
           ? value168['resultExtractor'](requester5)
           : requester5;
-    if (extractVideoUrls(value171, value168?.['responseMapping'])['length'] > 0x0) return value171;
+    if (extractVideoUrls(value171, value168?.['responseMapping'])['length'] > 0) return value171;
     const asyncVideoTaskStatus2 = resolveAsyncVideoTaskStatus(value171, value168?.['responseMapping']);
     if (isAsyncVideoTaskFailureStatus(asyncVideoTaskStatus2, value168?.['taskPolling']?.['failedStatuses'])) {
-      const error15 = parseError('comfyui', value171, 0xc8);
+      const error15 = parseError('comfyui', value171, 200);
       if (error15) throw error15;
       throw ApiError['taskFailed'](
         'comfyui',
@@ -1718,7 +1718,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
       ...(args16 || {}),
       ...(args18 ? { responseMapping: args18 } : {}),
       ...(dom?.['taskPolling'] ? { taskPolling: dom['taskPolling'] } : {}),
-      ...(Array['isArray'](dom?.['errorRules']) && dom['errorRules']['length'] > 0x0
+      ...(Array['isArray'](dom?.['errorRules']) && dom['errorRules']['length'] > 0
         ? { errorRules: dom['errorRules'] }
         : {}),
       ...(typeof dom?.['resultExtractor'] === 'function' ? { resultExtractor: dom['resultExtractor'] } : {}),
@@ -1769,7 +1769,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
     args20 = '';
   if (value173) {
     if (String(error16?.['code'] || '') === 'SUBSCRIPTION_REQUIRED') {
-      const error17 = new Error(error16?.['message'] || '该模型为\x20VIP，请先激活\x20CDKEY/订阅');
+      const error17 = new Error(error16?.['message'] || '该模型为 VIP，请先激活 CDKEY/订阅');
       ((error17['code'] = 'SUBSCRIPTION_REQUIRED'),
         (error17['contactText'] = error16?.['contactText'] || ''),
         (error17['contactUrl'] = error16?.['contactUrl'] || ''));
@@ -1781,9 +1781,9 @@ async function generateVideoUnqueued(args15, args16 = {}) {
           ? value182
           : null,
       runningHubVideoTaskId2 = resolveRunningHubVideoTaskId(error16, value178, value179, args18) || null,
-      enabled23 = runningHubVideoTaskId2 && (count13 === 0x324 || count13 === 0x32d);
-    if (count13 !== null && count13 !== 0x0 && !enabled23) {
-      const error18 = parseError(videoProviderId, error16, 0xc8);
+      enabled23 = runningHubVideoTaskId2 && (count13 === 804 || count13 === 813);
+    if (count13 !== null && count13 !== 0 && !enabled23) {
+      const error18 = parseError(videoProviderId, error16, 200);
       throw (
         error18 ||
         new ApiError({
@@ -1792,21 +1792,21 @@ async function generateVideoUnqueued(args15, args16 = {}) {
           code: count13,
           message: String(error16?.['message'] || error16?.['msg'] || 'RunningHub 任务提交失败'),
           raw: error16,
-          retryable: count13 === 0x1a5,
+          retryable: count13 === 421,
         })
       );
     }
     if (videoProviderId === 'comfyui') {
-      const error19 = parseError(videoProviderId, error16, 0xc8);
+      const error19 = parseError(videoProviderId, error16, 200);
       if (error19) throw error19;
     }
     if (runningHubVideoTaskId2) {
       const value183 = String(runningHubVideoTaskId2);
-      count13 === 0x32d &&
+      count13 === 813 &&
         args16?.['onRunningHubWorkflowQueueChange']?.({
           status: 'queued',
-          queueIndex: 0x0,
-          queueLength: 0x1,
+          queueIndex: 0,
+          queueLength: 1,
           reason: 'provider-accepted-queue',
           taskId: value183,
         });
@@ -1860,10 +1860,10 @@ async function generateVideoUnqueued(args15, args16 = {}) {
     }
   }
   if (!processVideoTaskResult5) {
-    const extractVideoUrls3 = extractVideoUrls(error16, args18)[0x0] || extractVideoUrl(error16);
+    const extractVideoUrls3 = extractVideoUrls(error16, args18)[0] || extractVideoUrl(error16);
     if (!extractVideoUrls3) {
       if (hasExplicitVideoSubmitFailureSignal(error16)) {
-        const error20 = parseError(videoProviderId, error16, 0xc8);
+        const error20 = parseError(videoProviderId, error16, 200);
         if (error20) {
           error20['message'] = error20['getUserMessage']();
           throw error20;
@@ -1907,8 +1907,8 @@ function createRunningHubWorkflowQueueChangeEmitter(handler6) {
     const value189 = String(options10?.['status'] || '')
         ['trim']()
         ['toLowerCase'](),
-      value190 = Number(options10?.['queueIndex'] ?? -0x1),
-      value191 = Number(options10?.['queueLength'] ?? 0x0),
+      value190 = Number(options10?.['queueIndex'] ?? -1),
+      value191 = Number(options10?.['queueLength'] ?? 0),
       value192 = value189 + ':' + value190 + ':' + value191;
     if (value192 === value188) return ![];
     return ((value188 = value192), handler6(options10), !![]);

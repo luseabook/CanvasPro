@@ -10,8 +10,8 @@ function isGroupNode(key) {
 function nodeSize(box) {
   const isGroupNode2 = isGroupNode(box);
   return {
-    width: Number(box?.width ?? box?.w) || (isGroupNode2 ? 0x190 : 0x104),
-    height: Number(box?.height ?? box?.h) || (isGroupNode2 ? 0x12c : 100),
+    width: Number(box?.width ?? box?.w) || (isGroupNode2 ? 400 : 260),
+    height: Number(box?.height ?? box?.h) || (isGroupNode2 ? 300 : 100),
   };
 }
 function isNodeContainedInGroup(box2, box3) {

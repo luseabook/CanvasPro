@@ -19,9 +19,9 @@ export function createRendererMediaPresentationCoordinator({
   previewRelease: previewRelease,
   videoSlots: videoSlots,
   videoBackpressure: videoBackpressure = createRendererVideoHydrationBackpressure(),
-  batchSize: batchSize = 0x2,
-  presentedMediaLeaseMs: presentedMediaLeaseMs = 0x258,
-  maxRetainedPresentedMedia: maxRetainedPresentedMedia = 0x3,
+  batchSize: batchSize = 2,
+  presentedMediaLeaseMs: presentedMediaLeaseMs = 600,
+  maxRetainedPresentedMedia: maxRetainedPresentedMedia = 3,
   suspendDelayMs: suspendDelayMs,
   onHydrateDiagnostic: onHydrateDiagnostic,
   onParkSuspendDiagnostic: onParkSuspendDiagnostic,
@@ -66,7 +66,7 @@ export function createRendererMediaPresentationCoordinator({
       );
     },
     onParkSuspend: (nodeId, entry) => {
-      const record = onParkSuspendDiagnostic ? performance['now']() : 0x0;
+      const record = onParkSuspendDiagnostic ? performance['now']() : 0;
       try {
         entry?.['suspendRendererMedia']?.();
       } catch {}

@@ -16,7 +16,7 @@ export function splitDocumentText(input, limit = STORY_LIMITS.script) {
       else if (line > start + limit / 2) end = line + 1;
       // Never split a valid surrogate pair between episodes.
       const previous = input.charCodeAt(end - 1), next = input.charCodeAt(end);
-      if (previous >= 0xd800 && previous <= 0xdbff && next >= 0xdc00 && next <= 0xdfff) end--;
+      if (previous >= 55296 && previous <= 56319 && next >= 56320 && next <= 57343) end--;
     }
     parts.push(input.slice(start, end)); start = end;
   }

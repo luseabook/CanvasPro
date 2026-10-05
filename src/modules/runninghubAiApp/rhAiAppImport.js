@@ -47,30 +47,30 @@ function sanitizeIdentifierPart(options, target = 'field') {
 function createStableHash(next) {
   const list = String(next || '');
   let current = 0x811c9dc5;
-  for (let entry = 0x0; entry < list['length']; entry += 0x1) {
+  for (let entry = 0; entry < list['length']; entry += 1) {
     ((current ^= list['charCodeAt'](entry)), (current = Math['imul'](current, 0x1000193)));
   }
-  return (current >>> 0x0)['toString'](0x24)['padStart'](0x7, '0')['slice'](0x0, 0x8);
+  return (current >>> 0)['toString'](36)['padStart'](7, '0')['slice'](0, 8);
 }
 function stripCurlLineContinuations(record) {
-  return String(record || '')['replace'](/\\\r?\n/g, '\x0a');
+  return String(record || '')['replace'](/\\\r?\n/g, '\n');
 }
 function readQuotedCurlValue(list2, payload) {
   let handle = payload;
-  while (handle < list2['length'] && /\s/['test'](list2[handle])) handle += 0x1;
+  while (handle < list2['length'] && /\s/['test'](list2[handle])) handle += 1;
   const state = list2[handle];
-  if (state !== '\x27' && state !== '\x22') {
+  if (state !== '\'' && state !== '"') {
     const config = list2['slice'](handle),
-      scope = config['split'](/\r?\n/)[0x0] || config;
+      scope = config['split'](/\r?\n/)[0] || config;
     return scope['trim']();
   }
-  handle += 0x1;
+  handle += 1;
   let input = '';
-  for (; handle < list2['length']; handle += 0x1) {
+  for (; handle < list2['length']; handle += 1) {
     const output = list2[handle];
     if (output === state) {
-      const enabled = list2[handle - 0x1] === '\x5c';
-      if (!enabled || state === '\x27') return input;
+      const enabled = list2[handle - 1] === '\\';
+      if (!enabled || state === '\'') return input;
     }
     input += output;
   }
@@ -80,38 +80,38 @@ function extractCurlDataPayload(value2) {
   const stripCurlLineContinuations2 = stripCurlLineContinuations(value2),
     enabled2 = DATA_FLAG_RE['exec'](stripCurlLineContinuations2);
   if (!enabled2) return '';
-  return readQuotedCurlValue(stripCurlLineContinuations2, enabled2['index'] + enabled2[0x0]['length']);
+  return readQuotedCurlValue(stripCurlLineContinuations2, enabled2['index'] + enabled2[0]['length']);
 }
 function extractFirstJsonObject(value3) {
   const list3 = String(value3 || ''),
     count = list3['indexOf']('{');
-  if (count < 0x0) return '';
-  let count2 = 0x0,
+  if (count < 0) return '';
+  let count2 = 0,
     enabled3 = ![],
     value4 = '',
     value5 = ![];
-  for (let value6 = count; value6 < list3['length']; value6 += 0x1) {
+  for (let value6 = count; value6 < list3['length']; value6 += 1) {
     const value7 = list3[value6];
     if (enabled3) {
       if (value5) {
         value5 = ![];
         continue;
       }
-      if (value7 === '\x5c') {
+      if (value7 === '\\') {
         value5 = !![];
         continue;
       }
       value7 === value4 && ((enabled3 = ![]), (value4 = ''));
       continue;
     }
-    if (value7 === '\x22' || value7 === '\x27') {
+    if (value7 === '"' || value7 === '\'') {
       ((enabled3 = !![]), (value4 = value7));
       continue;
     }
-    if (value7 === '{') count2 += 0x1;
+    if (value7 === '{') count2 += 1;
     if (value7 === '}') {
-      count2 -= 0x1;
-      if (count2 === 0x0) return list3['slice'](count, value6 + 0x1);
+      count2 -= 1;
+      if (count2 === 0) return list3['slice'](count, value6 + 1);
     }
   }
   return '';
@@ -121,7 +121,7 @@ function extractAiAppId(value8, value9 = {}, value10 = '') {
   if (text) return text;
   const value11 = String(value8 || ''),
     value12 = value11['match'](RUNNINGHUB_AI_APP_URL_RE),
-    text2 = normalizeText(value12?.[0x1]);
+    text2 = normalizeText(value12?.[1]);
   if (text2) return text2;
   return normalizeText(value9['appId'] || value9['workflowId'] || value9['aiAppId']);
 }
@@ -139,11 +139,11 @@ export function parseRunningHubAiAppInput(value14, { appId: appId2 = '' } = {}) 
     (sourceText['startsWith']('{') ? sourceText : '') ||
     extractCurlDataPayload(sourceText) ||
     extractFirstJsonObject(sourceText);
-  if (!enabled4) throw new Error('未找到\x20--data-raw\x20JSON\x20请求体');
+  if (!enabled4) throw new Error('未找到 --data-raw JSON 请求体');
   const body = parseJsonPayload(enabled4),
     appId3 = extractAiAppId(sourceText, body, appId2);
   if (!appId3) throw new Error('未找到 RunningHub AI App 的 appId');
-  if (!Array['isArray'](body['nodeInfoList']) || body['nodeInfoList']['length'] === 0x0)
+  if (!Array['isArray'](body['nodeInfoList']) || body['nodeInfoList']['length'] === 0)
     throw new Error('JSON 中缺少 nodeInfoList');
   return {
     appId: appId3,
@@ -199,7 +199,7 @@ function looksLikeLongEnglishText(value27) {
   const value28 = String(value27 ?? '')['trim'](),
     list6 = value28['match'](/[A-Za-z][A-Za-z'-]*/g) || [],
     count3 = (value28['match'](/[A-Za-z]/g) || [])['length'];
-  return list6['length'] >= 0x4 || count3 >= 0x1c;
+  return list6['length'] >= 4 || count3 >= 28;
 }
 function looksLikeStructuredText(value29) {
   const list7 = String(value29 ?? '')['trim']();
@@ -207,7 +207,7 @@ function looksLikeStructuredText(value29) {
   return (
     containsCjkText(list7) ||
     looksLikeLongEnglishText(list7) ||
-    list7['length'] > 0x2a ||
+    list7['length'] > 42 ||
     /[\s,.;:!?，。；：！？、]/['test'](list7) ||
     /^[\[{]/['test'](list7)
   );
@@ -316,11 +316,11 @@ function normalizeBooleanDefault(value48) {
 }
 function normalizeIntegerDefault(value50) {
   const value51 = Number(value50);
-  return Number['isFinite'](value51) ? Math['trunc'](value51) : 0x0;
+  return Number['isFinite'](value51) ? Math['trunc'](value51) : 0;
 }
 function normalizeFloatDefault(value52) {
   const value53 = Number(value52);
-  return Number['isFinite'](value53) ? value53 : 0x0;
+  return Number['isFinite'](value53) ? value53 : 0;
 }
 function normalizeDefaultValueForControl(value54, value55) {
   const controlType = normalizeControlType(value54);
@@ -350,8 +350,8 @@ function getUiSchemaTypeForControl(value61) {
 function getFloatStep(value62) {
   const value63 = String(value62 ?? '')['trim'](),
     value64 = value63['match'](/\.(\d+)/),
-    value65 = value64 ? Math['max'](0x1, value64[0x1]['length']) : 0x2;
-  return Number('0.' + '0'['repeat'](Math['max'](0x0, value65 - 0x1)) + '1');
+    value65 = value64 ? Math['max'](1, value64[1]['length']) : 2;
+  return Number('0.' + '0'['repeat'](Math['max'](0, value65 - 1)) + '1');
 }
 function createParamFieldId(value66, value67) {
   const sanitizeIdentifierPart2 = sanitizeIdentifierPart(value66?.['nodeId'], 'node_' + value67),
@@ -366,7 +366,7 @@ function buildInputSlotCounts(list8) {
   return list8['reduce']((value71, value72) => {
     const enabled5 = String(value72?.['kind'] || '')['trim']();
     if (!enabled5) return value71;
-    return ((value71[enabled5] = (value71[enabled5] || 0x0) + 0x1), value71);
+    return ((value71[enabled5] = (value71[enabled5] || 0) + 1), value71);
   }, {});
 }
 function buildResultConfig(value73) {
@@ -407,7 +407,7 @@ export function buildRunningHubCustomAppExtensions(kind2, appId4, name, value74 
       kind2 === 'image' &&
       (value76['imageMenu'] = {
         group: 'rhAiApp',
-        order: 0x3e7,
+        order: 999,
         title: name,
         subtitle: subtitle,
         icon: 'images/RH.png',
@@ -418,11 +418,11 @@ export function buildRunningHubCustomAppExtensions(kind2, appId4, name, value74 
       (value76['videoMenu'] = {
         role: 'rhAiApp',
         group: 'rhAiApp',
-        order: 0x3e7,
+        order: 999,
         label: name,
         subtitle: subtitle,
       }),
-    isSavedApp && kind2 === 'audio' && (value76['audioMenu'] = { group: 'rhAiApp', order: 0x3e7 }),
+    isSavedApp && kind2 === 'audio' && (value76['audioMenu'] = { group: 'rhAiApp', order: 999 }),
     value76
   );
 }
@@ -566,7 +566,7 @@ function buildComponentOverrideMap(list12 = []) {
   return (
     list12['forEach']((value87) => {
       const count4 = Number(value87?.['index']);
-      if (!Number['isInteger'](count4) || count4 < 0x0) return;
+      if (!Number['isInteger'](count4) || count4 < 0) return;
       map2['set'](count4, value87);
     }),
     map2
@@ -662,7 +662,7 @@ function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
       rhAiAppComponentIndex: item4['index'],
       ...(type === 'stepper'
         ? {
-            step: step === 'float' ? getFloatStep(defaultValue) : 0x1,
+            step: step === 'float' ? getFloatStep(defaultValue) : 1,
             ...(step === 'float' ? { valueType: 'float' } : {}),
           }
         : {}),
@@ -686,7 +686,7 @@ function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
         const orderValue =
           normalizeOrderValue(value91['displayOrder'], value91['_sourceOrder']) -
           normalizeOrderValue(value92['displayOrder'], value92['_sourceOrder']);
-        if (orderValue !== 0x0) return orderValue;
+        if (orderValue !== 0) return orderValue;
         return value91['_sourceOrder'] - value92['_sourceOrder'];
       })
       ['map'](({ _sourceOrder: _sourceOrder2, ...args3 }, displayOrder) => ({
@@ -694,12 +694,12 @@ function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
         displayOrder: displayOrder,
       })),
     uiFields = [
-      list14[0x0],
-      ...list14['slice'](0x1)['sort']((value93, value94) => {
+      list14[0],
+      ...list14['slice'](1)['sort']((value93, value94) => {
         const count5 = String(value93?.['placement'] || '')['localeCompare'](
           String(value94?.['placement'] || ''),
         );
-        if (count5 !== 0x0) return count5;
+        if (count5 !== 0) return count5;
         return (
           normalizeOrderValue(value93?.['displayOrder'], Number['MAX_SAFE_INTEGER']) -
           normalizeOrderValue(value94?.['displayOrder'], Number['MAX_SAFE_INTEGER'])
@@ -792,8 +792,8 @@ export function buildRunningHubAiAppManifestBundle({
   });
 }
 export function summarizeRunningHubAiAppBundle(value96) {
-  const kind5 = value96?.['models']?.[0x0] || {},
-    appId6 = value96?.['executions']?.[0x0] || {},
+  const kind5 = value96?.['models']?.[0] || {},
+    appId6 = value96?.['executions']?.[0] || {},
     slotCount = Array['isArray'](kind5?.['inputSlots']?.['fixedSlots'])
       ? kind5['inputSlots']['fixedSlots']
       : [],

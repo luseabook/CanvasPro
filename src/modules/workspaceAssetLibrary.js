@@ -22,8 +22,8 @@ function escapeHtml(key) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function resolveAssetCategory(options = {}) {
   return normalizeText(options['category'] || options['assetCategory']) || '其他';
@@ -58,12 +58,12 @@ export function getWorkspaceAssetLibraryMediaLabel(payload) {
 }
 export function buildWorkspaceAssetLibraryItems({
   allowedTypes: allowedTypes = ['image'],
-  limit: limit = 0x0,
+  limit: limit = 0,
 } = {}) {
   const assetMentionCandidates = getAssetMentionCandidates({ allowedTypes: allowedTypes }),
     handle =
-      Number(limit) > 0x0
-        ? assetMentionCandidates['slice'](0x0, Math['trunc'](Number(limit)))
+      Number(limit) > 0
+        ? assetMentionCandidates['slice'](0, Math['trunc'](Number(limit)))
         : assetMentionCandidates;
   return handle['map']((sourceAssetId) => {
     const thumbnailUrl = normalizeText(sourceAssetId['thumbUrl']),
@@ -150,7 +150,7 @@ export function buildWorkspaceAssetLibraryHierarchy({
   const value5 = (value6) => {
     return (
       (value6['children'] = value6['children']['filter'](value5)),
-      value6['assets']['length'] > 0x0 || value6['children']['length'] > 0x0
+      value6['assets']['length'] > 0 || value6['children']['length'] > 0
     );
   };
   return value2['filter'](value5);
@@ -176,40 +176,40 @@ export function renderWorkspaceAssetLibraryGroups({
     ),
     workspaceAssetLibraryHierarchy = buildWorkspaceAssetLibraryHierarchy({ assets: assets });
   if (!workspaceAssetLibraryHierarchy['length']) return '';
-  const run2 = (value11, count2 = 0x0) => {
+  const run2 = (value11, count2 = 0) => {
     const value12 = value11['category'],
       escapeHtml2 = escapeHtml(value12),
       enabled = value10['has'](normalizeCategoryKey(value12)),
-      value13 = value11['children']['map']((value14) => run2(value14, count2 + 0x1))['join'](''),
+      value13 = value11['children']['map']((value14) => run2(value14, count2 + 1))['join'](''),
       value15 = value11['assets']['length']
         ? '<div class="story-asset-grid workspace-asset-library-grid">' +
           value11['assets']['map'](renderAsset)['join']('') +
           '</div>'
         : '';
     return (
-      '<section\x20class=\x22v2-material-folder\x20workspace-asset-library-group' +
-      (count2 > 0x0 ? ' is-nested' : '') +
-      '\x22\x20data-workspace-asset-library-category=\x22' +
+      '<section class="v2-material-folder workspace-asset-library-group' +
+      (count2 > 0 ? ' is-nested' : '') +
+      '" data-workspace-asset-library-category="' +
       escapeHtml2 +
       '" role="treeitem" aria-level="' +
-      (count2 + 0x1) +
-      '\x22\x20aria-expanded=\x22' +
+      (count2 + 1) +
+      '" aria-expanded="' +
       enabled +
       '">\n      <div class="v2-material-folder-row workspace-asset-library-folder-row">\n        <button type="button" class="v2-material-folder-toggle workspace-asset-library-folder-toggle" data-workspace-asset-library-toggle="' +
       escapeHtml2 +
       '" aria-expanded="' +
       enabled +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22v2-material-tree-chevron' +
+      '">\n          <span class="v2-material-tree-chevron' +
       (enabled ? ' is-open' : '') +
       '" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>\n          <span class="v2-material-folder-icon" aria-hidden="true"><svg viewBox="0 0 28 24"><path d="M2 5.5A2.5 2.5 0 0 1 4.5 3H11l2.4 2.5h10.1A2.5 2.5 0 0 1 26 8v11.5a2.5 2.5 0 0 1-2.5 2.5h-19A2.5 2.5 0 0 1 2 19.5v-14Z" fill="currentColor"/></svg></span>\n          <span class="v2-material-folder-name">' +
       escapeHtml(value11['label']) +
       '</span>\n        </button>\n        <span class="v2-material-folder-count">' +
       value11['count'] +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22v2-material-folder-content\x20workspace-asset-library-category-content\x22\x20data-workspace-asset-library-category-content=\x22' +
+      '</span>\n      </div>\n      <div class="v2-material-folder-content workspace-asset-library-category-content" data-workspace-asset-library-category-content="' +
       escapeHtml2 +
-      '\x22\x20role=\x22group\x22\x20aria-hidden=\x22' +
+      '" role="group" aria-hidden="' +
       !enabled +
-      '\x22' +
+      '"' +
       (enabled ? '' : ' hidden') +
       '>\n        ' +
       value13 +

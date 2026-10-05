@@ -6,7 +6,7 @@ import { normalizeLocalPath } from '../utils/localMediaPath.js';
 const IMAGE_FILE_EXTENSION_RE = /\.(?:png|jpe?g|webp|gif|bmp|avif)$/i,
   clickSubscribers = new Set();
 let unsubscribeDesktopClicks = null,
-  notificationSequence = 0x0;
+  notificationSequence = 0;
 function createNotificationReceipt(value) {
   const notificationId = value ? 'renderer-' + Date['now']() + '-' + ++notificationSequence : '';
   let enabled,
@@ -46,7 +46,7 @@ function showCompletionToast(dom, data) {
         ? t('coreServices.completion.notificationNodeBody', { name: name })
         : t('coreServices.completion.notificationBody')),
     options = { ...args };
-  globalThis['window']?.['showToast']?.(ariaLabel, 'success', 0x2710, {
+  globalThis['window']?.['showToast']?.(ariaLabel, 'success', 10000, {
     ariaLabel: ariaLabel + '，点击查看结果',
     onClick: () => {
       (data['acknowledge'](), dispatchCompletionClick(options));
@@ -58,7 +58,7 @@ function getNotificationApi() {
 }
 function normalizeText(target) {
   return String(target || '')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
 }
 function normalizeMediaKind(source) {
@@ -71,8 +71,8 @@ function getPrimaryMediaItem(args2 = {}, next = '') {
   const current = next === 'video' ? 'videos' : 'images',
     entry = next === 'video' ? 'mainVideoIndex' : 'mainImageIndex',
     list2 = Array['isArray'](args2?.[current]) ? args2[current] : [];
-  if (list2['length'] === 0x0) return args2;
-  const record = Math['max'](0x0, Math['trunc'](Number(args2?.[entry]) || 0x0)),
+  if (list2['length'] === 0) return args2;
+  const record = Math['max'](0, Math['trunc'](Number(args2?.[entry]) || 0)),
     args3 = list2[record] || list2['find']((enabled2) => enabled2 && !enabled2['error']);
   return args3 && typeof args3 === 'object' ? { ...args2, ...args3 } : args2;
 }
@@ -197,7 +197,7 @@ export async function showTaskStatusNotification({
   globalThis['window']?.['showToast']?.(
     body,
     type,
-    0x2710,
+    10000,
     navigation2
       ? {
           ariaLabel: body + '，点击查看任务',
@@ -210,7 +210,7 @@ export async function showTaskStatusNotification({
   const completionSoundSettings2 = await loadCompletionSoundSettings(),
     list3 = [];
   completionSoundSettings2['enabled'] !== ![] &&
-    completionSoundSettings2['volume'] > 0x0 &&
+    completionSoundSettings2['volume'] > 0 &&
     desktopBridge['notificationSound']['isAvailable']() &&
     list3['push'](
       Promise['resolve']()['then'](() => desktopBridge['notificationSound']['play']({ system: !![] })),

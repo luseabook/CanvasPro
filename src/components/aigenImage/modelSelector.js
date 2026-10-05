@@ -88,7 +88,7 @@ export function renderAIGenImageModelSelectorMarkup({
     renderImageModelTriggerIconHTML({ model: model, provider: provider }) +
     '\n        <span class="img-model-label">' +
     escapeHtml(getDisplayModelName(model)) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</span>\n        ' +
     (showCaret
       ? '<svg class="image-model-selector-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
       : '') +
@@ -105,23 +105,23 @@ export function renderAIGenImageModelSelectorMarkup({
     (showSchemaControls
       ? '<div class="ui-schema-placement ui-schema-mode-slot" style="' +
         (result['mode'] ? '' : 'display:none;') +
-        '\x22>' +
+        '">' +
         result['mode'] +
         '</div>\n    <div class="ui-schema-placement ui-schema-resolution-slot" style="' +
         (result['resolution'] ? '' : 'display:none;') +
-        '\x22>' +
+        '">' +
         result['resolution'] +
-        '</div>\x0a\x20\x20\x20\x20<div\x20class=\x22rh-adv-wrap\x22\x20style=\x22position:relative;' +
+        '</div>\n    <div class="rh-adv-wrap" style="position:relative;' +
         (result['advanced'] ? '' : 'display:none;') +
         '">\n      <button type="button" class="img-pill-btn rh-adv-btn advanced-settings-icon-button" data-tooltip="' +
         escapeHtml2 +
-        '\x22\x20aria-label=\x22' +
+        '" aria-label="' +
         escapeHtml2 +
         '" aria-expanded="false">' +
         ADVANCED_SETTINGS_TUNE_ICON_MARKUP +
-        '</button>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-instance-slot\x22\x20style=\x22' +
+        '</button>\n    </div>\n    <div class="ui-schema-placement ui-schema-instance-slot" style="' +
         (result['instance'] ? '' : 'display:none;') +
-        '\x22>' +
+        '">' +
         result['instance'] +
         '</div>\n    <div class="rh-adv-panel">' +
         result['advanced'] +

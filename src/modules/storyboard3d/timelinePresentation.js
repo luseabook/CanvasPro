@@ -27,8 +27,8 @@ export function captureTimelinePresentation(el) {
       const top = shotId['querySelector'](selector);
       return {
         selector: selector,
-        top: top?.['scrollTop'] || 0x0,
-        left: top?.['scrollLeft'] || 0x0,
+        top: top?.['scrollTop'] || 0,
+        left: top?.['scrollLeft'] || 0,
       };
     }),
     focus: shotId['contains'](key) ? controlKey(key) : null,

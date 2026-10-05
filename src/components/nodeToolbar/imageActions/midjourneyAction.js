@@ -5,7 +5,7 @@ import {
 } from '../actionMenu.js';
 import { showProviderApiKeyMissingToastForError } from '../../../modules/providerApiKeyMissingToast.js';
 const APIMART_MIDJOURNEY_MODEL_ID = 'apimart/midjourney',
-  MJ_SECONDARY_ACTION_POLL_OPTIONS = Object['freeze']({ maxPolls: 0x384, pollIntervalMs: 0x7d0 }),
+  MJ_SECONDARY_ACTION_POLL_OPTIONS = Object['freeze']({ maxPolls: 900, pollIntervalMs: 2000 }),
   MJ_VARIATION_OPTIONS = Object['freeze']([
     Object['freeze']({ mode: 'weak', labelKey: 'variationWeakAction' }),
     Object['freeze']({ mode: 'medium', labelKey: 'variationMediumAction' }),
@@ -20,15 +20,15 @@ function midjourneyText(value, item = {}) {
 }
 function clampMainImageIndex(options = {}) {
   const list = Array['isArray'](options?.['images']) ? options['images'] : [];
-  if (list['length'] === 0x0) return 0x0;
-  const key = Number['parseInt'](options?.['mainImageIndex'], 0xa);
-  if (!Number['isFinite'](key)) return 0x0;
-  return Math['max'](0x0, Math['min'](list['length'] - 0x1, key));
+  if (list['length'] === 0) return 0;
+  const key = Number['parseInt'](options?.['mainImageIndex'], 10);
+  if (!Number['isFinite'](key)) return 0;
+  return Math['max'](0, Math['min'](list['length'] - 1, key));
 }
-function normalizeMjIndex(result, count = 0x0) {
-  const count2 = Number['parseInt'](result, 0xa);
-  if (Number['isFinite'](count2) && count2 >= 0x1 && count2 <= 0x4) return count2;
-  return count >= 0x1 && count <= 0x4 ? count : 0x0;
+function normalizeMjIndex(result, count = 0) {
+  const count2 = Number['parseInt'](result, 10);
+  if (Number['isFinite'](count2) && count2 >= 1 && count2 <= 4) return count2;
+  return count >= 1 && count <= 4 ? count : 0;
 }
 function normalizeMjModelVersion(data) {
   return String(data || '')
@@ -74,7 +74,7 @@ function normalizeButtons(list2) {
 }
 function getCurrentImage(options2 = {}) {
   const list3 = Array['isArray'](options2?.['images']) ? options2['images'] : [];
-  if (list3['length'] === 0x0) return options2 || {};
+  if (list3['length'] === 0) return options2 || {};
   return list3[clampMainImageIndex(options2)] || {};
 }
 function getCurrentImageUrl(options3 = {}, handler = null) {
@@ -132,7 +132,7 @@ export function resolveApimartMidjourneyToolbarContext(options5 = {}) {
   const value2 = output && typeof output === 'object' ? output : {},
     list6 = Array['isArray'](options5?.['images']) ? options5['images'] : [],
     clampMainImageIndex2 = clampMainImageIndex(options5),
-    index2 = normalizeMjIndex(value2['index'], clampMainImageIndex2 + 0x1),
+    index2 = normalizeMjIndex(value2['index'], clampMainImageIndex2 + 1),
     taskId = String(value2['taskId'] || options5?.['asyncTaskId'] || options5?.['taskId'] || '')['trim'](),
     buttons = normalizeButtons(value2['buttons']),
     list7 = String(value2['action'] || '')
@@ -140,10 +140,10 @@ export function resolveApimartMidjourneyToolbarContext(options5 = {}) {
       ['toUpperCase']();
   if (list7['includes']('UPSCALE')) return { enabled: ![] };
   const enabled3 =
-    buttons['length'] > 0x0 ||
+    buttons['length'] > 0 ||
     String(value2['gridImageUrl'] || '')['trim']() ||
     list7['includes']('IMAGINE') ||
-    list6['length'] >= 0x4;
+    list6['length'] >= 4;
   if (!taskId || !index2 || !enabled3) return { enabled: ![] };
   const mjModel = String(
       value2['mjModel'] ||
@@ -194,7 +194,7 @@ function resolveHdCommand(value3 = '') {
   if (list8['includes']('6')) return 'upsample_v6_2x_subtle';
   return 'upsample_v7_2x_subtle';
 }
-export function buildApimartMidjourneyHdCustomId(list9 = [], value4 = 0x0, value5 = '') {
+export function buildApimartMidjourneyHdCustomId(list9 = [], value4 = 0, value5 = '') {
   const mjIndex = normalizeMjIndex(value4);
   if (!mjIndex) return '';
   if (!isApimartMidjourneyHdSupported(value5)) return '';
@@ -203,16 +203,16 @@ export function buildApimartMidjourneyHdCustomId(list9 = [], value4 = 0x0, value
     const enabled4 = String(value6?.['customId'] || '')['trim']();
     if (!enabled4) continue;
     const list10 = enabled4['split']('::');
-    if (list10['length'] < 0x5) continue;
-    if (String(list10[0x0])['toUpperCase']() !== 'MJ') continue;
-    if (String(list10[0x1])['toUpperCase']() !== 'JOB') continue;
-    if (!String(list10[0x2] || '')['startsWith']('upsample')) continue;
-    if (Number['parseInt'](list10[0x3], 0xa) !== mjIndex) continue;
-    return ((list10[0x2] = hdCommand), list10['join']('::'));
+    if (list10['length'] < 5) continue;
+    if (String(list10[0])['toUpperCase']() !== 'MJ') continue;
+    if (String(list10[1])['toUpperCase']() !== 'JOB') continue;
+    if (!String(list10[2] || '')['startsWith']('upsample')) continue;
+    if (Number['parseInt'](list10[3], 10) !== mjIndex) continue;
+    return ((list10[2] = hdCommand), list10['join']('::'));
   }
   return '';
 }
-function midjourneyOutputText({ actionLabel: actionLabel = '', index: index = 0x0 } = {}) {
+function midjourneyOutputText({ actionLabel: actionLabel = '', index: index = 0 } = {}) {
   return midjourneyText('outputText', {
     model: midjourneyText('modelLabel'),
     action: actionLabel,
@@ -224,25 +224,25 @@ function getPlainObject(value7) {
 }
 export function buildApimartMidjourneyTargetNodePayload({
   id: id = '',
-  x: x = 0x0,
-  y: y = 0x0,
-  width: width = 0x120,
-  height: height = 0x120,
+  x: x = 0,
+  y: y = 0,
+  width: width = 288,
+  height: height = 288,
   name: name = '',
   outputText: outputText = '',
   fileName: fileName = '',
   generationParams: generationParams = {},
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   startPatch: startPatch = {},
   protocolPatch: protocolPatch = {},
 } = {}) {
   return {
     id: id,
     type: 'ai-image',
-    x: Number(x) || 0x0,
-    y: Number(y) || 0x0,
-    width: Math['max'](0x1, Math['round'](Number(width) || 0x120)),
-    height: Math['max'](0x1, Math['round'](Number(height) || 0x120)),
+    x: Number(x) || 0,
+    y: Number(y) || 0,
+    width: Math['max'](1, Math['round'](Number(width) || 288)),
+    height: Math['max'](1, Math['round'](Number(height) || 288)),
     needsAutoResize: ![],
     name: name,
     prompt: '',
@@ -346,24 +346,24 @@ function openVariationSubmenu(el4, value14, list11 = MJ_VARIATION_OPTIONS) {
   ((el7['className'] = 'node-toolbar-action-menu-title'),
     (el7['textContent'] = midjourneyText('chooseVariation')),
     el6['appendChild'](el7));
-  const value16 = Array['isArray'](list11) && list11['length'] > 0x0 ? list11 : MJ_VARIATION_OPTIONS;
+  const value16 = Array['isArray'](list11) && list11['length'] > 0 ? list11 : MJ_VARIATION_OPTIONS;
   for (const value17 of value16) {
     const el8 = document['createElement']('div');
-    ((el8['className'] = 'node-toolbar-action-menu-item\x20node-toolbar-action-submenu-item'),
+    ((el8['className'] = 'node-toolbar-action-menu-item node-toolbar-action-submenu-item'),
       el8['setAttribute']('role', 'menuitem'),
-      (el8['tabIndex'] = 0x0),
+      (el8['tabIndex'] = 0),
       (el8['textContent'] = midjourneyText(value17['labelKey'])));
     const run = (event) => {
       (event['stopPropagation'](), event['preventDefault'](), handler3(), value14?.(value17['mode']));
     };
     (el8['addEventListener']('click', run),
       el8['addEventListener']('keydown', (event2) => {
-        if (event2['key'] !== 'Enter' && event2['key'] !== '\x20') return;
+        if (event2['key'] !== 'Enter' && event2['key'] !== ' ') return;
         run(event2);
       }),
       el6['appendChild'](el8));
   }
-  const run2 = createToolbarActionPopupAnchorPositionGetter(el4, { gap: 0xa }),
+  const run2 = createToolbarActionPopupAnchorPositionGetter(el4, { gap: 10 }),
     handler4 = () => {
       const value18 = run2();
       positionToolbarActionSubmenuAbove(value18, el6);
@@ -392,7 +392,7 @@ function openVariationSubmenu(el4, value14, list11 = MJ_VARIATION_OPTIONS) {
   const run3 =
     typeof requestAnimationFrame === 'function'
       ? requestAnimationFrame
-      : (value23) => setTimeout(value23, 0x0);
+      : (value23) => setTimeout(value23, 0);
   return (
     run3(() => {
       (handler4(), (el6['style']['opacity'] = '1'), (el6['style']['pointerEvents'] = 'auto'));
@@ -500,7 +500,7 @@ export function bindApimartMidjourneyActions(value24) {
             '-' +
             Date['now']() +
             '-' +
-            Math['random']()['toString'](0x24)['slice'](0x2, 0x6),
+            Math['random']()['toString'](36)['slice'](2, 6),
           outputText2 = midjourneyOutputText({ actionLabel: actionLabel2, index: index3['index'] }),
           generationParams2 = {
             ...getPlainObject(value28?.['generationParams']),
@@ -587,7 +587,7 @@ export function bindApimartMidjourneyActions(value24) {
               const resultImages = normalizeResumedImages(value29)['filter'](
                   (enabled6) => enabled6 && !enabled6['error'] && getResultUrlFromImage(enabled6),
                 ),
-                resumedImage = resultImages[0x0] || null;
+                resumedImage = resultImages[0] || null;
               if (!resumedImage || resumedImage['error'])
                 throw new Error(String(resumedImage?.['error'] || midjourneyText('missingResultImage')));
               const resultUrl = getResultUrlFromImage(resumedImage);
@@ -599,7 +599,7 @@ export function bindApimartMidjourneyActions(value24) {
               if (!sourceUrl2) throw new Error(midjourneyText('missingResultImage'));
               ((sourceUrl = sourceUrl2), (fileName2 = value30?.['resumedImage'] || null));
               const images = Array['isArray'](value30?.['resultImages']) ? value30['resultImages'] : [];
-              if (executionId && images['length'] > 0x1) {
+              if (executionId && images['length'] > 1) {
                 ((imageUrl = fileName2?.['thumbUrl'] || fileName2?.['imageUrl'] || sourceUrl2),
                   (localPath = fileName2?.['localPath'] || ''),
                   (width2 = await resolveFinalResultDisplaySize(box, {

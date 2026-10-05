@@ -1,4 +1,4 @@
-const DEFAULT_COMMAND_TIMEOUT_MS = 0x3a98;
+const DEFAULT_COMMAND_TIMEOUT_MS = 15000;
 function createProtocolError(error = {}) {
   const message = String(error?.['message'] || 'Chrome DevTools Protocol command failed'),
     protocolError = new Error(message);
@@ -17,10 +17,10 @@ export function createChromeCdpPipeClient({
   if (!readablePipe || typeof readablePipe['on'] !== 'function')
     throw new TypeError('Chrome CDP readable pipe is required');
   if (!writablePipe || typeof writablePipe['write'] !== 'function')
-    throw new TypeError('Chrome\x20CDP\x20writable\x20pipe\x20is\x20required');
+    throw new TypeError('Chrome CDP writable pipe is required');
   const pending = new Map(),
     eventHandlers = new Set();
-  let nextId = 0x0,
+  let nextId = 0,
     buffer = '',
     isClosed = false;
   function settle(id, callback) {
@@ -52,9 +52,9 @@ export function createChromeCdpPipeClient({
     buffer += Buffer['isBuffer'](chunk) ? chunk['toString']('utf8') : String(chunk || '');
     while (true) {
       const separatorIndex = buffer['indexOf']('\x00');
-      if (separatorIndex < 0x0) break;
-      const frame = buffer['slice'](0x0, separatorIndex);
-      buffer = buffer['slice'](separatorIndex + 0x1);
+      if (separatorIndex < 0) break;
+      const frame = buffer['slice'](0, separatorIndex);
+      buffer = buffer['slice'](separatorIndex + 1);
       if (!frame) continue;
       try {
         dispatch(JSON['parse'](frame));
@@ -63,7 +63,7 @@ export function createChromeCdpPipeClient({
           type: 'chrome_cdp.invalid_message',
           level: 'warn',
           source: 'main',
-          message: 'Chrome\x20CDP\x20pipe\x20returned\x20an\x20invalid\x20message',
+          message: 'Chrome CDP pipe returned an invalid message',
           error: parseError,
         });
       }
@@ -113,9 +113,9 @@ export function createChromeCdpPipeClient({
       };
     if (!payload['method']) return Promise['reject'](new Error('Chrome CDP method is required'));
     return new Promise((resolve, reject) => {
-      const delay = Math['max'](0x0, Number(commandTimeoutMs) || 0x0),
+      const delay = Math['max'](0, Number(commandTimeoutMs) || 0),
         timer =
-          delay > 0x0
+          delay > 0
             ? setTimeoutFn(() => {
                 settle(requestId, (entry) => {
                   entry['reject'](new Error('Chrome CDP command timed out: ' + payload['method']));

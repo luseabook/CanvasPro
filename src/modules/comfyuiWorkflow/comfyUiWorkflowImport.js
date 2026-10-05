@@ -1,6 +1,6 @@
 import { buildManifestDraftBundle } from '../../manifests/index.js';
 import { getParameterFooterFields } from '../../domain/customAiApp/parameterLayout.js';
-export const COMFYUI_WORKFLOW_DISPLAY_NAME = 'ComfyUI\x20工作流';
+export const COMFYUI_WORKFLOW_DISPLAY_NAME = 'ComfyUI 工作流';
 const MEDIA_COMPONENT_KINDS = new Set(['image', 'video', 'audio']),
   COMPONENT_KINDS = new Set(['image', 'video', 'audio', 'prompt', 'param']),
   CONTROL_TYPES = new Set(['text', 'textarea', 'stepper', 'float', 'toggle', 'prompt']),
@@ -12,13 +12,13 @@ const MEDIA_COMPONENT_KINDS = new Set(['image', 'video', 'audio']),
   AMBIGUOUS_ZERO_CONTROL_OPTIONS = Object['freeze'](['text', 'stepper', 'float']),
   TEXT_COMPONENT_KIND_OPTIONS = Object['freeze'](['param', 'prompt']);
 export const COMFYUI_GENERATION_COUNT_FIELD_ID = 'batchSize';
-export const COMFYUI_GENERATION_COUNT_OPTIONS = Object['freeze']([0x1, 0x2, 0x4, 0x6, 0x8, 0xa, 0xc]);
+export const COMFYUI_GENERATION_COUNT_OPTIONS = Object['freeze']([1, 2, 4, 6, 8, 10, 12]);
 const COMFYUI_GENERATION_COUNT_FIELD = Object['freeze']({
   id: COMFYUI_GENERATION_COUNT_FIELD_ID,
   type: 'segmented',
   placement: 'batch',
   label: '生成数量',
-  defaultValue: 0x1,
+  defaultValue: 1,
   options: Object['freeze'](
     COMFYUI_GENERATION_COUNT_OPTIONS['map']((value) =>
       Object['freeze']({ value: value, label: value + 'x', selectedLabel: value + 'x' }),
@@ -59,41 +59,41 @@ function sanitizeIdentifierPart(current, entry = 'field') {
 function createStableHash(payload) {
   const list = String(payload || '');
   let handle = 0x811c9dc5;
-  for (let state = 0x0; state < list['length']; state += 0x1) {
+  for (let state = 0; state < list['length']; state += 1) {
     ((handle ^= list['charCodeAt'](state)), (handle = Math['imul'](handle, 0x1000193)));
   }
-  return (handle >>> 0x0)['toString'](0x24)['padStart'](0x7, '0')['slice'](0x0, 0x8);
+  return (handle >>> 0)['toString'](36)['padStart'](7, '0')['slice'](0, 8);
 }
 function extractFirstJsonObject(config) {
   const list2 = String(config || ''),
     count = list2['indexOf']('{');
-  if (count < 0x0) return '';
-  let count2 = 0x0,
+  if (count < 0) return '';
+  let count2 = 0,
     enabled = ![],
     scope = '',
     input = ![];
-  for (let output = count; output < list2['length']; output += 0x1) {
+  for (let output = count; output < list2['length']; output += 1) {
     const value2 = list2[output];
     if (enabled) {
       if (input) {
         input = ![];
         continue;
       }
-      if (value2 === '\x5c') {
+      if (value2 === '\\') {
         input = !![];
         continue;
       }
       value2 === scope && ((enabled = ![]), (scope = ''));
       continue;
     }
-    if (value2 === '\x22' || value2 === '\x27') {
+    if (value2 === '"' || value2 === '\'') {
       ((enabled = !![]), (scope = value2));
       continue;
     }
-    if (value2 === '{') count2 += 0x1;
+    if (value2 === '{') count2 += 1;
     if (value2 === '}') {
-      count2 -= 0x1;
-      if (count2 === 0x0) return list2['slice'](count, output + 0x1);
+      count2 -= 1;
+      if (count2 === 0) return list2['slice'](count, output + 1);
     }
   }
   return '';
@@ -127,7 +127,7 @@ function normalizeComfyUiWorkflowGraph(value5) {
   if (!enabled2 || typeof enabled2 !== 'object' || Array['isArray'](enabled2))
     throw new Error('ComfyUI 工作流 API JSON 必须是节点对象');
   const list3 = Object['entries'](enabled2)['filter'](([, value6]) => isComfyUiApiNode(value6));
-  if (list3['length'] === 0x0)
+  if (list3['length'] === 0)
     throw new Error('未找到 ComfyUI API 格式节点，请导出 API format workflow JSON');
   return list3['reduce']((value7, [value8, args]) => {
     return ((value7[String(value8)] = { ...args, inputs: { ...(args['inputs'] || {}) } }), value7);
@@ -145,9 +145,9 @@ export function parseComfyUiWorkflowApiInput(value9) {
 function isConnectionValue(list4) {
   return (
     Array['isArray'](list4) &&
-    list4['length'] >= 0x2 &&
-    (typeof list4[0x0] === 'string' || typeof list4[0x0] === 'number') &&
-    typeof list4[0x1] === 'number'
+    list4['length'] >= 2 &&
+    (typeof list4[0] === 'string' || typeof list4[0] === 'number') &&
+    typeof list4[1] === 'number'
   );
 }
 function isScalarValue(value10) {
@@ -198,7 +198,7 @@ function looksLikeLongEnglishText(value25) {
   const value26 = String(value25 ?? '')['trim'](),
     list8 = value26['match'](/[A-Za-z][A-Za-z'-]*/g) || [],
     count3 = (value26['match'](/[A-Za-z]/g) || [])['length'];
-  return list8['length'] >= 0x4 || count3 >= 0x1c;
+  return list8['length'] >= 4 || count3 >= 28;
 }
 function looksLikeStructuredText(value27) {
   const list9 = String(value27 ?? '')['trim']();
@@ -206,7 +206,7 @@ function looksLikeStructuredText(value27) {
   return (
     containsCjkText(list9) ||
     looksLikeLongEnglishText(list9) ||
-    list9['length'] > 0x2a ||
+    list9['length'] > 42 ||
     /[\s,.;:!?，。；：！？、]/['test'](list9)
   );
 }
@@ -265,8 +265,8 @@ function inferComponentConfig({ classType: classType, inputName: inputName, valu
       componentKindLocked: !![],
       componentKindOptions: ['param'],
       controlType: 'stepper',
-      controlTypeLocked: value36 !== 0x0,
-      controlTypeOptions: value36 === 0x0 ? AMBIGUOUS_ZERO_CONTROL_OPTIONS['slice']() : ['stepper'],
+      controlTypeLocked: value36 !== 0,
+      controlTypeOptions: value36 === 0 ? AMBIGUOUS_ZERO_CONTROL_OPTIONS['slice']() : ['stepper'],
     };
   if (typeof value36 === 'number' || isDecimalLiteral(value36))
     return {
@@ -303,7 +303,7 @@ export function formatComfyUiComponentLabel(options2 = {}) {
       normalizeText(options2?.['nodeTitle']) ||
       normalizeText(options2?.['classType']) ||
       normalizeText(options2?.['nodeId']);
-  return text2 ? (options2['inputCount'] === 0x1 ? text2 : text2 + '.' + text) : text;
+  return text2 ? (options2['inputCount'] === 1 ? text2 : text2 + '.' + text) : text;
 }
 function createComponentLabel({
   nodeId: nodeId,
@@ -367,11 +367,11 @@ function normalizeBooleanDefault(value52) {
 }
 function normalizeIntegerDefault(value54) {
   const value55 = Number(value54);
-  return Number['isFinite'](value55) ? Math['trunc'](value55) : 0x0;
+  return Number['isFinite'](value55) ? Math['trunc'](value55) : 0;
 }
 function normalizeFloatDefault(value56) {
   const value57 = Number(value56);
-  return Number['isFinite'](value57) ? value57 : 0x0;
+  return Number['isFinite'](value57) ? value57 : 0;
 }
 function normalizeDefaultValueForControl(value58, value59) {
   const controlType = normalizeControlType(value58);
@@ -401,8 +401,8 @@ function getUiSchemaTypeForControl(value65) {
 function getFloatStep(value66) {
   const value67 = String(value66 ?? '')['trim'](),
     value68 = value67['match'](/\.(\d+)/),
-    value69 = value68 ? Math['max'](0x1, value68[0x1]['length']) : 0x2;
-  return Number('0.' + '0'['repeat'](Math['max'](0x0, value69 - 0x1)) + '1');
+    value69 = value68 ? Math['max'](1, value68[1]['length']) : 2;
+  return Number('0.' + '0'['repeat'](Math['max'](0, value69 - 1)) + '1');
 }
 function normalizeOptionList(list10 = [], map = null) {
   if (!Array['isArray'](list10)) return [];
@@ -482,7 +482,7 @@ function buildComponentOverrideMap(list13 = []) {
   return (
     list13['forEach']((value76) => {
       const count4 = Number(value76?.['index']);
-      if (!Number['isInteger'](count4) || count4 < 0x0) return;
+      if (!Number['isInteger'](count4) || count4 < 0) return;
       map2['set'](count4, value76);
     }),
     map2
@@ -541,7 +541,7 @@ function buildInputSlotCounts(list15) {
   return list15['reduce']((value83, value84) => {
     const enabled5 = String(value84?.['kind'] || '')['trim']();
     if (!enabled5) return value83;
-    return ((value83[enabled5] = (value83[enabled5] || 0x0) + 0x1), value83);
+    return ((value83[enabled5] = (value83[enabled5] || 0) + 1), value83);
   }, {});
 }
 export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 = [], value86 = {}) {
@@ -551,7 +551,7 @@ export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 
         ? new Set(
             (Array['isArray'](value85) ? value85 : [])
               ['map']((value87) => Number(value87?.['index']))
-              ['filter']((count5) => Number['isInteger'](count5) && count5 >= 0x0),
+              ['filter']((count5) => Number['isInteger'](count5) && count5 >= 0),
           )
         : null,
     map4 = buildComponentOverrideMap(value85),
@@ -633,7 +633,7 @@ export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 
       comfyUiComponentIndex: item4['index'],
       ...(type === 'stepper'
         ? {
-            step: step === 'float' ? getFloatStep(defaultValue) : 0x1,
+            step: step === 'float' ? getFloatStep(defaultValue) : 1,
             ...(step === 'float' ? { valueType: 'float' } : {}),
           }
         : {}),
@@ -657,7 +657,7 @@ export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 
         const orderValue =
           normalizeOrderValue(value92['displayOrder'], value92['_sourceOrder']) -
           normalizeOrderValue(value93['displayOrder'], value93['_sourceOrder']);
-        if (orderValue !== 0x0) return orderValue;
+        if (orderValue !== 0) return orderValue;
         return value92['_sourceOrder'] - value93['_sourceOrder'];
       })
       ['map'](({ _sourceOrder: _sourceOrder2, ...args5 }, displayOrder) => ({
@@ -668,7 +668,7 @@ export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 
       const count6 = String(value94?.['placement'] || '')['localeCompare'](
         String(value95?.['placement'] || ''),
       );
-      if (count6 !== 0x0) return count6;
+      if (count6 !== 0) return count6;
       return (
         normalizeOrderValue(value94?.['displayOrder'], Number['MAX_SAFE_INTEGER']) -
         normalizeOrderValue(value95?.['displayOrder'], Number['MAX_SAFE_INTEGER'])
@@ -776,7 +776,7 @@ function buildModelExtensions(kind3, workflowId, name, value111 = '', value112 =
       kind3 === 'image' &&
       (value114['imageMenu'] = {
         group: getComfyUiWorkflowImageMenuGroup(baseUrlMode2),
-        order: 0x3e7,
+        order: 999,
         title: name,
         subtitle: getComfyUiWorkflowImageMenuSubtitle(baseUrlMode2, value112),
         iconKind: getComfyUiWorkflowImageMenuIconKind(baseUrlMode2),
@@ -786,7 +786,7 @@ function buildModelExtensions(kind3, workflowId, name, value111 = '', value112 =
       (value114['videoMenu'] = {
         role: 'comfyUiWorkflow',
         group: getComfyUiWorkflowImageMenuGroup(baseUrlMode2),
-        order: 0x3e7,
+        order: 999,
         label: name,
         subtitle: getComfyUiWorkflowImageMenuSubtitle(baseUrlMode2, value112),
         iconKind: getComfyUiWorkflowImageMenuIconKind(baseUrlMode2),
@@ -795,7 +795,7 @@ function buildModelExtensions(kind3, workflowId, name, value111 = '', value112 =
       kind3 === 'audio' &&
       (value114['audioMenu'] = {
         group: getComfyUiWorkflowImageMenuGroup(baseUrlMode2),
-        order: 0x3e7,
+        order: 999,
         label: name,
         subtitle: getComfyUiWorkflowImageMenuSubtitle(baseUrlMode2, value112),
         iconKind: getComfyUiWorkflowImageMenuIconKind(baseUrlMode2),
@@ -873,8 +873,8 @@ export function buildComfyUiWorkflowManifestBundle({
   });
 }
 export function summarizeComfyUiWorkflowBundle(value115) {
-  const kind5 = value115?.['models']?.[0x0] || {},
-    workflowId3 = value115?.['executions']?.[0x0] || {},
+  const kind5 = value115?.['models']?.[0] || {},
+    workflowId3 = value115?.['executions']?.[0] || {},
     slotCount = Array['isArray'](kind5?.['inputSlots']?.['fixedSlots'])
       ? kind5['inputSlots']['fixedSlots']
       : [],

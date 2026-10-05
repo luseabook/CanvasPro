@@ -4,8 +4,8 @@ export function getAudioWorkflowSlots(value = '', { includeImages: includeImages
     item = modelManifest?.['inputSlots'],
     list = item?.['fixedSlots'],
     count = Number(item?.['maxByKind']?.['audio']);
-  if (Number['isFinite'](count) && count <= 0x0 && !includeImages) return [];
-  if (Array['isArray'](list) && list['length'] > 0x0)
+  if (Number['isFinite'](count) && count <= 0 && !includeImages) return [];
+  if (Array['isArray'](list) && list['length'] > 0)
     return list['map']((label) => ({
       slot: String(label?.['id'] || '')['trim'](),
       kind: String(label?.['kind'] || '')['trim'](),
@@ -16,16 +16,16 @@ export function getAudioWorkflowSlots(value = '', { includeImages: includeImages
         enabled['slot'] &&
         (!enabled['kind'] || enabled['kind'] === 'audio' || (includeImages && enabled['kind'] === 'image')),
     );
-  if (Number['isFinite'](count) && count <= 0x0) return [];
+  if (Number['isFinite'](count) && count <= 0) return [];
   return [{ slot: 'audioRef', kind: 'audio', label: '音频参考', required: !![] }];
 }
 export function getAudioWorkflowInputLimit(key = '') {
-  return getAudioWorkflowSlots(key)['length'] || 0x1;
+  return getAudioWorkflowSlots(key)['length'] || 1;
 }
 export function normalizeAudioWorkflowRefSlots(list2 = [], index = '') {
   const list3 = Array['isArray'](list2) ? list2 : [],
     refSlot = getAudioWorkflowSlots(index)['map']((result) => result['slot']);
-  if (refSlot['length'] === 0x0) return list3;
+  if (refSlot['length'] === 0) return list3;
   const map = new Set();
   return list3['map']((args) => {
     const refSlot2 = String(args?.['refSlot'] || '')['trim']();
@@ -37,5 +37,5 @@ export function normalizeAudioWorkflowRefSlots(list2 = [], index = '') {
   });
 }
 export function doesAudioWorkflowSupportMultipleAudioInputs(options = '') {
-  return getAudioWorkflowSlots(options)['length'] >= 0x2;
+  return getAudioWorkflowSlots(options)['length'] >= 2;
 }

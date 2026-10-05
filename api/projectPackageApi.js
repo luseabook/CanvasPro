@@ -1,5 +1,5 @@
 import { post } from './requester.js';
-const PROJECT_PACKAGE_UPLOAD_TIMEOUT_MS = 0x1e * 0x3c * 0x3e8;
+const PROJECT_PACKAGE_UPLOAD_TIMEOUT_MS = 30 * 60 * 1000;
 function normalizeProjectPackageFilename(error) {
   const value = String(error?.['name'] || '')['trim']();
   if (!/\.aicpkg$/i['test'](value)) throw new Error('只支持 .aicpkg 项目包');
@@ -14,7 +14,7 @@ export async function stageProjectPackageFile(item, signal = {}) {
         provider: 'local',
         headers: { 'Content-Type': 'application/octet-stream' },
         timeout: PROJECT_PACKAGE_UPLOAD_TIMEOUT_MS,
-        retries: 0x0,
+        retries: 0,
         signal: signal['signal'],
       },
     ),
@@ -29,6 +29,6 @@ export async function discardStagedProjectPackage(key) {
   return await post(
     '/api/v2/desktop/project/discard-staged-package',
     { stageId: stageId2 },
-    { provider: 'local', retries: 0x0 },
+    { provider: 'local', retries: 0 },
   );
 }

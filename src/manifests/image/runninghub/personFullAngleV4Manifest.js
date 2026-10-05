@@ -10,10 +10,10 @@ export const PERSON_FULL_ANGLE_V4_SUBSCRIPTION_ALIASES = Object['freeze']([
 ]);
 export const PERSON_FULL_ANGLE_V4_HELP_TOOLTIP = [
   '人物全角度V4用法',
-  '接入\x20[[red:1\x20张人物参考图]]，生成同一人物的全角度参考图',
+  '接入 [[red:1 张人物参考图]]，生成同一人物的全角度参考图',
   '提示词可补充服装、发型、表情和镜头要求，也可以留空',
   '背景提示词放在高级设置中，用于单独约束背景环境',
-]['join']('\x0a');
+]['join']('\n');
 export const PERSON_FULL_ANGLE_V4_IMAGE_SIZE_FIELD = Object['freeze']({
   id: 'imageSize',
   type: 'segmented',
@@ -56,24 +56,24 @@ export const personFullAngleV4ModelManifest = Object['freeze']({
     placeholder: '可补充人物外观、服装、表情或镜头提示词，也可以留空',
   }),
   extensions: Object['freeze']({
-    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 0x32 }),
+    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 50 }),
     ratioPolicy: Object['freeze']({ capability: 'dimensions' }),
     vipAliases: PERSON_FULL_ANGLE_V4_SUBSCRIPTION_ALIASES,
   }),
   capabilities: Object['freeze']({
     inputKinds: Object['freeze'](['text', 'image']),
     outputType: 'image',
-    maxImages: 0x1,
+    maxImages: 1,
     fixedImageSlots: Object['freeze'](['personReference']),
   }),
   inputSlots: Object['freeze']({
     allowedKinds: Object['freeze'](['text', 'image']),
-    minByKind: Object['freeze']({ image: 0x1 }),
-    maxByKind: Object['freeze']({ text: 0x0, image: 0x1, video: 0x0, audio: 0x0 }),
+    minByKind: Object['freeze']({ image: 1 }),
+    maxByKind: Object['freeze']({ text: 0, image: 1, video: 0, audio: 0 }),
     displayAspectRatioSource: Object['freeze']({
       kind: 'image',
       slot: 'personReference',
-      fallbackIndex: 0x0,
+      fallbackIndex: 0,
     }),
     fixedSlots: Object['freeze']([
       Object['freeze']({ id: 'personReference', kind: 'image', label: '人物参考', required: !![] }),
@@ -135,9 +135,9 @@ export const personFullAngleV4ExecutionManifest = Object['freeze']({
     defaultValue: 'default',
     allowedValues: RUNNINGHUB_INSTANCE_TYPE_ALLOWED_VALUES,
   }),
-  validation: Object['freeze']({ minInputImages: 0x1, missingInputMessage: '请先添加一张人物参考图再生成' }),
+  validation: Object['freeze']({ minInputImages: 1, missingInputMessage: '请先添加一张人物参考图再生成' }),
   mapping: Object['freeze']({
-    maxInputImages: 0x1,
+    maxInputImages: 1,
     imageNodes: Object['freeze']([
       Object['freeze']({ nodeId: '22', fieldName: 'image', description: '载入图片' }),
     ]),
@@ -150,8 +150,8 @@ export const personFullAngleV4ExecutionManifest = Object['freeze']({
     dimensionsNode: Object['freeze']({
       defaultImageSize: '1K',
       defaultAspectRatio: '9:16',
-      longSideByImageSize: Object['freeze']({ '1K': 0x500, '1.5K': 0x780, '2K': 0xa00 }),
-      align: 0x8,
+      longSideByImageSize: Object['freeze']({ '1K': 1280, '1.5K': 1920, '2K': 2560 }),
+      align: 8,
       widthNode: Object['freeze']({ nodeId: '1381', fieldName: 'value', description: '宽' }),
       heightNode: Object['freeze']({ nodeId: '1382', fieldName: 'value', description: '高' }),
     }),
@@ -161,8 +161,8 @@ export const personFullAngleV4ExecutionManifest = Object['freeze']({
         fieldName: 'value',
         field: 'rhPersonFullAngleCharacterType',
         defaultValue: '0',
-        allowedValues: Object['freeze']([0x0, 0x1, 0x2, 0x3]),
-        description: '写实女0\x20写实男1\x20动漫女2\x20动漫男3',
+        allowedValues: Object['freeze']([0, 1, 2, 3]),
+        description: '写实女0 写实男1 动漫女2 动漫男3',
       }),
       Object['freeze']({
         nodeId: '1319',

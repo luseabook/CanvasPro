@@ -1,6 +1,6 @@
 import { formatPrice, priceText } from './modelPricingText.js';
-const valid = (count) => typeof count === 'number' && Number['isFinite'](count) && count >= 0x0,
-  effective = (value, item) => (valid(value) && valid(item) ? (value * item) / 0x64 : null),
+const valid = (count) => typeof count === 'number' && Number['isFinite'](count) && count >= 0,
+  effective = (value, item) => (valid(value) && valid(item) ? (value * item) / 100 : null),
   same = (key, index) => String(key ?? '')['toLowerCase']() === String(index ?? '')['toLowerCase']();
 function tokenRows(args) {
   const list = [],
@@ -24,12 +24,12 @@ function tokenRows(args) {
           });
       }
     };
-  if (args['tier_count'] > 0x1 && Array['isArray'](args['tiers'])) {
-    let target = 0x0;
+  if (args['tier_count'] > 1 && Array['isArray'](args['tiers'])) {
+    let target = 0;
     for (const source of args['tiers']) {
       const valid2 = valid(source['up_to_input_tokens']) ? source['up_to_input_tokens'] : null;
-      (handler(source, null, priceText('tier') + '\x20' + target + '–' + (valid2 ?? priceText('unlimited'))),
-        (target = valid2 === null ? target : valid2 + 0x1));
+      (handler(source, null, priceText('tier') + ' ' + target + '–' + (valid2 ?? priceText('unlimited'))),
+        (target = valid2 === null ? target : valid2 + 1));
     }
   } else handler(args['rates'], args['effective_rates'], '');
   const enabled = { ...args['extras']?.['tools'] };
@@ -137,20 +137,20 @@ export function buildApimartPriceView(enabled2, value6) {
       value9 = rows['find'](
         (value10) =>
           value10['table'] === 'version_resolution_prices' &&
-          same(value10['path'][0x0], value7['version'] ?? value7['mode'] ?? enabled2['default_version']) &&
-          same(value10['path'][0x1], value8),
+          same(value10['path'][0], value7['version'] ?? value7['mode'] ?? enabled2['default_version']) &&
+          same(value10['path'][1], value8),
       );
     else {
       if (enabled2['resolution_duration_prices'])
         value9 = rows['find'](
           (value11) =>
             value11['table'] === 'resolution_duration_prices' &&
-            same(value11['path'][0x0], value8 + '-' + value7['duration'] + 's'),
+            same(value11['path'][0], value8 + '-' + value7['duration'] + 's'),
         );
       else {
         if (enabled2['resolution_prices'])
           value9 = rows['find'](
-            (value12) => value12['table'] === 'resolution_prices' && same(value12['path'][0x0], value8),
+            (value12) => value12['table'] === 'resolution_prices' && same(value12['path'][0], value8),
           );
         else
           !enabled2['billing_tiers'] &&
@@ -160,21 +160,21 @@ export function buildApimartPriceView(enabled2, value6) {
             (value9 = rows['find']((value13) => value13['table'] === 'base'));
       }
     }
-    const value14 = Number(value7['batchSize'] ?? value7['n'] ?? 0x1),
+    const value14 = Number(value7['batchSize'] ?? value7['n'] ?? 1),
       value15 = Number(value7['duration']),
       count2 = enabled2['billing_type'] === 'per_second' ? value15 * value14 : value14,
       enabled4 =
         value6['hasReferences'] ||
-        enabled2['input_image_price'] > 0x0 ||
+        enabled2['input_image_price'] > 0 ||
         enabled2['billing_variants'] ||
         enabled2['operation_prices'] ||
         enabled2['layer_decomposition_prices'] ||
         enabled2['size_quality_prices'];
-    if (value9?.['quoted'] && !enabled4 && count2 > 0x0 && Number['isFinite'](count2))
+    if (value9?.['quoted'] && !enabled4 && count2 > 0 && Number['isFinite'](count2))
       ((estimate = value9['amount'] * count2),
         (prefix = priceText('estimate')),
         (amountText = formatPrice(estimate)),
-        (label2 = prefix + '\x20' + amountText));
+        (label2 = prefix + ' ' + amountText));
     else {
       const list5 = rows['filter'](
         (value16) =>
@@ -183,21 +183,21 @@ export function buildApimartPriceView(enabled2, value6) {
             value16['table'],
           ),
       );
-      if (value9?.['quoted'] && count2 > 0x0 && Number['isFinite'](count2))
+      if (value9?.['quoted'] && count2 > 0 && Number['isFinite'](count2))
         ((prefix = priceText('reference')),
           (amountText = formatPrice(value9['amount'] * count2)),
-          (label2 = prefix + '\x20' + amountText));
+          (label2 = prefix + ' ' + amountText));
       else
         list5['length'] &&
           ((prefix = priceText('reference')),
           (amountText = formatPrice(Math['min'](...list5['map']((value17) => value17['amount'])))),
-          (label2 = prefix + '\x20' + amountText));
+          (label2 = prefix + ' ' + amountText));
       notes['push'](priceText('variable'));
     }
   } else notes['push'](priceText('variable'));
   !rows['length'] && ((label2 = priceText('unavailable')), notes['push'](priceText('unknown')));
   if (enabled2['pricing']?.['time_pricing']?.['current_window'])
-    notes['push'](priceText('timeWindow') + ':\x20' + enabled2['pricing']['time_pricing']['current_window']);
+    notes['push'](priceText('timeWindow') + ': ' + enabled2['pricing']['time_pricing']['current_window']);
   return {
     label: label2,
     prefix: prefix,

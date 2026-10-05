@@ -1,6 +1,6 @@
 import { normalizeStoryboard3DShotAnimation, sampleStoryboard3DShotAnimation } from './shotAnimation.js';
 export function createDirectorVideoPlan(value, item, key = {}) {
-  let index = 0x0;
+  let index = 0;
   const args = item['map']((args2) => {
     const result = key['scenes']?.['find']((data) => data['id'] === args2['sceneId']) || value;
     let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(
@@ -17,7 +17,7 @@ export function createDirectorVideoPlan(value, item, key = {}) {
         )));
       if (options !== 'camera')
         storyboard3DShotAnimation['cameraKeyframes'] = [
-          { id: 'video-camera', time: 0x0, camera: structuredClone(args2['camera']), easing: 'linear' },
+          { id: 'video-camera', time: 0, camera: structuredClone(args2['camera']), easing: 'linear' },
         ];
       ((storyboard3DShotAnimation['cameraConstraint'] = {}),
         (storyboard3DShotAnimation['cameraConstraintClips'] = []),
@@ -26,9 +26,9 @@ export function createDirectorVideoPlan(value, item, key = {}) {
     storyboard3DShotAnimation['cameraKeyframes']['forEach']((next) => {
       next['camera']['aspectRatio'] = key['aspectRatio'] || '16:9';
     });
-    const current = Math['max'](0x0, Number(key['videoStart']) || 0x0),
+    const current = Math['max'](0, Number(key['videoStart']) || 0),
       entry =
-        Number(key['videoEnd']) > 0x0
+        Number(key['videoEnd']) > 0
           ? Math['min'](storyboard3DShotAnimation['duration'], Number(key['videoEnd']))
           : storyboard3DShotAnimation['duration'];
     if (entry <= current)
@@ -60,7 +60,7 @@ export function createDirectorVideoPlan(value, item, key = {}) {
 }
 export function sampleDirectorVideoPlan(config, scope, input) {
   const output =
-    config['segments']['find']((value2) => scope < value2['end']) || config['segments']['at'](-0x1);
+    config['segments']['find']((value2) => scope < value2['end']) || config['segments']['at'](-1);
   input = output['scene'] || input;
   const value3 =
     config['track'] === 'all'
@@ -70,7 +70,7 @@ export function sampleDirectorVideoPlan(config, scope, input) {
         );
   return sampleStoryboard3DShotAnimation(
     output['animation'],
-    output['sourceStart'] + Math['max'](0x0, Math['min'](output['duration'], scope - output['start'])),
+    output['sourceStart'] + Math['max'](0, Math['min'](output['duration'], scope - output['start'])),
     {
       camera: output['shot']['camera'],
       objectTransforms: output['objectTransforms'] || config['objectTransforms'],

@@ -587,11 +587,11 @@ export function getDreaminaStyleVideoInputLimits(value116, value117 = '') {
   const dreaminaStyleVideoManifest12 = resolveDreaminaStyleVideoManifest(value116, value117),
     handler = (value118, value119) => {
       const count9 = Number(value118);
-      return Number['isFinite'](count9) && count9 >= 0x0 ? Math['trunc'](count9) : value119;
+      return Number['isFinite'](count9) && count9 >= 0 ? Math['trunc'](count9) : value119;
     };
   return Object['freeze']({
-    image: handler(dreaminaStyleVideoManifest12?.['inputSlots']?.['maxByKind']?.['image'], 0x9),
-    video: handler(dreaminaStyleVideoManifest12?.['inputSlots']?.['maxByKind']?.['video'], 0x3),
-    audio: handler(dreaminaStyleVideoManifest12?.['inputSlots']?.['maxByKind']?.['audio'], 0x3),
+    image: handler(dreaminaStyleVideoManifest12?.['inputSlots']?.['maxByKind']?.['image'], 9),
+    video: handler(dreaminaStyleVideoManifest12?.['inputSlots']?.['maxByKind']?.['video'], 3),
+    audio: handler(dreaminaStyleVideoManifest12?.['inputSlots']?.['maxByKind']?.['audio'], 3),
   });
 }

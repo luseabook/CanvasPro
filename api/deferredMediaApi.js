@@ -17,7 +17,7 @@ export function withDeferredMediaFiles(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON['stringify']({ paths: paths }),
-      timeout: 0x1e * 0x3c * 0x3e8,
+      timeout: 30 * 60 * 1000,
     }),
 ) {
   const args = new Set(),

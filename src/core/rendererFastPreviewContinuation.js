@@ -31,11 +31,11 @@ function buildContinuationKey(item, key = {}) {
     box['x'],
     box['y'],
     box['zoom'],
-    key['viewportBusy'] === !![] ? 0x1 : 0x0,
-    key['suppressNewMedia'] === !![] ? 0x1 : 0x0,
-    key['deferVisibleMediaSrc'] === !![] ? 0x1 : 0x0,
-    key['suspendNewMediaSrc'] === !![] ? 0x1 : 0x0,
-    key['keepMountedMediaPreview'] === !![] ? 0x1 : 0x0,
+    key['viewportBusy'] === !![] ? 1 : 0,
+    key['suppressNewMedia'] === !![] ? 1 : 0,
+    key['deferVisibleMediaSrc'] === !![] ? 1 : 0,
+    key['suspendNewMediaSrc'] === !![] ? 1 : 0,
+    key['keepMountedMediaPreview'] === !![] ? 1 : 0,
     buildNodeIdSetKey(key['fullEligibleVisibleImageNodeIds']),
     buildNodeIdSetKey(key['fullEligiblePreviewImageNodeIds']),
     key['mediaSourceOwnerIds'] == null
@@ -44,16 +44,16 @@ function buildContinuationKey(item, key = {}) {
     key['requiredImmediateMediaSourceOwnerIds'] == null
       ? 'legacy-required-media-source-owners'
       : buildNodeIdSetKey(key['requiredImmediateMediaSourceOwnerIds']),
-    Number(data) || 0x0,
+    Number(data) || 0,
     index['side'] || '',
     options,
-    result['isCommittingDrag'] === !![] ? 0x1 : 0x0,
-    result['hasMoved'] === !![] ? 0x1 : 0x0,
+    result['isCommittingDrag'] === !![] ? 1 : 0,
+    result['hasMoved'] === !![] ? 1 : 0,
   ]['join']('|');
 }
 function requestContinuationFrame(target) {
   if (typeof requestAnimationFrame === 'function') return { kind: 'raf', id: requestAnimationFrame(target) };
-  return { kind: 'timer', id: setTimeout(target, 0x20) };
+  return { kind: 'timer', id: setTimeout(target, 32) };
 }
 function cancelContinuationFrame(enabled2) {
   if (!enabled2) return;
@@ -64,19 +64,19 @@ function cancelContinuationFrame(enabled2) {
   if (enabled2['kind'] === 'timer') clearTimeout(enabled2['id']);
 }
 export function createRendererFastPreviewLifecycleTracker() {
-  let lifecycleRevision2 = 0x0,
-    nonMediaLifecycleRevision2 = 0x0;
+  let lifecycleRevision2 = 0,
+    nonMediaLifecycleRevision2 = 0;
   return {
     record(source) {
-      lifecycleRevision2 += 0x1;
+      lifecycleRevision2 += 1;
       const list = String(source || '')['toLowerCase']();
       !list['includes']('image') &&
         !list['includes']('video') &&
         !list['includes']('media-clip') &&
-        (nonMediaLifecycleRevision2 += 0x1);
+        (nonMediaLifecycleRevision2 += 1);
     },
     reset() {
-      ((lifecycleRevision2 = 0x0), (nonMediaLifecycleRevision2 = 0x0));
+      ((lifecycleRevision2 = 0), (nonMediaLifecycleRevision2 = 0));
     },
     getContinuationOptions() {
       return { lifecycleRevision: lifecycleRevision2, nonMediaLifecycleRevision: nonMediaLifecycleRevision2 };
@@ -109,7 +109,7 @@ export function syncRendererFastPreviewAfterNodeRender({
   hasPendingStructuralOps: hasPendingStructuralOps,
   connOverlay: connOverlay,
   pickConnectMode: pickConnectMode,
-  nodeCount: nodeCount = 0x0,
+  nodeCount: nodeCount = 0,
   viewport: viewport,
   containerWidth: containerWidth,
   containerHeight: containerHeight,
@@ -124,8 +124,8 @@ export function syncRendererFastPreviewAfterNodeRender({
   fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds = null,
   mediaSourceOwnerIds: mediaSourceOwnerIds = null,
   requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds = null,
-  lifecycleRevision: lifecycleRevision = 0x0,
-  nonMediaLifecycleRevision: nonMediaLifecycleRevision = 0x0,
+  lifecycleRevision: lifecycleRevision = 0,
+  nonMediaLifecycleRevision: nonMediaLifecycleRevision = 0,
   mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame = ![],
   updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame = ![],
   hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts = ![],
@@ -151,14 +151,14 @@ export function syncRendererFastPreviewAfterNodeRender({
       lifecycleRevision: lifecycleRevision,
       nonMediaLifecycleRevision: nonMediaLifecycleRevision,
       keepMountedMediaPreview:
-        nodeCount >= 0x30 && (viewportBusy || Number(viewport?.['zoom'] || 0x1) <= 0.45),
+        nodeCount >= 48 && (viewportBusy || Number(viewport?.['zoom'] || 1) <= 0.45),
     },
     deferFullSync3 =
       shouldDeferRendererFastPreviewSync({
         mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame,
         updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame,
         hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts,
-        hasExistingPreviewSurface: layer?.['getStats']?.()['fastPreviewCount'] > 0x0,
+        hasExistingPreviewSurface: layer?.['getStats']?.()['fastPreviewCount'] > 0,
         dragContext: dragContext2,
       }) &&
       !(
@@ -289,7 +289,7 @@ export function createRendererFastPreviewContinuationController({
       sync?.(canvasEl2, nodes3, previewCandidateIds2, selectedNodeSet2, options4);
     } finally {
       recordFastPreviewContinuationEvent('full-sync-run', {
-        durationMs: Math['max'](0x0, nowContinuationProbeMs() - nowContinuationProbeMs2),
+        durationMs: Math['max'](0, nowContinuationProbeMs() - nowContinuationProbeMs2),
         hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
       });
     }

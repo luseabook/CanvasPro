@@ -94,7 +94,7 @@ export const rhVideoBasicExecutionManifest = createRunningHubVideoExecutionManif
         fieldName: 'value',
         source: 'param',
         field: 'rhVideoResolution',
-        defaultValue: 0x340,
+        defaultValue: 832,
         transform: 'normalizeRhVideoResolution',
       }),
       Object.freeze({

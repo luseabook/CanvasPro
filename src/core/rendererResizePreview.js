@@ -23,10 +23,10 @@ export function previewNodeResizeGeometry(
     height2 = toFiniteNumber(height);
   if (width2 === null || height2 === null) return ![];
   const index = snapshot['edges'] || {},
-    result = Number['isFinite'](snapshot['_edgesRev']) ? snapshot['_edgesRev'] : 0x0;
+    result = Number['isFinite'](snapshot['_edgesRev']) ? snapshot['_edgesRev'] : 0;
   ensureEdgeIndex?.(index, result);
   const edgeIds = normalizeEdgeIds(nodeToEdgeIds?.['get']?.(nodeId));
-  if (edgeIds['size'] === 0x0) return !![];
+  if (edgeIds['size'] === 0) return !![];
   return (
     renderEdgesByIds?.(
       edgeIds,

@@ -6,7 +6,7 @@ import {
 } from '../services/desktopMediaBlobSource.js';
 import { beginAudioPlayback, registerAudioPlaybackClient } from './audioPlaybackCoordinator.js';
 const AUDIO_VOICE_PREVIEW_ACTIONS = new Set(['play-source', 'play-converted', 'play-history']);
-let audioVoicePlaybackOwnerSequence = 0x0;
+let audioVoicePlaybackOwnerSequence = 0;
 function normalizeAudioUrl(value) {
   return String(value || '')['trim']();
 }
@@ -70,16 +70,16 @@ export function createAudioVoicePlaybackSession({
   beginPlayback: beginPlayback = beginAudioPlayback,
   registerPlaybackClient: registerPlaybackClient = registerAudioPlaybackClient,
   ownerId: ownerId = 'audio-voice-preview:' + ++audioVoicePlaybackOwnerSequence,
-  maxCachedAudioElements: maxCachedAudioElements = 0x10,
+  maxCachedAudioElements: maxCachedAudioElements = 16,
 } = {}) {
   const map = new Map(),
-    next = Math['max'](0x1, Number(maxCachedAudioElements) || 0x10);
+    next = Math['max'](1, Number(maxCachedAudioElements) || 16);
   let el2 = null,
     current = '',
     enabled2 = null,
     enabled3 = null,
-    entry = 0x0,
-    record = 0x0,
+    entry = 0,
+    record = 0,
     enabled4 = ![];
   const registerPlaybackClient2 = registerPlaybackClient(ownerId, { stopForExternalPlayback: () => clear() });
   function run2(enabled5) {
@@ -116,7 +116,7 @@ export function createAudioVoicePlaybackSession({
   }
   function run6(payload, handle) {
     if (map['get'](payload) !== handle) return;
-    (map['delete'](payload), (record += 0x1), run2(handle));
+    (map['delete'](payload), (record += 1), run2(handle));
   }
   function run7() {
     while (map['size'] > next) {
@@ -154,7 +154,7 @@ export function createAudioVoicePlaybackSession({
     } catch {}
   }
   function stop() {
-    ((entry += 0x1), run9(), run5());
+    ((entry += 1), run9(), run5());
   }
   function run10() {
     if (enabled3) return;
@@ -183,10 +183,10 @@ export function createAudioVoicePlaybackSession({
       return { status: 'failed', audioEl: audioEl };
     }
   }
-  async function warmMany(list = [], { limit: limit = 0x4 } = {}) {
+  async function warmMany(list = [], { limit: limit = 4 } = {}) {
     const list2 = [
       ...new Set((Array['isArray'](list) ? list : [])['map'](normalizeAudioUrl)['filter'](Boolean)),
-    ]['slice'](0x0, Math['max'](0x0, Number(limit) || 0x0));
+    ]['slice'](0, Math['max'](0, Number(limit) || 0));
     return await Promise['all'](list2['map'](warm));
   }
   async function play(value4) {
@@ -210,8 +210,8 @@ export function createAudioVoicePlaybackSession({
       if (!prepareAudioVoicePlaybackElement2 || !shouldAssign3())
         return { status: 'stale', audioEl: audioEl2 };
       try {
-        (Number['isFinite'](audioEl2['duration']) || audioEl2['currentTime'] > 0x0) &&
-          (audioEl2['currentTime'] = 0x0);
+        (Number['isFinite'](audioEl2['duration']) || audioEl2['currentTime'] > 0) &&
+          (audioEl2['currentTime'] = 0);
       } catch {}
       (run10(), run4(audioEl2));
       const promise = audioEl2['play']?.();
@@ -229,7 +229,7 @@ export function createAudioVoicePlaybackSession({
     }
   }
   function clear() {
-    ((record += 0x1),
+    ((record += 1),
       stop(),
       map['forEach']((value6) => {
         run2(value6);

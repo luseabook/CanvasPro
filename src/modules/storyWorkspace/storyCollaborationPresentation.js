@@ -13,8 +13,8 @@ const escapeHtml = (value) =>
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 export function renderStoryConceptionPage(item) {
   const key = item['data']['project'],
     index = key['collaboration'],
@@ -34,9 +34,9 @@ export function renderStoryConceptionPage(item) {
       (result) =>
         '<button type="button" class="story-secondary-button" data-collaboration-direction="' +
         result +
-        '\x22\x20aria-pressed=\x22' +
+        '" aria-pressed="' +
         index['directions']['includes'](result) +
-        '\x22>' +
+        '">' +
         result +
         '</button>',
     )['join']('') +
@@ -48,10 +48,10 @@ export function renderStoryConceptionPage(item) {
     escapeHtml(index['draft']) +
     '</textarea></label>\n      </details>\n    </div>\n    ' +
     createStoryWorkspaceChromePresentation()['renderFooter']({
-      title: '与\x20AI\x20一起打磨故事',
+      title: '与 AI 一起打磨故事',
       hint: '正文由你编辑和确认，确认后继续原有制作流程',
       actionsMarkup: actionsMarkup,
     }) +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }

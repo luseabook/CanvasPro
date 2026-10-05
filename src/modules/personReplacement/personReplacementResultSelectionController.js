@@ -71,8 +71,8 @@ export function createPersonReplacementResultSelectionController({
           results,
         ),
         activeIndex = Math['max'](
-          0x0,
-          Math['min'](results['length'] - 0x1, Math['trunc'](Number(result) || 0x0)),
+          0,
+          Math['min'](results['length'] - 1, Math['trunc'](Number(result) || 0)),
         ),
         options = Object['prototype']['hasOwnProperty']['call'](results[activeIndex], 'userPrompt'),
         imagePrompt = normalizeText(results[activeIndex]?.['userPrompt']),
@@ -126,17 +126,17 @@ export function createPersonReplacementResultSelectionController({
         text2 = normalizeText(entry ?? record['workspace']['selectedShotId']),
         enabled3 = record['shots']['find']((payload) => payload['id'] === text2),
         list = getPersonReplacementImageResults(enabled3);
-      if (!enabled3 || list['length'] < 0x2) return ![];
+      if (!enabled3 || list['length'] < 2) return ![];
       const personReplacementActiveImageResultIndex2 = getPersonReplacementActiveImageResultIndex(
           enabled3,
           list,
         ),
         handle =
-          (personReplacementActiveImageResultIndex2 + Math['sign'](Number(current) || 0x0) + list['length']) %
+          (personReplacementActiveImageResultIndex2 + Math['sign'](Number(current) || 0) + list['length']) %
           list['length'];
       return selectImageResult(text2, handle, {
         ...args2,
-        direction: Math['sign'](Number(current) || 0x0) < 0x0 ? 'previous' : 'next',
+        direction: Math['sign'](Number(current) || 0) < 0 ? 'previous' : 'next',
       });
     },
     setImageReference = (state, resultIndex) => {
@@ -145,7 +145,7 @@ export function createPersonReplacementResultSelectionController({
         enabled4 = config['shots']['find']((scope) => scope['id'] === shotId),
         list2 = getPersonReplacementImageResults(enabled4),
         count = Math['trunc'](Number(resultIndex));
-      if (!enabled4 || !Number['isInteger'](count) || count < 0x0 || count >= list2['length']) return ![];
+      if (!enabled4 || !Number['isInteger'](count) || count < 0 || count >= list2['length']) return ![];
       const personReplacementActiveImageResultIndex3 = getPersonReplacementActiveImageResultIndex(
           enabled4,
           list2,
@@ -204,9 +204,9 @@ export function createPersonReplacementResultSelectionController({
         count2 = Number(value10);
       if (
         !enabled5 ||
-        list3['length'] < 0x2 ||
+        list3['length'] < 2 ||
         !Number['isInteger'](count2) ||
-        count2 < 0x0 ||
+        count2 < 0 ||
         count2 >= list3['length']
       )
         return ![];
@@ -221,9 +221,9 @@ export function createPersonReplacementResultSelectionController({
         results2 = list3['filter']((value12, value13) => value13 !== count2),
         activeIndex2 =
           count2 < personReplacementActiveImageResultIndex4
-            ? personReplacementActiveImageResultIndex4 - 0x1
+            ? personReplacementActiveImageResultIndex4 - 1
             : count2 === personReplacementActiveImageResultIndex4
-              ? Math['min'](count2, results2['length'] - 0x1)
+              ? Math['min'](count2, results2['length'] - 1)
               : personReplacementActiveImageResultIndex4,
         replacementImageRef2 = resolvePersonReplacementImageResultRef(results2[activeIndex2]),
         value14 = Object['prototype']['hasOwnProperty']['call'](results2[activeIndex2], 'userPrompt'),
@@ -266,8 +266,8 @@ export function createPersonReplacementResultSelectionController({
           results3,
         ),
         activeIndex3 = Math['max'](
-          0x0,
-          Math['min'](results3['length'] - 0x1, Math['trunc'](Number(value17) || 0x0)),
+          0,
+          Math['min'](results3['length'] - 1, Math['trunc'](Number(value17) || 0)),
         );
       if (activeIndex3 === personReplacementActiveVideoResultIndex) return ![];
       const value19 =
@@ -308,9 +308,9 @@ export function createPersonReplacementResultSelectionController({
         count3 = Number(value22);
       if (
         !enabled7 ||
-        list4['length'] < 0x2 ||
+        list4['length'] < 2 ||
         !Number['isInteger'](count3) ||
-        count3 < 0x0 ||
+        count3 < 0 ||
         count3 >= list4['length']
       )
         return ![];
@@ -325,9 +325,9 @@ export function createPersonReplacementResultSelectionController({
         results4 = list4['filter']((value24, value25) => value25 !== count3),
         activeIndex4 =
           count3 < personReplacementActiveVideoResultIndex2
-            ? personReplacementActiveVideoResultIndex2 - 0x1
+            ? personReplacementActiveVideoResultIndex2 - 1
             : count3 === personReplacementActiveVideoResultIndex2
-              ? Math['min'](count3, results4['length'] - 0x1)
+              ? Math['min'](count3, results4['length'] - 1)
               : personReplacementActiveVideoResultIndex2,
         resultVideoRef2 = resolvePersonReplacementVideoResultRef(results4[activeIndex4]),
         value26 = resultVideoRef2 !== personReplacementVideoResultRef;
@@ -403,18 +403,18 @@ export function createPersonReplacementResultSelectionController({
         text5 = normalizeText(value36 ?? value37['workspace']['selectedShotId']),
         enabled8 = value37['shots']['find']((value38) => value38['id'] === text5),
         list5 = getPersonReplacementVideoResults(enabled8);
-      if (!enabled8 || list5['length'] < 0x2) return ![];
+      if (!enabled8 || list5['length'] < 2) return ![];
       const personReplacementActiveVideoResultIndex4 = getPersonReplacementActiveVideoResultIndex(
           enabled8,
           list5,
         ),
         value39 =
           (personReplacementActiveVideoResultIndex4 +
-            Math['sign'](Number(value35) || 0x0) +
+            Math['sign'](Number(value35) || 0) +
             list5['length']) %
           list5['length'];
       return selectVideoResult(text5, value39, {
-        direction: Math['sign'](Number(value35) || 0x0) < 0x0 ? 'previous' : 'next',
+        direction: Math['sign'](Number(value35) || 0) < 0 ? 'previous' : 'next',
       });
     },
     selectVideoReference = (
@@ -436,8 +436,8 @@ export function createPersonReplacementResultSelectionController({
           : [];
       if (!enabled9 || !list6['length']) return ![];
       const value44 = Math['max'](
-          0x0,
-          Math['min'](list6['length'] - 0x1, Math['trunc'](Number(value41) || 0x0)),
+          0,
+          Math['min'](list6['length'] - 1, Math['trunc'](Number(value41) || 0)),
         ),
         value45 = list6[value44],
         personReplacementVideoReference = selectPersonReplacementVideoReference(value42, {

@@ -48,8 +48,8 @@ export function syncTextResultSources(value) {
       search === null
         ? t('aigenText.result.toolUsageUnavailable')
         : t('aigenText.result.toolUsage', {
-            search: search['web_search']?.['count'] || 0x0,
-            read: search['web_extractor']?.['count'] || 0x0,
+            search: search['web_search']?.['count'] || 0,
+            read: search['web_extractor']?.['count'] || 0,
           })),
       el4['appendChild'](el9));
   }

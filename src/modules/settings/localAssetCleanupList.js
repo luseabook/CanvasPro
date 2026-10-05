@@ -1,6 +1,6 @@
 import { t } from '../../i18n/index.js';
 import { formatCleanupBytes } from '../../services/localAssetCleanupService.js';
-const PAGE_SIZE = 0x32,
+const PAGE_SIZE = 50,
   text = (value, item = {}) => t('settings.fileSave.cleanupRuntime.' + value, item);
 export function createLocalAssetCleanupList({
   list: list,
@@ -9,7 +9,7 @@ export function createLocalAssetCleanupList({
   onSelectionChange: onSelectionChange,
 }) {
   let response = null,
-    page = 0x0,
+    page = 0,
     enabled = ![];
   const map = new Set(),
     map2 = new Map(),
@@ -21,7 +21,7 @@ export function createLocalAssetCleanupList({
     const el2 = document['createElement']('button');
     return (
       (el2['type'] = 'button'),
-      (el2['className'] = 'settings-save-btn\x20settings-btn-ghost'),
+      (el2['className'] = 'settings-save-btn settings-btn-ghost'),
       (el2['textContent'] = text(key)),
       (el2['dataset']['cleanupAction'] = key),
       el2['addEventListener']('click', () => {
@@ -31,7 +31,7 @@ export function createLocalAssetCleanupList({
       el2
     );
   }
-  const run2 = () => (response?.['items'] || [])['slice'](page * PAGE_SIZE, (page + 0x1) * PAGE_SIZE),
+  const run2 = () => (response?.['items'] || [])['slice'](page * PAGE_SIZE, (page + 1) * PAGE_SIZE),
     selectedItems = () => (response?.['items'] || [])['filter']((index) => map['has'](index['localPath'])),
     el3 = run('selectPage', () => {
       (run2()['forEach']((result) => map['add'](result['localPath'])), run3());
@@ -53,16 +53,16 @@ export function createLocalAssetCleanupList({
     ((el['textContent'] = text('selectedSummary', {
       count: count['length'],
       bytes: formatCleanupBytes(
-        count['reduce']((data, options) => data + Number(options['size'] || 0x0), 0x0),
+        count['reduce']((data, options) => data + Number(options['size'] || 0), 0),
       ),
     })),
       (el3['disabled'] = !enabled2 || !run2()['length']),
       (el4['disabled'] = enabled || !map['size']),
-      (el5['disabled'] = enabled || page === 0x0),
-      (el7['disabled'] = enabled || (page + 0x1) * PAGE_SIZE >= (response?.['items']?.['length'] || 0x0)),
+      (el5['disabled'] = enabled || page === 0),
+      (el7['disabled'] = enabled || (page + 1) * PAGE_SIZE >= (response?.['items']?.['length'] || 0)),
       (el6['textContent'] = text('pageSummary', {
-        page: page + 0x1,
-        pages: Math['max'](0x1, Math['ceil']((response?.['items']?.['length'] || 0x0) / PAGE_SIZE)),
+        page: page + 1,
+        pages: Math['max'](1, Math['ceil']((response?.['items']?.['length'] || 0) / PAGE_SIZE)),
       })));
     for (const [target, el8] of map2) {
       ((el8['checked'] = map['has'](target)), (el8['disabled'] = !enabled2));
@@ -111,7 +111,7 @@ export function createLocalAssetCleanupList({
         el9['appendChild'](el14),
         list['appendChild'](el9));
     }
-    ((list['scrollTop'] = 0x0), run3());
+    ((list['scrollTop'] = 0), run3());
   }
   return {
     selectedItems: selectedItems,
@@ -119,13 +119,13 @@ export function createLocalAssetCleanupList({
       ((enabled = next), run3());
     },
     setScan(current) {
-      ((response = current), map['clear'](), (page = 0x0));
+      ((response = current), map['clear'](), (page = 0));
       const count2 = response?.['coverage'],
         list2 = response ? [text('scopeNotice')] : [];
       if (count2) {
         list2['push'](
           text('scopeProjects', {
-            count: count2['projectFiles'] || 0x0,
+            count: count2['projectFiles'] || 0,
             path: count2['canvasDirectory'] || '—',
           }),
         );
@@ -133,8 +133,8 @@ export function createLocalAssetCleanupList({
           list2['push'](entry['prefix'] + ' → ' + entry['path']);
       }
       for (const error of response?.['warnings'] || [])
-        list2['push'](error['source'] + ':\x20' + error['message']);
-      ((details['textContent'] = list2['join']('\x0a')), (details['hidden'] = !list2['length']), run4());
+        list2['push'](error['source'] + ': ' + error['message']);
+      ((details['textContent'] = list2['join']('\n')), (details['hidden'] = !list2['length']), run4());
     },
   };
 }

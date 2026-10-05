@@ -33,12 +33,12 @@ function createAdapterRegistry(list2 = [], renderer = '') {
       if (list3['some']((result) => result['id'] === enabled['id']))
         throw new Error('UI schema adapter id is already registered: ' + enabled['id']);
       if (typeof enabled['matches'] !== 'function')
-        throw new Error('UI\x20schema\x20adapter\x20matcher\x20is\x20required');
+        throw new Error('UI schema adapter matcher is required');
       return (
         list3['unshift'](enabled),
         () => {
           const count = list3['findIndex']((data) => data === enabled);
-          if (count >= 0x0) list3['splice'](count, 0x1);
+          if (count >= 0) list3['splice'](count, 1);
         }
       );
     },

@@ -5,7 +5,7 @@ import {
   hasRunningHubWorkflowPollingTimedOut,
   resolveRunningHubWorkflowPollingPolicy,
 } from './runningHubWorkflowPollingPolicy.js';
-const DETECTION_TIMEOUT = 0x5 * 0x3c * 0x3e8;
+const DETECTION_TIMEOUT = 5 * 60 * 1000;
 export async function buildSceneDetectionRequest(videoUrl) {
   await ensureConfig();
   const provider = videoUrl['provider'] || 'grsai',
@@ -16,7 +16,7 @@ export async function buildSceneDetectionRequest(videoUrl) {
     throw ApiError['authError'](
       provider,
       null,
-      'API\x20Key\x20未配置（厂商：' + provider + '），无法发起场景检测请求',
+      'API Key 未配置（厂商：' + provider + '），无法发起场景检测请求',
     );
   if (provider === 'grsai')
     return {
@@ -49,13 +49,13 @@ export async function buildSceneDetectionRequest(videoUrl) {
 async function pollSceneDetectionTask(taskId, provider2, apiKey2, value = {}) {
   const providerConfig2 = getProviderConfig(provider2),
     item = provider2 === 'runninghubwf' ? resolveRunningHubWorkflowPollingPolicy(value) : null,
-    count = item?.['pollIntervalMs'] ?? 0x7d0,
+    count = item?.['pollIntervalMs'] ?? 2000,
     key = item?.['pollTimeoutMs'] ?? null,
-    index = item?.['maxPolls'] ?? 0x12c,
+    index = item?.['maxPolls'] ?? 300,
     result = Date['now']();
-  for (let data = 0x0; data < index; data++) {
+  for (let data = 0; data < index; data++) {
     if (key !== null && hasRunningHubWorkflowPollingTimedOut(result, key)) break;
-    count > 0x0 && (await new Promise((options) => setTimeout(options, count)));
+    count > 0 && (await new Promise((options) => setTimeout(options, count)));
     if (key !== null && hasRunningHubWorkflowPollingTimedOut(result, key)) break;
     const url =
       provider2 === 'runninghubwf'
@@ -66,7 +66,7 @@ async function pollSceneDetectionTask(taskId, provider2, apiKey2, value = {}) {
           url: url,
           method: 'POST',
           provider: provider2,
-          timeout: 0x7530,
+          timeout: 30000,
           headers: { 'Content-Type': 'application/json' },
           body:
             provider2 === 'runninghubwf'
@@ -74,7 +74,7 @@ async function pollSceneDetectionTask(taskId, provider2, apiKey2, value = {}) {
               : JSON['stringify']({ apiUrl: url, apiKey: apiKey2 }),
         }),
         response = requester2['data'] || requester2,
-        error = parseError(provider2, response, 0xc8);
+        error = parseError(provider2, response, 200);
       if (error) throw error;
       const target = (response['status'] || '')['toUpperCase']();
       if (['COMPLETED', 'SUCCEEDED', 'SUCCESS']['includes'](target)) return response;
@@ -107,7 +107,7 @@ function extractSceneChanges(next) {
 function processSceneDetectionResult(raw, provider3) {
   const sceneChanges = extractSceneChanges(raw);
   if (!Array['isArray'](sceneChanges)) {
-    const error2 = parseError(provider3, raw, 0xc8);
+    const error2 = parseError(provider3, raw, 200);
     if (error2) throw error2;
     const message = parseTaskError(provider3, raw);
     if (message)
@@ -129,7 +129,7 @@ function processSceneDetectionResult(raw, provider3) {
       retryable: ![],
     });
   }
-  return { sceneChanges: sceneChanges, sceneCount: sceneChanges['length'] + 0x1 };
+  return { sceneChanges: sceneChanges, sceneCount: sceneChanges['length'] + 1 };
 }
 export async function detectScenes(current, entry) {
   const provider4 = current['provider'] || 'grsai',

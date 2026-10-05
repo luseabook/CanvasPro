@@ -13,7 +13,7 @@ export function createAgentMaterialUploader({
     if (!enabled) return null;
     const state = graphStore?.['getState']?.() || graphStore?.['getStateRaw']?.() || {},
       list = Array['isArray'](state['selectedNodeIds']) ? state['selectedNodeIds'] : [],
-      value = list[list['length'] - 0x1] || '';
+      value = list[list['length'] - 1] || '';
     return value ? state['nodes']?.[value] || null : null;
   };
 }

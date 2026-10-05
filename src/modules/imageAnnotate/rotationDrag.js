@@ -1,7 +1,7 @@
 import { startMediaProgressDragSession } from '../../components/shared/mediaProgressDragSession.js';
 export function getRotationDragValue(value, item, key = {}) {
-  const index = key['ctrlKey'] ? 0.1 : key['shiftKey'] ? 0x5 : 0x1;
-  return Math['round']((value + Math['trunc'](item / 0x6) * index) * 0xa) / 0xa;
+  const index = key['ctrlKey'] ? 0.1 : key['shiftKey'] ? 5 : 1;
+  return Math['round']((value + Math['trunc'](item / 6) * index) * 10) / 10;
 }
 export function bindRotationDrag(el, { read: read, preview: preview, commit: commit, cancel: cancel }) {
   const el2 = el['ownerDocument'],
@@ -27,7 +27,7 @@ export function bindRotationDrag(el, { read: read, preview: preview, commit: com
     onMove = (event) => {
       if (!box || event['pointerId'] !== box['id']) return;
       const options = event['clientX'] - box['x'];
-      if (Math['abs'](options) < 0x2 && !box['dragged']) return;
+      if (Math['abs'](options) < 2 && !box['dragged']) return;
       (event['preventDefault'](), (box['dragged'] = !![]), el['classList']['add']('is-dragging'));
       const source = event['ctrlKey'] ? 'fine' : event['shiftKey'] ? 'snap' : 'normal';
       source !== box['modifier'] &&
@@ -42,7 +42,7 @@ export function bindRotationDrag(el, { read: read, preview: preview, commit: com
       (event2['preventDefault'](), event2['stopImmediatePropagation'](), run(!![]));
     },
     next = (id) => {
-      if (id['button'] !== 0x0 || el['disabled']) return;
+      if (id['button'] !== 0 || el['disabled']) return;
       (id['preventDefault'](), id['stopPropagation'](), run(!![]), (enabled = ![]));
       const base = read();
       ((box = {

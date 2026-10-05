@@ -1,7 +1,7 @@
 export function normalizeTextResultSources(value) {
   const map = new Map();
   for (const response of Array['isArray'](value) ? value : []) {
-    if (typeof response?.['url'] !== 'string' || response['url']['length'] > 0x2000) continue;
+    if (typeof response?.['url'] !== 'string' || response['url']['length'] > 8192) continue;
     try {
       const url = new URL(response['url']);
       if (!['http:', 'https:']['includes'](url['protocol']) || url['username'] || url['password']) continue;
@@ -11,10 +11,10 @@ export function normalizeTextResultSources(value) {
           title:
             String(response['title'] || url['hostname'])
               ['trim']()
-              ['slice'](0x0, 0x1f4) || url['hostname'],
+              ['slice'](0, 500) || url['hostname'],
         });
     } catch {}
-    if (map['size'] >= 0x64) break;
+    if (map['size'] >= 100) break;
   }
   return [...map['values']()];
 }
@@ -23,7 +23,7 @@ export function normalizeTextToolUsage(enabled) {
   return Object['fromEntries'](
     ['web_search', 'web_extractor', 'web_search_image', 'image_search']['flatMap']((item) => {
       const count = enabled[item]?.['count'];
-      return Number['isSafeInteger'](count) && count >= 0x0 ? [[item, { count: count }]] : [];
+      return Number['isSafeInteger'](count) && count >= 0 ? [[item, { count: count }]] : [];
     }),
   );
 }

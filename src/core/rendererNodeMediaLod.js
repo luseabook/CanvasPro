@@ -52,7 +52,7 @@ export function collectFullEligibleVisibleImageNodeIds({
 }
 
 export function applyRendererFullEligibleImageCandidates(args, record) {
-  if (!(record instanceof Set) || record['size'] === 0x0) return args;
+  if (!(record instanceof Set) || record['size'] === 0) return args;
   const payload = new Set(args?.['mountCandidateIds']),
     handle = new Set(args?.['parkCandidateIds']);
   for (const state of record) {
@@ -62,7 +62,7 @@ export function applyRendererFullEligibleImageCandidates(args, record) {
 }
 
 export function prioritizeFullEligibleVisibleImageNodes(config, scope) {
-  if (!Array['isArray'](config) || config['length'] < 0x2 || !(scope instanceof Set) || scope['size'] === 0x0)
+  if (!Array['isArray'](config) || config['length'] < 2 || !(scope instanceof Set) || scope['size'] === 0)
     return config;
   const list = [],
     input = [];

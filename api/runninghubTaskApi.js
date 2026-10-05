@@ -4,7 +4,7 @@ export async function cancelRunningHubTask({ apiKey: apiKey, taskId: taskId }) {
     const response = await post(
       '/api/v2/runninghubwf/cancel',
       { apiKey: apiKey, taskId: taskId },
-      60 * 0x3e8,
+      60 * 1000,
     );
     if (!response.success) {
       if (

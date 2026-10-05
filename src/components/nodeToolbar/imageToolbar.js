@@ -163,7 +163,7 @@ function getToolbarActionFromButton(el) {
   if (!el?.['classList']) return '';
   for (const list of el['classList']) {
     if (!list['startsWith']('act-')) continue;
-    const target = list['slice'](0x4);
+    const target = list['slice'](4);
     if (IMAGE_TOOLBAR_ACTIONS['includes'](target)) return target;
   }
   return '';

@@ -46,11 +46,11 @@ import {
   countStorySpokenUnits,
   normalizeStoryEpisodeSpokenTiming,
 } from './storyEpisodeSpokenTiming.js';
-export const STORY_EPISODE_SPLIT_QUALITY_SCHEMA_VERSION = 0x4;
-export const STORY_EPISODE_SPLIT_QUALITY_BATCH_SIZE = 0xa;
-const MAX_SOURCE_CHARACTERS = 0x8ca0,
-  MAX_OUTPUT_TOKENS = 0x2ee0,
-  REQUEST_TIMEOUT_MS = 0x8 * 0x3c * 0x3e8,
+export const STORY_EPISODE_SPLIT_QUALITY_SCHEMA_VERSION = 4;
+export const STORY_EPISODE_SPLIT_QUALITY_BATCH_SIZE = 10;
+const MAX_SOURCE_CHARACTERS = 36000,
+  MAX_OUTPUT_TOKENS = 12000,
+  REQUEST_TIMEOUT_MS = 8 * 60 * 1000,
   MAX_SPOKEN_UNITS_PER_SECOND = STORY_MAX_SPOKEN_UNITS_PER_SECOND,
   BLOCKING_LOCAL_SIGNAL_CODES = new Set([
     'replication_duration_extreme',
@@ -68,9 +68,9 @@ const MAX_SOURCE_CHARACTERS = 0x8ca0,
     '你是短剧分镜成片前的独立审片员。你的任务是发现具体片段的问题，不是重新规划整集。',
     '片段数量和整集总时长没有固定正确值，绝不能因为片段多、片段少、整集长或整集短而判失败。',
     '时长必须按当前剧本内容判断：对白能否自然说完、动作是否能完成、情绪停顿和镜头调度是否有足够时间。',
-    '只根据给出的原剧本、候选片段和邻接关系判定；没有明确问题就通过。只返回严格\x20JSON。',
+    '只根据给出的原剧本、候选片段和邻接关系判定；没有明确问题就通过。只返回严格 JSON。',
     '每项 reason 和 repairInstruction 各不超过 80 字，只写问题结论与修改动作，不复述台词、不复制 JSON、不输出推理过程；字符串内部若含 ASCII 双引号必须按 JSON 转义。',
-  ]['join']('\x0a');
+  ]['join']('\n');
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -94,10 +94,10 @@ function stableSerialize(list) {
 function fingerprint(index) {
   const list2 = stableSerialize(index);
   let data = 0x811c9dc5;
-  for (let options = 0x0; options < list2['length']; options += 0x1) {
+  for (let options = 0; options < list2['length']; options += 1) {
     ((data ^= list2['charCodeAt'](options)), (data = Math['imul'](data, 0x1000193)));
   }
-  return 'fnv1a-' + (data >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'fnv1a-' + (data >>> 0)['toString'](16)['padStart'](8, '0');
 }
 function getEpisodeRef(options2 = {}, target = {}) {
   return (
@@ -108,20 +108,20 @@ function getEpisodeRef(options2 = {}, target = {}) {
 }
 function getEpisodeSource(options3 = {}) {
   const list3 = normalizeText(options3?.['script']?.['fullText']);
-  if (list3) return list3['slice'](0x0, MAX_SOURCE_CHARACTERS);
+  if (list3) return list3['slice'](0, MAX_SOURCE_CHARACTERS);
   return (Array['isArray'](options3?.['script']?.['scenes']) ? options3['script']['scenes'] : [])
     ['map']((dom) =>
-      [dom?.['heading'], dom?.['body']]['map'](normalizeText)['filter'](Boolean)['join']('\x0a'),
+      [dom?.['heading'], dom?.['body']]['map'](normalizeText)['filter'](Boolean)['join']('\n'),
     )
     ['filter'](Boolean)
-    ['join']('\x0a\x0a')
-    ['slice'](0x0, MAX_SOURCE_CHARACTERS);
+    ['join']('\n\n')
+    ['slice'](0, MAX_SOURCE_CHARACTERS);
 }
 function getSpokenText(options4 = {}) {
   return [options4?.['dialogue'], options4?.['voiceover']]
     ['map'](normalizeText)
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function inspectStoryEpisodeSplitLocalSignals({ clips: clips = [] } = {}) {
   const list4 = [];
@@ -130,32 +130,32 @@ export function inspectStoryEpisodeSplitLocalSignals({ clips: clips = [] } = {})
       const clipRef = normalizeText(source?.['ref']),
         list5 = Array['isArray'](source?.['shots']) ? source['shots'] : [],
         next = list5['reduce'](
-          (current, entry) => current + Math['max'](0x0, Number(entry?.['durationSec']) || 0x0),
-          0x0,
+          (current, entry) => current + Math['max'](0, Number(entry?.['durationSec']) || 0),
+          0,
         ),
-        record = Math['max'](0x0, Number(source?.['durationSec']) || 0x0);
+        record = Math['max'](0, Number(source?.['durationSec']) || 0);
       (Math['abs'](next - record) > 0.11 &&
         list4['push']({
           clipRef: clipRef,
           code: 'duration_sum_mismatch',
-          message: '片段时长\x20' + record + ' 秒与镜头合计 ' + Number(next['toFixed'](0x1)) + ' 秒不一致',
+          message: '片段时长 ' + record + ' 秒与镜头合计 ' + Number(next['toFixed'](1)) + ' 秒不一致',
         }),
         list5['forEach']((payload, shotIndex) => {
           const spokenText = getSpokenText(payload),
             countStorySpokenUnits2 = countStorySpokenUnits(spokenText),
-            handle = Math['max'](0x0, Number(payload?.['durationSec']) || 0x0),
-            state = handle ? countStorySpokenUnits2 / handle : 0x0;
-          countStorySpokenUnits2 >= 0x8 &&
+            handle = Math['max'](0, Number(payload?.['durationSec']) || 0),
+            state = handle ? countStorySpokenUnits2 / handle : 0;
+          countStorySpokenUnits2 >= 8 &&
             state > MAX_SPOKEN_UNITS_PER_SECOND &&
             list4['push']({
               clipRef: clipRef,
               shotIndex: shotIndex,
               code: 'dialogue_timing_suspicious',
               message:
-                '镜头\x20' +
-                (shotIndex + 0x1) +
+                '镜头 ' +
+                (shotIndex + 1) +
                 ' 约 ' +
-                Number(state['toFixed'](0x1)) +
+                Number(state['toFixed'](1)) +
                 ' 字/词每秒，需结合语气与表演复核',
             });
         }));
@@ -175,11 +175,11 @@ function getStoryEpisodeSplitLocalRepairInstruction(options5 = {}) {
   if (options5['code'] === 'replication_shot_coverage_missing')
     return (
       REPLICATION_SHOT_GUIDANCE +
-      '\x20对照本段原片镜头补全独立\x20shots，保持\x20clip\x20引用、来源区间和总时长；不要只改写\x20camera\x20或增加‘随后’来假装完成拆镜。'
+      ' 对照本段原片镜头补全独立 shots，保持 clip 引用、来源区间和总时长；不要只改写 camera 或增加‘随后’来假装完成拆镜。'
     );
   if (options5['code'] === 'replication_duration_extreme') return REPLICATION_TIMELINE_RULE;
   if (options5['code'] === 'replication_shot_collapsed')
-    return '保持本片段总时长、原话、人物绑定和动作顺序；仅将混在一个\x20shot\x20中的动作、切镜及多轮问答拆成连续时间区间的\x20shots，每镜就地放对应人声，跨镜人声在起始镜头完整保留一次及声音时间。不要新建\x20clip，不加剧情，不机械均分秒数。';
+    return '保持本片段总时长、原话、人物绑定和动作顺序；仅将混在一个 shot 中的动作、切镜及多轮问答拆成连续时间区间的 shots，每镜就地放对应人声，跨镜人声在起始镜头完整保留一次及声音时间。不要新建 clip，不加剧情，不机械均分秒数。';
   return options5?.['code'] === 'dialogue_timing_suspicious'
     ? '拆成足够多个连续片段或镜头，为完整对白保留自然说话时间；禁止删改对白或依靠高速口播。'
     : '修正片段与镜头的时长分项，使片段总时长等于全部镜头时长之和。';
@@ -224,37 +224,37 @@ function assertStoryEpisodeSplitLocalTiming(clips2 = [], handler = inspectStoryE
   error2['code'] = 'STORY_LOCAL_TIMING';
   throw error2;
 }
-function getStoryEpisodeSplitSpokenTimingBudget(options6 = {}, minimumClipCountForSpokenContent = 0x0) {
+function getStoryEpisodeSplitSpokenTimingBudget(options6 = {}, minimumClipCountForSpokenContent = 0) {
   const spokenUnits = (Array['isArray'](options6?.['shots']) ? options6['shots'] : [])['reduce'](
     (value2, value3) =>
       value2 +
       countStorySpokenUnits(
         [normalizeText(value3?.['dialogue']), normalizeText(value3?.['voiceover'])]
           ['filter'](Boolean)
-          ['join']('\x0a'),
+          ['join']('\n'),
       ),
-    0x0,
+    0,
   );
   if (!spokenUnits) return null;
-  const minimumSpokenDurationSeconds = Math['ceil']((spokenUnits / MAX_SPOKEN_UNITS_PER_SECOND) * 0xa) / 0xa;
+  const minimumSpokenDurationSeconds = Math['ceil']((spokenUnits / MAX_SPOKEN_UNITS_PER_SECOND) * 10) / 10;
   return {
     spokenUnits: spokenUnits,
     maxSpokenUnitsPerSecond: MAX_SPOKEN_UNITS_PER_SECOND,
     minimumSpokenDurationSeconds: minimumSpokenDurationSeconds,
     minimumClipCountForSpokenContent: minimumClipCountForSpokenContent
-      ? Math['max'](0x1, Math['ceil'](minimumSpokenDurationSeconds / minimumClipCountForSpokenContent))
-      : 0x1,
+      ? Math['max'](1, Math['ceil'](minimumSpokenDurationSeconds / minimumClipCountForSpokenContent))
+      : 1,
   };
 }
 function compactClip(options7 = {}) {
   return {
     ref: normalizeText(options7['ref']),
     script: normalizeText(options7['script']),
-    durationSec: Number(options7['durationSec']) || 0x0,
+    durationSec: Number(options7['durationSec']) || 0,
     shots: (Array['isArray'](options7['shots']) ? options7['shots'] : [])['map']((startSec, index2) => ({
-      index: index2 + 0x1,
+      index: index2 + 1,
       ...replicationVisualFields(startSec),
-      durationSec: Number(startSec?.['durationSec']) || 0x0,
+      durationSec: Number(startSec?.['durationSec']) || 0,
       ...(Number['isFinite'](startSec?.['startSec']) ? { startSec: startSec['startSec'] } : {}),
       ...(Number['isFinite'](startSec?.['endSec']) ? { endSec: startSec['endSec'] } : {}),
       assetUsages: Array['isArray'](startSec?.['assetUsages']) ? startSec['assetUsages'] : [],
@@ -303,10 +303,10 @@ function compactAssets(list11 = [], list12 = [], value4 = '') {
 }
 function createBatches(list14, value6) {
   const list15 = [];
-  for (let startIndex = 0x0; startIndex < list14['length']; startIndex += value6) {
+  for (let startIndex = 0; startIndex < list14['length']; startIndex += value6) {
     const clipRefs = list14['slice'](startIndex, startIndex + value6);
     list15['push']({
-      ref: 'quality-batch-' + (list15['length'] + 0x1),
+      ref: 'quality-batch-' + (list15['length'] + 1),
       startIndex: startIndex,
       clipRefs: clipRefs['map']((value7) => value7['ref']),
     });
@@ -324,7 +324,7 @@ function buildReviewPrompt({
   phase: phase,
   constraints: constraints2,
 }) {
-  const maxClipDurationSeconds = Math['max'](0x0, Number(constraints2?.['sceneMaxSeconds']) || 0x0);
+  const maxClipDurationSeconds = Math['max'](0, Number(constraints2?.['sceneMaxSeconds']) || 0);
   return JSON['stringify']({
     task: 'review_story_episode_split_quality',
     ...buildVideoReplicationSpeechReviewContext(episode2),
@@ -346,12 +346,12 @@ function buildReviewPrompt({
       ...STORY_ASSET_REFERENCE_RULES,
       '逐项核对原剧本信息是否遗漏、重复、乱序或被改写成相反含义。',
       '对白必须与原文一致；按人物语气、停顿和表演判断镜头时间是否足够，不使用固定字数公式直接定罪。',
-      '动作、情绪反应和运镜必须能在各镜头\x20durationSec\x20内自然完成；一个镜头需要\x2015\x20秒时，15\x20秒就是正确的。',
+      '动作、情绪反应和运镜必须能在各镜头 durationSec 内自然完成；一个镜头需要 15 秒时，15 秒就是正确的。',
       '检查相邻片段的地点、人物状态、道具、动作起止和视线是否连续。',
       '检查画面、摄影、声音和资产引用是否与当前剧情一致且可执行。',
       '人物资产只应绑定画面中实际可见的角色；仅在对白、语音、电话、名单、记录、照片文字或他人口述中被提及的人物，不得作为出镜人物资产绑定。',
       '人物已在前一片段或前一镜头明确离场时，后续镜头不得继续绑定其人物资产，除非原剧本明确让其重新入镜。',
-      '选择\x20appearanceRef\x20时必须核对形象的\x20description、occurrences\x20与\x20sourceChapterIds，尤其区分回忆、当前时间、受伤和换装状态。',
+      '选择 appearanceRef 时必须核对形象的 description、occurrences 与 sourceChapterIds，尤其区分回忆、当前时间、受伤和换装状态。',
       maxClipDurationSeconds
         ? '单个片段不得超过 ' +
           maxClipDurationSeconds +
@@ -368,10 +368,10 @@ function getNeighboringClips(list16, count, value8, map3 = new Map()) {
     if (!enabled) return null;
     const list17 = map3['get'](normalizeText(enabled['ref']));
     if (!Array['isArray'](list17) || !list17['length']) return enabled;
-    return value9 === 'left' ? list17['at'](-0x1) : list17[0x0];
+    return value9 === 'left' ? list17['at'](-1) : list17[0];
   };
   return [
-    run(count > 0x0 ? list16[count - 0x1] : null, 'left'),
+    run(count > 0 ? list16[count - 1] : null, 'left'),
     run(count + value8 < list16['length'] ? list16[count + value8] : null, 'right'),
   ]['filter'](Boolean);
 }
@@ -383,7 +383,7 @@ function buildRepairPrompt({
   neighbors: neighbors,
   assets: assets3,
   constraints: constraints3,
-  repairRound: repairRound = 0x1,
+  repairRound: repairRound = 1,
   previousErrorsByRef: previousErrorsByRef = {},
   previousClipsByRef: previousClipsByRef = {},
 }) {
@@ -391,7 +391,7 @@ function buildRepairPrompt({
     list18 = getStoryEpisodeClipGroupingRequirements(constraints3?.['promptMode']),
     args2 = getStoryEpisodePromptModePlanningRequirements(constraints3?.['promptMode']),
     isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(constraints3?.['promptMode']),
-    maxClipDurationSeconds2 = Math['max'](0x0, Number(constraints3?.['sceneMaxSeconds']) || 0x0),
+    maxClipDurationSeconds2 = Math['max'](0, Number(constraints3?.['sceneMaxSeconds']) || 0),
     args3 = Object['values'](previousClipsByRef || {})['flatMap']((value11) =>
       Array['isArray'](value11) ? value11 : [],
     ),
@@ -442,7 +442,7 @@ function buildRepairPrompt({
             '修复结果的每个 clip 用 startsNewNarrativeBeat 标记是否开始新的独立叙事阶段：换场、时间跳跃或剧情阶段结束后开始新阶段时为 true；同一段连续对话中的换说话人、切镜头或因时长上限续段为 false。',
           ]
         : []),
-      repairRound > 0x1
+      repairRound > 1
         ? '这是定点重试。必须先解决 failedClips.previousAttemptError 指出的上一轮校验或复审错误，禁止原样重复上一轮结果。'
         : '这是第一轮定点修复。',
       maxClipDurationSeconds2
@@ -450,7 +450,7 @@ function buildRepairPrompt({
           maxClipDurationSeconds2 +
           ' 秒；内容需要更长时间时必须拆分，禁止用超限延长解决。'
         : '当前任务未设置单片段时长上限。',
-      '对白与旁白必须满足每个镜头不超过\x20' +
+      '对白与旁白必须满足每个镜头不超过 ' +
         MAX_SPOKEN_UNITS_PER_SECOND +
         ' 字/词每秒。failedClips.timingBudget 是只计算说话内容得到的最低时间与最低片段数；动作、停顿和反应还应在此基础上增加时间。',
       '保留原对白文字、剧情顺序和资产真实性。只返回严格 JSON。',
@@ -501,7 +501,7 @@ function createDraft({
     candidateFingerprint: candidateFingerprint2,
     status: 'reviewing',
     batches: batches2['map']((args5) => ({ ...args5, status: 'pending' })),
-    requestCount: 0x0,
+    requestCount: 0,
     unresolvedClipRefs: [],
     completedClips: null,
     createdAt: createdAt,
@@ -540,7 +540,7 @@ function createQualityReviewSummary(verificationScope = {}) {
     ...(verificationScope['verificationScope']
       ? { verificationScope: verificationScope['verificationScope'] }
       : {}),
-    requestCount: Math['max'](0x0, Number(verificationScope['requestCount']) || 0x0),
+    requestCount: Math['max'](0, Number(verificationScope['requestCount']) || 0),
     unresolvedClipRefs: cloneJson(status),
     unresolvedItems: unresolvedItems,
   };
@@ -583,7 +583,7 @@ export async function reviewStoryEpisodeSplitQuality({
           (map6['get'](value22) ?? Number['MAX_SAFE_INTEGER']),
       ),
     episodeRef5 = getEpisodeRef(episode, result),
-    value23 = Math['max'](0x1, Math['min'](0x14, Math['trunc'](Number(batchSize) || 0xa))),
+    value23 = Math['max'](1, Math['min'](20, Math['trunc'](Number(batchSize) || 10))),
     batches3 = createBatches(clips5, value23),
     timingGuidance = buildVideoReplicationTimingGuidance(episode),
     candidateFingerprint3 = fingerprint({
@@ -617,8 +617,8 @@ export async function reviewStoryEpisodeSplitQuality({
       ...result,
       clips: cloneJson(totalDurationSeconds['completedClips']),
       totalDurationSeconds: totalDurationSeconds['completedClips']['reduce'](
-        (value25, value26) => value25 + Math['max'](0x0, Number(value26?.['durationSec']) || 0x0),
-        0x0,
+        (value25, value26) => value25 + Math['max'](0, Number(value26?.['durationSec']) || 0),
+        0,
       ),
       qualityReview: createQualityReviewSummary(totalDurationSeconds),
     };
@@ -634,7 +634,7 @@ export async function reviewStoryEpisodeSplitQuality({
     list19['forEach']((value30) => map8['add'](value30));
     if (list19['length']) response['status'] = 'reviewed';
   }
-  let attempt = Math['max'](0x0, Number(totalDurationSeconds['requestCount']) || 0x0);
+  let attempt = Math['max'](0, Number(totalDurationSeconds['requestCount']) || 0);
   const checkpoint = async () => {
       ((totalDurationSeconds['updatedAt'] = Date['now']()),
         (totalDurationSeconds['requestCount'] = attempt),
@@ -654,7 +654,7 @@ export async function reviewStoryEpisodeSplitQuality({
         checkpoint: checkpoint,
         invoke: async () => {
           return (
-            (attempt += 0x1),
+            (attempt += 1),
             invokeStoryGenerationRequest({
               request: request,
               requestPayload: {
@@ -672,14 +672,14 @@ export async function reviewStoryEpisodeSplitQuality({
                     : '',
                 ]
                   ['filter'](Boolean)
-                  ['join']('\x0a'),
+                  ['join']('\n'),
                 ...(reviewPolicy
                   ? buildReplicationReviewRequest(payload2, sourceVideoEvidence, episode, constraints)
                   : {}),
                 thinking: { type: 'disabled' },
                 temperature: 0.1,
                 maxOutputTokens: MAX_OUTPUT_TOKENS,
-                timeoutMs: reviewPolicy ? 0x2bf20 : REQUEST_TIMEOUT_MS,
+                timeoutMs: reviewPolicy ? 180000 : REQUEST_TIMEOUT_MS,
               },
               stepId: stepId,
               attempt: attempt,
@@ -705,7 +705,7 @@ export async function reviewStoryEpisodeSplitQuality({
           providerProfileId: providerProfileId,
         }),
       });
-  for (let current2 = 0x0; current2 < totalDurationSeconds['batches']['length']; current2 += 0x1) {
+  for (let current2 = 0; current2 < totalDurationSeconds['batches']['length']; current2 += 1) {
     const batchRef2 = totalDurationSeconds['batches'][current2];
     if (batchRef2['status'] === 'completed') continue;
     const clips6 = clips5['slice'](
@@ -716,12 +716,12 @@ export async function reviewStoryEpisodeSplitQuality({
       localSignals3 = localSignals2({ clips: clips6 });
     onProgress?.({
       stage: 'reviewing-episode-split-quality',
-      current: current2 + 0x1,
+      current: current2 + 1,
       total: totalDurationSeconds['batches']['length'],
       message: reviewPolicy
-        ? '正在检查格式与时间 ' + (current2 + 0x1) + '/' + totalDurationSeconds['batches']['length']
+        ? '正在检查格式与时间 ' + (current2 + 1) + '/' + totalDurationSeconds['batches']['length']
         : '正在审片 ' +
-          (current2 + 0x1) +
+          (current2 + 1) +
           '/' +
           totalDurationSeconds['batches']['length'] +
           '，检查剧情、时长与连续性',
@@ -803,7 +803,7 @@ export async function reviewStoryEpisodeSplitQuality({
     const failedClips2 = clips6['filter']((value39) => list20['includes'](value39['ref']));
     onProgress?.({
       stage: 'repairing-episode-split-quality',
-      current: current2 + 0x1,
+      current: current2 + 1,
       total: totalDurationSeconds['batches']['length'],
       message: '正在定点修复 ' + failedClips2['length'] + ' 个未通过片段',
     });
@@ -892,9 +892,9 @@ export async function reviewStoryEpisodeSplitQuality({
       let list23 = [...list20],
         requestStoryReviewRepairs2 = map9,
         value48 = 'initial';
-      const value49 = reviewPolicy ? 0x1 : 0x3;
-      for (let repairRound2 = 0x1; repairRound2 <= value49 && list23['length']; repairRound2 += 0x1) {
-        if (repairRound2 > 0x1) {
+      const value49 = reviewPolicy ? 1 : 3;
+      for (let repairRound2 = 1; repairRound2 <= value49 && list23['length']; repairRound2 += 1) {
+        if (repairRound2 > 1) {
           const failedClips4 = failedClips2['filter']((value50) => list23['includes'](value50['ref']));
           try {
             requestStoryReviewRepairs2 = await requestStoryReviewRepairs({
@@ -938,7 +938,7 @@ export async function reviewStoryEpisodeSplitQuality({
         let value56 = ![];
         if (list25['length']) {
           const assessments3 = list25['flatMap']((value57) => map10['get'](value57) || []),
-            batchRef3 = batchRef2['ref'] + '-repair-recheck' + (repairRound2 > 0x1 ? '-' + repairRound2 : '');
+            batchRef3 = batchRef2['ref'] + '-repair-recheck' + (repairRound2 > 1 ? '-' + repairRound2 : '');
           try {
             const value58 = reviewPolicy
                 ? JSON['stringify']({
@@ -972,7 +972,7 @@ export async function reviewStoryEpisodeSplitQuality({
                     },
                     'quality-recheck:' +
                       batchRef2['ref'] +
-                      (repairRound2 > 0x1 ? ':round-' + repairRound2 : ''),
+                      (repairRound2 > 1 ? ':round-' + repairRound2 : ''),
                   ),
               list27 = applyBlockingLocalSignalsToAssessments(
                 parseReviewResponse(value58, {
@@ -983,7 +983,7 @@ export async function reviewStoryEpisodeSplitQuality({
                 localSignals2({ clips: assessments3 }),
               );
             list22['push'](cloneJson(list27));
-            if (repairRound2 === 0x1) batchRef2['recheck'] = cloneJson(list27);
+            if (repairRound2 === 1) batchRef2['recheck'] = cloneJson(list27);
             const map12 = new Map(list27['map']((value62) => [value62['clipRef'], value62]));
             list25['forEach']((value63) => {
               if (batchRef2['pendingRecheck']) delete batchRef2['pendingRecheck'][value63];
@@ -1037,7 +1037,7 @@ export async function reviewStoryEpisodeSplitQuality({
         ((list23 = [...new Set(list26)]),
           (value48 = list24['length'] && value56 ? 'mixed' : list24['length'] ? 'validation' : 'recheck'));
       }
-      (list22['length'] > 0x1 && (batchRef2['recheckRounds'] = list22),
+      (list22['length'] > 1 && (batchRef2['recheckRounds'] = list22),
         (batchRef2['replacements'] = value47),
         (batchRef2['repairErrors'] = previousErrorsByRef2),
         (batchRef2['repairErrorCodes'] = value43),
@@ -1066,7 +1066,7 @@ export async function reviewStoryEpisodeSplitQuality({
     !isStoryContinuousTimelinePromptMode(constraints?.['promptMode'])
   ) {
     const clips9 = normalizeStoryEpisodeSpokenTiming(clips8, {
-        maxClipDurationSeconds: Math['max'](0x0, Number(constraints?.['sceneMaxSeconds']) || 0x0),
+        maxClipDurationSeconds: Math['max'](0, Number(constraints?.['sceneMaxSeconds']) || 0),
         maxSpokenUnitsPerSecond: MAX_SPOKEN_UNITS_PER_SECOND,
       }),
       list32 = getBlockingStoryEpisodeSplitLocalSignals(
@@ -1103,7 +1103,7 @@ export async function reviewStoryEpisodeSplitQuality({
       await checkpoint());
     throw new Error(
       reviewPolicy
-        ? '片段\x20' +
+        ? '片段 ' +
             [...list33]['join']('、') +
             ' 局部修复后仍有明显' +
             (list31['some']((value80) => /replication_(?:shot|speech)_/u['test'](value80['code']))
@@ -1129,8 +1129,8 @@ export async function reviewStoryEpisodeSplitQuality({
       ...result,
       clips: clips8,
       totalDurationSeconds: clips8['reduce'](
-        (value82, value83) => value82 + Math['max'](0x0, Number(value83?.['durationSec']) || 0x0),
-        0x0,
+        (value82, value83) => value82 + Math['max'](0, Number(value83?.['durationSec']) || 0),
+        0,
       ),
       qualityReview: createQualityReviewSummary(totalDurationSeconds),
     }

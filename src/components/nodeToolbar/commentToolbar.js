@@ -266,7 +266,7 @@ export function bindCommentNoteToolbarEvents(...list2) {
       if (!el4) return;
       el4.setAttribute('data-tooltip', getJumpShortcutTooltipText(record));
     },
-    handler7 = (payload, handle = 0x708) => {
+    handler7 = (payload, handle = 1800) => {
       if (!el4) return;
       (handler5(),
         el4.classList.add('is-tooltip-pinned'),

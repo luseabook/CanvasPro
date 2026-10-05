@@ -1,11 +1,11 @@
 const STORY_EPISODE_OUTLINE_RUN_KIND = 'story-episode-outline-run',
-  STORY_EPISODE_OUTLINE_RUN_VERSION = 0x1,
+  STORY_EPISODE_OUTLINE_RUN_VERSION = 1,
   STORY_EPISODE_OUTLINE_STAGE_VERSION = '2',
   STORY_EPISODE_OUTLINE_SCHEMA_VERSION = 'story-episode-outline/v2',
   STORY_EPISODE_OUTLINE_PROMPT_VERSION = 'episode-outline-planning/v3',
-  MAX_INVOCATIONS = 0x18,
-  MAX_RAW_RESPONSE_CHARACTERS = 0x13880;
-let runSequence = 0x0;
+  MAX_INVOCATIONS = 24,
+  MAX_RAW_RESPONSE_CHARACTERS = 80000;
+let runSequence = 0;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -29,14 +29,14 @@ function stableSerialize(list) {
 function fingerprintValue(index) {
   const list2 = stableSerialize(index);
   let result = 0x811c9dc5;
-  for (let data = 0x0; data < list2['length']; data += 0x1) {
+  for (let data = 0; data < list2['length']; data += 1) {
     ((result ^= list2['charCodeAt'](data)), (result = Math['imul'](result, 0x1000193)));
   }
-  return 'fnv1a-' + (result >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'fnv1a-' + (result >>> 0)['toString'](16)['padStart'](8, '0');
 }
 function createRunId(options) {
   return (
-    (runSequence += 0x1),
+    (runSequence += 1),
     'episode-planning:' + (normalizeText(options) || 'project') + ':' + Date['now']() + ':' + runSequence
   );
 }
@@ -47,7 +47,7 @@ function getRunInput({
 } = {}) {
   return {
     projectId: normalizeText(project['id']),
-    summaryRevision: Math['max'](0x0, Math['trunc'](Number(project['summaryRevision']) || 0x0)),
+    summaryRevision: Math['max'](0, Math['trunc'](Number(project['summaryRevision']) || 0)),
     summaryFingerprint: fingerprintValue({
       summary: normalizeText(project['summary']),
       storyContract: project['storyContract'] || null,
@@ -70,14 +70,14 @@ function normalizeInvocation(options2 = {}) {
   return {
     id: normalizeText(options2['id']),
     stepId: normalizeText(options2['stepId']),
-    attempt: Math['max'](0x1, Math['trunc'](Number(options2['attempt']) || 0x1)),
+    attempt: Math['max'](1, Math['trunc'](Number(options2['attempt']) || 1)),
     state: normalizeText(options2['state']),
     requestFingerprint: normalizeText(options2['requestFingerprint']),
-    rawResponse: String(options2['rawResponse'] || '')['slice'](0x0, MAX_RAW_RESPONSE_CHARACTERS),
+    rawResponse: String(options2['rawResponse'] || '')['slice'](0, MAX_RAW_RESPONSE_CHARACTERS),
     error: normalizeText(options2['error']),
-    preparedAt: Math['max'](0x0, Number(options2['preparedAt'] || 0x0)),
-    completedAt: Math['max'](0x0, Number(options2['completedAt'] || 0x0)),
-    retryAuthorizedAt: Math['max'](0x0, Number(options2['retryAuthorizedAt'] || 0x0)),
+    preparedAt: Math['max'](0, Number(options2['preparedAt'] || 0)),
+    completedAt: Math['max'](0, Number(options2['completedAt'] || 0)),
+    retryAuthorizedAt: Math['max'](0, Number(options2['retryAuthorizedAt'] || 0)),
   };
 }
 export function normalizeStoryEpisodeOutlineRun(regenerationMode2) {
@@ -105,8 +105,8 @@ export function normalizeStoryEpisodeOutlineRun(regenerationMode2) {
     candidateArtifact: cloneJson(regenerationMode2['candidateArtifact'] || null),
     errorCode: normalizeText(regenerationMode2['errorCode']),
     error: normalizeText(regenerationMode2['error']),
-    createdAt: Math['max'](0x0, Number(regenerationMode2['createdAt'] || 0x0)) || Date['now'](),
-    updatedAt: Math['max'](0x0, Number(regenerationMode2['updatedAt'] || 0x0)) || Date['now'](),
+    createdAt: Math['max'](0, Number(regenerationMode2['createdAt'] || 0)) || Date['now'](),
+    updatedAt: Math['max'](0, Number(regenerationMode2['updatedAt'] || 0)) || Date['now'](),
   };
 }
 export function getStoryEpisodeOutlineRunFromTask(options3 = {}) {
@@ -192,7 +192,7 @@ function createInvocationId(state, config) {
     ':' +
     config['attempt'] +
     ':' +
-    (state['invocations']['length'] + 0x1)
+    (state['invocations']['length'] + 1)
   );
 }
 function getPersistedResumeResponses(response2) {
@@ -290,13 +290,13 @@ export function createStoryEpisodeOutlineApplication({ planEpisodes: planEpisode
               ['find'](
                 (value3) =>
                   value3['stepId'] === normalizeText(stepId['stepId']) &&
-                  value3['attempt'] === Math['max'](0x1, Math['trunc'](Number(stepId['attempt']) || 0x1)) &&
+                  value3['attempt'] === Math['max'](1, Math['trunc'](Number(stepId['attempt']) || 1)) &&
                   value3['state'] === 'prepared',
               );
             value2 &&
               ((value2['state'] = normalizeText(stepId['state'])),
               (value2['rawResponse'] = String(stepId['rawResponse'] || '')['slice'](
-                0x0,
+                0,
                 MAX_RAW_RESPONSE_CHARACTERS,
               )),
               (value2['error'] = normalizeText(stepId['error'])),
@@ -337,7 +337,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
       : null;
   async function execute2({ confirmRegeneration: confirmRegeneration = !![] } = {}) {
     if (state2['storyPlanningOperation']) return ![];
-    if (!enabled2) return (host['showToast']?.('分集规划\x20Agent\x20尚未初始化。', 'error'), ![]);
+    if (!enabled2) return (host['showToast']?.('分集规划 Agent 尚未初始化。', 'error'), ![]);
     if (!normalizeText(state2['data']['project']?.['summary']))
       return (host['showToast']?.('请先生成剧本摘要。', 'warn'), ![]);
     const selectedEpisodeId = host['createProjectTaskToken'](),
@@ -431,28 +431,28 @@ export function createStoryEpisodeOutlineWorkspaceController({
         host['registerProjectData'](selectedEpisodeId),
         (selectedEpisodeId['data']['project']['outlineStatus'] = 'completed'),
         (selectedEpisodeId['data']['project']['outlineSourceSummaryRevision'] = Math['max'](
-          0x0,
-          Math['trunc'](Number(selectedEpisodeId['data']['project']['summaryRevision']) || 0x0),
+          0,
+          Math['trunc'](Number(selectedEpisodeId['data']['project']['summaryRevision']) || 0),
         )));
       host['isProjectTaskCurrent'](selectedEpisodeId) &&
         ((state2['data'] = selectedEpisodeId['data']),
         host['resetDownstreamUi']({
-          selectedEpisodeId: selectedEpisodeId['data']['episodes'][0x0]?.['id'] || '',
+          selectedEpisodeId: selectedEpisodeId['data']['episodes'][0]?.['id'] || '',
         }));
       host['schedulePersistence']({ immediate: !![] });
-      const value10 = Math['max'](0x0, selectedEpisodeId['data']['episodes']['length'] - value7);
+      const value10 = Math['max'](0, selectedEpisodeId['data']['episodes']['length'] - value7);
       return (
         host['notifyComplete'](
           value10
-            ? '分集规划完成，新增 ' + value10 + '\x20集。'
+            ? '分集规划完成，新增 ' + value10 + ' 集。'
             : '已规划 ' + selectedEpisodeId['data']['episodes']['length'] + ' 集。',
           selectedEpisodeId,
-          { step: 0x1, outlineSectionId: 'episodes' },
+          { step: 1, outlineSectionId: 'episodes' },
           { notificationMessage: '分集大纲生成完成。' },
         ),
         host['finishBackgroundTask'](selectedEpisodeId, id, {
           status: 'succeeded',
-          message: '已规划 ' + selectedEpisodeId['data']['episodes']['length'] + '\x20集',
+          message: '已规划 ' + selectedEpisodeId['data']['episodes']['length'] + ' 集',
           resumable: ![],
           resumePayload: createStoryEpisodeOutlineRunPayload(completeStoryEpisodeOutlineRun(value9['run'])),
         }),
@@ -475,7 +475,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
       const text = normalizeText(error3?.['message']);
       return (
         host['showTaskResultToast'](
-          text ? text + '\x20已有大纲和下游内容均已保留。' : '分集规划失败，已有大纲和下游内容均已保留。',
+          text ? text + ' 已有大纲和下游内容均已保留。' : '分集规划失败，已有大纲和下游内容均已保留。',
           'error',
           error3,
         ),

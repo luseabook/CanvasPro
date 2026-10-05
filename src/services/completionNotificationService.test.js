@@ -137,7 +137,7 @@ test('completionNotificationService: navigation payload drives the toast and the
     assert.equal(toasts.length, 1),
     assert.equal(toasts[0][0], '“图片 1”生成完成。'),
     assert.equal(toasts[0][1], 'success'),
-    assert.equal(toasts[0][2], 0x2710),
+    assert.equal(toasts[0][2], 10000),
     assert.equal(toasts[0][3].ariaLabel, '“图片 1”生成完成。，点击查看结果'),
     assert.equal(delivered.length, 1),
     assert.equal(delivered[0].body, '“图片 1”生成完成。'),

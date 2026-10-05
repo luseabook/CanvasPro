@@ -16,7 +16,7 @@ import {
   ensureDesktopUpdateAvailable,
   resolveAutoUpdatePrimaryAction,
 } from './autoUpdatePolicy.js';
-const CHECK_INTERVAL = 0x3c * 0x3c * 0x3e8,
+const CHECK_INTERVAL = 60 * 60 * 1000,
   _NS = 'http://www.w3.org/2000/svg';
 let _dismissedSignature = '',
   _activeBannerInfo = null,
@@ -24,7 +24,7 @@ let _dismissedSignature = '',
   _desktopUpdateUnsubscribe = null,
   _desktopUpdaterActive = ![],
   _desktopInstallAfterDownload = ![],
-  _desktopBannerRequestSequence = 0x0;
+  _desktopBannerRequestSequence = 0;
 const _startupBannerQueue = createLatestStartupVisualTaskQueue(),
   _startupAutomaticToastQueue = createLatestStartupVisualTaskQueue();
 function autoUpdateText(value, item = {}) {
@@ -94,7 +94,7 @@ function _createDownloadSvg() {
     el7['setAttribute']('stroke-width', '2.2'),
     el7['setAttribute']('stroke-linecap', 'round'),
     el7['setAttribute']('stroke-linejoin', 'round'),
-    ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12\x2015V3']['forEach']((data) => {
+    ['M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4', 'M7 10l5 5 5-5', 'M12 15V3']['forEach']((data) => {
       const el8 = document['createElementNS'](_NS, 'path');
       (el8['setAttribute']('d', data), el7['appendChild'](el8));
     }),
@@ -121,10 +121,10 @@ function _setBtnContent(el11, target, source) {
   if (!el11) return;
   (el11['replaceChildren'](),
     el11['appendChild'](target ? _createSpinSvg(!![]) : _createDownloadSvg()),
-    el11['appendChild'](document['createTextNode']('\x20' + source)));
+    el11['appendChild'](document['createTextNode'](' ' + source)));
 }
 function _formatPercent(next) {
-  const current = Math['max'](0x0, Math['min'](0x64, Number(next || 0x0)));
+  const current = Math['max'](0, Math['min'](100, Number(next || 0)));
   return Math['round'](current) + '%';
 }
 function _formatBannerVersion(entry) {
@@ -154,9 +154,9 @@ function _htmlNotesToText(handle) {
   let state = String(handle || '')['trim']();
   if (!/<\/?[a-z][\s\S]*>/i['test'](state)) return state;
   return (
-    (state = state['replace'](/<br\s*\/?>/gi, '\x0a')
-      ['replace'](/<\/(?:p|div|h[1-6]|li|ul|ol|section|article|blockquote)>/gi, '\x0a')
-      ['replace'](/<li[^>]*>/gi, '-\x20')
+    (state = state['replace'](/<br\s*\/?>/gi, '\n')
+      ['replace'](/<\/(?:p|div|h[1-6]|li|ul|ol|section|article|blockquote)>/gi, '\n')
+      ['replace'](/<li[^>]*>/gi, '- ')
       ['replace'](/<[^>]+>/g, '')),
     _decodeHtmlText(state)
   );
@@ -167,7 +167,7 @@ function _buildNotesText(config) {
     ['map']((scope) => scope['trim']())
     ['filter'](Boolean);
   if (!list['length']) return autoUpdateText('notes.empty');
-  return list['join']('\x0a');
+  return list['join']('\n');
 }
 function _cleanNotesHeading(input) {
   return String(input || '')
@@ -265,13 +265,13 @@ export const __autoUpdateNotesForTest = Object['freeze']({ parse: _parseUpdateNo
 function _appendTextWithLinks(el13, value13) {
   const list3 = String(value13 || ''),
     value14 = /(https?:\/\/[^\s]+)/gi;
-  let value15 = 0x0,
+  let value15 = 0,
     value16 = value14['exec'](list3);
   while (value16) {
     value16['index'] > value15 &&
       el13['appendChild'](document['createTextNode'](list3['slice'](value15, value16['index'])));
-    const list4 = value16[0x0]['replace'](/[),.;，。；）]+$/u, ''),
-      value17 = value16[0x0]['slice'](list4['length']),
+    const list4 = value16[0]['replace'](/[),.;，。；）]+$/u, ''),
+      value17 = value16[0]['slice'](list4['length']),
       el14 = document['createElement']('a');
     ((el14['className'] = 'update-banner-note-link'),
       (el14['href'] = list4),
@@ -279,7 +279,7 @@ function _appendTextWithLinks(el13, value13) {
       (el14['textContent'] = list4),
       el13['appendChild'](el14));
     if (value17) el13['appendChild'](document['createTextNode'](value17));
-    ((value15 = value16['index'] + value16[0x0]['length']), (value16 = value14['exec'](list3)));
+    ((value15 = value16['index'] + value16[0]['length']), (value16 = value14['exec'](list3)));
   }
   value15 < list3['length'] &&
     el13['appendChild'](document['createTextNode'](list3['slice'](value15)));
@@ -381,8 +381,8 @@ function _buildBilibiliPlayerUrl(value35) {
     const uRL3 = new URL('https://player.bilibili.com/player.html');
     return (
       enabled8
-        ? uRL3['searchParams']['set']('bvid', enabled8[0x1])
-        : uRL3['searchParams']['set']('aid', enabled9[0x1]),
+        ? uRL3['searchParams']['set']('bvid', enabled8[1])
+        : uRL3['searchParams']['set']('aid', enabled9[1]),
       uRL3['searchParams']['set']('page', uRL2['searchParams']['get']('p') || '1'),
       uRL3['searchParams']['set']('autoplay', '0'),
       uRL3['toString']()
@@ -519,7 +519,7 @@ function _setDesktopDownloadInPlace(options3 = {}, { retrying: retrying = ![] } 
     el39 = document['getElementById']('update-banner-btn'),
     el40 = document['getElementById']('update-banner-close'),
     value46 = document['getElementById']('update-banner-cancel'),
-    count = Number(options3['retryCount'] || 0x0),
+    count = Number(options3['retryCount'] || 0),
     value47 = retrying
       ? autoUpdateText('progress.retrying', { count: count })
       : autoUpdateText('progress.downloading', { percent: '0%' });
@@ -529,7 +529,7 @@ function _setDesktopDownloadInPlace(options3 = {}, { retrying: retrying = ![] } 
     (el38['textContent'] = retrying
       ? autoUpdateText('status.autoRetry')
       : autoUpdateText('status.downloadingAutoInstall')));
-  (_setUpdateProgress(0x0, value47),
+  (_setUpdateProgress(0, value47),
     _setBtnContent(
       el39,
       !![],
@@ -653,7 +653,7 @@ function _showBanner(enabled11, enabled12 = {}) {
   if (!enabled13 && value48 && !enabled11['disableSkip']) {
     const el57 = document['createElement']('button');
     ((el57['type'] = 'button'),
-      (el57['className'] = 'update-banner-btn\x20update-banner-btn-secondary'),
+      (el57['className'] = 'update-banner-btn update-banner-btn-secondary'),
       (el57['textContent'] = autoUpdateText('buttons.skipVersion')),
       (el57['onclick'] = () => _dismissBanner(enabled11)),
       el55['appendChild'](el57));
@@ -790,7 +790,7 @@ async function _doApply(enabled18) {
     const error = await applyUpdateFromServer();
     if (error['success']) {
       _setBtnContent(el61, !![], autoUpdateText('buttons.restartingWait'));
-      const value53 = Date['now']() + 0x7530,
+      const value53 = Date['now']() + 30000,
         async2 = async () => {
           if (Date['now']() > value53) {
             location['reload']();
@@ -803,9 +803,9 @@ async function _doApply(enabled18) {
               return;
             }
           } catch (value54) {}
-          setTimeout(async2, 0x320);
+          setTimeout(async2, 800);
         };
-      setTimeout(async2, 0x7d0);
+      setTimeout(async2, 2000);
       return;
     }
     _setProgramUpdateFallback(
@@ -841,7 +841,7 @@ function _formatDesktopRemoteVersion(value58) {
   return enabled19['startsWith']('V') ? enabled19 : 'V' + enabled19;
 }
 function _getPageLocalVersion() {
-  const value59 = document['querySelector']('meta[name=\x22app-version\x22]')?.['getAttribute']('content');
+  const value59 = document['querySelector']('meta[name="app-version"]')?.['getAttribute']('content');
   return String(value59 || '')['trim']();
 }
 function _isRemoteVersionNewer(value60, value61, value62 = ![]) {
@@ -854,9 +854,9 @@ function _isRemoteVersionNewer(value60, value61, value62 = ![]) {
     list10 = run2(value61);
   if (!list9['length'] || !list10['length']) return Boolean(value62);
   const value64 = Math['max'](list9['length'], list10['length']);
-  for (let value65 = 0x0; value65 < value64; value65 += 0x1) {
-    const value66 = list9[value65] || 0x0,
-      value67 = list10[value65] || 0x0;
+  for (let value65 = 0; value65 < value64; value65 += 1) {
+    const value66 = list9[value65] || 0,
+      value67 = list10[value65] || 0;
     if (value67 !== value66) return value67 > value66;
   }
   return ![];
@@ -905,9 +905,9 @@ async function _showDesktopUpdateBanner(value70, value71 = {}) {
     subtitleText2 = value70 === 'downloaded',
     showProgress = value70 === 'downloading',
     enabled20 = value70 === 'retrying',
-    progressPercent = Number(value71['percent'] || 0x0),
+    progressPercent = Number(value71['percent'] || 0),
     progressText = enabled20
-      ? autoUpdateText('progress.retrying', { count: Number(value71['retryCount'] || 0x0) })
+      ? autoUpdateText('progress.retrying', { count: Number(value71['retryCount'] || 0) })
       : autoUpdateText('progress.downloading', { percent: _formatPercent(progressPercent) });
   _showBanner(
     {
@@ -952,8 +952,8 @@ async function _showDesktopDownloadFailedBanner(options5 = {}) {
     localVersion3 = await _getDesktopLocalVersion();
   if (value74 !== _desktopBannerRequestSequence) return;
   const remoteVersion3 = _formatDesktopRemoteVersion(value75),
-    retryCount = Number(options5['retryCount'] || 0x0),
-    subtitleText3 = Number(options5['maxRetries'] || 0x0),
+    retryCount = Number(options5['retryCount'] || 0),
+    subtitleText3 = Number(options5['maxRetries'] || 0),
     message = autoUpdateText('desktop.downloadFailedMessage');
   _showBanner(
     {
@@ -998,14 +998,14 @@ function _desktopEventFromState(state2 = {}) {
     type: type,
     state: state2['state'],
     info: state2['latestInfo'] || null,
-    retryCount: state2['retryCount'] || 0x0,
-    maxRetries: state2['maxRetries'] || 0x0,
+    retryCount: state2['retryCount'] || 0,
+    maxRetries: state2['maxRetries'] || 0,
   };
 }
 function _handleDesktopUpdaterEvent(enabled21) {
   if (!enabled21 || typeof enabled21 !== 'object') return;
   if (enabled21['type'] === 'checking') {
-    ((_desktopBannerRequestSequence += 0x1), _startupBannerQueue['clear'](), (_desktopUpdaterActive = !![]));
+    ((_desktopBannerRequestSequence += 1), _startupBannerQueue['clear'](), (_desktopUpdaterActive = !![]));
     return;
   }
   if (enabled21['type'] === 'available') {
@@ -1015,19 +1015,19 @@ function _handleDesktopUpdaterEvent(enabled21) {
     return;
   }
   if (enabled21['type'] === 'download-started') {
-    ((_desktopBannerRequestSequence += 0x1), (_desktopUpdaterActive = !![]));
+    ((_desktopBannerRequestSequence += 1), (_desktopUpdaterActive = !![]));
     if (_setDesktopDownloadInPlace(enabled21)) return;
     void _showDesktopUpdateBanner('downloading', enabled21);
     return;
   }
   if (enabled21['type'] === 'download-retry') {
-    ((_desktopBannerRequestSequence += 0x1), (_desktopUpdaterActive = !![]));
+    ((_desktopBannerRequestSequence += 1), (_desktopUpdaterActive = !![]));
     if (_setDesktopDownloadInPlace(enabled21, { retrying: !![] })) return;
     void _showDesktopUpdateBanner('retrying', enabled21);
     return;
   }
   if (enabled21['type'] === 'download-progress') {
-    ((_desktopBannerRequestSequence += 0x1), (_desktopUpdaterActive = !![]));
+    ((_desktopBannerRequestSequence += 1), (_desktopUpdaterActive = !![]));
     if (!document['getElementById']('update-banner-progress')) {
       void _showDesktopUpdateBanner('downloading', enabled21);
       return;
@@ -1041,7 +1041,7 @@ function _handleDesktopUpdaterEvent(enabled21) {
   if (enabled21['type'] === 'downloaded') {
     _desktopUpdaterActive = !![];
     if (_desktopInstallAfterDownload) {
-      ((_desktopBannerRequestSequence += 0x1), (_desktopInstallAfterDownload = ![]));
+      ((_desktopBannerRequestSequence += 1), (_desktopInstallAfterDownload = ![]));
       const el63 = document['getElementById']('update-banner-btn'),
         el64 = document['getElementById']('update-banner-sub');
       el64 &&
@@ -1062,14 +1062,14 @@ function _handleDesktopUpdaterEvent(enabled21) {
     return;
   }
   if (enabled21['type'] === 'download-cancelled') {
-    ((_desktopBannerRequestSequence += 0x1),
+    ((_desktopBannerRequestSequence += 1),
       (_desktopUpdaterActive = !![]),
       (_desktopInstallAfterDownload = ![]),
       _removeBanner());
     return;
   }
   if (enabled21['type'] === 'not-available') {
-    ((_desktopBannerRequestSequence += 0x1),
+    ((_desktopBannerRequestSequence += 1),
       _startupBannerQueue['clear'](),
       (_desktopUpdaterActive = ![]),
       _startupAutomaticToastQueue['clear']());
@@ -1078,14 +1078,14 @@ function _handleDesktopUpdaterEvent(enabled21) {
     return;
   }
   if (enabled21['type'] === 'installing') {
-    ((_desktopBannerRequestSequence += 0x1),
+    ((_desktopBannerRequestSequence += 1),
       (_desktopUpdaterActive = !![]),
       window['showToast']?.(autoUpdateText('toasts.installing')));
     return;
   }
   if (enabled21['type'] === 'error') {
     if (enabled21['skipped']) return;
-    ((_desktopBannerRequestSequence += 0x1),
+    ((_desktopBannerRequestSequence += 1),
       _startupBannerQueue['clear'](),
       (_desktopInstallAfterDownload = ![]));
     const autoUpdateText2 = autoUpdateText('toasts.updateFailed');
@@ -1118,8 +1118,8 @@ function _bindDesktopUpdaterEvents() {
 }
 export function initAutoUpdate() {
   (_bindDesktopUpdaterEvents(),
-    setTimeout(_checkUpdate, 0x1388),
-    setTimeout(_checkUpdate, 0x4e20),
+    setTimeout(_checkUpdate, 5000),
+    setTimeout(_checkUpdate, 20000),
     setInterval(_checkUpdate, CHECK_INTERVAL));
 }
 export async function showManualUpdateCheck() {

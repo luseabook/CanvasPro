@@ -2,8 +2,8 @@ import { post } from '../../api/apiBase.js';
 import { deferredMediaPreview, withDeferredMediaFiles } from '../../api/deferredMediaApi.js';
 import { CHROME_SHELL_STARTUP_READY_EVENT } from './chromeShellStartupReadiness.js';
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']),
-  LONG_DESKTOP_REQUEST_TIMEOUT_MS = 0x1e * 0x3c * 0x3e8,
-  CHROME_SHELL_STARTUP_READY_REQUEST_TIMEOUT_MS = 0x5dc,
+  LONG_DESKTOP_REQUEST_TIMEOUT_MS = 30 * 60 * 1000,
+  CHROME_SHELL_STARTUP_READY_REQUEST_TIMEOUT_MS = 1500,
   CHROME_SHELL_STARTUP_READY_PATH = '/api/v2/desktop/diagnostics/log-event',
   LONG_DESKTOP_REQUEST_PATHS = new Set([
     '/api/v2/desktop/project/export-package',
@@ -145,7 +145,7 @@ function subscribeByPolling(
   handler,
   handler2,
   {
-    intervalMs: intervalMs = 0x3e8,
+    intervalMs: intervalMs = 1000,
     extractItems: extractItems = (input) => input,
     getKey: getKey = (output) => JSON['stringify'](output),
   } = {},
@@ -178,13 +178,13 @@ function subscribeByPolling(
       if (!enabled3) setTimeout(async2, intervalMs);
     };
   return (
-    setTimeout(async2, 0x0),
+    setTimeout(async2, 0),
     () => {
       enabled3 = !![];
     }
   );
 }
-function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs = 0x1f4 } = {}) {
+function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs = 500 } = {}) {
   if (!desktopBridge['isChromeShell'] || typeof handler4 !== 'function') return () => {};
   let enabled4 = ![];
   const async3 = async () => {
@@ -192,12 +192,12 @@ function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs =
     try {
       const list2 = await handler3();
       if (enabled4) return;
-      if (Array['isArray'](list2) && list2['length'] > 0x0) handler4(list2);
+      if (Array['isArray'](list2) && list2['length'] > 0) handler4(list2);
     } catch {}
     if (!enabled4) setTimeout(async3, intervalMs);
   };
   return (
-    setTimeout(async3, 0x0),
+    setTimeout(async3, 0),
     () => {
       enabled4 = !![];
     }
@@ -223,8 +223,8 @@ function updaterEventFromStateSnapshot(info = {}) {
     type: type,
     state: state2,
     info: info['latestInfo'] || null,
-    retryCount: Number(info['retryCount'] || 0x0),
-    maxRetries: Number(info['maxRetries'] || 0x0),
+    retryCount: Number(info['retryCount'] || 0),
+    maxRetries: Number(info['maxRetries'] || 0),
   };
 }
 function subscribeToUpdaterState(value8, handler5, handler6 = subscribeByPolling) {
@@ -235,7 +235,7 @@ function subscribeToUpdaterState(value8, handler5, handler6 = subscribeByPolling
       const updaterEventFromStateSnapshot2 = updaterEventFromStateSnapshot(value9);
       if (updaterEventFromStateSnapshot2) handler5(updaterEventFromStateSnapshot2);
     },
-    { intervalMs: 0xbb8, getKey: () => 'updater-state' },
+    { intervalMs: 3000, getKey: () => 'updater-state' },
   );
 }
 function subscribeByLongPolling(handler7, handler8) {
@@ -244,17 +244,17 @@ function subscribeByLongPolling(handler7, handler8) {
   const run3 = (value10) => new Promise((value11) => setTimeout(value11, value10)),
     handler9 = async () => {
       while (!enabled5) {
-        let count = 0x0;
+        let count = 0;
         try {
           const value12 = await handler7();
           if (enabled5) break;
           const list3 = Array['isArray'](value12) ? value12 : [];
           ((count = list3['length']), list3['forEach']((value13) => handler8(value13)));
         } catch {
-          if (!enabled5) await run3(0xfa);
+          if (!enabled5) await run3(250);
           continue;
         }
-        if (!enabled5 && count === 0x0) await run3(0x18);
+        if (!enabled5 && count === 0) await run3(24);
       }
     };
   return (
@@ -297,33 +297,33 @@ export const desktopBridge = {
     },
     getAppVersion: (...args) =>
       getDesktopApi()?.['getAppVersion']?.(...args) ??
-      chromeShellPost('/api/v2/desktop/app/get-version', args[0x0]) ??
+      chromeShellPost('/api/v2/desktop/app/get-version', args[0]) ??
       Promise['resolve'](''),
     getDeviceId: (...args2) =>
       getDesktopApi()?.['getDeviceId']?.(...args2) ??
-      chromeShellPost('/api/v2/desktop/app/get-device-id', args2[0x0]) ??
+      chromeShellPost('/api/v2/desktop/app/get-device-id', args2[0]) ??
       Promise['resolve'](''),
     checkForUpdates: (...args3) =>
       getDesktopApi()?.['checkForUpdates']?.(...args3) ??
-      chromeShellPost('/api/v2/desktop/app/check-for-updates', args3[0x0]) ??
+      chromeShellPost('/api/v2/desktop/app/check-for-updates', args3[0]) ??
       Promise['resolve'](null),
     getUpdateState: (...args4) =>
       getDesktopApi()?.['getUpdateState']?.(...args4) ??
-      chromeShellPost('/api/v2/desktop/app/update-state', args4[0x0]) ??
+      chromeShellPost('/api/v2/desktop/app/update-state', args4[0]) ??
       Promise['resolve'](null),
     downloadUpdate: (...args5) =>
       getDesktopApi()?.['downloadUpdate']?.(...args5) ??
-      chromeShellPost('/api/v2/desktop/app/download-update', args5[0x0]) ??
+      chromeShellPost('/api/v2/desktop/app/download-update', args5[0]) ??
       Promise['resolve'](null),
     cancelUpdateDownload: (...args6) =>
       getDesktopApi()?.['cancelUpdateDownload']?.(...args6) ??
-      chromeShellPost('/api/v2/desktop/app/cancel-update-download', args6[0x0]) ??
+      chromeShellPost('/api/v2/desktop/app/cancel-update-download', args6[0]) ??
       Promise['resolve'](null),
     installDownloadedUpdate: async (...args7) => {
       return (
         await writeChromeShellRecoverySnapshotBeforeInstall(),
         getDesktopApi()?.['installDownloadedUpdate']?.(...args7) ??
-          chromeShellPost('/api/v2/desktop/app/install-downloaded-update', args7[0x0]) ??
+          chromeShellPost('/api/v2/desktop/app/install-downloaded-update', args7[0]) ??
           null
       );
     },
@@ -340,50 +340,50 @@ export const desktopBridge = {
     },
     open: (...args8) =>
       desktopBridge['project']['api']?.['open']?.(...args8) ??
-      chromeShellPost('/api/v2/desktop/project/open', args8[0x0]),
+      chromeShellPost('/api/v2/desktop/project/open', args8[0]),
     save: (...args9) =>
       desktopBridge['project']['api']?.['save']?.(...args9) ??
-      chromeShellPost('/api/v2/desktop/project/save', args9[0x0]),
+      chromeShellPost('/api/v2/desktop/project/save', args9[0]),
     exportPackage: (...args10) =>
       withDeferredMediaFiles(
         args10,
         () =>
           desktopBridge['project']['api']?.['exportPackage']?.(...args10) ??
-          chromeShellPost('/api/v2/desktop/project/export-package', args10[0x0]),
+          chromeShellPost('/api/v2/desktop/project/export-package', args10[0]),
       ),
     importPackage: (...args11) =>
       desktopBridge['project']['api']?.['importPackage']?.(...args11) ??
-      chromeShellPost('/api/v2/desktop/project/import-package', args11[0x0]),
+      chromeShellPost('/api/v2/desktop/project/import-package', args11[0]),
     listRecent: (...args12) =>
       desktopBridge['project']['api']?.['listRecent']?.(...args12) ??
-      chromeShellPost('/api/v2/desktop/project/list-recent', args12[0x0]),
+      chromeShellPost('/api/v2/desktop/project/list-recent', args12[0]),
     removeRecent: (...args13) =>
       desktopBridge['project']['api']?.['removeRecent']?.(...args13) ??
-      chromeShellPost('/api/v2/desktop/project/remove-recent', args13[0x0]),
+      chromeShellPost('/api/v2/desktop/project/remove-recent', args13[0]),
     clearRecoverySnapshot: (...args14) =>
       desktopBridge['project']['api']?.['clearRecoverySnapshot']?.(...args14) ??
-      chromeShellPost('/api/v2/desktop/project/clear-recovery-snapshot', args14[0x0]),
+      chromeShellPost('/api/v2/desktop/project/clear-recovery-snapshot', args14[0]),
     writeRecoverySnapshot: (...args15) =>
       desktopBridge['project']['api']?.['writeRecoverySnapshot']?.(...args15) ??
-      chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', args15[0x0]),
+      chromeShellPost('/api/v2/desktop/project/write-recovery-snapshot', args15[0]),
     getRecoverySnapshotInfo: (...args16) =>
       desktopBridge['project']['api']?.['getRecoverySnapshotInfo']?.(...args16) ??
-      chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', args16[0x0]),
+      chromeShellPost('/api/v2/desktop/project/get-recovery-snapshot-info', args16[0]),
     readRecoverySnapshot: (...args17) =>
       desktopBridge['project']['api']?.['readRecoverySnapshot']?.(...args17) ??
-      chromeShellPost('/api/v2/desktop/project/read-recovery-snapshot', args17[0x0]),
+      chromeShellPost('/api/v2/desktop/project/read-recovery-snapshot', args17[0]),
     setUnsavedState: (...args18) =>
       desktopBridge['project']['api']?.['setUnsavedState']?.(...args18) ??
-      postChromeShellUnsavedState(args18[0x0]),
+      postChromeShellUnsavedState(args18[0]),
     consumeExternalOpenRequests: (...args19) =>
       desktopBridge['project']['api']?.['consumeExternalOpenRequests']?.(...args19) ??
-      chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', args19[0x0]),
+      chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', args19[0]),
     onExternalOpen: (value19) =>
       desktopBridge['project']['api']?.['onExternalOpen']?.(value19) ||
       subscribeToConsumedBatch(
         () => chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', {}),
         value19,
-        { intervalMs: 0x1f4 },
+        { intervalMs: 500 },
       ),
     onPackageProgress: (value20) =>
       desktopBridge['project']['api']?.['onPackageProgress']?.(value20) ||
@@ -391,7 +391,7 @@ export const desktopBridge = {
         () => chromeShellPost('/api/v2/desktop/project/consume-package-progress-events', {}),
         value20,
         {
-          intervalMs: 0xfa,
+          intervalMs: 250,
           extractItems: (value21) => (Array['isArray'](value21) ? value21 : []),
           getKey: (value22) =>
             String(value22?.['createdAt'] || value22?.['operationId'] || JSON['stringify'](value22 || {})),
@@ -431,7 +431,7 @@ export const desktopBridge = {
           globalThis['open'](String(url || ''), '_blank', 'noopener,noreferrer'),
           Promise['resolve']({ ok: !![], fallback: 'browser' })
         );
-      return Promise['resolve']({ ok: ![], error: 'openExternal\x20unavailable' });
+      return Promise['resolve']({ ok: ![], error: 'openExternal unavailable' });
     },
   },
   mediaPreview: {
@@ -471,27 +471,27 @@ export const desktopBridge = {
         args20,
         () =>
           getElectronApi()?.['importAsset']?.(...args20) ??
-          chromeShellPost('/api/v2/desktop/asset/import', args20[0x0]),
+          chromeShellPost('/api/v2/desktop/asset/import', args20[0]),
       ),
     importRemoteAsset: (...args21) =>
       withDeferredMediaFiles(
         args21,
         () =>
           getElectronApi()?.['importRemoteAsset']?.(...args21) ??
-          chromeShellPost('/api/v2/desktop/asset/import-remote', args21[0x0]),
+          chromeShellPost('/api/v2/desktop/asset/import-remote', args21[0]),
       ),
     importLocalFile: (...args22) =>
       withDeferredMediaFiles(
         args22,
         () =>
           getElectronApi()?.['importLocalFile']?.(...args22) ??
-          chromeShellPost('/api/v2/desktop/file/import-local', args22[0x0]),
+          chromeShellPost('/api/v2/desktop/file/import-local', args22[0]),
       ),
     getPathForFile: (...args23) => getElectronApi()?.['getPathForFile']?.(...args23) || '',
     onAssetUpdated: (value25) =>
       getElectronApi()?.['onAssetUpdated']?.(value25) ||
       subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), value25, {
-        intervalMs: 0x1f4,
+        intervalMs: 500,
         extractItems: (value26) => (Array['isArray'](value26) ? value26 : []),
         getKey: (value27) => String(value27?.['assetId'] || JSON['stringify'](value27 || {})),
       }),
@@ -502,7 +502,7 @@ export const desktopBridge = {
     },
     selectDirectory: (...args24) =>
       getElectronApi()?.['selectDirectory']?.(...args24) ??
-      chromeShellPost('/api/v2/desktop/dialog/select-directory', args24[0x0]),
+      chromeShellPost('/api/v2/desktop/dialog/select-directory', args24[0]),
   },
   webPreview: {
     get api() {
@@ -519,21 +519,21 @@ export const desktopBridge = {
     },
     syncViews: (...args25) =>
       desktopBridge['webPreview']['api']?.['syncViews']?.(...args25) ??
-      chromeShellPost('/api/v2/desktop/web-preview/sync-views', args25[0x0]),
+      chromeShellPost('/api/v2/desktop/web-preview/sync-views', args25[0]),
     syncViewsFast: (...args26) =>
       desktopBridge['webPreview']['api']?.['syncViewsFast']?.(...args26) ??
       desktopBridge['webPreview']['api']?.['syncViews']?.(...args26) ??
-      syncChromeShellWebPreviewViews(args26[0x0]),
+      syncChromeShellWebPreviewViews(args26[0]),
     disposeViews: (...args27) =>
       desktopBridge['webPreview']['api']?.['disposeViews']?.(...args27) ??
-      chromeShellPost('/api/v2/desktop/web-preview/dispose-views', args27[0x0]),
+      chromeShellPost('/api/v2/desktop/web-preview/dispose-views', args27[0]),
     controlView: (...args28) =>
       desktopBridge['webPreview']['api']?.['controlView']?.(...args28) ??
-      chromeShellPost('/api/v2/desktop/web-preview/control-view', args28[0x0]),
+      chromeShellPost('/api/v2/desktop/web-preview/control-view', args28[0]),
     onEvent: (value28) =>
       desktopBridge['webPreview']['api']?.['onEvent']?.(value28) ||
       subscribeByLongPolling(
-        () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 0x3e8 }),
+        () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 1000 }),
         value28,
       ),
   },
@@ -546,10 +546,10 @@ export const desktopBridge = {
     },
     read: (...args29) =>
       desktopBridge['customAiApps']['api']?.['read']?.(...args29) ??
-      chromeShellPost('/api/v2/desktop/custom-ai-apps/read', args29[0x0]),
+      chromeShellPost('/api/v2/desktop/custom-ai-apps/read', args29[0]),
     write: (...args30) =>
       desktopBridge['customAiApps']['api']?.['write']?.(...args30) ??
-      chromeShellPost('/api/v2/desktop/custom-ai-apps/write', args30[0x0]),
+      chromeShellPost('/api/v2/desktop/custom-ai-apps/write', args30[0]),
   },
   agentSkills: {
     get api() {
@@ -560,19 +560,19 @@ export const desktopBridge = {
     },
     list: (...args31) =>
       desktopBridge['agentSkills']['api']?.['list']?.(...args31) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/list', args31[0x0]),
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/list', args31[0]),
     openRoot: (...args32) =>
       desktopBridge['agentSkills']['api']?.['openRoot']?.(...args32) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/open-root', args32[0x0]),
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/open-root', args32[0]),
     installFromFolder: (...args33) =>
       desktopBridge['agentSkills']['api']?.['installFromFolder']?.(...args33) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/install-folder', args33[0x0]),
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/install-folder', args33[0]),
     saveManaged: (...args34) =>
       desktopBridge['agentSkills']['api']?.['saveManaged']?.(...args34) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/save-managed', args34[0x0]),
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/save-managed', args34[0]),
     deleteInstalled: (...args35) =>
       desktopBridge['agentSkills']['api']?.['deleteInstalled']?.(...args35) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/delete-installed', args35[0x0]),
+      chromeShellPostOperationResult('/api/v2/desktop/agent-skills/delete-installed', args35[0]),
   },
   agentInformation: {
     get api() {
@@ -583,7 +583,7 @@ export const desktopBridge = {
     },
     readUrl: (...args36) =>
       desktopBridge['agentInformation']['api']?.['readUrl']?.(...args36) ??
-      chromeShellPostOperationResult('/api/v2/desktop/agent-information/read-url', args36[0x0]),
+      chromeShellPostOperationResult('/api/v2/desktop/agent-information/read-url', args36[0]),
   },
   storageMigration: {
     isAvailable() {
@@ -598,13 +598,13 @@ export const desktopBridge = {
     },
     get: (...args37) =>
       desktopBridge['secureSettings']['api']?.['get']?.(...args37) ??
-      chromeShellPost('/api/v2/desktop/secure-settings/get', args37[0x0]),
+      chromeShellPost('/api/v2/desktop/secure-settings/get', args37[0]),
     set: (...args38) =>
       desktopBridge['secureSettings']['api']?.['set']?.(...args38) ??
-      chromeShellPost('/api/v2/desktop/secure-settings/set', args38[0x0]),
+      chromeShellPost('/api/v2/desktop/secure-settings/set', args38[0]),
     delete: (...args39) =>
       desktopBridge['secureSettings']['api']?.['delete']?.(...args39) ??
-      chromeShellPost('/api/v2/desktop/secure-settings/delete', args39[0x0]),
+      chromeShellPost('/api/v2/desktop/secure-settings/delete', args39[0]),
   },
   mediaTask: {
     get api() {
@@ -618,18 +618,18 @@ export const desktopBridge = {
         args40,
         () =>
           desktopBridge['mediaTask']['api']?.['enqueue']?.(...args40) ??
-          chromeShellPost('/api/v2/desktop/media-task/enqueue', args40[0x0]),
+          chromeShellPost('/api/v2/desktop/media-task/enqueue', args40[0]),
       ),
     cancel: (...args41) =>
       desktopBridge['mediaTask']['api']?.['cancel']?.(...args41) ??
-      chromeShellPost('/api/v2/desktop/media-task/cancel', args41[0x0]),
+      chromeShellPost('/api/v2/desktop/media-task/cancel', args41[0]),
     list: (...args42) =>
       desktopBridge['mediaTask']['api']?.['list']?.(...args42) ??
-      chromeShellPost('/api/v2/desktop/media-task/list', args42[0x0]),
+      chromeShellPost('/api/v2/desktop/media-task/list', args42[0]),
     onUpdate: (value30) =>
       desktopBridge['mediaTask']['api']?.['onUpdate']?.(value30) ||
-      subscribeByPolling(() => desktopBridge['mediaTask']['list']({ limit: 0x78 }), value30, {
-        intervalMs: 0x3e8,
+      subscribeByPolling(() => desktopBridge['mediaTask']['list']({ limit: 120 }), value30, {
+        intervalMs: 1000,
         extractItems: (value31) =>
           Array['isArray'](value31?.['tasks']) ? value31['tasks'] : Array['isArray'](value31) ? value31 : [],
         getKey: (value32) => String(value32?.['taskId'] || JSON['stringify'](value32 || {})),
@@ -644,13 +644,13 @@ export const desktopBridge = {
     },
     logEvent: (...args43) =>
       desktopBridge['diagnostics']['api']?.['logEvent']?.(...args43) ??
-      chromeShellPost('/api/v2/desktop/diagnostics/log-event', args43[0x0]),
+      chromeShellPost('/api/v2/desktop/diagnostics/log-event', args43[0]),
     createPackage: (...args44) =>
       desktopBridge['diagnostics']['api']?.['createPackage']?.(...args44) ??
-      chromeShellPost('/api/v2/desktop/diagnostics/create-package', args44[0x0]),
+      chromeShellPost('/api/v2/desktop/diagnostics/create-package', args44[0]),
     openLogsFolder: (...args45) =>
       desktopBridge['diagnostics']['api']?.['openLogsFolder']?.(...args45) ??
-      chromeShellPost('/api/v2/desktop/diagnostics/open-logs-folder', args45[0x0]),
+      chromeShellPost('/api/v2/desktop/diagnostics/open-logs-folder', args45[0]),
   },
   nodeExport: {
     openJianying: () =>
@@ -662,7 +662,7 @@ export const desktopBridge = {
         args46,
         () =>
           desktopBridge['nodeExport']['api']?.['saveTimeline']?.(...args46) ??
-          chromeShellPost('/api/v2/desktop/node-export/save-timeline', args46[0x0]) ??
+          chromeShellPost('/api/v2/desktop/node-export/save-timeline', args46[0]) ??
           unavailable('nodeExport.saveTimeline')(),
       ),
     get api() {
@@ -694,7 +694,7 @@ export const desktopBridge = {
         args47,
         () =>
           desktopBridge['nodeExport']['api']?.['exportSelected']?.(...args47) ??
-          chromeShellPost('/api/v2/desktop/node-export/export-selected', args47[0x0]) ??
+          chromeShellPost('/api/v2/desktop/node-export/export-selected', args47[0]) ??
           unavailable('nodeExport.exportSelected')(),
       ),
     saveMedia: (...args48) =>
@@ -702,19 +702,19 @@ export const desktopBridge = {
         args48,
         () =>
           desktopBridge['nodeExport']['api']?.['saveMedia']?.(...args48) ??
-          chromeShellPost('/api/v2/desktop/node-export/save-media', args48[0x0]) ??
+          chromeShellPost('/api/v2/desktop/node-export/save-media', args48[0]) ??
           unavailable('nodeExport.saveMedia')(),
       ),
     saveText: (...args49) =>
       desktopBridge['nodeExport']['api']?.['saveText']?.(...args49) ??
-      chromeShellPost('/api/v2/desktop/node-export/save-text', args49[0x0]) ??
+      chromeShellPost('/api/v2/desktop/node-export/save-text', args49[0]) ??
       unavailable('nodeExport.saveText')(),
     saveMediaFiles: (...args50) =>
       withDeferredMediaFiles(
         args50,
         () =>
           desktopBridge['nodeExport']['api']?.['saveMediaFiles']?.(...args50) ??
-          chromeShellPost('/api/v2/desktop/node-export/save-media-files', args50[0x0]) ??
+          chromeShellPost('/api/v2/desktop/node-export/save-media-files', args50[0]) ??
           unavailable('nodeExport.saveMediaFiles')(),
       ),
   },
@@ -736,7 +736,7 @@ export const desktopBridge = {
       chromeShellPost('/api/v2/desktop/notification/acknowledge', value34),
     showGenerationComplete: (...args51) =>
       desktopBridge['notification']['api']?.['showGenerationComplete']?.(...args51) ??
-      chromeShellPost('/api/v2/desktop/notification/show-generation-complete', args51[0x0]) ??
+      chromeShellPost('/api/v2/desktop/notification/show-generation-complete', args51[0]) ??
       Promise['resolve']({ success: !![], shown: ![], reason: 'unavailable' }),
     onGenerationCompleteClick: (value35) =>
       desktopBridge['notification']['api']?.['onGenerationCompleteClick']?.(value35) ||
@@ -744,7 +744,7 @@ export const desktopBridge = {
         () => chromeShellPost('/api/v2/desktop/notification/consume-generation-complete-clicks', {}),
         value35,
         {
-          intervalMs: 0x190,
+          intervalMs: 400,
           extractItems: (value36) => (Array['isArray'](value36) ? value36 : []),
           getKey: (value37) =>
             String(value37?.['eventId'] || value37?.['createdAt'] || JSON['stringify'](value37 || {})),
@@ -760,17 +760,17 @@ export const desktopBridge = {
     },
     captureDisplay: (...args52) =>
       desktopBridge['screenshot']['api']?.['captureDisplay']?.(...args52) ??
-      chromeShellPost('/api/v2/desktop/screenshot/capture-display', args52[0x0]),
+      chromeShellPost('/api/v2/desktop/screenshot/capture-display', args52[0]),
     updateGlobalShortcut: (...args53) =>
       desktopBridge['screenshot']['api']?.['updateGlobalShortcut']?.(...args53) ??
-      chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', args53[0x0]),
+      chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', args53[0]),
     onGlobalCapture: (value38) =>
       desktopBridge['screenshot']['api']?.['onGlobalCapture']?.(value38) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/screenshot/consume-global-capture-events', {}),
         value38,
         {
-          intervalMs: 0x96,
+          intervalMs: 150,
           extractItems: (value39) => (Array['isArray'](value39) ? value39 : []),
           getKey: (value40) =>
             String(value40?.['createdAt'] || value40?.['source'] || JSON['stringify'](value40 || {})),
@@ -781,7 +781,7 @@ export const desktopBridge = {
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/screenshot/get-global-shortcut-status', {}),
         value41,
-        { intervalMs: 0x3e8, getKey: () => 'global-shortcut-status' },
+        { intervalMs: 1000, getKey: () => 'global-shortcut-status' },
       ),
   },
   textPreset: {
@@ -793,7 +793,7 @@ export const desktopBridge = {
     },
     updateGlobalShortcut: (...args54) =>
       desktopBridge['textPreset']['api']?.['updateGlobalShortcut']?.(...args54) ??
-      chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', args54[0x0]),
+      chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', args54[0]),
     claimEvent: (value42) =>
       desktopBridge['textPreset']['api']?.['claimEvent']?.(value42) ??
       chromeShellPost('/api/v2/desktop/text-preset/claim-event', value42),
@@ -805,14 +805,14 @@ export const desktopBridge = {
       subscribeToConsumedBatch(
         () => chromeShellPost('/api/v2/desktop/text-preset/consume-events', {}),
         (list4) => list4['forEach']((value44) => handler10(value44)),
-        { intervalMs: 0x96 },
+        { intervalMs: 150 },
       ),
     onGlobalShortcutStatus: (value45) =>
       desktopBridge['textPreset']['api']?.['onGlobalShortcutStatus']?.(value45) ||
       subscribeByPolling(
         () => chromeShellPost('/api/v2/desktop/text-preset/get-global-shortcut-status', {}),
         value45,
-        { intervalMs: 0x3e8, getKey: () => 'global-text-preset-shortcut-status' },
+        { intervalMs: 1000, getKey: () => 'global-text-preset-shortcut-status' },
       ),
   },
   notificationSound: {
@@ -824,16 +824,16 @@ export const desktopBridge = {
     },
     listMp3Files: (...args55) =>
       desktopBridge['notificationSound']['api']?.['listMp3Files']?.(...args55) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/list-mp3-files', args55[0x0]),
+      chromeShellPost('/api/v2/desktop/notification-sound/list-mp3-files', args55[0]),
     listSystemSounds: (...args56) =>
       desktopBridge['notificationSound']['api']?.['listSystemSounds']?.(...args56) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/list-system-sounds', args56[0x0]),
+      chromeShellPost('/api/v2/desktop/notification-sound/list-system-sounds', args56[0]),
     openSystemSoundFolder: (...args57) =>
       desktopBridge['notificationSound']['api']?.['openSystemSoundFolder']?.(...args57) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/open-system-sound-folder', args57[0x0]),
+      chromeShellPost('/api/v2/desktop/notification-sound/open-system-sound-folder', args57[0]),
     play: (...args58) =>
       desktopBridge['notificationSound']['api']?.['play']?.(...args58) ??
-      chromeShellPost('/api/v2/desktop/notification-sound/play', args58[0x0]),
+      chromeShellPost('/api/v2/desktop/notification-sound/play', args58[0]),
   },
   localAssetCleanup: {
     get api() {
@@ -844,10 +844,10 @@ export const desktopBridge = {
     },
     scan: (...args59) =>
       desktopBridge['localAssetCleanup']['api']?.['scan']?.(...args59) ??
-      chromeShellPost('/api/v2/desktop/local-asset-cleanup/scan', args59[0x0]),
+      chromeShellPost('/api/v2/desktop/local-asset-cleanup/scan', args59[0]),
     trash: (...args60) =>
       desktopBridge['localAssetCleanup']['api']?.['trash']?.(...args60) ??
-      chromeShellPost('/api/v2/desktop/local-asset-cleanup/trash', args60[0x0]),
+      chromeShellPost('/api/v2/desktop/local-asset-cleanup/trash', args60[0]),
   },
   clipboard: {
     get api() {
@@ -872,16 +872,16 @@ export const desktopBridge = {
       chromeShellPost('/api/v2/desktop/clipboard/read-image'),
     writeFileReferences: (...args63) =>
       desktopBridge['clipboard']['api']?.['writeFileReferences']?.(...args63) ??
-      chromeShellPost('/api/v2/desktop/clipboard/write-file-references', args63[0x0]),
+      chromeShellPost('/api/v2/desktop/clipboard/write-file-references', args63[0]),
     readFileReferences: (...args64) =>
       desktopBridge['clipboard']['api']?.['readFileReferences']?.(...args64) ??
-      chromeShellPost('/api/v2/desktop/clipboard/read-file-references', args64[0x0]),
+      chromeShellPost('/api/v2/desktop/clipboard/read-file-references', args64[0]),
     writeText: (...args65) =>
       desktopBridge['clipboard']['api']?.['writeText']?.(...args65) ??
-      chromeShellPost('/api/v2/desktop/clipboard/write-text', args65[0x0]),
+      chromeShellPost('/api/v2/desktop/clipboard/write-text', args65[0]),
     readText: (...args66) =>
       desktopBridge['clipboard']['api']?.['readText']?.(...args66) ??
-      chromeShellPost('/api/v2/desktop/clipboard/read-text', args66[0x0]),
+      chromeShellPost('/api/v2/desktop/clipboard/read-text', args66[0]),
   },
   canvasVisualSnapshot: {
     get api() {
@@ -947,14 +947,14 @@ export function installDesktopBridgeCompat() {
           subscribeToConsumedBatch(
             () => chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', {}),
             value66,
-            { intervalMs: 0x1f4 },
+            { intervalMs: 500 },
           ),
         onPackageProgress: (value67) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/project/consume-package-progress-events', {}),
             value67,
             {
-              intervalMs: 0xfa,
+              intervalMs: 250,
               extractItems: (value68) => (Array['isArray'](value68) ? value68 : []),
               getKey: (value69) =>
                 String(
@@ -983,7 +983,7 @@ export function installDesktopBridgeCompat() {
         controlView: (value81) => chromeShellPost('/api/v2/desktop/web-preview/control-view', value81),
         onEvent: (value82) =>
           subscribeByLongPolling(
-            () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 0x3e8 }),
+            () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 1000 }),
             value82,
           ),
       },
@@ -1005,10 +1005,10 @@ export function installDesktopBridgeCompat() {
         list: (value91) => chromeShellPost('/api/v2/desktop/media-task/list', value91),
         onUpdate: (value92) =>
           subscribeByPolling(
-            () => chromeShellPost('/api/v2/desktop/media-task/list', { limit: 0x78 }),
+            () => chromeShellPost('/api/v2/desktop/media-task/list', { limit: 120 }),
             value92,
             {
-              intervalMs: 0x3e8,
+              intervalMs: 1000,
               extractItems: (value93) =>
                 Array['isArray'](value93?.['tasks'])
                   ? value93['tasks']
@@ -1061,7 +1061,7 @@ export function installDesktopBridgeCompat() {
             () => chromeShellPost('/api/v2/desktop/screenshot/consume-global-capture-events', {}),
             value113,
             {
-              intervalMs: 0x96,
+              intervalMs: 150,
               extractItems: (value114) => (Array['isArray'](value114) ? value114 : []),
               getKey: (value115) =>
                 String(value115?.['createdAt'] || value115?.['source'] || JSON['stringify'](value115 || {})),
@@ -1071,7 +1071,7 @@ export function installDesktopBridgeCompat() {
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/screenshot/get-global-shortcut-status', {}),
             value116,
-            { intervalMs: 0x3e8, getKey: () => 'global-shortcut-status' },
+            { intervalMs: 1000, getKey: () => 'global-shortcut-status' },
           ),
       },
       textPreset: {
@@ -1084,13 +1084,13 @@ export function installDesktopBridgeCompat() {
           subscribeToConsumedBatch(
             () => chromeShellPost('/api/v2/desktop/text-preset/consume-events', {}),
             (list5) => list5['forEach']((value120) => handler11(value120)),
-            { intervalMs: 0x96 },
+            { intervalMs: 150 },
           ),
         onGlobalShortcutStatus: (value121) =>
           subscribeByPolling(
             () => chromeShellPost('/api/v2/desktop/text-preset/get-global-shortcut-status', {}),
             value121,
-            { intervalMs: 0x3e8, getKey: () => 'global-text-preset-shortcut-status' },
+            { intervalMs: 1000, getKey: () => 'global-text-preset-shortcut-status' },
           ),
       },
       clipboard: {
@@ -1103,7 +1103,7 @@ export function installDesktopBridgeCompat() {
       },
       onAssetUpdated: (value126) =>
         subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), value126, {
-          intervalMs: 0x1f4,
+          intervalMs: 500,
           extractItems: (value127) => (Array['isArray'](value127) ? value127 : []),
           getKey: (value128) => String(value128?.['assetId'] || JSON['stringify'](value128 || {})),
         }),
@@ -1112,7 +1112,7 @@ export function installDesktopBridgeCompat() {
           type: 'import.drag_profile',
           level: 'debug',
           source: 'renderer',
-          message: 'Drag\x20import\x20profile',
+          message: 'Drag import profile',
           context: { label: label, ...(value129 || {}) },
         }),
     }),

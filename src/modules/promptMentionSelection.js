@@ -2,12 +2,12 @@ import { matchPromptMentions } from './promptMentionMatcher.js';
 export function deletePromptMention(controller, pill, selection, key, onDeleted) {
   const doc = controller['promptEl']['ownerDocument'];
   if (!doc?.['execCommand']) {
-    if (selection['collapsed'] && selection['startContainer']['nodeType'] === 0x3) {
+    if (selection['collapsed'] && selection['startContainer']['nodeType'] === 3) {
       const textNode = selection['startContainer'];
       textNode['textContent'] =
         key === 'Backspace'
           ? textNode['textContent']['slice'](selection['startOffset'])
-          : textNode['textContent']['slice'](0x0, selection['startOffset']);
+          : textNode['textContent']['slice'](0, selection['startOffset']);
     }
     (pill['remove'](), onDeleted(controller));
     return;
@@ -42,7 +42,7 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
   if (!doc?.['execCommand'] || !doc['createTreeWalker'] || mention['pillKind']) return null;
   const windowSelection = doc['defaultView']['getSelection'](),
     triggerRange =
-      options['triggerRange'] || (windowSelection['rangeCount'] ? windowSelection['getRangeAt'](0x0) : null),
+      options['triggerRange'] || (windowSelection['rangeCount'] ? windowSelection['getRangeAt'](0) : null),
     pillToEdit = options['pillToEdit'];
   if (!pillToEdit && (!triggerRange || !promptEl['contains'](triggerRange['startContainer']))) return ![];
   const clone = promptEl['cloneNode'](!![]),
@@ -51,17 +51,17 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
     if (!promptEl['contains'](pillToEdit)) return ![];
     cloneTarget(promptEl, clone, pillToEdit)['replaceWith'](pill);
   } else {
-    if (triggerRange['startContainer']['nodeType'] !== 0x3) return ![];
+    if (triggerRange['startContainer']['nodeType'] !== 3) return ![];
     const textNode = cloneTarget(promptEl, clone, triggerRange['startContainer']),
       caretOffset = triggerRange['startOffset'],
       atIndex =
-        options['atIndex'] >= 0x0
+        options['atIndex'] >= 0
           ? options['atIndex']
           : Math['max'](
-              textNode['textContent']['lastIndexOf']('@', caretOffset - 0x1),
-              textNode['textContent']['lastIndexOf']('＠', caretOffset - 0x1),
+              textNode['textContent']['lastIndexOf']('@', caretOffset - 1),
+              textNode['textContent']['lastIndexOf']('＠', caretOffset - 1),
             );
-    if (atIndex < 0x0) return ![];
+    if (atIndex < 0) return ![];
     const range = doc['createRange']();
     (range['setStart'](textNode, atIndex),
       range['setEnd'](textNode, caretOffset),
@@ -69,13 +69,13 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
       range['insertNode'](pill));
   }
   const mentionWithoutLabel = { ...mention, refLabel: '', assetName: '' },
-    walker = doc['createTreeWalker'](clone, 0x4),
+    walker = doc['createTreeWalker'](clone, 4),
     targets = [];
   let textNode;
   while ((textNode = walker['nextNode']())) {
     if (textNode['parentElement']?.['closest']('.ref-pill, [contenteditable="false"]')) continue;
     const matches = matchPromptMentions(textNode['textContent'], [mentionWithoutLabel])['filter'](
-      (match) => match['candidates']['length'] === 0x1,
+      (match) => match['candidates']['length'] === 1,
     );
     if (matches['length']) targets['push']({ node: textNode, matches: matches });
   }
@@ -92,7 +92,7 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
   const pillIndex = [...clone['querySelectorAll']('.ref-pill')]['indexOf'](pill),
     scrollTop = promptEl['scrollTop'],
     scrollLeft = promptEl['scrollLeft'],
-    savedRange = windowSelection['rangeCount'] ? windowSelection['getRangeAt'](0x0)['cloneRange']() : null;
+    savedRange = windowSelection['rangeCount'] ? windowSelection['getRangeAt'](0)['cloneRange']() : null;
   promptEl['focus']({ preventScroll: !![] });
   const range = doc['createRange']();
   (range['selectNodeContents'](promptEl),

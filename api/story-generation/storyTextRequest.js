@@ -26,7 +26,7 @@ function buildRetryPrompt(
       ? { validationDetails: validationDetails['validationDetails'] }
       : {}),
     rejectedResponse: normalizeText(rejectedResponse),
-    instruction: normalizeText(instruction) || '重新执行原任务，只返回符合要求的严格\x20JSON\x20对象。',
+    instruction: normalizeText(instruction) || '重新执行原任务，只返回符合要求的严格 JSON 对象。',
     outputContract: outputContract,
   });
 }
@@ -35,7 +35,7 @@ export async function requestStrictResult({
   requestPayload: requestPayload,
   parse: parse,
   outputContract: outputContract2,
-  maxAttempts: maxAttempts = 0x2,
+  maxAttempts: maxAttempts = 2,
   repairInstruction: repairInstruction = '',
   retryTemperature: retryTemperature,
   resumeResponse: resumeResponse = null,
@@ -43,14 +43,14 @@ export async function requestStrictResult({
   onResponse: onResponse = null,
   onRequestError: onRequestError = null,
 }) {
-  const data = Math['max'](0x1, Math['floor'](Number(maxAttempts) || 0x1)),
-    count = Math['max'](0x0, Math['min'](data, Math['trunc'](Number(resumeResponse?.['attempt']) || 0x0)));
+  const data = Math['max'](1, Math['floor'](Number(maxAttempts) || 1)),
+    count = Math['max'](0, Math['min'](data, Math['trunc'](Number(resumeResponse?.['attempt']) || 0)));
   let attempt = count,
-    response2 = count > 0x0 ? resumeResponse?.['response'] : undefined,
+    response2 = count > 0 ? resumeResponse?.['response'] : undefined,
     requestPayload2 = requestPayload;
   while (attempt < data || response2 !== undefined) {
     if (response2 === undefined) {
-      ((attempt += 0x1), await onRequest?.({ attempt: attempt, requestPayload: requestPayload2 }));
+      ((attempt += 1), await onRequest?.({ attempt: attempt, requestPayload: requestPayload2 }));
       try {
         response2 = await request(requestPayload2);
       } catch (error) {
@@ -75,5 +75,5 @@ export async function requestStrictResult({
         (response2 = undefined));
     }
   }
-  throw new Error('Agent\x20返回结果校验失败。');
+  throw new Error('Agent 返回结果校验失败。');
 }

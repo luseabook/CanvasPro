@@ -9,7 +9,7 @@ import { openSettingsPanelToField } from '../settings/panelSettings.js';
 export function hasConfiguredApi(options = {}) {
   return Object['values'](options?.['providers'] || {})['some']((value) =>
     [value?.['apiKey'], value?.['modelApiKey']]['some'](
-      (item) => typeof item === 'string' && item['trim']()['length'] > 0x0,
+      (item) => typeof item === 'string' && item['trim']()['length'] > 0,
     ),
   );
 }
@@ -18,15 +18,15 @@ export function createCanvasOnboardingState() {
     configured = ![],
     enabled = ![];
   return {
-    update(key, count = 0x0) {
+    update(key, count = 0) {
       configured = hasConfiguredApi(key);
       if (visible === null) visible = !configured;
       !configured && ((visible = !![]), (enabled = ![]));
-      if (visible && configured && count > 0x0) enabled = !![];
+      if (visible && configured && count > 0) enabled = !![];
       return { visible: visible && !enabled, configured: configured };
     },
     onNodesChanged(count2) {
-      if (visible && configured && count2 > 0x0) enabled = !![];
+      if (visible && configured && count2 > 0) enabled = !![];
       return { visible: visible === !![] && !enabled, configured: configured };
     },
   };
@@ -60,7 +60,7 @@ export function initEmptyCanvasOnboarding({ store: store }) {
       (el5['textContent'] = t('emptyHint.onboarding.create')),
       el5['setAttribute']('aria-current', enabled3['configured'] ? 'step' : 'false'));
   }
-  const run2 = () => store['getStateRaw']()['_nodeCount'] || 0x0,
+  const run2 = () => store['getStateRaw']()['_nodeCount'] || 0,
     handler = () => {
       if (!enabled2 && isApiConfigLoaded())
         run(canvasOnboardingState['update'](getApiConfigSnapshot(), run2()));
@@ -75,7 +75,7 @@ export function initEmptyCanvasOnboarding({ store: store }) {
     el2['addEventListener']('dblclick', (event2) => event2['stopPropagation']()),
     window['addEventListener'](API_CONFIG_CHANGED_EVENT, result));
   const target = store['subscribeSelector'](
-      (source) => source['_nodeCount'] || 0x0,
+      (source) => source['_nodeCount'] || 0,
       (next) => run(canvasOnboardingState['onNodesChanged'](next)),
     ),
     handler2 = onLocaleChange(() => run());

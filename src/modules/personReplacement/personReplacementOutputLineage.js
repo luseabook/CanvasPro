@@ -40,7 +40,7 @@ function completeComposition(args3, key) {
     visualMasterRef = normalizeText(key['visualMasterRef']);
   if (!originalAudioRef || !visualMasterRef)
     throw new TypeError(
-      'Replacement\x20Studio\x20composition\x20requires\x20original\x20and\x20visual\x20masters',
+      'Replacement Studio composition requires original and visual masters',
     );
   const composedShotIds = Array['isArray'](key['composedShotIds'])
     ? key['composedShotIds']['map'](normalizeText)['filter'](Boolean)
@@ -104,5 +104,5 @@ export function transitionPersonReplacementOutput(options = {}, data = {}) {
     return completeComposition(options, data);
   if (text === PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['FINAL_MUX_SUCCEEDED'])
     return completeFinalMux(options, data);
-  throw new TypeError('Unknown\x20Replacement\x20Studio\x20output\x20transition:\x20' + text);
+  throw new TypeError('Unknown Replacement Studio output transition: ' + text);
 }

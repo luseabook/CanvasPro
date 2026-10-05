@@ -19,7 +19,7 @@ export function createGenerationErrorCard({
 } = {}) {
   const text = normalizeText(title) || '生成失败',
     el = documentObject['createElement']('div');
-  el['className'] = ['gen-error-card', normalizeText(className)]['filter'](Boolean)['join']('\x20');
+  el['className'] = ['gen-error-card', normalizeText(className)]['filter'](Boolean)['join'](' ');
   const el2 = documentObject['createElement']('div');
   ((el2['className'] = 'gen-error-card-icon'), (el2['innerHTML'] = GENERATION_ERROR_ICON_MARKUP));
   const el3 = documentObject['createElement']('span');
@@ -42,18 +42,18 @@ export function renderGenerationErrorCardMarkup({
 } = {}) {
   const text2 = normalizeText(title) || '生成失败',
     key = String(errorMessage || text2),
-    index = ['gen-error-card', normalizeText(className)]['filter'](Boolean)['join']('\x20'),
-    text3 = normalizeText(role) ? ' role="' + escapeHtml(role) + '\x22' : '';
+    index = ['gen-error-card', normalizeText(className)]['filter'](Boolean)['join'](' '),
+    text3 = normalizeText(role) ? ' role="' + escapeHtml(role) + '"' : '';
   return (
     '<section class="' +
     escapeHtml(index) +
-    '\x22' +
+    '"' +
     text3 +
     '>\n    <span class="gen-error-card-icon" aria-hidden="true">' +
     GENERATION_ERROR_ICON_MARKUP +
-    '</span>\x0a\x20\x20\x20\x20<span\x20class=\x22gen-error-card-title\x22>' +
+    '</span>\n    <span class="gen-error-card-title">' +
     escapeHtml(text2) +
-    '</span>\x0a\x20\x20\x20\x20<span\x20class=\x22gen-error-card-detail\x22>' +
+    '</span>\n    <span class="gen-error-card-detail">' +
     escapeHtml(key) +
     '</span>\n  </section>'
   );

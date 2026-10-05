@@ -18,23 +18,23 @@ export function resolveStoryboard3DNavigationMode(
     value = event['shiftKey'] === !![],
     item = event['ctrlKey'] === !![] || event['metaKey'] === !![],
     key = STORYBOARD_3D_NAVIGATION_PRESETS[preset] ? preset : DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET;
-  if (flyMode && count === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['FLY_LOOK'];
+  if (flyMode && count === 2) return STORYBOARD_3D_NAVIGATION_MODE['FLY_LOOK'];
   if (key === 'blender') {
-    if (count !== 0x1) return null;
+    if (count !== 1) return null;
     if (item) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
     if (value) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
     return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
   }
   if (key === 'unity') {
-    if (count === 0x1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
-    if (enabled && count === 0x0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
-    if (enabled && count === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
+    if (count === 1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
+    if (enabled && count === 0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
+    if (enabled && count === 2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
     return null;
   }
   if (!enabled) return null;
-  if (count === 0x0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
-  if (count === 0x1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
-  if (count === 0x2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
+  if (count === 0) return STORYBOARD_3D_NAVIGATION_MODE['ORBIT'];
+  if (count === 1) return STORYBOARD_3D_NAVIGATION_MODE['PAN'];
+  if (count === 2) return STORYBOARD_3D_NAVIGATION_MODE['DOLLY'];
   return null;
 }
 export function getStoryboard3DNavigationHelpText({
@@ -42,7 +42,7 @@ export function getStoryboard3DNavigationHelpText({
   preset: preset = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET,
 } = {}) {
   return flyMode
-    ? '飞行模式\x20·\x20WASD\x20/\x20Q\x20E\x20/\x20右键观察\x20/\x20Shift\x20加速'
+    ? '飞行模式 · WASD / Q E / 右键观察 / Shift 加速'
     : STORYBOARD_3D_NAVIGATION_PRESETS[preset]?.['summary'] ||
         STORYBOARD_3D_NAVIGATION_PRESETS[DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET]['summary'];
 }

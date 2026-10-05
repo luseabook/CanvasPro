@@ -16,7 +16,7 @@ function createJobId(handler) {
     typeof handler === 'function' ? handler('model-import') : globalThis['crypto']?.['randomUUID']?.();
   return (
     text(item) ||
-    'model-import-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x9)
+    'model-import-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 9)
   );
 }
 function cancellationError(cause, stage2) {
@@ -62,12 +62,12 @@ export function yieldStoryboard3DModelImportStart({
   setTimeoutFn: setTimeoutFn = globalThis['setTimeout'],
 } = {}) {
   return new Promise((result) => {
-    const data = () => setTimeoutFn(result, 0x0);
+    const data = () => setTimeoutFn(result, 0);
     if (typeof windowObject?.['requestAnimationFrame'] === 'function') {
       windowObject['requestAnimationFrame'](data);
       return;
     }
-    setTimeoutFn(result, 0x0);
+    setTimeoutFn(result, 0);
   });
 }
 function cachedFileLike(error, size) {
@@ -76,7 +76,7 @@ function cachedFileLike(error, size) {
     fileName: text(error?.['fileName'] || error?.['name']),
     type: text(error?.['type']),
     size: size['byteLength'],
-    lastModified: Math['max'](0x0, Number(error?.['lastModified']) || 0x0),
+    lastModified: Math['max'](0, Number(error?.['lastModified']) || 0),
     webkitRelativePath: text(error?.['webkitRelativePath']),
     async arrayBuffer() {
       return size;
@@ -125,9 +125,9 @@ export class Storyboard3DModelImportJob {
   } = {}) {
     if (!file || typeof file['arrayBuffer'] !== 'function')
       throw new TypeError('A readable model file is required');
-    if (typeof importModel !== 'function') throw new TypeError('importModel\x20must\x20be\x20a\x20function');
+    if (typeof importModel !== 'function') throw new TypeError('importModel must be a function');
     if (typeof yieldControl !== 'function')
-      throw new TypeError('yieldControl\x20must\x20be\x20a\x20function');
+      throw new TypeError('yieldControl must be a function');
     ((this['jobId'] = createJobId(idFactory)),
       (this['file'] = file),
       (this['relatedFiles'] = Array['isArray'](relatedFiles) ? [...relatedFiles] : []),
@@ -141,7 +141,7 @@ export class Storyboard3DModelImportJob {
       (this['onStateChange'] = onStateChange),
       (this['onError'] = onError),
       (this['status'] = 'queued'),
-      (this['progress'] = 0x0),
+      (this['progress'] = 0),
       (this['result'] = null),
       (this['error'] = null),
       (this['cancelReason'] = null),
@@ -167,7 +167,7 @@ export class Storyboard3DModelImportJob {
     ((this['status'] = reason),
       (this['progress'] = Math['max'](
         this['progress'],
-        Math['min'](0x1, Math['max'](0x0, Number(handle) || 0x0)),
+        Math['min'](1, Math['max'](0, Number(handle) || 0)),
       )));
     if (args['result'] !== undefined) this['result'] = args['result'];
     if (args['error'] !== undefined) this['error'] = args['error'];
@@ -186,7 +186,7 @@ export class Storyboard3DModelImportJob {
   ['_throwIfCancelled'](config) {
     if (!this['_isCancelled']()) return;
     throw cancellationError(
-      this['cancelReason'] || this['externalSignal']?.['reason'] || 'Model\x20import\x20was\x20cancelled',
+      this['cancelReason'] || this['externalSignal']?.['reason'] || 'Model import was cancelled',
       config,
     );
   }
@@ -212,7 +212,7 @@ export class Storyboard3DModelImportJob {
   }
   async ['_run']() {
     let stage3 = 'queued';
-    if (this['status'] !== 'cancelled') this['_transition']('queued', 0x0);
+    if (this['status'] !== 'cancelled') this['_transition']('queued', 0);
     try {
       (this['_throwIfCancelled'](stage3),
         await this['yieldControl']({ job: this, stage: stage3 }),
@@ -236,7 +236,7 @@ export class Storyboard3DModelImportJob {
         signal: this['abortController']?.['signal'] || this['externalSignal'],
         onProgress: (input, parserDetail = {}) => {
           if (this['_isCancelled']()) return;
-          const parserProgress = Math['max'](0x0, Math['min'](0x1, Number(input) || 0x0));
+          const parserProgress = Math['max'](0, Math['min'](1, Number(input) || 0));
           this['_transition']('parsing', 0.55 + parserProgress * 0.4, {
             parserProgress: parserProgress,
             parserDetail: parserDetail,
@@ -245,7 +245,7 @@ export class Storyboard3DModelImportJob {
       });
       return (
         this['_isCancelled']() && (this['disposeResult']?.(result2), this['_throwIfCancelled'](stage3)),
-        this['_transition']('completed', 0x1, { result: result2 }),
+        this['_transition']('completed', 1, { result: result2 }),
         result2
       );
     } catch (output) {

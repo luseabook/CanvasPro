@@ -27,13 +27,13 @@ export function createCanvasProjectSaveController({
 } = {}) {
   const manager = windowObject,
     workspacePersistencePresentation = createWorkspacePersistencePresentation({ getRoot: getRoot });
-  let enabled = 0x0;
+  let enabled = 0;
   const run = () => {
     return (
-      (enabled += 0x1),
+      (enabled += 1),
       workspacePersistencePresentation['update']({ status: 'saving' }),
       () => {
-        enabled -= 0x1;
+        enabled -= 1;
         if (!enabled) workspacePersistencePresentation['update']({ status: 'saved' });
       }
     );
@@ -107,7 +107,7 @@ export function createCanvasProjectSaveController({
             filename: filename2['filename'],
             recentId: '',
             displayPath: '',
-            lastModified: 0x0,
+            lastModified: 0,
           }),
           { rename: rename2['renameActiveCanvas'] === !![] },
         );

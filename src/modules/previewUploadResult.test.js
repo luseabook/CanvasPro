@@ -71,8 +71,8 @@ function installStoreState(value) {
         uploadRes: {
           url: '/data/uploads/preview.png',
           localPath: 'data/uploads/preview.png',
-          originalWidth: 0x3c0,
-          originalHeight: 0x21c,
+          originalWidth: 960,
+          originalHeight: 540,
         },
         fileName: 'preview.png',
       }),

@@ -30,7 +30,7 @@ function getCharacterAppearance(result, data = '') {
   return (
     list['find']((options) => options['id'] === data) ||
     getWorkspaceAssetBaseAppearance(result) ||
-    list[0x0] ||
+    list[0] ||
     null
   );
 }
@@ -47,10 +47,10 @@ function resolveVideoShotReferencePreview(target, source) {
       ? personReplacementVideoImageInput['referenceOptions']
       : [],
     next = Math['max'](
-      0x0,
+      0,
       Math['min'](
-        Math['max'](0x0, list2['length'] - 0x1),
-        Math['trunc'](Number(personReplacementVideoImageInput?.['activeReferenceIndex']) || 0x0),
+        Math['max'](0, list2['length'] - 1),
+        Math['trunc'](Number(personReplacementVideoImageInput?.['activeReferenceIndex']) || 0),
       ),
     ),
     isCharacterReference = list2[next] || null;
@@ -70,9 +70,9 @@ export function createPersonReplacementAssetHoverPreviewController({
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis,
 } = {}) {
-  let current = 0x0,
-    entry = 0x0,
-    record = 0x0,
+  let current = 0,
+    entry = 0,
+    record = 0,
     el = null,
     payload = '',
     enabled = null,
@@ -124,34 +124,34 @@ export function createPersonReplacementAssetHoverPreviewController({
         el5?.['setAttribute']?.('aria-hidden', 'true'));
     },
     handler5 = () => {
-      current = 0x0;
+      current = 0;
       const el6 = run();
       if (!el6?.['classList']?.['contains']?.('is-visible')) return;
       const box = el6['getBoundingClientRect']?.();
       if (!box) return;
       const input =
-          windowObject?.['innerWidth'] || documentObject?.['documentElement']?.['clientWidth'] || 0x400,
+          windowObject?.['innerWidth'] || documentObject?.['documentElement']?.['clientWidth'] || 1024,
         output =
-          windowObject?.['innerHeight'] || documentObject?.['documentElement']?.['clientHeight'] || 0x300,
-        value2 = 0xe,
-        value3 = 0xa,
+          windowObject?.['innerHeight'] || documentObject?.['documentElement']?.['clientHeight'] || 768,
+        value2 = 14,
+        value3 = 10,
         value4 = Math['max'](value3, input - box['width'] - value3),
         value5 = Math['max'](value3, output - box['height'] - value3),
         box2 = el?.['getBoundingClientRect']?.(),
         value6 =
-          Number(box2?.['width']) > 0x0 &&
+          Number(box2?.['width']) > 0 &&
           Number['isFinite'](Number(box2?.['left'])) &&
           Number['isFinite'](Number(box2?.['top'])),
         value7 = value6
-          ? Number(box2['left']) + (Number(box2['width']) - box['width']) / 0x2
+          ? Number(box2['left']) + (Number(box2['width']) - box['width']) / 2
           : entry + value2,
         value8 = value6 ? Number(box2['top']) - box['height'] - value2 : record + value2;
       ((el6['style']['left'] = Math['round'](Math['min'](Math['max'](value3, value7), value4)) + 'px'),
         (el6['style']['top'] = Math['round'](Math['min'](Math['max'](value3, value8), value5)) + 'px'));
     },
     handler6 = (event, { anchor: anchor = null } = {}) => {
-      ((entry = Number(event?.['clientX'] || 0x0)),
-        (record = Number(event?.['clientY'] || 0x0)),
+      ((entry = Number(event?.['clientX'] || 0)),
+        (record = Number(event?.['clientY'] || 0)),
         (el = anchor));
       if (current) return;
       typeof windowObject?.['requestAnimationFrame'] === 'function'
@@ -175,7 +175,7 @@ export function createPersonReplacementAssetHoverPreviewController({
             ),
             handler5());
         };
-        if (el8['complete'] && Number(el8['naturalWidth']) > 0x0) run2();
+        if (el8['complete'] && Number(el8['naturalWidth']) > 0) run2();
         else el8['addEventListener']?.('load', run2, { once: !![] });
       });
     },
@@ -205,27 +205,27 @@ export function createPersonReplacementAssetHoverPreviewController({
       if (handler4(el9)) return (hide(), ![]);
       const text2 = normalizeText(el9['dataset']?.['storyAssetHoverAppearanceId']),
         value10 =
-          project['workspace']['step'] === 0x2 &&
+          project['workspace']['step'] === 2 &&
           Boolean(el9['closest']?.('.person-replacement-target-assets')),
         enabled3 =
-          project['workspace']['step'] === 0x2 &&
+          project['workspace']['step'] === 2 &&
           Boolean(value10 || el9['closest']?.('[data-person-replacement-person-drop]')),
         value11 = el9['dataset']?.['personReplacementReplacementAssetKind'] === 'scene',
         mediaOnly =
-          project['workspace']['step'] === 0x3 &&
+          project['workspace']['step'] === 3 &&
           el9['dataset']?.['personReplacementVideoShotHoverPreview'] === 'true',
         enabled4 =
-          project['workspace']['step'] === 0x3 &&
+          project['workspace']['step'] === 3 &&
           el9['dataset']?.['personReplacementVideoReferenceHoverPreview'] === 'true',
         enabled5 =
-          project['workspace']['step'] === 0x5 &&
+          project['workspace']['step'] === 5 &&
           el9['dataset']?.['personReplacementCompositeShotHoverPreview'] === 'true',
         selectedAssetId = Boolean(name),
         sourceShotIndex =
           mediaOnly || enabled4 || enabled5
             ? project['shots']['findIndex']((value12) => normalizeText(value12?.['id']) === id)
-            : -0x1,
-        value13 = sourceShotIndex >= 0x0 ? project['shots'][sourceShotIndex] : null,
+            : -1,
+        value13 = sourceShotIndex >= 0 ? project['shots'][sourceShotIndex] : null,
         personReplacementImageResults = getPersonReplacementImageResults(value13),
         personReplacementActiveImageResultIndex = getPersonReplacementActiveImageResultIndex(
           value13,
@@ -240,7 +240,7 @@ export function createPersonReplacementAssetHoverPreviewController({
           ? {
               id: id,
               kind: 'scene',
-              name: '片段' + String(sourceShotIndex + 0x1)['padStart'](0x2, '0'),
+              name: '片段' + String(sourceShotIndex + 1)['padStart'](2, '0'),
               appearances: [
                 {
                   id: 'source-frame',
@@ -265,15 +265,15 @@ export function createPersonReplacementAssetHoverPreviewController({
         value17 = value15 ? resolvePersonReplacementVideoImageInput(project, value15) : null,
         list3 = Array['isArray'](value17?.['referenceOptions']) ? value17['referenceOptions'] : [],
         value18 = Math['max'](
-          0x0,
+          0,
           Math['min'](
-            Math['max'](0x0, list3['length'] - 0x1),
-            Math['trunc'](Number(el9['dataset']?.['personReplacementVideoReferenceIndex']) || 0x0),
+            Math['max'](0, list3['length'] - 1),
+            Math['trunc'](Number(el9['dataset']?.['personReplacementVideoReferenceIndex']) || 0),
           ),
         ),
         resultIndex = Math['max'](
-          0x0,
-          Math['trunc'](Number(el9['dataset']?.['personReplacementVideoReferenceResultIndex']) || 0x0),
+          0,
+          Math['trunc'](Number(el9['dataset']?.['personReplacementVideoReferenceResultIndex']) || 0),
         ),
         text3 = normalizeText(el9['dataset']?.['personReplacementVideoReferenceSourceShotId'])
           ? personReplacementImageResults[resultIndex]
@@ -288,10 +288,10 @@ export function createPersonReplacementAssetHoverPreviewController({
               kind: 'scene',
               name: Number['isInteger'](value19['sourceShotIndex'])
                 ? '片段' +
-                  (value19['sourceShotIndex'] + 0x1) +
+                  (value19['sourceShotIndex'] + 1) +
                   '.图片' +
-                  ((value19['resultIndex'] || 0x0) + 0x1)
-                : '替换参考图 ' + (value18 + 0x1),
+                  ((value19['resultIndex'] || 0) + 1)
+                : '替换参考图 ' + (value18 + 1),
               appearances: [
                 {
                   id: 'video-reference-' + value18,
@@ -308,7 +308,7 @@ export function createPersonReplacementAssetHoverPreviewController({
                 kind: 'scene',
                 name:
                   normalizeText(value13['title']) ||
-                  '片段' + String(sourceShotIndex + 0x1)['padStart'](0x2, '0'),
+                  '片段' + String(sourceShotIndex + 1)['padStart'](2, '0'),
                 appearances: [
                   {
                     id: 'composite-thumbnail',
@@ -332,7 +332,7 @@ export function createPersonReplacementAssetHoverPreviewController({
           !enabled4 &&
           !enabled5 &&
           (value11 ||
-            (project['workspace']['step'] === 0x1 && project['workspace']['characterAssetTab'] === 'scene')),
+            (project['workspace']['step'] === 1 && project['workspace']['characterAssetTab'] === 'scene')),
         value23 =
           !enabled6 &&
           !enabled2 &&
@@ -396,15 +396,15 @@ export function createPersonReplacementAssetHoverPreviewController({
       if (value24 && !enabled7) return (hide(), ![]);
       const el11 = run(),
         selectedAppearanceId = selectedAssetId
-          ? value22?.['appearances']?.[0x0]
+          ? value22?.['appearances']?.[0]
           : enabled5
-            ? value21?.['appearances']?.[0x0]
+            ? value21?.['appearances']?.[0]
             : enabled4
-              ? value20?.['appearances']?.[0x0]
+              ? value20?.['appearances']?.[0]
               : mediaOnly
-                ? value14?.['appearances']?.[0x1]
+                ? value14?.['appearances']?.[1]
                 : value24
-                  ? enabled7?.['appearances']?.[0x0]
+                  ? enabled7?.['appearances']?.[0]
                   : args?.['isLibraryAsset']
                     ? args
                     : text2
@@ -435,7 +435,7 @@ export function createPersonReplacementAssetHoverPreviewController({
             enabled5 ||
             selectedAssetId ||
             value24 ||
-            [0x1, 0x2]['includes'](project['workspace']['step']),
+            [1, 2]['includes'](project['workspace']['step']),
           getAppearances: getWorkspaceAssetAppearances,
           hasVoiceReference: (value30) => Boolean(getCharacterVoiceUrl(value30)),
         });
@@ -515,7 +515,7 @@ export function createPersonReplacementAssetHoverPreviewController({
         current &&
           typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
           windowObject['cancelAnimationFrame'](current),
-        (current = 0x0),
+        (current = 0),
         (enabled = null),
         hide());
     },

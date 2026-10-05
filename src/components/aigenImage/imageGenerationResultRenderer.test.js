@@ -15,8 +15,8 @@ import {
         sourceUrl: 'https://img.example.com/final.png',
         thumbUrl: '/output/final-thumb.png',
         localPath: 'output/final.png',
-        originalWidth: 0x500,
-        originalHeight: 0x2d0,
+        originalWidth: 1280,
+        originalHeight: 720,
       },
       { startedAt: startedAt },
     );
@@ -27,8 +27,8 @@ import {
     assert.equal(imageGenerationResultPatch.sourceUrl, 'https://img.example.com/final.png'),
     assert.equal(imageGenerationResultPatch.thumbUrl, '/output/final-thumb.png'),
     assert.equal(imageGenerationResultPatch.localPath, 'output/final.png'),
-    assert.equal(imageGenerationResultPatch.originalWidth, 0x500),
-    assert.equal(imageGenerationResultPatch.originalHeight, 0x2d0),
+    assert.equal(imageGenerationResultPatch.originalWidth, 1280),
+    assert.equal(imageGenerationResultPatch.originalHeight, 720),
     assert.equal(imageGenerationResultPatch.mainImageIndex, 0),
     assert.equal(imageGenerationResultPatch.isImagesExpanded, false));
 }),
@@ -107,11 +107,11 @@ import {
   test('image generation result renderer: explicit failure helper builds image failure patch', () => {
     const imageGenerationFailurePatch = buildImageGenerationFailurePatch({
       error: 'provider rejected',
-      duration: 0x4b0,
+      duration: 1200,
     });
     (assert.equal(imageGenerationFailurePatch.jobStatus, 'error'),
       assert.equal(imageGenerationFailurePatch.jobError, 'provider rejected'),
-      assert.equal(imageGenerationFailurePatch.generationDuration, 0x4b0),
+      assert.equal(imageGenerationFailurePatch.generationDuration, 1200),
       assert.equal(imageGenerationFailurePatch.images.length, 1),
       assert.equal(imageGenerationFailurePatch.images[0].error, 'provider rejected'),
       assert.equal(imageGenerationFailurePatch.mainImageIndex, 0),
@@ -121,7 +121,7 @@ import {
   test('image generation result renderer: failure helper can preserve media fields', () => {
     const imageGenerationFailurePatch2 = buildImageGenerationFailurePatch({
       error: 'resume failed',
-      duration: 0x4b0,
+      duration: 1200,
       clearMediaFields: false,
     });
     (assert.equal(imageGenerationFailurePatch2.jobStatus, 'error'),

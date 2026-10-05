@@ -8,20 +8,20 @@ export function shouldSkipPromptTriggerForBulkInput(value) {
     item === 'insertHTML'
   )
     return !![];
-  return typeof value?.['data'] === 'string' && value['data']['length'] > 0x1;
+  return typeof value?.['data'] === 'string' && value['data']['length'] > 1;
 }
 function _getCompositionTriggerState(el) {
   let key = _compositionTriggerStateByElement['get'](el);
   if (key) return key;
   return (
-    (key = { pending: new Map(), timer: 0x0 }),
+    (key = { pending: new Map(), timer: 0 }),
     el['addEventListener']('compositionend', () => {
       if (key['timer']) clearTimeout(key['timer']);
       key['timer'] = setTimeout(() => {
-        key['timer'] = 0x0;
+        key['timer'] = 0;
         const list = Array['from'](key['pending']['values']());
         (key['pending']['clear'](), list['forEach']((handler) => handler()));
-      }, 0x0);
+      }, 0);
     }),
     _compositionTriggerStateByElement['set'](el, key),
     key
@@ -39,7 +39,7 @@ export function deferPromptTriggerUntilCompositionEnd({
   if (!promptEl?.['addEventListener'] || typeof onCompositionEnd !== 'function') return !![];
   const result = index || _getCompositionTriggerState(promptEl);
   return (
-    result['timer'] && (clearTimeout(result['timer']), (result['timer'] = 0x0)),
+    result['timer'] && (clearTimeout(result['timer']), (result['timer'] = 0)),
     result['pending']['set'](triggerKey, onCompositionEnd),
     !![]
   );

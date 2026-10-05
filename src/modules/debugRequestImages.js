@@ -2,7 +2,7 @@ import { resolveDebugImageSource } from '../utils/debugImagePreview.js';
 export function renderDebugRequestImages(value, list, item = [], el) {
   const el2 = value['ownerDocument'];
   ((el['hidden'] = !![]), el['replaceChildren'](), value['replaceChildren']());
-  let key = 0x0;
+  let key = 0;
   (item['forEach']((index) => {
     const debugImageSource = resolveDebugImageSource(index['src']);
     if (
@@ -17,7 +17,7 @@ export function renderDebugRequestImages(value, list, item = [], el) {
     result['className'] = 'request-debug-image-row';
     const el3 = el2['createElement']('span');
     ((el3['className'] = 'request-debug-thumbnail'),
-      (el3['tabIndex'] = 0x0),
+      (el3['tabIndex'] = 0),
       el3['setAttribute']('role', 'img'),
       el3['setAttribute']('aria-label', index['label'] + ' · ' + index['path']),
       (el3['dataset']['label'] = index['label']),

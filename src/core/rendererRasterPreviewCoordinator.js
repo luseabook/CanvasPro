@@ -7,7 +7,7 @@ import {
   selectRendererMotionAheadMediaIds,
 } from './rendererFastPreviewAdmission.js';
 import { RENDERER_VIRTUALIZATION_CONFIG } from './rendererVirtualization.js';
-const DENSE_RASTER_MEDIA_DEFER_NODE_COUNT = 0x140;
+const DENSE_RASTER_MEDIA_DEFER_NODE_COUNT = 320;
 function toIdSet(value) {
   if (value instanceof Set) return new Set(value);
   if (Array['isArray'](value)) return new Set(value);
@@ -35,8 +35,8 @@ function resolveRenderScale(box, data) {
   const count = Number(box?.['zoom']),
     count2 = Number(data);
   return (
-    (Number['isFinite'](count) && count > 0x0 ? count : 0x1) *
-    (Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x1)
+    (Number['isFinite'](count) && count > 0 ? count : 1) *
+    (Number['isFinite'](count2) && count2 > 0 ? count2 : 1)
   );
 }
 function buildRasterVisualStateSignature(options, map2) {
@@ -53,10 +53,10 @@ function buildRasterPresentationIdentity(enabled, handler = resolveRendererPrevi
   return [
     response['kind'],
     response['text'],
-    Number['isFinite'](Number(box2['x'])) ? Number(box2['x']) : 0x0,
-    Number['isFinite'](Number(box2['y'])) ? Number(box2['y']) : 0x0,
-    Math['max'](0x1, Number(box2['width']) || 0x1),
-    Math['max'](0x1, Number(box2['height']) || 0x1),
+    Number['isFinite'](Number(box2['x'])) ? Number(box2['x']) : 0,
+    Number['isFinite'](Number(box2['y'])) ? Number(box2['y']) : 0,
+    Math['max'](1, Number(box2['width']) || 1),
+    Math['max'](1, Number(box2['height']) || 1),
     ...response['sources'],
   ]['join']('\x1f');
 }
@@ -69,10 +69,10 @@ function buildRasterPresentationIdentityCacheKey(box3) {
   };
   return [
     source,
-    run(box3?.['x'], 0x0),
-    run(box3?.['y'], 0x0),
-    Math['max'](0x1, run(box3?.['width'], 0xa0)),
-    Math['max'](0x1, run(box3?.['height'], 0x78)),
+    run(box3?.['x'], 0),
+    run(box3?.['y'], 0),
+    Math['max'](1, run(box3?.['width'], 160)),
+    Math['max'](1, run(box3?.['height'], 120)),
   ]['join']('\x1f');
 }
 function collectExplicitDomRequiredIds({
@@ -193,7 +193,7 @@ export function createRendererRasterPreviewCoordinator({
     lockRasterParticipation: lockRasterParticipation = ![],
     deferInitialPlanning: deferInitialPlanning = ![],
     releaseFullSurface: releaseFullSurface,
-    devicePixelRatio: devicePixelRatio = typeof window !== 'undefined' ? window['devicePixelRatio'] : 0x1,
+    devicePixelRatio: devicePixelRatio = typeof window !== 'undefined' ? window['devicePixelRatio'] : 1,
   } = {}) {
     ((value3 = null), (mediaLoadingBusy2 = mediaLoadingBusy === !![]));
     const enabled3 =
@@ -215,8 +215,8 @@ export function createRendererRasterPreviewCoordinator({
       value10 =
         mediaLoadingBusy2 &&
         proxyCount['size'] >= DENSE_RASTER_MEDIA_DEFER_NODE_COUNT &&
-        map4['size'] === 0x0;
-    if (map4['size'] === 0x0 && (deferInitialPlanning === !![] || value10)) {
+        map4['size'] === 0;
+    if (map4['size'] === 0 && (deferInitialPlanning === !![] || value10)) {
       const rasterIds = new Set(),
         domProxyIds = new Set([...exactVisibleCount]['filter']((value11) => !fullSurfaceIds['has'](value11))),
         domPreviewCandidateIds = new Set([...fullSurfaceIds, ...domProxyIds]),
@@ -242,21 +242,21 @@ export function createRendererRasterPreviewCoordinator({
           signature: signature,
           coverageSignature: signature,
           stats: {
-            scenePressure: Number(scenePlan?.['pressure']) || 0x0,
-            proxyPressure: 0x0,
-            activationSignal: 0x0,
-            activationFloor: 0x0,
-            rasterShare: 0x0,
+            scenePressure: Number(scenePlan?.['pressure']) || 0,
+            proxyPressure: 0,
+            activationSignal: 0,
+            activationFloor: 0,
+            rasterShare: 0,
             proxyCount: proxyCount['size'],
-            rasterCandidateCount: 0x0,
-            rasterCount: 0x0,
+            rasterCandidateCount: 0,
+            rasterCount: 0,
             domProxyCount: domProxyIds['size'],
-            interactiveDomCount: 0x0,
-            unsupportedDomCount: 0x0,
-            projectedDomCount: 0x0,
+            interactiveDomCount: 0,
+            unsupportedDomCount: 0,
+            projectedDomCount: 0,
             exactVisibleCount: exactVisibleCount['size'],
             exactVisibleCoveredCount: exactVisibleCount['size'],
-            exactVisibleMissingCount: 0x0,
+            exactVisibleMissingCount: 0,
           },
         };
       return {
@@ -348,7 +348,7 @@ export function createRendererRasterPreviewCoordinator({
         }),
       ),
       value20 = lockRasterParticipation === !![] && freezeRasterSurface === !![] && viewportBusy === !![],
-      map11 = value20 && map4['size'] === 0x0 ? new Set() : policy2['rasterIds'],
+      map11 = value20 && map4['size'] === 0 ? new Set() : policy2['rasterIds'],
       map12 = new Set([...map11, ...args2]),
       list3 = [...map11]['filter']((value21) => exactVisibleCount['has'](value21)),
       value22 = [...map4]['some']((value23) => !map12['has'](value23)),
@@ -362,8 +362,8 @@ export function createRendererRasterPreviewCoordinator({
       reuseWhileBusy =
         freezeRasterSurface === !![] &&
         viewportBusy &&
-        map4['size'] > 0x0 &&
-        (map11['size'] > 0x0 || value20) &&
+        map4['size'] > 0 &&
+        (map11['size'] > 0 || value20) &&
         !enabled5 &&
         !enabled6 &&
         !enabled7,
@@ -482,7 +482,7 @@ export function createRendererRasterPreviewCoordinator({
         releaseFullSurface(value40);
       }
     return {
-      active: active['size'] > 0x0,
+      active: active['size'] > 0,
       rasterIds: active,
       domProxyIds: domProxyIds2,
       domPreviewCandidateIds: domPreviewCandidateIds2,

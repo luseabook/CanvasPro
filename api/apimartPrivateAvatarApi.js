@@ -162,8 +162,8 @@ export async function pollApimartPrivateAvatarTask({
   apiKey: apiKey2,
   apiUrl: apiUrl2,
   taskId: taskId2,
-  pollIntervalMs: pollIntervalMs = 0x9c4,
-  maxWaitMs: maxWaitMs = 0x1d4c0,
+  pollIntervalMs: pollIntervalMs = 2500,
+  maxWaitMs: maxWaitMs = 120000,
   signal: signal,
 } = {}) {
   const apiKey3 = normalizeApiKey(apiKey2);
@@ -177,7 +177,7 @@ export async function pollApimartPrivateAvatarTask({
       raw = await get('/api/v2/proxy/task?apiUrl=' + encodeURIComponent(privateAvatarPollUrl), {
         provider: 'apimart',
         headers: { Authorization: 'Bearer ' + apiKey3 },
-        timeout: 0xea60,
+        timeout: 60000,
         signal: signal,
       });
     assertApimartApiCodeOk(raw, 'APIMART 人脸检测查询失败');
@@ -234,7 +234,7 @@ export async function submitApimartSeedance2PrivateAvatar({
   const raw2 = await post(
     '/api/v2/proxy/image',
     { apiUrl: apiUrl4 + '/v1/seedance2/private-avatar', apiKey: apiKey5, ...args },
-    { provider: 'apimart', timeout: 0x1d4c0, signal: signal2 },
+    { provider: 'apimart', timeout: 120000, signal: signal2 },
   );
   assertApimartApiCodeOk(raw2, 'APIMART 人脸检测提交失败');
   const assetUrl2 = extractApimartPrivateAvatarAssetUrl(raw2),

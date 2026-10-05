@@ -24,10 +24,10 @@ function toNumber(key, index = 0) {
   return Number.isFinite(result) ? result : index;
 }
 function roundSec(data) {
-  return Math.round(Math.max(0, toNumber(data, 0)) * 0x3e8) / 0x3e8;
+  return Math.round(Math.max(0, toNumber(data, 0)) * 1000) / 1000;
 }
 function roundSignedSec(options) {
-  return Math.round(toNumber(options, 0) * 0x3e8) / 0x3e8;
+  return Math.round(toNumber(options, 0) * 1000) / 1000;
 }
 function clampNumber(target, source, next, current) {
   const toNumber2 = toNumber(target, current);
@@ -38,7 +38,7 @@ export function normalizeMediaClipAudioLaneIndex(entry) {
   return Math.max(0, Math.min(MEDIA_CLIP_AUDIO_LANE_COUNT_MAX - 1, record));
 }
 function roundTimelineZoom(payload) {
-  return Math.round(payload * 0x3e8) / 0x3e8;
+  return Math.round(payload * 1000) / 1000;
 }
 export function normalizeMediaClipTimelineView(options2 = {}) {
   const box = options2 && typeof options2 === 'object' ? options2 : {};
@@ -174,7 +174,7 @@ export function resolveMediaClipDimensions(options7 = {}) {
   }
   const width = Math.round(toNumber(box2.videoWidth ?? box2.width ?? box2.naturalWidth, 0)),
     height = Math.round(toNumber(box2.videoHeight ?? box2.height ?? box2.naturalHeight, 0));
-  return { width: width > 0 ? width : 0x500, height: height > 0 ? height : 0x2d0 };
+  return { width: width > 0 ? width : 1280, height: height > 0 ? height : 720 };
 }
 export function clampMediaClipRange(options8 = {}, value7 = 0) {
   const count2 = Math.max(0, toNumber(value7, 0)),
@@ -919,7 +919,7 @@ export function mapMediaClipVideoSecToAudioSec(value107 = 0, enabled13 = null, e
   const roundSec32 = roundSec(enabled13.startSec),
     roundSec33 = roundSec(enabled14.startSec),
     roundSec34 = roundSec(enabled14.endSec),
-    count11 = Math.round((toNumber(value107, 0) - roundSec32) * 0x3e8) / 0x3e8;
+    count11 = Math.round((toNumber(value107, 0) - roundSec32) * 1000) / 1000;
   if (count11 < 0 || !(roundSec34 > roundSec33)) return null;
   const roundSec35 = roundSec(roundSec33 + count11);
   if (roundSec35 > roundSec34) return null;

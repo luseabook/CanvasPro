@@ -12,15 +12,15 @@ import {
   sampleSpatialCurve,
 } from './directorCurves.js';
 import { normalizeDirectorClips, resolveDirectorClipSample } from './directorClips.js';
-const DEFAULT_DURATION_SECONDS = 0x6,
-  DEFAULT_FPS = 0x18,
+const DEFAULT_DURATION_SECONDS = 6,
+  DEFAULT_FPS = 24,
   MIN_DURATION_SECONDS = 0.1,
-  MAX_DURATION_SECONDS = 0xe10,
-  MIN_FPS = 0x1,
-  MAX_FPS = 0x78,
+  MAX_DURATION_SECONDS = 3600,
+  MIN_FPS = 1,
+  MAX_FPS = 120,
   EASING_VALUES = new Set(['linear', 'ease-in', 'ease-out', 'ease-in-out']);
 export const STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES = Object['freeze'](['position', 'rotation', 'scale']);
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -29,32 +29,32 @@ function clamp(index, result, data) {
 }
 function normalizeVector3(options, target) {
   const source = Array['isArray'](options) ? options : [];
-  return [0x0, 0x1, 0x2]['map']((next) => finiteNumber(source[next], target[next]));
+  return [0, 1, 2]['map']((next) => finiteNumber(source[next], target[next]));
 }
 function normalizeScale(current) {
-  return normalizeVector3(current, [0x1, 0x1, 0x1])['map']((entry) => Math['max'](0.001, entry));
+  return normalizeVector3(current, [1, 1, 1])['map']((entry) => Math['max'](0.001, entry));
 }
 function normalizeTransform(options2 = {}) {
   return {
-    position: normalizeVector3(options2['position'], [0x0, 0x0, 0x0]),
-    rotation: normalizeVector3(options2['rotation'], [0x0, 0x0, 0x0]),
+    position: normalizeVector3(options2['position'], [0, 0, 0]),
+    rotation: normalizeVector3(options2['rotation'], [0, 0, 0]),
     scale: normalizeScale(options2['scale']),
   };
 }
 function normalizeCamera(options3 = {}) {
   const record = Math['max'](0.001, finiteNumber(options3['near'], 0.1)),
     payload = {
-      position: normalizeVector3(options3['position'], [0x5, 0x4, 0x7]),
-      target: normalizeVector3(options3['target'], [0x0, 1.2, 0x0]),
-      focalLength: clamp(finiteNumber(options3['focalLength'], 0x23), 0x1, 0x1f4),
+      position: normalizeVector3(options3['position'], [5, 4, 7]),
+      target: normalizeVector3(options3['target'], [0, 1.2, 0]),
+      focalLength: clamp(finiteNumber(options3['focalLength'], 35), 1, 500),
       near: record,
-      far: Math['max'](record + 0.001, finiteNumber(options3['far'], 0x3e8)),
+      far: Math['max'](record + 0.001, finiteNumber(options3['far'], 1000)),
       aspectRatio: String(options3['aspectRatio'] || '16:9'),
     };
   return (
     options3['fov'] != null &&
       Number['isFinite'](Number(options3['fov'])) &&
-      (payload['fov'] = clamp(Number(options3['fov']), 0x1, 0xb3)),
+      (payload['fov'] = clamp(Number(options3['fov']), 1, 179)),
     options3['roll'] != null &&
       Number['isFinite'](Number(options3['roll'])) &&
       (payload['roll'] = clamp(Number(options3['roll']), -Math['PI'], Math['PI'])),
@@ -71,7 +71,7 @@ function createKeyframeId(config = 'keyframe', handler) {
   if (typeof handler === 'function') return String(handler(config));
   const scope = globalThis['crypto'];
   if (typeof scope?.['randomUUID'] === 'function') return config + '-' + scope['randomUUID']();
-  return config + '-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x9);
+  return config + '-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 9);
 }
 function normalizeCameraKeyframe(input, output, value2) {
   return {
@@ -84,8 +84,8 @@ function normalizeCameraKeyframe(input, output, value2) {
     ...(normalizeEasingCurve(input?.['easingCurve'])
       ? { easingCurve: normalizeEasingCurve(input['easingCurve']) }
       : {}),
-    id: String(input?.['id'] || 'camera-keyframe-' + (output + 0x1)),
-    time: Math['max'](0x0, finiteNumber(input?.['time'], output)),
+    id: String(input?.['id'] || 'camera-keyframe-' + (output + 1)),
+    time: Math['max'](0, finiteNumber(input?.['time'], output)),
     camera: normalizeCamera(input?.['camera'] || value2),
     easing: normalizeEasing(input?.['easing']),
   };
@@ -104,8 +104,8 @@ function normalizePropertyKeyframe(value3, value4, args, value5) {
     ...(normalizeEasingCurve(value3?.['easingCurve'])
       ? { easingCurve: normalizeEasingCurve(value3['easingCurve']) }
       : {}),
-    id: String(value3?.['id'] || args + '-keyframe-' + (value4 + 0x1)),
-    time: Math['max'](0x0, finiteNumber(value3?.['time'], value4)),
+    id: String(value3?.['id'] || args + '-keyframe-' + (value4 + 1)),
+    time: Math['max'](0, finiteNumber(value3?.['time'], value4)),
     value: value6,
     easing: normalizeEasing(value3?.['easing']),
   };
@@ -152,7 +152,7 @@ export function createStoryboard3DShotAnimation({
     cameraKeyframes: [
       {
         id: createKeyframeId('camera-keyframe', idFactory),
-        time: 0x0,
+        time: 0,
         camera: normalizeCamera(camera),
         easing: 'ease-in-out',
       },
@@ -174,10 +174,10 @@ export function normalizeStoryboard3DShotAnimation(
     args2 = uniqueSortedKeyframes(options4?.['cameraKeyframes'], (value21, value22) =>
       normalizeCameraKeyframe(value21, value22, camera2),
     );
-  args2['length'] === 0x0 &&
+  args2['length'] === 0 &&
     args2['push']({
       id: createKeyframeId('camera-keyframe', idFactory2),
-      time: 0x0,
+      time: 0,
       camera: normalizeCamera(camera2),
       easing: 'ease-in-out',
     });
@@ -194,7 +194,7 @@ export function normalizeStoryboard3DShotAnimation(
       objectTracks: args3,
     }),
     value24 = Math['max'](
-      0x0,
+      0,
       ...args4['actionClips']['map']((value25) => value25['end']),
       ...args4['cameraConstraintClips']['map']((value26) => value26['end']),
       ...args5['map']((value27) => value27['end']),
@@ -247,7 +247,7 @@ function upsertAtTime(list, args6, value34) {
 }
 export function upsertStoryboard3DCameraKeyframe(
   value42,
-  { time: time = 0x0, camera: camera3, easing: easing = 'ease-in-out' } = {},
+  { time: time = 0, camera: camera3, easing: easing = 'ease-in-out' } = {},
   { idFactory: idFactory3 } = {},
 ) {
   const storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(value42, {
@@ -277,7 +277,7 @@ export function upsertStoryboard3DObjectKeyframe(
   {
     objectId: objectId,
     property: property,
-    time: time = 0x0,
+    time: time = 0,
     transform: transform2,
     value: value44,
     easing: easing = 'ease-in-out',
@@ -328,7 +328,7 @@ export function removeStoryboard3DAnimationKeyframe(
     enabled3 = String(keyframeId || '')['trim']();
   if (!enabled3) return storyboard3DShotAnimation3;
   if (type === 'camera') {
-    if (storyboard3DShotAnimation3['cameraKeyframes']['length'] <= 0x1) return storyboard3DShotAnimation3;
+    if (storyboard3DShotAnimation3['cameraKeyframes']['length'] <= 1) return storyboard3DShotAnimation3;
     return (
       (storyboard3DShotAnimation3['cameraKeyframes'] = storyboard3DShotAnimation3['cameraKeyframes'][
         'filter'
@@ -356,14 +356,14 @@ export function updateStoryboard3DShotAnimationSettings(args7, args8 = {}) {
   });
 }
 export function applyStoryboard3DAnimationEasing(value52, value53 = 'linear') {
-  const clamp2 = clamp(finiteNumber(value52), 0x0, 0x1);
+  const clamp2 = clamp(finiteNumber(value52), 0, 1);
   switch (normalizeEasing(value53)) {
     case 'ease-in':
       return clamp2 * clamp2;
     case 'ease-out':
-      return 0x1 - (0x1 - clamp2) * (0x1 - clamp2);
+      return 1 - (1 - clamp2) * (1 - clamp2);
     case 'ease-in-out':
-      return clamp2 < 0.5 ? 0x2 * clamp2 * clamp2 : 0x1 - Math['pow'](-0x2 * clamp2 + 0x2, 0x2) / 0x2;
+      return clamp2 < 0.5 ? 2 * clamp2 * clamp2 : 1 - Math['pow'](-2 * clamp2 + 2, 2) / 2;
     default:
       return clamp2;
   }
@@ -373,7 +373,7 @@ function interpolateNumber(value54, value55, value56) {
 }
 function interpolateAngle(value57, value58, value59) {
   const value60 =
-    ((((value58 - value57 + Math['PI']) % (Math['PI'] * 0x2)) + Math['PI'] * 0x2) % (Math['PI'] * 0x2)) -
+    ((((value58 - value57 + Math['PI']) % (Math['PI'] * 2)) + Math['PI'] * 2) % (Math['PI'] * 2)) -
     Math['PI'];
   return value57 + value60 * value59;
 }
@@ -385,13 +385,13 @@ function interpolateVector(value61, value62, value63, { angles: angles = ![] } =
   );
 }
 function sampleKeyframes(list2, value66, handler3) {
-  if (!Array['isArray'](list2) || list2['length'] === 0x0) return null;
-  if (list2['length'] === 0x1 || value66 <= list2[0x0]['time']) return { ...list2[0x0], progress: 0x0 };
-  const args9 = list2['at'](-0x1);
-  if (value66 >= args9['time']) return { ...args9, progress: 0x0 };
-  let args10 = list2[0x0],
-    value67 = list2[0x1];
-  for (let value68 = 0x1; value68 < list2['length']; value68 += 0x1) {
+  if (!Array['isArray'](list2) || list2['length'] === 0) return null;
+  if (list2['length'] === 1 || value66 <= list2[0]['time']) return { ...list2[0], progress: 0 };
+  const args9 = list2['at'](-1);
+  if (value66 >= args9['time']) return { ...args9, progress: 0 };
+  let args10 = list2[0],
+    value67 = list2[1];
+  for (let value68 = 1; value68 < list2['length']; value68 += 1) {
     value67 = list2[value68];
     if (value66 <= value67['time']) break;
     args10 = value67;
@@ -414,7 +414,7 @@ function sampleCameraKeyframes(value72, value73) {
     position: sampleSpatialCurve(value74, value75, count, 'camera'),
     target: interpolateVector(value74['camera']['target'], value75['camera']['target'], count),
     focalLength: interpolateNumber(value74['camera']['focalLength'], value75['camera']['focalLength'], count),
-    roll: interpolateAngle(value74['camera']['roll'] || 0x0, value75['camera']['roll'] || 0x0, count),
+    roll: interpolateAngle(value74['camera']['roll'] || 0, value75['camera']['roll'] || 0, count),
     near: interpolateNumber(value74['camera']['near'], value75['camera']['near'], count),
     far: interpolateNumber(value74['camera']['far'], value75['camera']['far'], count),
     aspectRatio: count < 0.5 ? value74['camera']['aspectRatio'] : value75['camera']['aspectRatio'],
@@ -432,11 +432,11 @@ export function sampleStoryboard3DShotAnimation(
     objectTransforms: objectTransforms,
   });
   let finiteNumber2 = finiteNumber(value77);
-  storyboard3DShotAnimation4['loop'] && storyboard3DShotAnimation4['duration'] > 0x0
+  storyboard3DShotAnimation4['loop'] && storyboard3DShotAnimation4['duration'] > 0
     ? (finiteNumber2 =
         ((finiteNumber2 % storyboard3DShotAnimation4['duration']) + storyboard3DShotAnimation4['duration']) %
         storyboard3DShotAnimation4['duration'])
-    : (finiteNumber2 = clamp(finiteNumber2, 0x0, storyboard3DShotAnimation4['duration']));
+    : (finiteNumber2 = clamp(finiteNumber2, 0, storyboard3DShotAnimation4['duration']));
   const value78 = {};
   storyboard3DShotAnimation4['objectTracks']['forEach']((value79) => {
     const args11 = normalizeTransform(objectTransforms[value79['objectId']]),

@@ -498,9 +498,9 @@ export {
 };
 export { syncStoryCharacterVoicePlayerPreviewUi } from './storyCharacterVoiceWorkspaceController.js';
 const STORY_STEPS = Object['freeze']([
-    { id: 0x1, label: '剧本' },
-    { id: 0x2, label: '素材设定' },
-    { id: 0x3, label: '分集视频' },
+    { id: 1, label: '剧本' },
+    { id: 2, label: '素材设定' },
+    { id: 3, label: '分集视频' },
   ]),
   STORY_ASSET_TAB_ORDER = Object['freeze'](['character', 'scene', 'prop', 'audio', 'library']);
 function escapeHtml(value) {
@@ -544,7 +544,7 @@ export function toggleStoryEpisodeSelectAll(list3 = [], target = []) {
 function toModelSearchText(options2 = {}) {
   return [options2['label'], options2['providerLabel'], options2['description'], options2['modelId']]
     ['filter'](Boolean)
-    ['join']('\x20')
+    ['join'](' ')
     ['toLowerCase']();
 }
 function isUsableImageUrl(source) {
@@ -629,7 +629,7 @@ export {
 const storyWorkspaceChromeProjection = createStoryWorkspaceChromeProjection({ steps: STORY_STEPS }),
   storyWorkspaceChromePresentation = createStoryWorkspaceChromePresentation();
 export function getStoryAssetHoverGridColumns(next) {
-  const current = Math['max'](0x1, Math['floor'](Number(next) || 0x1));
+  const current = Math['max'](1, Math['floor'](Number(next) || 1));
   return Math['ceil'](Math['sqrt'](current));
 }
 export function isStoryAssetHoverLandscape(entry, record) {
@@ -661,17 +661,17 @@ export function buildStoryAssetHoverPreviewContent(
   });
 }
 export function resolveStoryAppearanceWheelDelta(event2) {
-  const config = Number(event2?.['deltaX'] || 0x0),
-    scope = Number(event2?.['deltaY'] || 0x0),
+  const config = Number(event2?.['deltaX'] || 0),
+    scope = Number(event2?.['deltaY'] || 0),
     input = Math['abs'](scope) >= Math['abs'](config) ? scope : config,
-    count = Number(event2?.['deltaMode'] || 0x0),
-    output = count === 0x1 ? 0x10 : count === 0x2 ? 0x320 : 0x1;
+    count = Number(event2?.['deltaMode'] || 0),
+    output = count === 1 ? 16 : count === 2 ? 800 : 1;
   return input * output;
 }
 export function consumeStoryWheelDirection(
   value2,
   value3,
-  { threshold: threshold = 0x18, lockDuration: lockDuration = 0xdc, now: now = Date['now']() } = {},
+  { threshold: threshold = 24, lockDuration: lockDuration = 220, now: now = Date['now']() } = {},
 ) {
   return consumeWorkspaceWheelDirection(value2, value3, {
     threshold: threshold,
@@ -747,9 +747,9 @@ function renderImageOrEmpty({
     const text5 = normalizeText(imageUrl),
       text6 = normalizeText(fallbackImageUrl),
       value8 = workspaceAssetLibraryImage
-        ? '\x20data-workspace-asset-library-image' +
+        ? ' data-workspace-asset-library-image' +
           (isUsableImageUrl(text6) && text6 !== text5
-            ? ' data-workspace-asset-library-fallback-src="' + escapeHtml(text6) + '\x22'
+            ? ' data-workspace-asset-library-fallback-src="' + escapeHtml(text6) + '"'
             : '')
         : '';
     return (
@@ -759,15 +759,15 @@ function renderImageOrEmpty({
       escapeHtml(text5) +
       '" alt="' +
       escapeHtml(alt) +
-      '\x22\x20loading=\x22lazy\x22\x20decoding=\x22async\x22' +
+      '" loading="lazy" decoding="async"' +
       value8 +
       '>'
     );
   }
   return (
-    '<div\x20class=\x22' +
+    '<div class="' +
     escapeHtml(className) +
-    '\x20story-media-empty\x22\x20role=\x22img\x22\x20aria-label=\x22' +
+    ' story-media-empty" role="img" aria-label="' +
     escapeHtml(alt + '待生成') +
     '">\n    <span>待生成</span>\n  </div>'
   );
@@ -787,7 +787,7 @@ function renderModelIcon(enabled, value9 = 'story-model-icon') {
     escapeHtml(value9) +
     '" src="' +
     escapeHtml(enabled['icon']) +
-    '\x22\x20alt=\x22\x22\x20loading=\x22eager\x22\x20decoding=\x22async\x22>'
+    '" alt="" loading="eager" decoding="async">'
   );
 }
 function renderModelPicker(value10, value11, value12) {
@@ -824,14 +824,14 @@ function renderModelPicker(value10, value11, value12) {
             '</strong>\n                <small>' +
             escapeHtml(value17['description'] || value17['providerLabel']) +
             '</small>\n              </span>\n              ' +
-            (value17['vip'] ? '<span\x20class=\x22story-model-vip\x22>VIP</span>' : '') +
+            (value17['vip'] ? '<span class="story-model-vip">VIP</span>' : '') +
             '\n            </button>',
         )['join']('') +
         '\n      </section>',
     )
     ['join']('');
   return (
-    '<div\x20class=\x22story-model-picker\x22\x20data-story-model-picker=\x22' +
+    '<div class="story-model-picker" data-story-model-picker="' +
     escapeHtml(value12) +
     '">\n    <button type="button" class="story-model-trigger" data-story-model-trigger aria-haspopup="listbox" aria-expanded="false">\n      ' +
     renderModelIcon(storyWorkspaceModelChoice) +
@@ -862,7 +862,7 @@ export function getStoryScriptWorkflowStage(options3 = {}) {
   if (!list7['length']) return 'summary-ready';
   return compileStoryEpisodeScripts(list7)['complete'] ? 'scripts-complete' : 'scripts-pending';
 }
-export function updateStorySummaryCharacterField(list8 = [], value20 = -0x1, value21 = '', value22 = '') {
+export function updateStorySummaryCharacterField(list8 = [], value20 = -1, value21 = '', value22 = '') {
   const enabled2 = Array['isArray'](list8) ? list8[value20] : null,
     map2 = new Set([
       'name',
@@ -893,7 +893,7 @@ export function updateStoryEpisodeOutlineField(options4 = {}, value24 = '', valu
   const count2 = options4['episodes']['findIndex'](
     (value27) => String(value27?.['id'] || '') === String(value24 || ''),
   );
-  if (count2 < 0x0) return ![];
+  if (count2 < 0) return ![];
   return (
     options4['episodes'][count2]?.['script']?.['fullText'] &&
       (options4['episodes'] = invalidateStoryEpisodeScriptsFrom(options4['episodes'], count2)),
@@ -912,8 +912,8 @@ function createStoryScriptPlanningEpisodeView(selectionMode, title2, value31) {
       ? selectionMode['data']['episodes']
       : [],
     canGenerate = selectionMode['data']?.['project'] || {},
-    index2 = Math['max'](0x0, Math['trunc'](Number(value31) || 0x0)),
-    number = Math['max'](0x1, Math['trunc'](Number(title2?.['number']) || index2 + 0x1)),
+    index2 = Math['max'](0, Math['trunc'](Number(value31) || 0)),
+    number = Math['max'](1, Math['trunc'](Number(title2?.['number']) || index2 + 1)),
     value33 = title2?.['id'],
     id = normalizeText(value33),
     isComplete = Boolean(title2?.['script']?.['fullText']),
@@ -933,7 +933,7 @@ function createStoryScriptPlanningEpisodeView(selectionMode, title2, value31) {
     isComplete: isComplete,
     isGenerating: isGenerating,
     isSelected: isSelected['includes'](value33),
-    isOpen: isOpen ? isGenerating : isStoryOutlineSectionOpen(selectionMode, 'episode-' + id, index2 < 0x2),
+    isOpen: isOpen ? isGenerating : isStoryOutlineSectionOpen(selectionMode, 'episode-' + id, index2 < 2),
     canSelect: !isComplete && index2 >= getNextStoryEpisodeScriptIndex(value32),
     canGenerate:
       canGenerate['sourceMode'] !== 'upload-original' &&
@@ -973,7 +973,7 @@ function createStoryScriptPlanningEpisodeSectionView(isOutlineGenerating) {
     selectionMode: selectionMode2,
     batchCount: selectionMode2
       ? list10['length']
-      : Math['max'](0x0, complete['totalCount'] - complete['completedCount']),
+      : Math['max'](0, complete['totalCount'] - complete['completedCount']),
     isStale: isUploadedOriginal['outlineStatus'] === 'stale',
     busy: Boolean(isOutlineGenerating['storyPlanningOperation']),
     batchGenerating: isOutlineGenerating['storyPlanningOperation'] === 'writing-episode-scripts',
@@ -1007,21 +1007,21 @@ export function renderStoryTextRequestDebugAction({
       escapeHtml(action) +
       '" title="' +
       escapeHtml(title) +
-      '\x22\x20' +
+      '" ' +
       (disabled ? 'disabled' : ''),
   );
 }
 export function renderStoryScriptGenerationFooter(hint) {
   const compileStoryEpisodeScripts2 = compileStoryEpisodeScripts(hint['data']['episodes']),
     enabled3 = Math['max'](
-      0x0,
+      0,
       compileStoryEpisodeScripts2['totalCount'] - compileStoryEpisodeScripts2['completedCount'],
     ),
     nextStoryEpisodeScriptIndex = getNextStoryEpisodeScriptIndex(hint['data']['episodes']),
     enabled4 = hint['data']['episodes'][nextStoryEpisodeScriptIndex] || null,
     value40 = enabled4
-      ? Math['max'](0x1, Math['trunc'](Number(enabled4['number']) || nextStoryEpisodeScriptIndex + 0x1))
-      : 0x0,
+      ? Math['max'](1, Math['trunc'](Number(enabled4['number']) || nextStoryEpisodeScriptIndex + 1))
+      : 0,
     disabled2 = Boolean(hint['storyPlanningOperation']),
     value41 = hint['storyPlanningOperation'] === 'writing-episode-scripts',
     value42 = hint['storyPlanningOperation'] === 'writing-episode-script',
@@ -1032,17 +1032,17 @@ export function renderStoryScriptGenerationFooter(hint) {
     enabled5 = list11['length'],
     value44 = hint['scriptSelectionMode']
       ? 'data-story-action="generate-episode-scripts-batch" data-story-script-batch-scope="selected"'
-      : 'data-story-action=\x22generate-next-episode-script\x22',
+      : 'data-story-action="generate-next-episode-script"',
     value45 = hint['scriptSelectionMode']
-      ? '生成 ' + enabled5 + '\x20集'
+      ? '生成 ' + enabled5 + ' 集'
       : enabled4
-        ? '生成第\x20' + value40 + '\x20集'
+        ? '生成第 ' + value40 + ' 集'
         : '已全部生成',
     value46 = disabled2 || (hint['scriptSelectionMode'] ? !enabled5 : !enabled4),
     renderStoryTextRequestDebugAction2 = renderStoryTextRequestDebugAction({
       isDeveloperMode: Boolean(hint['experimentalSplitAvailable']),
       action: 'debug-episode-script-request',
-      title: '只预览下一集正文的实际请求，不发送\x20API',
+      title: '只预览下一集正文的实际请求，不发送 API',
       disabled: disabled2 || !enabled4,
     }),
     value47 = value41
@@ -1053,13 +1053,13 @@ export function renderStoryScriptGenerationFooter(hint) {
         '</button>'
       : '<button type="button" class="story-secondary-button" data-story-action="generate-episode-scripts-batch" data-story-script-batch-scope="all" ' +
         (disabled2 || !enabled3 ? 'disabled' : '') +
-        '>生成全集</button>\x0a\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x22\x20' +
+        '>生成全集</button>\n       <button type="button" class="story-primary-button" ' +
         value44 +
-        '\x20' +
+        ' ' +
         (value46 ? 'disabled' : '') +
         ' aria-busy="' +
         value42 +
-        '\x22>' +
+        '">' +
         (value42 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
         escapeHtml(value42 ? hint['storyPlanningStatus'] || '正在生成分集正文' : value45) +
         '</button>';
@@ -1071,7 +1071,7 @@ export function renderStoryScriptGenerationFooter(hint) {
         compileStoryEpisodeScripts2['completedCount'] +
         '/' +
         compileStoryEpisodeScripts2['totalCount'] +
-        '\x20集',
+        ' 集',
     actionsMarkup:
       '\n      ' +
       renderStoryPlanningTextModelPicker(hint, 'script', { disabled: disabled2 }) +
@@ -1079,7 +1079,7 @@ export function renderStoryScriptGenerationFooter(hint) {
       renderStoryTextRequestDebugAction2 +
       '\n      ' +
       value47 +
-      '\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20story-script-continue-button\x22\x20data-story-action=\x22continue-to-assets\x22\x20aria-label=\x22进入下一步：人设与素材拆解\x22\x20' +
+      '\n      <button type="button" class="story-secondary-button story-script-continue-button" data-story-action="continue-to-assets" aria-label="进入下一步：人设与素材拆解" ' +
       (disabled2 ? 'disabled' : '') +
       '>' +
       renderStoryAssetContinuationIcon() +
@@ -1103,10 +1103,10 @@ export function renderStoryAssetExtractionFooter(options6 = {}) {
           : '开发测试',
     value51 = storyAssetExperimentalDraftDisplay['hasProgress']
       ? storyAssetExperimentalDraftDisplay['summary']
-      : '开发测试\x20V1：先由本地\x20PP-UIE\x20建立候选清单；中短剧本仍把完整原文交给角色、场景、道具三条专用\x20API，超长剧本只提交受预算约束的剧情证据。每类最多一次且不自动重试；失败不会写入本地兜底提示词，也不会覆盖现有素材',
+      : '开发测试 V1：先由本地 PP-UIE 建立候选清单；中短剧本仍把完整原文交给角色、场景、道具三条专用 API，超长剧本只提交受预算约束的剧情证据。每类最多一次且不自动重试；失败不会写入本地兜底提示词，也不会覆盖现有素材',
     value52 = storyAssetExperimentalDraftDisplay['hasProgress']
       ? ''
-      : '\x20title=\x22' + escapeHtml(value51) + '\x22',
+      : ' title="' + escapeHtml(value51) + '"',
     value53 = disabled3
       ? value49
       : className2['hasProgress']
@@ -1119,11 +1119,11 @@ export function renderStoryAssetExtractionFooter(options6 = {}) {
     value54 = options6['experimentalAssetExtractionAvailable']
       ? '<button type="button" class="story-secondary-button story-experimental-asset-extraction" data-story-action="extract-assets-experimental"' +
         value52 +
-        '\x20' +
+        ' ' +
         (disabled3 ? 'disabled' : '') +
         ' aria-busy="' +
         value48 +
-        '\x22>' +
+        '">' +
         (value48 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
         escapeHtml(value50) +
         '</button>'
@@ -1146,13 +1146,13 @@ export function renderStoryAssetExtractionFooter(options6 = {}) {
       value54 +
       '\n      ' +
       renderStoryPlanningTextModelPicker2 +
-      '\x0a\x20\x20\x20\x20\x20\x20' +
+      '\n      ' +
       renderRequestDebugButton('data-story-action="debug-asset-extraction-request"') +
       '\n      <button type="button" class="story-next-button" data-story-action="extract-assets" ' +
       (disabled3 ? 'disabled' : '') +
       ' aria-busy="' +
       disabled3 +
-      '\x22>' +
+      '">' +
       (disabled3 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
       '<span>' +
       escapeHtml(value53) +
@@ -1181,11 +1181,11 @@ export function renderStoryEpisodeOutlinePlanningFooter(options7 = {}, { stale: 
       renderStoryPlanningTextModelPicker(options7, 'outline', { disabled: disabled4 }) +
       '\n      ' +
       renderStoryTextRequestDebugAction4 +
-      '\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-next-button\x22\x20data-story-action=\x22plan-episode-outlines\x22\x20' +
+      '\n      <button type="button" class="story-next-button" data-story-action="plan-episode-outlines" ' +
       (disabled4 ? 'disabled' : '') +
       ' aria-busy="' +
       disabled4 +
-      '\x22>' +
+      '">' +
       (disabled4 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
       '<span>' +
       escapeHtml(value55) +
@@ -1269,9 +1269,9 @@ export function renderOutlinePage(value57) {
 }
 export function renderStoryAssetBreakdownPage(options8 = {}) {
   const list13 = getStoryAssetBreakdownEpisodes(options8),
-    value61 = Math['trunc'](Number(options8['assetBreakdownVisibleCount']) || 0x0),
-    value62 = Math['min'](list13['length'], Math['max'](list13['length'] ? 0x1 : 0x0, value61)),
-    episodes2 = list13['slice'](0x0, value62);
+    value61 = Math['trunc'](Number(options8['assetBreakdownVisibleCount']) || 0),
+    value62 = Math['min'](list13['length'], Math['max'](list13['length'] ? 1 : 0, value61)),
+    episodes2 = list13['slice'](0, value62);
   return storyScriptPlanningPresentation['renderAssetBreakdown']({ episodes: episodes2 });
 }
 function renderStoryChapter(value63, value64) {
@@ -1279,14 +1279,14 @@ function renderStoryChapter(value63, value64) {
     '<article class="story-chapter-card" data-story-chapter-index="' +
     value64 +
     '">\n    <label class="story-chapter-title"><span>第 ' +
-    (value64 + 0x1) +
+    (value64 + 1) +
     ' 章</span><input type="text" value="' +
     escapeHtml(value63['title'] || '') +
     '" data-story-chapter-title="' +
     value64 +
     '"></label>\n    <label class="story-chapter-content"><span>章节正文</span><textarea data-story-chapter-content="' +
     value64 +
-    '\x22>' +
+    '">' +
     escapeHtml(value63['content'] || '') +
     '</textarea></label>\n  </article>'
   );
@@ -1295,7 +1295,7 @@ export function renderStoryEpisodeCardActionIcon(value65 = 'generate') {
   if (value65 === 'edit')
     return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19h4l10-10-4-4L5 15v4Z"/><path d="m13.5 6.5 4 4M5 19l4-1"/></svg>';
   if (value65 === 'regenerate')
-    return '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M20\x2011a8\x208\x200\x201\x200-2.34\x205.66\x22/><path\x20d=\x22M20\x204v7h-7\x22/></svg>';
+    return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.34 5.66"/><path d="M20 4v7h-7"/></svg>';
   return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="4" y="5" width="12" height="14" rx="2"/><path d="M4 10h12M8 5v14M18.5 4v5M16 6.5h5"/></svg>';
 }
 export function renderStoryEpisodeExperimentalSplitAction(
@@ -1303,7 +1303,7 @@ export function renderStoryEpisodeExperimentalSplitAction(
   { isDeveloperMode: isDeveloperMode = ![], disabled: disabled = ![], busy: busy = ![] } = {},
 ) {
   if (!isDeveloperMode) return '';
-  const value66 = Math['max'](0x1, Math['trunc'](Number(options9?.['number']) || 0x1)),
+  const value66 = Math['max'](1, Math['trunc'](Number(options9?.['number']) || 1)),
     storyEpisodeCardAction = getStoryEpisodeCardAction(options9);
   return (
     '<button type="button" class="story-episode-experimental-split story-episode-experimental-split--after-' +
@@ -1312,11 +1312,11 @@ export function renderStoryEpisodeExperimentalSplitAction(
     escapeHtml(options9?.['id']) +
     '" aria-label="使用开发测试生成第 ' +
     value66 +
-    '\x20集\x22\x20title=\x22仅开发者模式可用：使用实验性分批生成流程，先规划整集蓝图，再分批生成\x203–5\x20个片段\x22\x20' +
+    ' 集" title="仅开发者模式可用：使用实验性分批生成流程，先规划整集蓝图，再分批生成 3–5 个片段" ' +
     (disabled ? 'disabled' : '') +
-    '\x20aria-busy=\x22' +
+    ' aria-busy="' +
     busy +
-    '\x22>' +
+    '">' +
     (busy ? renderStoryGenerationSpinner({ button: !![] }) : renderStoryEpisodeCardActionIcon('generate')) +
     '<span>' +
     (busy ? '生成中' : '开发测试') +
@@ -1332,11 +1332,11 @@ export function renderStoryEpisodeExperimentalModeToggle(enabled7 = ![], { disab
     (value67 ? 'is-active' : '') +
     '" data-story-action="toggle-experimental-split-mode" aria-pressed="' +
     value67 +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     (value67 ? '关闭' : '开启') +
-    '实验模式\x22\x20title=\x22' +
+    '实验模式" title="' +
     value68 +
-    '\x22\x20' +
+    '" ' +
     (disabled ? 'disabled' : '') +
     '><span class="story-experimental-mode-track" aria-hidden="true"><span class="story-experimental-mode-thumb"></span></span><span class="story-experimental-mode-label">实验模式</span></button>'
   );
@@ -1346,14 +1346,14 @@ export function renderStoryEpisodeRequestDebugAction(
   { isDeveloperMode: isDeveloperMode = ![], disabled: disabled = ![] } = {},
 ) {
   if (!isDeveloperMode) return '';
-  const value69 = Math['max'](0x1, Math['trunc'](Number(options10?.['number']) || 0x1)),
+  const value69 = Math['max'](1, Math['trunc'](Number(options10?.['number']) || 1)),
     storyEpisodeCardAction2 = getStoryEpisodeCardAction(options10);
   return renderRequestDebugButton(
     'data-story-action="debug-experimental-split-request" data-story-episode-id="' +
       escapeHtml(options10?.['id']) +
       '" title="调试第 ' +
       value69 +
-      '\x20集实验分批请求\x22\x20' +
+      ' 集实验分批请求" ' +
       (disabled ? 'disabled' : ''),
   );
 }
@@ -1365,8 +1365,8 @@ export function renderStoryEpisodeSplitDraftStatus(options11 = {}, { disabled: d
         value71 +
         (response2?.['status'] === 'valid' && Array['isArray'](response2?.['clips'])
           ? response2['clips']['length']
-          : 0x0),
-      0x0,
+          : 0),
+      0,
     ),
     list15 = list14['filter']((response3) => response3?.['status'] !== 'valid'),
     enabled8 = list15['length'];
@@ -1378,18 +1378,18 @@ export function renderStoryEpisodeSplitDraftStatus(options11 = {}, { disabled: d
         list15['find']((value72) => normalizeText(value72?.['error']?.['message']))?.['error']?.['message'],
     ),
     value73 = list15['some'](
-      (value74) => Array['isArray'](value74?.['rawClips']) && value74['rawClips']['length'] > 0x0,
+      (value74) => Array['isArray'](value74?.['rawClips']) && value74['rawClips']['length'] > 0,
     ),
-    value75 = count3 > 0x0 || value73,
-    value76 = count3 > 0x0 ? '应用 ' + count3 + ' 个合格片段' : '重新校验已保存结果',
+    value75 = count3 > 0 || value73,
+    value76 = count3 > 0 ? '应用 ' + count3 + ' 个合格片段' : '重新校验已保存结果',
     value77 =
-      count3 > 0x0 ? '只应用已通过校验的片段，不调用模型' : '使用当前规则重新校验已保存的片段，不调用模型',
+      count3 > 0 ? '只应用已通过校验的片段，不调用模型' : '使用当前规则重新校验已保存的片段，不调用模型',
     value78 = value75
       ? '<button type="button" class="story-secondary-button story-episode-split-draft-repair" data-story-action="repair-episode-split-draft" data-story-episode-id="' +
         escapeHtml(options11?.['id']) +
-        '\x22\x20title=\x22' +
+        '" title="' +
         value77 +
-        '\x22\x20' +
+        '" ' +
         (disabled ? 'disabled' : '') +
         '>' +
         value76 +
@@ -1402,7 +1402,7 @@ export function renderStoryEpisodeSplitDraftStatus(options11 = {}, { disabled: d
     enabled8 +
     ' 项原始错误；当前旧版本未被覆盖。' +
     (text7 ? ' 失败原因：' + escapeHtml(text7) : '') +
-    '</span>\x0a\x20\x20\x20\x20' +
+    '</span>\n    ' +
     value78 +
     '\n  </div>'
   );
@@ -1413,9 +1413,9 @@ function createStoryEpisodeCardPresentation(sequenceLabel, id2) {
     characterCount = value79
       ? deriveStoryEpisodeAssetSummary(id2, sequenceLabel['data']['assets'])
       : {
-          characterCount: Number(id2?.['characterCount']) || 0x0,
-          sceneCount: Number(id2?.['sceneCount']) || 0x0,
-          propCount: Number(id2?.['propCount']) || 0x0,
+          characterCount: Number(id2?.['characterCount']) || 0,
+          sceneCount: Number(id2?.['sceneCount']) || 0,
+          propCount: Number(id2?.['propCount']) || 0,
         },
     disabled6 = getStoryEpisodeGenerationControlState(sequenceLabel, id2['id']),
     isSplitting = disabled6['isGenerating'],
@@ -1428,7 +1428,7 @@ function createStoryEpisodeCardPresentation(sequenceLabel, id2) {
     sequenceLabel:
       sequenceLabel['data']?.['project']?.['sourceMode'] === 'video-replication'
         ? '视频 ' + id2['number']
-        : '第\x20' + id2['number'] + '\x20集',
+        : '第 ' + id2['number'] + ' 集',
     posterLayout: sequenceLabel['workspaceSurface'] === 'replication',
     title: id2['title'],
     status: id2['storyboardStale']
@@ -1471,9 +1471,9 @@ export function renderEpisodesPage(title3) {
     experimentalMode = shouldUseStoryEpisodeExperimentalSplit(title3),
     disabled7 =
       batchControl['disabled'] ||
-      (Array['isArray'](title3['splittingEpisodeIds']) && title3['splittingEpisodeIds']['length'] > 0x0),
+      (Array['isArray'](title3['splittingEpisodeIds']) && title3['splittingEpisodeIds']['length'] > 0),
     allEpisodesSelected =
-      cards['length'] > 0x0 &&
+      cards['length'] > 0 &&
       cards['every']((value82) => title3['selectedEpisodeIds']['includes'](value82['id']));
   return storyClipProductionPresentation['renderOverview']({
     kind: 'page',
@@ -1509,13 +1509,13 @@ function renderPageFooter(value84, value85 = {}) {
 function getSelectedEpisode(value86) {
   return (
     value86['data']['episodes']['find']((value87) => value87['id'] === value86['selectedEpisodeId']) ||
-    value86['data']['episodes'][0x0]
+    value86['data']['episodes'][0]
   );
 }
 function getSelectedClip(value88, value89) {
   return (
     value89?.['clips']?.['find']((value90) => value90['id'] === value88['selectedClipId']) ||
-    value89?.['clips']?.[0x0] ||
+    value89?.['clips']?.[0] ||
     null
   );
 }
@@ -1592,7 +1592,7 @@ function renderEpisodeDetail(value97) {
     clipMeta = [storyStyleSelection['label'], normalizeStoryAspectRatio(styleId['aspectRatio'])]['filter'](
       Boolean,
     ),
-    hasMultipleClips = (selectedEpisode2?.['clips'] || [])['length'] > 0x1;
+    hasMultipleClips = (selectedEpisode2?.['clips'] || [])['length'] > 1;
   if (selectedEpisode2 && value97['selectedEpisodeId'] !== selectedEpisode2['id'])
     value97['selectedEpisodeId'] = selectedEpisode2['id'];
   if (title4 && value97['selectedClipId'] !== title4['id']) value97['selectedClipId'] = title4['id'];
@@ -1625,13 +1625,13 @@ function renderEpisodeDetail(value97) {
 }
 function renderProjectPage(styleId2) {
   if (
-    styleId2['step'] === 0x0 &&
+    styleId2['step'] === 0 &&
     styleId2['view'] === 'project' &&
     isStoryCollaborationProject(styleId2['data'])
   )
     return renderStoryConceptionPage(styleId2);
   if (styleId2['view'] === 'episode') return renderEpisodeDetail(styleId2);
-  if (styleId2['step'] === 0x1 && styleId2['data']?.['project']?.['sourceMode'] === 'video-replication') {
+  if (styleId2['step'] === 1 && styleId2['data']?.['project']?.['sourceMode'] === 'video-replication') {
     const targetLabel = getStoryReplicationLocale(
         styleId2['data']['project']?.['replication']?.['targetLocale'],
       ),
@@ -1648,10 +1648,10 @@ function renderProjectPage(styleId2) {
       footerMarkup: renderStoryVideoReplicationFooter(styleId2),
     });
   }
-  if (styleId2['step'] === 0x1 && isStoryAssetExtractionOperation(styleId2['storyPlanningOperation']))
+  if (styleId2['step'] === 1 && isStoryAssetExtractionOperation(styleId2['storyPlanningOperation']))
     return renderStoryAssetBreakdownPage(styleId2);
-  if (styleId2['step'] === 0x2) return renderAssetsPage(styleId2);
-  if (styleId2['step'] === 0x3) return renderEpisodesPage(styleId2);
+  if (styleId2['step'] === 2) return renderAssetsPage(styleId2);
+  if (styleId2['step'] === 3) return renderEpisodesPage(styleId2);
   return renderOutlinePage(styleId2);
 }
 function renderStoryVideoReplicationFooter(planningStatus) {
@@ -1668,11 +1668,11 @@ function renderStoryVideoReplicationFooter(planningStatus) {
       (title5['actionAttention'] ? ' is-attention' : '') +
       '" data-story-action="' +
       title5['action'] +
-      '\x22\x20' +
+      '" ' +
       (title5['actionDisabled'] ? 'disabled' : '') +
       ' aria-busy="' +
       title5['busy'] +
-      '\x22>' +
+      '">' +
       (title5['busy'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
       '<span>' +
       escapeHtml(title5['actionLabel']) +
@@ -1703,7 +1703,7 @@ export function updateStoryAssetPromptFromEditor(options13 = {}, value103 = null
   if (!asset3 || !appearance3 || asset3['isLibraryAsset']) return ![];
   return (
     (appearance3['prompt'] = readStoryAssetPromptText(value103)),
-    normalizeText(getStoryAssetAppearances(asset3)[0x0]?.['id']) === normalizeText(appearance3['id']) &&
+    normalizeText(getStoryAssetAppearances(asset3)[0]?.['id']) === normalizeText(appearance3['id']) &&
       (asset3['prompt'] = appearance3['prompt']),
     !![]
   );
@@ -1723,10 +1723,10 @@ function syncProjectChapterContent(enabled9) {
     })));
   const value107 = (enabled9['chapters'] || [])
     ['map']((value108) =>
-      (normalizeText(value108['title']) + '\x0a' + normalizeText(value108['content']))['trim'](),
+      (normalizeText(value108['title']) + '\n' + normalizeText(value108['content']))['trim'](),
     )
     ['filter'](Boolean)
-    ['join']('\x0a\x0a');
+    ['join']('\n\n');
   ((enabled9['plotScript'] = value107), (enabled9['narrationScript'] = value107));
 }
 export function reportStoryWorkspaceApiError(value109, code, value110 = {}) {
@@ -1745,7 +1745,7 @@ export function reportStoryWorkspaceApiError(value109, code, value110 = {}) {
     };
   return (
     globalThis['console']?.['error']?.(
-      '[storyWorkspace][' + operation + ']\x20API\x20请求失败',
+      '[storyWorkspace][' + operation + '] API 请求失败',
       value112,
       code,
     ),
@@ -1761,10 +1761,10 @@ export function resolveStoryTaskResultDestination(options14 = {}, value113 = {})
     const text13 = normalizeText(value113?.['clipId']),
       value116 =
         value114['clips']['find']((value117) => normalizeText(value117?.['id']) === text13) ||
-        value114['clips'][0x0];
+        value114['clips'][0];
     return {
       view: 'episode',
-      step: 0x3,
+      step: 3,
       episodeId: normalizeText(value114['id']),
       clipId: normalizeText(value116?.['id']),
     };
@@ -1774,7 +1774,7 @@ export function resolveStoryTaskResultDestination(options14 = {}, value113 = {})
   if (value118)
     return {
       view: 'project',
-      step: 0x2,
+      step: 2,
       assetId: normalizeText(value118['id']),
       assetFilter: normalizeText(value118['kind']) || 'character',
     };
@@ -1782,7 +1782,7 @@ export function resolveStoryTaskResultDestination(options14 = {}, value113 = {})
   return {
     view: 'project',
     step: step,
-    outlineSectionId: step === 0x1 ? normalizeText(value113?.['outlineSectionId']) : '',
+    outlineSectionId: step === 1 ? normalizeText(value113?.['outlineSectionId']) : '',
   };
 }
 export function notifyStoryTaskResult(
@@ -1874,13 +1874,13 @@ export function initStoryWorkspace({
     image2 = resolveStoryWorkspaceModelId('image'),
     video = resolveStoryWorkspaceModelId('video'),
     state2 = {
-      storyProjectSessionId: 0x1,
-      storyProjectSessionById: { [normalizeText(selectedAssetId2['project']?.['id'])]: 0x1 },
+      storyProjectSessionId: 1,
+      storyProjectSessionById: { [normalizeText(selectedAssetId2['project']?.['id'])]: 1 },
       experimentalSplitAvailable: isStoryEpisodeExperimentalSplitAvailable(windowObject),
       experimentalAssetExtractionAvailable: isStoryAssetExperimentalExtractionAvailable(windowObject),
       developerModeAvailable: windowObject?.['DEV_MODE'] === !![],
       view: 'home',
-      step: 0x1,
+      step: 1,
       homeTab: 'generate',
       uploadInputMode: 'file',
       replicationSourceFiles: [],
@@ -1908,7 +1908,7 @@ export function initStoryWorkspace({
       storyPlanningOperation: '',
       storyPlanningStatus: '',
       assetBreakdownEpisodes: [],
-      assetBreakdownVisibleCount: 0x0,
+      assetBreakdownVisibleCount: 0,
       scriptSelectionMode: ![],
       selectedScriptEpisodeIds: [],
       generatingEpisodeScriptId: '',
@@ -1954,9 +1954,9 @@ export function initStoryWorkspace({
       scriptMode: 'plot',
       assetFilter: 'character',
       assetLibraryDisclosure: createWorkspaceAssetLibraryDisclosure(),
-      assetSplitRatio: 0x32,
-      assetDetailSplitRatio: 0x32,
-      episodeAssetPanelRatio: 0x16,
+      assetSplitRatio: 50,
+      assetDetailSplitRatio: 50,
+      episodeAssetPanelRatio: 22,
       episodeEditorPanelRatio: 0x22,
       episodeAssetRailTab: 'assets',
       assetSelectionMode: ![],
@@ -1974,8 +1974,8 @@ export function initStoryWorkspace({
       assetAppearanceMotion: '',
       selectedAssetId:
         selectedAssetId2['assets']['find']((value126) => value126['kind'] === 'character')?.['id'] || '',
-      selectedEpisodeId: selectedAssetId2['episodes'][0x0]?.['id'] || '',
-      selectedClipId: selectedAssetId2['episodes'][0x0]?.['clips']?.[0x0]?.['id'] || '',
+      selectedEpisodeId: selectedAssetId2['episodes'][0]?.['id'] || '',
+      selectedClipId: selectedAssetId2['episodes'][0]?.['clips']?.[0]?.['id'] || '',
       pendingAssetUploadId: '',
       pendingAssetAppearanceId: '',
       pendingCharacterVoiceAssetId: '',
@@ -2042,7 +2042,7 @@ export function initStoryWorkspace({
     value139 = '';
   const replicationAnalysisPromises = new Map(),
     replicationSourceFileByEpisodeKey = new Map();
-  let value140 = 0x0;
+  let value140 = 0;
   const storyAssetHoverPreviewController = createStoryAssetHoverPreviewController({
       previewElement: previewElement,
       getState: () => state2,
@@ -2054,7 +2054,7 @@ export function initStoryWorkspace({
     }),
     handler5 = (...args2) => storyAssetHoverPreviewController['show'](...args2);
   let timer = null;
-  const value141 = { accumulator: 0x0, lockedUntil: 0x0 },
+  const value141 = { accumulator: 0, lockedUntil: 0 },
     map4 = new WeakMap(),
     workspacePageTransitionController = createWorkspacePageTransitionController({
       windowObject: windowObject,
@@ -2132,7 +2132,7 @@ export function initStoryWorkspace({
         details: details3,
         ...(value152
           ? {
-              duration: 0x2710,
+              duration: 10000,
               toastOptions: {
                 ariaLabel: String(value149 || '任务完成')['trim']() + '，点击查看结果',
                 onClick: () => {
@@ -2251,8 +2251,8 @@ export function initStoryWorkspace({
   function run5(args8 = {}) {
     const { changed: changed2, currentProjectChanged: currentProjectChanged } = projectData['applyChanges'](
       (value171, { isCurrent: isCurrent2 }) => {
-        const episodeId = isCurrent2 ? getSelectedEpisode(state2) : value171['episodes']?.[0x0] || null,
-          clipId = isCurrent2 ? getSelectedClip(state2, episodeId) : episodeId?.['clips']?.[0x0] || null;
+        const episodeId = isCurrent2 ? getSelectedEpisode(state2) : value171['episodes']?.[0] || null,
+          clipId = isCurrent2 ? getSelectedClip(state2, episodeId) : episodeId?.['clips']?.[0] || null;
         return reconcileStoryCanvasMediaNodes(value171, {
           ...args8,
           episodeId: episodeId?.['id'],
@@ -2419,7 +2419,7 @@ export function initStoryWorkspace({
       showTaskApiKeyError: showTaskApiKeyError,
       showTaskResultToast: showTaskResultToast,
       showNavigableTaskResultToast: showNavigableTaskResultToast,
-      isEditorSurfaceActive: () => enabled11 && state2['view'] === 'project' && state2['step'] === 0x2,
+      isEditorSurfaceActive: () => enabled11 && state2['view'] === 'project' && state2['step'] === 2,
     }),
     {
       closeEditor: closeEditor,
@@ -2507,8 +2507,8 @@ export function initStoryWorkspace({
       const error2 = resolveAssetMentionRef({
           assetId: assetId2['dataset']['storyReferenceAsset'],
           itemIndex: Math['max'](
-            0x0,
-            Math['trunc'](Number(assetId2['dataset']['storyReferenceAssetIndex']) || 0x0),
+            0,
+            Math['trunc'](Number(assetId2['dataset']['storyReferenceAssetIndex']) || 0),
           ),
         }),
         imageUrl2 =
@@ -2582,9 +2582,9 @@ export function initStoryWorkspace({
       box = applyStoryEpisodePanelRatiosToLayout(
         assetSplitter,
         {
-          assetSplitter: assetSplitter?.['querySelector']?.('[data-story-episode-splitter=\x22assets\x22]'),
+          assetSplitter: assetSplitter?.['querySelector']?.('[data-story-episode-splitter="assets"]'),
           previewSplitter: assetSplitter?.['querySelector']?.(
-            '[data-story-episode-splitter=\x22preview\x22]',
+            '[data-story-episode-splitter="preview"]',
           ),
         },
         value183,
@@ -2656,7 +2656,7 @@ export function initStoryWorkspace({
     const el20 = documentObject['createElement']('button');
     ((el20['type'] = 'button'),
       (el20['className'] =
-        'story-voice-pill-toggle' + (storyClipMentionVoiceState['enabled'] ? '\x20is-active' : '')),
+        'story-voice-pill-toggle' + (storyClipMentionVoiceState['enabled'] ? ' is-active' : '')),
       (el20['dataset']['storyVoiceToggle'] = 'true'),
       el20['setAttribute']('contenteditable', 'false'),
       el20['setAttribute']('aria-pressed', String(storyClipMentionVoiceState['enabled'])),
@@ -2856,7 +2856,7 @@ export function initStoryWorkspace({
       },
     };
   }
-  function insertMention(assetId3, { assetIndex: assetIndex = 0x0, triggerRange: triggerRange = null } = {}) {
+  function insertMention(assetId3, { assetIndex: assetIndex = 0, triggerRange: triggerRange = null } = {}) {
     const storyAsset = findStoryAsset(state2, assetId3),
       clips2 = getSelectedEpisode(state2),
       selectedClip2 = getSelectedClip(state2, clips2);
@@ -2867,7 +2867,7 @@ export function initStoryWorkspace({
       ? buildStoryClipMentionCandidates({
           assets: [storyAsset],
           episode: { assetIds: [storyAsset['id']] },
-        })[0x0]
+        })[0]
       : null;
     !candidate2 &&
       (candidate2 = buildStoryClipFrameMentionCandidates(state2['data']['clipFrames'], {
@@ -2881,10 +2881,10 @@ export function initStoryWorkspace({
     if (!candidate2) {
       const assetMentionRef = resolveAssetMentionRef({
         assetId: assetId3,
-        itemIndex: Math['max'](0x0, Math['trunc'](Number(assetIndex) || 0x0)),
+        itemIndex: Math['max'](0, Math['trunc'](Number(assetIndex) || 0)),
       });
       candidate2 = assetMentionRef
-        ? buildStoryClipMentionCandidates({ libraryCandidates: [assetMentionRef] })[0x0]
+        ? buildStoryClipMentionCandidates({ libraryCandidates: [assetMentionRef] })[0]
         : null;
     }
     if (!enabled12 || !candidate2) return ![];
@@ -2915,7 +2915,7 @@ export function initStoryWorkspace({
       showCaret: showCaret,
     } = map7;
   function run18() {
-    ((value138 = ''), (value140 = 0x0), map7['clear']());
+    ((value138 = ''), (value140 = 0), map7['clear']());
   }
   const storyClipAdjustmentController = createStoryClipAdjustmentController({
       state: state2,
@@ -3024,7 +3024,7 @@ export function initStoryWorkspace({
       el27?.['style']['setProperty']('--story-episode-editor-width', box2['center'] + '%'),
       run23(el25),
       windowObject['requestAnimationFrame']?.(() =>
-        el25['querySelector']('[data-workspace-episode-rail-item][aria-current=\x22page\x22]')?.[
+        el25['querySelector']('[data-workspace-episode-rail-item][aria-current="page"]')?.[
           'scrollIntoView'
         ]?.({ block: 'nearest', inline: 'nearest' }),
       ),
@@ -3097,7 +3097,7 @@ export function initStoryWorkspace({
           globalThis['console']?.['warn']?.('[storyWorkspace] 页面控制器清理失败', value201);
         }
       }
-      list21['length'] = 0x0;
+      list21['length'] = 0;
     };
     try {
       const run24 = (el29, handler7) => {
@@ -3437,7 +3437,7 @@ export function initStoryWorkspace({
       page = run22(value223);
     if (!current2 || direction2 === 'none')
       return (
-        viewportElement['querySelectorAll'](':scope\x20>\x20.story-page')['forEach']((value224) => {
+        viewportElement['querySelectorAll'](':scope > .story-page')['forEach']((value224) => {
           if (value224 !== page) disposePage(value224);
         }),
         viewportElement['replaceChildren'](page),
@@ -3487,7 +3487,7 @@ export function initStoryWorkspace({
     if (state2['view'] === 'episode')
       return 'project:' + text23 + ':episode:' + (normalizeText(state2['selectedEpisodeId']) || 'selected');
     if (
-      state2['step'] === 0x1 &&
+      state2['step'] === 1 &&
       state2['data']?.['project']?.['sourceMode'] !== 'video-replication' &&
       isStoryAssetExtractionOperation(state2['storyPlanningOperation'])
     )
@@ -3506,15 +3506,15 @@ export function initStoryWorkspace({
     state2['pageScrollPositions'] = {
       ...(state2['pageScrollPositions'] || {}),
       [value228]: {
-        top: Math['max'](0x0, Number(el40['scrollTop']) || 0x0),
-        left: Math['max'](0x0, Number(el40['scrollLeft']) || 0x0),
+        top: Math['max'](0, Number(el40['scrollTop']) || 0),
+        left: Math['max'](0, Number(el40['scrollLeft']) || 0),
       },
     };
   }
   function syncStoryPlanningLoading() {
     const enabled18 =
       state2['view'] === 'project' &&
-      state2['step'] === 0x2 &&
+      state2['step'] === 2 &&
       state2['storyPlanningOperation'] === 'planning-episodes';
     (el6['classList']['toggle']('is-planning', enabled18),
       el6['setAttribute']('aria-busy', String(enabled18)),
@@ -3522,9 +3522,9 @@ export function initStoryWorkspace({
       enabled18 && (el8['textContent'] = state2['storyPlanningStatus'] || '正在生成分镜视频'));
   }
   function refreshStoryAssetExtractionFooterInPlace() {
-    if (state2['view'] !== 'project' || state2['step'] !== 0x1) return ![];
+    if (state2['view'] !== 'project' || state2['step'] !== 1) return ![];
     if (state2['data']?.['project']?.['sourceMode'] === 'video-replication') return refreshFooter();
-    const enabled19 = viewportElement['querySelector']('.story-page.is-current\x20.story-page-footer');
+    const enabled19 = viewportElement['querySelector']('.story-page.is-current .story-page-footer');
     if (!enabled19) return ![];
     const el42 = documentObject['createElement']('template');
     el42['innerHTML'] = renderStoryAssetExtractionFooter(state2)['trim']();
@@ -3561,8 +3561,8 @@ export function initStoryWorkspace({
       el43 = value233['page'];
     return (
       el43 &&
-        ((el43['scrollTop'] = Math['max'](0x0, Number(box3['top']) || 0x0)),
-        (el43['scrollLeft'] = Math['max'](0x0, Number(box3['left']) || 0x0)),
+        ((el43['scrollTop'] = Math['max'](0, Number(box3['top']) || 0)),
+        (el43['scrollLeft'] = Math['max'](0, Number(box3['left']) || 0)),
         restoreStoryWorkspaceNestedScrollPositions(el43, value232)),
       value233['committedImmediately']
         ? (value132 = value231)
@@ -3584,7 +3584,7 @@ export function initStoryWorkspace({
     );
   }
   function run28() {
-    if (state2['view'] !== 'project' || state2['step'] !== 0x2) return null;
+    if (state2['view'] !== 'project' || state2['step'] !== 2) return null;
     return viewportElement['querySelector']('.story-page.is-current');
   }
   function syncFrameRail({ refreshContent: refreshContent = ![] } = {}) {
@@ -3597,11 +3597,11 @@ export function initStoryWorkspace({
       el46['innerHTML'] = renderEpisodeAssetRail(state2);
       const el47 = el46['firstElementChild'];
       ['assets', 'frames', 'library']['forEach']((value236) => {
-        const el48 = el45['querySelector']('[data-story-episode-asset-panel="' + value236 + '\x22]'),
-          el49 = el47?.['querySelector']('[data-story-episode-asset-panel="' + value236 + '\x22]');
+        const el48 = el45['querySelector']('[data-story-episode-asset-panel="' + value236 + '"]'),
+          el49 = el47?.['querySelector']('[data-story-episode-asset-panel="' + value236 + '"]');
         if (el48 && el49) el48['innerHTML'] = el49['innerHTML'];
-        const el50 = el45['querySelector']('[data-story-episode-asset-count="' + value236 + '\x22]'),
-          el51 = el47?.['querySelector']('[data-story-episode-asset-count=\x22' + value236 + '\x22]');
+        const el50 = el45['querySelector']('[data-story-episode-asset-count="' + value236 + '"]'),
+          el51 = el47?.['querySelector']('[data-story-episode-asset-count="' + value236 + '"]');
         if (el50 && el51) el50['textContent'] = el51['textContent'];
       });
     }
@@ -3611,7 +3611,7 @@ export function initStoryWorkspace({
         const value237 = el52['dataset']['storyEpisodeAssetTab'] === storyEpisodeAssetRailTab;
         (el52['classList']['toggle']('is-active', value237),
           el52['setAttribute']('aria-selected', String(value237)),
-          (el52['tabIndex'] = value237 ? 0x0 : -0x1));
+          (el52['tabIndex'] = value237 ? 0 : -1));
       }),
       el45['querySelectorAll']('[data-story-episode-asset-panel]')['forEach']((el53) => {
         const enabled21 = el53['dataset']['storyEpisodeAssetPanel'] === storyEpisodeAssetRailTab;
@@ -3637,7 +3637,7 @@ export function initStoryWorkspace({
     return (syncStoryClipFrameCardSaveError(el55, errorMessage), !![]);
   }
   function run7(value239) {
-    if (state2['view'] !== 'project' || state2['step'] !== 0x3) return ![];
+    if (state2['view'] !== 'project' || state2['step'] !== 3) return ![];
     const el58 = viewportElement['querySelector']('.story-page.is-current'),
       enabled22 = state2['data']['episodes']['find']((value240) => value240['id'] === value239),
       enabled23 = [...(el58?.['querySelectorAll']('.story-episode-card[data-story-marquee-id]') || [])][
@@ -3675,7 +3675,7 @@ export function initStoryWorkspace({
     const list22 = getStoryAssetAppearances(alt2),
       selectedAssetAppearanceIndex = getSelectedAssetAppearanceIndex(state2, alt2),
       imageUrl4 = getSelectedAssetAppearance(state2, alt2) || alt2,
-      value242 = list22['length'] > 0x1,
+      value242 = list22['length'] > 1,
       generationControl = getStoryAssetGenerationControlState(state2, alt2['id'], imageUrl4['id']),
       value243 = generationControl['isGenerating'],
       el68 = el66['querySelector']('.story-asset-preview-slide'),
@@ -3694,7 +3694,7 @@ export function initStoryWorkspace({
         el68['after'](el71));
       const value244 = () => el71['remove']();
       (el71['addEventListener']('animationend', value244, { once: !![] }),
-        windowObject['setTimeout'](value244, 0x1cc));
+        windowObject['setTimeout'](value244, 460));
     }
     el66['classList']['remove']('is-sliding-next', 'is-sliding-previous');
     state2['assetAppearanceMotion'] &&
@@ -3706,7 +3706,7 @@ export function initStoryWorkspace({
         '' +
         renderImageOrEmpty({
           imageUrl: imageUrl4['imageUrl'],
-          alt: alt2['name'] + '\x20·\x20' + (imageUrl4['name'] || '形象'),
+          alt: alt2['name'] + ' · ' + (imageUrl4['name'] || '形象'),
           className: 'story-asset-preview',
         }) +
         (value243 ? renderStoryAssetLoadingOverlay() : '')));
@@ -3723,7 +3723,7 @@ export function initStoryWorkspace({
       if (value245 && value246) value245['replaceWith'](value246);
       ((el69['dataset']['storyAppearanceWheel'] = String(value242)),
         value242
-          ? ((el69['tabIndex'] = 0x0),
+          ? ((el69['tabIndex'] = 0),
             el69['setAttribute']('aria-label', '滚动鼠标滚轮或按左右方向键切换形象'))
           : (el69['removeAttribute']('tabindex'),
             el69['removeAttribute']('aria-label'),
@@ -3750,9 +3750,9 @@ export function initStoryWorkspace({
     el76 &&
       (el76['textContent'] =
         (imageUrl4['name'] || alt2['role'] || '素材') +
-        '\x20·\x20' +
+        ' · ' +
         formatStoryAssetOccurrences(imageUrl4['occurrences'] || alt2['occurrences'] || '当前项目') +
-        (value242 ? ' · ' + (selectedAssetAppearanceIndex + 0x1) + '/' + list22['length'] : ''));
+        (value242 ? ' · ' + (selectedAssetAppearanceIndex + 1) + '/' + list22['length'] : ''));
     const el77 = el74?.['querySelector']('.story-base-appearance-button');
     if (el77) {
       const isStoryAssetBaseAppearance2 = isStoryAssetBaseAppearance(alt2, imageUrl4),
@@ -3834,7 +3834,7 @@ export function initStoryWorkspace({
     };
     return (
       el92?.['addEventListener']('animationend', value252, { once: !![] }),
-      windowObject['setTimeout'](value252, 0x1cc),
+      windowObject['setTimeout'](value252, 460),
       windowObject['requestAnimationFrame'](() => {
         el88['querySelector']('[data-story-clip-id].is-selected')?.['scrollIntoView']?.({
           block: 'nearest',
@@ -3881,7 +3881,7 @@ export function initStoryWorkspace({
     };
     return (
       el96['addEventListener']('animationend', value257, { once: !![] }),
-      windowObject['setTimeout'](value257, 0x1cc),
+      windowObject['setTimeout'](value257, 460),
       !![]
     );
   }
@@ -3895,7 +3895,7 @@ export function initStoryWorkspace({
     el104['innerHTML'] = renderEpisodeDetail(state2);
     const el105 = el104['firstElementChild']?.['querySelector']('.story-clip-timeline');
     if (!el105) return ![];
-    const value259 = Math['max'](0x0, Number(value258?.['scrollLeft']) || 0x0);
+    const value259 = Math['max'](0, Number(value258?.['scrollLeft']) || 0);
     el103['replaceWith'](el105);
     const value260 = el105['querySelector']('.story-clip-strip');
     if (value260) value260['scrollLeft'] = value259;
@@ -3912,7 +3912,7 @@ export function initStoryWorkspace({
     const value261 = storyClipProduction['renderEpisode'](state2, selectedEpisode6, selectedClip4),
       value262 = value261['referenceCounts'];
     (['image', 'audio', 'video']['forEach']((value263) => {
-      const el107 = el106['querySelector']('[data-story-reference-count=\x22' + value263 + '\x22]');
+      const el107 = el106['querySelector']('[data-story-reference-count="' + value263 + '"]');
       if (el107) el107['textContent'] = String(value262[value263 + 'Count']);
     }),
       el106['setAttribute'](
@@ -3980,7 +3980,7 @@ export function initStoryWorkspace({
     if (state2['view'] !== 'episode') return ![];
     const el117 = viewportElement['querySelector']('.story-page.is-current'),
       el118 = el117?.['querySelector']('.story-clip-adjustment-control'),
-      el119 = el118?.['querySelector']('[data-story-action=\x22toggle-clip-adjustment\x22]'),
+      el119 = el118?.['querySelector']('[data-story-action="toggle-clip-adjustment"]'),
       selectedEpisode7 = getSelectedEpisode(state2),
       selectedClip6 = getSelectedClip(state2, selectedEpisode7);
     if (!el117 || !el118 || !el119 || !selectedEpisode7 || !selectedClip6) return ![];
@@ -4071,7 +4071,7 @@ export function initStoryWorkspace({
         ['filter'](Boolean),
     );
     el136['classList']['toggle']('is-selection-mode', state2['clipSelectionMode']);
-    const el138 = el136['querySelector']('.story-clip-timeline-header\x20small');
+    const el138 = el136['querySelector']('.story-clip-timeline-header small');
     return (
       el138 &&
         (el138['textContent'] = state2['clipSelectionMode']
@@ -4278,16 +4278,16 @@ export function initStoryWorkspace({
       text27 = normalizeText(el163?.['querySelector']('[data-story-style-search-input]')?.['value'])[
         'toLowerCase'
       ]();
-    let count4 = 0x0;
+    let count4 = 0;
     el163?.['querySelectorAll']('[data-story-style-card-category]')['forEach']((el164) => {
       const value287 = el164['dataset']['storyStyleCardCategory'],
         value288 = value286 === 'all' || value287 === value286,
         value289 = !text27 || String(el164['dataset']['storyStyleSearch'] || '')['includes'](text27);
       el164['hidden'] = !(value288 && value289);
-      if (!el164['hidden']) count4 += 0x1;
+      if (!el164['hidden']) count4 += 1;
     });
     const el165 = el163?.['querySelector']('[data-story-style-empty]');
-    if (el165) el165['hidden'] = count4 > 0x0;
+    if (el165) el165['hidden'] = count4 > 0;
   }
   function run45(value290) {
     const storyAspectRatio = normalizeStoryAspectRatio(value290);
@@ -4342,7 +4342,7 @@ export function initStoryWorkspace({
   }
   function run47(el166) {
     const count5 = Number(el166?.['value']);
-    if (!Number['isInteger'](count5) || count5 < 0x1 || count5 > STORY_EPISODE_COUNT_MAX)
+    if (!Number['isInteger'](count5) || count5 < 1 || count5 > STORY_EPISODE_COUNT_MAX)
       return (
         el166?.['setAttribute']('aria-invalid', 'true'),
         showToast('请输入 1-' + STORY_EPISODE_COUNT_MAX + ' 的整数集数。', 'warn'),
@@ -4376,7 +4376,7 @@ export function initStoryWorkspace({
       normalizeText(el172['value'])
         ? run47(el172)
         : run48(el172, normalizeStoryEpisodeCount(state2['data']['project']?.['planning']?.['episodeCount']));
-    }, 0x0);
+    }, 0);
   }
   function run50(styleId3) {
     const visualStyle = resolveStoryStyleSelection({ styleId: styleId3 });
@@ -4399,7 +4399,7 @@ export function initStoryWorkspace({
       render());
   }
   function run51(el173) {
-    const visualStyle2 = normalizeText(el173?.['value'])['slice'](0x0, STORY_CUSTOM_STYLE_MAX_CHARACTERS);
+    const visualStyle2 = normalizeText(el173?.['value'])['slice'](0, STORY_CUSTOM_STYLE_MAX_CHARACTERS);
     if (!visualStyle2) {
       (showToast('请输入自定义风格提示词。', 'warn'), el173?.['focus']());
       return;
@@ -4461,7 +4461,7 @@ export function initStoryWorkspace({
     response6 &&
       typeof response6 === 'object' &&
       ((state2['scriptFileName'] = String(response6['fileName'] || '')),
-      (state2['scriptText'] = String(response6['text'] || '')['slice'](0x0, STORY_SCRIPT_MAX_CHARACTERS)),
+      (state2['scriptText'] = String(response6['text'] || '')['slice'](0, STORY_SCRIPT_MAX_CHARACTERS)),
       (state2['scriptCharacterCount'] = Number['isFinite'](response6['characterCount'])
         ? response6['characterCount']
         : state2['scriptText']['length']));
@@ -4551,7 +4551,7 @@ export function initStoryWorkspace({
         (value304) => value304['id'] === selectedEpisode8?.['id'],
       ),
       removeStoryEpisodeClip2 = removeStoryEpisodeClip(selectedEpisode8, text31);
-    if (!text31 || !removeStoryEpisodeClip2 || count6 < 0x0)
+    if (!text31 || !removeStoryEpisodeClip2 || count6 < 0)
       return (
         (state2['pendingDeleteClipId'] = ''),
         render(),
@@ -4578,18 +4578,18 @@ export function initStoryWorkspace({
   }
   function run4(value309) {
     const storyClipFrameMentionId = buildStoryClipFrameMentionId(value309);
-    if (!storyClipFrameMentionId) return 0x0;
+    if (!storyClipFrameMentionId) return 0;
     const run57 = (el176) => {
-      let value310 = 0x0;
+      let value310 = 0;
       return (
         el176?.['querySelectorAll']?.('.ref-pill')?.['forEach']((el177) => {
           if (normalizeText(el177['dataset']?.['assetId']) !== storyClipFrameMentionId) return;
-          (el177['remove']?.(), (value310 += 0x1));
+          (el177['remove']?.(), (value310 += 1));
         }),
         value310
       );
     };
-    let value311 = 0x0;
+    let value311 = 0;
     const selectedClip7 = getSelectedClip(state2, getSelectedEpisode(state2)),
       el178 = storyRoot['querySelector']('[data-story-clip-prompt]');
     if (el178 && selectedClip7) {
@@ -4638,7 +4638,7 @@ export function initStoryWorkspace({
       getStoryClipFrameMediaType(canvasId) === STORY_CLIP_MEDIA_TYPE_VIDEO ? '视频片段' : '片段帧';
     return (
       showToast(
-        count7 > 0x0
+        count7 > 0
           ? storyClipFrameMediaType + '已删除，相关提示词引用已移除。'
           : storyClipFrameMediaType + '已删除。',
         'success',
@@ -4843,7 +4843,7 @@ export function initStoryWorkspace({
       (value322['narrationScript'] = fullText['fullText']),
       (value322['compiledScript'] = fullText['complete']
         ? {
-            revision: Number(value322['compiledScript']?.['revision'] || 0x0) + 0x1,
+            revision: Number(value322['compiledScript']?.['revision'] || 0) + 1,
             episodeIds: episodeIds['episodes']['map']((value323) => value323['id']),
             fullText: fullText['fullText'],
             confirmedAt: Date['now'](),
@@ -4913,7 +4913,7 @@ export function initStoryWorkspace({
         persistNow: persistNow,
         persistenceRequired: () => typeof saveWorkspace === 'function' && coordinator['isReady'](),
         renderPlanningProgress: () => {
-          if (state2['view'] === 'project' && state2['step'] === 0x1) render();
+          if (state2['view'] === 'project' && state2['step'] === 1) render();
         },
         registerProjectData: registerProjectData,
         resetDownstreamUi: resetDownstreamUi,
@@ -4934,11 +4934,11 @@ export function initStoryWorkspace({
   async function run62(episodeId3, { regeneration: regeneration = ![] } = {}) {
     if (state2['storyPlanningOperation']) return ![];
     const count8 = state2['data']['episodes']['findIndex']((value326) => value326['id'] === episodeId3);
-    if (count8 < 0x0) return ![];
+    if (count8 < 0) return ![];
     if (!regeneration && !canGenerateStoryEpisodeScript(state2['data']['episodes'], count8))
       return (
         showToast(
-          '请先完成第\x20' + (getNextStoryEpisodeScriptIndex(state2['data']['episodes']) + 0x1) + ' 集剧本。',
+          '请先完成第 ' + (getNextStoryEpisodeScriptIndex(state2['data']['episodes']) + 1) + ' 集剧本。',
           'warn',
         ),
         ![]
@@ -4946,15 +4946,15 @@ export function initStoryWorkspace({
     const value327 = state2['data']['episodes'][count8];
     ((state2['scriptGenerationFocusMode'] = !![]),
       (state2['generatingEpisodeScriptId'] = value327['id']),
-      (state2['episodeScriptGenerationStatus'] = '正在生成第 ' + (count8 + 0x1) + ' 集完整剧本'),
+      (state2['episodeScriptGenerationStatus'] = '正在生成第 ' + (count8 + 1) + ' 集完整剧本'),
       setStoryPlanningOperation('writing-episode-script', state2['episodeScriptGenerationStatus']));
     const value328 = createProjectToken(state2);
     try {
       const value329 = await run61(value327, value328, { regeneration: regeneration });
       if (!isLive(value328)) return ![];
       return (
-        notifyTextTaskComplete('第\x20' + (count8 + 0x1) + ' 集完整剧本生成完成。', value328, {
-          step: 0x1,
+        notifyTextTaskComplete('第 ' + (count8 + 1) + ' 集完整剧本生成完成。', value328, {
+          step: 1,
           outlineSectionId: 'episode-' + episodeId3,
         }),
         Boolean(value329)
@@ -4968,7 +4968,7 @@ export function initStoryWorkspace({
           episodeId: episodeId3,
         }),
         showTaskResultToast(
-          error5?.['message'] || '第\x20' + (count8 + 0x1) + '\x20集剧本生成失败。',
+          error5?.['message'] || '第 ' + (count8 + 1) + ' 集剧本生成失败。',
           'error',
           error5,
         ),
@@ -5006,13 +5006,13 @@ export function initStoryWorkspace({
         (value333) => normalizeText(value333?.['id']) === pendingEpisodeIds,
       ),
       label =
-        count9 >= 0x0
+        count9 >= 0
           ? '已取消后续 ' +
             cancelledEpisodeIds['length'] +
-            '\x20集排队，正在完成第\x20' +
-            (count9 + 0x1) +
-            '\x20集'
-          : '已取消后续\x20' + cancelledEpisodeIds['length'] + '\x20集排队，正在完成当前集',
+            ' 集排队，正在完成第 ' +
+            (count9 + 1) +
+            ' 集'
+          : '已取消后续 ' + cancelledEpisodeIds['length'] + ' 集排队，正在完成当前集',
       value334 = createProjectToken(state2);
     return (
       updateBackgroundTaskBatch(value334, text33, {
@@ -5047,15 +5047,15 @@ export function initStoryWorkspace({
       value336 = value335['data'],
       batchId = createTaskBatch('episode-scripts', {
         total: total['length'],
-        completed: 0x0,
+        completed: 0,
         targetEpisodeIds: total['map']((value337) => value337['id']),
         pendingEpisodeIds: total['map']((value338) => value338['id']),
         label: '批量生成 0/' + total['length'],
       });
     ((state2['episodeScriptBatchId'] = batchId['id']),
       (state2['episodeScriptBatchCancelRequested'] = ![]),
-      setStoryPlanningOperation('writing-episode-scripts', '准备按顺序生成 ' + total['length'] + '\x20集'));
-    let completed = 0x0;
+      setStoryPlanningOperation('writing-episode-scripts', '准备按顺序生成 ' + total['length'] + ' 集'));
+    let completed = 0;
     try {
       const response7 = await runStoryEpisodeScriptBatchQueue({
         targets: total,
@@ -5069,7 +5069,7 @@ export function initStoryWorkspace({
           pendingTargets: pendingTargets,
         }) => {
           const value340 = value336['episodes']['findIndex']((value341) => value341['id'] === target2['id']),
-            label2 = '正在生成第 ' + (value340 + 0x1) + ' 集 · ' + (completed2 + 0x1) + '/' + total2;
+            label2 = '正在生成第 ' + (value340 + 1) + ' 集 · ' + (completed2 + 1) + '/' + total2;
           (syncTaskBatch(value335, batchId, {
             completed: completed2,
             pendingEpisodeIds: pendingTargets['map']((value342) => value342['id']),
@@ -5097,7 +5097,7 @@ export function initStoryWorkspace({
               pendingEpisodeIds: pendingTargets2['map']((value346) => value346['id']),
               label: cancelRequested
                 ? '批量生成已停止 · 完成 ' + completed + '/' + total3
-                : '批量生成\x20' + completed + '/' + total3,
+                : '批量生成 ' + completed + '/' + total3,
             }));
         },
       });
@@ -5106,18 +5106,18 @@ export function initStoryWorkspace({
         return (
           notifyTextTaskComplete(
             response7['cancelled']
-              ? '当前集已完成，已取消剩余 ' + response7['cancelled'] + '\x20集排队。'
+              ? '当前集已完成，已取消剩余 ' + response7['cancelled'] + ' 集排队。'
               : '当前集已完成，批量生成已停止。',
             value335,
-            { step: 0x1, outlineSectionId: 'episodes' },
+            { step: 1, outlineSectionId: 'episodes' },
           ),
           isCurrent3(value335) &&
             ((state2['scriptSelectionMode'] = ![]), (state2['selectedScriptEpisodeIds'] = [])),
           !![]
         );
       return (
-        notifyTextTaskComplete('已按顺序完成\x20' + completed + '\x20集完整剧本。', value335, {
-          step: 0x1,
+        notifyTextTaskComplete('已按顺序完成 ' + completed + ' 集完整剧本。', value335, {
+          step: 1,
           outlineSectionId: 'episodes',
         }),
         isCurrent3(value335) &&
@@ -5157,21 +5157,21 @@ export function initStoryWorkspace({
     if (state2['data']['project']?.['sourceMode'] === 'upload-original')
       return (showToast('上传剧本保持原稿，不支持 AI 扩写分集正文。', 'info'), ![]);
     const count10 = state2['data']['episodes']['findIndex']((value348) => value348['id'] === value347);
-    if (count10 < 0x0 || !normalizeText(state2['data']['episodes'][count10]?.['script']?.['fullText']))
+    if (count10 < 0 || !normalizeText(state2['data']['episodes'][count10]?.['script']?.['fullText']))
       return (showToast('当前分集正文尚未生成。', 'info'), ![]);
     return run62(value347, { regeneration: !![] });
   }
   function run66(value349) {
     const nextStoryEpisodeScriptIndex2 = getNextStoryEpisodeScriptIndex(state2['data']['episodes']),
       count11 = state2['data']['episodes']['findIndex']((value350) => value350['id'] === value349);
-    if (count11 < nextStoryEpisodeScriptIndex2 || count11 < 0x0) return ![];
+    if (count11 < nextStoryEpisodeScriptIndex2 || count11 < 0) return ![];
     const value351 = state2['selectedScriptEpisodeIds']['includes'](value349),
-      value352 = value351 ? count11 : count11 + 0x1;
+      value352 = value351 ? count11 : count11 + 1;
     return (
       (state2['selectedScriptEpisodeIds'] = state2['data']['episodes']
         ['slice'](nextStoryEpisodeScriptIndex2, value352)
         ['map']((value353) => value353['id'])),
-      (state2['scriptSelectionMode'] = state2['selectedScriptEpisodeIds']['length'] > 0x0),
+      (state2['scriptSelectionMode'] = state2['selectedScriptEpisodeIds']['length'] > 0),
       render(),
       !![]
     );
@@ -5214,7 +5214,7 @@ export function initStoryWorkspace({
     if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return ![];
     if (state2['storyPlanningOperation']) return ![];
     if (typeof planEpisodes !== 'function')
-      return (showToast('分集规划\x20Agent\x20尚未初始化。', 'error'), ![]);
+      return (showToast('分集规划 Agent 尚未初始化。', 'error'), ![]);
     const storyWorkspaceAssetData = normalizeStoryWorkspaceAssetData(run2(state2['data'])),
       project2 = getStoryPlanningAgentContext(storyWorkspaceAssetData);
     try {
@@ -5263,8 +5263,8 @@ export function initStoryWorkspace({
           generateEpisodeScript({
             project: project3['project'],
             episode: episode8,
-            previousEpisode: previousEpisode > 0x0 ? nextEpisode['episodes'][previousEpisode - 0x1] : null,
-            nextEpisode: nextEpisode['episodes'][previousEpisode + 0x1] || null,
+            previousEpisode: previousEpisode > 0 ? nextEpisode['episodes'][previousEpisode - 1] : null,
+            nextEpisode: nextEpisode['episodes'][previousEpisode + 1] || null,
             model: project3['model'],
             provider: project3['provider'],
             providerProfileId: project3['providerProfileId'],
@@ -5276,7 +5276,7 @@ export function initStoryWorkspace({
           documentObject: documentObject,
           windowObject: windowObject,
           preparePayload: preparePayload2,
-          title: '第\x20' + (episode8['number'] || previousEpisode + 0x1) + ' 集正文请求调试',
+          title: '第 ' + (episode8['number'] || previousEpisode + 1) + ' 集正文请求调试',
           subtitle: '以下是下一集正文生成时构造的实际请求；本次仅预览，不会发送到 API。',
         }),
         !![]
@@ -5334,14 +5334,14 @@ export function initStoryWorkspace({
     if (el187['disabled']) return ![];
     const run71 = promptExperiment ? splitEpisodeExperimental : splitEpisode;
     if (typeof run71 !== 'function')
-      return (showToast('实验分批拆分\x20Agent\x20尚未初始化。', 'error'), ![]);
+      return (showToast('实验分批拆分 Agent 尚未初始化。', 'error'), ![]);
     const assets2 = normalizeStoryWorkspaceAssetData(run2(state2['data'])),
       episode9 = assets2['episodes']['find']((value356) => value356['id'] === value355);
     if (!episode9) return ![];
     const project4 = getStoryPlanningAgentContext(assets2),
       count12 = assets2['episodes']['findIndex']((value357) => value357['id'] === episode9['id']),
-      previousEpisode2 = count12 > 0x0 ? assets2['episodes'][count12 - 0x1] : null,
-      nextEpisode2 = count12 >= 0x0 ? assets2['episodes'][count12 + 0x1] || null : null,
+      previousEpisode2 = count12 > 0 ? assets2['episodes'][count12 - 1] : null,
+      nextEpisode2 = count12 >= 0 ? assets2['episodes'][count12 + 1] || null : null,
       resumeDraft =
         episode9?.['experimentalSplitDraft']?.['status'] === 'completed'
           ? null
@@ -5369,7 +5369,7 @@ export function initStoryWorkspace({
           documentObject: documentObject,
           windowObject: windowObject,
           preparePayload: preparePayload4,
-          title: '第\x20' + (episode9['number'] || '') + ' 集请求调试',
+          title: '第 ' + (episode9['number'] || '') + ' 集请求调试',
           subtitle: '下一次分镜生成构造的请求；本次仅预览，不会发送到 API。',
         }),
         !![]
@@ -5428,8 +5428,8 @@ export function initStoryWorkspace({
       if (error11?.['canceled']) return ![];
       if (!error11?.['success'])
         throw new Error(error11?.['error'] || error11?.['message'] || '视频片段导出失败。');
-      const value359 = Math['max'](0x0, Number(error11['exportedCount']) || 0x0),
-        value360 = Math['max'](0x0, Number(error11['skippedCount']) || 0x0);
+      const value359 = Math['max'](0, Number(error11['exportedCount']) || 0),
+        value360 = Math['max'](0, Number(error11['skippedCount']) || 0);
       return (
         showToast(
           value360
@@ -5483,7 +5483,7 @@ export function initStoryWorkspace({
     if (normalizeText(state2['exportingAssetAppearanceKey']) === value362) return ![];
     const project5 = createProjectToken(state2),
       contentElement = storyRoot['querySelector'](
-        '.story-page.is-current\x20.story-asset-detail\x20.story-asset-preview',
+        '.story-page.is-current .story-asset-detail .story-asset-preview',
       ),
       fromRect = contentElement?.['getBoundingClientRect']?.() || null;
     let value363 = ![];
@@ -5540,7 +5540,7 @@ export function initStoryWorkspace({
         imageUrl6 && (appearance7['imageUrl'] = imageUrl6),
         (appearance7['totalAssetRef'] = {
           assetId: normalizeText(saveAssetPackageItem2?.['assetId']),
-          itemIndex: Math['max'](0x0, Math['trunc'](Number(saveAssetPackageItem2?.['itemIndex']) || 0x0)),
+          itemIndex: Math['max'](0, Math['trunc'](Number(saveAssetPackageItem2?.['itemIndex']) || 0)),
           itemKey: itemKey['itemKey'],
           imageUrl: imageUrl6,
           updatedAt: Date['now'](),
@@ -5581,7 +5581,7 @@ export function initStoryWorkspace({
     if (!targetAssetId) return (showToast('请选择本剧已有的角色、场景或道具。', 'warn'), ![]);
     const visibleStoryAssets2 = getVisibleStoryAssets(state2),
       list27 = value365 || getStoryLibraryActionAssetIds(state2, visibleStoryAssets2);
-    if (normalizeText(targetAppearanceId) && list27['length'] !== 0x1)
+    if (normalizeText(targetAppearanceId) && list27['length'] !== 1)
       return (showToast('替换已有形象时只能选择一张总素材图片。', 'warn'), ![]);
     const args36 = addStoryLibraryAssetsToProject(
         state2['data']['assets'],
@@ -5594,7 +5594,7 @@ export function initStoryWorkspace({
     if (!list28['length']) return (showToast('请选择总素材中的图片后再加入项目。', 'warn'), ![]);
     (run35(), (state2['data']['assets'] = args36['assets']));
     const storyAsset3 = findStoryAsset(state2, targetAssetId['id']),
-      value366 = list28['at'](-0x1) || '',
+      value366 = list28['at'](-1) || '',
       selectedAppearanceIndex = getStoryAssetAppearances(storyAsset3)['findIndex'](
         (value367) => normalizeText(value367?.['id']) === value366,
       );
@@ -5609,7 +5609,7 @@ export function initStoryWorkspace({
     else
       args36['addedAssetIds']['length']
         ? showToast(
-            '已为' + targetAssetId['name'] + '新增\x20' + args36['addedAssetIds']['length'] + ' 个形象。',
+            '已为' + targetAssetId['name'] + '新增 ' + args36['addedAssetIds']['length'] + ' 个形象。',
             'success',
           )
         : showToast('所选图片已在' + targetAssetId['name'] + '的形象中。', 'info');
@@ -5618,7 +5618,7 @@ export function initStoryWorkspace({
   function run76(count13, value368 = state2['selectedAssetId']) {
     const storyAsset4 = findStoryAsset(state2, value368),
       list29 = storyAsset4 ? getStoryAssetAppearances(storyAsset4) : [];
-    if (list29['length'] < 0x2) return;
+    if (list29['length'] < 2) return;
     const selectedAssetAppearanceIndex2 = getSelectedAssetAppearanceIndex(state2, storyAsset4),
       value369 = (selectedAssetAppearanceIndex2 + count13 + list29['length']) % list29['length'];
     ((state2['assetAppearanceIndexes'] = {
@@ -5626,7 +5626,7 @@ export function initStoryWorkspace({
       [storyAsset4['id']]: value369,
     }),
       (state2['pendingDeleteAssetAppearanceKey'] = ''),
-      (state2['assetAppearanceMotion'] = count13 > 0x0 ? 'next' : 'previous'));
+      (state2['assetAppearanceMotion'] = count13 > 0 ? 'next' : 'previous'));
     const el189 = [...storyRoot['querySelectorAll']('.story-asset-card[data-story-asset-id]')]['find'](
       (el190) => el190['dataset']['storyAssetId'] === value368,
     );
@@ -5658,7 +5658,7 @@ export function initStoryWorkspace({
     const el193 = event14['target']['closest']?.(
       '[data-story-appearance-wheel="true"], [data-story-card-appearance-wheel]',
     );
-    if (!el193 || state2['view'] !== 'project' || state2['step'] !== 0x2) return ![];
+    if (!el193 || state2['view'] !== 'project' || state2['step'] !== 2) return ![];
     for (
       let value372 = event14['target'];
       value372 && value372 !== el193;
@@ -5706,7 +5706,7 @@ export function initStoryWorkspace({
         beforeCommit: () =>
           updateStoryAssetPromptFromEditor(
             state2,
-            run28()?.['querySelector']?.('[data-story-asset-prompt][contenteditable=\x22true\x22]'),
+            run28()?.['querySelector']?.('[data-story-asset-prompt][contenteditable="true"]'),
           ),
         render: () => {
           (render(), focusWorkspaceAssetCard(storyRoot, state2['selectedAssetId']));
@@ -5716,7 +5716,7 @@ export function initStoryWorkspace({
       return {
         enabled:
           state2['view'] === 'project' &&
-          state2['step'] === 0x3 &&
+          state2['step'] === 3 &&
           !getStoryEpisodeBatchControlState(state2)['disabled'],
         selectedIds: state2['selectedEpisodeIds'],
         commit(value374) {
@@ -5759,7 +5759,7 @@ export function initStoryWorkspace({
       "[contenteditable='true']",
       "[role='button']",
       "[role='option']",
-      '[role=\x27menuitem\x27]',
+      '[role=\'menuitem\']',
       "[role='slider']",
       '[tabindex]',
     ]['join'](',');
@@ -5768,10 +5768,10 @@ export function initStoryWorkspace({
       el195 = event15?.['target'];
     if (!enabled50?.['contains'](el195) || !el195?.['closest']) return ![];
     if (el195['closest'](value376)) return ![];
-    if (state2['view'] === 'project' && state2['step'] === 0x2 && state2['assetSelectionMode'])
+    if (state2['view'] === 'project' && state2['step'] === 2 && state2['assetSelectionMode'])
       ((state2['assetSelectionMode'] = ![]), (state2['selectedAssetIds'] = []), render());
     else {
-      if (state2['view'] === 'project' && state2['step'] === 0x3 && state2['episodeSelectionMode'])
+      if (state2['view'] === 'project' && state2['step'] === 3 && state2['episodeSelectionMode'])
         ((state2['episodeSelectionMode'] = ![]), (state2['selectedEpisodeIds'] = []), render());
       else {
         if (state2['view'] === 'episode' && state2['clipSelectionMode'])
@@ -5795,19 +5795,19 @@ export function initStoryWorkspace({
   }
   function run79(value377) {
     const storyWorkspaceStep = normalizeStoryWorkspaceStep(value377);
-    if (state2['data']?.['project']?.['outlineStatus'] === 'stale' && storyWorkspaceStep > 0x1) {
+    if (state2['data']?.['project']?.['outlineStatus'] === 'stale' && storyWorkspaceStep > 1) {
       showToast('故事蓝图已修改，请先重新运行分集规划。', 'warn');
       return;
     }
-    if (state2['step'] !== 0x3 && storyWorkspaceStep === 0x3) void openEpisodeStage();
+    if (state2['step'] !== 3 && storyWorkspaceStep === 3) void openEpisodeStage();
     else void run55(storyWorkspaceStep);
   }
   function run80(value378) {
     return handleWorkspaceStepShortcut(value378, {
       enabled:
         enabled11 && !state2['canvasSyncPending'] && ['project', 'episode']['includes'](state2['view']),
-      stepCount: STORY_STEPS['length'] + (isStoryCollaborationProject(state2['data']) ? 0x1 : 0x0),
-      navigate: (value379) => run79(value379 - (isStoryCollaborationProject(state2['data']) ? 0x1 : 0x0)),
+      stepCount: STORY_STEPS['length'] + (isStoryCollaborationProject(state2['data']) ? 1 : 0),
+      navigate: (value379) => run79(value379 - (isStoryCollaborationProject(state2['data']) ? 1 : 0)),
     });
   }
   async function run54(episodeId4, clipId3 = '', el196 = null) {
@@ -5816,7 +5816,7 @@ export function initStoryWorkspace({
     if (el196 && 'disabled' in el196) el196['disabled'] = !![];
     try {
       return (
-        hasPendingRuntimeManifestLoad() && (await waitForRuntimeManifestLoad({ timeoutMs: 0x1f4 })),
+        hasPendingRuntimeManifestLoad() && (await waitForRuntimeManifestLoad({ timeoutMs: 500 })),
         storyWorkspaceNavigationTransaction['navigate']({
           view: 'episode',
           episodeId: episodeId4,
@@ -5904,7 +5904,7 @@ export function initStoryWorkspace({
         !(event18['relatedTarget'] && value392['contains'](event18['relatedTarget'])) &&
         handler2(value392);
       const value393 = event18['target']['closest']?.(
-        '.story-clip-card-shell[data-story-video-history=\x22true\x22]',
+        '.story-clip-card-shell[data-story-video-history="true"]',
       );
       value393 &&
         storyRoot['contains'](value393) &&
@@ -5970,8 +5970,8 @@ export function initStoryWorkspace({
         }
         const text38 = normalizeText(el200['dataset']['storyReferenceAsset']),
           value398 = Math['max'](
-            0x0,
-            Math['trunc'](Number(el200['dataset']['storyReferenceAssetIndex']) || 0x0),
+            0,
+            Math['trunc'](Number(el200['dataset']['storyReferenceAssetIndex']) || 0),
           );
         if (!writeStoryAssetDragData(event21['dataTransfer'], text38, value398)) return;
         (applyStoryAssetNativeDragPreview(event21['dataTransfer'], el200),
@@ -6018,9 +6018,9 @@ export function initStoryWorkspace({
         count14 = state2['data']['episodes']['findIndex'](
           (value401) => normalizeText(value401?.['id']) === text39,
         ),
-        count15 = ['ArrowUp', 'ArrowLeft']['includes'](event22['key']) ? -0x1 : 0x1,
+        count15 = ['ArrowUp', 'ArrowLeft']['includes'](event22['key']) ? -1 : 1,
         count16 = count14 + count15;
-      if (count14 < 0x0 || count16 < 0x0 || count16 >= state2['data']['episodes']['length']) return;
+      if (count14 < 0 || count16 < 0 || count16 >= state2['data']['episodes']['length']) return;
       (event22['preventDefault'](), event22['stopPropagation']());
       const value402 = state2['data']['episodes']['map']((value403) => value403['id']);
       (([value402[count14], value402[count16]] = [value402[count16], value402[count14]]),
@@ -6035,7 +6035,7 @@ export function initStoryWorkspace({
         ]((el207) => normalizeText(el207['dataset']['storyReplicationEpisodeId']) === value402[count14]);
       (el206 &&
         value404 &&
-        (el206['insertBefore'](el205, count15 < 0x0 ? value404 : value404['nextSibling']),
+        (el206['insertBefore'](el205, count15 < 0 ? value404 : value404['nextSibling']),
         state2['data']['episodes']['forEach']((value405, value406) => {
           const value407 = [...el206['querySelectorAll']('article[data-story-replication-episode-id]')][
             'find'
@@ -6089,8 +6089,8 @@ export function initStoryWorkspace({
         const enabled53 = viewportElement['querySelector']('.story-page.is-current');
         if (!enabled53) return;
         (event25['preventDefault'](),
-          (enabled53['scrollTop'] += Number(event25['deltaY'] || 0x0)),
-          (enabled53['scrollLeft'] += Number(event25['deltaX'] || 0x0)));
+          (enabled53['scrollTop'] += Number(event25['deltaY'] || 0)),
+          (enabled53['scrollLeft'] += Number(event25['deltaX'] || 0)));
       },
       { passive: ![] },
     ),
@@ -6103,8 +6103,8 @@ export function initStoryWorkspace({
         ((state2['pageScrollPositions'] = {
           ...(state2['pageScrollPositions'] || {}),
           [value412]: {
-            top: Math['max'](0x0, Number(enabled54['scrollTop']) || 0x0),
-            left: Math['max'](0x0, Number(enabled54['scrollLeft']) || 0x0),
+            top: Math['max'](0, Number(enabled54['scrollTop']) || 0),
+            left: Math['max'](0, Number(enabled54['scrollLeft']) || 0),
           },
         }),
           schedulePersistence({ uiOnly: !![] }));
@@ -6126,7 +6126,7 @@ export function initStoryWorkspace({
             ));
         return;
       }
-      const el209 = event27['target']['closest']?.('[data-story-action=\x22toggle-clip-adjustment-mode\x22]');
+      const el209 = event27['target']['closest']?.('[data-story-action="toggle-clip-adjustment-mode"]');
       if (el209 && ['ArrowDown', 'ArrowUp']['includes'](event27['key'])) {
         (event27['preventDefault'](), event27['stopPropagation']());
         const kind =
@@ -6141,13 +6141,13 @@ export function initStoryWorkspace({
       if (el210 && ['ArrowDown', 'ArrowUp', 'Home', 'End']['includes'](event27['key'])) {
         const el211 = el210['closest']('[role=listbox]'),
           list31 = [...(el211?.['querySelectorAll']('[data-story-clip-adjustment-mode-option]') || [])],
-          value414 = Math['max'](0x0, list31['indexOf'](el210)),
+          value414 = Math['max'](0, list31['indexOf'](el210)),
           value415 =
             event27['key'] === 'Home'
-              ? 0x0
+              ? 0
               : event27['key'] === 'End'
-                ? list31['length'] - 0x1
-                : (value414 + (event27['key'] === 'ArrowDown' ? 0x1 : -0x1) + list31['length']) %
+                ? list31['length'] - 1
+                : (value414 + (event27['key'] === 'ArrowDown' ? 1 : -1) + list31['length']) %
                   list31['length'];
         (event27['preventDefault'](), event27['stopPropagation'](), list31[value415]?.['focus']());
         return;
@@ -6182,7 +6182,7 @@ export function initStoryWorkspace({
           run35(),
           run6(),
           state2['view'] === 'project' &&
-            state2['step'] === 0x2 &&
+            state2['step'] === 2 &&
             ((state2['assetSelectionMode'] = ![]), (state2['selectedAssetIds'] = []), render()),
           state2['clipSelectionMode'] &&
             ((state2['clipSelectionMode'] = ![]), (state2['selectedClipGenerationIds'] = []), run32()),
@@ -6199,7 +6199,7 @@ export function initStoryWorkspace({
         (event27['preventDefault'](),
           event27['stopPropagation'](),
           run76(
-            event27['key'] === 'ArrowRight' ? 0x1 : -0x1,
+            event27['key'] === 'ArrowRight' ? 1 : -1,
             el212['dataset']['storyCardAppearanceWheel'] || state2['selectedAssetId'],
           ));
         return;
@@ -6208,14 +6208,14 @@ export function initStoryWorkspace({
       if (value416 && ['ArrowLeft', 'ArrowRight']['includes'](event27['key'])) {
         (event27['preventDefault'](),
           event27['stopPropagation'](),
-          switchSelectedClip(event27['key'] === 'ArrowRight' ? 0x1 : -0x1));
+          switchSelectedClip(event27['key'] === 'ArrowRight' ? 1 : -1));
         return;
       }
       if (storyAssetLayoutResizeController['handleKeyDown'](event27)) return;
       const el213 = event27['target']['closest']?.('[data-story-episode-splitter]');
       if (el213 && ['ArrowLeft', 'ArrowRight']['includes'](event27['key'])) {
         (event27['preventDefault'](), event27['stopPropagation']());
-        const value417 = event27['key'] === 'ArrowLeft' ? -0x2 : 0x2;
+        const value417 = event27['key'] === 'ArrowLeft' ? -2 : 2;
         el213['dataset']['storyEpisodeSplitter'] === 'assets'
           ? run12(state2['episodeAssetPanelRatio'] + value417, state2['episodeEditorPanelRatio'], {
               persist: !![],
@@ -6403,7 +6403,7 @@ export function initStoryWorkspace({
             const value423 = el235['dataset']['storyAssetFilter'] === text41;
             (el235['classList']['toggle']('is-active', value423),
               el235['setAttribute']('aria-selected', String(value423)),
-              (el235['tabIndex'] = value423 ? 0x0 : -0x1));
+              (el235['tabIndex'] = value423 ? 0 : -1));
           });
         (render({ direction: direction3, updateToolbar: ![], transitionScope: 'asset-content' }),
           schedulePersistence({ uiOnly: !![] }));
@@ -6498,7 +6498,7 @@ export function initStoryWorkspace({
             (state2['selectedEpisodeIds'] = workspaceCardMultiSelection2['selectedIds']));
           if (!toggleKey['shiftKey']) state2['selectedEpisodeId'] = itemId2;
           (render(),
-            storyRoot['querySelector']('[data-story-select-episode="' + CSS['escape'](itemId2) + '\x22]')?.[
+            storyRoot['querySelector']('[data-story-select-episode="' + CSS['escape'](itemId2) + '"]')?.[
               'focus'
             ]());
         }
@@ -6526,7 +6526,7 @@ export function initStoryWorkspace({
           count17 = state2['data']['episodes']['findIndex'](
             (value431) => value431['id'] === promptMode?.['id'],
           );
-        if (!insertStoryEpisodeClip2 || count17 < 0x0) {
+        if (!insertStoryEpisodeClip2 || count17 < 0) {
           showToast('新增片段失败，请刷新后重试。', 'error');
           return;
         }
@@ -6565,7 +6565,7 @@ export function initStoryWorkspace({
             value433 = list32['findIndex']((value434) => value434['id'] === state2['selectedClipId']),
             count18 = list32['findIndex']((value435) => value435['id'] === itemId3),
             value436 = state2['selectedClipId'] !== itemId3,
-            value437 = count18 >= 0x0 && count18 < value433 ? 'previous' : 'next';
+            value437 = count18 >= 0 && count18 < value433 ? 'previous' : 'next';
           state2['pendingDeleteClipId'] = '';
           if (value436) resetUi({ close: !![] });
           ((state2['selectedClipId'] = itemId3),
@@ -6576,11 +6576,11 @@ export function initStoryWorkspace({
           schedulePersistence({ uiOnly: !![] });
         }
         storyRoot['querySelector'](
-          '.story-clip-card[data-story-clip-id="' + CSS['escape'](itemId3) + '\x22]',
+          '.story-clip-card[data-story-clip-id="' + CSS['escape'](itemId3) + '"]',
         )?.['focus']({ preventScroll: !![] });
         return;
       }
-      const el242 = toggleKey['target']['closest']('[data-story-clip-prompt-surface]\x20.ref-thumb-delete');
+      const el242 = toggleKey['target']['closest']('[data-story-clip-prompt-surface] .ref-thumb-delete');
       if (el242) {
         const kind3 = el242['closest']('[data-slot]');
         if (!kind3) return;
@@ -6611,7 +6611,7 @@ export function initStoryWorkspace({
         return;
       }
       const value438 = toggleKey['target']['closest'](
-        '[data-story-clip-prompt-surface]\x20.prompt-attachment-btn',
+        '[data-story-clip-prompt-surface] .prompt-attachment-btn',
       );
       if (value438) {
         const episodeId6 = getSelectedEpisode(state2),
@@ -6721,19 +6721,19 @@ export function initStoryWorkspace({
         else if (home === 'toggle-novel-chapter') {
           const text42 = normalizeText(selectedOnly2['dataset']['storyNovelChapter']),
             count19 = list36['indexOf'](text42);
-          (count19 >= 0x0 ? list36['splice'](count19, 0x1) : list36['push'](text42),
+          (count19 >= 0 ? list36['splice'](count19, 1) : list36['push'](text42),
             (state2['novelSelectedChapterIds'] = list36));
         } else if (home === 'set-novel-episode-count')
           state2['novelEpisodeCount'] = Math['max'](
-            0x1,
+            1,
             Math['trunc'](
-              Number(storyRoot['querySelector']('[data-story-novel-episode-count]')?.['value']) || 0x1,
+              Number(storyRoot['querySelector']('[data-story-novel-episode-count]')?.['value']) || 1,
             ),
           );
         else {
           const count20 = Number(storyRoot['querySelector']('[data-story-novel-episode-count]')?.['value']);
           (Number['isFinite'](count20) &&
-            count20 > 0x0 &&
+            count20 > 0 &&
             (state2['novelEpisodeCount'] = Math['trunc'](count20)),
             showToast(
               '批次转换尚未接通（下一步实现逐集生成）。本次已选 ' +
@@ -6848,7 +6848,7 @@ export function initStoryWorkspace({
                                     Number(selectedOnly2['dataset']['storyReplicationFileIndex']),
                                   );
                                   if (
-                                    count21 >= 0x0 &&
+                                    count21 >= 0 &&
                                     count21 < state2['replicationSourceFiles']['length']
                                   ) {
                                     (revokeSourcePreviewUrl(state2['replicationSourcePreviewUrls'][count21]),
@@ -6859,7 +6859,7 @@ export function initStoryWorkspace({
                                         'replicationSourcePreviewUrls'
                                       ]['filter']((value451, value452) => value452 !== count21)));
                                     const value453 = viewportElement['querySelector'](
-                                      '.story-page.is-current\x20.story-home-composer-body',
+                                      '.story-page.is-current .story-home-composer-body',
                                     );
                                     if (value453) syncStoryReplicationHomeSources(value453, state2);
                                     syncGenerateState();
@@ -7088,7 +7088,7 @@ export function initStoryWorkspace({
                                                                               (state2['scriptSelectionMode'] =
                                                                                 state2[
                                                                                   'selectedScriptEpisodeIds'
-                                                                                ]['length'] > 0x0),
+                                                                                ]['length'] > 0),
                                                                               render(),
                                                                               storyRoot['querySelector'](
                                                                                 '[data-story-action="select-all-script-episodes"]',
@@ -7519,12 +7519,12 @@ export function initStoryWorkspace({
                                                                                                                                   ][
                                                                                                                                     'length'
                                                                                                                                   ] >
-                                                                                                                                  0x0),
+                                                                                                                                  0),
                                                                                                                                 render(),
                                                                                                                                 storyRoot[
                                                                                                                                   'querySelector'
                                                                                                                                 ](
-                                                                                                                                  '[data-story-action=\x22toggle-all-episodes\x22]',
+                                                                                                                                  '[data-story-action="toggle-all-episodes"]',
                                                                                                                                 )?.[
                                                                                                                                   'focus'
                                                                                                                                 ]());
@@ -7696,7 +7696,7 @@ export function initStoryWorkspace({
                                                                                                                                                         state2[
                                                                                                                                                           'step'
                                                                                                                                                         ] -
-                                                                                                                                                          0x1,
+                                                                                                                                                          1,
                                                                                                                                                       );
                                                                                                                                                     else {
                                                                                                                                                       if (
@@ -7791,7 +7791,7 @@ export function initStoryWorkspace({
                                                                                                                                                                   )[
                                                                                                                                                                     'length'
                                                                                                                                                                   ] <=
-                                                                                                                                                                    0x1)
+                                                                                                                                                                    1)
                                                                                                                                                               : !isStoryAddedAssetAppearance(
                                                                                                                                                                   enabled57,
                                                                                                                                                                 ) ||
@@ -7800,7 +7800,7 @@ export function initStoryWorkspace({
                                                                                                                                                                 )[
                                                                                                                                                                   'length'
                                                                                                                                                                 ] <=
-                                                                                                                                                                  0x1
+                                                                                                                                                                  1
                                                                                                                                                           ) {
                                                                                                                                                             showToast(
                                                                                                                                                               '剧本识别出的原始形象不能删除。',
@@ -8332,7 +8332,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                         'previous-appearance'
                                                                                                                                                                                       )
                                                                                                                                                                                         run76(
-                                                                                                                                                                                          -0x1,
+                                                                                                                                                                                          -1,
                                                                                                                                                                                           selectedOnly2[
                                                                                                                                                                                             'dataset'
                                                                                                                                                                                           ][
@@ -8348,7 +8348,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                           'next-appearance'
                                                                                                                                                                                         )
                                                                                                                                                                                           run76(
-                                                                                                                                                                                            0x1,
+                                                                                                                                                                                            1,
                                                                                                                                                                                             selectedOnly2[
                                                                                                                                                                                               'dataset'
                                                                                                                                                                                             ][
@@ -8364,7 +8364,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                             'previous-clip'
                                                                                                                                                                                           )
                                                                                                                                                                                             switchSelectedClip(
-                                                                                                                                                                                              -0x1,
+                                                                                                                                                                                              -1,
                                                                                                                                                                                             );
                                                                                                                                                                                           else {
                                                                                                                                                                                             if (
@@ -8372,7 +8372,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                               'next-clip'
                                                                                                                                                                                             )
                                                                                                                                                                                               switchSelectedClip(
-                                                                                                                                                                                                0x1,
+                                                                                                                                                                                                1,
                                                                                                                                                                                               );
                                                                                                                                                                                             else {
                                                                                                                                                                                               if (
@@ -8380,7 +8380,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                 'previous-video-result'
                                                                                                                                                                                               )
                                                                                                                                                                                                 switchSelectedVideoResult(
-                                                                                                                                                                                                  -0x1,
+                                                                                                                                                                                                  -1,
                                                                                                                                                                                                 );
                                                                                                                                                                                               else {
                                                                                                                                                                                                 if (
@@ -8388,7 +8388,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                   'next-video-result'
                                                                                                                                                                                                 )
                                                                                                                                                                                                   switchSelectedVideoResult(
-                                                                                                                                                                                                    0x1,
+                                                                                                                                                                                                    1,
                                                                                                                                                                                                   );
                                                                                                                                                                                                 else {
                                                                                                                                                                                                   if (
@@ -8564,7 +8564,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                   ][
                                                                                                                                                                                                                     'length'
                                                                                                                                                                                                                   ] >
-                                                                                                                                                                                                                  0x0),
+                                                                                                                                                                                                                  0),
                                                                                                                                                                                                                 render(),
                                                                                                                                                                                                                 focusWorkspaceAssetCard(
                                                                                                                                                                                                                   storyRoot,
@@ -8709,7 +8709,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                           ][
                                                                                                                                                                                                                             'length'
                                                                                                                                                                                                                           ] >
-                                                                                                                                                                                                                          0x0),
+                                                                                                                                                                                                                          0),
                                                                                                                                                                                                                         run32(),
                                                                                                                                                                                                                         storyRoot[
                                                                                                                                                                                                                           'querySelector'
@@ -8761,10 +8761,10 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                                 state2[
                                                                                                                                                                                                                                   'data'
                                                                                                                                                                                                                                 ],
-                                                                                                                                                                                                                                0x3,
+                                                                                                                                                                                                                                3,
                                                                                                                                                                                                                               )
-                                                                                                                                                                                                                                ? 0x3
-                                                                                                                                                                                                                                : 0x1,
+                                                                                                                                                                                                                                ? 3
+                                                                                                                                                                                                                                : 1,
                                                                                                                                                                                                                             ));
                                                                                                                                                                                                                         else {
                                                                                                                                                                                                                           if (
@@ -9064,13 +9064,13 @@ export function initStoryWorkspace({
       if (root['target']['matches']('[data-story-custom-episode-count-input]')) {
         const value471 = String(root['target']['value'] || '')
           ['replace'](/\D+/gu, '')
-          ['slice'](0x0, 0x3);
+          ['slice'](0, 3);
         root['target']['value'] =
           value471 && Number(value471) > STORY_EPISODE_COUNT_MAX ? String(STORY_EPISODE_COUNT_MAX) : value471;
         return;
       }
       if (root['target']['matches']('[data-story-clip-adjustment-instruction]')) {
-        state2['clipAdjustmentInstruction'] = String(root['target']['value'] || '')['slice'](0x0, 0x258);
+        state2['clipAdjustmentInstruction'] = String(root['target']['value'] || '')['slice'](0, 600);
         const selectedEpisode12 = getSelectedEpisode(state2),
           selectedClip9 = getSelectedClip(state2, selectedEpisode12),
           storyPromptMode = normalizeStoryPromptMode(
@@ -9084,13 +9084,13 @@ export function initStoryWorkspace({
           }),
           el254 = root['target']
             ['closest']('[data-story-clip-adjustment-bar]')
-            ?.['querySelector']('[data-story-action=\x22generate-clip-adjustment\x22]');
+            ?.['querySelector']('[data-story-action="generate-clip-adjustment"]');
         el254 &&
           (el254['disabled'] = !canGenerateStoryClipAdjustment(state2, selectedEpisode12, selectedClip9));
         return;
       }
       if (root['target']['matches']('[data-story-project-search]')) {
-        const list40 = String(root['target']['value'] || '')['slice'](0x0, 0x78);
+        const list40 = String(root['target']['value'] || '')['slice'](0, 120);
         ((state2['projectSearchQuery'] = list40),
           (state2['openProjectMenuId'] = ''),
           (root['target']['value'] = list40));
@@ -9109,7 +9109,7 @@ export function initStoryWorkspace({
       if (root['target']['matches']('[data-story-character-voice-sample]')) {
         state2['characterVoiceEditor'] &&
           (state2['characterVoiceEditor']['sampleText'] = String(root['target']['value'] || '')['slice'](
-            0x0,
+            0,
             STORY_CHARACTER_VOICE_SAMPLE_MAX_CHARACTERS,
           ));
         return;
@@ -9118,7 +9118,7 @@ export function initStoryWorkspace({
         state2['characterVoiceEditor'] &&
           (state2['characterVoiceEditor']['voiceDescription'] = String(root['target']['value'] || '')[
             'slice'
-          ](0x0, 0x258));
+          ](0, 600));
         return;
       }
       if (root['target']['matches']('[data-story-style-search-input]')) {
@@ -9126,20 +9126,20 @@ export function initStoryWorkspace({
         return;
       }
       if (root['target']['matches']('[data-story-style-custom-input]')) {
-        const list41 = String(root['target']['value'] || '')['slice'](0x0, STORY_CUSTOM_STYLE_MAX_CHARACTERS);
+        const list41 = String(root['target']['value'] || '')['slice'](0, STORY_CUSTOM_STYLE_MAX_CHARACTERS);
         if (root['target']['value'] !== list41) root['target']['value'] = list41;
         const el256 = root['target']
           ['closest']('.story-style-custom-editor')
           ?.['querySelector']('[data-story-style-custom-count]');
-        if (el256) el256['textContent'] = list41['length'] + '\x20/\x20' + STORY_CUSTOM_STYLE_MAX_CHARACTERS;
+        if (el256) el256['textContent'] = list41['length'] + ' / ' + STORY_CUSTOM_STYLE_MAX_CHARACTERS;
         return;
       }
       if (root['target']['matches']('[data-story-idea-input]'))
-        ((state2['idea'] = root['target']['value']['slice'](0x0, STORY_IDEA_MAX_CHARACTERS)),
+        ((state2['idea'] = root['target']['value']['slice'](0, STORY_IDEA_MAX_CHARACTERS)),
           syncGenerateState());
       else {
         if (root['target']['matches']('[data-story-paste-input]')) {
-          ((state2['scriptText'] = root['target']['value']['slice'](0x0, STORY_SCRIPT_MAX_CHARACTERS)),
+          ((state2['scriptText'] = root['target']['value']['slice'](0, STORY_SCRIPT_MAX_CHARACTERS)),
             (state2['scriptCharacterCount'] = state2['scriptText']['length']),
             (state2['scriptFileName'] = normalizeText(state2['scriptText']) ? '粘贴文本' : ''));
           if (!state2['hasCreatedProject'])
@@ -9267,8 +9267,8 @@ export function initStoryWorkspace({
                                 } else {
                                   if (root['target']['matches']('[data-story-project-title]')) {
                                     const value482 = String(root['target']['value'] || '')['slice'](
-                                        0x0,
-                                        0x78,
+                                        0,
+                                        120,
                                       ),
                                       value483 = root['target']['dataset']['storyProjectTitle'],
                                       value484 = state2['projects']['find'](
@@ -9319,7 +9319,7 @@ export function initStoryWorkspace({
         schedulePersistence({ immediate: !![] }));
     }),
     el9?.['addEventListener']('change', async () => {
-      const enabled62 = el9['files']?.[0x0];
+      const enabled62 = el9['files']?.[0];
       if (!enabled62) return;
       (await selectScriptFile(enabled62), (el9['value'] = ''));
     }));
@@ -9355,7 +9355,7 @@ export function initStoryWorkspace({
     const episodeId7 = value139;
     value139 = '';
     if (episodeId7 && state2['data']?.['project']?.['sourceMode'] === 'video-replication') {
-      const file = el10['files']?.[0x0],
+      const file = el10['files']?.[0],
         response11 = validateStoryReplicationVideoFile(file, state2['models']['text']);
       if (!response11['ok']) showToast(response11['error'], 'warn');
       else {
@@ -9388,7 +9388,7 @@ export function initStoryWorkspace({
     }),
     bindStoryAssetImageDrop2 = bindStoryAssetImageDrop(storyRoot, { state: state2, ...args38 });
   (el11?.['addEventListener']('change', async () => {
-    const value497 = el11['files']?.[0x0],
+    const value497 = el11['files']?.[0],
       value498 = value133;
     ((value133 = null),
       (state2['pendingAssetUploadId'] = ''),
@@ -9397,7 +9397,7 @@ export function initStoryWorkspace({
       await args38['upload'](value497, value498));
   }),
     el12?.['addEventListener']('change', async () => {
-      const error17 = el12['files']?.[0x0],
+      const error17 = el12['files']?.[0],
         value499 = value134;
       value134 = null;
       const enabled63 = value499?.['projectToken'],
@@ -9482,7 +9482,7 @@ export function initStoryWorkspace({
           ? state2['characterVoiceEditor']
           : null;
     if (!isSupportedStoryCharacterVoiceFile(fileName)) {
-      sampleText && (sampleText['error'] = '仅支持\x20MP3、WAV\x20或\x20M4A\x20音频文件。');
+      sampleText && (sampleText['error'] = '仅支持 MP3、WAV 或 M4A 音频文件。');
       if (isCurrent3(value504)) render();
       return;
     }
@@ -9551,7 +9551,7 @@ export function initStoryWorkspace({
     }
   }
   (el13?.['addEventListener']('change', async () => {
-    const value507 = el13['files']?.[0x0],
+    const value507 = el13['files']?.[0],
       value508 = value135 || {
         projectToken: createProjectToken(state2),
         assetId: state2['pendingCharacterVoiceAssetId'],
@@ -9564,7 +9564,7 @@ export function initStoryWorkspace({
       (el13['value'] = ''));
   }),
     el14?.['addEventListener']('change', async () => {
-      const value509 = el14['files']?.[0x0];
+      const value509 = el14['files']?.[0];
       (await uploadSelectedInput(value509), (el14['value'] = ''));
     }),
     storyRoot['addEventListener']('dragover', (event30) => {
@@ -9668,7 +9668,7 @@ export function initStoryWorkspace({
         (event32['preventDefault'](),
           event32['stopPropagation'](),
           el272['classList']['remove']('is-dragover'));
-        const value517 = event32['dataTransfer']?.['files']?.[0x0];
+        const value517 = event32['dataTransfer']?.['files']?.[0];
         await run84(value517, state2['characterVoiceEditor']?.['assetId']);
         return;
       }
@@ -9704,7 +9704,7 @@ export function initStoryWorkspace({
       if (
         enabled11 &&
         state2['view'] === 'project' &&
-        state2['step'] === 0x2 &&
+        state2['step'] === 2 &&
         state2['assetFilter'] === 'library'
       ) {
         render();
@@ -9728,7 +9728,7 @@ export function initStoryWorkspace({
       value522 = ![];
     try {
       const workspace = await loadWorkspace();
-      await waitForRuntimeManifestLoad({ timeoutMs: 0x1f4 });
+      await waitForRuntimeManifestLoad({ timeoutMs: 500 });
       const providerProfileId3 = parseStoryWorkspaceSnapshotPayload(workspace);
       if (providerProfileId3) {
         const list46 = providerProfileId3['projects']['map']((args39) => {
@@ -9744,7 +9744,7 @@ export function initStoryWorkspace({
           (projectData['restoreEntries'](mergeStoryWorkspaceHydratedProjects(state2['projects'], list46), {
             preserveLive: !![],
           }),
-            (value521 = list46['length'] > 0x0),
+            (value521 = list46['length'] > 0),
             coordinator['schedule']());
         else {
           (projectData['restoreEntries'](list46),
@@ -9812,10 +9812,10 @@ export function initStoryWorkspace({
           state2['step'] = canEnterStoryWorkspaceStep(state2['data'], storyWorkspaceStep2)
             ? storyWorkspaceStep2
             : state2['data']['project']['collaboration']?.['stage'] === 'writing'
-              ? 0x0
-              : 0x1;
+              ? 0
+              : 1;
           state2['view'] === 'episode' &&
-            !canEnterStoryWorkspaceStep(state2['data'], 0x3) &&
+            !canEnterStoryWorkspaceStep(state2['data'], 3) &&
             (state2['view'] = 'project');
           ((state2['homeTab'] = resolveStoryVideoReplicationHomeTab(
             state2,
@@ -9832,12 +9832,12 @@ export function initStoryWorkspace({
             (state2['uploadInputMode'] =
               providerProfileId3['ui']['uploadInputMode'] === 'paste' ? 'paste' : 'file'),
             (state2['idea'] = String(providerProfileId3['ui']['idea'] || '')['slice'](
-              0x0,
+              0,
               STORY_IDEA_MAX_CHARACTERS,
             )),
             (state2['scriptFileName'] = String(providerProfileId3['ui']['scriptFileName'] || '')),
             (state2['scriptText'] = String(providerProfileId3['ui']['scriptText'] || '')['slice'](
-              0x0,
+              0,
               STORY_SCRIPT_MAX_CHARACTERS,
             )),
             (state2['scriptCharacterCount'] = Number['isFinite'](
@@ -9850,7 +9850,7 @@ export function initStoryWorkspace({
             typeof response12 === 'object' &&
             ((state2['scriptFileName'] = String(response12['fileName'] || state2['scriptFileName'])),
             (state2['scriptText'] = String(response12['text'] || state2['scriptText'])['slice'](
-              0x0,
+              0,
               STORY_SCRIPT_MAX_CHARACTERS,
             )),
             (state2['scriptCharacterCount'] = Number['isFinite'](response12['characterCount'])
@@ -9909,7 +9909,7 @@ export function initStoryWorkspace({
     } catch (value524) {
       (console['warn']('[storyWorkspace] 用户数据加载失败', value524),
         coordinator['setHydrationError'](value524),
-        showToast('历史剧本项目加载失败，已暂停自动保存以防覆盖数据。', 'error', 0x2710));
+        showToast('历史剧本项目加载失败，已暂停自动保存以防覆盖数据。', 'error', 10000));
       return;
     }
     coordinator['setReady'](!![]);
@@ -9921,12 +9921,12 @@ export function initStoryWorkspace({
       }
     value521 &&
       !enabled10 &&
-      void backfillStoryVideoThumbnails(projectData['getAllData'](), { concurrency: 0x1 })
+      void backfillStoryVideoThumbnails(projectData['getAllData'](), { concurrency: 1 })
         ['then']((enabled65) => {
           if (enabled10 || !enabled65['updatedCount']) return;
           schedulePersistence({ immediate: !![] });
           if (!enabled11) return;
-          if (state2['view'] === 'project' && state2['step'] === 0x3)
+          if (state2['view'] === 'project' && state2['step'] === 3)
             enabled65['changedEpisodeIds']['forEach']((value526) => {
               run7(value526);
             });
@@ -9936,7 +9936,7 @@ export function initStoryWorkspace({
               (hideHistory(), refreshTimeline());
         })
         ['catch']((value527) => {
-          console['warn']('[storyWorkspace]\x20历史视频缩略图补全失败', value527);
+          console['warn']('[storyWorkspace] 历史视频缩略图补全失败', value527);
         });
   }
   collaboration = createStoryCollaboration({
@@ -10006,7 +10006,7 @@ export function initStoryWorkspace({
         subscribeAssetMentionRegistry2?.(),
         value518?.(),
         value519?.(),
-        viewportElement['querySelectorAll'](':scope\x20>\x20.story-page')['forEach'](disposePage),
+        viewportElement['querySelectorAll'](':scope > .story-page')['forEach'](disposePage),
         run82(),
         storyRoot['removeEventListener']('error', handleStoryWorkspaceImageError, !![]),
         windowObject?.['removeEventListener']?.('pointermove', handleWindowPointerMove, !![]),

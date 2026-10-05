@@ -19,14 +19,14 @@ export function initCliComponentSettings({
   const list = [],
     map = new Map(),
     map2 = new Map();
-  let value = 0x0;
+  let value = 0;
   const item = { codex: 'btnCodexCliLogin', dreamina: 'btnDreaminaAuth' },
     handler = (key) => (key === 'codex' ? fetchCliProviderStatuses() : fetchDreaminaCliStatusFromServer());
   function run(enabled2) {
     if (enabled || !enabled2) return;
     const index = enabled2['provider'];
     map['set'](index, enabled2);
-    const el = documentObject['querySelector']('[data-cli-component="' + index + '\x22]');
+    const el = documentObject['querySelector']('[data-cli-component="' + index + '"]');
     if (!el) return;
     const enabled3 = enabled2['phase'] === 'downloading',
       enabled4 = map2['get'](index),
@@ -42,21 +42,21 @@ export function initCliComponentSettings({
       (el3['hidden'] = !el3['textContent']));
     const el4 = el['querySelector']('[data-component-status]'),
       result = enabled2['downloadBytes']
-        ? '约\x20' + (enabled2['downloadBytes'] / 0xf4240)['toFixed'](0x1) + ' MB'
+        ? '约 ' + (enabled2['downloadBytes'] / 1000000)['toFixed'](1) + ' MB'
         : '';
     ((el4['textContent'] = enabled3
       ? '正在下载 ' +
-        (enabled2['progress'] || 0x0) +
+        (enabled2['progress'] || 0) +
         '% · ' +
-        ((enabled2['receivedBytes'] || 0x0) / 0xf4240)['toFixed'](0x1) +
-        '\x20MB'
+        ((enabled2['receivedBytes'] || 0) / 1000000)['toFixed'](1) +
+        ' MB'
       : [enabled2['installed'] ? '' : result, enabled2['error'] || enabled2['busyReason']]
           ['filter'](Boolean)
-          ['join']('\x20·\x20')),
+          ['join'](' · ')),
       (el4['hidden'] = !el4['textContent']));
     const el5 = el['querySelector']('progress');
     el5['hidden'] = !enabled3 && !enabled5;
-    if (enabled3 && enabled2['totalBytes'] > 0x0) el5['value'] = enabled2['progress'] || 0x0;
+    if (enabled3 && enabled2['totalBytes'] > 0) el5['value'] = enabled2['progress'] || 0;
     else el5['removeAttribute']('value');
     const el6 = el['querySelector']('[data-component-install]');
     ((el6['hidden'] = enabled2['installed']),
@@ -80,7 +80,7 @@ export function initCliComponentSettings({
   }
   async function run2(data, handler2) {
     if (map2['has'](data)) return;
-    ((value += 0x1), map2['set'](data, handler2), run(map['get'](data)));
+    ((value += 1), map2['set'](data, handler2), run(map['get'](data)));
     try {
       await handler2(data);
       if (!enabled && handler2 !== checkCliComponentUpdate)
@@ -90,11 +90,11 @@ export function initCliComponentSettings({
     } catch (error2) {
       if (!enabled) showToast?.(error2['message'], 'error');
     } finally {
-      (map2['delete'](data), (value += 0x1), run(map['get'](data)));
+      (map2['delete'](data), (value += 1), run(map['get'](data)));
     }
   }
   for (const options of Object['keys'](item)) {
-    const el10 = documentObject['querySelector']('[data-cli-component="' + options + '\x22]');
+    const el10 = documentObject['querySelector']('[data-cli-component="' + options + '"]');
     if (!el10) continue;
     const el11 = el10['querySelector']('[data-component-install]'),
       el12 = el10['querySelector']('[data-component-remove]'),
@@ -127,7 +127,7 @@ export function initCliComponentSettings({
       }));
   }
   const payload = (handle) => {
-    ((value += 0x1), run(handle['detail']));
+    ((value += 1), run(handle['detail']));
   };
   host['addEventListener'](CLI_COMPONENT_CHANGED, payload);
   function run3(state) {
@@ -161,7 +161,7 @@ export function initCliComponentSettings({
       } finally {
         config = ![];
       }
-    }, 0xbb8),
+    }, 3000),
     output = value;
   return (
     fetchCliComponents()

@@ -46,10 +46,10 @@ const PRESENTATION_MODES = new Set(['none', 'render', 'state']),
   ]),
   INTERRUPTED_CHARACTER_APPEARANCE_ERROR = '页面刷新后生成任务已中断，请重新生成。',
   INTERRUPTED_PROJECT_TASK_ERROR = '页面刷新后任务已中断，请重试。',
-  PERSON_REPLACEMENT_LAYOUT_DEFAULTS = Object['freeze']({ left: 0x18, right: 0x20, centerTop: 0x44 }),
-  PERSON_REPLACEMENT_VOICE_LAYOUT_DEFAULTS = Object['freeze']({ assetsEnd: 0x10, sourcesEnd: 0x26 }),
-  PERSON_REPLACEMENT_COMPOSITE_SIDEBAR_WIDTH_DEFAULT = 0x140;
-export const PERSON_REPLACEMENT_COMPOSITE_SIDEBAR_WIDTH_RANGE = Object['freeze']({ min: 0xf0, max: 0x2d0 });
+  PERSON_REPLACEMENT_LAYOUT_DEFAULTS = Object['freeze']({ left: 24, right: 32, centerTop: 0x44 }),
+  PERSON_REPLACEMENT_VOICE_LAYOUT_DEFAULTS = Object['freeze']({ assetsEnd: 16, sourcesEnd: 38 }),
+  PERSON_REPLACEMENT_COMPOSITE_SIDEBAR_WIDTH_DEFAULT = 320;
+export const PERSON_REPLACEMENT_COMPOSITE_SIDEBAR_WIDTH_RANGE = Object['freeze']({ min: 240, max: 720 });
 const WORKSPACE_PROJECT_PROJECTION_FIELDS = new Set([
   'libraryProjects',
   'libraryAssets',
@@ -71,12 +71,12 @@ function normalizeMediaUrl(target) {
   if (!text) return '';
   return localPathToUrl(text) || text;
 }
-function normalizeLibraryAssetForProjectSession(error2 = {}, next = 0x0) {
+function normalizeLibraryAssetForProjectSession(error2 = {}, next = 0) {
   const sourceAssetId =
-      normalizeText(error2['assetId'] || error2['sourceAssetId'] || error2['id']) || 'asset-' + (next + 0x1),
+      normalizeText(error2['assetId'] || error2['sourceAssetId'] || error2['id']) || 'asset-' + (next + 1),
     sourceItemIndex = Math['max'](
-      0x0,
-      Math['trunc'](Number(error2['itemIndex'] ?? error2['sourceItemIndex']) || 0x0),
+      0,
+      Math['trunc'](Number(error2['itemIndex'] ?? error2['sourceItemIndex']) || 0),
     ),
     mediaKind = (normalizeText(error2['type'] || error2['mediaKind']) || 'image')['toLowerCase'](),
     assetName = normalizeText(error2['assetName']) || normalizeText(error2['name']) || '画布素材',
@@ -135,9 +135,9 @@ function getActiveCharacterAppearanceKeys(options2 = {}) {
 export function normalizePersonReplacementLayout(options3 = {}) {
   const box = options3 && typeof options3 === 'object' ? options3 : {};
   return {
-    left: clamp(box['left'], 0x12, 0x26, PERSON_REPLACEMENT_LAYOUT_DEFAULTS['left']),
-    right: clamp(box['right'], 0x18, 0x2a, PERSON_REPLACEMENT_LAYOUT_DEFAULTS['right']),
-    centerTop: clamp(box['centerTop'], 0x26, 0x52, PERSON_REPLACEMENT_LAYOUT_DEFAULTS['centerTop']),
+    left: clamp(box['left'], 18, 38, PERSON_REPLACEMENT_LAYOUT_DEFAULTS['left']),
+    right: clamp(box['right'], 24, 42, PERSON_REPLACEMENT_LAYOUT_DEFAULTS['right']),
+    centerTop: clamp(box['centerTop'], 38, 82, PERSON_REPLACEMENT_LAYOUT_DEFAULTS['centerTop']),
   };
 }
 export function normalizePersonReplacementAssetDetailSplitRatio(payload) {
@@ -145,14 +145,14 @@ export function normalizePersonReplacementAssetDetailSplitRatio(payload) {
 }
 export function normalizePersonReplacementVoiceLayout(options4 = {}) {
   const handle = options4 && typeof options4 === 'object' ? options4 : {},
-    assetsEnd = clamp(handle['assetsEnd'], 0x10, 0x20, PERSON_REPLACEMENT_VOICE_LAYOUT_DEFAULTS['assetsEnd']);
+    assetsEnd = clamp(handle['assetsEnd'], 16, 32, PERSON_REPLACEMENT_VOICE_LAYOUT_DEFAULTS['assetsEnd']);
   return {
     assetsEnd: assetsEnd,
     sourcesEnd: clamp(
       handle['sourcesEnd'],
-      assetsEnd + 0x10,
-      0x3c,
-      Math['max'](PERSON_REPLACEMENT_VOICE_LAYOUT_DEFAULTS['sourcesEnd'], assetsEnd + 0x10),
+      assetsEnd + 16,
+      60,
+      Math['max'](PERSON_REPLACEMENT_VOICE_LAYOUT_DEFAULTS['sourcesEnd'], assetsEnd + 16),
     ),
   };
 }
@@ -172,7 +172,7 @@ export function normalizePersonReplacementPersistenceState(options5 = {}) {
   return {
     status: status2,
     error: normalizeText(response['error']),
-    retryAttempt: Math['max'](0x0, Math['trunc'](Number(response['retryAttempt']) || 0x0)),
+    retryAttempt: Math['max'](0, Math['trunc'](Number(response['retryAttempt']) || 0)),
   };
 }
 export function isPersonReplacementSourceProcessing(options6 = {}) {
@@ -190,14 +190,14 @@ export function getPersonReplacementProjectTaskSummary(options7 = {}) {
       output = Math['round'](
         clamp(
           input ? scope['videoPreparation']?.['progress'] : scope['sourceAnalysis']?.['progress'],
-          0x0,
-          0x64,
-          0x0,
+          0,
+          100,
+          0,
         ),
       );
     return {
-      activeCount: 0x1,
-      failedCount: 0x0,
+      activeCount: 1,
+      failedCount: 0,
       label: (input ? '正在准备镜头' : '视频处理中') + ' · ' + output + '%',
     };
   }
@@ -256,23 +256,23 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
     text10 = normalizeText(view['selectedShotId'] || value12['selectedShotId']),
     selectedShotId = args['shots']['some']((value13) => value13['id'] === text10)
       ? text10
-      : args['shots'][0x0]?.['id'] || '',
+      : args['shots'][0]?.['id'] || '',
     text11 = normalizeText(view['selectedCharacterId']),
     selectedCharacterId = args['characters']['some']((value14) => value14['id'] === text11)
       ? text11
-      : args['characters'][0x0]?.['id'] || '',
+      : args['characters'][0]?.['id'] || '',
     text12 = normalizeText(view['selectedSceneId']),
     selectedSceneId = args['scenes']['some']((value15) => value15['id'] === text12)
       ? text12
-      : args['scenes'][0x0]?.['id'] || '',
+      : args['scenes'][0]?.['id'] || '',
     text13 = normalizeText(view['selectedAudioAssetId']),
     selectedAudioAssetId = args['audioAssets']['some']((value16) => value16['id'] === text13)
       ? text13
-      : args['audioAssets'][0x0]?.['id'] || '',
+      : args['audioAssets'][0]?.['id'] || '',
     text14 = normalizeText(view['selectedVoiceSourceId']),
     selectedVoiceSourceId = args['sources']['some']((value17) => value17['id'] === text14)
       ? text14
-      : args['sources'][0x0]?.['id'] || '',
+      : args['sources'][0]?.['id'] || '',
     libraryAssets = Array['isArray'](value12['libraryAssets'])
       ? value12['libraryAssets']
           ['filter']((value18) =>
@@ -285,7 +285,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
     text15 = normalizeText(view['selectedLibraryAssetId']),
     selectedLibraryAssetId = libraryAssets['some']((value19) => value19['id'] === text15)
       ? text15
-      : libraryAssets[0x0]?.['id'] || '',
+      : libraryAssets[0]?.['id'] || '',
     value20 =
       value12['sourcePreviewRefs'] && typeof value12['sourcePreviewRefs'] === 'object'
         ? value12['sourcePreviewRefs']
@@ -296,7 +296,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
         ['filter'](([, value22]) => value22['startsWith']('blob:')),
     ),
     map = getActiveCharacterAppearanceKeys(args),
-    value23 = Math['trunc'](clamp(view['step'] ?? value12['step'], 0x1, 0x5, 0x1)),
+    value23 = Math['trunc'](clamp(view['step'] ?? value12['step'], 1, 5, 1)),
     imageGeneration = normalizePersonReplacementImageGenerationState(view['imageGeneration']),
     imageGenerationsByShotId = normalizePersonReplacementImageGenerationsByShotId(
       view['imageGenerationsByShotId'],
@@ -350,7 +350,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
         view['assetAppearanceIndexes'] && typeof view['assetAppearanceIndexes'] === 'object'
           ? { ...view['assetAppearanceIndexes'] }
           : {},
-      assetSplitRatio: clamp(view['assetSplitRatio'], 0x1c, 0x48, 0x32),
+      assetSplitRatio: clamp(view['assetSplitRatio'], 28, 72, 50),
       assetDetailSplitRatio: normalizePersonReplacementAssetDetailSplitRatio(view['assetDetailSplitRatio']),
       compositeSidebarWidth: normalizePersonReplacementCompositeSidebarWidth(view['compositeSidebarWidth']),
       compositePreviewMode:
@@ -376,8 +376,8 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
           ? videoGenerationsByShotId[personReplacementVideoGenerationState['shotId']]
           : value25 || personReplacementVideoGenerationState,
       videoGenerationsByShotId: videoGenerationsByShotId,
-      videoPreparation: view['videoPreparation'] || { status: 'idle', progress: 0x0, error: '' },
-      sourceAnalysis: view['sourceAnalysis'] || { status: 'idle', progress: 0x0 },
+      videoPreparation: view['videoPreparation'] || { status: 'idle', progress: 0, error: '' },
+      sourceAnalysis: view['sourceAnalysis'] || { status: 'idle', progress: 0 },
       smartClipSettingsOpen: view['smartClipSettingsOpen'] === !![],
       identityAnalysis: view['identityAnalysis'] || {
         status: 'idle',
@@ -429,7 +429,7 @@ export function createPersonReplacementWorkspaceProject(options9 = {}, value32 =
       title:
         normalizeText(
           libraryProjects['shots']?.['find']?.((value34) => value34?.['id'] === persons['id'])?.['title'],
-        ) || '片段\x20' + String(value33 + 0x1)['padStart'](0x2, '0'),
+        ) || '片段 ' + String(value33 + 1)['padStart'](2, '0'),
       thumbnailUrl: normalizeMediaUrl(persons['keyframeRef']),
       keyframeUrl: normalizeMediaUrl(persons['keyframeRef']),
       persons: persons['people']['map']((args4, value35) => ({
@@ -444,7 +444,7 @@ export function createPersonReplacementWorkspaceProject(options9 = {}, value32 =
         selectedShotId2['selectedShotId'] ||
         libraryProjects['selectedShotId'] ||
         args3['selectedShotId'] ||
-        shots[0x0]?.['id'] ||
+        shots[0]?.['id'] ||
         '',
     },
     libraryAssets2 = Array['isArray'](libraryProjects['libraryAssets']),
@@ -573,7 +573,7 @@ function settleInterruptedCharacterAppearanceGenerations(options12 = {}) {
         ? project['workspace']['generatingAppearanceKeys']['map'](normalizeText)['filter'](Boolean)
         : [],
     );
-  let enabled4 = map4['size'] > 0x0;
+  let enabled4 = map4['size'] > 0;
   const characters = (Array['isArray'](project['characters']) ? project['characters'] : [])['map'](
     (args10) => {
       let enabled5 = ![];
@@ -691,8 +691,8 @@ export function settleInterruptedReplacementStudioProjectTasks(
           materializationProgress:
             normalizeText(value49?.['videoRef']) &&
             Boolean(value49?.['materializedIsReversed']) === Boolean(value49?.['isReversed'])
-              ? 0x64
-              : 0x0,
+              ? 100
+              : 0,
         }),
         (enabled9 =
           enabled9 ||

@@ -221,10 +221,10 @@ export async function executeGridCrop({ nodeData: nodeData2, cols: cols3, rows: 
     record = rows3 * height + (rows3 - 1) * current;
   let payload, handle;
   direction === 'right'
-    ? ((payload = srcNode.x + (srcNode.width || 0x104) + spacing),
-      (handle = srcNode.y + ((srcNode.height || 0x104) - record) / 2))
-    : ((payload = srcNode.x + ((srcNode.width || 0x104) - entry) / 2),
-      (handle = srcNode.y + (srcNode.height || 0x104) + spacing));
+    ? ((payload = srcNode.x + (srcNode.width || 260) + spacing),
+      (handle = srcNode.y + ((srcNode.height || 260) - record) / 2))
+    : ((payload = srcNode.x + ((srcNode.width || 260) - entry) / 2),
+      (handle = srcNode.y + (srcNode.height || 260) + spacing));
   if (avoidOverlap) {
     const box2 = findAvailablePosition(
       stateSnapshot.nodes,

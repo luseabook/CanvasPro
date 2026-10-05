@@ -1,23 +1,23 @@
 export function normalizeDirectorGeneratedLayers(value, item) {
   return (Array['isArray'](value) ? value : [])
-    ['slice'](-0x1e)
+    ['slice'](-30)
     ['filter']((key) => typeof key?.['id'] === 'string')
     ['map']((id) => ({
       id: id['id'],
-      name: String(id['name'] || '生成层')['slice'](0x0, 0x78),
+      name: String(id['name'] || '生成层')['slice'](0, 120),
       objectIds: (Array['isArray'](id['objectIds']) ? id['objectIds'] : [])['filter'](
         (index) => typeof index === 'string',
       ),
-      versions: (Array['isArray'](id['versions']) ? id['versions'] : [])['slice'](-0xa)['map']((error) => ({
+      versions: (Array['isArray'](id['versions']) ? id['versions'] : [])['slice'](-10)['map']((error) => ({
         id: String(error['id']),
-        name: String(error['name'] || '历史版本')['slice'](0x0, 0x78),
+        name: String(error['name'] || '历史版本')['slice'](0, 120),
         objects: (Array['isArray'](error['objects']) ? error['objects'] : [])['map'](item)['filter'](Boolean),
       })),
     }));
 }
 export function normalizeDirectorGenerationJobs(result) {
   return (Array['isArray'](result) ? result : [])
-    ['slice'](-0x1e)
+    ['slice'](-30)
     ['filter']((data) => typeof data?.['id'] === 'string')
     ['map']((id2) => ({
       id: id2['id'],
@@ -25,12 +25,12 @@ export function normalizeDirectorGenerationJobs(result) {
       sceneId: String(id2['sceneId'] || ''),
       kind: id2['kind'] === 'panorama' ? 'panorama' : 'layer',
       status: ['running', 'completed', 'failed']['includes'](id2['status']) ? id2['status'] : 'failed',
-      message: String(id2['message'] || '')['slice'](0x0, 0x1f4),
-      prompt: String(id2['prompt'] || '')['slice'](0x0, 0x1388),
+      message: String(id2['message'] || '')['slice'](0, 500),
+      prompt: String(id2['prompt'] || '')['slice'](0, 5000),
       model: String(id2['model'] || ''),
       provider: String(id2['provider'] || ''),
       taskId: String(id2['taskId'] || ''),
-      createdAt: Math['max'](0x0, Number(id2['createdAt']) || 0x0),
+      createdAt: Math['max'](0, Number(id2['createdAt']) || 0),
     }));
 }
 export function applyDirectorGeneratedLayer(
@@ -71,7 +71,7 @@ export function applyDirectorGeneratedLayer(
       objects: structuredClone(args['objects']['filter']((record) => map['has'](record['id']))),
     });
   return (
-    (name2['versions'] = name2['versions']['slice'](-0xa)),
+    (name2['versions'] = name2['versions']['slice'](-10)),
     (args['objects'] = [...args['objects']['filter']((payload) => !map['has'](payload['id'])), ...list]),
     (name2['objectIds'] = list['map']((handle) => handle['id'])),
     args

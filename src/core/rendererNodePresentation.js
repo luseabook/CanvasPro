@@ -68,11 +68,11 @@ export function formatRendererNodeLabelText(record) {
   const list3 = String(record || '')['trim']();
   if (!list3) return '';
   const payload = /^[\x00-\x7F]*$/['test'](list3);
-  return payload && list3['length'] > 0x14 ? list3['slice'](0x0, 0x14) + '...' : list3;
+  return payload && list3['length'] > 20 ? list3['slice'](0, 20) + '...' : list3;
 }
 export function getRendererGroupColorWithOpacity(handle, state) {
   const config = String(handle || '')['match'](/var\(--([^)]+)\)/);
-  return config ? 'var(--' + config[0x1] + '-' + state + ')' : handle;
+  return config ? 'var(--' + config[1] + '-' + state + ')' : handle;
 }
 export function getRendererNodeLabelKind(scope) {
   const refKindByNodeType = getRefKindByNodeType(scope);
@@ -183,8 +183,8 @@ function getDreaminaTimerPhaseTitle(enabled3) {
 }
 export function formatRendererNodeTimerText(value9, value10) {
   const value11 = Math.max(0, Number(value10) || 0),
-    value12 = Math.floor(value11 / 0x3e8),
-    value13 = Math.floor((value11 % 0x3e8) / 0x64),
+    value12 = Math.floor(value11 / 1000),
+    value13 = Math.floor((value11 % 1000) / 100),
     value14 = value12 + '.' + value13 + 's',
     dreaminaTimerPhaseTitle = getDreaminaTimerPhaseTitle(value9);
   return dreaminaTimerPhaseTitle ? dreaminaTimerPhaseTitle + ' · ' + value14 : value14;
@@ -199,8 +199,8 @@ function normalizeRendererNodeZIndex(value15) {
 }
 
 function resolveFastPreviewOwnedNodeZIndex(value17) {
-  const value18 = Number['parseInt'](value17, 0xa),
-    value19 = Number['parseInt'](FAST_PREVIEW_OWNED_NODE_Z_INDEX, 0xa);
+  const value18 = Number['parseInt'](value17, 10),
+    value19 = Number['parseInt'](FAST_PREVIEW_OWNED_NODE_Z_INDEX, 10);
   if (!Number['isFinite'](value18)) return FAST_PREVIEW_OWNED_NODE_Z_INDEX;
   return String(Math['min'](value18, value19));
 }
@@ -212,7 +212,7 @@ function applyRendererNodePresentationZIndex(el8) {
     ),
     enabled4 =
       el8['dataset']['rendererPresentationOwner'] === FAST_PREVIEW_PRESENTATION_OWNER &&
-      Number['parseInt'](rendererNodeZIndex, 0xa) > Number(FAST_PREVIEW_OWNED_NODE_Z_INDEX) &&
+      Number['parseInt'](rendererNodeZIndex, 10) > Number(FAST_PREVIEW_OWNED_NODE_Z_INDEX) &&
       !!el8['querySelector']?.('.text-prompt-panel') &&
       !!el8['querySelector']?.('.img-node-preview');
   enabled4
@@ -239,9 +239,9 @@ export function liftRendererNodePresentationZIndex(el10, value22) {
   if (!el10?.['dataset'] || !el10?.['style']) return '';
   const value23 = Number['parseInt'](
       el10['dataset']['rendererPresentationTargetZIndex'] || el10['style']['zIndex'],
-      0xa,
+      10,
     ),
-    value24 = Number['parseInt'](value22, 0xa);
+    value24 = Number['parseInt'](value22, 10);
   if (!Number['isFinite'](value23) || (Number['isFinite'](value24) && value23 < value24))
     return syncRendererNodePresentationZIndex(el10, value22);
   return applyRendererNodePresentationZIndex(el10);
@@ -265,14 +265,14 @@ export function syncRendererFastPreviewPresentationOwner(el11, value25) {
 export function formatVideoMetaText({ fps: fps, frames: frames, width: width, height: height } = {}) {
   const count = Number(fps),
     count2 = Number(frames);
-  if (!Number['isFinite'](count) || count <= 0x0 || !Number['isFinite'](count2) || count2 <= 0x0) return '';
+  if (!Number['isFinite'](count) || count <= 0 || !Number['isFinite'](count2) || count2 <= 0) return '';
   const value26 =
       Math['abs'](count - Math['round'](count)) < 0.01
         ? String(Math['round'](count))
-        : String(Number(count['toFixed'](0x2))),
+        : String(Number(count['toFixed'](2))),
     count3 = Number(width),
     count4 = Number(height),
-    value27 = Number['isFinite'](count3) && count3 > 0x0 && Number['isFinite'](count4) && count4 > 0x0,
+    value27 = Number['isFinite'](count3) && count3 > 0 && Number['isFinite'](count4) && count4 > 0,
     t3 = t('coreUi.renderer.videoMeta.framesFps', { frames: Math['round'](count2), fps: value26 });
-  return value27 ? Math['round'](count3) + '×' + Math['round'](count4) + '\x20·\x20' + t3 : t3;
+  return value27 ? Math['round'](count3) + '×' + Math['round'](count4) + ' · ' + t3 : t3;
 }

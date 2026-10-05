@@ -8,7 +8,7 @@ import {
 } from './runninghubWorkflowApi.js';
 function makeJsonResponse(value, ok = 200) {
   return {
-    ok: ok >= 200 && ok < 0x12c,
+    ok: ok >= 200 && ok < 300,
     status: ok,
     headers: {
       get(item) {
@@ -134,12 +134,12 @@ function makeJsonResponse(value, ok = 200) {
     let count = 0;
     try {
       ((globalThis.setTimeout = (state, config, ...args) =>
-        handler(state, Number(config) > 0x1388 ? Number(config) : 0, ...args)),
+        handler(state, Number(config) > 5000 ? Number(config) : 0, ...args)),
         (globalThis.fetch = async (scope) => {
           if (String(scope) !== '/api/v2/runninghubwf/query')
             throw new Error('unexpected url: ' + String(scope));
           count += 1;
-          if (count === 1) return makeJsonResponse({ code: 0x324, msg: '排队中' });
+          if (count === 1) return makeJsonResponse({ code: 804, msg: '排队中' });
           return makeJsonResponse({ code: 0, data: [{ url: 'https://cdn.example.com/final.mp4' }] });
         }));
       const resumeRunninghubWorkflowTask2 = await resumeRunninghubWorkflowTask({
@@ -159,7 +159,7 @@ function makeJsonResponse(value, ok = 200) {
       list = [];
     try {
       ((globalThis.setTimeout = (output, value2, ...args2) =>
-        handler2(output, Number(value2) > 0x1388 ? Number(value2) : 0, ...args2)),
+        handler2(output, Number(value2) > 5000 ? Number(value2) : 0, ...args2)),
         (globalThis.fetch = async (value3, dom4 = {}) => {
           assert.equal(String(value3), '/api/v2/proxy/image');
           const value4 = JSON.parse(String(dom4.body || '{}'));
@@ -189,7 +189,7 @@ function makeJsonResponse(value, ok = 200) {
       handler3 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value6, value7, ...args3) =>
-        handler3(value6, Number(value7) > 0x1388 ? Number(value7) : 0, ...args3)),
+        handler3(value6, Number(value7) > 5000 ? Number(value7) : 0, ...args3)),
         (globalThis.fetch = async (value8) => {
           if (String(value8) !== '/api/v2/runninghubwf/query')
             throw new Error('unexpected url: ' + String(value8));
@@ -208,11 +208,11 @@ function makeJsonResponse(value, ok = 200) {
       handler4 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value10, value11, ...args4) =>
-        handler4(value10, Number(value11) > 0x1388 ? Number(value11) : 0, ...args4)),
+        handler4(value10, Number(value11) > 5000 ? Number(value11) : 0, ...args4)),
         (globalThis.fetch = async (value12) => {
           if (String(value12) !== '/api/v2/runninghubwf/query')
             throw new Error('unexpected url: ' + String(value12));
-          return makeJsonResponse({ code: 0x324, msg: '排队中' });
+          return makeJsonResponse({ code: 804, msg: '排队中' });
         }));
       const signal = new AbortController();
       (setTimeout(() => signal.abort(), 0),

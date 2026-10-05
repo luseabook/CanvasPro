@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
 import path from 'node:path';
-const MAX_FAILURE_TEXT_LENGTH = 0x7d0,
+const MAX_FAILURE_TEXT_LENGTH = 2000,
   WINDOWS_SYSTEM_TOOLS = Object['freeze']({
     netstat: { fallback: 'netstat.exe', relativePath: ['System32', 'netstat.exe'] },
     powershell: {
@@ -32,7 +32,7 @@ export function resolveWindowsSystemToolPath(toolName, { env: env = process['env
 }
 function normalizeFailureText(value) {
   const text = Buffer['isBuffer'](value) ? value['toString']('utf8') : String(value ?? '');
-  return text['slice'](0x0, MAX_FAILURE_TEXT_LENGTH);
+  return text['slice'](0, MAX_FAILURE_TEXT_LENGTH);
 }
 export function describeSystemCommandFailure(cause) {
   const details = {};

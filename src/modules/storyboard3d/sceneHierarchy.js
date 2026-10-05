@@ -5,23 +5,23 @@ function normalizeId(value) {
 function normalizeName(item) {
   return String(item || '')['trim']();
 }
-function finite(key, index = 0x0) {
+function finite(key, index = 0) {
   const result = Number(key);
   return Number['isFinite'](result) ? result : index;
 }
 function normalizeVector3(data, options) {
   const target = Array['isArray'](data) ? data : [];
   return [
-    finite(target[0x0], options[0x0]),
-    finite(target[0x1], options[0x1]),
-    finite(target[0x2], options[0x2]),
+    finite(target[0], options[0]),
+    finite(target[1], options[1]),
+    finite(target[2], options[2]),
   ];
 }
 function normalizeTransform(source) {
   return {
-    position: normalizeVector3(source?.['position'], [0x0, 0x0, 0x0]),
-    rotation: normalizeVector3(source?.['rotation'], [0x0, 0x0, 0x0]),
-    scale: normalizeVector3(source?.['scale'], [0x1, 0x1, 0x1])['map']((next) => Math['max'](0.001, next)),
+    position: normalizeVector3(source?.['position'], [0, 0, 0]),
+    rotation: normalizeVector3(source?.['rotation'], [0, 0, 0]),
+    scale: normalizeVector3(source?.['scale'], [1, 1, 1])['map']((next) => Math['max'](0.001, next)),
   };
 }
 function cloneScene(current) {
@@ -37,7 +37,7 @@ function objectMap(entry) {
 }
 function requireObject(payload, handle) {
   const objectMap2 = objectMap(payload)['get'](normalizeId(handle));
-  if (!objectMap2) throw new Error('Storyboard\x20object\x20does\x20not\x20exist:\x20' + handle);
+  if (!objectMap2) throw new Error('Storyboard object does not exist: ' + handle);
   return objectMap2;
 }
 function requireGroup(state, config) {
@@ -48,23 +48,23 @@ function requireGroup(state, config) {
 function createGroupId(scope, handler) {
   const map = new Set((scope['objects'] || [])['map']((input) => normalizeId(input['id'])));
   if (typeof handler === 'function') {
-    for (let count = 0x0; count < 0x3e8; count += 0x1) {
+    for (let count = 0; count < 1000; count += 1) {
       const id = normalizeId(handler('group'));
       if (id && !map['has'](id)) return id;
     }
     throw new Error('Unable to create a unique storyboard group id');
   }
-  let output = 0x1,
+  let output = 1,
     value2 = 'group-' + output;
   while (map['has'](value2)) {
-    ((output += 0x1), (value2 = 'group-' + output));
+    ((output += 1), (value2 = 'group-' + output));
   }
   return value2;
 }
 function assertValidHierarchy(value3) {
   const response = validateStoryboard3DSceneHierarchy(value3);
   if (!response['ok']) {
-    const error = new Error(response['errors']['map']((value4) => value4['message'])['join']('\x20'));
+    const error = new Error(response['errors']['map']((value4) => value4['message'])['join'](' '));
     ((error['code'] = 'STORYBOARD_3D_HIERARCHY_INVALID'), (error['details'] = response));
     throw error;
   }
@@ -85,7 +85,7 @@ function collectDescendantIds(value7, value8) {
   });
   const value10 = new Set(),
     value11 = [...(map2['get'](normalizeId(value8)) || [])];
-  while (value11['length'] > 0x0) {
+  while (value11['length'] > 0) {
     const enabled = value11['pop']();
     if (!enabled || value10['has'](enabled)) continue;
     (value10['add'](enabled), value11['push'](...(map2['get'](enabled) || [])));
@@ -134,7 +134,7 @@ export function validateStoryboard3DSceneHierarchy(value12) {
           code: 'HIERARCHY_PARENT_NOT_FOUND',
           objectId: value16,
           parentId: id5,
-          message: 'Storyboard\x20parent\x20does\x20not\x20exist:\x20' + id5 + '.',
+          message: 'Storyboard parent does not exist: ' + id5 + '.',
         });
         return;
       }
@@ -152,7 +152,7 @@ export function validateStoryboard3DSceneHierarchy(value12) {
     if (value19 === 'visited') return;
     if (value19 === 'visiting') {
       const value20 = list3['indexOf'](value18),
-        value21 = [...list3['slice'](Math['max'](0x0, value20)), value18];
+        value21 = [...list3['slice'](Math['max'](0, value20)), value18];
       list['push']({
         code: 'HIERARCHY_CYCLE',
         objectId: value18,
@@ -169,7 +169,7 @@ export function validateStoryboard3DSceneHierarchy(value12) {
   return (
     map3['forEach']((value22, value23) => run(value23)),
     {
-      ok: list['length'] === 0x0,
+      ok: list['length'] === 0,
       errors: list,
       objectCount: list2['length'],
       groupCount: list2['filter']((value24) => value24?.['type'] === 'group')['length'],
@@ -282,7 +282,7 @@ export function applyStoryboard3DHierarchyOperation(
     count2 = (
       Array['isArray'](cloneStoryboard3DProject2['scenes']) ? cloneStoryboard3DProject2['scenes'] : []
     )['findIndex']((value51) => value51['id'] === value49);
-  if (count2 < 0x0) throw new Error('Storyboard\x20scene\x20does\x20not\x20exist:\x20' + value49);
+  if (count2 < 0) throw new Error('Storyboard scene does not exist: ' + value49);
   const id11 = normalizeId(value50?.['type']),
     args2 = value50?.['args'] && typeof value50['args'] === 'object' ? value50['args'] : {},
     value52 = cloneStoryboard3DProject2['scenes'][count2];
@@ -332,7 +332,7 @@ export function applyStoryboard3DHierarchyOperation(
                   args2['groupId'],
                   { deleteChildren: args2['deleteChildren'] === !![] },
                 );
-              else throw new Error('Unsupported\x20storyboard\x20hierarchy\x20operation:\x20' + id11);
+              else throw new Error('Unsupported storyboard hierarchy operation: ' + id11);
             }
           }
         }
@@ -341,8 +341,8 @@ export function applyStoryboard3DHierarchyOperation(
   }
   return (
     (cloneStoryboard3DProject2['updatedAt'] = Math['max'](
-      0x0,
-      finite(now, finite(cloneStoryboard3DProject2['updatedAt'], 0x0)),
+      0,
+      finite(now, finite(cloneStoryboard3DProject2['updatedAt'], 0)),
     )),
     cloneStoryboard3DProject2
   );

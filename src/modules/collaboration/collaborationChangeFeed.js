@@ -9,7 +9,7 @@ export function createCollaborationChangeFeed({
     enabled2 = ![];
   async function start() {
     if (enabled2 || signal['aborted']) return;
-    let value = 0x0;
+    let value = 0;
     try {
       const enabled3 = await read(enabled);
       if (enabled2 || signal['aborted']) return;
@@ -18,7 +18,7 @@ export function createCollaborationChangeFeed({
       ((enabled = enabled3['cursor']), onChange(enabled3, item));
     } catch (key) {
       if (!enabled2 && !signal['aborted']) onError(key);
-      value = 0x5dc;
+      value = 1500;
     }
     if (!enabled2 && !signal['aborted']) setTimeout2 = setTimeout(start, value);
   }

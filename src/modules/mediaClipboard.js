@@ -162,7 +162,7 @@ export async function copyNodeMediaToSystemClipboard(payload) {
   let blob2 = null,
     error2 = null;
   try {
-    ((blob2 = await fetchRemoteBlob(url3, { timeout: 0x3a98 })), !isBlobLike(blob2) && (blob2 = null));
+    ((blob2 = await fetchRemoteBlob(url3, { timeout: 15000 })), !isBlobLike(blob2) && (blob2 = null));
   } catch (handle) {
     error2 = handle;
   }

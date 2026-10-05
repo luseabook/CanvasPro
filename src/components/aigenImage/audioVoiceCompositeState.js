@@ -14,7 +14,7 @@ export function resolveAudioVoiceCompositeState({
     defaultModeValue2 = normalizeText(defaultModeValue) || 'default',
     customModeValue2 = normalizeText(customModeValue) || 'custom',
     voiceTypeLabel2 = String(voiceTypeLabel ?? voiceTypeValue ?? '')['trim'](),
-    isCustomMode = voiceModeValue2 ? voiceModeValue2 === customModeValue2 : speakerIdValue2['length'] > 0x0;
+    isCustomMode = voiceModeValue2 ? voiceModeValue2 === customModeValue2 : speakerIdValue2['length'] > 0;
   return {
     voiceTypeValue: voiceTypeValue,
     voiceTypeLabel: voiceTypeLabel2,
@@ -26,7 +26,7 @@ export function resolveAudioVoiceCompositeState({
     customAreaDisabled: !isCustomMode,
     defaultAreaDisabled: isCustomMode,
     customAreaClassName: isCustomMode ? '' : ' is-disabled',
-    defaultAreaClassName: isCustomMode ? '\x20is-disabled' : '',
-    triggerLabel: isCustomMode ? '自定义音色' : '音色："' + voiceTypeLabel2 + '\x22',
+    defaultAreaClassName: isCustomMode ? ' is-disabled' : '',
+    triggerLabel: isCustomMode ? '自定义音色' : '音色："' + voiceTypeLabel2 + '"',
   };
 }

@@ -27,7 +27,7 @@ export async function renderImageDerivativePayload(source) {
     canvas.height = 0;
   }
 }
-export function createImageDerivativeWorker({ BrowserWindow: BrowserWindow, timeoutMs: timeoutMs = 0x7530 }) {
+export function createImageDerivativeWorker({ BrowserWindow: BrowserWindow, timeoutMs: timeoutMs = 30000 }) {
   const operationQueue = createKeyedOperationQueue();
   return (sourcePath) =>
     operationQueue.run('image-derivatives', async () => {

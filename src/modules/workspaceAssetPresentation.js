@@ -12,16 +12,16 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&apos;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&apos;');
 }
 function renderAttributes(options = {}) {
   return Object['entries'](options && typeof options === 'object' ? options : {})
     ['filter'](([key, index]) => normalizeText(key) && index !== ![] && index != null)
     ['map'](([result, data]) =>
       data === !![]
-        ? '\x20' + escapeHtml(result)
-        : '\x20' + escapeHtml(result) + '=\x22' + escapeHtml(data) + '\x22',
+        ? ' ' + escapeHtml(result)
+        : ' ' + escapeHtml(result) + '="' + escapeHtml(data) + '"',
     )
     ['join']('');
 }
@@ -33,14 +33,14 @@ export function renderWorkspaceCardDeleteControl({
 } = {}) {
   const text = normalizeText(className);
   return (
-    '<button\x20type=\x22button\x22\x20class=\x22story-action-icon-button\x20is-danger\x20story-project-delete-trigger\x20story-card-delete-button\x20story-card-delete-control' +
-    (text ? '\x20' + escapeHtml(text) : '') +
-    '\x22' +
+    '<button type="button" class="story-action-icon-button is-danger story-project-delete-trigger story-card-delete-button story-card-delete-control' +
+    (text ? ' ' + escapeHtml(text) : '') +
+    '"' +
     renderAttributes(actionAttributes) +
     ' aria-label="' +
     escapeHtml(ariaLabel) +
-    '\x22' +
-    (disabled ? '\x20disabled' : '') +
+    '"' +
+    (disabled ? ' disabled' : '') +
     '>' +
     renderWorkspaceDeleteIcon() +
     '</button>'
@@ -73,39 +73,39 @@ export function renderWorkspaceCardImageActions({
   );
 }
 export function isWorkspaceAssetHoverLandscape(current, entry) {
-  const count = Number(current) || 0x0,
-    count2 = Number(entry) || 0x0;
-  return count > 0x0 && count2 > 0x0 && count > count2;
+  const count = Number(current) || 0,
+    count2 = Number(entry) || 0;
+  return count > 0 && count2 > 0 && count > count2;
 }
 export function resolveWorkspaceWheelDelta(event) {
-  const record = Number(event?.['deltaX'] || 0x0),
-    payload = Number(event?.['deltaY'] || 0x0),
+  const record = Number(event?.['deltaX'] || 0),
+    payload = Number(event?.['deltaY'] || 0),
     handle = Math['abs'](payload) >= Math['abs'](record) ? payload : record,
-    count3 = Number(event?.['deltaMode'] || 0x0),
-    state = count3 === 0x1 ? 0x10 : count3 === 0x2 ? 0x320 : 0x1;
+    count3 = Number(event?.['deltaMode'] || 0),
+    state = count3 === 1 ? 16 : count3 === 2 ? 800 : 1;
   return handle * state;
 }
 export function consumeWorkspaceWheelDirection(
   config,
   enabled,
-  { threshold: threshold = 0x18, lockDuration: lockDuration = 0xdc, now: now = Date['now']() } = {},
+  { threshold: threshold = 24, lockDuration: lockDuration = 220, now: now = Date['now']() } = {},
 ) {
-  if (!enabled || now < Number(enabled['lockedUntil'] || 0x0)) return 0x0;
+  if (!enabled || now < Number(enabled['lockedUntil'] || 0)) return 0;
   const workspaceWheelDelta = resolveWorkspaceWheelDelta(config);
-  if (!workspaceWheelDelta) return 0x0;
+  if (!workspaceWheelDelta) return 0;
   enabled['accumulator'] &&
     Math['sign'](enabled['accumulator']) !== Math['sign'](workspaceWheelDelta) &&
-    (enabled['accumulator'] = 0x0);
-  enabled['accumulator'] = Number(enabled['accumulator'] || 0x0) + workspaceWheelDelta;
-  if (Math['abs'](enabled['accumulator']) < threshold) return 0x0;
-  const scope = enabled['accumulator'] > 0x0 ? 0x1 : -0x1;
-  return ((enabled['accumulator'] = 0x0), (enabled['lockedUntil'] = now + lockDuration), scope);
+    (enabled['accumulator'] = 0);
+  enabled['accumulator'] = Number(enabled['accumulator'] || 0) + workspaceWheelDelta;
+  if (Math['abs'](enabled['accumulator']) < threshold) return 0;
+  const scope = enabled['accumulator'] > 0 ? 1 : -1;
+  return ((enabled['accumulator'] = 0), (enabled['lockedUntil'] = now + lockDuration), scope);
 }
 export function resolveWorkspaceTabTransitionDirection(input, output, list = []) {
   const list2 = Array['isArray'](list) ? list['map'](normalizeText) : [],
     count4 = list2['indexOf'](normalizeText(input)),
     count5 = list2['indexOf'](normalizeText(output));
-  if (count4 < 0x0 || count5 < 0x0 || count4 === count5) return 'none';
+  if (count4 < 0 || count5 < 0 || count4 === count5) return 'none';
   return count5 > count4 ? 'forward' : 'backward';
 }
 export function renderWorkspaceAssetTabIcon(value2) {
@@ -137,7 +137,7 @@ export function renderWorkspaceAssetLoadingOverlay({
 } = {}) {
   const value5 = compact
       ? ''
-      : '<span\x20class=\x22story-asset-loading-copy\x22><strong>' +
+      : '<span class="story-asset-loading-copy"><strong>' +
         escapeHtml(title) +
         '</strong>' +
         (description ? '<small>' + escapeHtml(description) + '</small>' : '') +
@@ -145,16 +145,16 @@ export function renderWorkspaceAssetLoadingOverlay({
     value6 = compact
       ? ''
       : '<div class="storyboard-script-loading-bar" aria-hidden="true"><div class="storyboard-script-loading-bar-fill"></div></div>',
-    value7 = '<span\x20class=\x22storyboard-script-loading-spinner\x22\x20aria-hidden=\x22true\x22></span>',
+    value7 = '<span class="storyboard-script-loading-spinner" aria-hidden="true"></span>',
     value8 = compact
       ? value7
-      : '<div\x20class=\x22story-video-empty\x20story-video-loading\x22>' +
+      : '<div class="story-video-empty story-video-loading">' +
         value7 +
         value5 +
         value6 +
         '</div>';
   return (
-    '<div\x20class=\x22img-loading-overlay\x20story-asset-loading-overlay' +
+    '<div class="img-loading-overlay story-asset-loading-overlay' +
     (compact ? ' is-compact' : '') +
     '" role="status" aria-busy="true" aria-label="正在生成">' +
     value8 +
@@ -172,17 +172,17 @@ export function renderWorkspacePreviewArrow(
 ) {
   const value10 = value9 === 'previous',
     value11 = value10 ? 'story-appearance-arrow--previous' : 'story-appearance-arrow--next',
-    value12 = value10 ? 'm14.5\x206.5-5.5\x205.5\x205.5\x205.5' : 'm9.5 6.5 5.5 5.5-5.5 5.5',
+    value12 = value10 ? 'm14.5 6.5-5.5 5.5 5.5 5.5' : 'm9.5 6.5 5.5 5.5-5.5 5.5',
     value13 = actionAttributes || (action ? { 'data-workspace-action': action } : {});
   return (
     '<button type="button" class="story-appearance-arrow ' +
     value11 +
-    (className ? '\x20' + escapeHtml(className) : '') +
-    '\x22' +
+    (className ? ' ' + escapeHtml(className) : '') +
+    '"' +
     renderAttributes(value13) +
     ' aria-label="' +
     escapeHtml(label) +
-    '\x22><svg\x20class=\x22story-appearance-arrow-icon\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22' +
+    '"><svg class="story-appearance-arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="' +
     value12 +
     '"/></svg></button>'
   );
@@ -193,7 +193,7 @@ export function renderWorkspaceCardAppearanceNavigation({
   nextAttributes: nextAttributes = {},
 } = {}) {
   return (
-    '<span\x20class=\x22story-card-appearance-navigation\x22' +
+    '<span class="story-card-appearance-navigation"' +
     renderAttributes(attributes) +
     '>' +
     renderWorkspacePreviewArrow('previous', { label: '上一个形象', actionAttributes: previousAttributes }) +
@@ -222,7 +222,7 @@ export function buildWorkspaceAssetHoverPreviewContent(
   if (!appearances2['length']) return null;
   const value15 = error['kind'] === 'character' && !error['isLibraryAsset'],
     hasVoice = value15 && hasVoiceReference(error),
-    columns = Math['ceil'](Math['sqrt'](Math['max'](0x1, appearances2['length']))),
+    columns = Math['ceil'](Math['sqrt'](Math['max'](1, appearances2['length']))),
     value16 = mediaOnly
       ? ''
       : '<div class="story-asset-hover-preview-heading"><strong>' +
@@ -233,9 +233,9 @@ export function buildWorkspaceAssetHoverPreviewContent(
         allAppearances['length'] +
         '</span>' +
         (value15
-          ? '<span\x20class=\x22story-character-voice-hover-status\x20' +
+          ? '<span class="story-character-voice-hover-status ' +
             (hasVoice ? 'has-reference' : 'is-missing') +
-            '\x22><i></i>' +
+            '"><i></i>' +
             (hasVoice ? '有声音参考' : '无声音参考') +
             '</span>'
           : '') +
@@ -245,24 +245,24 @@ export function buildWorkspaceAssetHoverPreviewContent(
       '\n    <div class="story-asset-hover-preview-grid">\n      ' +
       appearances2['map']((error2, value17) => {
         const text3 = normalizeText(error2?.['imageUrl']),
-          value18 = error2?.['name'] || '形象 ' + (value17 + 0x1),
+          value18 = error2?.['name'] || '形象 ' + (value17 + 1),
           value19 = [
             'story-asset-hover-preview-cell',
             error2?.['id'] === selectedAppearanceId && error['id'] === selectedAssetId ? 'is-current' : '',
             error['baseAppearanceId'] === error2?.['id'] ? 'is-base' : '',
           ]
             ['filter'](Boolean)
-            ['join']('\x20'),
+            ['join'](' '),
           value20 = mediaOnly
             ? ''
-            : '<span\x20class=\x22story-asset-hover-preview-status\x22>' + escapeHtml(value18) + '</span>',
-          value21 = mediaOnly ? '\x20title=\x22' + escapeHtml(value18) + '\x22' : '';
+            : '<span class="story-asset-hover-preview-status">' + escapeHtml(value18) + '</span>',
+          value21 = mediaOnly ? ' title="' + escapeHtml(value18) + '"' : '';
         return (
-          '<span\x20class=\x22story-asset-hover-preview-item\x22>' +
+          '<span class="story-asset-hover-preview-item">' +
           value20 +
           '<span class="' +
           value19 +
-          '\x22' +
+          '"' +
           value21 +
           '><img src="' +
           escapeHtml(text3) +
@@ -271,7 +271,7 @@ export function buildWorkspaceAssetHoverPreviewContent(
           '" data-story-asset-hover-image loading="eager" decoding="async" draggable="false"></span></span>'
         );
       })['join']('') +
-      '\x0a\x20\x20\x20\x20</div>';
+      '\n    </div>';
   return {
     allAppearances: allAppearances,
     appearances: appearances2,
@@ -323,40 +323,40 @@ export function renderWorkspaceAssetCard({
       previewAppearance ||
       getWorkspaceAssetBaseAppearance(asset) ||
       total['find']((value23) => normalizeText(value23?.['imageUrl'])) ||
-      total[0x0] ||
+      total[0] ||
       asset,
     text4 = normalizeText(error3?.['imageUrl']),
     text5 = normalizeText(fallbackImageUrl),
     value24 = workspaceAssetLibraryImage
       ? ' data-workspace-asset-library-image' +
         (text5 && text5 !== text4
-          ? ' data-workspace-asset-library-fallback-src="' + escapeHtml(text5) + '\x22'
+          ? ' data-workspace-asset-library-fallback-src="' + escapeHtml(text5) + '"'
           : '')
       : '',
     value25 =
       cardMediaHtml ||
       (text4
-        ? '<img\x20class=\x22story-asset-card-image\x22\x20src=\x22' +
+        ? '<img class="story-asset-card-image" src="' +
           escapeHtml(text4) +
           '" alt="' +
-          escapeHtml('' + (asset['name'] || '') + (error3?.['name'] ? '\x20·\x20' + error3['name'] : '')) +
+          escapeHtml('' + (asset['name'] || '') + (error3?.['name'] ? ' · ' + error3['name'] : '')) +
           '" loading="lazy" decoding="async"' +
           value24 +
           '>'
         : '<div class="story-asset-card-image story-media-empty" role="img" aria-label="' +
           escapeHtml((asset['name'] || '素材') + '待生成') +
-          '\x22><span>待生成</span></div>'),
+          '"><span>待生成</span></div>'),
     value26 =
-      stats && typeof stats === 'object' ? stats : { total: total['length'], generated: 0x0, failed: 0x0 },
+      stats && typeof stats === 'object' ? stats : { total: total['length'], generated: 0, failed: 0 },
     value27 =
       '<button type="button" class="story-asset-card ' +
       (selected && !selectionMode ? 'is-selected' : '') +
-      '\x20' +
+      ' ' +
       (selectionMode ? 'is-selection-mode' : '') +
-      '\x20' +
+      ' ' +
       (checked ? 'is-checked' : '') +
-      (cardClassName ? '\x20' + escapeHtml(cardClassName) : '') +
-      '\x22\x20data-workspace-asset-id=\x22' +
+      (cardClassName ? ' ' + escapeHtml(cardClassName) : '') +
+      '" data-workspace-asset-id="' +
       escapeHtml(asset['id']) +
       '" data-story-asset-id="' +
       escapeHtml(asset['id']) +
@@ -364,16 +364,16 @@ export function renderWorkspaceAssetCard({
       escapeHtml(asset['id']) +
       '" data-story-marquee-id="' +
       escapeHtml(asset['id']) +
-      '\x22\x20data-story-appearance-count=\x22' +
+      '" data-story-appearance-count="' +
       total['length'] +
       '" aria-pressed="' +
       (selectionMode ? String(checked) : 'false') +
-      '\x22' +
+      '"' +
       (draggable ? ' draggable="true"' : '') +
-      (cardAttributes ? '\x20' + cardAttributes : '') +
+      (cardAttributes ? ' ' + cardAttributes : '') +
       '>\n    ' +
       (selectionMode && showSelectionIndicator
-        ? '<span\x20class=\x22story-asset-select-indicator\x22\x20aria-hidden=\x22true\x22>' +
+        ? '<span class="story-asset-select-indicator" aria-hidden="true">' +
           (checked ? '✓' : '') +
           '</span>'
         : '') +
@@ -385,12 +385,12 @@ export function renderWorkspaceAssetCard({
       value25 +
       '\n      ' +
       (!loading && !text4 && normalizeText(error3?.['error'])
-        ? '<span\x20class=\x22story-asset-card-failure\x22\x20role=\x22status\x22>生成失败</span>'
+        ? '<span class="story-asset-card-failure" role="status">生成失败</span>'
         : '') +
       '\n      ' +
       (loading ? renderWorkspaceAssetLoadingOverlay({ compact: !![] }) : '') +
-      '\x0a\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20<span\x20class=\x22story-asset-card-copy\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-asset-card-heading\x22><strong' +
-      (nameAttributes ? '\x20' + nameAttributes : '') +
+      '\n    </span>\n    <span class="story-asset-card-copy">\n      <span class="story-asset-card-heading"><strong' +
+      (nameAttributes ? ' ' + nameAttributes : '') +
       '>' +
       escapeHtml(asset['name'] || '未命名素材') +
       '</strong>' +
@@ -400,7 +400,7 @@ export function renderWorkspaceAssetCard({
       (cardStatusHtml ||
         (statusText
           ? '<span>' + escapeHtml(statusText) + '</span>'
-          : value26['total'] > 0x1
+          : value26['total'] > 1
             ? '<span>形象 ' + value26['generated'] + '/' + value26['total'] + '</span>'
             : '')) +
       '</span>\n      ' +
@@ -410,13 +410,13 @@ export function renderWorkspaceAssetCard({
       '</p>\n    </span>\n  </button>';
   if (!preserveShell && !deleteControlHtml && !accessoryHtml) return value27;
   return (
-    '<span\x20class=\x22story-asset-card-shell' +
-    (shellClassName ? '\x20' + escapeHtml(shellClassName) : '') +
+    '<span class="story-asset-card-shell' +
+    (shellClassName ? ' ' + escapeHtml(shellClassName) : '') +
     '">\n    ' +
     value27 +
     '\n    ' +
     deleteControlHtml +
     accessoryHtml +
-    '\x0a\x20\x20</span>'
+    '\n  </span>'
   );
 }

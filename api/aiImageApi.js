@@ -32,12 +32,12 @@ import { isModelApiModel, resolveModelExecution, resolveModelProvider } from '..
 import { requester } from './requester.js';
 import { runTaskSingleFlight } from './taskSingleFlight.js';
 import { ApiError, ErrorType, parseError, parseTaskError, parseNetworkError } from './errors/index.js';
-const GENERATION_TIMEOUT = 10 * 60 * 0x3e8;
+const GENERATION_TIMEOUT = 10 * 60 * 1000;
 export async function cancelRunningHubImageTask({ apiKey: apiKey, taskId: taskId } = {}) {
   return cancelRunningHubTask({ apiKey: apiKey, taskId: taskId });
 }
 const GENERATION_RETRIES = 2,
-  GENERATION_RETRY_DELAY = 0x3e8;
+  GENERATION_RETRY_DELAY = 1000;
 function getProviderId(value) {
   return resolveModelProvider(value?.model, value?.provider);
 }
@@ -865,7 +865,7 @@ async function probeApimartTaskIdCandidate(value124, value125, signal = {}) {
         method: 'GET',
         headers: { Authorization: 'Bearer ' + enabled18 },
         provider: 'apimart',
-        timeout: 0x7530,
+        timeout: 30000,
         signal: signal?.signal,
       }),
       args2 = normalizeTaskSnapshotPayload(requester2),
@@ -1017,9 +1017,9 @@ async function pollAsyncImageTask(value144, value145, value146, signal2 = {}) {
     apiKey2 = String(value145?.apiKey || providerConfig3?.apiKey || '').trim();
   if (!apiKey2)
     throw ApiError.authError(provider, null, 'API Key 未配置（厂商：' + provider + '），无法轮询任务');
-  for (let count5 = 0; count5 < 0x1c2; count5++) {
+  for (let count5 = 0; count5 < 450; count5++) {
     if (signal2?.signal?.aborted) throw new Error('CANCELLED');
-    await new Promise((value147) => setTimeout(value147, 0x7d0));
+    await new Promise((value147) => setTimeout(value147, 2000));
     if (signal2?.signal?.aborted) throw new Error('CANCELLED');
     const url2 = String(providerConfig3?.apiUrl || '').replace(/\/+$/, ''),
       manifestPollCandidate = buildManifestPollCandidate(enabled20, signal2?.taskPolling),
@@ -1047,7 +1047,7 @@ async function pollAsyncImageTask(value144, value145, value146, signal2 = {}) {
                 url: '/api/v2/proxy/image',
                 method: 'POST',
                 provider: provider,
-                timeout: 0x7530,
+                timeout: 30000,
                 signal: signal2?.signal,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ apiUrl: apiUrl.url, apiKey: apiKey2, ...(apiUrl.body || {}) }),
@@ -1057,7 +1057,7 @@ async function pollAsyncImageTask(value144, value145, value146, signal2 = {}) {
                 method: 'GET',
                 headers: { Authorization: 'Bearer ' + apiKey2 },
                 provider: provider,
-                timeout: 0x7530,
+                timeout: 30000,
                 signal: signal2?.signal,
               }));
           value149 = null;
@@ -1131,8 +1131,8 @@ async function pollRunningHubTask(taskId2, value154, provider2, value155) {
   const isModelApiModel2 = isModelApiModel(value154.model, 'runninghub'),
     url3 = value155?.useOpenapiQuery === true || isModelApiModel2 || isRunningHubOpenApiV2AiApp(value154),
     count6 =
-      value155?.pollIntervalMs === undefined ? 0x7d0 : Math.max(0, Number(value155.pollIntervalMs) || 0),
-    value156 = Math.max(1, Number(value155?.maxPolls) || 0x1c2),
+      value155?.pollIntervalMs === undefined ? 2000 : Math.max(0, Number(value155.pollIntervalMs) || 0),
+    value156 = Math.max(1, Number(value155?.maxPolls) || 450),
     value157 = value155?.softTimeout === true,
     providerConfig4 = getProviderConfig(isModelApiModel2 ? 'runninghub' : 'runninghubwf'),
     apiKey3 = isModelApiModel2
@@ -1147,7 +1147,7 @@ async function pollRunningHubTask(taskId2, value154, provider2, value155) {
           url: url3 ? '/api/v2/proxy/image' : '/api/v2/runninghubwf/query',
           method: 'POST',
           provider: provider2,
-          timeout: 0x7530,
+          timeout: 30000,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(
             url3
@@ -1156,7 +1156,7 @@ async function pollRunningHubTask(taskId2, value154, provider2, value155) {
           ),
         }),
         count7 = typeof requester4?.code === 'number' ? requester4.code : null;
-      if (count7 === 0x324 || count7 === 0x32d) continue;
+      if (count7 === 804 || count7 === 813) continue;
       if (count7 !== null && count7 !== 0) throw parseError(provider2, requester4, 200);
       if (url3 && hasImageResultOutput(requester4, value155?.responseMapping)) return requester4;
       if (count7 === 0 && Array.isArray(requester4.data)) {
@@ -1359,7 +1359,7 @@ async function doGenerateOnce(value164, provider3, enabled21) {
     (provider3 === 'ppio' || provider3 === 'grsai') &&
     (!taskId4 || isAsyncTaskPendingStatus(asyncTaskStatus))
   ) {
-    const previewText = String(value167 || '').slice(0, 0x190);
+    const previewText = String(value167 || '').slice(0, 400);
     let headerSnapshot = {};
     if (list26 && typeof list26.forEach === 'function') {
       const value171 = {};
@@ -1610,7 +1610,7 @@ export async function generateImage(value189, value190) {
   return { isBatch: true, images: images8 };
 }
 
-const MAX_MANIFEST_GENERATION_TIMEOUT = 0x3c * 0x3c * 0x3e8;
+const MAX_MANIFEST_GENERATION_TIMEOUT = 60 * 60 * 1000;
 
 const APIMART_MIDJOURNEY_MODEL_ID = 'apimart/midjourney';
 const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object['freeze']({
@@ -1635,8 +1635,8 @@ const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object['freeze']({
 
 function resolveGenerationRequestTimeout(value194) {
   const count9 = Number(value194?.['requestTimeoutMs']);
-  if (!Number['isFinite'](count9) || count9 <= 0x0) return GENERATION_TIMEOUT;
-  return Math['min'](MAX_MANIFEST_GENERATION_TIMEOUT, Math['max'](0x7530, Math['trunc'](count9)));
+  if (!Number['isFinite'](count9) || count9 <= 0) return GENERATION_TIMEOUT;
+  return Math['min'](MAX_MANIFEST_GENERATION_TIMEOUT, Math['max'](30000, Math['trunc'](count9)));
 }
 
 function buildApimartMidjourneyTaskPolling(value195 = '') {
@@ -1650,9 +1650,9 @@ function buildApimartMidjourneyTaskPolling(value195 = '') {
 }
 
 function createImageBatchAttemptContext(value196) {
-  const count10 = Number['parseInt'](value196, 0xa);
-  if (!Number['isFinite'](count10) || count10 <= 0x1) return null;
-  return { __aicBatchSize: count10, __aicBatchSeedNonce: Math['floor'](Math['random']() * 0x3b9aca00) };
+  const count10 = Number['parseInt'](value196, 10);
+  if (!Number['isFinite'](count10) || count10 <= 1) return null;
+  return { __aicBatchSize: count10, __aicBatchSeedNonce: Math['floor'](Math['random']() * 1000000000) };
 }
 
 function buildImageBatchAttemptPayload(args9, args10, value197) {
@@ -1661,10 +1661,10 @@ function buildImageBatchAttemptPayload(args9, args10, value197) {
 }
 
 function normalizeDreaminaImageGenerateNum(options2 = {}) {
-  const value198 = options2?.['generateNum'] ?? options2?.['generate_num'] ?? options2?.['batchSize'] ?? 0x1,
-    value199 = Number['parseInt'](value198, 0xa);
-  if (!Number['isFinite'](value199)) return 0x1;
-  return Math['max'](0x1, Math['min'](0xa, value199));
+  const value198 = options2?.['generateNum'] ?? options2?.['generate_num'] ?? options2?.['batchSize'] ?? 1,
+    value199 = Number['parseInt'](value198, 10);
+  if (!Number['isFinite'](value199)) return 1;
+  return Math['max'](1, Math['min'](10, value199));
 }
 
 function buildDreaminaImageUpscaleSubmitRequest(value200) {
@@ -1808,7 +1808,7 @@ function normalizeApimartMidjourneyButtons(value209) {
         response20['label'] || response20['name'] || response20['text'] || response20['emoji'] || '',
       )['trim'](),
       value210 = { ...(args18 ? { customId: args18 } : {}), ...(args19 ? { label: args19 } : {}) };
-    return Object['keys'](value210)['length'] > 0x0 ? value210 : null;
+    return Object['keys'](value210)['length'] > 0 ? value210 : null;
   })['filter'](Boolean);
 }
 
@@ -1819,12 +1819,12 @@ function extractApimartMidjourneyImageRecords(args20, value211 = null, value212 
         ? { ...args20, ...args20['data'] }
         : args20,
     list32 =
-      Array['isArray'](value213?.['image_urls']) && value213['image_urls']['length'] > 0x0
+      Array['isArray'](value213?.['image_urls']) && value213['image_urls']['length'] > 0
         ? value213['image_urls']
         : String(value213?.['image_url'] || '')['trim']()
           ? [value213['image_url']]
           : [];
-  if (list32['length'] === 0x0) return [];
+  if (list32['length'] === 0) return [];
   const value214 = String(
       resolveApimartTaskIdStrict(value213) ||
         resolveAsyncImageTaskId(value213, value211) ||
@@ -1847,11 +1847,11 @@ function extractApimartMidjourneyImageRecords(args20, value211 = null, value212 
         model: APIMART_MIDJOURNEY_MODEL_ID,
         apimartMidjourney: {
           taskId: value214,
-          index: value217 + 0x1,
+          index: value217 + 1,
           ...args23,
           ...(args21 ? { gridImageUrl: args21 } : {}),
           ...(args24 ? { action: args24 } : {}),
-          ...(args22['length'] > 0x0 ? { buttons: args22 } : {}),
+          ...(args22['length'] > 0 ? { buttons: args22 } : {}),
         },
       },
     };
@@ -1866,9 +1866,9 @@ async function pollComfyUiImageTask(value218, value219 = {}) {
   const value220 = String(value218 || '')['trim'](),
     args25 = value219?.['taskPolling'] || {},
     args26 = String(args25['baseUrl'] || '')['trim']();
-  for (let count11 = 0x0; count11 < 0x1c2; count11++) {
+  for (let count11 = 0; count11 < 450; count11++) {
     if (value219?.['signal']?.['aborted']) throw new Error('CANCELLED');
-    await new Promise((value221) => setTimeout(value221, 0x7d0));
+    await new Promise((value221) => setTimeout(value221, 2000));
     if (value219?.['signal']?.['aborted']) throw new Error('CANCELLED');
     const uRLSearchParams = new URLSearchParams({
         promptId: value220,
@@ -1879,7 +1879,7 @@ async function pollComfyUiImageTask(value218, value219 = {}) {
         url: '/api/v2/comfyui/history?' + uRLSearchParams['toString'](),
         method: 'GET',
         provider: 'comfyui',
-        timeout: 0x7530,
+        timeout: 30000,
         signal: value219?.['signal'],
       }),
       value222 =
@@ -1926,9 +1926,9 @@ function normalizeApimartMidjourneyUpscaleSpeed(value228) {
 }
 
 function normalizeApimartMidjourneyUpscaleIndex(value230) {
-  const count12 = Number['parseInt'](value230, 0xa);
-  if (!Number['isFinite'](count12)) return 0x0;
-  return count12 >= 0x1 && count12 <= 0x4 ? count12 : 0x0;
+  const count12 = Number['parseInt'](value230, 10);
+  if (!Number['isFinite'](count12)) return 0;
+  return count12 >= 1 && count12 <= 4 ? count12 : 0;
 }
 
 function normalizeApimartMidjourneyVariationMode(value231) {
@@ -2003,7 +2003,7 @@ export async function submitApimartMidjourneyUpscaleRequest(options7 = {}) {
       responseType: 'text',
     }),
     value238 = typeof requester6 === 'string' ? parseResponseData(requester6) : requester6 || {},
-    error13 = parseError('apimart', value238, 0xc8);
+    error13 = parseError('apimart', value238, 200);
   if (error13) throw error13;
   const enabled29 = String(
     resolveApimartTaskIdStrict(value238) ||
@@ -2028,11 +2028,11 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
   const enabled31 = String(
     options8?.['taskId'] || options8?.['parentTaskId'] || options8?.['mjTaskId'] || '',
   )['trim']();
-  if (!enabled31) throw new Error('缺少\x20APIMart\x20Midjourney\x20task_id');
+  if (!enabled31) throw new Error('缺少 APIMart Midjourney task_id');
   const enabled32 = String(options8?.['customId'] || options8?.['custom_id'] || '')['trim'](),
     apimartMidjourneyUpscaleIndex2 = normalizeApimartMidjourneyUpscaleIndex(options8?.['index']);
   if (!enabled32 && !apimartMidjourneyUpscaleIndex2)
-    throw new Error('APIMart\x20Midjourney\x20variation\x20需要\x20index\x20或\x20custom_id');
+    throw new Error('APIMart Midjourney variation 需要 index 或 custom_id');
   const apimartMidjourneyVariationMode = normalizeApimartMidjourneyVariationMode(
       options8?.['variationMode'] || options8?.['mode'] || options8?.['strength'],
     ),
@@ -2045,7 +2045,7 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
     )['trim'](),
     args29 = isApimartMidjourneyRemixVersion(args28);
   if (args29 && !apimartMidjourneyUpscaleIndex2)
-    throw new Error('APIMart\x20Midjourney\x20remix\x20需要\x20index');
+    throw new Error('APIMart Midjourney remix 需要 index');
   const apimartBaseUrl4 = normalizeApimartBaseUrl(providerConfig6?.['apiUrl']),
     value239 = {
       apiUrl:
@@ -2074,7 +2074,7 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
       responseType: 'text',
     }),
     value240 = typeof requester7 === 'string' ? parseResponseData(requester7) : requester7 || {},
-    error14 = parseError('apimart', value240, 0xc8);
+    error14 = parseError('apimart', value240, 200);
   if (error14) throw error14;
   const enabled33 = String(
     resolveApimartTaskIdStrict(value240) ||
@@ -2121,10 +2121,10 @@ export async function resumeApimartMidjourneyUpscaleTask(value241, args30 = {}, 
         ? { apimartMidjourneySource: args32['apimartMidjourneySource'] }
         : {}),
     });
-    if (processTaskResult2['length'] === 0x1 && processTaskResult2[0x0]?.['error'])
-      throw new Error(processTaskResult2[0x0]['error'] || 'Midjourney 二次操作恢复失败');
-    return processTaskResult2['length'] === 0x1
-      ? processTaskResult2[0x0]
+    if (processTaskResult2['length'] === 1 && processTaskResult2[0]?.['error'])
+      throw new Error(processTaskResult2[0]['error'] || 'Midjourney 二次操作恢复失败');
+    return processTaskResult2['length'] === 1
+      ? processTaskResult2[0]
       : { isBatch: !![], images: processTaskResult2 };
   });
 }
@@ -2182,22 +2182,22 @@ async function generateImageUnqueued(value246, value247) {
       batchSize: imageGenerationBatchSize2,
       executionManifest: imageExecution3,
     });
-    return list34['length'] === 0x1 ? list34[0x0] : { isBatch: !![], images: list34 };
+    return list34['length'] === 1 ? list34[0] : { isBatch: !![], images: list34 };
   }
-  if (imageGenerationBatchSize2 <= 0x1 || shouldSubmitProviderBatchOnce3)
+  if (imageGenerationBatchSize2 <= 1 || shouldSubmitProviderBatchOnce3)
     try {
       const doGenerateOnce3 = await doGenerateOnce(value246, providerId4, value247),
         value248 = Array['isArray'](doGenerateOnce3) ? doGenerateOnce3 : [doGenerateOnce3];
-      if (value248['length'] === 0x1 && value248[0x0]['error'])
-        throw new Error(value248[0x0]['error'], { cause: value248[0x0]['cause'] });
-      return value248['length'] === 0x1 ? value248[0x0] : { isBatch: !![], images: value248 };
+      if (value248['length'] === 1 && value248[0]['error'])
+        throw new Error(value248[0]['error'], { cause: value248[0]['cause'] });
+      return value248['length'] === 1 ? value248[0] : { isBatch: !![], images: value248 };
     } catch (value249) {
       if (value249 instanceof ApiError) throw new Error(value249['getUserMessage'](), { cause: value249 });
       throw value249;
     }
   const list35 = [],
     imageBatchAttemptContext = createImageBatchAttemptContext(imageGenerationBatchSize2);
-  for (let value250 = 0x0; value250 < imageGenerationBatchSize2; value250++) {
+  for (let value250 = 0; value250 < imageGenerationBatchSize2; value250++) {
     try {
       const args33 = await doGenerateOnce(
         buildImageBatchAttemptPayload(value246, imageBatchAttemptContext, value250),
@@ -2215,7 +2215,7 @@ async function generateImageUnqueued(value246, value247) {
         : list35['push']({ error: value251['message'] || '未知错误', status: 'failed', retryable: ![] });
     }
   }
-  if (list35['length'] === 0x0) throw new Error('批量生成全部失败');
-  if (list35['length'] === 0x1) return list35[0x0];
+  if (list35['length'] === 0) throw new Error('批量生成全部失败');
+  if (list35['length'] === 1) return list35[0];
   return { isBatch: !![], images: list35 };
 }

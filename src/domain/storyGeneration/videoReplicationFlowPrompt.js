@@ -8,11 +8,11 @@ import {
 } from './videoReplicationSpeechLayout.js';
 import { formatReplicationSpatial } from './videoReplicationVisualContract.js';
 const limits = Object['freeze']({
-    [STORY_PROMPT_MODE_SEEDANCE_2_0]: 0xf,
-    [STORY_PROMPT_MODE_SEEDANCE_2_5]: 0x1e,
+    [STORY_PROMPT_MODE_SEEDANCE_2_0]: 15,
+    [STORY_PROMPT_MODE_SEEDANCE_2_5]: 30,
   }),
-  tick = (value) => Math['round']((value + Number['EPSILON']) * 0xa),
-  seconds = (item) => (tick(item) / 0xa)['toFixed'](0x1);
+  tick = (value) => Math['round']((value + Number['EPSILON']) * 10),
+  seconds = (item) => (tick(item) / 10)['toFixed'](1);
 export function resolveReplicationFlowOptions({
   promptMode: promptMode = STORY_PROMPT_MODE_SEEDANCE_2_0,
   maxSeconds: maxSeconds,
@@ -20,7 +20,7 @@ export function resolveReplicationFlowOptions({
   return (
     requireFlow(
       Object['hasOwn'](limits, promptMode),
-      '当前复刻草稿编译仅支持\x20Seedance\x202.0\x20/\x202.5',
+      '当前复刻草稿编译仅支持 Seedance 2.0 / 2.5',
     ),
     (maxSeconds ??= limits[promptMode]),
     requireFlow(Number['isFinite'](maxSeconds) && maxSeconds >= 0.1, '片段时长上限无效'),
@@ -34,13 +34,13 @@ export function stripFlowSubtitleOverlays(key = '') {
   let data = '';
   for (const options of key) {
     data += options;
-    if (options === '\x22') {
-      if (enabled['at'](-0x1) === options) enabled['pop']();
+    if (options === '"') {
+      if (enabled['at'](-1) === options) enabled['pop']();
       else enabled['push'](options);
     } else {
       if (result[options]) enabled['push'](result[options]);
       else {
-        if (options === enabled['at'](-0x1)) enabled['pop']();
+        if (options === enabled['at'](-1)) enabled['pop']();
       }
     }
     !enabled['length'] && /[，,。；;\n]/u['test'](options) && (index['push'](data), (data = ''));
@@ -65,7 +65,7 @@ function promptBlocks(source, next, current, handler = tick) {
       handle = Math['min'](current, record['endSec']);
     if (handler(handle - next) === handler(payload - next)) {
       if (entry['length'])
-        ((entry['at'](-0x1)['endSec'] = handle), entry['at'](-0x1)['shots']['push'](record));
+        ((entry['at'](-1)['endSec'] = handle), entry['at'](-1)['shots']['push'](record));
       else args['push'](record);
     } else
       (entry['push']({ startSec: args['length'] ? next : payload, endSec: handle, shots: [...args, record] }),
@@ -138,9 +138,9 @@ export function buildReplicationFlowPrompt(
                 ['join']('，'),
               count = shots['indexOf'](value19),
               value23 =
-                count === 0x0 ||
-                (value19['sceneKey'] && value19['sceneKey'] !== shots[count - 0x1]?.['sceneKey']),
-              value24 = stagingHandoff && count === shots['length'] - 0x1,
+                count === 0 ||
+                (value19['sceneKey'] && value19['sceneKey'] !== shots[count - 1]?.['sceneKey']),
+              value24 = stagingHandoff && count === shots['length'] - 1,
               value25 = value23 ? formatReplicationSpatial(value19['spatialStart']) : '',
               value26 = value24 ? formatReplicationSpatial(value19['spatialEnd']) : '';
             return [
@@ -153,13 +153,13 @@ export function buildReplicationFlowPrompt(
                 : '',
             ]
               ['filter'](Boolean)
-              ['join']('\x0a');
+              ['join']('\n');
           })
-          ['join']('\x0a'),
+          ['join']('\n'),
         formatStoryPromptShotHeading2 = formatStoryPromptShotHeading({
           promptMode: promptMode2,
           index: value13,
-          durationSec: (tick3 - tick2) / 0xa,
+          durationSec: (tick3 - tick2) / 10,
           timeRange: run(value12['startSec'] - start) + '-' + run(value12['endSec'] - start) + '秒',
         }),
         value27 = shotSpeech
@@ -175,7 +175,7 @@ export function buildReplicationFlowPrompt(
             value31 = value29['endSec'] - start,
             handler6 =
               run(value30) === run(value31) && value31 > value30
-                ? (value32) => String(Number(value32['toFixed'](0x3)))
+                ? (value32) => String(Number(value32['toFixed'](3)))
                 : run,
             value33 = handler6(value30) + '-' + handler6(value31) + '秒',
             list5 = value29['parts']['map']((response) =>
@@ -203,7 +203,7 @@ export function buildReplicationFlowPrompt(
         sourceShotIds: value12['shots']['map']((value34) => value34['id']),
         speechFragments: value14,
         continuedSpeechIds: value16['map']((value35) => value35['sourceId']),
-        prompt: [formatStoryPromptShotHeading2 + '：\x0a' + value18, ...args2]['join']('\x0a'),
+        prompt: [formatStoryPromptShotHeading2 + '：\n' + value18, ...args2]['join']('\n'),
       };
     });
   return {
@@ -219,6 +219,6 @@ export function buildReplicationFlowPrompt(
       ...list4['map']((value37) => value37['prompt']),
     ]
       ['filter'](Boolean)
-      ['join']('\x0a\x0a'),
+      ['join']('\n\n'),
   };
 }

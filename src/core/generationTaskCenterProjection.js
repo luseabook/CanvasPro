@@ -4,7 +4,7 @@ import { getProviderConfig } from '../../api/configApi.js';
 import { translateManifestText } from '../i18n/manifestText.js';
 import { resolveTaskCenterThumbnail } from '../modules/taskCenterThumbnail.js';
 const storeIds = new WeakMap();
-let storeSequence = 0x0;
+let storeSequence = 0;
 export function reportRuntimeTask(taskId, message = {}) {
   if (!taskId) return;
   const provider = taskId['spec'] || {},
@@ -56,7 +56,7 @@ export function reportRuntimeTask(taskId, message = {}) {
       nodeId: taskId['targetNodeId'],
     },
     status: status,
-    progress: progress && status === 'complete' ? 0x1 : null,
+    progress: progress && status === 'complete' ? 1 : null,
     message:
       message['message'] ||
       (message['status'] === 'paused'
@@ -83,6 +83,6 @@ export function reportRuntimeTask(taskId, message = {}) {
         : null,
     createdAt: taskId['startedAt'],
     startedAt: taskId['startedAt'],
-    finishedAt: progress ? Date['now']() : 0x0,
+    finishedAt: progress ? Date['now']() : 0,
   });
 }

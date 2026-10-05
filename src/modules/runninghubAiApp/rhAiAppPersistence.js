@@ -18,7 +18,7 @@ export function createRhAiAppPersistence({
           storage['setItem']('aiCanvas.runningHubAiApp.savedApps.v1', JSON['stringify'](value['savedApps']));
         } catch (item) {
           if (!enabled) throw item;
-          onWarning('[RH\x20AI\x20App]\x20local\x20cache\x20update\x20failed:', item);
+          onWarning('[RH AI App] local cache update failed:', item);
         }
       return (onCommitted(), { ok: !![] });
     });

@@ -32,7 +32,7 @@ function createFrameInterpolationNode(args = {}) {
     type: 'source-video',
     x: 0,
     y: 0,
-    width: 0x140,
+    width: 320,
     height: 180,
     provider: 'runninghubwf',
     model: 'runninghub/2047784060881211393',
@@ -241,7 +241,7 @@ function createFakeLoadingCard() {
         type: 'source-video',
         x: 0,
         y: 0,
-        width: 0x140,
+        width: 320,
         height: 180,
         provider: 'apimart',
         model: 'apimart/seedance-1.5',
@@ -264,7 +264,7 @@ function createFakeLoadingCard() {
       _asyncResumeAbortController: null,
       _asyncResumeTaskId: '',
       _asyncResumePromise: null,
-      _computeGenerationDuration: () => 0x28e,
+      _computeGenerationDuration: () => 654,
     }),
       (value10._resumeAsyncTaskPoller = async () => {
         throw new Error('异步视频恢复失败');
@@ -275,7 +275,7 @@ function createFakeLoadingCard() {
     (assert.equal(value11.isGenerating, false),
       assert.equal(value11.jobStatus, 'error'),
       assert.equal(value11.jobError, '异步视频恢复失败'),
-      assert.equal(value11.generationDuration, 0x28e),
+      assert.equal(value11.generationDuration, 654),
       assert.equal(value11.asyncTaskStatus, 'failed'),
       assert.equal(value11.asyncTaskRecovering, false),
       assert.equal(value11.videos?.[0]?.error, '异步视频恢复失败'),
@@ -856,7 +856,7 @@ function createFakeLoadingCard() {
       constructor() {
         ((this.onload = null),
           (this.onerror = null),
-          (this.naturalWidth = 0x140),
+          (this.naturalWidth = 320),
           (this.naturalHeight = 180));
       }
       set ['src'](src) {
@@ -1260,11 +1260,11 @@ function createFakeLoadingCard() {
     installDomStubs();
     const { buildSourceVideoUploadSizePatch: buildSourceVideoUploadSizePatch } =
       await import('./SourceVideoNode.js');
-    assert.deepEqual(buildSourceVideoUploadSizePatch({ width: 0x780, height: 0x438 }), {
-      width: 0x200,
-      height: 0x120,
-      videoWidth: 0x780,
-      videoHeight: 0x438,
+    assert.deepEqual(buildSourceVideoUploadSizePatch({ width: 1920, height: 1080 }), {
+      width: 512,
+      height: 288,
+      videoWidth: 1920,
+      videoHeight: 1080,
       needsAutoResize: false,
     });
   }),
@@ -1272,11 +1272,11 @@ function createFakeLoadingCard() {
     installDomStubs();
     const { buildSourceVideoUploadSizePatch: buildSourceVideoUploadSizePatch2 } =
       await import('./SourceVideoNode.js');
-    assert.deepEqual(buildSourceVideoUploadSizePatch2({ width: 0x438, height: 0x780 }), {
-      width: 0x120,
-      height: 0x200,
-      videoWidth: 0x438,
-      videoHeight: 0x780,
+    assert.deepEqual(buildSourceVideoUploadSizePatch2({ width: 1080, height: 1920 }), {
+      width: 288,
+      height: 512,
+      videoWidth: 1080,
+      videoHeight: 1920,
       needsAutoResize: false,
     });
   }),
@@ -1321,8 +1321,8 @@ function createFakeLoadingCard() {
           type: 'source-video',
           x: 0,
           y: 0,
-          width: 0x200,
-          height: 0x120,
+          width: 512,
+          height: 288,
           name: '视频',
         },
       },
@@ -1400,14 +1400,14 @@ function createFakeLoadingCard() {
         assert.ok(list7.includes('paint')),
         assert.ok(list7.includes('upload:start:project-video:sizeResolved=false')),
         assert.equal(typeof handler4, 'function'),
-        handler4({ width: 0x780, height: 0x438 }),
+        handler4({ width: 1920, height: 1080 }),
         await value84);
       const box = appStore.getState().nodes[id14];
       (assert.equal(box.localPath, 'data/assets/original/clip.mp4'),
-        assert.equal(box.width, 0x200),
-        assert.equal(box.height, 0x120),
-        assert.equal(box.videoWidth, 0x780),
-        assert.equal(box.videoHeight, 0x438),
+        assert.equal(box.width, 512),
+        assert.equal(box.height, 288),
+        assert.equal(box.videoWidth, 1920),
+        assert.equal(box.videoHeight, 1080),
         assert.equal(value79._input.value, ''),
         assert.ok(list7.includes('restore:1')));
     } finally {

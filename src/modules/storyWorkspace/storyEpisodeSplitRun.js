@@ -1,9 +1,9 @@
 import { buildVideoReplicationSourceEvidence } from '../../domain/storyGeneration/videoReplicationSourceAnalysis.js';
 const RUN_KIND = 'story-episode-split-run',
-  RUN_VERSION = 0x1,
-  MAX_INVOCATIONS = 0x20,
-  MAX_RAW_RESPONSE_CHARACTERS = 0x27100;
-let sequence = 0x0;
+  RUN_VERSION = 1,
+  MAX_INVOCATIONS = 32,
+  MAX_RAW_RESPONSE_CHARACTERS = 160000;
+let sequence = 0;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -27,10 +27,10 @@ function stableSerialize(list) {
 function fingerprint(index) {
   const list2 = stableSerialize(index);
   let result = 0x811c9dc5;
-  for (let data = 0x0; data < list2['length']; data += 0x1) {
+  for (let data = 0; data < list2['length']; data += 1) {
     ((result ^= list2['charCodeAt'](data)), (result = Math['imul'](result, 0x1000193)));
   }
-  return 'fnv1a-' + (result >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return 'fnv1a-' + (result >>> 0)['toString'](16)['padStart'](8, '0');
 }
 function normalizeExecution(options = {}) {
   return {
@@ -113,14 +113,14 @@ function normalizeInvocation(options2 = {}) {
   return {
     id: normalizeText(options2['id']),
     stepId: normalizeText(options2['stepId']),
-    attempt: Math['max'](0x1, Math['trunc'](Number(options2['attempt']) || 0x1)),
+    attempt: Math['max'](1, Math['trunc'](Number(options2['attempt']) || 1)),
     state: normalizeText(options2['state']),
     requestFingerprint: normalizeText(options2['requestFingerprint']),
-    rawResponse: String(options2['rawResponse'] || '')['slice'](0x0, MAX_RAW_RESPONSE_CHARACTERS),
+    rawResponse: String(options2['rawResponse'] || '')['slice'](0, MAX_RAW_RESPONSE_CHARACTERS),
     error: normalizeText(options2['error']),
-    preparedAt: Math['max'](0x0, Number(options2['preparedAt'] || 0x0)),
-    completedAt: Math['max'](0x0, Number(options2['completedAt'] || 0x0)),
-    retryAuthorizedAt: Math['max'](0x0, Number(options2['retryAuthorizedAt'] || 0x0)),
+    preparedAt: Math['max'](0, Number(options2['preparedAt'] || 0)),
+    completedAt: Math['max'](0, Number(options2['completedAt'] || 0)),
+    retryAuthorizedAt: Math['max'](0, Number(options2['retryAuthorizedAt'] || 0)),
     metrics: cloneJson(options2['metrics'] || null),
   };
 }
@@ -142,7 +142,7 @@ export function normalizeStoryEpisodeSplitRun(next) {
     inputFingerprint: normalizeText(response['inputFingerprint']),
     input: cloneJson(response['input'] || {}),
     checkpoint: cloneJson(response['checkpoint'] || null),
-    checkpointAt: Math['max'](0x0, Number(response['checkpointAt'] || 0x0)),
+    checkpointAt: Math['max'](0, Number(response['checkpointAt'] || 0)),
     qualityReview: cloneJson(response['qualityReview'] || null),
     generatedCandidate: cloneJson(response['generatedCandidate'] || null),
     invocations: (Array['isArray'](response['invocations']) ? response['invocations'] : [])
@@ -151,15 +151,15 @@ export function normalizeStoryEpisodeSplitRun(next) {
       ['slice'](-MAX_INVOCATIONS),
     candidateArtifact: cloneJson(response['candidateArtifact'] || null),
     error: normalizeText(response['error']),
-    createdAt: Math['max'](0x0, Number(response['createdAt'] || 0x0)) || Date['now'](),
-    updatedAt: Math['max'](0x0, Number(response['updatedAt'] || 0x0)) || Date['now'](),
+    createdAt: Math['max'](0, Number(response['createdAt'] || 0)) || Date['now'](),
+    updatedAt: Math['max'](0, Number(response['updatedAt'] || 0)) || Date['now'](),
   };
 }
 function createRun(entry) {
   const input = createInput(entry),
     createdAt = Date['now']();
   return (
-    (sequence += 0x1),
+    (sequence += 1),
     {
       kind: RUN_KIND,
       version: RUN_VERSION,
@@ -176,7 +176,7 @@ function createRun(entry) {
       inputFingerprint: fingerprint(input),
       input: input,
       checkpoint: null,
-      checkpointAt: 0x0,
+      checkpointAt: 0,
       qualityReview: null,
       generatedCandidate: null,
       invocations: [],
@@ -255,7 +255,7 @@ export function createStoryEpisodeSplitRunRecorder({
     async onInvocation(stepId = {}) {
       const preparedAt = Date['now']();
       if (stepId['state'] === 'prepared')
-        ((sequence += 0x1),
+        ((sequence += 1),
           id2['invocations']['push'](
             normalizeInvocation({
               id:
@@ -277,13 +277,13 @@ export function createStoryEpisodeSplitRunRecorder({
           ['find'](
             (config) =>
               config['stepId'] === normalizeText(stepId['stepId']) &&
-              config['attempt'] === Math['max'](0x1, Math['trunc'](Number(stepId['attempt']) || 0x1)) &&
+              config['attempt'] === Math['max'](1, Math['trunc'](Number(stepId['attempt']) || 1)) &&
               config['state'] === 'prepared',
           );
         state &&
           ((state['state'] = normalizeText(stepId['state'])),
           (state['rawResponse'] = String(stepId['rawResponse'] || '')['slice'](
-            0x0,
+            0,
             MAX_RAW_RESPONSE_CHARACTERS,
           )),
           (state['error'] = normalizeText(stepId['error'])),

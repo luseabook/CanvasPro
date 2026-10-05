@@ -183,7 +183,7 @@ export function getGenerationMediaItemSize(options3 = {}) {
       box6['videoHeight'],
       box6['height'],
     );
-  return width3 > 0x0 && height3 > 0x0 ? { width: width3, height: height3 } : null;
+  return width3 > 0 && height3 > 0 ? { width: width3, height: height3 } : null;
 }
 
 export function pickGenerationRatioSourceInput(options4 = {}, value5 = {}) {
@@ -193,12 +193,12 @@ export function pickGenerationRatioSourceInput(options4 = {}, value5 = {}) {
         list5 = Array['isArray'](value7) ? value7 : value7 ? [value7] : [];
       return list5['filter'](Boolean)['map']((item5) => ({ item: item5, kind: kind2 }));
     });
-  if (list4['length'] === 0x0) return null;
+  if (list4['length'] === 0) return null;
   const generationDisplayRatioSourceConfig2 = getGenerationDisplayRatioSourceConfig(value5),
     list6 = generationDisplayRatioSourceConfig2?.['kind']
       ? list4['filter'](({ kind: kind3 }) => kind3 === generationDisplayRatioSourceConfig2['kind'])
       : list4,
-    list7 = list6['length'] > 0x0 ? list6 : list4,
+    list7 = list6['length'] > 0 ? list6 : list4,
     value8 = Array['isArray'](generationDisplayRatioSourceConfig2?.['slots'])
       ? generationDisplayRatioSourceConfig2['slots']
       : generationDisplayRatioSourceConfig2?.['slot']
@@ -214,9 +214,9 @@ export function pickGenerationRatioSourceInput(options4 = {}, value5 = {}) {
     generationDisplayRatioSourceConfig2?.['inputIndex'] !== undefined
       ? generationDisplayRatioSourceConfig2['inputIndex']
       : generationDisplayRatioSourceConfig2?.['fallbackIndex'];
-  if (Number['isInteger'](count4) && count4 >= 0x0 && count4 < list7['length'])
+  if (Number['isInteger'](count4) && count4 >= 0 && count4 < list7['length'])
     return list7[count4]?.['item'] || null;
-  return list7[0x0]?.['item'] || null;
+  return list7[0]?.['item'] || null;
 }
 
 export function getGenerationInputRatioMediaSize(options5 = {}, value11 = {}) {

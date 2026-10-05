@@ -11,28 +11,28 @@ import { buildStoryClipCanvasBindingKey, buildStoryLinkedCanvasName } from './st
 import { buildStoryClipCanvasNodeData } from './storyEpisodeCanvas.js';
 import { normalizeStoryClipInputs } from './storyClipInputSlots.js';
 import { resolveStoryClipPromptAssetRefs } from './storyClipMentions.js';
-const NODE_GAP = 0x48,
-  ASSET_COLUMNS = 0x5,
-  ASSET_CATEGORY_GAP = 0xb4,
-  ASSET_CATEGORY_NOTE_HEIGHT = 0xb4,
-  ASSET_CATEGORY_MIN_WIDTH = 0x2d0,
-  STAGE_GAP = 0x140,
+const NODE_GAP = 72,
+  ASSET_COLUMNS = 5,
+  ASSET_CATEGORY_GAP = 180,
+  ASSET_CATEGORY_NOTE_HEIGHT = 180,
+  ASSET_CATEGORY_MIN_WIDTH = 720,
+  STAGE_GAP = 320,
   STAGE_GROUP_COLORS = Object['freeze']({
     project: 'var(--indigo)',
     assets: 'var(--green)',
     episode: Object['freeze'](['var(--gold)', 'var(--purple)', 'var(--cyan)']),
   });
-export const STORY_PROJECT_CANVAS_LAYOUT_VERSION = 0x4;
+export const STORY_PROJECT_CANVAS_LAYOUT_VERSION = 4;
 export const STORY_PROJECT_CANVAS_NODE_SIZES = Object['freeze']({
-  'comment-note': Object['freeze']({ width: 0x578, height: 0x120 }),
-  group: Object['freeze']({ width: 0x200, height: 0x170 }),
-  'source-text': Object['freeze']({ width: 0x2d0, height: 0x1e0 }),
-  'source-image': Object['freeze']({ width: 0x200, height: 0x120 }),
-  'source-video': Object['freeze']({ width: 0x200, height: 0x120 }),
-  'source-audio': Object['freeze']({ width: 0x1a4, height: 0xb4 }),
-  'ai-image': Object['freeze']({ width: 0x120, height: 0x120 }),
-  'storyboard-script': Object['freeze']({ width: 0x400, height: 0x240 }),
-  'ai-video': Object['freeze']({ width: 0x200, height: 0x120 }),
+  'comment-note': Object['freeze']({ width: 1400, height: 288 }),
+  group: Object['freeze']({ width: 512, height: 368 }),
+  'source-text': Object['freeze']({ width: 720, height: 480 }),
+  'source-image': Object['freeze']({ width: 512, height: 288 }),
+  'source-video': Object['freeze']({ width: 512, height: 288 }),
+  'source-audio': Object['freeze']({ width: 420, height: 180 }),
+  'ai-image': Object['freeze']({ width: 288, height: 288 }),
+  'storyboard-script': Object['freeze']({ width: 1024, height: 576 }),
+  'ai-video': Object['freeze']({ width: 512, height: 288 }),
 });
 function asObject(value) {
   return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
@@ -42,8 +42,8 @@ function normalizeText(item) {
 }
 function normalizeIndex(index, count) {
   const result = Number(index);
-  if (!Number['isFinite'](result) || count <= 0x0) return 0x0;
-  return Math['max'](0x0, Math['min'](count - 0x1, Math['trunc'](result)));
+  if (!Number['isFinite'](result) || count <= 0) return 0;
+  return Math['max'](0, Math['min'](count - 1, Math['trunc'](result)));
 }
 function normalizeList(list) {
   return Array['isArray'](list) ? list['filter'](Boolean) : [];
@@ -75,8 +75,8 @@ function pushLabeledLine(list3, current, entry) {
   if (text2) list3['push'](current + '：' + text2);
 }
 function getEpisodeLabel(options2 = {}) {
-  const count2 = Math['max'](0x0, Math['trunc'](Number(options2['number']) || 0x0));
-  return [count2 > 0x0 ? '第\x20' + count2 + '\x20集' : '分集', normalizeText(options2['title'])]
+  const count2 = Math['max'](0, Math['trunc'](Number(options2['number']) || 0));
+  return [count2 > 0 ? '第 ' + count2 + ' 集' : '分集', normalizeText(options2['title'])]
     ['filter'](Boolean)
     ['join'](' · ');
 }
@@ -91,9 +91,9 @@ function getAssetKindLabel(handle) {
 function getPositiveMediaDimension(...args) {
   for (const state of args) {
     const count3 = Number(state);
-    if (Number['isFinite'](count3) && count3 > 0x0) return count3;
+    if (Number['isFinite'](count3) && count3 > 0) return count3;
   }
-  return 0x0;
+  return 0;
 }
 function resolveStoryAssetCanvasGeometry({
   asset: asset = {},
@@ -147,8 +147,8 @@ function resolveStoryAssetCanvasGeometry({
       box2['originalHeight'],
       box2['height'],
     );
-  if (!(imageWidth > 0x0 && imageHeight > 0x0))
-    return { width: width['width'], height: width['height'], imageWidth: 0x0, imageHeight: 0x0 };
+  if (!(imageWidth > 0 && imageHeight > 0))
+    return { width: width['width'], height: width['height'], imageWidth: 0, imageHeight: 0 };
   return {
     ...getAutoMediaSizeByShortSide(imageWidth, imageHeight),
     imageWidth: imageWidth,
@@ -161,7 +161,7 @@ async function resolveStoryAssetImageRecordSize(asset2 = {}) {
     appearance: asset2,
     activeImage: asObject(asset2['generatedImage']),
   });
-  if (storyAssetCanvasGeometry['imageWidth'] > 0x0 && storyAssetCanvasGeometry['imageHeight'] > 0x0)
+  if (storyAssetCanvasGeometry['imageWidth'] > 0 && storyAssetCanvasGeometry['imageHeight'] > 0)
     return asset2;
   const response = asObject(asset2['generatedImage']),
     imageWidth2 = await resolveOutputMediaSize({
@@ -190,8 +190,8 @@ function createPlanEntry(key2, data2, box3, box4 = {}) {
   const type = normalizeText(data2?.['type']),
     box5 = STORY_PROJECT_CANVAS_NODE_SIZES[type];
   if (!type || !box5) throw new Error('不支持的项目画布节点类型：' + (type || 'unknown'));
-  const width2 = Math['max'](0x1, Number(box4['width']) || box5['width']),
-    height = Math['max'](0x1, Number(box4['height']) || box5['height']),
+  const width2 = Math['max'](1, Number(box4['width']) || box5['width']),
+    height = Math['max'](1, Number(box4['height']) || box5['height']),
     inputConnections = normalizeList(box4['inputConnections'])
       ['map']((event) => {
         if (typeof event === 'string') return { key: normalizeText(event), preferredRefSlot: '' };
@@ -207,7 +207,7 @@ function createPlanEntry(key2, data2, box3, box4 = {}) {
     data: data2,
     width: width2,
     height: height,
-    position: { x: Number(box3?.['x']) || 0x0, y: Number(box3?.['y']) || 0x0 },
+    position: { x: Number(box3?.['x']) || 0, y: Number(box3?.['y']) || 0 },
     ...(normalizeText(box4['parentKey']) ? { parentKey: normalizeText(box4['parentKey']) } : {}),
     ...(normalizeList(box4['inputKeys'])['length']
       ? { inputKeys: normalizeList(box4['inputKeys'])['map'](normalizeText)['filter'](Boolean) }
@@ -232,7 +232,7 @@ export function buildStoryProjectOverviewNodeData({ project: project = {} } = {}
     {
       type: 'source-text',
       name: buildStoryProjectCanvasName(project) + ' · 项目设定',
-      content: content2['join']('\x0a\x0a'),
+      content: content2['join']('\n\n'),
       storyWorkspaceBinding: { projectId: normalizeText(project['id']), kind: 'project-overview' },
     }
   );
@@ -245,11 +245,11 @@ export function buildStoryProjectCopyNodeData({ project: project = {} } = {}) {
   if (text4 && text4 !== text3) content3['push']('完整文案\n' + text4);
   const text5 = normalizeText(project['narrationScript']);
   return (
-    text5 && text5 !== text4 && text5 !== text3 && content3['push']('旁白文案\x0a' + text5),
+    text5 && text5 !== text4 && text5 !== text3 && content3['push']('旁白文案\n' + text5),
     {
       type: 'source-text',
-      name: buildStoryProjectCanvasName(project) + '\x20·\x20完整文案',
-      content: content3['join']('\x0a\x0a---\x0a\x0a'),
+      name: buildStoryProjectCanvasName(project) + ' · 完整文案',
+      content: content3['join']('\n\n---\n\n'),
       storyWorkspaceBinding: { projectId: normalizeText(project['id']), kind: 'project-copy' },
     }
   );
@@ -273,7 +273,7 @@ export function buildStoryAssetCanvasNodeData({
     images =
       Array['isArray'](appearance['generatedImages']) && appearance['generatedImages']['length']
         ? appearance['generatedImages']
-        : Object['keys'](response2)['length'] > 0x0
+        : Object['keys'](response2)['length'] > 0
           ? [{ ...response2, imageUrl: imageUrl || response2['imageUrl'] }]
           : imageUrl
             ? [{ url: imageUrl, imageUrl: imageUrl, sourceUrl: imageUrl, thumbUrl: imageUrl }]
@@ -313,7 +313,7 @@ export function buildStoryAssetCanvasNodeData({
     thumbId: normalizeText(activeImage2['thumbId']),
     width: width3['width'],
     height: width3['height'],
-    ...(width3['imageWidth'] > 0x0 && width3['imageHeight'] > 0x0
+    ...(width3['imageWidth'] > 0 && width3['imageHeight'] > 0
       ? { imageWidth: width3['imageWidth'], imageHeight: width3['imageHeight'] }
       : {}),
     storyWorkspaceBinding: {
@@ -337,7 +337,7 @@ export function buildStoryEpisodeCopyNodeData({ project: project = {}, episode: 
   return {
     type: 'source-text',
     name: getEpisodeLabel(episode) + ' · 分集文案',
-    content: content4['join']('\x0a\x0a'),
+    content: content4['join']('\n\n'),
     storyWorkspaceBinding: {
       projectId: normalizeText(project['id']),
       episodeId: normalizeText(episode['id']),
@@ -374,7 +374,7 @@ function describeShotAssets(value4, map2) {
         ),
         value7 =
           error2 && normalizeText(error2['name']) !== '基础形象'
-            ? text9 + '\x20·\x20' + normalizeText(error2['name'])
+            ? text9 + ' · ' + normalizeText(error2['name'])
             : text9,
         value8 = ['character', 'scene', 'prop']['includes'](error['kind']) ? error['kind'] : 'character';
       if (!promise[value8]['includes'](value7)) promise[value8]['push'](value7);
@@ -396,9 +396,9 @@ export function buildStoryEpisodeStoryboardNodeData({
         count4 = Number(value11['durationSec'] || value11['durationSeconds']);
       rows['push']({
         镜号:
-          Math['max'](0x1, Math['trunc'](Number(value9['number']) || value10 + 0x1)) + '-' + (value12 + 0x1),
+          Math['max'](1, Math['trunc'](Number(value9['number']) || value10 + 1)) + '-' + (value12 + 1),
         时长:
-          normalizeText(value11['time']) || (Number['isFinite'](count4) && count4 > 0x0 ? count4 + 's' : ''),
+          normalizeText(value11['time']) || (Number['isFinite'](count4) && count4 > 0 ? count4 + 's' : ''),
         场景: promise2['scene']['join']('、'),
         画面描述: normalizeText(value11['visual']),
         角色: promise2['character']['join']('、'),
@@ -410,7 +410,7 @@ export function buildStoryEpisodeStoryboardNodeData({
         视频提示词: normalizeText(value11['videoPrompt'] || value9['prompt']),
         对白: [normalizeText(value11['dialogue']), normalizeText(value11['voiceover'])]
           ['filter'](Boolean)
-          ['join']('\x0a'),
+          ['join']('\n'),
         音效: normalizeText(value11['audio']),
       });
     });
@@ -442,7 +442,7 @@ function buildStoryStageAnnotationNodeData({
     type: 'comment-note',
     name: normalizeText(title),
     content: normalizeText(content),
-    style: { fontSize: 0x28, textColor: 'white', backgroundColor: 'transparent' },
+    style: { fontSize: 40, textColor: 'white', backgroundColor: 'transparent' },
     storyWorkspaceBinding: {
       projectId: normalizeText(project['id']),
       episodeId: normalizeText(episode?.['id']),
@@ -474,16 +474,16 @@ function buildStoryClipInputCanvasNodeData({
   clip: clip = {},
   input: input = {},
   kind: kind = 'image',
-  inputIndex: inputIndex = 0x0,
+  inputIndex: inputIndex = 0,
 } = {}) {
   const localPath2 = buildStoryClipInputMediaLocation(input);
   if (!localPath2['url']) return null;
   const episodeLabel = getEpisodeLabel(episode),
-    value14 = Math['max'](0x1, Math['trunc'](Number(clip['number']) || 0x1)),
+    value14 = Math['max'](1, Math['trunc'](Number(clip['number']) || 1)),
     value15 = { image: '图片入参', video: '视频入参', audio: '音频入参' }[kind] || '媒体入参',
     name3 =
       normalizeText(input['name']) ||
-      episodeLabel + ' · 片段 ' + value14 + '\x20·\x20' + value15 + '\x20' + (inputIndex + 0x1),
+      episodeLabel + ' · 片段 ' + value14 + ' · ' + value15 + ' ' + (inputIndex + 1),
     storyWorkspaceBinding = {
       projectId: normalizeText(project['id']),
       episodeId: normalizeText(episode['id']),
@@ -496,12 +496,12 @@ function buildStoryClipInputCanvasNodeData({
   if (kind === 'video') {
     const videos = normalizeVideoGenerationResult({
       videos: [{ localPath: localPath2['localPath'], videoUrl: localPath2['url'] }],
-    })['items'][0x0];
+    })['items'][0];
     return {
       type: 'source-video',
       name: name3,
       videos: videos ? [videos] : [],
-      mainVideoIndex: 0x0,
+      mainVideoIndex: 0,
       videoUrl: normalizeText(videos?.['videoUrl'] || localPath2['url']),
       localPath: normalizeText(videos?.['localPath'] || localPath2['localPath']),
       storyWorkspaceBinding: storyWorkspaceBinding,
@@ -510,13 +510,13 @@ function buildStoryClipInputCanvasNodeData({
   if (kind === 'audio') {
     const audios = normalizeAudioGenerationResult({
       audios: [{ localPath: localPath2['localPath'], audioUrl: localPath2['url'] }],
-    })['items'][0x0];
+    })['items'][0];
     return {
       type: 'source-audio',
       name: name3,
       fileName: name3,
       audios: audios ? [audios] : [],
-      mainAudioIndex: 0x0,
+      mainAudioIndex: 0,
       audioUrl: normalizeText(audios?.['audioUrl'] || localPath2['url']),
       localPath: normalizeText(audios?.['localPath'] || localPath2['localPath']),
       storyWorkspaceBinding: storyWorkspaceBinding,
@@ -531,12 +531,12 @@ function buildStoryClipInputCanvasNodeData({
         ...buildCanvasLocalImageFields(input),
       },
     ],
-  })['items'][0x0];
+  })['items'][0];
   return {
     type: 'source-image',
     name: name3,
     images: images3 ? [images3] : [],
-    mainImageIndex: 0x0,
+    mainImageIndex: 0,
     imageUrl: normalizeText(images3?.['imageUrl'] || localPath2['url']),
     sourceUrl: normalizeText(images3?.['sourceUrl'] || localPath2['url']),
     localPath: normalizeText(images3?.['localPath'] || localPath2['localPath']),
@@ -565,7 +565,7 @@ function findStoryAssetCanvasRecord(list7 = [], value16 = {}) {
     );
     if (list9) return list9;
   }
-  return text13 ? list8[0x0] || null : null;
+  return text13 ? list8[0] || null : null;
 }
 function buildStoryClipCanvasInputPlan({
   project: project = {},
@@ -616,7 +616,7 @@ function buildStoryClipCanvasInputPlan({
           inputIndex: inputIndex2,
         });
         if (!data3) return;
-        const encodeURIComponent2 = encodeURIComponent(text15 || kind2 + '-' + (inputIndex2 + 0x1)),
+        const encodeURIComponent2 = encodeURIComponent(text15 || kind2 + '-' + (inputIndex2 + 1)),
           key4 = clipKey + ':input:' + kind2 + ':' + encodeURIComponent2;
         (inputEntries['push']({
           key: key4,
@@ -632,7 +632,7 @@ function buildStoryClipCanvasInputPlan({
 }
 function getPlanBounds(list10 = []) {
   const list11 = normalizeList(list10);
-  if (!list11['length']) return { left: 0x0, top: 0x0, right: 0x0, bottom: 0x0, width: 0x0, height: 0x0 };
+  if (!list11['length']) return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
   const left = Math['min'](...list11['map']((value29) => value29['position']['x'])),
     top = Math['min'](...list11['map']((value30) => value30['position']['y'])),
     right = Math['max'](...list11['map']((box6) => box6['position']['x'] + box6['width'])),
@@ -730,7 +730,7 @@ export function buildStoryProjectCanvasPlan({
     height2 = STORY_PROJECT_CANVAS_NODE_SIZES['comment-note'],
     x4 = STORY_PROJECT_CANVAS_NODE_SIZES['source-text'],
     box10 = STORY_PROJECT_CANVAS_NODE_SIZES['ai-video'];
-  let appendHorizontalStoryStage2 = 0x0;
+  let appendHorizontalStoryStage2 = 0;
   const entries2 = [],
     y = height2['height'] + NODE_GAP;
   (entries2['push'](
@@ -742,12 +742,12 @@ export function buildStoryProjectCanvasPlan({
         title: '阶段 1 · 项目设定',
         content: '项目摘要、世界设定与完整文案。',
       }),
-      { x: 0x0, y: 0x0 },
+      { x: 0, y: 0 },
     ),
   ),
     entries2['push'](
       createPlanEntry('project:overview', buildStoryProjectOverviewNodeData({ project: project }), {
-        x: 0x0,
+        x: 0,
         y: y,
       }),
     ));
@@ -763,7 +763,7 @@ export function buildStoryProjectCanvasPlan({
       project: project,
       key: 'stage:project:group',
       stage: 'project',
-      name: '阶段\x201\x20·\x20项目设定',
+      name: '阶段 1 · 项目设定',
       color: STAGE_GROUP_COLORS['project'],
     }),
     appendHorizontalStoryStage2,
@@ -773,12 +773,12 @@ export function buildStoryProjectCanvasPlan({
   normalizeList(assets)['forEach']((prompt, value40) => {
     const list17 = normalizeList(prompt['appearances']),
       list18 =
-        list17['length'] > 0x0
+        list17['length'] > 0
           ? list17
           : [
               {
                 id:
-                  getStableKeyPart(prompt['id'] || prompt['planningRef'], 'asset-' + (value40 + 0x1)) +
+                  getStableKeyPart(prompt['id'] || prompt['planningRef'], 'asset-' + (value40 + 1)) +
                   '-base',
                 name: '基础形象',
                 prompt: prompt['prompt'],
@@ -789,11 +789,11 @@ export function buildStoryProjectCanvasPlan({
     list18['forEach']((appearance2, value41) => {
       const stableKeyPart = getStableKeyPart(
           prompt['id'] || prompt['planningRef'],
-          'asset-' + (value40 + 0x1),
+          'asset-' + (value40 + 1),
         ),
         stableKeyPart2 = getStableKeyPart(
           appearance2['id'] || appearance2['planningRef'],
-          'appearance-' + (value41 + 0x1),
+          'appearance-' + (value41 + 1),
         ),
         data4 = buildStoryAssetCanvasNodeData({
           project: project,
@@ -804,11 +804,11 @@ export function buildStoryProjectCanvasPlan({
           generationParams: imageGenerationParams,
         }),
         width5 = Math['max'](
-          0x1,
+          1,
           Number(data4['width']) || STORY_PROJECT_CANVAS_NODE_SIZES['ai-image']['width'],
         ),
         height3 = Math['max'](
-          0x1,
+          1,
           Number(data4['height']) || STORY_PROJECT_CANVAS_NODE_SIZES['ai-image']['height'],
         );
       assetRecords2['push']({
@@ -827,8 +827,8 @@ export function buildStoryProjectCanvasPlan({
           data4['imageUrl'],
           data4['localPath'],
           data4['sourceUrl'],
-          data4['images']?.[0x0]?.['imageUrl'],
-          data4['images']?.[0x0]?.['localPath'],
+          data4['images']?.[0]?.['imageUrl'],
+          data4['images']?.[0]?.['localPath'],
         ]
           ['map']((url) => buildStoryClipInputMediaLocation({ url: url })['url'])
           ['filter'](Boolean),
@@ -846,13 +846,13 @@ export function buildStoryProjectCanvasPlan({
   (list19['forEach']((title2) => {
     const list20 = assetRecords2['filter']((value43) => value43['kind'] === title2['kind']),
       list21 = [];
-    for (let value44 = 0x0; value44 < list20['length']; value44 += ASSET_COLUMNS) {
+    for (let value44 = 0; value44 < list20['length']; value44 += ASSET_COLUMNS) {
       const items = list20['slice'](value44, value44 + ASSET_COLUMNS);
       list21['push']({
         items: items,
         width: items['reduce'](
-          (value45, box11, count5) => value45 + box11['width'] + (count5 > 0x0 ? NODE_GAP : 0x0),
-          0x0,
+          (value45, box11, count5) => value45 + box11['width'] + (count5 > 0 ? NODE_GAP : 0),
+          0,
         ),
         height: Math['max'](...items['map']((box12) => box12['height'])),
       });
@@ -868,13 +868,13 @@ export function buildStoryProjectCanvasPlan({
             title: title2['title'],
             content: title2['content'],
           }),
-          { x: 0x0, y: y2 },
+          { x: 0, y: y2 },
           { width: width7, height: ASSET_CATEGORY_NOTE_HEIGHT },
         ),
       ));
     let y3 = y2 + ASSET_CATEGORY_NOTE_HEIGHT + NODE_GAP;
     list21['forEach']((box14) => {
-      let x5 = 0x0;
+      let x5 = 0;
       (box14['items']['forEach']((width8) => {
         (entries3['push'](
           createPlanEntry(
@@ -900,7 +900,7 @@ export function buildStoryProjectCanvasPlan({
           title: '阶段 2 · 素材设定',
           content: '角色、场景和道具素材。',
         }),
-        { x: 0x0, y: 0x0 },
+        { x: 0, y: 0 },
         { width: width6, height: height2['height'] },
       ),
     ),
@@ -917,21 +917,21 @@ export function buildStoryProjectCanvasPlan({
       appendHorizontalStoryStage2,
     )));
   const value47 = appendHorizontalStoryStage2;
-  let appendVerticalStoryStage2 = 0x0;
+  let appendVerticalStoryStage2 = 0;
   return (
     normalizeList(episodes)
-      ['slice'](0x0, 0x1)
+      ['slice'](0, 1)
       ['forEach']((episode2, episodeIndex) => {
         const entries4 = [],
           stableKeyPart3 = getStableKeyPart(
             episode2['id'] || episode2['planningRef'],
-            'episode-' + (episodeIndex + 0x1),
+            'episode-' + (episodeIndex + 1),
           ),
           list22 = [
             createPlanEntry(
               'episode:' + stableKeyPart3 + ':copy',
               buildStoryEpisodeCopyNodeData({ project: project, episode: episode2 }),
-              { x: 0x0, y: 0x0 },
+              { x: 0, y: 0 },
             ),
           ],
           list23 = normalizeList(episode2['clips'])['map']((clip2, clipIndex) => {
@@ -950,8 +950,8 @@ export function buildStoryProjectCanvasPlan({
                 clipKey: clipKey2,
               }),
               inputLaneWidth = inputPlan['inputEntries']['reduce'](
-                (value48, box15, count6) => value48 + box15['width'] + (count6 > 0x0 ? NODE_GAP : 0x0),
-                0x0,
+                (value48, box15, count6) => value48 + box15['width'] + (count6 > 0 ? NODE_GAP : 0),
+                0,
               ),
               clipData = buildStoryClipCanvasNodeData({
                 project: project,
@@ -970,11 +970,11 @@ export function buildStoryProjectCanvasPlan({
               { clipKey: clipKey2, clipData: clipData, inputPlan: inputPlan, inputLaneWidth: inputLaneWidth }
             );
           }),
-          count7 = Math['max'](0x0, ...list23['map']((value49) => value49['inputLaneWidth'])),
-          x6 = count7 > 0x0 ? count7 + NODE_GAP : 0x0;
+          count7 = Math['max'](0, ...list23['map']((value49) => value49['inputLaneWidth'])),
+          x6 = count7 > 0 ? count7 + NODE_GAP : 0;
         let y4 = x4['height'] + NODE_GAP;
         list23['forEach'](({ clipKey: clipKey3, clipData: clipData2, inputPlan: inputPlan2 }) => {
-          let x7 = 0x0;
+          let x7 = 0;
           (inputPlan2['inputEntries']['forEach']((width9) => {
             (list22['push'](
               createPlanEntry(
@@ -1007,11 +1007,11 @@ export function buildStoryProjectCanvasPlan({
             buildStoryStageAnnotationNodeData({
               project: project,
               episode: episode2,
-              stage: 'episode-' + (episodeIndex + 0x1),
-              title: getEpisodeLabel(episode2) + '\x20·\x20分集制作',
+              stage: 'episode-' + (episodeIndex + 1),
+              title: getEpisodeLabel(episode2) + ' · 分集制作',
               content: '本集文案和视频片段。',
             }),
-            { x: 0x0, y: 0x0 },
+            { x: 0, y: 0 },
             { width: Math['max'](height2['width'], value51), height: height2['height'] },
           ),
         );
@@ -1029,7 +1029,7 @@ export function buildStoryProjectCanvasPlan({
               project: project,
               episode: episode2,
               key: 'episode:' + stableKeyPart3 + ':group',
-              stage: 'episode-' + (episodeIndex + 0x1),
+              stage: 'episode-' + (episodeIndex + 1),
               name: getEpisodeLabel(episode2),
               color: STAGE_GROUP_COLORS['episode'][episodeIndex % STAGE_GROUP_COLORS['episode']['length']],
             }),
@@ -1045,10 +1045,10 @@ function buildStoryProjectPlanLayout(list24 = []) {
     normalizeList(list24)['map']((box17) => [
       box17['key'],
       {
-        x: Number(box17['position']?.['x']) || 0x0,
-        y: Number(box17['position']?.['y']) || 0x0,
-        width: Number(box17['width']) || 0x0,
-        height: Number(box17['height']) || 0x0,
+        x: Number(box17['position']?.['x']) || 0,
+        y: Number(box17['position']?.['y']) || 0,
+        width: Number(box17['width']) || 0,
+        height: Number(box17['height']) || 0,
         parentKey: normalizeText(box17['parentKey']),
       },
     ]),
@@ -1078,7 +1078,7 @@ function storyProjectLayoutsMatch(options4 = {}, value53 = {}) {
 }
 function shouldReflowStoryProjectCanvas(value57, value58) {
   return (
-    Math['trunc'](Number(value57?.['layoutVersion']) || 0x0) !== STORY_PROJECT_CANVAS_LAYOUT_VERSION ||
+    Math['trunc'](Number(value57?.['layoutVersion']) || 0) !== STORY_PROJECT_CANVAS_LAYOUT_VERSION ||
     !storyProjectLayoutsMatch(value57?.['layout'], value58)
   );
 }
@@ -1121,7 +1121,7 @@ export async function syncStoryProjectCanvas({
   ];
   if (list27['some']((value59) => typeof adapter2?.[value59] !== 'function'))
     throw new Error('syncStoryProjectCanvas requires a complete canvas adapter');
-  const canvasName = buildStoryProjectCanvasName(project, normalizeList(episodes)[0x0]),
+  const canvasName = buildStoryProjectCanvasName(project, normalizeList(episodes)[0]),
     assets2 = await resolveStoryProjectAssetImageSizes(assets),
     list28 = buildStoryProjectCanvasPlan({
       project: project,
@@ -1158,9 +1158,9 @@ export async function syncStoryProjectCanvas({
     reflowed = reused2 ? shouldReflowStoryProjectCanvas(asObject4, layout) : ![],
     nodes2 = {},
     nodes3 = [];
-  let createdCount = 0x0,
-    updatedCount = 0x0,
-    deletedCount = 0x0;
+  let createdCount = 0,
+    updatedCount = 0,
+    deletedCount = 0;
   const sequenceKey = 'story-project:' + (normalizeText(project['id']) || canvasId2),
     mutationSnapshot2 = await adapter2['createMutationSnapshot']?.({ canvasId: canvasId2 });
   try {
@@ -1202,8 +1202,8 @@ export async function syncStoryProjectCanvas({
               sequenceKey: sequenceKey,
               parentNodeId: normalizeText(nodes2[key5['parentKey']]),
             });
-      if (value65) updatedCount += 0x1;
-      else createdCount += 0x1;
+      if (value65) updatedCount += 1;
+      else createdCount += 1;
       const nodeId = normalizeText(node?.['id'] || (value65 ? text18 : ''));
       if (!nodeId) throw new Error('同步项目画布节点失败：' + (key5['data']['name'] || key5['key']));
       ((nodes2[key5['key']] = nodeId), nodes3['push']({ ...key5, nodeId: nodeId, node: node }));
@@ -1221,7 +1221,7 @@ export async function syncStoryProjectCanvas({
       for (const event6 of normalizeList(event5['inputConnections'])) {
         const text22 = normalizeText(nodes2[event6?.['key']]);
         if (!text22 || !text21)
-          throw new Error('剧本项目画布连线缺少节点：' + event6?.['key'] + '\x20→\x20' + event5['key']);
+          throw new Error('剧本项目画布连线缺少节点：' + event6?.['key'] + ' → ' + event5['key']);
         if (
           (await adapter2['connectNodes'](text22, text21, {
             canvasId: canvasId2,
@@ -1236,7 +1236,7 @@ export async function syncStoryProjectCanvas({
       typeof adapter2['focusNodes'] === 'function' &&
         (await adapter2['focusNodes'](
           nodes3['map']((value66) => value66['nodeId']),
-          { padding: 0x50, durationMs: 0x0, maxZoom: 0.2 },
+          { padding: 80, durationMs: 0, maxZoom: 0.2 },
         )));
   } catch (value67) {
     await rollbackStoryProjectCanvasMutation({

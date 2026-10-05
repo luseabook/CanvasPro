@@ -156,36 +156,36 @@ export {
   normalizeStoryScriptMode,
   validateStoryPlanningConstraints,
 };
-export const STORY_GENERATION_SCHEMA_VERSION = 0x2;
-export const STORY_PLANNING_SCHEMA_VERSION = 0x1;
-export const STORY_EPISODE_SPLIT_SCHEMA_VERSION = 0x3;
-export const STORY_EPISODE_BATCHED_SPLIT_SCHEMA_VERSION = 0x3;
-export const STORY_EPISODE_OUTLINE_SCHEMA_VERSION = 0x2;
-export const STORY_EPISODE_SCRIPT_SCHEMA_VERSION = 0x2;
-export const STORY_SOURCE_CHUNK_CHARACTERS = 0x5dc0;
-export const STORY_CHAPTER_MIN_CHARACTERS = 0x5dc;
-export const STORY_CHAPTER_MAX_CHARACTERS = 0xbb8;
-export const STORY_TEXT_REQUEST_TIMEOUT_MS = 0xa * 0x3c * 0x3e8;
-export const STORY_TEXT_MAX_OUTPUT_TOKENS = 0x4000;
-export const STORY_EPISODE_SPLIT_MAX_OUTPUT_TOKENS = 0x8000;
-export const STORY_EPISODE_SPLIT_REQUEST_TIMEOUT_MS = 0x8 * 0x3c * 0x3e8;
-const STORY_EPISODE_DEV_RESPONSE_HISTORY_LIMIT = 0x6,
-  STORY_EPISODE_OUTLINE_BATCH_SIZE = 0x4,
-  STORY_CONTINUITY_MAX_CHARACTER_STATES = 0xc,
-  STORY_CONTINUITY_MAX_PROP_STATES = 0xa,
-  STORY_CONTINUITY_MAX_UNRESOLVED_THREADS = 0x8,
-  STORY_CONTINUITY_MAX_FACTS = 0xc,
-  STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH = 0x8,
-  STORY_EPISODE_EXPERIMENTAL_BATCH_TARGET_DURATION_SECONDS = 0x4b,
-  STORY_EPISODE_EXPERIMENTAL_FALLBACK_PLAN_DURATION_SECONDS = 0xf,
-  STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP = 0x0,
-  STORY_EPISODE_EXPERIMENTAL_PREFERRED_SHOTS_PER_CLIP = 0x4,
-  STORY_EPISODE_EXPERIMENTAL_MAX_FINAL_SHOTS_PER_CLIP = 0x5,
-  STORY_EPISODE_EXPERIMENTAL_SOURCE_BEAT_TARGET_CHARACTERS = 0x1a4,
+export const STORY_GENERATION_SCHEMA_VERSION = 2;
+export const STORY_PLANNING_SCHEMA_VERSION = 1;
+export const STORY_EPISODE_SPLIT_SCHEMA_VERSION = 3;
+export const STORY_EPISODE_BATCHED_SPLIT_SCHEMA_VERSION = 3;
+export const STORY_EPISODE_OUTLINE_SCHEMA_VERSION = 2;
+export const STORY_EPISODE_SCRIPT_SCHEMA_VERSION = 2;
+export const STORY_SOURCE_CHUNK_CHARACTERS = 24000;
+export const STORY_CHAPTER_MIN_CHARACTERS = 1500;
+export const STORY_CHAPTER_MAX_CHARACTERS = 3000;
+export const STORY_TEXT_REQUEST_TIMEOUT_MS = 10 * 60 * 1000;
+export const STORY_TEXT_MAX_OUTPUT_TOKENS = 16384;
+export const STORY_EPISODE_SPLIT_MAX_OUTPUT_TOKENS = 32768;
+export const STORY_EPISODE_SPLIT_REQUEST_TIMEOUT_MS = 8 * 60 * 1000;
+const STORY_EPISODE_DEV_RESPONSE_HISTORY_LIMIT = 6,
+  STORY_EPISODE_OUTLINE_BATCH_SIZE = 4,
+  STORY_CONTINUITY_MAX_CHARACTER_STATES = 12,
+  STORY_CONTINUITY_MAX_PROP_STATES = 10,
+  STORY_CONTINUITY_MAX_UNRESOLVED_THREADS = 8,
+  STORY_CONTINUITY_MAX_FACTS = 12,
+  STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH = 8,
+  STORY_EPISODE_EXPERIMENTAL_BATCH_TARGET_DURATION_SECONDS = 75,
+  STORY_EPISODE_EXPERIMENTAL_FALLBACK_PLAN_DURATION_SECONDS = 15,
+  STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP = 0,
+  STORY_EPISODE_EXPERIMENTAL_PREFERRED_SHOTS_PER_CLIP = 4,
+  STORY_EPISODE_EXPERIMENTAL_MAX_FINAL_SHOTS_PER_CLIP = 5,
+  STORY_EPISODE_EXPERIMENTAL_SOURCE_BEAT_TARGET_CHARACTERS = 420,
   STORY_EPISODE_SPLIT_TEMPERATURE = 0.2,
-  STORY_EPISODE_EXPERIMENTAL_SOURCE_BEAT_MAX_CHARACTERS = 0x26c,
-  STORY_EPISODE_EXPERIMENTAL_MAX_CONCURRENT_BATCHES = 0x3,
-  STORY_EPISODE_EXPERIMENTAL_MIN_CLIP_DURATION_SECONDS = 0x4;
+  STORY_EPISODE_EXPERIMENTAL_SOURCE_BEAT_MAX_CHARACTERS = 620,
+  STORY_EPISODE_EXPERIMENTAL_MAX_CONCURRENT_BATCHES = 3,
+  STORY_EPISODE_EXPERIMENTAL_MIN_CLIP_DURATION_SECONDS = 4;
 export const STORY_GENERATION_SYSTEM_PROMPT = [
   '你是一名专业的短剧故事策划与剧本编辑。',
   '你的任务仅是创建或整理故事剧情，不生成分镜、镜头提示词、角色绘图提示词、场景绘图提示词或分集方案。',
@@ -195,7 +195,7 @@ export const STORY_GENERATION_SYSTEM_PROMPT = [
   '只返回一个严格 JSON 对象；不要输出 Markdown、代码块、前后说明、注释或尾随逗号。',
   'JSON 必须且只能包含 title、storyType、storySummary、storyBackground、storySetting、logline、chapters 七个字段。',
   'storySummary 是可独立阅读的故事梗概，概括主角、目标、核心冲突、主要转折和结局。',
-  'storyBackground\x20说明故事发生的时代、地点、社会环境和初始处境。',
+  'storyBackground 说明故事发生的时代、地点、社会环境和初始处境。',
   'storySetting 说明世界规则、核心机制、人物必须遵守的限制和关键设定。',
   'logline 用一句话概括主角、目标、阻力和故事钩子。',
   'chapters 是章节数组，每章必须包含 title 和 content；title 是小说式主标题，content 使用自然段连续叙事。',
@@ -205,19 +205,19 @@ export const STORY_GENERATION_SYSTEM_PROMPT = [
     STORY_CHAPTER_MAX_CHARACTERS +
     ' 个汉字，不能用提纲、重复句或无意义内容凑字数。',
   '所有章节合在一起必须完整覆盖故事的起因、发展、转折、高潮和结局，不能只输出片段或章节提纲。',
-]['join']('\x0a');
+]['join']('\n');
 const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '你是长篇剧本信息整理助手。',
     '只提取原文事实，不续写、不评价、不改变人物关系和事件结果。',
     '每个分段摘要的 JSON 总内容控制在 1500 个汉字以内。',
     '只返回严格 JSON，不要输出 Markdown 或其他说明。',
-    'JSON\x20必须包含\x20characters、settings、events、continuity、endingState。',
-  ]['join']('\x0a'),
+    'JSON 必须包含 characters、settings、events、continuity、endingState。',
+  ]['join']('\n'),
   STORY_ASSET_EXTRACTION_SYSTEM_PROMPT = [
     '你是专业的影视资产策划 Agent。',
     '你的任务是从已经确认的故事中提取需要保持视觉一致的角色、场景和关键道具资产。',
     '只依据输入故事提取，不续写剧情，不创建分集或分镜。',
-    '角色的显著外观变化应拆成\x20appearances；普通情绪变化不要创建新形象。',
+    '角色的显著外观变化应拆成 appearances；普通情绪变化不要创建新形象。',
     '同一物理空间在不同年代、完好/损毁、正常/异变、干燥/积水等会明显改变参考画面的状态下，必须保留为同一个场景资产并拆成多个 appearances；普通镜头角度、短暂人物活动或不改变空间视觉基准的情绪氛围不拆形象。',
     '多形象角色的第一个 appearance 视为基础形象；每个 appearance name 都必须填写能区分视觉状态的通用具体名称，例如“日常装束”“正式装束”，禁止使用空值或笼统的“基础形象”。其他形象必须完整复述基础形象中的稳定身份特征，只改变剧情明确要求的服饰、年龄、伤势或状态。',
     '角色 name 只能填写原文姓名；原文没有姓名时使用不超过 6 个汉字的简短身份名，禁止写身份说明、剧情经历或逗号分隔的描述。',
@@ -235,7 +235,7 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
     '绝对不要复述、复制或改写输入剧本，也不要返回任务说明、输入参数或输出格式说明。',
     '返回 JSON 的顶层必须且只能包含 assets 字段；第一个字符必须是 {，最后一个字符必须是 }。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   STORY_EPISODE_PLANNING_SYSTEM_PROMPT = [
     '你是专业的短剧分集策划 Agent。',
     '你的任务是把已经确认的故事规划成若干连续分集，不生成镜头或视频提示词。',
@@ -246,13 +246,13 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '每集时长只能根据本集必要剧情、对白、动作、反应和自然停顿估算；不得套用固定集长，也不得为了接近某个秒数增加或删除剧情。',
     'assetRefs 必须逐字使用输入资产 ref，不得编造不存在的资产引用。',
     '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   STORY_EPISODE_SPLIT_ADAPTIVE_TIMING_GUIDANCE =
-    '时长按当前人物把对白和表演自然完成所需来判断。口播字数只是参考之一，同时结合人物性格、语速、情绪、句式、呼吸、动作、停顿和反应；同样字数可以说得快，也可以说得慢，表情、动作与反应也可以同步发生。每个\x20shot.d\x20直接给出足以让该镜头\x20q\x20与\x20o\x20自然说完并完成必要动作和反应的时长；当前片段容纳不下时，在自然叙事位置续到下一\x20clip。不得依靠不自然的高速口播塞入对白，也不要按固定字数或固定每秒字数计算。',
+    '时长按当前人物把对白和表演自然完成所需来判断。口播字数只是参考之一，同时结合人物性格、语速、情绪、句式、呼吸、动作、停顿和反应；同样字数可以说得快，也可以说得慢，表情、动作与反应也可以同步发生。每个 shot.d 直接给出足以让该镜头 q 与 o 自然说完并完成必要动作和反应的时长；当前片段容纳不下时，在自然叙事位置续到下一 clip。不得依靠不自然的高速口播塞入对白，也不要按固定字数或固定每秒字数计算。',
   STORY_EPISODE_SPLIT_GROUPING_GUIDANCE =
-    'clip\x20表示一次可独立生成的连续叙事片段，shots\x20表示该片段内部按观看节奏切换的镜头。先确定\x20clip\x20的连续表演过程，再在每个\x20clip\x20内设计\x20shots；不要先逐个设计\x20shot\x20再把每个\x20shot\x20分别包装成\x20clip。相邻内容仍处于同一场景与时段，并共同完成一段连续动作、同一轮对话及其表情或反应时，把它们组织为同一\x20clip\x20的连续\x20shots。说话人、景别、机位、视角、构图、运镜、表情或反应镜头的变化属于\x20shot\x20层级，不会单独决定片段边界。进入新的场景或时空、动作与情绪自然转入新的叙事阶段，或继续组织将超过用户设置的单片最大时长时，再自然进入下一\x20clip；片段与镜头数量按正文实际结构自然决定。',
+    'clip 表示一次可独立生成的连续叙事片段，shots 表示该片段内部按观看节奏切换的镜头。先确定 clip 的连续表演过程，再在每个 clip 内设计 shots；不要先逐个设计 shot 再把每个 shot 分别包装成 clip。相邻内容仍处于同一场景与时段，并共同完成一段连续动作、同一轮对话及其表情或反应时，把它们组织为同一 clip 的连续 shots。说话人、景别、机位、视角、构图、运镜、表情或反应镜头的变化属于 shot 层级，不会单独决定片段边界。进入新的场景或时空、动作与情绪自然转入新的叙事阶段，或继续组织将超过用户设置的单片最大时长时，再自然进入下一 clip；片段与镜头数量按正文实际结构自然决定。',
   STORY_EPISODE_SPLIT_CONTINUITY_CHAIN_GUIDANCE =
-    '单片时长上限只是生成能力造成的技术切片边界，不是剧情重新开场。相邻内容仍在同一\x20sourceSceneRef\x20和连续时空时，后一片段必须从前一片段结束的可观察状态继续：继承人物位置、朝向、动作进度、情绪、视线、手持道具、车辆或设备状态及空间方向；不得让人物返回更早位置、重复已经完成的动作、复原已经改变的道具或重新建立场景，除非原文明确写出返回、重复、复原、换场或时间跳跃。',
+    '单片时长上限只是生成能力造成的技术切片边界，不是剧情重新开场。相邻内容仍在同一 sourceSceneRef 和连续时空时，后一片段必须从前一片段结束的可观察状态继续：继承人物位置、朝向、动作进度、情绪、视线、手持道具、车辆或设备状态及空间方向；不得让人物返回更早位置、重复已经完成的动作、复原已经改变的道具或重新建立场景，除非原文明确写出返回、重复、复原、换场或时间跳跃。',
   STORY_EPISODE_SPLIT_PLOT_MODE_GUIDANCE =
     'scriptMode 为 plot（剧情模式）时，剧本中未标注说话人的普通动作和环境叙述用于设计画面 v，不作为可听见的解说。只有原剧本明确标注为旁白、画外音、VO 或 O.S. 的文字才放入 o；没有这种明确标注时 o 为空字符串。',
   STORY_EPISODE_SPLIT_NARRATION_MODE_GUIDANCE =
@@ -266,9 +266,9 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
   STORY_EPISODE_SPLIT_SYSTEM_PROMPT = [
     '把输入正文按原顺序直接整理为采用可执行视频描述方式的短剧视频片段，不分析、不续写。',
     '只返回一个完整、闭合的 JSON 对象；不要输出 Markdown、代码块、解释、注释或任何前后缀。',
-    '格式只能是\x20{\x22clips\x22:[{\x22s\x22:\x22场景代码\x22,\x22shots\x22:[{\x22d\x22:镜头秒数,\x22v\x22:\x22连续可观察画面\x22,\x22c\x22:\x22景别、机位与运镜\x22,\x22q\x22:\x22完整对白或空字符串\x22,\x22o\x22:\x22完整旁白或空字符串\x22,\x22a\x22:\x22必要音效或空字符串\x22},{\x22d\x22:后续镜头秒数,\x22v\x22:\x22后续连续可观察画面\x22,\x22c\x22:\x22后续景别、机位与运镜\x22,\x22q\x22:\x22完整对白或空字符串\x22,\x22o\x22:\x22完整旁白或空字符串\x22,\x22a\x22:\x22必要音效或空字符串\x22}]}]}。示意中的两个\x20shot\x20只展示同一\x20clip\x20内的层级关系，实际数量按当前片段内容自然确定；不得增加其他键。',
+    '格式只能是 {"clips":[{"s":"场景代码","shots":[{"d":镜头秒数,"v":"连续可观察画面","c":"景别、机位与运镜","q":"完整对白或空字符串","o":"完整旁白或空字符串","a":"必要音效或空字符串"},{"d":后续镜头秒数,"v":"后续连续可观察画面","c":"后续景别、机位与运镜","q":"完整对白或空字符串","o":"完整旁白或空字符串","a":"必要音效或空字符串"}]}]}。示意中的两个 shot 只展示同一 clip 内的层级关系，实际数量按当前片段内容自然确定；不得增加其他键。',
     'clips 中每一项是一个最终视频片段；s 必须逐字使用输入 scenes 中的 code，不得填写场景名称或编造代码。',
-    '人物对白按原文顺序放入\x20q，旁白按原文顺序放入\x20o，都必须逐字完整保留；说出口或画外叙述的文字不得放入\x20v。',
+    '人物对白按原文顺序放入 q，旁白按原文顺序放入 o，都必须逐字完整保留；说出口或画外叙述的文字不得放入 v。',
     '严格读取输入 scriptMode，并按剧情模式或解说模式分别处理普通动作叙述与明确画外音。',
     STORY_EPISODE_SPLIT_DIALOGUE_SPEAKER_GUIDANCE,
     STORY_EPISODE_SPLIT_ADAPTIVE_TIMING_GUIDANCE,
@@ -278,7 +278,7 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '有对白时让人物表情、视线、姿态和动作与台词同步，听者反应按当前表演节拍自然安排；a 记录对画面有帮助的环境声、动作声和表演声。q、o、a 没有内容时返回空字符串。',
     '每镜内容与 d 保持自然匹配；保持原剧情事实和资产，不额外扩写事件、人物、能力、道具或结果，也不输出表头、序号、@、人物外貌或结构标签。',
     '忽略“（本集完）”“（全剧终）”“待续”等编辑标记；只有原文明示为屏幕字幕的文字才表现字幕。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   STORY_EPISODES_SPLIT_SYSTEM_PROMPT = [
     '按输入剧本原顺序拆分分镜，不分析、不续写。',
     '严格读取输入 scriptMode，并按剧情模式或解说模式分别处理普通动作叙述与明确画外音。',
@@ -288,7 +288,7 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     STORY_EPISODE_SPLIT_VISUAL_GUIDANCE,
     STORY_EPISODE_SPLIT_CAMERA_GUIDANCE,
     '只返回一个完整 JSON 对象。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   getStoryEpisodeSplitRequestSystemPrompt = ({
     compactPrompt: compactPrompt = ![],
     promptMode: promptMode = 'seedance-2.0',
@@ -299,13 +299,13 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
       { announceTimelineContract: !![] },
     ),
   STORY_EPISODES_SPLIT_VALIDATION_SYSTEM_PROMPT =
-    '只检查并修复已有分镜结果的\x20JSON\x20格式和字段包装。不得增删、改写或重新生成分镜内容。只返回修复后的完整\x20JSON。',
+    '只检查并修复已有分镜结果的 JSON 格式和字段包装。不得增删、改写或重新生成分镜内容。只返回修复后的完整 JSON。',
   STORY_EPISODE_BATCHED_BLUEPRINT_SYSTEM_PROMPT = [
     '你是专业的短剧分镜总规划 Agent。',
     '你的任务是先为一整集建立连续片段蓝图，不写具体分镜、镜头语言或最终视频提示词。',
     '必须按原剧本顺序完整覆盖全部 sourceBeats；每个 sourceBeatRef 必须且只能出现一次，每个 clipPlan 代表一个之后会独立生成的视频片段。',
     '每个 clipPlan 只能覆盖同一个 sourceSceneRef 中连续的 sourceBeatRefs，换场必须新建 clipPlan。',
-    'sourceBeat\x20用于跟踪原文覆盖，不直接决定片段边界；一个\x20clipPlan\x20可以承载多个相互关联的动作、对白和反应。',
+    'sourceBeat 用于跟踪原文覆盖，不直接决定片段边界；一个 clipPlan 可以承载多个相互关联的动作、对白和反应。',
     STORY_EPISODE_SPLIT_GROUPING_GUIDANCE,
     STORY_EPISODE_SPLIT_ADAPTIVE_TIMING_GUIDANCE,
     STORY_EPISODE_SPLIT_CONTINUITY_CHAIN_GUIDANCE,
@@ -314,7 +314,7 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     'beat、entryState、exitState 各只写一句必要信息，不复述原文，不输出镜头细节。',
     '不得新增输入中不存在的人物、对白、资产、事件、规则或结局。',
     '只返回严格 JSON，不要输出 Markdown、注释、说明或具体 shots。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   STORY_EPISODE_BATCHED_EXPANSION_SYSTEM_PROMPT = [
     '你是专业的短剧分镜脚本 Agent。',
     '你当前只展开输入 batch.clipPlans，不重新规划整集；必须按给定顺序为每个计划准确返回一个同 ref 的 clip。',
@@ -328,28 +328,28 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '如实规划每个 shot 的 durationSec；实验分批不限制单个 clip 的总时长，不得为了凑时长压缩对白、动作或表演停顿。',
     '每个 shot 可返回 cutAfter：完整发言结束后可用 preferred 或 allowed；完整发言尚未结束时必须为 forbidden。客户端只会在完整发言之间结合场景边界和时长上限完成最终分组。',
     STORY_EPISODE_SPLIT_CAMERA_GUIDANCE,
-    '每个分镜中，画面实际出现的已登记角色必须来自\x20clipPlan.characterAssetRefs，并逐个把具体\x20appearanceRef\x20写入\x20shot.assetRefs；资产没有形象时才写\x20assetRef。角色只在\x20visual\x20首次出现时使用\x20assets[].name，后续优先使用他/她/该角色；存在指代歧义时使用普通姓名。dialogue\x20的说话人标签始终使用普通姓名，任何文本字段都不要输出\x20@。',
+    '每个分镜中，画面实际出现的已登记角色必须来自 clipPlan.characterAssetRefs，并逐个把具体 appearanceRef 写入 shot.assetRefs；资产没有形象时才写 assetRef。角色只在 visual 首次出现时使用 assets[].name，后续优先使用他/她/该角色；存在指代歧义时使用普通姓名。dialogue 的说话人标签始终使用普通姓名，任何文本字段都不要输出 @。',
     '只返回生成当前分镜必需的紧凑字段；script、creativeIntent、transition 和 time 由客户端依据蓝图本地补全。' +
       STORY_EPISODE_SPLIT_VISUAL_GUIDANCE +
-      '\x20camera\x20聚焦当前分镜的观察方式。',
+      ' camera 聚焦当前分镜的观察方式。',
     'shot.audio 只写必要的环境声、动作音效和可听见的表演声；允许呼吸、喘息、啜泣、衣物摩擦等与当前动作直接相关的声音。禁止固定人物音色设定、对白内容复述和脱离剧情的配乐分析；没有必要音效时返回空字符串。',
     '不得使用‘上一片段’‘下一片段’等外部上下文表达；连续状态要直接改写为当前 clip 内可观察的起始状态。',
     '不得新增输入中不存在的人物、对白、资产、事件、规则或结局。',
     '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   STORY_EPISODE_DIRECTOR_CONTINUITY_BLUEPRINT_SYSTEM_PROMPT = [
     STORY_EPISODE_BATCHED_BLUEPRINT_SYSTEM_PROMPT,
     '当前是开发测试专用的导演连续性提示词实验。',
     '除人物空间状态外，为每个 clipPlan 返回 openingShotIntent 与 closingShotIntent，用来表达镜头的叙事关注点和与相邻计划的画面关系；具体观察方式由剧情和表演决定。',
     '场景图片是固定空间锚点，人物位置必须使用可观察地标描述；镜头变化不得镜像或重构场景。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   STORY_EPISODE_DIRECTOR_CONTINUITY_EXPANSION_SYSTEM_PROMPT = [
     STORY_EPISODE_BATCHED_EXPANSION_SYSTEM_PROMPT,
     '当前是开发测试专用的导演连续性提示词实验。',
     '由你根据剧情和表演自主设计镜头数量、角度、构图、运镜和剪辑方式。',
     '每个 shot 必须返回 transitionFromPrevious，说明切镜、动作匹配、视线匹配、反应镜头、道具插入或连续长镜等衔接选择及叙事原因。',
     '避免无动机地连续重复同一主体、景别、机位和构图；也不要把普通争吵默认处理成双人纯侧面一镜到底。',
-  ]['join']('\x0a'),
+  ]['join']('\n'),
   getStoryEpisodeExperimentalExpansionSystemPrompt = ({
     promptExperiment: promptExperiment = ![],
     promptMode: promptMode = 'seedance-2.0',
@@ -364,37 +364,37 @@ function createStoryEpisodeExperimentalStructuredOutput(name, schema) {
   return { name: name, schema: schema, strict: !![], fallback: 'prompt' };
 }
 function normalizeStoryContinuityFacts(value) {
-  return normalizeStringArray(value)['slice'](0x0, STORY_CONTINUITY_MAX_FACTS);
+  return normalizeStringArray(value)['slice'](0, STORY_CONTINUITY_MAX_FACTS);
 }
 function normalizeStoryContinuityState(options = {}) {
   const item = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
   return {
     characters: normalizeStringArray(item['characters'] || item['characterStates'])['slice'](
-      0x0,
+      0,
       STORY_CONTINUITY_MAX_CHARACTER_STATES,
     ),
     props: normalizeStringArray(item['props'] || item['propStates'] || item['items'])['slice'](
-      0x0,
+      0,
       STORY_CONTINUITY_MAX_PROP_STATES,
     ),
     unresolvedThreads: normalizeStringArray(
       item['unresolvedThreads'] || item['threads'] || item['openThreads'],
-    )['slice'](0x0, STORY_CONTINUITY_MAX_UNRESOLVED_THREADS),
+    )['slice'](0, STORY_CONTINUITY_MAX_UNRESOLVED_THREADS),
   };
 }
 function hasStoryContinuityState(options2 = {}) {
   const storyContinuityState = normalizeStoryContinuityState(options2);
   return (
-    storyContinuityState['characters']['length'] > 0x0 ||
-    storyContinuityState['props']['length'] > 0x0 ||
-    storyContinuityState['unresolvedThreads']['length'] > 0x0
+    storyContinuityState['characters']['length'] > 0 ||
+    storyContinuityState['props']['length'] > 0 ||
+    storyContinuityState['unresolvedThreads']['length'] > 0
   );
 }
 function normalizeStoryProjectInput(options3 = {}) {
   const chapters = Array['isArray'](options3?.['chapters'])
     ? options3['chapters']
         ['map']((key, data) => ({
-          id: normalizeText(key?.['id']) || 'chapter-' + (data + 0x1),
+          id: normalizeText(key?.['id']) || 'chapter-' + (data + 1),
           title: normalizeText(key?.['title']),
           content: normalizeText(key?.['content']),
         }))
@@ -445,9 +445,9 @@ function stringifyStoryEpisodeDevResponse(payload) {
 }
 export function captureStoryEpisodeScriptDevResponse({
   response: response,
-  attempt: attempt = 0x1,
+  attempt: attempt = 1,
   episodeRef: episodeRef = '',
-  episodeNumber: episodeNumber = 0x1,
+  episodeNumber: episodeNumber = 1,
   model: model = '',
   provider: provider = '',
   windowObject: windowObject = globalThis['window'],
@@ -457,9 +457,9 @@ export function captureStoryEpisodeScriptDevResponse({
   if (windowObject?.['AI_CANVAS_IS_DEV_BUILD'] !== !![]) return null;
   const handle = {
       capturedAt: normalizeText(capturedAt),
-      attempt: Math['max'](0x1, Math['trunc'](Number(attempt) || 0x1)),
+      attempt: Math['max'](1, Math['trunc'](Number(attempt) || 1)),
       episodeRef: normalizeText(episodeRef),
-      episodeNumber: Math['max'](0x1, Math['trunc'](Number(episodeNumber) || 0x1)),
+      episodeNumber: Math['max'](1, Math['trunc'](Number(episodeNumber) || 1)),
       model: normalizeText(model),
       provider: normalizeText(provider),
       responseText: stringifyStoryEpisodeDevResponse(getResultText(response)),
@@ -481,8 +481,8 @@ function countStoryChapterCharacters(state) {
 export function parseStoryGenerationResult(
   config,
   {
-    minChapters: minChapters = 0x1,
-    minChapterCharacters: minChapterCharacters = 0x0,
+    minChapters: minChapters = 1,
+    minChapterCharacters: minChapterCharacters = 0,
     maxChapterCharacters: maxChapterCharacters = Number['POSITIVE_INFINITY'],
   } = {},
 ) {
@@ -507,9 +507,9 @@ export function parseStoryGenerationResult(
   if (!storyBackground) throw new Error('Agent 返回结果缺少故事背景。');
   if (!storySetting) throw new Error('Agent 返回结果缺少故事设定。');
   if (!logline) throw new Error('Agent 返回结果缺少一句话故事。');
-  const output = Math['max'](0x1, Math['trunc'](Number(minChapters) || 0x1));
-  if (chapters2['length'] < output) throw new Error('Agent 返回的有效章节不足 ' + output + '\x20章。');
-  const value2 = Math['max'](0x0, Math['trunc'](Number(minChapterCharacters) || 0x0)),
+  const output = Math['max'](1, Math['trunc'](Number(minChapters) || 1));
+  if (chapters2['length'] < output) throw new Error('Agent 返回的有效章节不足 ' + output + ' 章。');
+  const value2 = Math['max'](0, Math['trunc'](Number(minChapterCharacters) || 0)),
     value3 = Number(maxChapterCharacters),
     value4 = Number['isFinite'](value3)
       ? Math['max'](value2, Math['trunc'](value3))
@@ -524,17 +524,17 @@ export function parseStoryGenerationResult(
           value2 +
           ' 个字（当前 ' +
           countStoryChapterCharacters2 +
-          '\x20个字）。',
+          ' 个字）。',
       );
     if (countStoryChapterCharacters2 > value4)
       throw new Error(
-        'Agent\x20返回的章节“' +
+        'Agent 返回的章节“' +
           value5['title'] +
           '”正文超过 ' +
           value4 +
           ' 个字（当前 ' +
           countStoryChapterCharacters2 +
-          '\x20个字）。',
+          ' 个字）。',
       );
   }
   return {
@@ -550,19 +550,19 @@ export function parseStoryGenerationResult(
 }
 export function splitStorySourceText(value6, value7 = STORY_SOURCE_CHUNK_CHARACTERS) {
   const list = normalizeText(value6),
-    value8 = Math['max'](0x7d0, Math['trunc'](Number(value7) || 0x0));
+    value8 = Math['max'](2000, Math['trunc'](Number(value7) || 0));
   if (!list) return [];
   if (list['length'] <= value8) return [list];
   const list2 = [];
-  let value9 = 0x0;
+  let value9 = 0;
   while (value9 < list['length']) {
     let value10 = Math['min'](list['length'], value9 + value8);
     if (value10 < list['length']) {
-      const value11 = list['lastIndexOf']('\x0a', value10);
+      const value11 = list['lastIndexOf']('\n', value10);
       if (value11 > value9 + Math['floor'](value8 * 0.55)) value10 = value11;
     }
     (list2['push'](list['slice'](value9, value10)['trim']()), (value9 = value10));
-    while (list[value9] === '\x0a' || list[value9] === '\x0d') value9 += 0x1;
+    while (list[value9] === '\n' || list[value9] === '\r') value9 += 1;
   }
   return list2['filter'](Boolean);
 }
@@ -582,7 +582,7 @@ export function buildStoryGenerationPrompt({
     sourceDigests2 = Array['isArray'](sourceDigests) ? sourceDigests : [],
     args2 = validateStoryPlanningConstraints(planning);
   if (mode2 === 'generate' && !idea2) throw new Error('请先输入故事设定。');
-  if (mode2 === 'upload' && !sourceText2 && sourceDigests2['length'] === 0x0)
+  if (mode2 === 'upload' && !sourceText2 && sourceDigests2['length'] === 0)
     throw new Error('没有可供整理的剧本文本。');
   const modeInstruction =
     mode2 === 'upload'
@@ -609,7 +609,7 @@ export function buildStoryGenerationPrompt({
         STORY_CHAPTER_MIN_CHARACTERS +
         ' 至 ' +
         STORY_CHAPTER_MAX_CHARACTERS +
-        '\x20个汉字，每章都要有清晰主标题；不能用提纲、重复句或无意义内容凑字数。',
+        ' 个汉字，每章都要有清晰主标题；不能用提纲、重复句或无意义内容凑字数。',
       '开篇尽快建立人物、处境和触发事件。',
       '中段通过行动与代价升级冲突，避免只有设定介绍。',
       '高潮必须由前文因果推动，结局回应主角目标并完成主要人物弧光。',
@@ -636,7 +636,7 @@ export function buildStoryGenerationPrompt({
 function buildStorySourceDigestPrompt(text2, index2, total) {
   return JSON['stringify']({
     task: 'digest_story_source_chunk',
-    chunk: { index: index2 + 0x1, total: total, text: text2 },
+    chunk: { index: index2 + 1, total: total, text: text2 },
     requirements: [
       '按原文记录本段出现的人物、身份、关系与动机。',
       '按发生顺序记录关键事件、选择、结果和伏笔。',
@@ -690,12 +690,12 @@ export async function generateStoryDraft({
     sourceText3 = normalizeText(sourceText);
   if (message === 'upload' && sourceText3['length'] > STORY_SOURCE_CHUNK_CHARACTERS) {
     const total2 = splitStorySourceText(sourceText3);
-    for (let current2 = 0x0; current2 < total2['length']; current2 += 0x1) {
+    for (let current2 = 0; current2 < total2['length']; current2 += 1) {
       onProgress?.({
         stage: 'digesting',
-        current: current2 + 0x1,
+        current: current2 + 1,
         total: total2['length'],
-        message: '正在整理剧本 ' + (current2 + 0x1) + '/' + total2['length'],
+        message: '正在整理剧本 ' + (current2 + 1) + '/' + total2['length'],
       });
       const prompt2 = buildStorySourceDigestPrompt(total2[current2], current2, total2['length']),
         args3 = await requestStrictResult({
@@ -713,14 +713,14 @@ export async function generateStoryDraft({
           parse: parseStorySourceDigest,
           outputContract: 'characters/settings/events arrays and continuity/endingState strings',
         });
-      sourceDigests3['push']({ part: current2 + 0x1, ...args3 });
+      sourceDigests3['push']({ part: current2 + 1, ...args3 });
     }
     sourceText3 = '';
   }
   onProgress?.({
     stage: 'writing',
-    current: 0x1,
-    total: 0x1,
+    current: 1,
+    total: 1,
     message: message === 'upload' ? '正在整理故事内容' : '正在创建完整剧情',
   });
   const prompt3 = buildStoryGenerationPrompt({
@@ -747,7 +747,7 @@ export async function generateStoryDraft({
     },
     parse: (value13) =>
       parseStoryGenerationResult(value13, {
-        minChapters: message === 'generate' ? 0x3 : 0x1,
+        minChapters: message === 'generate' ? 3 : 1,
         minChapterCharacters: STORY_CHAPTER_MIN_CHARACTERS,
         maxChapterCharacters: STORY_CHAPTER_MAX_CHARACTERS,
       }),
@@ -757,7 +757,7 @@ export async function generateStoryDraft({
           STORY_CHAPTER_MIN_CHARACTERS +
           '-' +
           STORY_CHAPTER_MAX_CHARACTERS +
-          '\x20characters'
+          ' characters'
         : 'title/storyType/storySummary/storyBackground/storySetting/logline strings and agent-determined chapters[{title,content}], with each content containing ' +
           STORY_CHAPTER_MIN_CHARACTERS +
           '-' +
@@ -869,19 +869,19 @@ export const planStoryEpisodeOutlines = storyEpisodeOutlinePlanningApi['planStor
 function formatEpisodeSceneText(dom, value14, value15) {
   const value16 = dom['characters']['length'] ? '\n出场人物：' + dom['characters']['join']('、') : '';
   return (
-    '###\x20场' + value14 + '-' + (value15 + 0x1) + '\x0a' + dom['heading'] + value16 + '\x0a' + dom['body']
+    '### 场' + value14 + '-' + (value15 + 1) + '\n' + dom['heading'] + value16 + '\n' + dom['body']
   );
 }
 function normalizeStoryEpisodeScriptDialogueContent(value17 = '') {
   const text3 = normalizeText(value17);
   if (!text3) return text3;
   const value18 = text3['match'](/^((?:(?:（[^）]*）|\([^)]*\))\s*)+)([\s\S]+)$/u),
-    text4 = normalizeText(value18?.[0x1]),
-    text5 = normalizeText(value18?.[0x2] || text3);
+    text4 = normalizeText(value18?.[1]),
+    text5 = normalizeText(value18?.[2] || text3);
   if (!text5) return text3;
   const value19 = text5['match'](/^(?:“([\s\S]*)”|「([\s\S]*)」|『([\s\S]*)』|"([\s\S]*)")$/u);
   if (value19) {
-    const text6 = normalizeText(value19[0x1] || value19[0x2] || value19[0x3] || value19[0x4]);
+    const text6 = normalizeText(value19[1] || value19[2] || value19[3] || value19[4]);
     return text4 + '“' + text6 + '”';
   }
   if (/[“”「」『』"]/u['test'](text5)) return text3;
@@ -897,13 +897,13 @@ function normalizeStoryEpisodeScriptSceneBody(value20 = '', value21 = []) {
       if (!enabled2) return [''];
       if (isStoryEpisodeEditorialMarker(enabled2)) return [];
       const enabled3 = enabled2['match'](/^([^：:\n]{1,40})[：:]\s*(.+)$/u),
-        text7 = normalizeText(enabled3?.[0x1]);
+        text7 = normalizeText(enabled3?.[1]);
       if (!enabled3 || !map['has'](text7) || map2['has'](text7)) return [enabled2];
-      const storyEpisodeScriptDialogueContent = normalizeStoryEpisodeScriptDialogueContent(enabled3[0x2]);
+      const storyEpisodeScriptDialogueContent = normalizeStoryEpisodeScriptDialogueContent(enabled3[2]);
       return [text7 + '：' + storyEpisodeScriptDialogueContent];
     })
-    ['join']('\x0a')
-    ['replace'](/\n{2,}/gu, '\x0a')
+    ['join']('\n')
+    ['replace'](/\n{2,}/gu, '\n')
     ['trim']();
 }
 function normalizeStoryEpisodeScriptCharacters(value23) {
@@ -918,7 +918,7 @@ function normalizeStoryEpisodeScriptBodyValue(list3) {
   if (Array['isArray'](list3))
     return list3['map']((value25) => normalizeText(value25))
       ['filter'](Boolean)
-      ['join']('\x0a');
+      ['join']('\n');
   if (list3 && typeof list3 === 'object')
     return normalizeText(list3['text'] || list3['content'] || list3['body']);
   return normalizeText(list3);
@@ -961,36 +961,36 @@ function extractStoryEpisodeScriptStringProperty(value31, value32 = []) {
 function isStoryEpisodeScriptArrayClosed(value34, enabled4) {
   const list6 = getResultText(value34);
   if (typeof list6 !== 'string' || !list6 || !enabled4) return ![];
-  const list7 = '\x22' + enabled4 + '\x22',
+  const list7 = '"' + enabled4 + '"',
     count = list6['indexOf'](list7);
-  if (count < 0x0) return ![];
+  if (count < 0) return ![];
   const count2 = list6['indexOf'](':', count + list7['length']),
-    count3 = count2 >= 0x0 ? list6['indexOf']('[', count2 + 0x1) : -0x1;
-  if (count3 < 0x0) return ![];
-  let count4 = 0x0,
+    count3 = count2 >= 0 ? list6['indexOf']('[', count2 + 1) : -1;
+  if (count3 < 0) return ![];
+  let count4 = 0,
     value35 = ![],
     value36 = ![];
-  for (let value37 = count3; value37 < list6['length']; value37 += 0x1) {
+  for (let value37 = count3; value37 < list6['length']; value37 += 1) {
     const value38 = list6[value37];
     if (value35) {
       if (value36) value36 = ![];
       else {
-        if (value38 === '\x5c') value36 = !![];
+        if (value38 === '\\') value36 = !![];
         else {
-          if (value38 === '\x22') value35 = ![];
+          if (value38 === '"') value35 = ![];
         }
       }
       continue;
     }
-    if (value38 === '\x22') {
+    if (value38 === '"') {
       value35 = !![];
       continue;
     }
-    if (value38 === '[') count4 += 0x1;
+    if (value38 === '[') count4 += 1;
     else {
       if (value38 === ']') {
-        count4 -= 0x1;
-        if (count4 === 0x0) return !![];
+        count4 -= 1;
+        if (count4 === 0) return !![];
       }
     }
   }
@@ -1064,7 +1064,7 @@ export function parseStoryEpisodeScriptResult(
   value44,
   {
     episodeRef: episodeRef = 'episode-1',
-    episodeNumber: episodeNumber = 0x1,
+    episodeNumber: episodeNumber = 1,
     episodeTitle: episodeTitle = '',
     requireEndingState: requireEndingState = ![],
     fallbackContinuityFacts: fallbackContinuityFacts = [],
@@ -1081,7 +1081,7 @@ export function parseStoryEpisodeScriptResult(
   const title2 =
       normalizeText(data2['title'] || data2['episodeTitle'] || data2['episode_title']) ||
       normalizeText(episodeTitle) ||
-      '第\x20' + episodeNumber + '\x20集',
+      '第 ' + episodeNumber + ' 集',
     list9 = getStoryEpisodeScriptSceneEntries(data2),
     scenes3 = list9['length']
       ? list9['map']((dom2, value45) => {
@@ -1095,7 +1095,7 @@ export function parseStoryEpisodeScriptResult(
           return {
             ref:
               normalizeText(dom2?.['ref'] || dom2?.['sceneRef'] || dom2?.['scene_ref'] || dom2?.['id']) ||
-              episodeRef2 + '-scene-' + (value45 + 0x1),
+              episodeRef2 + '-scene-' + (value45 + 1),
             heading: normalizeText(
               dom2?.['heading'] ||
                 dom2?.['sceneHeading'] ||
@@ -1113,12 +1113,12 @@ export function parseStoryEpisodeScriptResult(
           };
         })['filter']((dom3) => dom3['heading'] && dom3['body'])
       : [];
-  if (!scenes3['length']) throw new Error('Agent\x20返回结果没有可用场次。');
-  const value46 = Math['max'](0x1, Math['trunc'](Number(episodeNumber) || 0x1)),
+  if (!scenes3['length']) throw new Error('Agent 返回结果没有可用场次。');
+  const value46 = Math['max'](1, Math['trunc'](Number(episodeNumber) || 1)),
     fullText = [
       '## 第' + value46 + '集：' + title2,
       ...scenes3['map']((value47, value48) => formatEpisodeSceneText(value47, value46, value48)),
-    ]['join']('\x0a'),
+    ]['join']('\n'),
     list10 = normalizeStoryContinuityFacts(
       data2['continuityFacts'] || data2['facts'] || data2['continuity_facts'],
     ),
@@ -1130,7 +1130,7 @@ export function parseStoryEpisodeScriptResult(
       ? storyContinuityState2
       : normalizeStoryContinuityState(fallbackEndingState);
   if (requireEndingState && !hasStoryContinuityState(endingState))
-    throw new Error('Agent\x20返回的完整分集剧本缺少有效结束状态。');
+    throw new Error('Agent 返回的完整分集剧本缺少有效结束状态。');
   return {
     schemaVersion: STORY_EPISODE_SCRIPT_SCHEMA_VERSION,
     episodeRef: episodeRef2,
@@ -1146,8 +1146,8 @@ function getStoryEpisodeScriptFinishReason(value49) {
   return normalizeText(
     value49?.['finishReason'] ||
       value49?.['finish_reason'] ||
-      value49?.['choices']?.[0x0]?.['finish_reason'] ||
-      value49?.['data']?.['choices']?.[0x0]?.['finish_reason'],
+      value49?.['choices']?.[0]?.['finish_reason'] ||
+      value49?.['data']?.['choices']?.[0]?.['finish_reason'],
   )['toLowerCase']();
 }
 function serializeStoryEpisodeScriptResponse(value50) {
@@ -1168,7 +1168,7 @@ function normalizeStoryEpisodeScriptRawResponses(attempt2 = null) {
         ]
       : [];
   return list11['map']((response3, value51) => ({
-    attempt: Math['max'](0x1, Math['trunc'](Number(response3?.['attempt']) || value51 + 0x1)),
+    attempt: Math['max'](1, Math['trunc'](Number(response3?.['attempt']) || value51 + 1)),
     phase: normalizeText(response3?.['phase']) || (value51 ? 'repair' : 'generation'),
     finishReason: normalizeText(response3?.['finishReason'])['toLowerCase'](),
     text:
@@ -1179,10 +1179,10 @@ function normalizeStoryEpisodeScriptRawResponses(attempt2 = null) {
 }
 function createStoryEpisodeScriptRawResponseRecord(
   value52,
-  { attempt: attempt = 0x1, phase: phase = 'generation' } = {},
+  { attempt: attempt = 1, phase: phase = 'generation' } = {},
 ) {
   return {
-    attempt: Math['max'](0x1, Math['trunc'](Number(attempt) || 0x1)),
+    attempt: Math['max'](1, Math['trunc'](Number(attempt) || 1)),
     phase: normalizeText(phase) || 'generation',
     finishReason: getStoryEpisodeScriptFinishReason(value52),
     text: serializeStoryEpisodeScriptResponse(value52),
@@ -1199,7 +1199,7 @@ function selectStoryEpisodeScriptRepairSource(list12 = []) {
 function buildStoryEpisodeScriptRepairPrompt({
   episode: episode = {},
   episodeRef: episodeRef = 'episode-1',
-  episodeNumber: episodeNumber = 0x1,
+  episodeNumber: episodeNumber = 1,
   rejectedResponse: rejectedResponse = '',
   finishReason: finishReason = '',
   error: error = null,
@@ -1209,7 +1209,7 @@ function buildStoryEpisodeScriptRepairPrompt({
     task: 'repair_story_episode_script_response',
     episode: {
       ref: normalizeText(episodeRef) || 'episode-' + episodeNumber,
-      number: Math['max'](0x1, Math['trunc'](Number(episodeNumber) || 0x1)),
+      number: Math['max'](1, Math['trunc'](Number(episodeNumber) || 1)),
       title: normalizeText(episode?.['title']),
       synopsis: normalizeText(episode?.['synopsis']),
       hook: normalizeText(episode?.['hook']),
@@ -1225,7 +1225,7 @@ function buildStoryEpisodeScriptRepairPrompt({
       '优先做最小修改，完整保留 rejectedResponse 中已经存在的场次正文、动作和对白。',
       '如果只是 JSON 语法或字段名错误，只修复语法和字段名，不改写剧情。',
       '如果返回在中途截断，只从截断位置继续，补完当前场次、本集钩子、continuityFacts 和 endingState。',
-      '返回内容包含\x20episodeRef、title、scenes、continuityFacts、endingState\x20即可；不要添加解释。',
+      '返回内容包含 episodeRef、title、scenes、continuityFacts、endingState 即可；不要添加解释。',
     ],
   });
 }
@@ -1251,15 +1251,15 @@ function chooseBestStoryEpisodeScriptResult(list13 = []) {
       (value56) => value56 && Array['isArray'](value56['scenes']) && value56['scenes']['length'],
     )['sort'](
       (value57, value58) =>
-        Number(value58['scenes']['length'] || 0x0) - Number(value57['scenes']['length'] || 0x0) ||
+        Number(value58['scenes']['length'] || 0) - Number(value57['scenes']['length'] || 0) ||
         normalizeText(value58['fullText'])['length'] - normalizeText(value57['fullText'])['length'],
-    )[0x0] || null
+    )[0] || null
   );
 }
 function createStoryEpisodeScriptPartialError({
   episodeRef: episodeRef = 'episode-1',
   rawResponses: rawResponses = [],
-  attempts: attempts = 0x1,
+  attempts: attempts = 1,
   parseResults: parseResults = [],
   cause: cause = null,
 } = {}) {
@@ -1269,9 +1269,9 @@ function createStoryEpisodeScriptPartialError({
       status: 'failed',
       episodeRef: normalizeText(episodeRef) || 'episode-1',
       attempts: Math['max'](
-        0x1,
-        Math['trunc'](Number(attempts) || 0x1),
-        ...rawResponses['map']((value60) => Math['trunc'](Number(value60?.['attempt']) || 0x0)),
+        1,
+        Math['trunc'](Number(attempts) || 1),
+        ...rawResponses['map']((value60) => Math['trunc'](Number(value60?.['attempt']) || 0)),
       ),
       rawResponses: rawResponses['map']((args4) => ({ ...args4 })),
       bestEffort: chooseBestStoryEpisodeScriptResult(parseResults),
@@ -1283,7 +1283,7 @@ function createStoryEpisodeScriptPartialError({
     },
     error3 = new Error(
       '完整分集剧本返回仍不完整，已保存本次返回；再次点击时会优先修复，不会重新生成整集。' +
-        (message2 ? '\x20' + message2 : ''),
+        (message2 ? ' ' + message2 : ''),
     );
   return (
     (error3['name'] = 'StoryEpisodeScriptPartialError'),
@@ -1306,7 +1306,7 @@ export async function generateStoryEpisodeScript({
   onInvocation: onInvocation = null,
 } = {}) {
   assertPlanningModel(model, provider);
-  const episodeNumber2 = Math['max'](0x1, Math['trunc'](Number(episode?.['number']) || 0x1)),
+  const episodeNumber2 = Math['max'](1, Math['trunc'](Number(episode?.['number']) || 1)),
     episodeRef3 =
       normalizeText(episode?.['ref'] || episode?.['planningRef'] || episode?.['id']) ||
       'episode-' + episodeNumber2,
@@ -1337,12 +1337,12 @@ export async function generateStoryEpisodeScript({
     },
     rawResponses2 = normalizeStoryEpisodeScriptRawResponses(repairDraft),
     attempts2 = Math['max'](
-      Math['trunc'](Number(repairDraft?.['attempts']) || 0x0),
-      ...rawResponses2['map']((value62) => Math['trunc'](Number(value62?.['attempt']) || 0x0)),
+      Math['trunc'](Number(repairDraft?.['attempts']) || 0),
+      ...rawResponses2['map']((value62) => Math['trunc'](Number(value62?.['attempt']) || 0)),
     ),
     parseResults2 = [];
-  let value63 = 0x0,
-    value64 = 0x0;
+  let value63 = 0,
+    value64 = 0;
   const attempt3 = () => attempts2 + ++value64,
     handler = async (requestPayload2, stepId) => {
       const attempt4 = attempt3(),
@@ -1356,7 +1356,7 @@ export async function generateStoryEpisodeScript({
           serializeResponse: serializeStoryEpisodeScriptResponse,
         });
       return (
-        (value63 += 0x1),
+        (value63 += 1),
         captureStoryEpisodeScriptDevResponse({
           response: response6,
           attempt: attempt4,
@@ -1395,7 +1395,7 @@ export async function generateStoryEpisodeScript({
         stage: 'revising-episode-script-content',
         current: episodeNumber2,
         total: episodeNumber2,
-        message: '第\x20' + episodeNumber2 + ' 集内容审查未通过，正在按分集大纲和连续性自动精简修订',
+        message: '第 ' + episodeNumber2 + ' 集内容审查未通过，正在按分集大纲和连续性自动精简修订',
       });
       const value66 = {
         ...requestPayload,
@@ -1443,7 +1443,7 @@ export async function generateStoryEpisodeScript({
         stage: 'repairing-episode-script',
         current: episodeNumber2,
         total: episodeNumber2,
-        message: '第\x20' + episodeNumber2 + ' 集返回格式异常，正在修复已有正文',
+        message: '第 ' + episodeNumber2 + ' 集返回格式异常，正在修复已有正文',
       });
       const value71 = {
         ...requestPayload,
@@ -1465,7 +1465,7 @@ export async function generateStoryEpisodeScript({
         throw createStoryEpisodeScriptPartialError({
           episodeRef: episodeRef3,
           rawResponses: rawResponses2,
-          attempts: attempts2 + value63 + 0x1,
+          attempts: attempts2 + value63 + 1,
           parseResults: parseResults2,
           cause: cause2,
         });
@@ -1523,7 +1523,7 @@ export async function generateStoryEpisodeScript({
     cause: cause5['error'] || new Error('首次返回在完整剧本结束前被截断。'),
   });
 }
-function normalizePlanningAssetSummary(error4 = {}, value74 = 0x0) {
+function normalizePlanningAssetSummary(error4 = {}, value74 = 0) {
   const kind2 = ['scene', 'prop']['includes'](error4['kind']) ? error4['kind'] : 'character',
     list14 = Array['isArray'](error4?.['appearances']) ? error4['appearances'] : [],
     appearances = list14['map']((error5) => ({
@@ -1546,7 +1546,7 @@ function normalizePlanningAssetSummary(error4 = {}, value74 = 0x0) {
       : null,
     baseAppearanceRef = normalizeStoryAssetReference(
       resolveStoryGenerationAppearanceRef(value76),
-      appearances['length'] === 0x1 ? appearances[0x0]['ref'] : '',
+      appearances['length'] === 1 ? appearances[0]['ref'] : '',
     );
   return {
     ref: resolveStoryGenerationAssetRef(error4, value74),
@@ -1618,7 +1618,7 @@ function createStoryEpisodeSplitCompactAssetCatalog(list15 = []) {
             })
           : [null];
       list18['forEach']((error10) => {
-        const code = 'a' + (list16['length'] + 0x1),
+        const code = 'a' + (list16['length'] + 1),
           text11 = normalizeText(error10?.['name']);
         list16['push']({
           code: code,
@@ -1646,7 +1646,7 @@ function createStoryEpisodeSplitCompactDialogueCatalog(options7 = {}, value83 = 
         options7?.['scriptText'] ||
         options7?.['synopsis'] ||
         options7?.['content'],
-      getStoryEpisodeReferenceAliases(options7)[0x0] || 'episode-1',
+      getStoryEpisodeReferenceAliases(options7)[0] || 'episode-1',
     );
   }
   const list20 = createStoryEpisodeSplitCompactAssetCatalog(value83)['filter'](
@@ -1662,9 +1662,9 @@ function createStoryEpisodeSplitCompactDialogueCatalog(options7 = {}, value83 = 
           )
         : [];
     return {
-      code: 'q' + (value86 + 0x1),
+      code: 'q' + (value86 + 1),
       ...(speaker ? { speaker: speaker } : {}),
-      ...(speakerAssetCode['length'] === 0x1 ? { speakerAssetCode: speakerAssetCode[0x0]['code'] } : {}),
+      ...(speakerAssetCode['length'] === 1 ? { speakerAssetCode: speakerAssetCode[0]['code'] } : {}),
       text: normalizeText(response8?.['text']),
     };
   })['filter']((response9) => response9['text']);
@@ -1704,7 +1704,7 @@ function expandStoryEpisodeSplitCompactData(
     episodeRef: normalizeText(clips['episodeRef']) || episodeRef,
     clips: clips['clips']['map']((args6, value100) => ({
       ...args6,
-      ref: normalizeText(args6?.['ref']) || 'clip-' + (value100 + 0x1),
+      ref: normalizeText(args6?.['ref']) || 'clip-' + (value100 + 1),
       shots: (Array['isArray'](args6?.['shots']) ? args6['shots'] : [])['map']((durationSec2) => {
         if (!durationSec2 || typeof durationSec2 !== 'object' || Array['isArray'](durationSec2))
           return durationSec2;
@@ -1717,7 +1717,7 @@ function expandStoryEpisodeSplitCompactData(
             ? normalizeText(durationSec2['c'])
             : Number['isInteger'](value102) && STORY_EPISODE_SPLIT_CAMERA_PRESETS[value102]
               ? STORY_EPISODE_SPLIT_CAMERA_PRESETS[value102]
-              : normalizeText(durationSec2['c']) || STORY_EPISODE_SPLIT_CAMERA_PRESETS[0x0],
+              : normalizeText(durationSec2['c']) || STORY_EPISODE_SPLIT_CAMERA_PRESETS[0],
           dialogue = decodeStoryEpisodeSplitCompactDialogue(durationSec2['q'], {
             dialogueByCode: dialogueByCode2,
             assetByCode: assetByCode2,
@@ -1778,7 +1778,7 @@ function sanitizeStoryEpisodeSplitSourceText(value108 = '') {
   return String(value108 || '')
     ['split'](/\r?\n/u)
     ['filter']((value109) => !isStoryEpisodeEditorialMarker(value109))
-    ['join']('\x0a')
+    ['join']('\n')
     ['trim']();
 }
 function getStoryEpisodeSplitSourceSceneMetadata(options8 = {}) {
@@ -1808,7 +1808,7 @@ function sanitizeStoryEpisodeSplitPromptText(value115 = '', value116 = {}) {
   return sanitizeStoryEpisodeSplitSourceText(value115)
     ['split'](/\r?\n/u)
     ['filter']((value117) => !isStoryEpisodeSplitSourceMetadataLine(value117, value116))
-    ['join']('\x0a')
+    ['join']('\n')
     ['trim']();
 }
 function filterStoryEpisodeBlueprintEpisodeBindings(list25 = [], value118 = []) {
@@ -1886,7 +1886,7 @@ function buildStoryEpisodeSplitAssetCatalog(list29 = [], value124 = []) {
       defaultAppearanceRef:
         normalizeStoryAssetReference(error11?.['baseAppearanceRef'], '') ||
         value127 ||
-        (appearanceRefs['length'] === 0x1 ? appearanceRefs[0x0] : ''),
+        (appearanceRefs['length'] === 1 ? appearanceRefs[0] : ''),
     });
   }
   for (const assetRef3 of normalizeStringArray(value124)) {
@@ -1905,10 +1905,10 @@ function getStoryEpisodeSplitAssetNameAliases(value128 = '') {
   const args10 = normalizeText(value128);
   if (!args10) return [];
   const args11 = new Set([args10]),
-    text15 = normalizeText(args10['split'](/[（(]/u, 0x1)[0x0]);
+    text15 = normalizeText(args10['split'](/[（(]/u, 1)[0]);
   if (text15) args11['add'](text15);
   const list30 = [...args10['matchAll'](/[（(]([^）)]+)[）)]/gu)]
-    ['map']((value129) => normalizeText(value129[0x1]))
+    ['map']((value129) => normalizeText(value129[1]))
     ['filter'](Boolean);
   list30['forEach']((value130) => args11['add'](value130));
   const value131 = args10['replace'](
@@ -1920,35 +1920,35 @@ function getStoryEpisodeSplitAssetNameAliases(value128 = '') {
 }
 function resolveStoryEpisodeSplitLegacyAppearanceOwner(value132, value133, value134, value135 = {}) {
   const list31 = [...(value133 || [])];
-  if (list31['length'] <= 0x1) return list31[0x0] || '';
+  if (list31['length'] <= 1) return list31[0] || '';
   const list32 = [value135?.['visual'], value135?.['camera'], value135?.['dialogue'], value135?.['voiceover']]
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x20'),
+      ['join'](' '),
     list33 = list31['filter']((value136) => {
       const value137 = value134['assetByRef']['get'](value136)?.['name'];
       return getStoryEpisodeSplitAssetNameAliases(value137)['some'](
         (value138) => value138 && list32['includes'](value138),
       );
     });
-  if (list33['length'] === 0x1) return list33[0x0];
+  if (list33['length'] === 1) return list33[0];
   const list34 = list31['filter']((value139) => value132['startsWith'](value139 + '-appearance-'));
-  return list34['length'] === 0x1 ? list34[0x0] : '';
+  return list34['length'] === 1 ? list34[0] : '';
 }
 function resolveStoryEpisodeSplitUnknownLegacyAppearance(value140, args12, value141 = {}) {
   const list35 = [...args12['assetByRef']['values']()],
     list36 = list35['filter']((value142) => value140['startsWith'](value142['assetRef'] + '-appearance-'));
-  if (list36['length'] === 0x1) return list36[0x0];
+  if (list36['length'] === 1) return list36[0];
   const list37 = [value141?.['visual'], value141?.['camera'], value141?.['dialogue'], value141?.['voiceover']]
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x20'),
+      ['join'](' '),
     list38 = list35['filter']((error12) =>
       getStoryEpisodeSplitAssetNameAliases(error12['name'])['some'](
         (value143) => value143 && list37['includes'](value143),
       ),
     );
-  return list38['length'] === 0x1 ? list38[0x0] : null;
+  return list38['length'] === 1 ? list38[0] : null;
 }
 function assertKnownReferences(list39, map7, value144) {
   const list40 = list39['filter']((value145) => !map7['has'](value145));
@@ -1957,7 +1957,7 @@ function assertKnownReferences(list39, map7, value144) {
 function normalizeStoryEpisodeSplitAssetUsage(options11 = {}, value146, value147) {
   const assetRef4 = normalizeStoryAssetReference(options11?.['assetRef'], '');
   let appearanceRef = normalizeStoryAssetReference(options11?.['appearanceRef'], '');
-  if (!assetRef4) throw new Error(value147 + '缺少\x20assetRef。');
+  if (!assetRef4) throw new Error(value147 + '缺少 assetRef。');
   const enabled6 = value146['assetByRef']['get'](assetRef4);
   if (!enabled6) throw new Error(value147 + '引用了不存在的资产：' + assetRef4 + '。');
   appearanceRef === assetRef4 &&
@@ -2006,7 +2006,7 @@ export function buildStoryAssetExtractionPrompt({
     value150 = {
       task: compactOutput
         ? 'complete_story_asset_visual_design_by_client_key'
-        : assetKinds2['length'] === 0x1
+        : assetKinds2['length'] === 1
           ? 'extract_story_assets_by_kind'
           : 'extract_story_assets',
       schemaVersion: STORY_ASSET_EXTRACTION_SCHEMA_VERSION,
@@ -2024,7 +2024,7 @@ export function buildStoryAssetExtractionPrompt({
         ...args13['requirements'],
         ...(compactOutput
           ? [
-              '这是紧凑视觉裁决模式：requiredAssets\x20与\x20candidateAssets\x20中的每一个\x20clientKey\x20都必须恰好返回一行，顺序不限，禁止省略、重复或编造\x20clientKey。',
+              '这是紧凑视觉裁决模式：requiredAssets 与 candidateAssets 中的每一个 clientKey 都必须恰好返回一行，顺序不限，禁止省略、重复或编造 clientKey。',
               'requiredAssets 必须 include=true；candidateAssets 必须逐项明确返回 include=true 或 include=false。即使 include=false，也必须保留 description、visualPrompt、voiceDescription 三个字符串字段，可返回空字符串。',
               'include=true 时，description 是可直接展示的最终资产简介，visualPrompt 是可直接提交图片模型的最终正向提示词；客户端不会补写、扩写或套用模板。',
               STORY_ASSET_VOICE_DESCRIPTION_RULE,
@@ -2037,19 +2037,19 @@ export function buildStoryAssetExtractionPrompt({
               '所有身份、外观、关系、物品归属和连续性事实都以所提供的剧本证据为准；不得为了视觉效果改写原文事实。',
               'ref 使用简短且在本次响应内唯一的英文或数字标识；它只是本次规划引用，不是持久 ID。',
               'sourceChapterIds 只能引用 project.chapters 中存在的 id。',
-              '角色\x20name\x20只能是姓名或简短身份名：优先使用原文姓名；没有姓名时给出不超过\x206\x20个汉字的身份短称，不得写人物介绍。',
+              '角色 name 只能是姓名或简短身份名：优先使用原文姓名；没有姓名时给出不超过 6 个汉字的身份短称，不得写人物介绍。',
               '角色 role 只能是主角、配角、反派或路人，必须依据人物在完整故事中的实际叙事作用分类；任何身份、关系、经历和叙事说明都写入 description。',
               STORY_ASSET_VOICE_DESCRIPTION_RULE,
               '每项资产至少提供一个信息充分、可直接用于图片生成的 appearance prompt，不得用‘符合设定’‘电影感人物’等空泛表述代替可见细节。',
-              '角色\x20prompt\x20必须写清脸型、五官、肤色肤质、发型发色、身材体态、服装材质层次、鞋履和必要穿戴细节，并采用正面全身人物设定图构图。',
-              '角色\x20prompt\x20只生成人设图，不生成人物剧照：聚焦脸部、发型、体态、服装、鞋履和必要穿戴细节，采用自然站立的正面全身人物设定图构图，不写剧情道具、动作表演、地点、家具、其他人物或剧情场面。',
-              '最终\x20prompt\x20只能写需要呈现的正向视觉内容，不得复述任何规则、限制、处理流程、模型说明或其他元说明措辞。',
+              '角色 prompt 必须写清脸型、五官、肤色肤质、发型发色、身材体态、服装材质层次、鞋履和必要穿戴细节，并采用正面全身人物设定图构图。',
+              '角色 prompt 只生成人设图，不生成人物剧照：聚焦脸部、发型、体态、服装、鞋履和必要穿戴细节，采用自然站立的正面全身人物设定图构图，不写剧情道具、动作表演、地点、家具、其他人物或剧情场面。',
+              '最终 prompt 只能写需要呈现的正向视觉内容，不得复述任何规则、限制、处理流程、模型说明或其他元说明措辞。',
               '每个场景资产只能对应一个可独立复用的物理空间；遇到用“/”“／”等并列多个地点的复合场景标题，必须拆成多个原子场景资产，禁止直接复制复合标题作为资产名。',
               '场景 prompt 必须写清空间布局、结构材质、前中后景、关键陈设、光源与色温、时间天气、色彩、镜头视角及景别，并默认无人。',
               '道具 prompt 必须写清用途、轮廓、尺寸比例、材质工艺、颜色纹样、磨损、关键结构及产品设定构图，并默认无人手持。',
               '每个 appearance 都必须提供具体形象名称；角色首个形象也要按服装、身份或时期命名，禁止留空或使用笼统的‘基础形象’。角色显著换装、年龄变化或受伤状态可拆成多个 appearances；其他形象必须重复稳定的脸部、发型和体态特征，只修改剧情差异。同一物理空间在不同年代、完好/损毁、正常/异变、干燥/积水等显著状态下必须拆成多个场景 appearances；道具仍只保留一个形象。',
               style
-                ? '每个\x20appearance\x20prompt\x20必须逐字以\x20visualDirection.style\x20的完整内容开头，再续写资产描述；不得省略、改写或重复此前缀。'
+                ? '每个 appearance prompt 必须逐字以 visualDirection.style 的完整内容开头，再续写资产描述；不得省略、改写或重复此前缀。'
                 : '提示词遵循项目视觉方向，但不要把画面比例写进角色身份描述。',
             ]),
       ],
@@ -2076,7 +2076,7 @@ export function buildStoryAssetExtractionPrompt({
                 voiceDescription:
                   '角色可选，有依据才写，没有则留空；可用标签：年龄：…；性别：…；身份：…；口音：…；情绪底色：…；声线：…；语速：…；说话方式：…；音色特征：…，不要求凑齐。',
                 occurrences: '人类可读的出现范围',
-                sourceChapterIds: ['chapter\x20id'],
+                sourceChapterIds: ['chapter id'],
                 appearances: [
                   {
                     ref: '资产内唯一形象引用',
@@ -2096,27 +2096,27 @@ export function buildStoryAssetExtractionPrompt({
     '请执行影视资产提取，并直接返回最终 JSON 结果。',
     '不要复述、复制或改写输入剧本；不要返回任务说明、输入参数、规则或输出格式说明。',
     '本次仅提取：' + assetKinds2['map']((value152) => value149[value152])['join']('、') + '。',
-    '返回\x20JSON\x20的顶层必须且只能包含\x20assets\x20字段。',
-    '下面的\x20JSON\x20仅是待分析的输入数据，禁止在答案中复述：',
+    '返回 JSON 的顶层必须且只能包含 assets 字段。',
+    '下面的 JSON 仅是待分析的输入数据，禁止在答案中复述：',
     '<story_input_json>',
     JSON['stringify'](compactOutput ? value150 : addReplicationAssetFrameContract(value150, project)),
     '</story_input_json>',
     '现在直接输出 {"assets":[...]}，不要输出输入内容。',
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 const STORY_ASSET_FORMAT_REPAIR_SYSTEM_PROMPT = [
   '你是严格的 JSON 结果修复器。',
-  '只修复输入结果的\x20JSON\x20语法、字段名称、字段类型和必填字段，不重新分析剧本。',
+  '只修复输入结果的 JSON 语法、字段名称、字段类型和必填字段，不重新分析剧本。',
   '不得返回原始请求、任务说明、校验说明或 Markdown。',
   '不得删除原结果中已经存在的资产；不得编造原结果无法支持的新人物、场景、道具或剧情事实。',
   '只返回一个顶层仅包含 assets 字段的严格 JSON 对象。',
-]['join']('\x0a');
+]['join']('\n');
 function getStoryAssetExtractionFinishReason(value153) {
   return normalizeText(
     value153?.['finishReason'] ||
       value153?.['finish_reason'] ||
-      value153?.['choices']?.[0x0]?.['finish_reason'] ||
-      value153?.['data']?.['choices']?.[0x0]?.['finish_reason'],
+      value153?.['choices']?.[0]?.['finish_reason'] ||
+      value153?.['data']?.['choices']?.[0]?.['finish_reason'],
   )['toLowerCase']();
 }
 function isStoryAssetExtractionInputEcho(value154, value155) {
@@ -2124,8 +2124,8 @@ function isStoryAssetExtractionInputEcho(value154, value155) {
     list42 = normalizeText(value155);
   if (!list41 || !list42) return ![];
   if (list41 === list42) return !![];
-  const list43 = list42['slice'](0x0, 0xf0);
-  if (list43['length'] >= 0x78 && list41['startsWith'](list43)) return !![];
+  const list43 = list42['slice'](0, 240);
+  if (list43['length'] >= 120 && list41['startsWith'](list43)) return !![];
   return (
     list41['includes']('<story_input_json>') ||
     (/"task"\s*:\s*"extract_story_assets(?:_by_kind)?"/u['test'](list41) &&
@@ -2148,7 +2148,7 @@ function classifyStoryAssetExtractionRecovery(value156, error13, value157) {
   if (!text16) return { mode: 'rerun', reason: 'empty' };
   if (
     /没有可用的(?:角色|场景|角色或场景)资产/u['test'](normalizeText(error13?.['message'] || error13)) &&
-    Math['max'](0x0, Math['trunc'](Number(error13?.['raw']?.['returnedAssetCount']) || 0x0)) === 0x0
+    Math['max'](0, Math['trunc'](Number(error13?.['raw']?.['returnedAssetCount']) || 0)) === 0
   )
     return { mode: 'rerun', reason: 'missing-assets' };
   return { mode: 'format-repair', reason: 'invalid-structure' };
@@ -2166,7 +2166,7 @@ function buildStoryAssetExtractionFormatRepairPrompt({
     '允许的 kind：' +
       (normalizeStringArray(assetKinds)['join']('、') || STORY_ASSET_EXTRACTION_KINDS['join']('、')) +
       '。',
-    '允许的\x20sourceChapterIds：' +
+    '允许的 sourceChapterIds：' +
       (normalizeStringArray(chapterIds)['join']('、') || '仅使用原结果已有值') +
       '。',
     '本地校验错误：' + (normalizeText(error14?.['message'] || error14) || '返回格式不合格'),
@@ -2175,8 +2175,8 @@ function buildStoryAssetExtractionFormatRepairPrompt({
     normalizeText(getResultText(response11)),
     '</rejected_response>',
     '输出前自行检查：顶层只能有 assets，JSON 必须闭合，所有必填字段必须存在。',
-    '现在只返回修复后的\x20JSON。',
-  ]['join']('\x0a');
+    '现在只返回修复后的 JSON。',
+  ]['join']('\n');
 }
 function buildStoryAssetExtractionRerunPrompt(value158, value159) {
   const value160 =
@@ -2190,7 +2190,7 @@ function buildStoryAssetExtractionRerunPrompt(value158, value159) {
     '请重新执行当前这一类资产提取；这是唯一一次自动重试。',
     '输出前自行检查：不要复述输入，顶层只能有 assets，JSON 必须完整闭合。',
     value158,
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 async function requestStoryAssetExtractionResult({
   request: request2,
@@ -2217,8 +2217,8 @@ async function requestStoryAssetExtractionResult({
       stage = mode4['mode'] === 'format-repair';
     onProgress2?.({
       stage: stage ? 'repairing-assets' : 'retrying-assets',
-      current: 0x1,
-      total: 0x1,
+      current: 1,
+      total: 1,
       message: message3
         ? stringArray + '缺少图片提示词，正在依据原片证据补全（1/1）'
         : stage
@@ -2231,12 +2231,12 @@ async function requestStoryAssetExtractionResult({
             prompt: [
               '上次结果存在空白或无有效视觉内容的 appearance.prompt；这是唯一一次图片提示词补全。',
               '依据下方原始证据及视觉规则，只补全缺失的图片提示词；保留原资产、形象、引用、来源和已有有效提示词，不增删资产，不把 description 直接复制为 prompt。',
-              '每个\x20appearance.prompt\x20必须包含可直接生图的具体正向视觉内容，场景默认无人，道具默认无人手持；禁止空字符串和规则说明。',
+              '每个 appearance.prompt 必须包含可直接生图的具体正向视觉内容，场景默认无人，道具默认无人手持；禁止空字符串和规则说明。',
               '<rejected_response>',
               normalizeText(getResultText(response12)),
               '</rejected_response>',
               requestPayload3['prompt'],
-            ]['join']('\x0a'),
+            ]['join']('\n'),
             temperature: 0.1,
           }
         : stage
@@ -2250,7 +2250,7 @@ async function requestStoryAssetExtractionResult({
                 outputContract: outputContract2,
               }),
               systemPrompt: STORY_ASSET_FORMAT_REPAIR_SYSTEM_PROMPT,
-              temperature: 0x0,
+              temperature: 0,
             }
           : {
               ...requestPayload3,
@@ -2299,7 +2299,7 @@ export async function extractStoryAssets({
   candidateAssetsByKind: candidateAssetsByKind = null,
   requiredAssetsByKind: requiredAssetsByKind = null,
   compactOutput: compactOutput = ![],
-  maxOutputTokens: maxOutputTokens = 0x0,
+  maxOutputTokens: maxOutputTokens = 0,
   allowOversizedPrompt: allowOversizedPrompt = ![],
   automaticRecovery: automaticRecovery = ![],
   structuredOutputFallback: structuredOutputFallback = 'none',
@@ -2313,8 +2313,8 @@ export async function extractStoryAssets({
     assertStoryProjectInput(storyProjectInput),
     onProgress?.({
       stage: 'extracting-assets',
-      current: 0x1,
-      total: 0x1,
+      current: 1,
+      total: 1,
       message: '正在提取角色、场景与道具',
     }),
     (request = withReplicationRequestPolicy(request, project)));
@@ -2333,9 +2333,9 @@ export async function extractStoryAssets({
       STORY_ASSET_EXTRACTION_KINDS['includes'](value167),
     ),
     allowEmptyResult =
-      list44['length'] === 0x1 &&
-      Array['isArray'](requiredAssetNamesByKind?.[list44[0x0]]) &&
-      requiredAssetNamesByKind[list44[0x0]]['length'] === 0x0,
+      list44['length'] === 1 &&
+      Array['isArray'](requiredAssetNamesByKind?.[list44[0]]) &&
+      requiredAssetNamesByKind[list44[0]]['length'] === 0,
     value168 = compactOutput
       ? 'assets[{clientKey,include,description,visualPrompt,voiceDescription}]'
       : 'assets[{ref,kind(character|scene|prop),name,role(character: 主角|配角|反派|路人),description,voiceDescription(optional character voice evidence; empty when unknown),occurrences,sourceChapterIds,appearances[{ref,name(required specific visual state),description,occurrences,sourceChapterIds,prompt}]}]',
@@ -2370,7 +2370,7 @@ export async function extractStoryAssets({
       thinking: { type: 'disabled' },
       temperature: 0.2,
       timeoutMs: STORY_TEXT_REQUEST_TIMEOUT_MS,
-      ...(Math['trunc'](Number(maxOutputTokens) || 0x0) > 0x0
+      ...(Math['trunc'](Number(maxOutputTokens) || 0) > 0
         ? { maxOutputTokens: Math['trunc'](Number(maxOutputTokens)) }
         : {}),
       ...(allowOversizedPrompt ? { allowOversizedPrompt: !![] } : {}),
@@ -2430,7 +2430,7 @@ export function buildStoryEpisodePlanningPrompt({
   if (!assets2['length']) throw new Error('请先提取并确认角色、场景与道具资产。');
   const constraints2 = resolveStoryPlanningConstraints(project, constraints),
     value173 = constraints2['episodeCount'],
-    value174 = Math['max'](0x1, Math['ceil'](value173 * 0.9));
+    value174 = Math['max'](1, Math['ceil'](value173 * 0.9));
   return JSON['stringify']({
     task: 'plan_story_episodes',
     schemaVersion: STORY_PLANNING_SCHEMA_VERSION,
@@ -2438,7 +2438,7 @@ export function buildStoryEpisodePlanningPrompt({
     assets: assets2,
     constraints: constraints2,
     requirements: [
-      '目标规划约\x20' +
+      '目标规划约 ' +
         value173 +
         ' 集，建议保持在 ' +
         value174 +
@@ -2453,7 +2453,7 @@ export function buildStoryEpisodePlanningPrompt({
       '每集预计时长只能按该集必要剧情的自然表演时间估算；不设固定最低或最高集长，不得为接近某个秒数注水或删减必要剧情。',
       '覆盖完整故事起因、发展、高潮和结局，不遗漏结局。',
       '每集 sourceChapterIds 和 assetRefs 必须引用输入中真实存在的值。',
-      '只规划分集，不生成\x20clips、分镜、镜头语言或视频提示词。',
+      '只规划分集，不生成 clips、分镜、镜头语言或视频提示词。',
     ],
     outputSchema: {
       episodes: [
@@ -2496,7 +2496,7 @@ export function parseStoryEpisodePlanningResult(
               value177?.['estimatedDurationSeconds'] || value177?.['durationSeconds'],
             );
             return {
-              ref: normalizeStoryAssetReference(value177?.['ref'], 'episode-' + (value178 + 0x1)),
+              ref: normalizeStoryAssetReference(value177?.['ref'], 'episode-' + (value178 + 1)),
               title: title4,
               synopsis: synopsis,
               sourceChapterIds: sourceChapterIds,
@@ -2533,7 +2533,7 @@ export async function planStoryEpisodes({
     : [];
   if (!assets3['length']) throw new Error('请先提取并确认角色、场景与道具资产。');
   const constraints4 = resolveStoryPlanningConstraints(project, constraints);
-  onProgress?.({ stage: 'planning-episodes', current: 0x1, total: 0x1, message: '正在规划分集' });
+  onProgress?.({ stage: 'planning-episodes', current: 1, total: 1, message: '正在规划分集' });
   const prompt6 = buildStoryEpisodePlanningPrompt({
     project: project3,
     assets: assets3,
@@ -2578,7 +2578,7 @@ function buildStoryEpisodeSplitProjectContext(
       ['flatMap']((dom4) => [dom4?.['heading'], dom4?.['body']])
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x0a');
+      ['join']('\n');
   return {
     title: title5['title'],
     storyType: title5['storyType'],
@@ -2652,7 +2652,7 @@ function selectStoryEpisodeSplitAssets(list48 = [], value188 = {}) {
     ]
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x0a'),
+      ['join']('\n'),
     args16 = list49['filter'](({ asset: asset2, normalized: normalized2 }) => {
       const list51 = [asset2?.['ref'], asset2?.['planningRef'], asset2?.['id'], normalized2['ref']]
         ['map']((value192) => normalizeStoryAssetReference(value192, ''))
@@ -2753,7 +2753,7 @@ function getStoryEpisodeBlueprintSceneAssetRefs(
       const list58 = getStoryEpisodeSceneAssetCandidates(map13['get'](value214), value212, {
         episodeRefs: episodeRefs,
       });
-      list58['length'] === 0x1 && map14['set'](value214, normalizeText(list58[0x0]?.['ref']));
+      list58['length'] === 1 && map14['set'](value214, normalizeText(list58[0]?.['ref']));
     }),
     map14
   );
@@ -2786,7 +2786,7 @@ function assertStoryEpisodeSceneAssetCoverage(
   }
   const list62 = list59['filter'](
     (value221) =>
-      getStoryEpisodeSceneAssetCandidates(value221, list60, { episodeRefs: episodeRefs })['length'] > 0x1,
+      getStoryEpisodeSceneAssetCandidates(value221, list60, { episodeRefs: episodeRefs })['length'] > 1,
   );
   if (list62['length']) {
     const value222 = list62['map'](
@@ -2808,12 +2808,12 @@ function normalizeStoryEpisodeSplitContinuityEpisode(
 ) {
   if (!enabled8 || typeof enabled8 !== 'object') return null;
   const value224 = Array['isArray'](enabled8?.['script']?.['scenes']) ? enabled8['script']['scenes'] : [],
-    dom6 = value224['at'](-0x1),
+    dom6 = value224['at'](-1),
     endingExcerpt = normalizeText(
       enabled8?.['script']?.['fullText'] || enabled8?.['fullScript'] || enabled8?.['scriptText'],
     );
   return {
-    number: Math['max'](0x1, Math['trunc'](Number(enabled8?.['number']) || 0x1)),
+    number: Math['max'](1, Math['trunc'](Number(enabled8?.['number']) || 1)),
     title: normalizeText(enabled8?.['title']),
     synopsis: normalizeText(enabled8?.['synopsis']),
     hook: normalizeText(enabled8?.['hook']),
@@ -2826,7 +2826,7 @@ function normalizeStoryEpisodeSplitContinuityEpisode(
           },
         }
       : includeEnding && endingExcerpt
-        ? { endingExcerpt: endingExcerpt['slice'](-0x4b0) }
+        ? { endingExcerpt: endingExcerpt['slice'](-1200) }
         : {}),
   };
 }
@@ -2839,9 +2839,9 @@ function normalizeStoryEpisodeClipDurationConstraints(enabled9 = null) {
           ['filter'](Boolean),
       ),
     ]['sort']((value226, value227) => value226 - value227),
-    minSeconds = normalizePositiveNumber(enabled9['minSeconds']) || allowedSeconds[0x0] || 0x0,
-    maxSeconds = normalizePositiveNumber(enabled9['maxSeconds']) || allowedSeconds['at'](-0x1) || 0x0,
-    stepSeconds = normalizePositiveNumber(enabled9['stepSeconds']) || 0x0;
+    minSeconds = normalizePositiveNumber(enabled9['minSeconds']) || allowedSeconds[0] || 0,
+    maxSeconds = normalizePositiveNumber(enabled9['maxSeconds']) || allowedSeconds['at'](-1) || 0,
+    stepSeconds = normalizePositiveNumber(enabled9['stepSeconds']) || 0;
   if (!minSeconds && !maxSeconds && !stepSeconds && !allowedSeconds['length']) return null;
   return {
     minSeconds: minSeconds,
@@ -2979,7 +2979,7 @@ function buildStoryEpisodeMinimalSplitPrompt({
           STORY_EPISODE_SPLIT_CAMERA_GUIDANCE,
         'assets 只包含本集已确认出场的角色、场景和道具；不得调用或编造其他集资产。',
         ...getStoryEpisodeTimelinePlanningRequirements(promptMode3),
-      ]['join']('\x0a'),
+      ]['join']('\n'),
       output: isStoryContinuousTimelinePromptMode(promptMode3)
         ? '{"clips":[{"s":"sceneCode","shots":[{"d":integerSeconds,"startSec":0,"endSec":integerSeconds,"v":"cameraVisibleAction","c":"cameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"},{"d":integerSeconds,"startSec":previousEndSec,"endSec":integerSeconds,"v":"nextCameraVisibleAction","c":"nextCameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"}]}]}'
         : '{"clips":[{"s":"sceneCode","shots":[{"d":seconds,"v":"cameraVisibleAction","c":"cameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"},{"d":seconds,"v":"nextCameraVisibleAction","c":"nextCameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"}]}]}',
@@ -3003,9 +3003,9 @@ export function buildStoryEpisodesSplitPrompt({
     episodes3 = (Array['isArray'](episodes) ? episodes : [])['map']((value232, value233) => {
       const ref4 = normalizeStoryAssetReference(
           value232?.['ref'] || value232?.['planningRef'] || value232?.['id'],
-          'episode-' + (value233 + 0x1),
+          'episode-' + (value233 + 1),
         ),
-        title7 = normalizeText(value232?.['title']) || '第\x20' + (value233 + 0x1) + '\x20集',
+        title7 = normalizeText(value232?.['title']) || '第 ' + (value233 + 1) + ' 集',
         text20 = sanitizeStoryEpisodeSplitPromptText(
           value232?.['script']?.['fullText'] ||
             value232?.['fullScript'] ||
@@ -3014,11 +3014,11 @@ export function buildStoryEpisodesSplitPrompt({
             value232?.['content'],
           value232,
         );
-      if (!text20) throw new Error('第\x20' + (value233 + 0x1) + '\x20集缺少正文，无法生成分镜脚本。');
+      if (!text20) throw new Error('第 ' + (value233 + 1) + ' 集缺少正文，无法生成分镜脚本。');
       const assets6 = selectStoryEpisodeSplitAssets(assets, value232),
         scenes6 = createStoryEpisodeSplitPromptSceneCatalog(assets6, promptMode4);
       if (!scenes6['length'])
-        throw new Error('第\x20' + (value233 + 0x1) + '\x20集缺少可用的场景资产，无法生成分镜脚本。');
+        throw new Error('第 ' + (value233 + 1) + ' 集缺少可用的场景资产，无法生成分镜脚本。');
       return {
         ref: ref4,
         title: title7,
@@ -3052,10 +3052,10 @@ export function buildStoryEpisodesSplitPrompt({
         STORY_EPISODE_SPLIT_CAMERA_GUIDANCE,
       '每个 episode.assets 只包含该集已确认出场的角色、场景和道具；不得跨集调用资产。',
       ...getStoryEpisodeTimelinePlanningRequirements(promptMode4),
-    ]['join']('\x0a'),
+    ]['join']('\n'),
     output: isStoryContinuousTimelinePromptMode(promptMode4)
-      ? '{\x22episodes\x22:[{\x22episodeRef\x22:\x22episodeRef\x22,\x22clips\x22:[{\x22s\x22:\x22sceneCode\x22,\x22shots\x22:[{\x22d\x22:integerSeconds,\x22startSec\x22:0,\x22endSec\x22:integerSeconds,\x22v\x22:\x22cameraVisibleAction\x22,\x22c\x22:\x22cameraViewAndMovement\x22,\x22q\x22:\x22dialogueOrEmpty\x22,\x22o\x22:\x22voiceoverOrEmpty\x22,\x22a\x22:\x22audioOrEmpty\x22},{\x22d\x22:integerSeconds,\x22startSec\x22:previousEndSec,\x22endSec\x22:integerSeconds,\x22v\x22:\x22nextCameraVisibleAction\x22,\x22c\x22:\x22nextCameraViewAndMovement\x22,\x22q\x22:\x22dialogueOrEmpty\x22,\x22o\x22:\x22voiceoverOrEmpty\x22,\x22a\x22:\x22audioOrEmpty\x22}]}]}]}'
-      : '{\x22episodes\x22:[{\x22episodeRef\x22:\x22episodeRef\x22,\x22clips\x22:[{\x22s\x22:\x22sceneCode\x22,\x22shots\x22:[{\x22d\x22:seconds,\x22v\x22:\x22cameraVisibleAction\x22,\x22c\x22:\x22cameraViewAndMovement\x22,\x22q\x22:\x22dialogueOrEmpty\x22,\x22o\x22:\x22voiceoverOrEmpty\x22,\x22a\x22:\x22audioOrEmpty\x22},{\x22d\x22:seconds,\x22v\x22:\x22nextCameraVisibleAction\x22,\x22c\x22:\x22nextCameraViewAndMovement\x22,\x22q\x22:\x22dialogueOrEmpty\x22,\x22o\x22:\x22voiceoverOrEmpty\x22,\x22a\x22:\x22audioOrEmpty\x22}]}]}]}',
+      ? '{"episodes":[{"episodeRef":"episodeRef","clips":[{"s":"sceneCode","shots":[{"d":integerSeconds,"startSec":0,"endSec":integerSeconds,"v":"cameraVisibleAction","c":"cameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"},{"d":integerSeconds,"startSec":previousEndSec,"endSec":integerSeconds,"v":"nextCameraVisibleAction","c":"nextCameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"}]}]}]}'
+      : '{"episodes":[{"episodeRef":"episodeRef","clips":[{"s":"sceneCode","shots":[{"d":seconds,"v":"cameraVisibleAction","c":"cameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"},{"d":seconds,"v":"nextCameraVisibleAction","c":"nextCameraViewAndMovement","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"}]}]}]}',
   });
 }
 function buildStoryEpisodesSplitValidationPrompt({
@@ -3064,8 +3064,8 @@ function buildStoryEpisodesSplitValidationPrompt({
   promptMode: promptMode = 'seedance-2.0',
 } = {}) {
   return [
-    '任务：检查下面的批量分镜返回，并修复\x20JSON\x20语法、外层包装或字段名称。',
-    '必须完整保留已有剧集、片段以及每个镜头原本所属的\x20clip，只修复格式，不改变\x20shots\x20数量或归属；不要重新创作。',
+    '任务：检查下面的批量分镜返回，并修复 JSON 语法、外层包装或字段名称。',
+    '必须完整保留已有剧集、片段以及每个镜头原本所属的 clip，只修复格式，不改变 shots 数量或归属；不要重新创作。',
     '剧集引用：' + normalizeStringArray(episodeRefs)['join']('、'),
     isStoryContinuousTimelinePromptMode(promptMode)
       ? '必须保留每个 shot 的 startSec、endSec 和 d，只修复字段包装；不得删除或重算时间轴。'
@@ -3075,7 +3075,7 @@ function buildStoryEpisodesSplitValidationPrompt({
       : '返回格式：{"episodes":[{"episodeRef":"episodeRef","clips":[{"s":"sceneCode","shots":[{"d":seconds,"v":"visual","c":"camera","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"},{"d":seconds,"v":"nextVisual","c":"nextCamera","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"}]}]}]}。示意中的两个 shot 只说明同一 clip 可以承载连续镜头，不代表固定数量。',
     '待检查结果：',
     String(result || ''),
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 function buildStoryEpisodeSplitValidationPrompt({
   episodeRef: episodeRef = '',
@@ -3083,8 +3083,8 @@ function buildStoryEpisodeSplitValidationPrompt({
   promptMode: promptMode = 'seedance-2.0',
 } = {}) {
   return [
-    '任务：检查下面这一集的分镜返回，并修复\x20JSON\x20语法、外层包装或字段名称。',
-    '必须完整保留已有片段以及每个镜头原本所属的\x20clip，只修复格式，不改变\x20shots\x20数量或归属；不要重新创作。',
+    '任务：检查下面这一集的分镜返回，并修复 JSON 语法、外层包装或字段名称。',
+    '必须完整保留已有片段以及每个镜头原本所属的 clip，只修复格式，不改变 shots 数量或归属；不要重新创作。',
     '剧集引用：' + normalizeText(episodeRef),
     isStoryContinuousTimelinePromptMode(promptMode)
       ? '必须保留每个 shot 的 startSec、endSec 和 d，只修复字段包装；不得删除或重算时间轴。'
@@ -3094,13 +3094,13 @@ function buildStoryEpisodeSplitValidationPrompt({
       : '返回格式：{"clips":[{"s":"sceneCode","shots":[{"d":seconds,"v":"visual","c":"camera","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"},{"d":seconds,"v":"nextVisual","c":"nextCamera","q":"dialogueOrEmpty","o":"voiceoverOrEmpty","a":"audioOrEmpty"}]}]}。示意中的两个 shot 只说明同一 clip 可以承载连续镜头，不代表固定数量。',
     '待检查结果：',
     String(result || ''),
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 function normalizeStoryEpisodeSplitSourceScenes(options16 = {}) {
-  const ref5 = getStoryEpisodeReferenceAliases(options16)[0x0] || 'episode-1',
+  const ref5 = getStoryEpisodeReferenceAliases(options16)[0] || 'episode-1',
     list63 = (Array['isArray'](options16?.['script']?.['scenes']) ? options16['script']['scenes'] : [])
       ['map']((dom7, value236) => ({
-        ref: normalizeStoryAssetReference(dom7?.['ref'] || dom7?.['id'], ref5 + '-scene-' + (value236 + 0x1)),
+        ref: normalizeStoryAssetReference(dom7?.['ref'] || dom7?.['id'], ref5 + '-scene-' + (value236 + 1)),
         heading: normalizeText(dom7?.['heading']),
         characters: normalizeStringArray(dom7?.['characters']),
         body: normalizeText(dom7?.['body']),
@@ -3114,30 +3114,30 @@ function normalizeStoryEpisodeSplitSourceScenes(options16 = {}) {
       options16?.['synopsis'] ||
       options16?.['content'],
   );
-  return splitStorySourceText(text21, 0xfa0)['map']((body2, value237) => ({
-    ref: ref5 + '-source-section-' + (value237 + 0x1),
-    heading: (normalizeText(options16?.['title']) || '本集') + '·文本段' + (value237 + 0x1),
+  return splitStorySourceText(text21, 4000)['map']((body2, value237) => ({
+    ref: ref5 + '-source-section-' + (value237 + 1),
+    heading: (normalizeText(options16?.['title']) || '本集') + '·文本段' + (value237 + 1),
     characters: [],
     body: body2,
   }));
 }
-function splitStoryEpisodeSourceBeatLine(value238 = '', value239 = 0xf0) {
+function splitStoryEpisodeSourceBeatLine(value238 = '', value239 = 240) {
   const list64 = normalizeText(value238);
   if (!list64) return [];
-  const value240 = Math['max'](0x50, Math['trunc'](Number(value239) || 0xf0));
+  const value240 = Math['max'](80, Math['trunc'](Number(value239) || 240));
   if (list64['length'] <= value240) return [list64];
-  const list65 = list64['match'](/^[^：:\r\n]{1,24}[：:]\s*/u)?.[0x0] || '',
+  const list65 = list64['match'](/^[^：:\r\n]{1,24}[：:]\s*/u)?.[0] || '',
     list66 = [];
   let list67 = list65 ? list64['slice'](list65['length'])['trim']() : list64;
-  const value241 = Math['max'](0x3c, value240 - list65['length']);
+  const value241 = Math['max'](60, value240 - list65['length']);
   while (list67['length'] > value241) {
-    const args19 = list67['slice'](0x0, value241 + 0x1),
+    const args19 = list67['slice'](0, value241 + 1),
       list68 = [...args19['matchAll'](/[。！？；.!?;]/gu)],
-      value242 = list68['map']((value243) => Number(value243['index']) + 0x1)
+      value242 = list68['map']((value243) => Number(value243['index']) + 1)
         ['filter']((value244) => value244 >= Math['floor'](value241 * 0.45) && value244 <= value241)
-        ['at'](-0x1),
+        ['at'](-1),
       value245 = value242 || value241;
-    (list66['push']('' + list65 + list67['slice'](0x0, value245)['trim']()),
+    (list66['push']('' + list65 + list67['slice'](0, value245)['trim']()),
       (list67 = list67['slice'](value245)['trim']()));
   }
   if (list67) list66['push']('' + list65 + list67);
@@ -3154,14 +3154,14 @@ function extractStoryEpisodeDialogueUnits(value246 = '', ref6 = 'source-beat', v
         const list71 = value248['trim']();
         if (!list71) return;
         const enabled10 = list71['match'](/^([^：:\n]{1,20})[：:]\s*(.+)$/u),
-          text22 = normalizeText(enabled10?.[0x1])['replace'](/\s*[（(][^）)]*[）)]\s*$/u, ''),
+          text22 = normalizeText(enabled10?.[1])['replace'](/\s*[（(][^）)]*[）)]\s*$/u, ''),
           count5 = list71['search'](/[“「『"]/u),
-          list72 = count5 >= 0x0 ? list71['slice'](0x0, count5) : '',
+          list72 = count5 >= 0 ? list71['slice'](0, count5) : '',
           list73 = list70['filter']((value249) => value249 && list72['includes'](value249)),
           speaker2 = list70['includes'](text22)
             ? text22
-            : list73['length'] === 0x1
-              ? list73[0x0]
+            : list73['length'] === 1
+              ? list73[0]
               : text22 &&
                   !map15['has'](text22) &&
                   !/(?:说道|问道|答道|喊道|叫道|叫住[他她]|开口|低声道|高声道|轻声道|冷声道|厉声道|喃喃道|嘀咕道)$/u[
@@ -3172,8 +3172,8 @@ function extractStoryEpisodeDialogueUnits(value246 = '', ref6 = 'source-beat', v
           list74 = [],
           value250 = /“([^”\n]+)”|「([^」\n]+)」|『([^』\n]+)』|"([^"\n]+)"/gu;
         for (const value251 of list71['matchAll'](value250)) {
-          const text23 = normalizeText(value251[0x1] || value251[0x2] || value251[0x3] || value251[0x4]);
-          if (text23) list74['push']({ text: text23, sourceOffset: Number(value251['index']) || 0x0 });
+          const text23 = normalizeText(value251[1] || value251[2] || value251[3] || value251[4]);
+          if (text23) list74['push']({ text: text23, sourceOffset: Number(value251['index']) || 0 });
         }
         if (list74['length']) {
           list69['push'](
@@ -3186,14 +3186,14 @@ function extractStoryEpisodeDialogueUnits(value246 = '', ref6 = 'source-beat', v
         }
         if (!enabled10) return;
         const speaker3 = speaker2,
-          text24 = normalizeText(enabled10[0x2])
+          text24 = normalizeText(enabled10[2])
             ['replace'](/^(?:(?:（[^）]*）|\([^)]*\))\s*)+/u, '')
             ['trim']();
         if (!speaker3 || !text24 || map15['has'](speaker3)) return;
-        list69['push']({ speaker: speaker3, text: text24, sourceOffset: 0x0 });
+        list69['push']({ speaker: speaker3, text: text24, sourceOffset: 0 });
       }),
     list69['map']((speaker4, value252) => ({
-      ref: ref6 + '-dialogue-' + (value252 + 0x1),
+      ref: ref6 + '-dialogue-' + (value252 + 1),
       ...(speaker4['speaker'] ? { speaker: speaker4['speaker'] } : {}),
       text: speaker4['text'],
     }))
@@ -3202,7 +3202,7 @@ function extractStoryEpisodeDialogueUnits(value246 = '', ref6 = 'source-beat', v
 function createStoryEpisodeSourceBeat({
   ref: ref = '',
   sourceSceneRef: sourceSceneRef = '',
-  order: order = 0x0,
+  order: order = 0,
   heading: heading = '',
   characters: characters = [],
   body: body = '',
@@ -3232,9 +3232,9 @@ export function normalizeStoryEpisodeSplitSourceBeats(options17 = {}) {
     list77['forEach']((body4, value254) => {
       order2['push'](
         createStoryEpisodeSourceBeat({
-          ref: ref8['ref'] + '-beat-' + (value254 + 0x1),
+          ref: ref8['ref'] + '-beat-' + (value254 + 1),
           sourceSceneRef: ref8['ref'],
-          order: order2['length'] + 0x1,
+          order: order2['length'] + 1,
           heading: ref8['heading'],
           characters: ref8['characters'],
           body: body4,
@@ -3249,7 +3249,7 @@ export function normalizeStoryEpisodeSplitSourceBeats(options17 = {}) {
 }
 export function normalizeStoryEpisodeExperimentalSourceBeats(options18 = {}) {
   const list79 = normalizeStoryEpisodeSplitSourceBeats(options18);
-  if (list79['length'] <= STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH * 0x2) return list79;
+  if (list79['length'] <= STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH * 2) return list79;
   const list80 = normalizeStoryEpisodeSplitSourceScenes(options18),
     order3 = [];
   list80['forEach']((sourceSceneRef2) => {
@@ -3262,31 +3262,31 @@ export function normalizeStoryEpisodeExperimentalSourceBeats(options18 = {}) {
         ),
       list82 = list81['length'] ? list81 : [normalizeText(sourceSceneRef2['heading'])]['filter'](Boolean);
     let body5 = [],
-      value257 = 0x0;
+      value257 = 0;
     const run = () => {
       if (!body5['length']) return;
       const value258 =
           order3['filter']((value259) => value259['sourceSceneRef'] === sourceSceneRef2['ref'])['length'] +
-          0x1,
+          1,
         ref9 = sourceSceneRef2['ref'] + '-semantic-beat-' + value258;
       (order3['push'](
         createStoryEpisodeSourceBeat({
           ref: ref9,
           sourceSceneRef: sourceSceneRef2['ref'],
-          order: order3['length'] + 0x1,
+          order: order3['length'] + 1,
           heading: sourceSceneRef2['heading'],
           characters: sourceSceneRef2['characters'],
-          body: body5['join']('\x0a'),
+          body: body5['join']('\n'),
         }),
       ),
         (body5 = []),
-        (value257 = 0x0));
+        (value257 = 0));
     };
     (list82['forEach']((list83) => {
-      const value260 = value257 + (body5['length'] ? 0x1 : 0x0) + list83['length'];
+      const value260 = value257 + (body5['length'] ? 1 : 0) + list83['length'];
       (body5['length'] && value260 > STORY_EPISODE_EXPERIMENTAL_SOURCE_BEAT_MAX_CHARACTERS && run(),
         body5['push'](list83),
-        (value257 += (body5['length'] > 0x1 ? 0x1 : 0x0) + list83['length']),
+        (value257 += (body5['length'] > 1 ? 1 : 0) + list83['length']),
         value257 >= STORY_EPISODE_EXPERIMENTAL_SOURCE_BEAT_TARGET_CHARACTERS && run());
     }),
       run());
@@ -3353,8 +3353,8 @@ export function parseStoryEpisodeSplitBlueprint(
     ),
     clipPlans2 = (Array['isArray'](strictJson5?.['clipPlans']) ? strictJson5['clipPlans'] : [])['map'](
       (value268, value269) => {
-        const label2 = '片段计划 ' + (value269 + 0x1),
-          ref10 = normalizeStoryAssetReference(value268?.['ref'], episodeRef4 + '-plan-' + (value269 + 0x1)),
+        const label2 = '片段计划 ' + (value269 + 1),
+          ref10 = normalizeStoryAssetReference(value268?.['ref'], episodeRef4 + '-plan-' + (value269 + 1)),
           sourceBeatRefs = (Array['isArray'](value268?.['sourceBeatRefs']) ? value268['sourceBeatRefs'] : [])
             ['map'](normalizeText)
             ['filter'](Boolean),
@@ -3376,18 +3376,18 @@ export function parseStoryEpisodeSplitBlueprint(
             sourceBeatRefs['map']((value272) => normalizeText(map18['get'](value272)?.['sourceSceneRef'])),
           ),
         ];
-        if (list85['length'] !== 0x1 || !map16['has'](list85[0x0]))
+        if (list85['length'] !== 1 || !map16['has'](list85[0]))
           throw new Error(label2 + ' 的 sourceBeatRefs 跨越或缺少有效场景。');
         const text25 = normalizeText(value268?.['sourceSceneRef']),
-          sourceSceneRef3 = text25 || list85[0x0];
-        if (sourceSceneRef3 !== list85[0x0])
-          throw new Error(label2 + '\x20的\x20sourceSceneRef\x20与\x20sourceBeatRefs\x20不一致。');
+          sourceSceneRef3 = text25 || list85[0];
+        if (sourceSceneRef3 !== list85[0])
+          throw new Error(label2 + ' 的 sourceSceneRef 与 sourceBeatRefs 不一致。');
         const list86 = getStoryEpisodeSceneAssetCandidates(map17['get'](sourceSceneRef3), assets, {
             episodeRefs: episodeRefs,
           }),
           sceneAssetRef =
             normalizeText(value268?.['sceneAssetRef']) ||
-            (list86['length'] === 0x1 ? normalizeText(list86[0x0]?.['ref']) : ''),
+            (list86['length'] === 1 ? normalizeText(list86[0]?.['ref']) : ''),
           enabled12 = assetsByRef2['get'](sceneAssetRef);
         if (!ref10) throw new Error(label2 + ' 缺少有效的 ref。');
         if (!enabled12 || enabled12['kind'] !== 'scene')
@@ -3458,7 +3458,7 @@ export function parseStoryEpisodeSplitBlueprint(
         };
       },
     );
-  if (!clipPlans2['length']) throw new Error('Agent\x20返回的分镜蓝图没有可用片段计划。');
+  if (!clipPlans2['length']) throw new Error('Agent 返回的分镜蓝图没有可用片段计划。');
   const list88 = clipPlans2['map']((value276) => value276['ref']);
   if (new Set(list88)['size'] !== list88['length']) throw new Error('Agent 返回了重复的片段计划引用。');
   const list89 = list84['map']((value277) => normalizeText(value277?.['ref'])),
@@ -3467,7 +3467,7 @@ export function parseStoryEpisodeSplitBlueprint(
     list89['length'] !== list90['length'] ||
     list89['some']((value279, value280) => value279 !== list90[value280])
   )
-    throw new Error('Agent\x20分镜蓝图未按原文顺序完整且唯一地覆盖全部\x20sourceBeats。');
+    throw new Error('Agent 分镜蓝图未按原文顺序完整且唯一地覆盖全部 sourceBeats。');
   return { episodeRef: episodeRef4, clipPlans: clipPlans2 };
 }
 function createLocalStoryEpisodeSplitBlueprint({
@@ -3495,9 +3495,9 @@ function createLocalStoryEpisodeSplitBlueprint({
       const sourceSceneRef4 = normalizeText(dom9?.['sourceSceneRef']),
         dom10 = map19['get'](sourceSceneRef4) || {},
         sceneAssetRef2 = value285
-          ? getStoryEpisodeSceneAssetCandidates(dom10, list91, { episodeRefs: episodeRefs })[0x0]
+          ? getStoryEpisodeSceneAssetCandidates(dom10, list91, { episodeRefs: episodeRefs })[0]
           : list91['find']((error20) => storySceneIdentitiesOverlap(error20?.['name'], dom10?.['heading'])) ||
-            list91[0x0];
+            list91[0];
       if (!sceneAssetRef2)
         throw new Error(
           '无法为场景“' + (normalizeText(dom10?.['heading']) || sourceSceneRef4) + '”建立本地分镜蓝图。',
@@ -3513,7 +3513,7 @@ function createLocalStoryEpisodeSplitBlueprint({
             (value291) =>
               normalizeText(value291?.['ref']) === normalizeText(sceneAssetRef2?.['baseAppearanceRef']),
           ) ||
-          list94[0x0],
+          list94[0],
         beat2 = normalizeText(dom9?.['body'] || dom10?.['body'] || dom10?.['heading']),
         map20 = new Set([
           ...normalizeStringArray(dom10?.['characters']),
@@ -3526,9 +3526,9 @@ function createLocalStoryEpisodeSplitBlueprint({
           'map'
         ]((value293) => value293['ref']),
         text27 = normalizeText(dom10?.['heading'] || dom9?.['heading']),
-        value294 = beat2['slice'](0x0, 0x78) || text27 || '原文块 ' + (value287 + 0x1);
+        value294 = beat2['slice'](0, 120) || text27 || '原文块 ' + (value287 + 1);
       return {
-        ref: ref11 + '-local-plan-' + (value287 + 0x1),
+        ref: ref11 + '-local-plan-' + (value287 + 1),
         sourceSceneRef: sourceSceneRef4,
         sourceBeatRefs: [normalizeText(dom9?.['ref'])],
         beat: beat2,
@@ -3548,26 +3548,26 @@ function createLocalStoryEpisodeSplitBlueprint({
         dialogueUnits: Array['isArray'](dom9?.['dialogueUnits'])
           ? dom9['dialogueUnits']['map']((args21) => ({ ...args21 }))
           : [],
-        targetDurationSec: Math['max'](0x4, Math['ceil']([...beat2]['length'] / 0x8)),
+        targetDurationSec: Math['max'](4, Math['ceil']([...beat2]['length'] / 8)),
       };
     });
   if (!clipPlans3['length']) throw new Error('无法从原文建立本地分镜蓝图。');
   return { episodeRef: ref11, clipPlans: clipPlans3 };
 }
-function distributeStoryEpisodePlanDurationTargets(list95 = [], value295 = 0x0) {
+function distributeStoryEpisodePlanDurationTargets(list95 = [], value295 = 0) {
   const list96 = Array['isArray'](list95) ? list95 : [],
     positiveNumber = normalizePositiveNumber(value295);
   if (!list96['length'] || !positiveNumber) return list96;
-  const list97 = list96['map']((value296) => normalizePositiveNumber(value296?.['targetDurationSec']) || 0x1),
-    value297 = list97['reduce']((value298, value299) => value298 + value299, 0x0);
-  let value300 = 0x0;
+  const list97 = list96['map']((value296) => normalizePositiveNumber(value296?.['targetDurationSec']) || 1),
+    value297 = list97['reduce']((value298, value299) => value298 + value299, 0);
+  let value300 = 0;
   return list96['map']((args22, value301) => {
     const value302 =
-      value301 === list96['length'] - 0x1
-        ? Number((positiveNumber - value300)['toFixed'](0x1))
-        : Number((positiveNumber * (list97[value301] / value297))['toFixed'](0x1));
+      value301 === list96['length'] - 1
+        ? Number((positiveNumber - value300)['toFixed'](1))
+        : Number((positiveNumber * (list97[value301] / value297))['toFixed'](1));
     return (
-      (value300 = Number((value300 + value302)['toFixed'](0x1))),
+      (value300 = Number((value300 + value302)['toFixed'](1))),
       { ...args22, targetDurationSec: Math['max'](0.1, value302) }
     );
   });
@@ -3577,8 +3577,8 @@ function reconcileStoryEpisodeSplitBlueprintTiming(args23 = {}, value303 = {}) {
     list98 = Array['isArray'](args23?.['clipPlans']) ? args23['clipPlans'] : [];
   if (!storyEpisodeSplitTimingBudget || !list98['length']) return args23;
   const value304 = list98['reduce'](
-      (value305, value306) => value305 + (normalizePositiveNumber(value306?.['targetDurationSec']) || 0x0),
-      0x0,
+      (value305, value306) => value305 + (normalizePositiveNumber(value306?.['targetDurationSec']) || 0),
+      0,
     ),
     value307 = storyEpisodeSplitTimingBudget['allowedProductionRangeSeconds'];
   if (value304 >= value307['minimum'] && value304 <= value307['maximum']) return args23;
@@ -3689,9 +3689,9 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
       STORY_EPISODE_SPLIT_GROUPING_GUIDANCE,
       STORY_EPISODE_SPLIT_CONTINUITY_CHAIN_GUIDANCE,
       enforceMaxDuration
-        ? 'targetDurationSec\x20体现当前连续叙事自然完成所需，并在视频模型的\x20' +
+        ? 'targetDurationSec 体现当前连续叙事自然完成所需，并在视频模型的 ' +
           storyPromptModeClipMaxSeconds +
-          '\x20秒能力内安排。' +
+          ' 秒能力内安排。' +
           STORY_EPISODE_SPLIT_ADAPTIVE_TIMING_GUIDANCE
         : 'targetDurationSec 体现当前连续叙事自然完成所需。' + STORY_EPISODE_SPLIT_ADAPTIVE_TIMING_GUIDANCE,
       ...(timingBudget2
@@ -3702,8 +3702,8 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
               timingBudget2['allowedProductionRangeSeconds']['minimum'] +
               '-' +
               timingBudget2['allowedProductionRangeSeconds']['maximum'] +
-              '\x20秒。',
-            '按\x20episode.timingBudget.sceneTimings\x20为对应\x20sourceSceneRef\x20分配时间；必须呈现账本中已经存在的对白、动作、等待、反应和转场，不得靠重复动作、空镜、慢动作或新增剧情凑时长。',
+              ' 秒。',
+            '按 episode.timingBudget.sceneTimings 为对应 sourceSceneRef 分配时间；必须呈现账本中已经存在的对白、动作、等待、反应和转场，不得靠重复动作、空镜、慢动作或新增剧情凑时长。',
           ]
         : []),
       '客户端会按 clipPlans 顺序本地生成 ref，并从 sourceBeatRefs 推导 sourceSceneRef；不要返回 ref、sourceSceneRef 或 continuityNotes。',
@@ -3711,7 +3711,7 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
         ? '每个 clipPlan 必须返回一个与 sourceBeatRefs 所属场景匹配的 kind=scene 的 assets[].ref。'
         : '当前 sourceSceneRef 均有唯一场景资产绑定，客户端会本地推导 sceneAssetRef；不要返回 sceneAssetRef。',
       '每个 clipPlan 必须返回该场景有效的 sceneAppearanceRef；场景没有形象时返回空字符串，多候选时不得猜测。',
-      'entryState\x20和\x20exitState\x20必须写成可观察状态，记录人物站位、动作、情绪、视线、道具和空间方向，供相邻计划直接承接。',
+      'entryState 和 exitState 必须写成可观察状态，记录人物站位、动作、情绪、视线、道具和空间方向，供相邻计划直接承接。',
       '同一 sourceSceneRef 的相邻 clipPlan 必须组成一条连续状态链：后一项 entryState 完整继承前一项 exitState，再描述当前 beat 如何从该状态继续；15 秒等单片时长上限不得被理解成重新入场、重新走位或重新执行动作。',
       ...(promptExperiment
         ? [
@@ -3730,7 +3730,7 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
       episodeRef: ref12,
       clipPlans: [
         {
-          sourceBeatRefs: ['按原顺序逐字使用一个或多个连续\x20sourceBeats[].ref'],
+          sourceBeatRefs: ['按原顺序逐字使用一个或多个连续 sourceBeats[].ref'],
           beat: '概括当前连续片段内相互关联的动作、对白推进与情绪变化，不展开镜头细节',
           ...(value319 ? { sceneAssetRef: '逐字使用一个 kind=scene 的 assets[].ref' } : {}),
           sceneAppearanceRef: '该场景有效的 appearances[].ref；没有形象时为空字符串',
@@ -3739,7 +3739,7 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
           ...(promptExperiment
             ? {
                 openingShotIntent: 'AI 自主决定的开场镜头叙事意图，不写固定模板',
-                closingShotIntent: 'AI\x20自主决定的结束镜头叙事意图，并考虑相邻计划衔接',
+                closingShotIntent: 'AI 自主决定的结束镜头叙事意图，并考虑相邻计划衔接',
               }
             : {}),
           characterAssetRefs: ['当前片段实际出现的角色 assets[].ref'],
@@ -3754,11 +3754,11 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
 }
 export function createStoryEpisodeSplitBlueprintBatches(
   list102 = [],
-  { minSize: minSize = 0x1, maxSize: maxSize = STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH } = {},
+  { minSize: minSize = 1, maxSize: maxSize = STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH } = {},
 ) {
   const list103 = Array['isArray'](list102) ? list102 : [];
   if (!list103['length']) return [];
-  const value323 = Math['max'](0x1, Math['trunc'](Number(minSize) || 0x1)),
+  const value323 = Math['max'](1, Math['trunc'](Number(minSize) || 1)),
     value324 = Math['max'](
       value323,
       Math['trunc'](Number(maxSize) || STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH),
@@ -3768,13 +3768,13 @@ export function createStoryEpisodeSplitBlueprintBatches(
     value326 = Math['floor'](list103['length'] / value325),
     value327 = list103['length'] % value325,
     list104 = [];
-  let value328 = 0x0;
-  for (let value329 = 0x0; value329 < value325; value329 += 0x1) {
-    const value330 = value326 + (value329 < value327 ? 0x1 : 0x0);
+  let value328 = 0;
+  for (let value329 = 0; value329 < value325; value329 += 1) {
+    const value330 = value326 + (value329 < value327 ? 1 : 0);
     (list104['push'](list103['slice'](value328, value328 + Math['max'](value323, value330))),
       (value328 += Math['max'](value323, value330)));
   }
-  if (value328 < list103['length']) list104['at'](-0x1)['push'](...list103['slice'](value328));
+  if (value328 < list103['length']) list104['at'](-1)['push'](...list103['slice'](value328));
   return list104['filter']((list105) => list105['length']);
 }
 export function createStoryEpisodeExperimentalConcurrentBatches(
@@ -3787,20 +3787,20 @@ export function createStoryEpisodeExperimentalConcurrentBatches(
   const list107 = Array['isArray'](list106) ? list106 : [];
   if (!list107['length']) return [];
   const value331 = Math['max'](
-      0x1,
+      1,
       Math['trunc'](Number(maxPlansPerBatch) || STORY_EPISODE_EXPERIMENTAL_MAX_PLANS_PER_BATCH),
     ),
     value332 = Math['max'](
-      0x1,
+      1,
       normalizePositiveNumber(targetDurationSeconds) ||
         STORY_EPISODE_EXPERIMENTAL_BATCH_TARGET_DURATION_SECONDS,
     ),
     list108 = [];
   let list109 = [],
-    value333 = 0x0;
+    value333 = 0;
   const run2 = () => {
     if (!list109['length']) return;
-    (list108['push'](list109), (list109 = []), (value333 = 0x0));
+    (list108['push'](list109), (list109 = []), (value333 = 0));
   };
   return (
     list107['forEach']((value334) => {
@@ -3834,7 +3834,7 @@ function selectStoryEpisodeSplitBatchAssets(list110 = [], list111 = [], list112 
     ])
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x0a'),
+      ['join']('\n'),
     list114 = list112['map']((value337) => normalizeText(value337?.['ref']));
   return (Array['isArray'](list110) ? list110 : [])['filter'](
     (error23) =>
@@ -3852,11 +3852,11 @@ export function buildStoryEpisodeSplitBatchPrompt({
   assets: assets = [],
   constraints: constraints = {},
   blueprint: blueprint = {},
-  batchIndex: batchIndex = 0x0,
+  batchIndex: batchIndex = 0,
   batches: batches = [],
   planBatch: planBatch = null,
-  batchNumber: batchNumber = 0x0,
-  batchTotal: batchTotal = 0x0,
+  batchNumber: batchNumber = 0,
+  batchTotal: batchTotal = 0,
   enforceMaxDuration: enforceMaxDuration = !![],
   sourceBeatsOverride: sourceBeatsOverride = null,
   promptExperiment: promptExperiment = ![],
@@ -3913,10 +3913,10 @@ export function buildStoryEpisodeSplitBatchPrompt({
       (value350) => !map27['has'](value350),
     );
   if (value348) throw new Error('实验分批拆分缺少场景资产“' + value348 + '”。');
-  const count6 = list115['findIndex']((value351) => value351?.['ref'] === clipPlans5[0x0]?.['ref']),
-    count7 = list115['findIndex']((value352) => value352?.['ref'] === clipPlans5['at'](-0x1)?.['ref']),
-    previousBoundary = count6 > 0x0 ? list115[count6 - 0x1] : null,
-    nextBoundary = count7 >= 0x0 ? list115[count7 + 0x1] || null : null;
+  const count6 = list115['findIndex']((value351) => value351?.['ref'] === clipPlans5[0]?.['ref']),
+    count7 = list115['findIndex']((value352) => value352?.['ref'] === clipPlans5['at'](-1)?.['ref']),
+    previousBoundary = count6 > 0 ? list115[count6 - 1] : null,
+    nextBoundary = count7 >= 0 ? list115[count7 + 1] || null : null;
   return JSON['stringify']({
     task: 'expand_story_episode_split_batch',
     ...(episode['replication']?.['sourceAnalysis']
@@ -3926,8 +3926,8 @@ export function buildStoryEpisodeSplitBatchPrompt({
     scriptMode: scriptMode6['scriptMode'],
     episode: { ref: ref13, title: normalizeText(episode?.['title']) },
     batch: {
-      index: Math['max'](0x1, Math['trunc'](Number(batchNumber) || batchIndex + 0x1)),
-      total: Math['max'](0x1, Math['trunc'](Number(batchTotal) || batches['length'] || 0x1)),
+      index: Math['max'](1, Math['trunc'](Number(batchNumber) || batchIndex + 1)),
+      total: Math['max'](1, Math['trunc'](Number(batchTotal) || batches['length'] || 1)),
       clipPlans: clipPlans5,
     },
     sourceBeats: sourceBeats3,
@@ -3944,10 +3944,10 @@ export function buildStoryEpisodeSplitBatchPrompt({
           }
         : null,
       currentEntry: {
-        ref: clipPlans5[0x0]['ref'],
-        entryState: clipPlans5[0x0]['entryState'],
+        ref: clipPlans5[0]['ref'],
+        entryState: clipPlans5[0]['entryState'],
         ...(promptExperiment
-          ? { openingShotIntent: normalizeText(clipPlans5[0x0]['openingShotIntent']) }
+          ? { openingShotIntent: normalizeText(clipPlans5[0]['openingShotIntent']) }
           : {}),
       },
       nextBoundary: nextBoundary
@@ -3975,14 +3975,14 @@ export function buildStoryEpisodeSplitBatchPrompt({
     })),
     ...(timingCorrection ? { timingCorrection: timingCorrection } : {}),
     requirements: [
-      '只展开\x20batch.clipPlans；按给定顺序为每个计划准确返回一个同\x20ref\x20的\x20clip，不得增加、合并、遗漏或重排。',
+      '只展开 batch.clipPlans；按给定顺序为每个计划准确返回一个同 ref 的 clip，不得增加、合并、遗漏或重排。',
       ...[buildVideoReplicationTimingGuidance(episode)]['filter'](Boolean),
       ...(buildVideoReplicationTimingGuidance(episode)
         ? [
             '原片总时长是整集所有批次的合计参考，不是当前批次或单个片段的目标；本批只分配其覆盖内容所需的时间。',
           ]
         : []),
-      '只依据当前\x20sourceBeats\x20写剧情、对白和旁白；不得补写未提供的整集内容，也不得遗漏\x20clipPlan.sourceBeatRefs\x20对应的信息。',
+      '只依据当前 sourceBeats 写剧情、对白和旁白；不得补写未提供的整集内容，也不得遗漏 clipPlan.sourceBeatRefs 对应的信息。',
       '返回的 clips 是按计划分开的中间展开容器，不直接提交给视频模型；按当前剧情和表演节拍展开原子分镜，客户端会依据用户设置的单片段最大时长重新分组。',
       enforceMaxDuration
         ? '根据当前连续叙事与表演节拍自主决定分镜组织方式；durationBudgets.targetDurationSec 用于安排参考，shots.durationSec 总和在视频模型的 ' +
@@ -3993,12 +3993,12 @@ export function buildStoryEpisodeSplitBatchPrompt({
           ' 秒能力内。',
       ...(resolveStoryEpisodeSplitTimingBudget(episode)
         ? [
-            'durationBudgets.targetDurationSec\x20来自正文逐场审时账本。每个计划全部\x20shots.durationSec\x20的合计必须落在对应\x20targetDurationSec\x20的\x2080%-120%\x20内；通过补全原文已有的动作过程、等待、反应和转场实现，不得重复内容或新增剧情。',
+            'durationBudgets.targetDurationSec 来自正文逐场审时账本。每个计划全部 shots.durationSec 的合计必须落在对应 targetDurationSec 的 80%-120% 内；通过补全原文已有的动作过程、等待、反应和转场实现，不得重复内容或新增剧情。',
           ]
         : []),
       ...(timingCorrection
         ? [
-            '这是自动时长复检后的定点重做。先根据\x20timingCorrection.previousFailure\x20修正上一轮时长缺口，再逐项自算每个计划\x20shots.durationSec\x20合计，确认达到\x20durationBudgets\x20后才返回。',
+            '这是自动时长复检后的定点重做。先根据 timingCorrection.previousFailure 修正上一轮时长缺口，再逐项自算每个计划 shots.durationSec 合计，确认达到 durationBudgets 后才返回。',
           ]
         : []),
       'batch.clipPlans[].dialogueUnits 是客户端从故事正文逐字提取的完整发言。每个 dialogueUnits[].text 必须且只能完整出现在一个 shot.dialogue 中；不得改写、删减、按逗号拆开或分散到多个 shots。正文通过动作、停顿、他人插话或独立引号形成的不同 dialogueUnits 才是允许的发言边界。',
@@ -4038,12 +4038,12 @@ export function buildStoryEpisodeSplitBatchPrompt({
               durationSec:
                 '当前原子分镜精确秒数；结合口播内容、人物语速、情绪、句式、呼吸、动作、停顿与反应判断，并在视频模型的 ' +
                 maxDurationSec +
-                '\x20秒能力内',
+                ' 秒能力内',
               ...(isStoryContinuousTimelinePromptMode(text30)
                 ? {
                     startSec: '当前 clip 内的整数开始秒数；首镜必须为 0，后续等于上一镜 endSec',
                     endSec:
-                      '当前\x20clip\x20内的整数结束秒数；必须大于\x20startSec，且\x20endSec-startSec\x20等于\x20durationSec',
+                      '当前 clip 内的整数结束秒数；必须大于 startSec，且 endSec-startSec 等于 durationSec',
                   }
                 : {}),
               assetRefs: ['画面实际使用的 appearanceRef；资产没有形象时使用 assetRef'],
@@ -4057,7 +4057,7 @@ export function buildStoryEpisodeSplitBatchPrompt({
                   }
                 : {}),
               dialogue:
-                '角色名：正文中的一条完整\x20dialogueUnit\x20原文；禁止自行断句或改写；没有则为空字符串',
+                '角色名：正文中的一条完整 dialogueUnit 原文；禁止自行断句或改写；没有则为空字符串',
               voiceover: '画外音或旁白；没有则为空字符串',
               audio:
                 '必要环境声、动作音效或可听见的表演声；允许呼吸、喘息、啜泣、衣物摩擦，禁止固定人物音色、对白复述与脱离剧情的配乐说明',
@@ -4082,7 +4082,7 @@ function parseStoryEpisodeSplitBatchResult(
   const storyEpisodeSplitResult = parseStoryEpisodeSplitResult(value353, {
       episodeRef: episodeRef,
       constraints: isStoryMinimaxH3PromptMode(promptMode)
-        ? { ...constraints, sceneMaxSeconds: 0xf }
+        ? { ...constraints, sceneMaxSeconds: 15 }
         : constraints,
       assets: assets,
       clipPlans: clipPlans,
@@ -4112,7 +4112,7 @@ function getStoryDialogueSpeakerPrefix(value360 = '') {
   return (
     String(value360 || '')
       ['trim']()
-      ['match'](/^([\p{Script=Han}A-Za-z0-9·_-]{1,16}\s*[：:]\s*)/u)?.[0x1] || ''
+      ['match'](/^([\p{Script=Han}A-Za-z0-9·_-]{1,16}\s*[：:]\s*)/u)?.[1] || ''
   );
 }
 function completeStoryEpisodeSplitDialogueSpeaker(value361 = '', value362 = []) {
@@ -4131,7 +4131,7 @@ function completeStoryEpisodeSplitDialogueSpeaker(value361 = '', value362 = []) 
         ['filter'](Boolean),
     ),
   ];
-  return list119['length'] === 0x1 ? list119[0x0] + '：' + text31 : text31;
+  return list119['length'] === 1 ? list119[0] + '：' + text31 : text31;
 }
 function mergeStoryEpisodeSplitDialogueFragments(list120 = [], value364 = []) {
   const list121 = Array['isArray'](list120) ? list120 : [],
@@ -4144,17 +4144,17 @@ function mergeStoryEpisodeSplitDialogueFragments(list120 = [], value364 = []) {
       ['filter']((response17) => response17['text'] && response17['comparisonText']);
   if (!list121['length'] || !list122['length']) return list121;
   const map28 = new Map();
-  let value365 = 0x0;
+  let value365 = 0;
   list122['forEach']((response18) => {
-    let count8 = -0x1,
-      endIndex = -0x1,
+    let count8 = -1,
+      endIndex = -1,
       value366 = '';
-    for (let value367 = value365; value367 < list121['length']; value367 += 0x1) {
+    for (let value367 = value365; value367 < list121['length']; value367 += 1) {
       const storyDialogueComparisonText2 = normalizeStoryDialogueComparisonText(
         list121[value367]?.['dialogue'],
       );
       if (!storyDialogueComparisonText2) continue;
-      if (count8 < 0x0) {
+      if (count8 < 0) {
         if (!response18['comparisonText']['startsWith'](storyDialogueComparisonText2)) continue;
         ((count8 = value367), (value366 = storyDialogueComparisonText2));
       } else {
@@ -4167,10 +4167,10 @@ function mergeStoryEpisodeSplitDialogueFragments(list120 = [], value364 = []) {
         break;
       }
     }
-    if (count8 < 0x0 || endIndex < count8) return;
-    const list123 = list121['slice'](count8, endIndex + 0x1),
-      args24 = list123[0x0],
-      value369 = list123['at'](-0x1),
+    if (count8 < 0 || endIndex < count8) return;
+    const list123 = list121['slice'](count8, endIndex + 1),
+      args24 = list123[0],
+      value369 = list123['at'](-1),
       storyDialogueSpeakerPrefix =
         getStoryDialogueSpeakerPrefix(args24?.['dialogue']) ||
         (normalizeText(response18?.['speaker']) ? normalizeText(response18['speaker']) + '：' : ''),
@@ -4192,9 +4192,9 @@ function mergeStoryEpisodeSplitDialogueFragments(list120 = [], value364 = []) {
       shot: {
         ...args24,
         durationSec: Number(
-          list123['reduce']((value373, value374) => value373 + Number(value374?.['durationSec'] || 0x0), 0x0)[
+          list123['reduce']((value373, value374) => value373 + Number(value374?.['durationSec'] || 0), 0)[
             'toFixed'
-          ](0x1),
+          ](1),
         ),
         ...(Number['isInteger'](Number(args24?.['startSec'])) &&
         Number['isInteger'](Number(value369?.['endSec']))
@@ -4214,11 +4214,11 @@ function mergeStoryEpisodeSplitDialogueFragments(list120 = [], value364 = []) {
             : normalizeText(value369?.['cutAfter']) || 'preferred',
       },
     }),
-      (value365 = endIndex + 0x1));
+      (value365 = endIndex + 1));
   });
   if (!map28['size']) return list121;
   const list124 = [];
-  for (let value376 = 0x0; value376 < list121['length']; value376 += 0x1) {
+  for (let value376 = 0; value376 < list121['length']; value376 += 1) {
     const enabled13 = map28['get'](value376);
     if (!enabled13) {
       list124['push'](list121[value376]);
@@ -4244,7 +4244,7 @@ function normalizeStoryEpisodeSplitShot(
   args25 = {},
   {
     clipTitle: clipTitle = '片段',
-    index: index = 0x0,
+    index: index = 0,
     assetCatalog: assetCatalog = buildStoryEpisodeSplitAssetCatalog(),
     fallbacks: fallbacks = {},
     allowEmptyAudio: allowEmptyAudio = !![],
@@ -4265,10 +4265,10 @@ function normalizeStoryEpisodeSplitShot(
       '片段“' +
         clipTitle +
         '”的分镜 ' +
-        (index + 0x1) +
-        '\x20缺少\x20durationSec、visual、camera\x20或\x20audio。',
+        (index + 1) +
+        ' 缺少 durationSec、visual、camera 或 audio。',
     );
-  const value378 = '片段“' + clipTitle + '”的分镜 ' + (index + 0x1),
+  const value378 = '片段“' + clipTitle + '”的分镜 ' + (index + 1),
     camera2 = preserveCameraCuts ? text33 : normalizeStoryEpisodeSplitShotCamera(text33),
     transitionFromPrevious = normalizeText(
       args25?.['transitionFromPrevious'] || fallbacks?.['transitionFromPrevious'],
@@ -4285,7 +4285,7 @@ function normalizeStoryEpisodeSplitShot(
       '片段“' +
         clipTitle +
         '”的分镜 ' +
-        (index + 0x1) +
+        (index + 1) +
         ' 必须提供连续整数 startSec/endSec，且 durationSec 等于二者之差。',
     );
   const list125 = Array['isArray'](args25?.['assetUsages'])
@@ -4293,10 +4293,10 @@ function normalizeStoryEpisodeSplitShot(
       : normalizeStringArray(args25?.['assetRefs'])['map']((assetRef5) => {
           const appearanceRef2 = assetCatalog['assetByRef']['get'](assetRef5);
           if (appearanceRef2)
-            return { assetRef: assetRef5, appearanceRef: appearanceRef2['appearanceRefs'][0x0] || '' };
+            return { assetRef: assetRef5, appearanceRef: appearanceRef2['appearanceRefs'][0] || '' };
           const args26 = assetCatalog['appearanceOwnerRefsByRef']['get'](assetRef5);
-          if (args26?.['size'] === 0x1) return { assetRef: [...args26][0x0], appearanceRef: assetRef5 };
-          if (args26?.['size'] > 0x1) {
+          if (args26?.['size'] === 1) return { assetRef: [...args26][0], appearanceRef: assetRef5 };
+          if (args26?.['size'] > 1) {
             const assetRef6 = resolveStoryEpisodeSplitLegacyAppearanceOwner(
               assetRef5,
               args26,
@@ -4308,7 +4308,7 @@ function normalizeStoryEpisodeSplitShot(
               value378 +
                 '的旧形象引用“' +
                 assetRef5 +
-                '”存在多个所属资产；请同时提供\x20assetRef\x20和\x20appearanceRef。',
+                '”存在多个所属资产；请同时提供 assetRef 和 appearanceRef。',
             );
           }
           const assetRef7 = resolveStoryEpisodeSplitUnknownLegacyAppearance(assetRef5, assetCatalog, args25);
@@ -4356,7 +4356,7 @@ function getStoryEpisodeSplitShotCharacterText(options19 = {}) {
   return [options19?.['visual'], options19?.['camera']]
     ['map'](normalizeText)
     ['filter'](Boolean)
-    ['join']('\x20');
+    ['join'](' ');
 }
 function hasStoryEpisodeSplitVisualCharacterReference(value381, list126) {
   if (normalizeText(value381?.['camera'])['includes'](list126)) return !![];
@@ -4366,12 +4366,12 @@ function hasStoryEpisodeSplitVisualCharacterReference(value381, list126) {
     ['filter']((list128) => list128['includes'](list126));
   return list127['some']((list129) => {
     const value383 = list129['indexOf'](list126),
-      value384 = list129['slice'](0x0, value383),
+      value384 = list129['slice'](0, value383),
       list130 = list129['slice'](value383 + list126['length']),
       value385 =
         STORY_EPISODE_CHARACTER_VISIBLE_SUBJECT_PATTERN['test'](list130) ||
         STORY_EPISODE_CHARACTER_VISIBLE_OBJECT_PATTERN['test'](value384) ||
-        STORY_EPISODE_CHARACTER_VISUAL_PRESENCE_PATTERN['test'](list130['slice'](0x0, 0xc));
+        STORY_EPISODE_CHARACTER_VISUAL_PRESENCE_PATTERN['test'](list130['slice'](0, 12));
     if (value385) return !![];
     if (STORY_EPISODE_AUDIO_ONLY_CHARACTER_REFERENCE_PATTERN['test'](list129)) return ![];
     return !STORY_EPISODE_INDIRECT_CHARACTER_REFERENCE_PATTERN['test'](list129);
@@ -4414,7 +4414,7 @@ function completeStoryEpisodeSplitCharacterAssetUsages(
         );
         if (
           !enabled14 &&
-          list132['length'] === 0x1 &&
+          list132['length'] === 1 &&
           (STORY_EPISODE_CHARACTER_SINGULAR_REFERENCE_PATTERN['test'](storyEpisodeSplitShotCharacterText) ||
             STORY_EPISODE_CHARACTER_ACTION_PATTERN['test'](storyEpisodeSplitShotCharacterText) ||
             normalizeText(args27?.['dialogue']) ||
@@ -4430,7 +4430,7 @@ function completeStoryEpisodeSplitCharacterAssetUsages(
             list135 = [...list134];
           else
             !enabled14 &&
-              list134['length'] === 0x1 &&
+              list134['length'] === 1 &&
               STORY_EPISODE_CHARACTER_SINGULAR_REFERENCE_PATTERN['test'](
                 storyEpisodeSplitShotCharacterText,
               ) &&
@@ -4446,7 +4446,7 @@ function completeStoryEpisodeSplitCharacterAssetUsages(
           normalizeStoryEpisodeSplitAssetUsage(
             { assetRef: assetRef8, appearanceRef: '' },
             assetCatalog,
-            '片段“' + clipTitle + '”的分镜 ' + (value390 + 0x1) + ' 自动补全人物“' + value395 + '”',
+            '片段“' + clipTitle + '”的分镜 ' + (value390 + 1) + ' 自动补全人物“' + value395 + '”',
           ),
         ),
           map30['add'](assetRef8));
@@ -4494,7 +4494,7 @@ function completeStoryEpisodeSplitSceneAssetUsage(
     '片段“' + clipTitle + '”自动补全场景',
   );
   return list138['map']((args30, count9) => {
-    if (count9 !== 0x0) return args30;
+    if (count9 !== 0) return args30;
     const assetUsages5 = [storyEpisodeSplitAssetUsage, ...args30['assetUsages']];
     return {
       ...args30,
@@ -4503,8 +4503,8 @@ function completeStoryEpisodeSplitSceneAssetUsage(
     };
   });
 }
-function formatStoryEpisodeClipTitle(value403 = 0x0) {
-  return '片段' + String(value403 + 0x1)['padStart'](0x2, '0');
+function formatStoryEpisodeClipTitle(value403 = 0) {
+  return '片段' + String(value403 + 1)['padStart'](2, '0');
 }
 function validateStoryEpisodeSplitClipIndependence({
   clipLabel: clipLabel = '片段',
@@ -4512,13 +4512,13 @@ function validateStoryEpisodeSplitClipIndependence({
   creativeIntent: creativeIntent = '',
   transition: transition = '',
 } = {}) {
-  const value404 = [script, creativeIntent, transition]['join']('\x20'),
+  const value404 = [script, creativeIntent, transition]['join'](' '),
     value405 = value404['match'](
       /当前为原片段第\s*\d+\s*\/\s*\d+\s*段|原片段第\s*\d+\s*\/\s*\d+\s*段|承接(?:上一|下一)片段|参见(?:上一|下一)片段/u,
     );
   if (value405)
     throw new Error(
-      clipLabel + '\x20包含依赖其他视频上下文的描述“' + value405[0x0] + '”，每个片段必须独立完整。',
+      clipLabel + ' 包含依赖其他视频上下文的描述“' + value405[0] + '”，每个片段必须独立完整。',
     );
 }
 function normalizeStoryEpisodeExperimentalStandaloneText(value406 = '') {
@@ -4530,7 +4530,7 @@ function normalizeStoryEpisodeExperimentalStandaloneText(value406 = '') {
     ['replace'](/(?:上一|下一)片段/gu, '相邻剧情');
 }
 function getStoryEpisodeSplitShotsDuration(list139 = []) {
-  return list139['reduce']((value407, value408) => value407 + Number(value408?.['durationSec'] || 0x0), 0x0);
+  return list139['reduce']((value407, value408) => value407 + Number(value408?.['durationSec'] || 0), 0);
 }
 function tokenizeStoryEpisodeExperimentalShotText(
   value409 = '',
@@ -4545,8 +4545,8 @@ function tokenizeStoryEpisodeExperimentalShotText(
       const enabled16 = value410['trim']();
       if (!enabled16) return;
       const value411 = preserveSpeaker ? enabled16['match'](/^([^：:\n]{1,20}[：:])\s*(.*)$/u) : null,
-        value412 = value411?.[0x1] || '',
-        value413 = value411?.[0x2] || enabled16,
+        value412 = value411?.[1] || '',
+        value413 = value411?.[2] || enabled16,
         list142 = value413['match'](
           preserveSpeaker
             ? /[^。！？!?\n]+(?:[。！？!?]+|$)/gu
@@ -4563,82 +4563,82 @@ function tokenizeStoryEpisodeExperimentalShotText(
 }
 function splitStoryEpisodeExperimentalClause(value416 = '', value417 = ![]) {
   const value418 = value417 ? value416['match'](/^([^：:\n]{1,20}[：:])(.*)$/u) : null,
-    value419 = value418?.[0x1] || '',
-    args31 = value418?.[0x2] || value416,
+    value419 = value418?.[1] || '',
+    args31 = value418?.[2] || value416,
     list143 = [...args31];
-  if (list143['length'] < 0x2) return [value416];
-  const value420 = Math['ceil'](list143['length'] / 0x2);
+  if (list143['length'] < 2) return [value416];
+  const value420 = Math['ceil'](list143['length'] / 2);
   return [
-    '' + value419 + list143['slice'](0x0, value420)['join'](''),
+    '' + value419 + list143['slice'](0, value420)['join'](''),
     '' + value419 + list143['slice'](value420)['join'](''),
   ];
 }
 function splitStoryEpisodeExperimentalShotText(
   value421 = '',
-  value422 = 0x1,
+  value422 = 1,
   { preserveSpeaker: preserveSpeaker = ![], splitFragments: splitFragments = !![] } = {},
 ) {
-  const length = Math['max'](0x1, Math['trunc'](Number(value422) || 0x1)),
+  const length = Math['max'](1, Math['trunc'](Number(value422) || 1)),
     list144 = tokenizeStoryEpisodeExperimentalShotText(value421, { preserveSpeaker: preserveSpeaker });
   while (splitFragments && list144['length'] && list144['length'] < length) {
-    let value423 = 0x0;
-    for (let value424 = 0x1; value424 < list144['length']; value424 += 0x1) {
+    let value423 = 0;
+    for (let value424 = 1; value424 < list144['length']; value424 += 1) {
       if ([...list144[value424]]['length'] > [...list144[value423]]['length']) value423 = value424;
     }
     const list145 = splitStoryEpisodeExperimentalClause(list144[value423], preserveSpeaker);
-    if (list145['length'] < 0x2) break;
-    list144['splice'](value423, 0x1, ...list145);
+    if (list145['length'] < 2) break;
+    list144['splice'](value423, 1, ...list145);
   }
   if (!list144['length']) return Array['from']({ length: length }, () => '');
   if (!splitFragments && list144['length'] < length) {
     const value425 = Array['from']({ length: length }, () => '');
     return (
       list144['forEach']((value426, value427) => {
-        const value428 = Math['min'](length - 0x1, Math['floor']((value427 * length) / list144['length']));
-        value425[value428] = value425[value428] ? value425[value428] + '\x0a' + value426 : value426;
+        const value428 = Math['min'](length - 1, Math['floor']((value427 * length) / list144['length']));
+        value425[value428] = value425[value428] ? value425[value428] + '\n' + value426 : value426;
       }),
       value425
     );
   }
   const list146 = [];
-  let value429 = 0x0;
-  for (let value430 = 0x0; value430 < length; value430 += 0x1) {
+  let value429 = 0;
+  for (let value430 = 0; value430 < length; value430 += 1) {
     const count10 = length - value430,
       count11 = list144['length'] - value429;
-    if (count11 <= 0x0) {
+    if (count11 <= 0) {
       list146['push']('');
       continue;
     }
-    if (count10 === 0x1) {
-      (list146['push'](list144['slice'](value429)['join'](preserveSpeaker ? '\x0a' : '')),
+    if (count10 === 1) {
+      (list146['push'](list144['slice'](value429)['join'](preserveSpeaker ? '\n' : '')),
         (value429 = list144['length']));
       continue;
     }
-    const value431 = Math['max'](0x1, count11 - (count10 - 0x1)),
+    const value431 = Math['max'](1, count11 - (count10 - 1)),
       value432 = list144['slice'](value429)['reduce'](
         (value433, args32) => value433 + [...args32]['length'],
-        0x0,
+        0,
       ),
       value434 = value432 / count10;
-    let value435 = 0x1,
+    let value435 = 1,
       value436 = [...list144[value429]]['length'];
     while (value435 < value431 && value436 < value434) {
-      ((value436 += [...list144[value429 + value435]]['length']), (value435 += 0x1));
+      ((value436 += [...list144[value429 + value435]]['length']), (value435 += 1));
     }
-    (list146['push'](list144['slice'](value429, value429 + value435)['join'](preserveSpeaker ? '\x0a' : '')),
+    (list146['push'](list144['slice'](value429, value429 + value435)['join'](preserveSpeaker ? '\n' : '')),
       (value429 += value435));
   }
   return list146;
 }
 function splitStoryEpisodeExperimentalOverlongEntry(
   args33 = {},
-  { maximum: maximum = 0xf, targetMaximum: targetMaximum = maximum, entryIndex: entryIndex = 0x0 } = {},
+  { maximum: maximum = 15, targetMaximum: targetMaximum = maximum, entryIndex: entryIndex = 0 } = {},
 ) {
   const args34 = args33?.['shot'] || {},
     positiveNumber4 = normalizePositiveNumber(args34?.['durationSec']);
   if (!positiveNumber4 || positiveNumber4 <= maximum + 0.001) return [args33];
-  const value437 = Math['max'](0x1, normalizePositiveNumber(targetMaximum) || maximum),
-    length2 = Math['max'](0x2, Math['ceil'](positiveNumber4 / value437)),
+  const value437 = Math['max'](1, normalizePositiveNumber(targetMaximum) || maximum),
+    length2 = Math['max'](2, Math['ceil'](positiveNumber4 / value437)),
     splitStoryEpisodeExperimentalShotText2 = splitStoryEpisodeExperimentalShotText(
       args34['visual'],
       length2,
@@ -4665,12 +4665,12 @@ function splitStoryEpisodeExperimentalOverlongEntry(
     splitStoryEpisodeExperimentalShotText5 = splitStoryEpisodeExperimentalShotText(args34['audio'], length2, {
       splitFragments: ![],
     });
-  let value438 = Number(positiveNumber4['toFixed'](0x1));
-  const ref15 = normalizeText(args33?.['sourceClip']?.['ref']) || 'clip-' + (entryIndex + 0x1);
+  let value438 = Number(positiveNumber4['toFixed'](1));
+  const ref15 = normalizeText(args33?.['sourceClip']?.['ref']) || 'clip-' + (entryIndex + 1);
   return Array['from']({ length: length2 }, (value439, transition2) => {
     const value440 = length2 - transition2,
-      durationSec4 = transition2 === length2 - 0x1 ? value438 : Number((value438 / value440)['toFixed'](0x1));
-    value438 = Number((value438 - durationSec4)['toFixed'](0x1));
+      durationSec4 = transition2 === length2 - 1 ? value438 : Number((value438 / value440)['toFixed'](1));
+    value438 = Number((value438 - durationSec4)['toFixed'](1));
     const visual3 = splitStoryEpisodeExperimentalShotText2[transition2] || normalizeText(args34['visual']),
       dialogue3 = splitStoryEpisodeExperimentalShotText3[transition2] || '',
       voiceover2 = splitStoryEpisodeExperimentalShotText4[transition2] || '',
@@ -4679,10 +4679,10 @@ function splitStoryEpisodeExperimentalOverlongEntry(
       ...args33,
       sourceClip: {
         ...args33['sourceClip'],
-        ref: ref15 + '-local-part-' + (entryIndex + 0x1) + '-' + (transition2 + 0x1),
-        script: [visual3, dialogue3, voiceover2]['filter'](Boolean)['join']('\x20'),
+        ref: ref15 + '-local-part-' + (entryIndex + 1) + '-' + (transition2 + 1),
+        script: [visual3, dialogue3, voiceover2]['filter'](Boolean)['join'](' '),
         transition:
-          transition2 === length2 - 0x1
+          transition2 === length2 - 1
             ? normalizeText(args33?.['sourceClip']?.['transition'])
             : '当前动作在下一镜中连续完成。',
       },
@@ -4694,13 +4694,13 @@ function splitStoryEpisodeExperimentalOverlongEntry(
         voiceover: voiceover2,
         audio: audio3,
         cutAfter:
-          transition2 === length2 - 0x1 ? normalizeText(args34?.['cutAfter']) || 'allowed' : 'allowed',
+          transition2 === length2 - 1 ? normalizeText(args34?.['cutAfter']) || 'allowed' : 'allowed',
       },
     };
   });
 }
 function compareStoryEpisodeExperimentalPartitionCandidate(value441, enabled17) {
-  if (!enabled17) return -0x1;
+  if (!enabled17) return -1;
   if (value441['groupCount'] !== enabled17['groupCount'])
     return value441['groupCount'] - enabled17['groupCount'];
   return value441['penalty'] - enabled17['penalty'];
@@ -4708,13 +4708,13 @@ function compareStoryEpisodeExperimentalPartitionCandidate(value441, enabled17) 
 function partitionStoryEpisodeExperimentalSceneShots(
   list147 = [],
   {
-    maxDurationSeconds: maxDurationSeconds = 0xf,
+    maxDurationSeconds: maxDurationSeconds = 15,
     minDurationSeconds: minDurationSeconds = STORY_EPISODE_EXPERIMENTAL_MIN_CLIP_DURATION_SECONDS,
   } = {},
 ) {
   if (!list147['length']) return [];
-  const maximum2 = Math['max'](0x1, normalizePositiveNumber(maxDurationSeconds) || 0xf),
-    value442 = Math['max'](0x0, normalizePositiveNumber(minDurationSeconds) || 0x0);
+  const maximum2 = Math['max'](1, normalizePositiveNumber(maxDurationSeconds) || 15),
+    value442 = Math['max'](0, normalizePositiveNumber(minDurationSeconds) || 0);
   list147 = list147['flatMap']((value443, entryIndex2) =>
     splitStoryEpisodeExperimentalOverlongEntry(value443, {
       maximum: maximum2,
@@ -4725,48 +4725,48 @@ function partitionStoryEpisodeExperimentalSceneShots(
   const value444 = Math['max'](value442, maximum2 * 0.68),
     map31 = new Map(),
     handler8 = (value445) => {
-      if (value445 >= list147['length']) return { groupCount: 0x0, penalty: 0x0, groups: [] };
+      if (value445 >= list147['length']) return { groupCount: 0, penalty: 0, groups: [] };
       if (map31['has'](value445)) return map31['get'](value445);
-      let value446 = 0x0,
+      let value446 = 0,
         value447 = null;
-      for (let value448 = value445; value448 < list147['length']; value448 += 0x1) {
-        const count12 = value448 - value445 + 0x1;
+      for (let value448 = value445; value448 < list147['length']; value448 += 1) {
+        const count12 = value448 - value445 + 1;
         if (count12 > STORY_EPISODE_EXPERIMENTAL_MAX_FINAL_SHOTS_PER_CLIP) break;
-        value446 += Number(list147[value448]?.['shot']?.['durationSec'] || 0x0);
+        value446 += Number(list147[value448]?.['shot']?.['durationSec'] || 0);
         if (value446 > maximum2 + 0.001) break;
-        const groupCount = handler8(value448 + 0x1);
+        const groupCount = handler8(value448 + 1);
         if (!groupCount) continue;
         const text35 = normalizeText(list147[value448]?.['shot']?.['cutAfter'])['toLowerCase'](),
           value449 =
-            value448 === list147['length'] - 0x1 || text35 === 'preferred'
-              ? 0x0
+            value448 === list147['length'] - 1 || text35 === 'preferred'
+              ? 0
               : text35 === 'forbidden'
-                ? 0x9c4
-                : 0x19,
-          value450 = value446 < value442 ? (value442 - value446) * 0x12c : 0x0,
-          value451 = (value446 - value444) ** 0x2,
+                ? 2500
+                : 25,
+          value450 = value446 < value442 ? (value442 - value446) * 300 : 0,
+          value451 = (value446 - value444) ** 2,
           value452 =
-            (count12 - STORY_EPISODE_EXPERIMENTAL_PREFERRED_SHOTS_PER_CLIP) ** 0x2 * 0x4b +
-            (count12 < 0x3 ? (0x3 - count12) * 0x1f4 : 0x0),
+            (count12 - STORY_EPISODE_EXPERIMENTAL_PREFERRED_SHOTS_PER_CLIP) ** 2 * 75 +
+            (count12 < 3 ? (3 - count12) * 500 : 0),
           value453 = {
-            groupCount: groupCount['groupCount'] + 0x1,
+            groupCount: groupCount['groupCount'] + 1,
             penalty: groupCount['penalty'] + value449 + value450 + value451 + value452,
-            groups: [list147['slice'](value445, value448 + 0x1), ...groupCount['groups']],
+            groups: [list147['slice'](value445, value448 + 1), ...groupCount['groups']],
           };
-        compareStoryEpisodeExperimentalPartitionCandidate(value453, value447) < 0x0 && (value447 = value453);
+        compareStoryEpisodeExperimentalPartitionCandidate(value453, value447) < 0 && (value447 = value453);
       }
       return (map31['set'](value445, value447), value447);
     },
-    enabled18 = handler8(0x0);
+    enabled18 = handler8(0);
   if (!enabled18) {
     const value454 = list147['find'](
-        (value455) => Number(value455?.['shot']?.['durationSec'] || 0x0) > maximum2 + 0.001,
+        (value455) => Number(value455?.['shot']?.['durationSec'] || 0) > maximum2 + 0.001,
       ),
-      value456 = Number(value454?.['shot']?.['durationSec'] || 0x0);
+      value456 = Number(value454?.['shot']?.['durationSec'] || 0);
     throw new Error(
       value456
         ? '实验分镜存在单镜 ' +
-            value456['toFixed'](0x1) +
+            value456['toFixed'](1) +
             ' 秒，超过 ' +
             maximum2 +
             ' 秒上限；单镜必须由 Agent 拆成连续镜头。'
@@ -4782,7 +4782,7 @@ export function repackStoryEpisodeExperimentalClips({
   episodeRef: episodeRef = '',
   clipPlans: clipPlans = [],
   completedPlanResults: completedPlanResults = [],
-  maxDurationSeconds: maxDurationSeconds = 0xf,
+  maxDurationSeconds: maxDurationSeconds = 15,
   minDurationSeconds: minDurationSeconds = STORY_EPISODE_EXPERIMENTAL_MIN_CLIP_DURATION_SECONDS,
   promptExperiment: promptExperiment = ![],
   preserveSourceGroups: preserveSourceGroups = ![],
@@ -4813,7 +4813,7 @@ export function repackStoryEpisodeExperimentalClips({
             ...args35,
             cutAfter:
               normalizeText(args35?.['cutAfter']) ||
-              (value460 === list150['length'] - 0x1 ? 'preferred' : 'allowed'),
+              (value460 === list150['length'] - 1 ? 'preferred' : 'allowed'),
           },
         });
       });
@@ -4829,11 +4829,11 @@ export function repackStoryEpisodeExperimentalClips({
         if (!shots2['length']) continue;
         list151['push']({
           ...args36,
-          ref: ref16 + '-experimental-clip-' + (list151['length'] + 0x1),
+          ref: ref16 + '-experimental-clip-' + (list151['length'] + 1),
           title: formatStoryEpisodeClipTitle(list151['length']),
           shots: shots2,
-          contentDurationSec: Number(getStoryEpisodeSplitShotsDuration(shots2)['toFixed'](0x1)),
-          durationSec: Number(getStoryEpisodeSplitShotsDuration(shots2)['toFixed'](0x1)),
+          contentDurationSec: Number(getStoryEpisodeSplitShotsDuration(shots2)['toFixed'](1)),
+          durationSec: Number(getStoryEpisodeSplitShotsDuration(shots2)['toFixed'](1)),
           assetRefs: [...new Set(shots2['flatMap']((value463) => value463?.['assetRefs'] || []))],
           sourcePlanRefs: [normalizeText(value461?.['ref'])]['filter'](Boolean),
         });
@@ -4872,12 +4872,12 @@ export function repackStoryEpisodeExperimentalClips({
         ],
         sourcePlanRefs = [...new Set(list155['map']((value471) => normalizeText(value471['plan']?.['ref'])))],
         shots3 = list155['map']((value472) => value472['shot']),
-        contentDurationSec = Number(getStoryEpisodeSplitShotsDuration(shots3)['toFixed'](0x1)),
+        contentDurationSec = Number(getStoryEpisodeSplitShotsDuration(shots3)['toFixed'](1)),
         durationSec5 = Number(
-          Math['max'](normalizePositiveNumber(minDurationSeconds) || 0x0, contentDurationSec)['toFixed'](0x1),
+          Math['max'](normalizePositiveNumber(minDurationSeconds) || 0, contentDurationSec)['toFixed'](1),
         );
       return {
-        ref: ref16 + '-experimental-clip-' + (value469 + 0x1),
+        ref: ref16 + '-experimental-clip-' + (value469 + 1),
         title: formatStoryEpisodeClipTitle(value469),
         script: joinStoryEpisodeExperimentalClipText(list156['map']((value473) => value473?.['script'])),
         creativeIntent: joinStoryEpisodeExperimentalClipText(
@@ -4898,9 +4898,9 @@ export function repackStoryEpisodeExperimentalClips({
 }
 function addStoryEpisodeDirectorContinuityHandoffs(list157 = []) {
   return list157['map']((args37, count13) => {
-    const value477 = count13 > 0x0 ? list157[count13 - 0x1] : null,
-      value478 = value477?.['shots']?.['at'](-0x1) || null,
-      value479 = args37?.['shots']?.[0x0] || null;
+    const value477 = count13 > 0 ? list157[count13 - 1] : null,
+      value478 = value477?.['shots']?.['at'](-1) || null,
+      value479 = args37?.['shots']?.[0] || null;
     return {
       ...args37,
       directorContinuityTest: !![],
@@ -4916,19 +4916,19 @@ function addStoryEpisodeDirectorContinuityHandoffs(list157 = []) {
 }
 function createStoryEpisodeClipDurationError({
   clip: clip = {},
-  clipIndex: clipIndex = 0x0,
-  clipCount: clipCount = 0x0,
+  clipIndex: clipIndex = 0,
+  clipCount: clipCount = 0,
   sourceShots: sourceShots = [],
   shots: shots = [],
-  durationSec: durationSec = 0x0,
-  maxDurationSeconds: maxDurationSeconds = 0xf,
+  durationSec: durationSec = 0,
+  maxDurationSeconds: maxDurationSeconds = 15,
 } = {}) {
   const formatStoryEpisodeClipTitle2 = formatStoryEpisodeClipTitle(clipIndex),
-    correctedDurationSec = Number(durationSec['toFixed'](0x1)),
+    correctedDurationSec = Number(durationSec['toFixed'](1)),
     error25 = new Error(
       '片段“' +
         formatStoryEpisodeClipTitle2 +
-        '”片段总时长\x20' +
+        '”片段总时长 ' +
         correctedDurationSec +
         ' 秒超过 ' +
         maxDurationSeconds +
@@ -4938,18 +4938,18 @@ function createStoryEpisodeClipDurationError({
     (error25['validationDetails'] = {
       type: 'clip_duration_overflow',
       clip: {
-        index: clipIndex + 0x1,
+        index: clipIndex + 1,
         count: clipCount,
-        ref: normalizeStoryAssetReference(clip?.['ref'], 'clip-' + (clipIndex + 0x1)),
+        ref: normalizeStoryAssetReference(clip?.['ref'], 'clip-' + (clipIndex + 1)),
         correctedDurationSec: correctedDurationSec,
         maxDurationSec: maxDurationSeconds,
-        overflowSeconds: Number((durationSec - maxDurationSeconds)['toFixed'](0x1)),
+        overflowSeconds: Number((durationSec - maxDurationSeconds)['toFixed'](1)),
         shots: shots['map']((time3, index3) => ({
-          index: index3 + 0x1,
+          index: index3 + 1,
           providedDurationSec: normalizePositiveNumber(
             sourceShots[index3]?.['durationSec'] || sourceShots[index3]?.['durationSeconds'],
           ),
-          correctedDurationSec: Number(Number(time3['durationSec'])['toFixed'](0x1)),
+          correctedDurationSec: Number(Number(time3['durationSec'])['toFixed'](1)),
           time: time3['time'],
           visual: time3['visual'],
           dialogue: time3['dialogue'],
@@ -4962,27 +4962,27 @@ function createStoryEpisodeClipDurationError({
 }
 function createStoryEpisodeClipDurationConstraintError({
   clip: clip = {},
-  clipIndex: clipIndex = 0x0,
-  clipCount: clipCount = 0x0,
-  durationSec: durationSec = 0x0,
+  clipIndex: clipIndex = 0,
+  clipCount: clipCount = 0,
+  durationSec: durationSec = 0,
   durationConstraints: durationConstraints = {},
 } = {}) {
   const formatStoryEpisodeClipTitle3 = formatStoryEpisodeClipTitle(clipIndex),
-    durationSec6 = Number(Number(durationSec)['toFixed'](0x1)),
+    durationSec6 = Number(Number(durationSec)['toFixed'](1)),
     allowedDurationSeconds = Array['isArray'](durationConstraints['allowedSeconds'])
       ? durationConstraints['allowedSeconds']
       : [],
     value480 = allowedDurationSeconds['length']
-      ? '只允许 ' + allowedDurationSeconds['join']('、') + '\x20秒'
-      : (durationConstraints['minSeconds'] || 0x0) +
+      ? '只允许 ' + allowedDurationSeconds['join']('、') + ' 秒'
+      : (durationConstraints['minSeconds'] || 0) +
         ' 至 ' +
         (durationConstraints['maxSeconds'] || '不限') +
-        '\x20秒' +
-        (durationConstraints['stepSeconds'] ? '、步进 ' + durationConstraints['stepSeconds'] + '\x20秒' : ''),
+        ' 秒' +
+        (durationConstraints['stepSeconds'] ? '、步进 ' + durationConstraints['stepSeconds'] + ' 秒' : ''),
     error26 = new Error(
       '片段“' +
         formatStoryEpisodeClipTitle3 +
-        '”总时长\x20' +
+        '”总时长 ' +
         durationSec6 +
         ' 秒不符合当前视频模型时长约束（' +
         value480 +
@@ -4992,13 +4992,13 @@ function createStoryEpisodeClipDurationConstraintError({
     (error26['validationDetails'] = {
       type: 'clip_duration_unsupported',
       clip: {
-        index: clipIndex + 0x1,
+        index: clipIndex + 1,
         count: clipCount,
-        ref: normalizeStoryAssetReference(clip?.['ref'], 'clip-' + (clipIndex + 0x1)),
+        ref: normalizeStoryAssetReference(clip?.['ref'], 'clip-' + (clipIndex + 1)),
         durationSec: durationSec6,
-        minDurationSec: durationConstraints['minSeconds'] || 0x0,
-        maxDurationSec: durationConstraints['maxSeconds'] || 0x0,
-        stepDurationSec: durationConstraints['stepSeconds'] || 0x0,
+        minDurationSec: durationConstraints['minSeconds'] || 0,
+        maxDurationSec: durationConstraints['maxSeconds'] || 0,
+        stepDurationSec: durationConstraints['stepSeconds'] || 0,
         allowedDurationSeconds: allowedDurationSeconds,
       },
     }),
@@ -5008,14 +5008,14 @@ function createStoryEpisodeClipDurationConstraintError({
 function isStoryEpisodeClipDurationSupported(value481, enabled19 = null) {
   if (!enabled19) return !![];
   const count14 = Number(value481);
-  if (!Number['isFinite'](count14) || count14 <= 0x0) return ![];
+  if (!Number['isFinite'](count14) || count14 <= 0) return ![];
   const list158 = Array['isArray'](enabled19['allowedSeconds']) ? enabled19['allowedSeconds'] : [];
   if (list158['length'])
     return list158['some']((value482) => Math['abs'](Number(value482) - count14) < 0.000001);
   if (enabled19['minSeconds'] && count14 < enabled19['minSeconds']) return ![];
   if (enabled19['maxSeconds'] && count14 > enabled19['maxSeconds']) return ![];
   if (enabled19['stepSeconds']) {
-    const value483 = enabled19['minSeconds'] || 0x0,
+    const value483 = enabled19['minSeconds'] || 0,
       value484 = (count14 - value483) / enabled19['stepSeconds'];
     if (Math['abs'](value484 - Math['round'](value484)) >= 0.000001) return ![];
   }
@@ -5028,10 +5028,10 @@ function tokenizeStorySpokenTextAtAuthoredPauses(value485 = '') {
     list160 = speakerPrefix ? list159['slice'](speakerPrefix['length']) : list159,
     value486 = /(?:…{2,}|\.{3,}|—{2,}|[。！？!?；;])(?:[”"’']+)?/gu,
     list161 = [];
-  let value487 = 0x0,
+  let value487 = 0,
     value488;
   while ((value488 = value486['exec'](list160)) !== null) {
-    const value489 = value488['index'] + value488[0x0]['length'],
+    const value489 = value488['index'] + value488[0]['length'],
       value490 = list160['slice'](value487, value489);
     if (value490['trim']()) list161['push'](value490);
     value487 = value489;
@@ -5042,7 +5042,7 @@ function tokenizeStorySpokenTextAtAuthoredPauses(value485 = '') {
   return (
     list161['forEach']((value492) => {
       if (/^[\s“”"'‘’…—.]+$/u['test'](value492) && units['length']) {
-        units[units['length'] - 0x1] += value492;
+        units[units['length'] - 1] += value492;
         return;
       }
       units['push'](value492);
@@ -5062,22 +5062,22 @@ function getStorySpokenChunkMinimumSeconds(value497, value498, value499, value50
 }
 function getStoryAuthoredPauseBoundaryPriority(options22 = {}) {
   const value501 = (Array['isArray'](options22?.['units']) ? options22['units'] : [])['join']('');
-  if (/[。！？!?；;][”"’']?$/u['test'](value501)) return 0x64;
-  if (/[”"’']—{2,}$/u['test'](value501)) return 0x5a;
-  if (/—{2,}[”"’']?$/u['test'](value501)) return 0x32;
-  if (/(?:…{2,}|\.{3,})[”"’']?$/u['test'](value501)) return 0x28;
-  return 0x0;
+  if (/[。！？!?；;][”"’']?$/u['test'](value501)) return 100;
+  if (/[”"’']—{2,}$/u['test'](value501)) return 90;
+  if (/—{2,}[”"’']?$/u['test'](value501)) return 50;
+  if (/(?:…{2,}|\.{3,})[”"’']?$/u['test'](value501)) return 40;
+  return 0;
 }
-function splitStoryEpisodeOverlongSpokenShot(args38 = {}, { maximum: maximum = 0xf } = {}) {
+function splitStoryEpisodeOverlongSpokenShot(args38 = {}, { maximum: maximum = 15 } = {}) {
   const positiveNumber5 = normalizePositiveNumber(args38?.['durationSec']);
   if (!positiveNumber5 || positiveNumber5 <= maximum + 0.001) return [args38];
   const list162 = ['dialogue', 'voiceover']['filter']((value502) => normalizeText(args38?.[value502]));
-  if (list162['length'] !== 0x1) return [args38];
-  const value503 = list162[0x0],
+  if (list162['length'] !== 1) return [args38];
+  const value503 = list162[0],
     { speakerPrefix: speakerPrefix2, units: units2 } = tokenizeStorySpokenTextAtAuthoredPauses(
       args38[value503],
     );
-  if (units2['length'] < 0x2) return [args38];
+  if (units2['length'] < 2) return [args38];
   let list163 = units2['map']((value504) => ({ units: [value504] }));
   for (const value505 of list163) {
     const storySpokenChunkMinimumSeconds = getStorySpokenChunkMinimumSeconds(
@@ -5088,17 +5088,17 @@ function splitStoryEpisodeOverlongSpokenShot(args38 = {}, { maximum: maximum = 0
     );
     if (storySpokenChunkMinimumSeconds > maximum + 0.001) return [args38];
   }
-  while (list163['length'] > 0x1) {
+  while (list163['length'] > 1) {
     let enabled20 = null;
-    for (let value506 = 0x0; value506 < list163['length'] - 0x1; value506 += 0x1) {
-      const value507 = { units: [...list163[value506]['units'], ...list163[value506 + 0x1]['units']] },
+    for (let value506 = 0; value506 < list163['length'] - 1; value506 += 1) {
+      const value507 = { units: [...list163[value506]['units'], ...list163[value506 + 1]['units']] },
         mergedMinimumSeconds = getStorySpokenChunkMinimumSeconds(args38, value503, value507, speakerPrefix2);
       if (mergedMinimumSeconds > maximum + 0.001) continue;
-      const chunks = [...list163['slice'](0x0, value506), value507, ...list163['slice'](value506 + 0x2)],
+      const chunks = [...list163['slice'](0, value506), value507, ...list163['slice'](value506 + 2)],
         value508 = chunks['reduce'](
           (value509, value510) =>
             value509 + getStorySpokenChunkMinimumSeconds(args38, value503, value510, speakerPrefix2),
-          0x0,
+          0,
         ),
         value511 = Math['max'](positiveNumber5, value508);
       if (value511 > chunks['length'] * maximum + 0.001) continue;
@@ -5118,40 +5118,40 @@ function splitStoryEpisodeOverlongSpokenShot(args38 = {}, { maximum: maximum = 0
   }
   const list164 = list163['map']((value512) =>
       Math['ceil'](
-        getStorySpokenChunkMinimumSeconds(args38, value503, value512, speakerPrefix2) * 0xa - 0.001,
+        getStorySpokenChunkMinimumSeconds(args38, value503, value512, speakerPrefix2) * 10 - 0.001,
       ),
     ),
-    value513 = Math['round'](maximum * 0xa),
+    value513 = Math['round'](maximum * 10),
     value514 = Math['max'](
-      Math['round'](positiveNumber5 * 0xa),
-      list164['reduce']((value515, value516) => value515 + value516, 0x0),
+      Math['round'](positiveNumber5 * 10),
+      list164['reduce']((value515, value516) => value515 + value516, 0),
     );
   if (value514 > list163['length'] * value513) return [args38];
   const durationSec7 = [...list164];
-  let count15 = value514 - durationSec7['reduce']((value517, value518) => value517 + value518, 0x0);
-  while (count15 > 0x0) {
+  let count15 = value514 - durationSec7['reduce']((value517, value518) => value517 + value518, 0);
+  while (count15 > 0) {
     let enabled21 = ![];
-    for (let value519 = 0x0; value519 < durationSec7['length'] && count15 > 0x0; value519 += 0x1) {
+    for (let value519 = 0; value519 < durationSec7['length'] && count15 > 0; value519 += 1) {
       if (durationSec7[value519] >= value513) continue;
-      ((durationSec7[value519] += 0x1), (count15 -= 0x1), (enabled21 = !![]));
+      ((durationSec7[value519] += 1), (count15 -= 1), (enabled21 = !![]));
     }
     if (!enabled21) break;
   }
   return list163['map']((value520, value521) => ({
     ...args38,
-    durationSec: durationSec7[value521] / 0xa,
+    durationSec: durationSec7[value521] / 10,
     [value503]: getStorySpokenChunkText(value520, speakerPrefix2),
   }));
 }
 function repackStoryEpisodeSplitClipsLocally(
   clipCount2 = [],
-  { maxDurationSeconds: maxDurationSeconds = 0xf } = {},
+  { maxDurationSeconds: maxDurationSeconds = 15 } = {},
 ) {
-  const maximum3 = normalizePositiveNumber(maxDurationSeconds) || 0xf;
+  const maximum3 = normalizePositiveNumber(maxDurationSeconds) || 15;
   return (Array['isArray'](clipCount2) ? clipCount2 : [])['flatMap']((clip2, clipIndex2) => {
     const list165 = [];
     let list166 = [],
-      value522 = 0x0;
+      value522 = 0;
     const value523 = (Array['isArray'](clip2?.['shots']) ? clip2['shots'] : [])['flatMap']((value524) =>
       splitStoryEpisodeOverlongSpokenShot(value524, { maximum: maximum3 }),
     );
@@ -5164,22 +5164,22 @@ function repackStoryEpisodeSplitClipsLocally(
           clipCount: clipCount2['length'],
           sourceShots: [value525],
           shots: [value525],
-          durationSec: durationSec8 || 0x0,
+          durationSec: durationSec8 || 0,
           maxDurationSeconds: maximum3,
         });
       if (durationSec8 > maximum3) {
-        list166['length'] && (list165['push'](list166), (list166 = []), (value522 = 0x0));
+        list166['length'] && (list165['push'](list166), (list166 = []), (value522 = 0));
         list165['push']([value525]);
         continue;
       }
       (list166['length'] &&
         value522 + durationSec8 > maximum3 &&
-        (list165['push'](list166), (list166 = []), (value522 = 0x0)),
+        (list165['push'](list166), (list166 = []), (value522 = 0)),
         list166['push'](value525),
         (value522 += durationSec8));
     }
     if (list166['length']) list165['push'](list166);
-    if (list165['length'] <= 0x1) return [clip2];
+    if (list165['length'] <= 1) return [clip2];
     return list165['map']((shots4, value526) => {
       const script4 = shots4['flatMap']((value527) => [
         normalizeText(value527?.['visual']),
@@ -5190,10 +5190,10 @@ function repackStoryEpisodeSplitClipsLocally(
         ['join']('；');
       return {
         ...clip2,
-        ref: clip2['ref'] + '-part-' + (value526 + 0x1),
+        ref: clip2['ref'] + '-part-' + (value526 + 1),
         script: script4 || clip2['script'],
         shots: shots4,
-        durationSec: Number(getStoryEpisodeSplitShotsDuration(shots4)['toFixed'](0x1)),
+        durationSec: Number(getStoryEpisodeSplitShotsDuration(shots4)['toFixed'](1)),
         assetRefs: [...new Set(shots4['flatMap']((value528) => value528['assetRefs'] || []))],
       };
     });
@@ -5226,8 +5226,8 @@ export function parseStoryEpisodeSplitResult(
     assets: assets = [],
     assetRefs: assetRefs = [],
     clipPlans: clipPlans = [],
-    minimumShotsPerClip: minimumShotsPerClip = 0x2,
-    maximumShotsPerClip: maximumShotsPerClip = 0x5,
+    minimumShotsPerClip: minimumShotsPerClip = 2,
+    maximumShotsPerClip: maximumShotsPerClip = 5,
     enforceMaxDuration: enforceMaxDuration = !![],
     repairMissingShotFields: repairMissingShotFields = ![],
     allowEmptyAudio: allowEmptyAudio = !![],
@@ -5250,9 +5250,9 @@ export function parseStoryEpisodeSplitResult(
     maxDurationSeconds2 = normalizeStoryPlanningConstraints(constraints),
     includeTimeline2 = isStoryContinuousTimelinePromptMode(promptMode),
     durationConstraints2 = normalizeStoryEpisodeClipDurationConstraints(clipDurationConstraints),
-    value533 = Math['max'](0x1, Math['min'](0x5, Math['trunc'](Number(minimumShotsPerClip) || 0x2))),
-    value534 = Math['max'](0x0, Math['trunc'](Number(maximumShotsPerClip) || 0x0)),
-    strictJson6 = parseStrictJson(getResultText(value531), 'Agent\x20未返回片段拆分结果。'),
+    value533 = Math['max'](1, Math['min'](5, Math['trunc'](Number(minimumShotsPerClip) || 2))),
+    value534 = Math['max'](0, Math['trunc'](Number(maximumShotsPerClip) || 0)),
+    strictJson6 = parseStrictJson(getResultText(value531), 'Agent 未返回片段拆分结果。'),
     clipCount3 = applyReplicationAsrDelivery(
       expandStoryEpisodeSplitCompactData(strictJson6, {
         episodeRef: episodeRef,
@@ -5274,7 +5274,7 @@ export function parseStoryEpisodeSplitResult(
       ? clipCount3['clips']
           ['map']((clip3, clipIndex3) => {
             const clipLabel2 = formatStoryEpisodeClipTitle(clipIndex3),
-              ref17 = normalizeStoryAssetReference(clip3?.['ref'], 'clip-' + (clipIndex3 + 0x1)),
+              ref17 = normalizeStoryAssetReference(clip3?.['ref'], 'clip-' + (clipIndex3 + 1)),
               clipPlan2 = map34['get'](ref17) || null,
               handler9 = repairMissingShotFields
                 ? normalizeStoryEpisodeExperimentalStandaloneText
@@ -5303,10 +5303,10 @@ export function parseStoryEpisodeSplitResult(
             if (sourceShots2['length'] < value533)
               throw new Error('片段“' + clipLabel2 + '”至少包含 ' + value533 + ' 个分镜。');
             if (value534 && sourceShots2['length'] > value534)
-              throw new Error('片段“' + clipLabel2 + '”最多包含\x20' + value534 + '\x20个分镜。');
+              throw new Error('片段“' + clipLabel2 + '”最多包含 ' + value534 + ' 个分镜。');
             const value539 = sourceShots2['map']((value540, index4) => {
-                const value541 = index4 === 0x0,
-                  cutAfter2 = index4 === sourceShots2['length'] - 0x1,
+                const value541 = index4 === 0,
+                  cutAfter2 = index4 === sourceShots2['length'] - 1,
                   visual4 =
                     [
                       ...new Set(
@@ -5349,13 +5349,13 @@ export function parseStoryEpisodeSplitResult(
               list168 = mergeStoryEpisodeSplitDialogueFragments(value539, clipPlan2?.['dialogueUnits']);
             includeTimeline2 &&
               list168['forEach']((value542, count16) => {
-                const value543 = count16 === 0x0 ? 0x0 : list168[count16 - 0x1]['endSec'];
+                const value543 = count16 === 0 ? 0 : list168[count16 - 1]['endSec'];
                 if (value542['startSec'] !== value543)
                   throw new Error(
                     '片段“' +
                       clipLabel2 +
-                      '”的时间轴不连续：分镜\x20' +
-                      (count16 + 0x1) +
+                      '”的时间轴不连续：分镜 ' +
+                      (count16 + 1) +
                       ' 应从 ' +
                       value543 +
                       ' 秒开始。',
@@ -5390,14 +5390,14 @@ export function parseStoryEpisodeSplitResult(
                     ['filter']((value551) => map35['has'](value551)),
                 ),
               ];
-              if (list169['length'] !== 0x1)
+              if (list169['length'] !== 1)
                 throw new Error(
                   list169['length']
                     ? '片段“' + clipLabel2 + '”引用了多个场景资产；每个片段只能设定在一个场景。'
                     : '片段“' + clipLabel2 + '”缺少场景资产；每个片段必须设定在一个场景。',
                 );
             }
-            const durationSec9 = Number(getStoryEpisodeSplitShotsDuration(shots5)['toFixed'](0x1)),
+            const durationSec9 = Number(getStoryEpisodeSplitShotsDuration(shots5)['toFixed'](1)),
               message4 = !isStoryEpisodeClipDurationSupported(durationSec9, durationConstraints2)
                 ? createStoryEpisodeClipDurationConstraintError({
                     clip: clip3,
@@ -5462,13 +5462,13 @@ export function parseStoryEpisodeSplitResult(
   if (!clips2['length']) throw new Error('Agent 返回结果没有可用片段。');
   const totalDurationSeconds = clips2['reduce'](
       (value554, value555) => value554 + value555['durationSec'],
-      0x0,
+      0,
     ),
     list171 = clips2['map']((value556) => value556['ref']);
-  if (new Set(list171)['size'] !== list171['length']) throw new Error('Agent\x20返回了重复的片段引用。');
+  if (new Set(list171)['size'] !== list171['length']) throw new Error('Agent 返回了重复的片段引用。');
   const episodeRef5 = normalizeStoryAssetReference(clipCount3['episodeRef'] || episodeRef, 'episode-1');
   if (episodeRef && episodeRef5 !== normalizeStoryAssetReference(episodeRef, 'episode-1'))
-    throw new Error('Agent\x20返回的分集引用与当前分集不一致。');
+    throw new Error('Agent 返回的分集引用与当前分集不一致。');
   return {
     schemaVersion: STORY_EPISODE_SPLIT_SCHEMA_VERSION,
     episodeRef: episodeRef5,
@@ -5478,14 +5478,14 @@ export function parseStoryEpisodeSplitResult(
 }
 function serializeStoryEpisodeSplitValidationError(
   error27,
-  { clipIndex: clipIndex = 0x0, clipCount: clipCount = 0x0 } = {},
+  { clipIndex: clipIndex = 0, clipCount: clipCount = 0 } = {},
 ) {
   const validationDetails = error27?.['validationDetails']
     ? JSON['parse'](JSON['stringify'](error27['validationDetails']))
     : null;
   return (
     validationDetails?.['clip'] &&
-      ((validationDetails['clip']['index'] = clipIndex + 0x1),
+      ((validationDetails['clip']['index'] = clipIndex + 1),
       (validationDetails['clip']['count'] = clipCount)),
     {
       message: normalizeText(error27?.['message'] || error27) || '片段校验失败。',
@@ -5502,8 +5502,8 @@ function normalizeStoryEpisodeSplitDraft(
     constraints: constraints = {},
     assets: assets = [],
     clipPlans: clipPlans = [],
-    minimumShotsPerClip: minimumShotsPerClip = 0x2,
-    maximumShotsPerClip: maximumShotsPerClip = 0x5,
+    minimumShotsPerClip: minimumShotsPerClip = 2,
+    maximumShotsPerClip: maximumShotsPerClip = 5,
     enforceMaxDuration: enforceMaxDuration = !![],
     repairMissingShotFields: repairMissingShotFields = ![],
     allowEmptyAudio: allowEmptyAudio = !![],
@@ -5537,13 +5537,13 @@ function normalizeStoryEpisodeSplitDraft(
     }
   }
   if (!Array['isArray'](clipCount4['clips']) || !clipCount4['clips']['length'])
-    throw new Error('Agent\x20返回结果没有可用片段。');
+    throw new Error('Agent 返回结果没有可用片段。');
   const episodeRef6 = normalizeStoryAssetReference(clipCount4['episodeRef'] || episodeRef, 'episode-1');
   if (episodeRef && episodeRef6 !== normalizeStoryAssetReference(episodeRef, 'episode-1'))
     throw new Error('Agent 返回的分集引用与当前分集不一致。');
   const map36 = new Set(),
     items = clipCount4['clips']['map']((args42, sourceIndex) => {
-      const ref18 = normalizeStoryAssetReference(args42?.['ref'], 'clip-' + (sourceIndex + 0x1)),
+      const ref18 = normalizeStoryAssetReference(args42?.['ref'], 'clip-' + (sourceIndex + 1)),
         text36 = normalizeText(args42?.['ref']) ? args42 : { ...args42, ref: ref18 };
       try {
         const clips4 = parseStoryEpisodeSplitResult(
@@ -5594,7 +5594,7 @@ function normalizeStoryEpisodeSplitDraft(
     status: 'draft',
     episodeRef: episodeRef6,
     items: items,
-    attempts: 0x1,
+    attempts: 1,
   };
 }
 function restoreStoryEpisodeSplitDraft(options24 = {}, { episodeRef: episodeRef = '' } = {}) {
@@ -5611,7 +5611,7 @@ function restoreStoryEpisodeSplitDraft(options24 = {}, { episodeRef: episodeRef 
       ...status,
       status: status?.['status'] === 'valid' ? 'valid' : 'invalid',
       sourceIndex: Number['isInteger'](status?.['sourceIndex']) ? status['sourceIndex'] : value564,
-      sourceClipRef: normalizeStoryAssetReference(status?.['sourceClipRef'], 'clip-' + (value564 + 0x1)),
+      sourceClipRef: normalizeStoryAssetReference(status?.['sourceClipRef'], 'clip-' + (value564 + 1)),
       clips: status?.['status'] === 'valid' && Array['isArray'](status?.['clips']) ? status['clips'] : [],
       rawClips:
         status?.['status'] === 'valid'
@@ -5629,7 +5629,7 @@ function restoreStoryEpisodeSplitDraft(options24 = {}, { episodeRef: episodeRef 
                 : {}),
             },
     })),
-    attempts: Math['max'](0x1, Math['trunc'](Number(options24?.['attempts']) || 0x1)),
+    attempts: Math['max'](1, Math['trunc'](Number(options24?.['attempts']) || 1)),
   };
 }
 function getStoryEpisodeSplitDraftCounts(options25 = {}) {
@@ -5640,8 +5640,8 @@ function getStoryEpisodeSplitDraftCounts(options25 = {}) {
         value565 +
         (response19?.['status'] === 'valid' && Array['isArray'](response19?.['clips'])
           ? response19['clips']['length']
-          : 0x0),
-      0x0,
+          : 0),
+      0,
     ),
     invalidItemCount: validClipCount['filter']((response20) => response20?.['status'] !== 'valid')['length'],
   };
@@ -5660,7 +5660,7 @@ function finalizeStoryEpisodeSplitDraft(episodeRef8 = {}) {
     episodeRef: episodeRef8['episodeRef'],
     totalDurationSeconds: totalDurationSeconds2['reduce'](
       (value569, value570) => value569 + value570['durationSec'],
-      0x0,
+      0,
     ),
     clips: totalDurationSeconds2,
     ...(typeof episodeRef8?.['rawResponse'] === 'string' ? { rawResponse: episodeRef8['rawResponse'] } : {}),
@@ -5691,8 +5691,8 @@ function createStoryEpisodeSplitPartialResult(episodeRef9 = {}) {
     items: episodeRef9['items'],
     clips: clips5,
     rejectedClips: rejectedClips,
-    totalDurationSeconds: clips5['reduce']((value572, value573) => value572 + value573['durationSec'], 0x0),
-    attempts: Math['max'](0x1, Math['trunc'](Number(episodeRef9?.['attempts']) || 0x1)),
+    totalDurationSeconds: clips5['reduce']((value572, value573) => value572 + value573['durationSec'], 0),
+    attempts: Math['max'](1, Math['trunc'](Number(episodeRef9?.['attempts']) || 1)),
     ...(typeof episodeRef9?.['rawResponse'] === 'string' ? { rawResponse: episodeRef9['rawResponse'] } : {}),
   };
 }
@@ -5701,14 +5701,14 @@ function throwStoryEpisodeSplitPartialResult(options26 = {}) {
     value574 = storyEpisodeSplitPartialResult['clips']['length'],
     count17 = storyEpisodeSplitPartialResult['rejectedClips']['length'],
     value575 =
-      count17 === 0x1 ? normalizeText(storyEpisodeSplitPartialResult['rejectedClips'][0x0]?.['message']) : '',
+      count17 === 1 ? normalizeText(storyEpisodeSplitPartialResult['rejectedClips'][0]?.['message']) : '',
     error28 = new Error(
-      '分集拆分未完全通过：已保留\x20' +
+      '分集拆分未完全通过：已保留 ' +
         value574 +
         ' 个合格片段，' +
         count17 +
-        '\x20个片段仍需修复。' +
-        (value575 ? '\x20' + value575 : ''),
+        ' 个片段仍需修复。' +
+        (value575 ? ' ' + value575 : ''),
     );
   ((error28['name'] = 'StoryEpisodeSplitPartialError'),
     (error28['partialResult'] = storyEpisodeSplitPartialResult));
@@ -5720,9 +5720,9 @@ function reportStoryEpisodeSplitRequestDiagnostics(
     phase: phase = 'full-generation',
     prompt: prompt = '',
     systemPrompt: systemPrompt = '',
-    failedClipCount: failedClipCount = 0x0,
+    failedClipCount: failedClipCount = 0,
     carriesFullEpisodeContext: carriesFullEpisodeContext = phase !== 'targeted-repair',
-    automaticCallLimit: automaticCallLimit = 0x2,
+    automaticCallLimit: automaticCallLimit = 2,
     details: details = {},
   } = {},
 ) {
@@ -5743,9 +5743,9 @@ function reportStoryEpisodeSplitRequestDiagnostics(
     systemPromptBytes: systemPromptBytes,
     inputCharacters: [...list173]['length'] + [...list174]['length'],
     inputBytes: promptBytes + systemPromptBytes,
-    failedClipCount: Math['max'](0x0, Math['trunc'](Number(failedClipCount) || 0x0)),
+    failedClipCount: Math['max'](0, Math['trunc'](Number(failedClipCount) || 0)),
     carriesFullEpisodeContext: Boolean(carriesFullEpisodeContext),
-    automaticCallLimit: Math['max'](0x1, Math['trunc'](Number(automaticCallLimit) || 0x1)),
+    automaticCallLimit: Math['max'](1, Math['trunc'](Number(automaticCallLimit) || 1)),
   });
 }
 function getStoryEpisodeSplitSerializedMetrics(value578) {
@@ -5768,7 +5768,7 @@ function getStoryEpisodeSplitResponseTiming(options27 = {}) {
       const value581 = value579[value580];
       if (value581 === null || value581 === undefined || value581 === '') return null;
       const count18 = Number(value581);
-      return Number['isFinite'](count18) && count18 >= 0x0 ? count18 : null;
+      return Number['isFinite'](count18) && count18 >= 0 ? count18 : null;
     };
   return {
     responseHeadersMs: responseHeadersMs('responseHeadersMs'),
@@ -5804,10 +5804,10 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
   carriesFullEpisodeContext: carriesFullEpisodeContext = ![],
   context: context = {},
 } = {}) {
-  let phaseAttempt = 0x0;
+  let phaseAttempt = 0;
   return async (prompt7 = {}) => {
-    phaseAttempt += 0x1;
-    const requestSequence = Math['max'](0x1, Math['trunc'](Number(nextRequestSequence?.()) || phaseAttempt)),
+    phaseAttempt += 1;
+    const requestSequence = Math['max'](1, Math['trunc'](Number(nextRequestSequence?.()) || phaseAttempt)),
       requestId = runId + ':' + requestSequence,
       requestPayloadCharacters = getStoryEpisodeSplitSerializedMetrics(prompt7),
       automaticCallLimit2 = {
@@ -5820,10 +5820,10 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
         model: normalizeText(prompt7?.['model']),
         provider: normalizeText(prompt7?.['provider']),
         structuredOutputRequested: Boolean(prompt7?.['structuredOutput']),
-        timeoutMs: Math['max'](0x0, Math['trunc'](Number(prompt7?.['timeoutMs']) || 0x0)),
+        timeoutMs: Math['max'](0, Math['trunc'](Number(prompt7?.['timeoutMs']) || 0)),
         requestPayloadCharacters: requestPayloadCharacters['characters'],
         requestPayloadBytes: requestPayloadCharacters['bytes'],
-        strictAttemptLimit: 0x1,
+        strictAttemptLimit: 1,
         transportAttemptLimit: STORY_EPISODE_EXPERIMENTAL_TRANSPORT_ATTEMPTS,
         maximumActualCallsForPhase: STORY_EPISODE_EXPERIMENTAL_TRANSPORT_ATTEMPTS,
         ...(context && typeof context === 'object' ? context : {}),
@@ -5852,7 +5852,7 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
               ...automaticCallLimit2,
               status: 'succeeded',
               countsTowardRequestTotal: ![],
-              elapsedMs: Math['max'](0x0, Date['now']() - value586),
+              elapsedMs: Math['max'](0, Date['now']() - value586),
               responseCharacters: responseCharacters['characters'],
               responseBytes: responseCharacters['bytes'],
               ...getStoryEpisodeSplitResponseTiming(value587),
@@ -5860,8 +5860,8 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
                 ? {
                     structuredOutputFallbackMode: normalizeText(value587['structuredOutputFallback']['mode']),
                     structuredOutputFallbackStatus: Math['max'](
-                      0x0,
-                      Math['trunc'](Number(value587['structuredOutputFallback']['status']) || 0x0),
+                      0,
+                      Math['trunc'](Number(value587['structuredOutputFallback']['status']) || 0),
                     ),
                   }
                 : {}),
@@ -5880,11 +5880,11 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
             ...automaticCallLimit2,
             status: 'failed',
             countsTowardRequestTotal: ![],
-            elapsedMs: Math['max'](0x0, Date['now']() - value586),
+            elapsedMs: Math['max'](0, Date['now']() - value586),
             errorType: normalizeText(error29?.['type'] || error29?.['name']),
             errorStatus: Math['max'](
-              0x0,
-              Math['trunc'](Number(error29?.['status'] || error29?.['statusCode']) || 0x0),
+              0,
+              Math['trunc'](Number(error29?.['status'] || error29?.['statusCode']) || 0),
             ),
             errorMessage: normalizeText(error29?.['message'] || error29),
             retryable: Boolean(error29?.['retryable'] || isStoryEpisodeExperimentalRetryable(error29)),
@@ -5906,7 +5906,7 @@ export function createStoryEpisodeDefaultSplitParseContext({
 } = {}) {
   const isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(promptMode),
     constraints5 = isStoryMinimaxH3PromptMode(promptMode)
-      ? { ...constraints, sceneMaxSeconds: 0xf }
+      ? { ...constraints, sceneMaxSeconds: 15 }
       : constraints;
   return {
     episodeRef: episodeRef,
@@ -5914,8 +5914,8 @@ export function createStoryEpisodeDefaultSplitParseContext({
     scriptMode: scriptMode,
     constraints: constraints5,
     assets: assets,
-    minimumShotsPerClip: 0x1,
-    maximumShotsPerClip: 0x0,
+    minimumShotsPerClip: 1,
+    maximumShotsPerClip: 0,
     enforceMaxDuration: ![],
     repairMissingShotFields: !![],
     allowEmptyAudio: !![],
@@ -5932,7 +5932,7 @@ export function createStoryEpisodeDefaultSplitParseContext({
 function createStoryEpisodeSplitRawResponsePartialResult({
   episodeRef: episodeRef = '',
   rawResponse: rawResponse = '',
-  attempts: attempts = 0x1,
+  attempts: attempts = 1,
   error: error = null,
 } = {}) {
   const error30 = serializeStoryEpisodeSplitValidationError(error);
@@ -5943,7 +5943,7 @@ function createStoryEpisodeSplitRawResponsePartialResult({
     items: [
       {
         status: 'invalid',
-        sourceIndex: 0x0,
+        sourceIndex: 0,
         sourceClipRef: 'raw-response',
         rawClips: [],
         rawResponse: rawResponse,
@@ -5951,9 +5951,9 @@ function createStoryEpisodeSplitRawResponsePartialResult({
       },
     ],
     clips: [],
-    rejectedClips: [{ sourceIndex: 0x0, sourceClipRef: 'raw-response', message: error30['message'] }],
-    totalDurationSeconds: 0x0,
-    attempts: Math['max'](0x1, Math['trunc'](Number(attempts) || 0x1)),
+    rejectedClips: [{ sourceIndex: 0, sourceClipRef: 'raw-response', message: error30['message'] }],
+    totalDurationSeconds: 0,
+    attempts: Math['max'](1, Math['trunc'](Number(attempts) || 1)),
     rawResponse: rawResponse,
   };
 }
@@ -6028,7 +6028,7 @@ export function recoverStoryEpisodeSplitDraftLocally({
     }),
     totalDurationSeconds3 = list178['sort'](
       (value593, value594) =>
-        Number(value593?.['sourceIndex'] || 0x0) - Number(value594?.['sourceIndex'] || 0x0),
+        Number(value593?.['sourceIndex'] || 0) - Number(value594?.['sourceIndex'] || 0),
     )
       ['flatMap']((response23) => {
         if (response23?.['status'] === 'valid' && Array['isArray'](response23?.['clips']))
@@ -6041,7 +6041,7 @@ export function recoverStoryEpisodeSplitDraftLocally({
                   ...args45,
                   ref: normalizeStoryAssetReference(
                     response23?.['sourceClipRef'],
-                    'clip-' + (Number(response23?.['sourceIndex'] || 0x0) + value595 + 0x1),
+                    'clip-' + (Number(response23?.['sourceIndex'] || 0) + value595 + 1),
                   ),
                 },
         );
@@ -6063,7 +6063,7 @@ export function recoverStoryEpisodeSplitDraftLocally({
     episodeRef: episodeRef10,
     totalDurationSeconds: totalDurationSeconds3['reduce'](
       (value598, value599) => value598 + value599['durationSec'],
-      0x0,
+      0,
     ),
     clips: totalDurationSeconds3,
   };
@@ -6107,7 +6107,7 @@ function parseStoryEpisodesSplitEntry({
   clipDurationConstraints: clipDurationConstraints = null,
   promptMode: promptMode = 'seedance-2.0',
 } = {}) {
-  const episodeRef11 = getStoryEpisodeReferenceAliases(episode)[0x0] || 'episode-1',
+  const episodeRef11 = getStoryEpisodeReferenceAliases(episode)[0] || 'episode-1',
     clips7 = Array['isArray'](entry?.['clips'])
       ? entry['clips']
       : Array['isArray'](entry?.['segments'])
@@ -6178,19 +6178,19 @@ async function splitStoryEpisodesCombinedRequest({
     };
   (onProgress?.({
     stage: 'splitting-episodes',
-    current: 0x1,
-    total: 0x2,
-    message: '正在一次生成 ' + episodes4['length'] + '\x20集分镜',
+    current: 1,
+    total: 2,
+    message: '正在一次生成 ' + episodes4['length'] + ' 集分镜',
   }),
     reportStoryEpisodeSplitRequestDiagnostics(diagnostics, {
       phase: 'batch-generation',
       prompt: prompt8,
       systemPrompt: systemPrompt2['systemPrompt'],
-      automaticCallLimit: 0x2,
+      automaticCallLimit: 2,
       details: {
         status: 'started',
-        requestIndex: 0x1,
-        requestCount: 0x2,
+        requestIndex: 1,
+        requestCount: 2,
         episodeCount: episodes4['length'],
         outputTokenLimitMode: 'provider-default',
         requestTimeoutMode: 'provider-default',
@@ -6206,13 +6206,13 @@ async function splitStoryEpisodesCombinedRequest({
       phase: 'batch-generation',
       prompt: prompt8,
       systemPrompt: systemPrompt2['systemPrompt'],
-      automaticCallLimit: 0x2,
+      automaticCallLimit: 2,
       details: {
         status: 'succeeded',
-        requestIndex: 0x1,
-        requestCount: 0x2,
+        requestIndex: 1,
+        requestCount: 2,
         episodeCount: episodes4['length'],
-        elapsedMs: Math['max'](0x0, Date['now']() - value604),
+        elapsedMs: Math['max'](0, Date['now']() - value604),
         responseCharacters: responseCharacters2['characters'],
         responseBytes: responseCharacters2['bytes'],
         ...getStoryEpisodeSplitResponseTiming(request4),
@@ -6223,13 +6223,13 @@ async function splitStoryEpisodesCombinedRequest({
       phase: 'batch-generation',
       prompt: prompt8,
       systemPrompt: systemPrompt2['systemPrompt'],
-      automaticCallLimit: 0x2,
+      automaticCallLimit: 2,
       details: {
         status: 'failed',
-        requestIndex: 0x1,
-        requestCount: 0x2,
+        requestIndex: 1,
+        requestCount: 2,
         episodeCount: episodes4['length'],
-        elapsedMs: Math['max'](0x0, Date['now']() - value604),
+        elapsedMs: Math['max'](0, Date['now']() - value604),
         errorType: normalizeText(error32?.['type'] || error32?.['name']),
         errorMessage: normalizeText(error32?.['message'] || error32),
       },
@@ -6238,12 +6238,12 @@ async function splitStoryEpisodesCombinedRequest({
         (normalizeText(error32?.['message']) || '批量分镜生成请求失败。') +
         '（生成请求失败，未执行结果检查。）'));
     if (hasStoryEpisodeSplitTransportModelOutput(error32?.['raw'])) {
-      const episodeRef12 = getStoryEpisodeReferenceAliases(episodes4[0x0])[0x0] || 'episode-1';
+      const episodeRef12 = getStoryEpisodeReferenceAliases(episodes4[0])[0] || 'episode-1';
       error32['partialResults'] = [
         createStoryEpisodeSplitRawResponsePartialResult({
           episodeRef: episodeRef12,
           rawResponse: serializeStoryEpisodeSplitTransportRaw(error32),
-          attempts: 0x1,
+          attempts: 1,
           error: error32,
         }),
       ];
@@ -6252,7 +6252,7 @@ async function splitStoryEpisodesCombinedRequest({
   }
   const result2 = getResultText(request4),
     episodeRefs3 = episodes4['map'](
-      (value605, value606) => getStoryEpisodeReferenceAliases(value605)[0x0] || 'episode-' + (value606 + 0x1),
+      (value605, value606) => getStoryEpisodeReferenceAliases(value605)[0] || 'episode-' + (value606 + 1),
     ),
     prompt9 = buildStoryEpisodesSplitValidationPrompt({
       episodeRefs: episodeRefs3,
@@ -6269,19 +6269,19 @@ async function splitStoryEpisodesCombinedRequest({
     };
   (onProgress?.({
     stage: 'validating-episodes',
-    current: 0x2,
-    total: 0x2,
+    current: 2,
+    total: 2,
     message: '正在检查并修复分镜返回格式',
   }),
     reportStoryEpisodeSplitRequestDiagnostics(diagnostics, {
       phase: 'batch-validation',
       prompt: prompt9,
       systemPrompt: STORY_EPISODES_SPLIT_VALIDATION_SYSTEM_PROMPT,
-      automaticCallLimit: 0x2,
+      automaticCallLimit: 2,
       details: {
         status: 'started',
-        requestIndex: 0x2,
-        requestCount: 0x2,
+        requestIndex: 2,
+        requestCount: 2,
         episodeCount: episodes4['length'],
         outputTokenLimitMode: 'provider-default',
         requestTimeoutMode: 'provider-default',
@@ -6298,13 +6298,13 @@ async function splitStoryEpisodesCombinedRequest({
       phase: 'batch-validation',
       prompt: prompt9,
       systemPrompt: STORY_EPISODES_SPLIT_VALIDATION_SYSTEM_PROMPT,
-      automaticCallLimit: 0x2,
+      automaticCallLimit: 2,
       details: {
         status: 'succeeded',
-        requestIndex: 0x2,
-        requestCount: 0x2,
+        requestIndex: 2,
+        requestCount: 2,
         episodeCount: episodes4['length'],
-        elapsedMs: Math['max'](0x0, Date['now']() - value608),
+        elapsedMs: Math['max'](0, Date['now']() - value608),
         responseCharacters: responseCharacters3['characters'],
         responseBytes: responseCharacters3['bytes'],
         ...getStoryEpisodeSplitResponseTiming(attempts3),
@@ -6316,13 +6316,13 @@ async function splitStoryEpisodesCombinedRequest({
         phase: 'batch-validation',
         prompt: prompt9,
         systemPrompt: STORY_EPISODES_SPLIT_VALIDATION_SYSTEM_PROMPT,
-        automaticCallLimit: 0x2,
+        automaticCallLimit: 2,
         details: {
           status: 'failed',
-          requestIndex: 0x2,
-          requestCount: 0x2,
+          requestIndex: 2,
+          requestCount: 2,
           episodeCount: episodes4['length'],
-          elapsedMs: Math['max'](0x0, Date['now']() - value608),
+          elapsedMs: Math['max'](0, Date['now']() - value608),
           errorType: normalizeText(error33?.['type'] || error33?.['name']),
           errorMessage: normalizeText(error33?.['message'] || error33),
         },
@@ -6345,7 +6345,7 @@ async function splitStoryEpisodesCombinedRequest({
       const list182 = getStoryEpisodesSplitResponseEntries(
         parseStrictJson(value612['rawResponse'], 'Agent 未返回批量分镜结果。'),
       );
-      if (!list182['length']) throw new Error('Agent\x20返回结果没有可用分集。');
+      if (!list182['length']) throw new Error('Agent 返回结果没有可用分集。');
       ((list181 = list182), (rawResponse4 = value612['rawResponse']));
       break;
     } catch (value613) {
@@ -6354,17 +6354,17 @@ async function splitStoryEpisodesCombinedRequest({
   }
   if (!list181['length']) {
     const error34 = value611 || value609 || new Error('批量分镜返回无法解析。'),
-      episodeRef13 = getStoryEpisodeReferenceAliases(episodes4[0x0])[0x0] || 'episode-1',
+      episodeRef13 = getStoryEpisodeReferenceAliases(episodes4[0])[0] || 'episode-1',
       rawResponse5 = [
         '首次生成返回：',
         result2,
         ...(normalizeText(rawResponse3) ? ['', '检查修复返回：', rawResponse3] : []),
-      ]['join']('\x0a');
+      ]['join']('\n');
     ((error34['partialResults'] = [
       createStoryEpisodeSplitRawResponsePartialResult({
         episodeRef: episodeRef13,
         rawResponse: rawResponse5,
-        attempts: attempts3 || value609 ? 0x2 : 0x1,
+        attempts: attempts3 || value609 ? 2 : 1,
         error: error34,
       }),
     ]),
@@ -6380,10 +6380,10 @@ async function splitStoryEpisodesCombinedRequest({
         (value617, value618) =>
           map38['has'](value618) && map39['has'](getStoryEpisodesSplitEntryRef(value617)),
       );
-      if (count19 < 0x0 && map38['has'](value616)) count19 = value616;
-      if (count19 < 0x0) count19 = [...map38][0x0] ?? -0x1;
-      const episodeRef14 = getStoryEpisodeReferenceAliases(episode3)[0x0] || 'episode-' + (value616 + 0x1);
-      if (count19 < 0x0)
+      if (count19 < 0 && map38['has'](value616)) count19 = value616;
+      if (count19 < 0) count19 = [...map38][0] ?? -1;
+      const episodeRef14 = getStoryEpisodeReferenceAliases(episode3)[0] || 'episode-' + (value616 + 1);
+      if (count19 < 0)
         return {
           episodeRef: episodeRef14,
           status: 'rejected',
@@ -6416,7 +6416,7 @@ async function splitStoryEpisodesCombinedRequest({
             createStoryEpisodeSplitRawResponsePartialResult({
               episodeRef: episodeRef14,
               rawResponse: JSON['stringify'](entry2),
-              attempts: 0x1,
+              attempts: 1,
               error: error35,
             }),
         };
@@ -6437,7 +6437,7 @@ export async function splitStoryEpisodesBatch({
   const items4 = await Promise['all'](
     episodeCount3['map'](async (episode4, episodeIndex) => {
       const episodeRef15 =
-        getStoryEpisodeReferenceAliases(episode4)[0x0] || 'episode-' + (episodeIndex + 0x1);
+        getStoryEpisodeReferenceAliases(episode4)[0] || 'episode-' + (episodeIndex + 1);
       try {
         const result3 = await splitStoryEpisodeChecked({
           ...args48,
@@ -6501,7 +6501,7 @@ export async function splitStoryEpisode({
           buildVideoReplicationTimingGuidance(episode),
         ]
           ['filter'](Boolean)
-          ['join']('\x0a'),
+          ['join']('\n'),
     storyEpisodeDefaultSplitParseContext2 = createStoryEpisodeDefaultSplitParseContext({
       episodeRef: episodeRef16,
       episode: episode,
@@ -6512,12 +6512,12 @@ export async function splitStoryEpisode({
       promptMode: promptMode6,
     }),
     rawResponse6 = [];
-  for (let current3 = 0x0; current3 < total3; current3 += 0x1) {
+  for (let current3 = 0; current3 < total3; current3 += 1) {
     const episode5 = list183[current3],
       assets12 = selectStoryEpisodeSplitAssets(assets11, episode5);
     onProgress?.({
       stage: 'splitting-episode',
-      current: current3 + 0x1,
+      current: current3 + 1,
       total: total3,
       message: repairDraft ? '正在重新生成整集分镜' : '正在生成分镜脚本',
     });
@@ -6556,7 +6556,7 @@ export async function splitStoryEpisode({
       automaticCallLimit: total3,
       details: {
         status: 'queued',
-        requestIndex: current3 + 0x1,
+        requestIndex: current3 + 1,
         requestCount: total3,
         outputTokenLimitMode: 'explicit',
         maxOutputTokens: maxOutputTokens2,
@@ -6564,14 +6564,14 @@ export async function splitStoryEpisode({
         requestTimeoutMs: STORY_EPISODE_SPLIT_REQUEST_TIMEOUT_MS,
         assetCount: assets11['length'],
         includesAdjacentEpisodes: ![],
-        blueprintRequestCount: 0x0,
+        blueprintRequestCount: 0,
       },
     });
     let response24;
     try {
       const run3 = async () => {
         const value620 = Date['now'](),
-          queueWaitMs = Math['max'](0x0, value620 - value619);
+          queueWaitMs = Math['max'](0, value620 - value619);
         reportStoryEpisodeSplitRequestDiagnosticsInBackground(diagnostics, {
           phase: repairDraft ? 'manual-regeneration' : 'full-generation',
           prompt: prompt10,
@@ -6579,7 +6579,7 @@ export async function splitStoryEpisode({
           automaticCallLimit: total3,
           details: {
             status: 'started',
-            requestIndex: current3 + 0x1,
+            requestIndex: current3 + 1,
             requestCount: total3,
             queueWaitMs: queueWaitMs,
             maxOutputTokens: maxOutputTokens2,
@@ -6591,7 +6591,7 @@ export async function splitStoryEpisode({
               request: request,
               requestPayload: requestPayload4,
               stepId: repairDraft ? 'manual-regeneration' : 'generation',
-              attempt: current3 + 0x1,
+              attempt: current3 + 1,
               onInvocation: onInvocation,
               serializeResponse: getResultText,
             }),
@@ -6606,10 +6606,10 @@ export async function splitStoryEpisode({
               automaticCallLimit: total3,
               details: {
                 status: 'succeeded',
-                requestIndex: current3 + 0x1,
+                requestIndex: current3 + 1,
                 requestCount: total3,
                 queueWaitMs: queueWaitMs,
-                elapsedMs: Math['max'](0x0, Date['now']() - value620),
+                elapsedMs: Math['max'](0, Date['now']() - value620),
                 responseCharacters: responseCharacters4['characters'],
                 responseBytes: responseCharacters4['bytes'],
                 ...getStoryEpisodeSplitResponseTiming(invokeStoryGenerationRequest2),
@@ -6626,7 +6626,7 @@ export async function splitStoryEpisode({
                       request: request,
                       requestPayload: requestPayload5,
                       stepId: 'replication-missing-clips',
-                      attempt: 0x1,
+                      attempt: 1,
                       onInvocation: onInvocation,
                       serializeResponse: getResultText,
                     }),
@@ -6641,10 +6641,10 @@ export async function splitStoryEpisode({
             automaticCallLimit: total3,
             details: {
               status: 'failed',
-              requestIndex: current3 + 0x1,
+              requestIndex: current3 + 1,
               requestCount: total3,
               queueWaitMs: queueWaitMs,
-              elapsedMs: Math['max'](0x0, Date['now']() - value620),
+              elapsedMs: Math['max'](0, Date['now']() - value620),
               errorType: normalizeText(error37?.['type'] || error37?.['name']),
               errorMessage: normalizeText(error37?.['message'] || error37),
               maxOutputTokens: maxOutputTokens2,
@@ -6663,7 +6663,7 @@ export async function splitStoryEpisode({
         (error38['partialResult'] = createStoryEpisodeSplitRawResponsePartialResult({
           episodeRef: episodeRef16,
           rawResponse: serializeStoryEpisodeSplitTransportRaw(error38),
-          attempts: current3 + 0x1,
+          attempts: current3 + 1,
           error: error38,
         }));
       throw error38;
@@ -6671,7 +6671,7 @@ export async function splitStoryEpisode({
     try {
       const responseData = parseStrictJson(getResultText(response24), 'Agent 未返回片段拆分结果。');
       if (!Array['isArray'](responseData?.['clips']) || !responseData['clips']['length'])
-        throw new Error('Agent\x20返回结果没有可用镜头。');
+        throw new Error('Agent 返回结果没有可用镜头。');
       rawResponse6['push']({
         response: response24,
         requestEpisode: episode5,
@@ -6682,7 +6682,7 @@ export async function splitStoryEpisode({
       ((error39['partialResult'] = createStoryEpisodeSplitRawResponsePartialResult({
         episodeRef: episodeRef16,
         rawResponse: getResultText(response24),
-        attempts: current3 + 0x1,
+        attempts: current3 + 1,
         error: error39,
       })),
         (error39['message'] =
@@ -6710,8 +6710,8 @@ export async function splitStoryEpisode({
         },
       ),
       clips8 =
-        total3 > 0x1
-          ? list184['map']((args51, value621) => ({ ...args51, ref: 'clip-' + (value621 + 0x1) }))
+        total3 > 1
+          ? list184['map']((args51, value621) => ({ ...args51, ref: 'clip-' + (value621 + 1) }))
           : list184;
     draft2 = {
       ...normalizeStoryEpisodeSplitDraft(
@@ -6719,12 +6719,12 @@ export async function splitStoryEpisode({
         storyEpisodeDefaultSplitParseContext2,
       ),
       rawResponse: rawResponse6['map'](({ response: response26 }) => getResultText(response26))['join'](
-        '\x0a\x0a',
+        '\n\n',
       ),
     };
   } catch (error40) {
     const rawResponse7 = rawResponse6['map'](({ response: response27 }) => getResultText(response27))['join'](
-      '\x0a\x0a',
+      '\n\n',
     );
     ((error40['partialResult'] = createStoryEpisodeSplitRawResponsePartialResult({
       episodeRef: episodeRef16,
@@ -6753,7 +6753,7 @@ export async function splitStoryEpisode({
           buildVideoReplicationTimingGuidance(episode),
         ]
           ['filter'](Boolean)
-          ['join']('\x0a'),
+          ['join']('\n'),
         dialogueSpeakerGuidance: STORY_EPISODE_SPLIT_DIALOGUE_SPEAKER_GUIDANCE,
         groupingGuidance: STORY_EPISODE_SPLIT_GROUPING_GUIDANCE,
         timelineRequirements: getStoryEpisodeTimelinePlanningRequirements(promptMode6),
@@ -6761,9 +6761,9 @@ export async function splitStoryEpisode({
       });
     (onProgress?.({
       stage: 'repairing-episode-split',
-      current: 0x0,
+      current: 0,
       total: total4,
-      message: '正在定点修复 ' + total4 + '\x20个格式或校验未通过的片段',
+      message: '正在定点修复 ' + total4 + ' 个格式或校验未通过的片段',
     }),
       reportStoryEpisodeSplitRequestDiagnostics(diagnostics, {
         phase: 'targeted-repair',
@@ -6771,8 +6771,8 @@ export async function splitStoryEpisode({
         systemPrompt: systemPrompt3,
         failedClipCount: total4,
         carriesFullEpisodeContext: ![],
-        automaticCallLimit: 0x1,
-        details: { status: 'queued', requestIndex: 0x1, requestCount: 0x1 },
+        automaticCallLimit: 1,
+        details: { status: 'queued', requestIndex: 1, requestCount: 1 },
       }));
     let value622 = null;
     try {
@@ -6791,7 +6791,7 @@ export async function splitStoryEpisode({
             timeoutMs: STORY_EPISODE_SPLIT_REQUEST_TIMEOUT_MS,
           },
           stepId: 'generation-repair',
-          attempt: 0x2,
+          attempt: 2,
           onInvocation: onInvocation,
           serializeResponse: getResultText,
         });
@@ -6816,7 +6816,7 @@ export async function splitStoryEpisode({
     resultText4 &&
       (draft2['rawResponse'] = [draft2['rawResponse'], '局部修复返回：', resultText4]
         ['filter'](Boolean)
-        ['join']('\x0a\x0a'));
+        ['join']('\n\n'));
     finalizeStoryEpisodeSplitDraft4 = finalizeStoryEpisodeSplitDraft(draft2);
     if (finalizeStoryEpisodeSplitDraft4)
       return assertStoryEpisodeSplitTiming(finalizeStoryEpisodeSplitDraft4, episode);
@@ -6824,8 +6824,8 @@ export async function splitStoryEpisode({
   throwStoryEpisodeSplitPartialResult(draft2);
 }
 const STORY_EPISODE_EXPERIMENTAL_DRAFT_STRATEGY = 'semantic-shot-batches-v3',
-  STORY_EPISODE_EXPERIMENTAL_TRANSPORT_ATTEMPTS = 0x2,
-  STORY_EPISODE_EXPERIMENTAL_RETRY_DELAY_MS = 0x258;
+  STORY_EPISODE_EXPERIMENTAL_TRANSPORT_ATTEMPTS = 2,
+  STORY_EPISODE_EXPERIMENTAL_RETRY_DELAY_MS = 600;
 function cloneStoryEpisodeExperimentalValue(enabled24) {
   if (!enabled24 || typeof enabled24 !== 'object') return null;
   try {
@@ -6837,13 +6837,13 @@ function cloneStoryEpisodeExperimentalValue(enabled24) {
 function hashStoryEpisodeExperimentalValue(value625) {
   const list185 = JSON['stringify'](value625);
   let value626 = 0x811c9dc5;
-  for (let value627 = 0x0; value627 < list185['length']; value627 += 0x1) {
+  for (let value627 = 0; value627 < list185['length']; value627 += 1) {
     ((value626 ^= list185['charCodeAt'](value627)), (value626 = Math['imul'](value626, 0x1000193)));
   }
   return (
     STORY_EPISODE_BATCHED_SPLIT_SCHEMA_VERSION +
     '-' +
-    (value626 >>> 0x0)['toString'](0x10)['padStart'](0x8, '0') +
+    (value626 >>> 0)['toString'](16)['padStart'](8, '0') +
     '-' +
     list185['length']
   );
@@ -6885,10 +6885,10 @@ function isStoryEpisodeExperimentalTimeout(error41) {
   return text38 === 'TIMEOUT' || text39 === 'aborterror' || /timeout|timed out|超时/u['test'](text40);
 }
 function isStoryEpisodeExperimentalPromptTooLong(error42) {
-  const count20 = Number(error42?.['status'] || error42?.['statusCode'] || 0x0),
+  const count20 = Number(error42?.['status'] || error42?.['statusCode'] || 0),
     text41 = normalizeText(error42?.['message'])['toLowerCase']();
   return (
-    count20 === 0x19d ||
+    count20 === 413 ||
     /提示词过长|prompt.{0,24}too long|context.{0,24}(length|limit)|request entity too large/u['test'](text41)
   );
 }
@@ -6896,12 +6896,12 @@ function isStoryEpisodeExperimentalBatchShrinkable(value628) {
   return isStoryEpisodeExperimentalTimeout(value628) || isStoryEpisodeExperimentalPromptTooLong(value628);
 }
 function isStoryEpisodeExperimentalRetryable(response29) {
-  const count21 = Number(response29?.['status'] || response29?.['statusCode'] || 0x0);
+  const count21 = Number(response29?.['status'] || response29?.['statusCode'] || 0);
   return (
     response29?.['retryable'] === !![] ||
     isStoryEpisodeExperimentalTimeout(response29) ||
-    count21 === 0x1ad ||
-    count21 >= 0x1f4
+    count21 === 429 ||
+    count21 >= 500
   );
 }
 function waitForStoryEpisodeExperimentalRetry(value629) {
@@ -6914,12 +6914,12 @@ async function settleStoryEpisodeExperimentalBatches(
 ) {
   const list187 = Array['isArray'](list186) ? list186 : [],
     value632 = new Array(list187['length']);
-  let value633 = 0x0;
-  const length3 = Math['min'](list187['length'], Math['max'](0x1, Math['trunc'](Number(value631) || 0x1))),
+  let value633 = 0;
+  const length3 = Math['min'](list187['length'], Math['max'](1, Math['trunc'](Number(value631) || 1))),
     value634 = Array['from']({ length: length3 }, async () => {
       while (value633 < list187['length']) {
         const value635 = value633;
-        value633 += 0x1;
+        value633 += 1;
         try {
           value632[value635] = {
             status: 'fulfilled',
@@ -6940,9 +6940,9 @@ async function requestStoryEpisodeExperimentalWithRetry(
     splitOversizedBatch: splitOversizedBatch = ![],
   } = {},
 ) {
-  const value636 = Math['max'](0x1, Math['trunc'](Number(maxAttempts) || 0x1));
+  const value636 = Math['max'](1, Math['trunc'](Number(maxAttempts) || 1));
   let value637 = null;
-  for (let value638 = 0x1; value638 <= value636; value638 += 0x1) {
+  for (let value638 = 1; value638 <= value636; value638 += 1) {
     try {
       return await handler11(value638, value637);
     } catch (value639) {
@@ -6950,7 +6950,7 @@ async function requestStoryEpisodeExperimentalWithRetry(
       if (!isStoryEpisodeExperimentalRetryable(value639) || value638 >= value636) throw value639;
       ((value637 = value639),
         await retryWait(
-          STORY_EPISODE_EXPERIMENTAL_RETRY_DELAY_MS * 0x2 ** (value638 - 0x1),
+          STORY_EPISODE_EXPERIMENTAL_RETRY_DELAY_MS * 2 ** (value638 - 1),
           value639,
           value638,
         ));
@@ -7017,7 +7017,7 @@ function restoreStoryEpisodeExperimentalDraft(
           constraints: constraints,
           assets: assets,
           clipPlans: [sourcePlanRef],
-          minimumShotsPerClip: 0x1,
+          minimumShotsPerClip: 1,
           maximumShotsPerClip: STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP,
           enforceMaxDuration: ![],
           repairMissingShotFields: !![],
@@ -7043,7 +7043,7 @@ function restoreStoryEpisodeExperimentalDraft(
       failedBatchRefs: normalizeStringArray(args52['failedBatchRefs'])['filter'](
         (value650) => !map43['has'](value650) && map40['has'](value650),
       ),
-      attempts: Math['max'](0x0, Math['trunc'](Number(args52['attempts']) || 0x0)),
+      attempts: Math['max'](0, Math['trunc'](Number(args52['attempts']) || 0)),
     };
   } catch {
     return null;
@@ -7071,7 +7071,7 @@ function createStoryEpisodeExperimentalBatchDraft(
       constraints: constraints,
       assets: assets,
       clipPlans: clipPlans,
-      minimumShotsPerClip: 0x1,
+      minimumShotsPerClip: 1,
       maximumShotsPerClip: STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP,
       enforceMaxDuration: ![],
       repairMissingShotFields: !![],
@@ -7138,11 +7138,11 @@ function assertStoryEpisodeExperimentalPlanTiming(options29 = {}, value655 = [])
       const totalDurationSeconds4 = (Array['isArray'](enabled26?.['clips']) ? enabled26['clips'] : [])[
           'reduce'
         ](
-          (value658, value659) => value658 + (normalizePositiveNumber(value659?.['durationSec']) || 0x0),
-          0x0,
+          (value658, value659) => value658 + (normalizePositiveNumber(value659?.['durationSec']) || 0),
+          0,
         ),
-        minimum = Number((targetDurationSec2 * 0.8)['toFixed'](0x1)),
-        maximum4 = Number((targetDurationSec2 * 1.2)['toFixed'](0x1));
+        minimum = Number((targetDurationSec2 * 0.8)['toFixed'](1)),
+        maximum4 = Number((targetDurationSec2 * 1.2)['toFixed'](1));
       if (totalDurationSeconds4 >= minimum && totalDurationSeconds4 <= maximum4) return [];
       return [
         {
@@ -7155,7 +7155,7 @@ function assertStoryEpisodeExperimentalPlanTiming(options29 = {}, value655 = [])
       ];
     });
   if (!list190['length']) return options29;
-  const value660 = list190['slice'](0x0, 0x4)
+  const value660 = list190['slice'](0, 4)
       ['map'](
         (value661) =>
           '计划“' +
@@ -7280,12 +7280,12 @@ export async function splitStoryEpisodeExperimental({
       promptMode: promptMode7,
       timingBudget: timingBudget3,
     }),
-    runId2 = 'episode-split-' + Date['now']()['toString'](0x24) + '-' + sourceFingerprint2['slice'](-0xc);
-  let value669 = 0x0,
-    attempt5 = 0x0;
+    runId2 = 'episode-split-' + Date['now']()['toString'](36) + '-' + sourceFingerprint2['slice'](-12);
+  let value669 = 0,
+    attempt5 = 0;
   const run5 = (request6, requestPayload7, stepId2) => {
       return (
-        (attempt5 += 0x1),
+        (attempt5 += 1),
         invokeStoryGenerationRequest({
           request: request6,
           requestPayload: requestPayload7,
@@ -7298,13 +7298,13 @@ export async function splitStoryEpisodeExperimental({
       );
     },
     nextRequestSequence2 = () => {
-      return ((value669 += 0x1), value669);
+      return ((value669 += 1), value669);
     },
     args56 = {
       projectId: normalizeText(project?.['id']),
       episodeId: normalizeText(episode?.['id']),
       episodeRef: episodeRef17,
-      episodeNumber: Math['max'](0x1, Math['trunc'](Number(episode?.['number']) || 0x1)),
+      episodeNumber: Math['max'](1, Math['trunc'](Number(episode?.['number']) || 1)),
       sourceBeatCount: sourceBeats4['length'],
       selectedAssetCount: assets13['length'],
       resumed: Boolean(resumeDraft),
@@ -7326,8 +7326,8 @@ export async function splitStoryEpisodeExperimental({
   if (!blueprint3) {
     onProgress?.({
       stage: 'planning-episode-split-blueprint',
-      current: 0x1,
-      total: 0x1,
+      current: 1,
+      total: 1,
       message: '正在规划整集分镜蓝图',
     });
     const prompt12 = buildStoryEpisodeSplitBlueprintPrompt({
@@ -7376,7 +7376,7 @@ export async function splitStoryEpisodeExperimental({
                 ...constraints9,
                 enforceMaxDuration: ![],
                 includeSceneAssetRef: Object['prototype']['hasOwnProperty']['call'](
-                  value670?.['outputSchema']?.['clipPlans']?.[0x0] || {},
+                  value670?.['outputSchema']?.['clipPlans']?.[0] || {},
                   'sceneAssetRef',
                 ),
                 includeDirectorContinuity: promptExperiment === !![],
@@ -7410,7 +7410,7 @@ export async function splitStoryEpisodeExperimental({
                 reportStoryEpisodeSplitRequestDiagnostics(diagnostics, {
                   phase: 'experimental-blueprint-local-fallback',
                   carriesFullEpisodeContext: ![],
-                  automaticCallLimit: 0x1,
+                  automaticCallLimit: 1,
                   details: {
                     status: 'recovered-locally',
                     countsTowardRequestTotal: ![],
@@ -7432,9 +7432,9 @@ export async function splitStoryEpisodeExperimental({
             }
           },
           outputContract: promptExperiment
-            ? 'episodeRef\x20and\x20ordered\x20clipPlans[{sourceBeatRefs,beat,optional\x20sceneAssetRef,sceneAppearanceRef,entryState,exitState,openingShotIntent,closingShotIntent,characterAssetRefs,propAssetRefs,targetDurationSec}]\x20covering\x20every\x20sourceBeat\x20exactly\x20once;\x20local\x20code\x20derives\x20plan\x20refs,\x20source\x20scenes,\x20continuity\x20notes,\x20and\x20uniquely\x20bound\x20scene\x20assets'
-            : 'episodeRef\x20and\x20ordered\x20clipPlans[{sourceBeatRefs,beat,optional\x20sceneAssetRef,sceneAppearanceRef,entryState,exitState,characterAssetRefs,propAssetRefs,targetDurationSec}]\x20covering\x20every\x20sourceBeat\x20exactly\x20once;\x20local\x20code\x20derives\x20plan\x20refs,\x20source\x20scenes,\x20continuity\x20notes,\x20and\x20uniquely\x20bound\x20scene\x20assets',
-          maxAttempts: 0x1,
+            ? 'episodeRef and ordered clipPlans[{sourceBeatRefs,beat,optional sceneAssetRef,sceneAppearanceRef,entryState,exitState,openingShotIntent,closingShotIntent,characterAssetRefs,propAssetRefs,targetDurationSec}] covering every sourceBeat exactly once; local code derives plan refs, source scenes, continuity notes, and uniquely bound scene assets'
+            : 'episodeRef and ordered clipPlans[{sourceBeatRefs,beat,optional sceneAssetRef,sceneAppearanceRef,entryState,exitState,characterAssetRefs,propAssetRefs,targetDurationSec}] covering every sourceBeat exactly once; local code derives plan refs, source scenes, continuity notes, and uniquely bound scene assets',
+          maxAttempts: 1,
         }),
       { retryWait: retryWait },
     )),
@@ -7449,7 +7449,7 @@ export async function splitStoryEpisodeExperimental({
         completedPlanResults: [],
         completedClips: [],
         failedBatchRefs: [],
-        attempts: 0x0,
+        attempts: 0,
         error: '',
         createdAt: Date['now'](),
         updatedAt: Date['now'](),
@@ -7458,13 +7458,13 @@ export async function splitStoryEpisodeExperimental({
   } else {
     const current4 = Array['isArray'](completedClipCount['completedPlanResults'])
       ? completedClipCount['completedPlanResults']['length']
-      : 0x0;
+      : 0;
     onProgress?.({
       stage: 'resuming-episode-split-batches',
       current: current4,
       total: blueprint3['clipPlans']['length'],
       message:
-        '正在从断点继续，已完成 ' + current4 + '/' + blueprint3['clipPlans']['length'] + '\x20个蓝图计划',
+        '正在从断点继续，已完成 ' + current4 + '/' + blueprint3['clipPlans']['length'] + ' 个蓝图计划',
     });
   }
   const current5 = new Map(
@@ -7474,7 +7474,7 @@ export async function splitStoryEpisodeExperimental({
     ),
     list191 = blueprint3['clipPlans']['filter']((value674) => !current5['has'](value674['ref'])),
     batchTotal2 = createStoryEpisodeExperimentalConcurrentBatches(list191);
-  let batchNumber2 = 0x0;
+  let batchNumber2 = 0;
   const run6 = async (value675) => {
       (value675['planResults']['forEach']((value676) => {
         current5['set'](value676['sourcePlanRef'], value676);
@@ -7491,14 +7491,14 @@ export async function splitStoryEpisodeExperimental({
         await saveStoryEpisodeExperimentalCheckpoint(completedClipCount, onCheckpoint));
     },
     handler13 = async (planBatch2, { previousError: previousError = null } = {}) => {
-      ((batchNumber2 += 0x1),
-        (completedClipCount['attempts'] += 0x1),
+      ((batchNumber2 += 1),
+        (completedClipCount['attempts'] += 1),
         onProgress?.({
           stage: 'expanding-episode-split-batch',
           current: current5['size'],
           total: blueprint3['clipPlans']['length'],
           message:
-            '正在展开\x20' +
+            '正在展开 ' +
             planBatch2['length'] +
             ' 个蓝图计划，已完成 ' +
             current5['size'] +
@@ -7569,7 +7569,7 @@ export async function splitStoryEpisodeExperimental({
             buildStoryEpisodeSplitBatchResponseSchema({
               clipCount: planBatch2['length'],
               maxDurationSeconds: constraints9['sceneMaxSeconds'],
-              minimumShotsPerClip: 0x1,
+              minimumShotsPerClip: 1,
               maximumShotsPerClip: STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP,
               requiredClipFields: ['ref', 'shots'],
               requiredShotFields: [
@@ -7602,7 +7602,7 @@ export async function splitStoryEpisodeExperimental({
       try {
         requestStoryEpisodeExperimentalWithRetry2 = await requestStoryEpisodeExperimentalWithRetry(
           (value683, previousError2) => handler13(splitOversizedBatch2, { previousError: previousError2 }),
-          { retryWait: retryWait, splitOversizedBatch: splitOversizedBatch2['length'] > 0x1 },
+          { retryWait: retryWait, splitOversizedBatch: splitOversizedBatch2['length'] > 1 },
         );
       } catch (planResults2) {
         Array['isArray'](planResults2?.['partialPlanResults']) &&
@@ -7611,10 +7611,10 @@ export async function splitStoryEpisodeExperimental({
             planResults: planResults2['partialPlanResults'],
             clips: planResults2['partialPlanResults']['flatMap']((value684) => value684['clips']),
           }));
-        if (isStoryEpisodeExperimentalBatchShrinkable(planResults2) && splitOversizedBatch2['length'] > 0x1) {
+        if (isStoryEpisodeExperimentalBatchShrinkable(planResults2) && splitOversizedBatch2['length'] > 1) {
           const list192 = splitOversizedBatch2['filter']((value685) => !current5['has'](value685['ref'])),
-            value686 = Math['floor'](list192['length'] / 0x2),
-            list193 = list192['slice'](0x0, value686),
+            value686 = Math['floor'](list192['length'] / 2),
+            list193 = list192['slice'](0, value686),
             list194 = list192['slice'](value686);
           onProgress?.({
             stage: 'shrinking-episode-split-batch',
@@ -7656,11 +7656,11 @@ export async function splitStoryEpisodeExperimental({
     current5['size'] &&
       (error47['message'] =
         completedClipCount['error'] +
-        '（已完成\x20' +
+        '（已完成 ' +
         current5['size'] +
         '/' +
         blueprint3['clipPlans']['length'] +
-        '\x20个蓝图计划，保留\x20' +
+        ' 个蓝图计划，保留 ' +
         completedClipCount['completedClips']['length'] +
         ' 个片段；再次点击实验分批可继续。）');
     throw error47;

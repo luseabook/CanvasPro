@@ -10,16 +10,16 @@ export function protectStoryPromptPills(index = '') {
     html = String(index),
     result = /<span\b[^>]*\bclass\s*=\s*["'][^"']*\bref-pill\b[^"']*["'][^>]*>/giu;
   let source = '',
-    data = 0x0,
+    data = 0,
     options;
   while ((options = result['exec'](html))) {
     const target = /<\/?span\b[^>]*>/giu;
     target['lastIndex'] = result['lastIndex'];
-    let next = 0x1,
+    let next = 1,
       current = result['lastIndex'],
       entry;
     while (next && (entry = target['exec'](html))) {
-      ((next += /^<\//u['test'](entry[0x0]) ? -0x1 : 0x1), (current = target['lastIndex']));
+      ((next += /^<\//u['test'](entry[0]) ? -1 : 1), (current = target['lastIndex']));
     }
     if (next) break;
     const token = 'story-pill-' + pills['length'] + '';
@@ -39,31 +39,31 @@ export function syncStoryClipPromptReferences(state, list = []) {
   if (String(state)['includes']('【参考素材】') && String(state)['includes']('【分镜与声音】')) return state;
   const ctx = protectStoryPromptPills(state || '');
   let list2 = ctx['source'];
-  const config = ctx['pills']['length'] > 0x0;
+  const config = ctx['pills']['length'] > 0;
   list['some']((scope) => scope['replicationSource']) &&
-    (list2 = list2['split']('\x0a')
+    (list2 = list2['split']('\n')
       ['filter']((input) => text(input) !== '保留原视频的视觉风格、场景和道具')
-      ['join']('\x0a'));
+      ['join']('\n'));
   for (const error of list) {
     for (const error2 of error['appearances'] || []) {
       const list3 =
-          '@' + text(error['name']) + (text(error2['name']) ? '\x20·\x20' + text(error2['name']) : ''),
+          '@' + text(error['name']) + (text(error2['name']) ? ' · ' + text(error2['name']) : ''),
         regExp = new RegExp(
           '<span\\b(?=[^>]*\\bdata-label="' +
-            escapeRegExp(escapeHtml(list3['slice'](0x1))) +
+            escapeRegExp(escapeHtml(list3['slice'](1))) +
             '")[^>]*>[\\s\\S]*?<\\/span>',
           'gu',
         ),
         args = ctx['pills']
           ['filter']((output) => {
             return (
-              (regExp['lastIndex'] = 0x0),
+              (regExp['lastIndex'] = 0),
               output['html']['includes'](
-                'data-asset-id=\x22story-asset:' +
+                'data-asset-id="story-asset:' +
                   encodeURIComponent(error['id']) +
                   ':' +
                   encodeURIComponent(error2['id']) +
-                  '\x22',
+                  '"',
               ) || regExp['test'](output['html'])
             );
           })
@@ -76,11 +76,11 @@ export function syncStoryClipPromptReferences(state, list = []) {
             value6 = value4 ? '&gt;' : '>',
             value7 = value4 ? escapeHtml(text(error['name'])) : text(error['name']),
             regExp2 = new RegExp(
-              '(^|\x5cn|<div>|<p>|<br\x5cs*/?>)将' +
+              '(^|\\n|<div>|<p>|<br\\s*/?>)将' +
                 value5 +
                 escapeRegExp(value3) +
                 value6 +
-                '[^\x5cn]*?定义为' +
+                '[^\\n]*?定义为' +
                 value5 +
                 escapeRegExp(value7) +
                 value6 +
@@ -103,9 +103,9 @@ export function syncStoryClipPromptReferences(state, list = []) {
           );
         }
         if (list4['some']((value10) => list2['includes'](value10)))
-          list2 = list2['split']('\x0a')
+          list2 = list2['split']('\n')
             ['filter']((enabled) => !enabled['startsWith']('声音设定（' + error['name'] + '）：'))
-            ['join']('\x0a');
+            ['join']('\n');
       }
       if (
         error['replicationSource'] &&
@@ -115,7 +115,7 @@ export function syncStoryClipPromptReferences(state, list = []) {
         const text2 = text(error2['description'] || error['description']),
           value11 = '' + text(error['name']) + (text2 ? '（' + text2 + '）' : '');
         list2 = list2['replace'](
-          new RegExp(escapeRegExp(list3) + '(?=$|[。；;，,：:\x5cs<>])', 'gu'),
+          new RegExp(escapeRegExp(list3) + '(?=$|[。；;，,：:\\s<>])', 'gu'),
           () => value11,
         );
         if (config) {

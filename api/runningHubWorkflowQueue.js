@@ -6,12 +6,12 @@ import {
   normalizeRunningHubModelApiProfileId,
   resolveRunningHubModelApiProfileId,
 } from '../src/modules/runningHubProviderProfiles.js';
-const DEFAULT_RUNNINGHUB_WORKFLOW_CONCURRENCY = 0x1,
-  DEFAULT_RUNNINGHUB_WORKFLOW_QUEUE_POLL_INTERVAL_MS = 0x7d0,
+const DEFAULT_RUNNINGHUB_WORKFLOW_CONCURRENCY = 1,
+  DEFAULT_RUNNINGHUB_WORKFLOW_QUEUE_POLL_INTERVAL_MS = 2000,
   PROVIDER_KEY = 'runninghubwf',
   queues = new Map(),
   sessionConcurrencyProbes = new Map();
-let nextQueueItemId = 0x1;
+let nextQueueItemId = 1;
 function isPlainObject(enabled) {
   return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
@@ -28,10 +28,10 @@ export function normalizeRunningHubWorkflowConcurrencyLimit(
   index,
   result = DEFAULT_RUNNINGHUB_WORKFLOW_CONCURRENCY,
 ) {
-  const data = Math['max'](0x1, Math['floor'](Number(result) || DEFAULT_RUNNINGHUB_WORKFLOW_CONCURRENCY)),
+  const data = Math['max'](1, Math['floor'](Number(result) || DEFAULT_RUNNINGHUB_WORKFLOW_CONCURRENCY)),
     count = Number(index);
-  if (!Number['isFinite'](count) || count <= 0x0) return data;
-  return Math['max'](0x1, Math['floor'](count));
+  if (!Number['isFinite'](count) || count <= 0) return data;
+  return Math['max'](1, Math['floor'](count));
 }
 function resolveRunningHubWorkflowProfileId(options = {}) {
   const runningHubProviderProfileId = getRunningHubProviderProfileId(options),
@@ -66,7 +66,7 @@ export function resolveRunningHubWorkflowQueueConfig({
   return {
     apiKey: apiKey2,
     providerProfileId: providerProfileId2,
-    concurrentLimit: normalizeRunningHubWorkflowConcurrencyLimit(source, 0x1),
+    concurrentLimit: normalizeRunningHubWorkflowConcurrencyLimit(source, 1),
     providerConfig: providerConfig2,
   };
 }
@@ -112,11 +112,11 @@ function getQueue(queueKey) {
     !enabled2 &&
       ((enabled2 = {
         queueKey: queueKey,
-        active: 0x0,
+        active: 0,
         concurrentLimit: DEFAULT_RUNNINGHUB_WORKFLOW_CONCURRENCY,
-        remoteOccupiedCount: 0x0,
-        remoteRunningCount: 0x0,
-        remoteQueuedCount: 0x0,
+        remoteOccupiedCount: 0,
+        remoteRunningCount: 0,
+        remoteQueuedCount: 0,
         waiting: [],
         probeTimer: null,
         probeOptions: null,
@@ -130,11 +130,11 @@ function getProbeKey(handle) {
 }
 function normalizeRemoteCount(state) {
   const count2 = Number(state);
-  return Number['isFinite'](count2) && count2 > 0x0 ? Math['floor'](count2) : 0x0;
+  return Number['isFinite'](count2) && count2 > 0 ? Math['floor'](count2) : 0;
 }
-function normalizeQueueStatus(config, scope = 0x1) {
+function normalizeQueueStatus(config, scope = 1) {
   const count3 = Number(config?.['concurrentLimit']);
-  if (!Number['isFinite'](count3) || count3 <= 0x0) return null;
+  if (!Number['isFinite'](count3) || count3 <= 0) return null;
   const runningCount = normalizeRemoteCount(config?.['runningCount']),
     queuedCount = normalizeRemoteCount(config?.['queuedCount']),
     count4 = Number(config?.['totalCurrentTasks']);
@@ -143,7 +143,7 @@ function normalizeQueueStatus(config, scope = 0x1) {
     runningCount: runningCount,
     queuedCount: queuedCount,
     totalCurrentTasks:
-      Number['isFinite'](count4) && count4 >= 0x0 ? Math['floor'](count4) : runningCount + queuedCount,
+      Number['isFinite'](count4) && count4 >= 0 ? Math['floor'](count4) : runningCount + queuedCount,
   };
 }
 function applyRemoteQueueStatus(input, output) {
@@ -151,7 +151,7 @@ function applyRemoteQueueStatus(input, output) {
   if (!queueStatus) return ![];
   return (
     (input['concurrentLimit'] = queueStatus['concurrentLimit']),
-    input['active'] === 0x0 &&
+    input['active'] === 0 &&
       ((input['remoteRunningCount'] = queueStatus['runningCount']),
       (input['remoteQueuedCount'] = queueStatus['queuedCount']),
       (input['remoteOccupiedCount'] = queueStatus['totalCurrentTasks'])),
@@ -177,9 +177,9 @@ async function ensureSessionQueueStatus(concurrentLimit2, value3 = {}) {
   if (!text4 || value3['autoProbeConcurrency'] === ![])
     return {
       concurrentLimit: concurrentLimit2['concurrentLimit'],
-      runningCount: 0x0,
-      queuedCount: 0x0,
-      totalCurrentTasks: 0x0,
+      runningCount: 0,
+      queuedCount: 0,
+      totalCurrentTasks: 0,
     };
   const probeKey = getProbeKey(concurrentLimit2['queueKey']),
     value4 = sessionConcurrencyProbes['get'](probeKey);
@@ -224,13 +224,13 @@ function emitWaiting(value8, args2 = {}) {
 }
 function removeWaitingItem(value10, value11) {
   const count5 = value10['waiting']['indexOf'](value11);
-  if (count5 >= 0x0) return (value10['waiting']['splice'](count5, 0x1), emitWaiting(value10), !![]);
+  if (count5 >= 0) return (value10['waiting']['splice'](count5, 1), emitWaiting(value10), !![]);
   return ![];
 }
 function resolveQueuePollIntervalMs(value12) {
   const count6 = Number(value12);
-  if (!Number['isFinite'](count6) || count6 <= 0x0) return DEFAULT_RUNNINGHUB_WORKFLOW_QUEUE_POLL_INTERVAL_MS;
-  return Math['max'](0x1, Math['floor'](count6));
+  if (!Number['isFinite'](count6) || count6 <= 0) return DEFAULT_RUNNINGHUB_WORKFLOW_QUEUE_POLL_INTERVAL_MS;
+  return Math['max'](1, Math['floor'](count6));
 }
 function getRunningHubErrorCode(response) {
   const value13 = [
@@ -248,14 +248,14 @@ function getRunningHubErrorCode(response) {
   return null;
 }
 function isRunningHubQueueMaxedError(error2) {
-  if (getRunningHubErrorCode(error2) === 0x1a5) return !![];
+  if (getRunningHubErrorCode(error2) === 421) return !![];
   const list = [
     error2?.['message'],
     error2?.['raw']?.['message'],
     error2?.['response']?.['data']?.['message'],
   ]
     ['map'](normalizeText)
-    ['join']('\x20')
+    ['join'](' ')
     ['toUpperCase']();
   return list['includes']('TASK_QUEUE_MAXED');
 }
@@ -266,7 +266,7 @@ function clearProbeTimer(enabled4) {
 function scheduleQueueProbe(value16) {
   if (
     value16['probeTimer'] ||
-    value16['waiting']['length'] === 0x0 ||
+    value16['waiting']['length'] === 0 ||
     value16['active'] + value16['remoteOccupiedCount'] < value16['concurrentLimit']
   )
     return;
@@ -274,23 +274,23 @@ function scheduleQueueProbe(value16) {
     queuePollIntervalMs2 = resolveQueuePollIntervalMs(value17['queuePollIntervalMs']);
   ((value16['probeTimer'] = setTimeout(async () => {
     value16['probeTimer'] = null;
-    if (value16['waiting']['length'] === 0x0) return;
+    if (value16['waiting']['length'] === 0) return;
     if (value17['autoProbeConcurrency'] !== ![] && normalizeText(value17['apiKey']))
       try {
         const probeRunningHubWorkflowQueueStatus2 = await probeRunningHubWorkflowQueueStatus(value17);
         !applyRemoteQueueStatus(value16, probeRunningHubWorkflowQueueStatus2) &&
-          ((value16['remoteOccupiedCount'] = 0x0),
-          (value16['remoteRunningCount'] = 0x0),
-          (value16['remoteQueuedCount'] = 0x0));
+          ((value16['remoteOccupiedCount'] = 0),
+          (value16['remoteRunningCount'] = 0),
+          (value16['remoteQueuedCount'] = 0));
       } catch {
-        ((value16['remoteOccupiedCount'] = 0x0),
-          (value16['remoteRunningCount'] = 0x0),
-          (value16['remoteQueuedCount'] = 0x0));
+        ((value16['remoteOccupiedCount'] = 0),
+          (value16['remoteRunningCount'] = 0),
+          (value16['remoteQueuedCount'] = 0));
       }
     else
-      ((value16['remoteOccupiedCount'] = 0x0),
-        (value16['remoteRunningCount'] = 0x0),
-        (value16['remoteQueuedCount'] = 0x0));
+      ((value16['remoteOccupiedCount'] = 0),
+        (value16['remoteRunningCount'] = 0),
+        (value16['remoteQueuedCount'] = 0));
     pumpQueue(value16);
   }, queuePollIntervalMs2)),
     value16['probeTimer']['unref']?.());
@@ -300,7 +300,7 @@ function pumpQueue(queueKey2) {
     clearProbeTimer(queueKey2);
   while (
     queueKey2['active'] + queueKey2['remoteOccupiedCount'] < queueKey2['concurrentLimit'] &&
-    queueKey2['waiting']['length'] > 0x0
+    queueKey2['waiting']['length'] > 0
   ) {
     const itemId = queueKey2['waiting']['shift']();
     if (!itemId || itemId['settled']) continue;
@@ -308,24 +308,24 @@ function pumpQueue(queueKey2) {
       ((itemId['settled'] = !![]), itemId['reject'](createAbortError()));
       continue;
     }
-    ((queueKey2['active'] += 0x1), (itemId['started'] = !![]));
+    ((queueKey2['active'] += 1), (itemId['started'] = !![]));
     const value18 = { provider: PROVIDER_KEY, queueKey: queueKey2['queueKey'], itemId: itemId['id'] };
-    (itemId['onQueueChange']?.(buildQueueDetail(queueKey2, { status: 'running', queueIndex: -0x1 })),
+    (itemId['onQueueChange']?.(buildQueueDetail(queueKey2, { status: 'running', queueIndex: -1 })),
       Promise['resolve']()
         ['then'](() => itemId['runner'](value18))
         ['then'](
           (value19) => {
-            ((queueKey2['active'] = Math['max'](0x0, queueKey2['active'] - 0x1)),
+            ((queueKey2['active'] = Math['max'](0, queueKey2['active'] - 1)),
               (itemId['settled'] = !![]),
               itemId['resolve'](value19),
               pumpQueue(queueKey2),
               emitWaiting(queueKey2));
           },
           (value20) => {
-            queueKey2['active'] = Math['max'](0x0, queueKey2['active'] - 0x1);
+            queueKey2['active'] = Math['max'](0, queueKey2['active'] - 1);
             if (isRunningHubQueueMaxedError(value20) && !itemId['signal']?.['aborted']) {
               ((itemId['started'] = ![]),
-                (queueKey2['remoteOccupiedCount'] = Math['max'](0x1, queueKey2['concurrentLimit'])),
+                (queueKey2['remoteOccupiedCount'] = Math['max'](1, queueKey2['concurrentLimit'])),
                 (queueKey2['remoteRunningCount'] = Math['max'](
                   queueKey2['remoteRunningCount'],
                   queueKey2['concurrentLimit'],
@@ -424,5 +424,5 @@ export function __resetRunningHubWorkflowQueueForTest() {
   (queues['forEach'](clearProbeTimer),
     queues['clear'](),
     sessionConcurrencyProbes['clear'](),
-    (nextQueueItemId = 0x1));
+    (nextQueueItemId = 1));
 }

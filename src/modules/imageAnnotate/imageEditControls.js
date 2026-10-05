@@ -9,10 +9,10 @@ const text = (value) => t('imageAnnotate.edit.' + value),
 export function getImageRotation(list = []) {
   return normalizeRotationDegrees(
     list['reduce']((item, key) => {
-      if (key?.['type'] === 'rotate-image') return item + (Number(key['degrees']) || 0x0);
+      if (key?.['type'] === 'rotate-image') return item + (Number(key['degrees']) || 0);
       if (key?.['type'] === 'flip-horizontal' || key?.['type'] === 'flip-vertical') return -item;
       return item;
-    }, 0x0),
+    }, 0),
   );
 }
 export const getEditorRotation = (index) => index['_rotationPreview'] ?? getImageRotation(index['_commands']);
@@ -70,10 +70,10 @@ export function syncImageEditControls(enabled2) {
   if (layoutKeys['get'](enabled2['toolbarEl']) === next) return;
   layoutKeys['set'](enabled2['toolbarEl'], next);
   const box3 = getImageRotationLayout(box['width'], box['height'], target, source),
-    center = worldToScreen(box['x'] + box['width'] / 0x2, box['y'] + box['height'] / 0x2, box2);
+    center = worldToScreen(box['x'] + box['width'] / 2, box['y'] + box['height'] / 2, box2);
   (positionCanvasEditorToolbar(enabled2['toolbarEl'], {
     center: center['x'],
-    top: center['y'] - (box3['height'] * box2['zoom']) / 0x2 - enabled2['toolbarEl']['offsetHeight'] - 0xc,
+    top: center['y'] - (box3['height'] * box2['zoom']) / 2 - enabled2['toolbarEl']['offsetHeight'] - 12,
   }),
     enabled3?.['colorMenu']['position'](),
     enabled3?.['menu']['position']());
@@ -154,7 +154,7 @@ export function mountImageEditControls(current) {
       current['_render']());
   });
   (keepButton['setAttribute']('aria-pressed', 'false'),
-    run(text('reset'), () => setImageRotation(current, 0x0)));
+    run(text('reset'), () => setImageRotation(current, 0)));
   const cancel = () => {
       ((current['_rotationPreview'] = null), current['_render']());
     },

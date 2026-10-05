@@ -1,13 +1,13 @@
 const MODES = new Set(['translate', 'rotate', 'scale']),
   SPACES = new Set(['local', 'world']),
   CONSTRAINTS = new Set(['free', 'x', 'y', 'z', 'xy', 'xz', 'yz']);
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
-function positiveNumber(index, result = 0x0) {
+function positiveNumber(index, result = 0) {
   const finiteNumber2 = finiteNumber(index, result);
-  return finiteNumber2 > 0x0 ? finiteNumber2 : 0x0;
+  return finiteNumber2 > 0 ? finiteNumber2 : 0;
 }
 function normalizeMode(data) {
   const options = data === 'move' ? 'translate' : String(data || 'translate')['trim']();
@@ -29,9 +29,9 @@ function cloneScale(box) {
     return { x: x, y: x, z: x };
   }
   return {
-    x: Math['max'](0.01, finiteNumber(box?.['x'], 0x1)),
-    y: Math['max'](0.01, finiteNumber(box?.['y'], 0x1)),
-    z: Math['max'](0.01, finiteNumber(box?.['z'], 0x1)),
+    x: Math['max'](0.01, finiteNumber(box?.['x'], 1)),
+    y: Math['max'](0.01, finiteNumber(box?.['y'], 1)),
+    z: Math['max'](0.01, finiteNumber(box?.['z'], 1)),
   };
 }
 function normalizePose(quaternion = {}) {
@@ -51,14 +51,14 @@ function normalizePose(quaternion = {}) {
           x: finiteNumber(quaternion['quaternion']['x']),
           y: finiteNumber(quaternion['quaternion']['y']),
           z: finiteNumber(quaternion['quaternion']['z']),
-          w: finiteNumber(quaternion['quaternion']['w'], 0x1),
+          w: finiteNumber(quaternion['quaternion']['w'], 1),
         }
       : null,
     scale: cloneScale(quaternion?.['scale']),
   };
 }
 function snapValue(entry, count) {
-  return count > 0x0 ? Math['round'](entry / count) * count : entry;
+  return count > 0 ? Math['round'](entry / count) * count : entry;
 }
 export function normalizeTransformInteractionOptions(uniformScale = {}) {
   return {
@@ -70,7 +70,7 @@ export function normalizeTransformInteractionOptions(uniformScale = {}) {
     snap: {
       enabled: uniformScale?.['snap']?.['enabled'] === !![],
       translation: positiveNumber(uniformScale?.['snap']?.['translation'], 0.25),
-      rotation: positiveNumber(uniformScale?.['snap']?.['rotation'], Math['PI'] / 0xc),
+      rotation: positiveNumber(uniformScale?.['snap']?.['rotation'], Math['PI'] / 12),
       scale: positiveNumber(uniformScale?.['snap']?.['scale'], 0.1),
     },
   };
@@ -78,7 +78,7 @@ export function normalizeTransformInteractionOptions(uniformScale = {}) {
 export function applyTransformInteractionOptions(record, payload = {}) {
   const box2 = normalizePose(record),
     y = normalizeTransformInteractionOptions(payload);
-  y['groundLock'] && y['mode'] === 'translate' && (box2['position']['y'] = 0x0);
+  y['groundLock'] && y['mode'] === 'translate' && (box2['position']['y'] = 0);
   if (y['uniformScale'] && y['mode'] === 'scale') {
     const handle = ['x', 'y', 'z']['find']((state) => y['constraint']['includes'](state)),
       x2 = box2['scale'][handle || 'x'];
@@ -89,7 +89,7 @@ export function applyTransformInteractionOptions(record, payload = {}) {
     const config = y['snap']['translation'];
     box2['position'] = {
       x: snapValue(box2['position']['x'], config),
-      y: y['groundLock'] ? 0x0 : snapValue(box2['position']['y'], config),
+      y: y['groundLock'] ? 0 : snapValue(box2['position']['y'], config),
       z: snapValue(box2['position']['z'], config),
     };
   } else {

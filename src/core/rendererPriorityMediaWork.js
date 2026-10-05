@@ -31,7 +31,7 @@ export function resolveRendererLowZoomRealVideoNodeIds({
   selectedNodeIds: selectedNodeIds,
   priorityNodeIds: priorityNodeIds,
   viewport: viewport,
-  nodeCount: nodeCount = 0x0,
+  nodeCount: nodeCount = 0,
   containerWidth: containerWidth,
   containerHeight: containerHeight,
 } = {}) {
@@ -40,7 +40,7 @@ export function resolveRendererLowZoomRealVideoNodeIds({
       viewport: viewport,
       nodeCount: nodeCount,
     });
-  if (rendererLowZoomMountLimit <= 0x0) return map;
+  if (rendererLowZoomMountLimit <= 0) return map;
   const key = nodes && typeof nodes === 'object' ? nodes : {},
     map2 = candidateNodeIds instanceof Set ? candidateNodeIds : new Set(candidateNodeIds || []),
     index =
@@ -56,12 +56,12 @@ export function resolveRendererLowZoomRealVideoNodeIds({
   }
   const count = Number(containerWidth),
     count2 = Number(containerHeight);
-  if (!(count > 0x0) || !(count2 > 0x0) || map['size'] >= rendererLowZoomMountLimit) return map;
+  if (!(count > 0) || !(count2 > 0) || map['size'] >= rendererLowZoomMountLimit) return map;
   const options = priorityNodeIds instanceof Set ? priorityNodeIds : new Set(priorityNodeIds || []);
   for (const target of options) {
     if (map['has'](target) || !map2['has'](target)) continue;
     const source = key[target];
-    if (!hasResolvedVideo(source) || !isNodeInsideViewportPadding(source, viewport, count, count2, 0x0))
+    if (!hasResolvedVideo(source) || !isNodeInsideViewportPadding(source, viewport, count, count2, 0))
       continue;
     map['add'](target);
     if (map['size'] >= rendererLowZoomMountLimit) return map;
@@ -69,7 +69,7 @@ export function resolveRendererLowZoomRealVideoNodeIds({
   for (const next of map2) {
     if (map['has'](next)) continue;
     const current = key[next];
-    if (!hasResolvedVideo(current) || !isNodeInsideViewportPadding(current, viewport, count, count2, 0x0))
+    if (!hasResolvedVideo(current) || !isNodeInsideViewportPadding(current, viewport, count, count2, 0))
       continue;
     map['add'](next);
     if (map['size'] >= rendererLowZoomMountLimit) break;
@@ -110,7 +110,7 @@ export function syncRendererPendingSourceVideoActivationIds({
   return map4;
 }
 export function applyRendererLowZoomRealVideoCandidates(args, config) {
-  if (!(config instanceof Set) || config['size'] === 0x0) return args;
+  if (!(config instanceof Set) || config['size'] === 0) return args;
   const mountCandidateIds = new Set(args?.['mountCandidateIds']),
     parkCandidateIds = new Set(args?.['parkCandidateIds']);
   for (const scope of config) {
@@ -157,7 +157,7 @@ export function hasRendererPriorityMediaWork({
   viewport: viewport2,
   containerWidth: containerWidth2,
   containerHeight: containerHeight2,
-  viewportPadding: viewportPadding = 0xc8,
+  viewportPadding: viewportPadding = 200,
   candidateNodeIds: candidateNodeIds2,
 } = {}) {
   const value3 = nodes3 && typeof nodes3 === 'object' ? nodes3 : {},
@@ -171,7 +171,7 @@ export function hasRendererPriorityMediaWork({
   }
   const count3 = Number(containerWidth2),
     count4 = Number(containerHeight2);
-  if (!viewport2 || !(count3 > 0x0) || !(count4 > 0x0)) return ![];
+  if (!viewport2 || !(count3 > 0) || !(count4 > 0)) return ![];
   const run = (value5) =>
     hasResolvedPriorityMedia(value5) &&
     isNodeInsideViewportPadding(value5, viewport2, count3, count4, viewportPadding);
@@ -189,14 +189,14 @@ export function shouldDeferInitialVideoMediaOnMount({
   isSelected: isSelected,
   isSelectionRelated: isSelectionRelated,
   dragTargets: dragTargets,
-  nodeCount: nodeCount = 0x0,
-  mountCandidateCount: mountCandidateCount = 0x0,
+  nodeCount: nodeCount = 0,
+  mountCandidateCount: mountCandidateCount = 0,
 } = {}) {
   if (!nodeId || !isNodeType(node, ['source-video', 'video', 'ai-video'])) return ![];
   if (isSelected || isSelectionRelated || dragTargets?.['has']?.(nodeId)) return ![];
   return (
-    Number(nodeCount || 0x0) >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'] ||
-    Number(mountCandidateCount || 0x0) >= 0xc
+    Number(nodeCount || 0) >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'] ||
+    Number(mountCandidateCount || 0) >= 12
   );
 }
 export function shouldEagerPosterlessSourceVideoOnMount({

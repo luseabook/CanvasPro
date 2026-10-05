@@ -1,13 +1,13 @@
 function normalizeViewport(box = {}) {
   const count = Number(box?.['zoom']);
   return {
-    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0x0,
-    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0x0,
-    zoom: Number['isFinite'](count) && count > 0x0 ? count : 0x1,
+    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0,
+    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0,
+    zoom: Number['isFinite'](count) && count > 0 ? count : 1,
   };
 }
 export function createRendererViewportJumpDetector({
-  panThreshold: panThreshold = 0xa0,
+  panThreshold: panThreshold = 160,
   zoomThreshold: zoomThreshold = 0.015,
 } = {}) {
   let value = null;

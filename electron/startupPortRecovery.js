@@ -4,7 +4,7 @@ function normalizeListenerPids(pids = []) {
     ...new Set(
       (Array['isArray'](pids) ? pids : [])
         ['map']((pid) => Number(pid))
-        ['filter']((normalizedPid) => Number['isInteger'](normalizedPid) && normalizedPid > 0x0),
+        ['filter']((normalizedPid) => Number['isInteger'](normalizedPid) && normalizedPid > 0),
     ),
   ];
 }
@@ -23,7 +23,7 @@ export async function reclaimStartupPort({
   confirmRuntimeIdentity: confirmRuntimeIdentity,
   terminateProcess: terminateProcess,
   delayFn: delayFn,
-  settleDelayMs: settleDelayMs = 0x320,
+  settleDelayMs: settleDelayMs = 800,
   onReclaim: onReclaim = null,
   onEnumerationUnavailable: onEnumerationUnavailable = null,
 } = {}) {
@@ -65,7 +65,7 @@ export async function reclaimStartupPort({
       { reclaimed: ![], pids: [], skippedReason: 'enumeration-unavailable-port-free' }
     );
   }
-  if (initialPids['length'] === 0x0) return { reclaimed: ![], pids: [] };
+  if (initialPids['length'] === 0) return { reclaimed: ![], pids: [] };
   const resolveVerifiedPids = async (pids) =>
       normalizeListenerPids(
         typeof confirmRuntimeIdentity === 'function'
@@ -83,18 +83,18 @@ export async function reclaimStartupPort({
   } catch (policyError) {
     if (policyError?.['code'] !== 'AIC_STARTUP_PORT_OWNERSHIP_UNVERIFIED' || typeof delayFn !== 'function')
       throw policyError;
-    const deadline = Date['now']() + 0x7d0;
-    for (let attempt = 0x0; attempt < 0xa && Date['now']() < deadline; attempt += 0x1) {
-      await delayFn(0xc8);
+    const deadline = Date['now']() + 2000;
+    for (let attempt = 0; attempt < 10 && Date['now']() < deadline; attempt += 1) {
+      await delayFn(200);
       const currentPids = normalizeListenerPids(await collectListeningPortPids(port));
-      if (currentPids['length'] === 0x0)
+      if (currentPids['length'] === 0)
         return { reclaimed: ![], pids: [], skippedReason: 'listener-exited' };
       if (!samePidSet(initialPids, currentPids)) break;
     }
     throw policyError;
   }
   const currentPids = normalizeListenerPids(await collectListeningPortPids(port));
-  if (currentPids['length'] === 0x0) return { reclaimed: !![], pids: [] };
+  if (currentPids['length'] === 0) return { reclaimed: !![], pids: [] };
   if (!samePidSet(initialPids, currentPids))
     throw createPortRecoveryError(
       'Port ' + port + ' listener ownership changed before termination',
@@ -116,15 +116,15 @@ export async function reclaimStartupPort({
       failures['push']({ pid: pid, error: String(error?.['message'] || error) });
     }
   }
-  if (failures['length'] > 0x0)
+  if (failures['length'] > 0)
     throw createPortRecoveryError(
       'Failed to stop the verified stale runtime on port ' + port,
       'AIC_STARTUP_PORT_RECLAIM_FAILED',
       { port: port, pids: failures['map']((failure) => failure['pid']), failures: failures },
     );
-  await delayFn?.(Math['max'](0x0, Number(settleDelayMs) || 0x0));
+  await delayFn?.(Math['max'](0, Number(settleDelayMs) || 0));
   const remainingPids = normalizeListenerPids(await collectListeningPortPids(port));
-  if (remainingPids['length'] > 0x0)
+  if (remainingPids['length'] > 0)
     throw createPortRecoveryError(
       'Port ' + port + ' is still busy after stopping the verified stale runtime',
       'AIC_STARTUP_PORT_STILL_BUSY',

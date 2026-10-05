@@ -46,20 +46,20 @@ function getApimartVeo3GenerationType(options2 = {}) {
 }
 function validateApimartVeo3ImageCount(
   options3 = {},
-  data = 0x0,
+  data = 0,
   { allowTextOnly: allowTextOnly = ![] } = {},
 ) {
-  const ok = Math['max'](0x0, Math['trunc'](Number(data) || 0x0));
-  if (allowTextOnly && ok === 0x0) return Object['freeze']({ ok: !![], message: '' });
+  const ok = Math['max'](0, Math['trunc'](Number(data) || 0));
+  if (allowTextOnly && ok === 0) return Object['freeze']({ ok: !![], message: '' });
   const apimartVeo3GenerationType = getApimartVeo3GenerationType(options3);
   if (apimartVeo3GenerationType === 'reference')
     return Object['freeze']({
-      ok: ok <= 0x3,
-      message: ok <= 0x3 ? '' : 'VEO3\x20参考图模式最多接入\x203\x20张图片',
+      ok: ok <= 3,
+      message: ok <= 3 ? '' : 'VEO3 参考图模式最多接入 3 张图片',
     });
   return Object['freeze']({
-    ok: ok <= 0x2,
-    message: ok <= 0x2 ? '' : 'VEO3 首尾帧模式最多接入 2 张图片',
+    ok: ok <= 2,
+    message: ok <= 2 ? '' : 'VEO3 首尾帧模式最多接入 2 张图片',
   });
 }
 export function apimartOmniFlashVideo({ currentBody: currentBody }) {
@@ -73,11 +73,11 @@ export function apimartOmniFlashVideo({ currentBody: currentBody }) {
     throw new Error('Gemini Omni 1.1 Flash Ext generation_type must be frame or reference');
   target['generation_type'] = source;
   const list = normalizeInputList(target['image_urls']);
-  if (source === 'frame' && list['length'] > 0x1)
+  if (source === 'frame' && list['length'] > 1)
     throw new Error('Gemini Omni 1.1 Flash Ext frame mode supports at most 1 image');
-  if (source === 'reference' && list['length'] > 0x0 && list['length'] !== 0x1 && list['length'] !== 0x3)
+  if (source === 'reference' && list['length'] > 0 && list['length'] !== 1 && list['length'] !== 3)
     throw new Error('Gemini Omni 1.1 Flash Ext reference mode supports only 1 or 3 images');
-  return (normalizeInputList(target['video_urls'])['length'] > 0x0 && delete target['duration'], target);
+  return (normalizeInputList(target['video_urls'])['length'] > 0 && delete target['duration'], target);
 }
 export function apimartVeo3Video({
   currentBody: currentBody2,
@@ -88,7 +88,7 @@ export function apimartVeo3Video({
     list2 = normalizeInputList(inputImages),
     mode = getApimartVeo3ModelChoice(payload),
     generation_type = getApimartVeo3GenerationType(payload);
-  ((next['duration'] = 0x8), delete next['official_fallback']);
+  ((next['duration'] = 8), delete next['official_fallback']);
   const current = String(next['resolution'] || '')
     ['trim']()
     ['toLowerCase']();
@@ -100,11 +100,11 @@ export function apimartVeo3Video({
     { allowTextOnly: !![] },
   );
   if (!error['ok']) throw new Error(error['message']);
-  if (list2['length'] === 0x0) return (delete next['generation_type'], delete next['image_urls'], next);
+  if (list2['length'] === 0) return (delete next['generation_type'], delete next['image_urls'], next);
   return (
     (next['generation_type'] = generation_type === 'reference' ? 'reference' : 'frame'),
     (next['image_urls'] =
-      next['generation_type'] === 'reference' ? list2['slice'](0x0, 0x3) : list2['slice'](0x0, 0x2)),
+      next['generation_type'] === 'reference' ? list2['slice'](0, 3) : list2['slice'](0, 2)),
     next
   );
 }
@@ -147,16 +147,16 @@ export function apimartHappyHorseVideo({
     payload?.['generationParams']?.['happyhorse_mode'] || payload?.['happyhorse_mode'] || 'auto',
   )['trim']();
   const enabled3 =
-    list3['length'] > 0x0 || list4['length'] > 0x0 || Object['keys'](inputUrlsBySlot)['length'] > 0x0;
+    list3['length'] > 0 || list4['length'] > 0 || Object['keys'](inputUrlsBySlot)['length'] > 0;
   (output === 'image' || output === 'reference' || output === 'edit') && !enabled3 && (output = 'auto');
   delete entry['happyhorse_mode'];
-  if (!enabled && list4['length'] > 0x0) throw new Error(handle + ' does not support video edit mode');
+  if (!enabled && list4['length'] > 0) throw new Error(handle + ' does not support video edit mode');
   if (output === 'edit') {
-    if (!enabled) throw new Error(handle + '\x20does\x20not\x20support\x20video\x20edit\x20mode');
-    if (!list4[0x0]) throw new Error(handle + ' video edit requires video_url input');
+    if (!enabled) throw new Error(handle + ' does not support video edit mode');
+    if (!list4[0]) throw new Error(handle + ' video edit requires video_url input');
     const list7 = handler(['editRefImage'], list3);
-    entry['video_url'] = list4[0x0];
-    if (list7['length'] > 0x0) entry['image_urls'] = list7['slice'](0x0, 0x5);
+    entry['video_url'] = list4[0];
+    if (list7['length'] > 0) entry['image_urls'] = list7['slice'](0, 5);
     const value2 = String(
       payload?.['generationParams']?.['audio_setting'] || payload?.['audio_setting'] || '',
     )['trim']();
@@ -171,9 +171,9 @@ export function apimartHappyHorseVideo({
   delete entry['audio_setting'];
   if (output === 'image') {
     const enabled4 = handler(['firstFrame'], list3);
-    if (!enabled4[0x0]) throw new Error(handle + ' image-to-video requires first_frame_image input');
+    if (!enabled4[0]) throw new Error(handle + ' image-to-video requires first_frame_image input');
     return (
-      (entry['first_frame_image'] = enabled4[0x0]),
+      (entry['first_frame_image'] = enabled4[0]),
       delete entry['image_urls'],
       delete entry['video_url'],
       delete entry['size'],
@@ -182,17 +182,17 @@ export function apimartHappyHorseVideo({
   }
   if (output === 'reference') {
     const list8 = handler(['referenceImage'], list3);
-    if (list8['length'] <= 0x0)
-      throw new Error(handle + '\x20reference\x20mode\x20requires\x20image_urls\x20input');
+    if (list8['length'] <= 0)
+      throw new Error(handle + ' reference mode requires image_urls input');
     return (
-      (entry['image_urls'] = list8['slice'](0x0, 0x9)),
+      (entry['image_urls'] = list8['slice'](0, 9)),
       delete entry['first_frame_image'],
       delete entry['video_url'],
       entry
     );
   }
-  if (output !== 'auto') throw new Error('Unsupported ' + handle + '\x20mode:\x20' + output);
-  if (list3['length'] > 0x0 || list4['length'] > 0x0)
+  if (output !== 'auto') throw new Error('Unsupported ' + handle + ' mode: ' + output);
+  if (list3['length'] > 0 || list4['length'] > 0)
     throw new Error(handle + ' media inputs require an explicit mode selection');
   return (delete entry['first_frame_image'], delete entry['image_urls'], delete entry['video_url'], entry);
 }
@@ -206,11 +206,11 @@ export function apimartHailuo23Video({
   delete value3['last_frame_image'];
   const inputList = normalizeInputList(inputImages),
     inputUrlsBySlot2 = normalizeInputUrlsBySlot(finalUrlsBySlot),
-    value4 = Object['keys'](inputUrlsBySlot2)['length'] > 0x0;
+    value4 = Object['keys'](inputUrlsBySlot2)['length'] > 0;
   if (value4) {
     delete value3['first_frame_image'];
     if (inputUrlsBySlot2['firstFrame']) value3['first_frame_image'] = inputUrlsBySlot2['firstFrame'];
-  } else inputList[0x0] && (value3['first_frame_image'] = inputList[0x0]);
+  } else inputList[0] && (value3['first_frame_image'] = inputList[0]);
   const value5 = String(modelToken || value3['model'] || '')
     ['trim']()
     ['toLowerCase']();
@@ -253,11 +253,11 @@ export function apimartMinimaxH3Video({
     removeApimartMinimaxH3TransientFields(value7));
   if (minimaxH3Request['mode'] === 'reference')
     return (
-      minimaxH3Request['referenceImages']['length'] > 0x0 &&
+      minimaxH3Request['referenceImages']['length'] > 0 &&
         (value7['image_urls'] = minimaxH3Request['referenceImages']),
-      minimaxH3Request['referenceVideos']['length'] > 0x0 &&
+      minimaxH3Request['referenceVideos']['length'] > 0 &&
         (value7['video_urls'] = minimaxH3Request['referenceVideos']),
-      minimaxH3Request['referenceAudios']['length'] > 0x0 &&
+      minimaxH3Request['referenceAudios']['length'] > 0 &&
         (value7['audio_urls'] = minimaxH3Request['referenceAudios']),
       (value7['aspect_ratio'] = minimaxH3Request['ratio']),
       value7
@@ -281,7 +281,7 @@ export function apimartViduQ3Video({
 }) {
   const value8 = { ...currentBody6 },
     enabled5 = String(value8['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
-  if (!enabled5) throw new Error('APIMart\x20Vidu\x20Q3\x20prompt\x20is\x20required');
+  if (!enabled5) throw new Error('APIMart Vidu Q3 prompt is required');
   value8['prompt'] = enabled5;
   const value9 = String(
       payload?.['generationParams']?.['vidu_q3_generation_mode'] ||
@@ -304,24 +304,24 @@ export function apimartViduQ3Video({
   if (value9 === 'reference') {
     if (!VIDU_Q3_REFERENCE_MODELS['has'](value10))
       throw new Error(
-        'APIMart\x20Vidu\x20Q3\x20reference\x20mode\x20only\x20supports\x20viduq3\x20or\x20viduq3-mix',
+        'APIMart Vidu Q3 reference mode only supports viduq3 or viduq3-mix',
       );
-    if (list9['length'] < 0x1 || count > 0x7)
+    if (list9['length'] < 1 || count > 7)
       throw new Error('APIMart Vidu Q3 reference mode requires 1-7 image inputs');
     return (
       (value8['model'] = value10),
-      (value8['image_urls'] = list9['slice'](0x0, 0x7)),
+      (value8['image_urls'] = list9['slice'](0, 7)),
       delete value8['audio'],
       value8
     );
   }
   if (!VIDU_Q3_VIDEO_MODELS['has'](value10))
     throw new Error('APIMart Vidu Q3 video generation mode only supports viduq3-turbo or viduq3-pro');
-  if (count > 0x2) throw new Error('APIMart Vidu Q3 video generation mode supports at most 2 image inputs');
+  if (count > 2) throw new Error('APIMart Vidu Q3 video generation mode supports at most 2 image inputs');
   return (
     (value8['model'] = value10),
-    list9['length'] > 0x0
-      ? ((value8['image_urls'] = list9['slice'](0x0, 0x2)), delete value8['aspect_ratio'])
+    list9['length'] > 0
+      ? ((value8['image_urls'] = list9['slice'](0, 2)), delete value8['aspect_ratio'])
       : delete value8['image_urls'],
     value8
   );
@@ -340,19 +340,19 @@ export function apimartWan27Video({ currentBody: currentBody7, payload: payload 
   (delete value11['wan27_mode'], delete value11['wan27_reference_input'], delete value11['wan27_edit_input']);
   if (value13 === 'reference') {
     value11['model'] = 'wan2.7-r2v';
-    const list12 = list10['slice'](0x0, 0x1),
-      list13 = list11['slice'](0x0, Math['max'](0x0, 0x5 - list12['length']));
-    if (list12['length'] <= 0x0 && list13['length'] <= 0x0)
+    const list12 = list10['slice'](0, 1),
+      list13 = list11['slice'](0, Math['max'](0, 5 - list12['length']));
+    if (list12['length'] <= 0 && list13['length'] <= 0)
       throw new Error('APIMart Wan2.7-R2V requires image_with_roles or video_urls input');
     return (
-      list12['length'] > 0x0
+      list12['length'] > 0
         ? (value11['image_with_roles'] = list12['map']((url, count2) => ({
             url: url,
             role: 'reference_image',
-            ...(count2 === 0x0 && reference_voice ? { reference_voice: reference_voice } : {}),
+            ...(count2 === 0 && reference_voice ? { reference_voice: reference_voice } : {}),
           })))
         : delete value11['image_with_roles'],
-      list13['length'] > 0x0 ? (value11['video_urls'] = list13) : delete value11['video_urls'],
+      list13['length'] > 0 ? (value11['video_urls'] = list13) : delete value11['video_urls'],
       delete value11['image_urls'],
       delete value11['audio_url'],
       value11
@@ -360,18 +360,18 @@ export function apimartWan27Video({ currentBody: currentBody7, payload: payload 
   }
   if (value13 === 'edit') {
     value11['model'] = 'wan2.7-videoedit';
-    if (!list11[0x0]) throw new Error('APIMart Wan2.7-VideoEdit requires video_urls input');
-    value11['video_urls'] = list11['slice'](0x0, 0x2);
-    if (list10['length'] > 0x0) value11['image_urls'] = list10['slice'](0x0, 0x4);
+    if (!list11[0]) throw new Error('APIMart Wan2.7-VideoEdit requires video_urls input');
+    value11['video_urls'] = list11['slice'](0, 2);
+    if (list10['length'] > 0) value11['image_urls'] = list10['slice'](0, 4);
     else delete value11['image_urls'];
     return (delete value11['audio_url'], value11);
   }
   value11['model'] = 'wan2.7';
-  if (list10['length'] > 0x0 && list11['length'] > 0x0)
+  if (list10['length'] > 0 && list11['length'] > 0)
     throw new Error('APIMart Wan2.7 image_urls cannot be used with video_urls');
-  if (list11['length'] > 0x0 && value12)
+  if (list11['length'] > 0 && value12)
     throw new Error('APIMart Wan2.7 video_urls cannot be used with audio_url');
-  return ((list10['length'] > 0x0 || list11['length'] > 0x0) && delete value11['size'], value11);
+  return ((list10['length'] > 0 || list11['length'] > 0) && delete value11['size'], value11);
 }
 function normalizeKlingV3OmniMode(value14) {
   const value15 = String(value14 || '')
@@ -400,8 +400,8 @@ export function apimartKlingO1Video({
   payload: payload = {},
 }) {
   const value19 = { ...currentBody8 },
-    list14 = normalizeInputList(inputImages)['slice'](0x0, 0x2),
-    list15 = normalizeInputList(inputVideos)['slice'](0x0, 0x1),
+    list14 = normalizeInputList(inputImages)['slice'](0, 2),
+    list15 = normalizeInputList(inputVideos)['slice'](0, 1),
     klingO1VideoRole = normalizeKlingO1VideoRole(
       payload?.['klingO1VideoRole'] ||
         payload?.['kling_o1_video_role'] ||
@@ -416,38 +416,38 @@ export function apimartKlingO1Video({
     delete value19['klingO1VideoRole'],
     delete value19['keep_original_sound'],
     delete value19['video_list']);
-  if (list15['length'] > 0x0) {
+  if (list15['length'] > 0) {
     const value20 = klingO1VideoRole || 'base';
-    value19['video_list'] = [buildKlingV3OmniVideoItem(list15[0x0], value20, klingKeepOriginalSound)];
+    value19['video_list'] = [buildKlingV3OmniVideoItem(list15[0], value20, klingKeepOriginalSound)];
     if (value20 === 'base') {
-      if (list14['length'] > 0x0)
+      if (list14['length'] > 0)
         throw new Error('APIMart Kling O1 base video cannot be used with image_urls');
       return (
         delete value19['image_urls'],
         delete value19['duration'],
         delete value19['aspect_ratio'],
-        (value19['prompt'] = replaceKlingO1PromptImageReferences(value19['prompt'], 0x0)),
+        (value19['prompt'] = replaceKlingO1PromptImageReferences(value19['prompt'], 0)),
         value19
       );
     }
-    if (list14['length'] > 0x1)
+    if (list14['length'] > 1)
       throw new Error('APIMart Kling O1 feature video supports at most one image_url');
     return (
-      list14['length'] > 0x0
-        ? (value19['image_urls'] = list14['slice'](0x0, 0x1))
+      list14['length'] > 0
+        ? (value19['image_urls'] = list14['slice'](0, 1))
         : delete value19['image_urls'],
       (value19['prompt'] = replaceKlingO1PromptImageReferences(
         value19['prompt'],
-        value19['image_urls']?.['length'] || 0x0,
+        value19['image_urls']?.['length'] || 0,
       )),
       value19
     );
   }
   return (
-    list14['length'] > 0x0 ? (value19['image_urls'] = list14) : delete value19['image_urls'],
+    list14['length'] > 0 ? (value19['image_urls'] = list14) : delete value19['image_urls'],
     (value19['prompt'] = replaceKlingO1PromptImageReferences(
       value19['prompt'],
-      value19['image_urls']?.['length'] || 0x0,
+      value19['image_urls']?.['length'] || 0,
     )),
     value19
   );
@@ -468,9 +468,9 @@ export function apimartKlingV3OmniVideo({
     );
   (delete value21['kling_v3_omni_mode'], delete value21['image_with_roles'], delete value21['video_list']);
   if (klingV3OmniMode === 'edit') {
-    if (!list17[0x0]) throw new Error('APIMart Kling V3 Omni video edit requires video_list input');
+    if (!list17[0]) throw new Error('APIMart Kling V3 Omni video edit requires video_list input');
     return (
-      (value21['video_list'] = [buildKlingV3OmniVideoItem(list17[0x0], 'base')]),
+      (value21['video_list'] = [buildKlingV3OmniVideoItem(list17[0], 'base')]),
       delete value21['image_urls'],
       delete value21['image_with_roles'],
       delete value21['audio'],
@@ -483,12 +483,12 @@ export function apimartKlingV3OmniVideo({
     const list18 = [];
     (appendUniqueUrl(list18, inputUrlsBySlot4['referenceImage']),
       list16['forEach']((value22) => appendUniqueUrl(list18, value22)));
-    const list19 = list18['slice'](0x0, 0x1),
-      enabled6 = list17[0x0] || '';
-    if (list19['length'] <= 0x0 && !enabled6)
+    const list19 = list18['slice'](0, 1),
+      enabled6 = list17[0] || '';
+    if (list19['length'] <= 0 && !enabled6)
       throw new Error('APIMart Kling V3 Omni reference mode requires image or video input');
     return (
-      list19['length'] > 0x0
+      list19['length'] > 0
         ? (value21['image_with_roles'] = list19['map']((url2) => ({
             url: url2,
             role: 'reference',
@@ -502,14 +502,14 @@ export function apimartKlingV3OmniVideo({
       value21
     );
   }
-  if (list17['length'] > 0x0)
+  if (list17['length'] > 0)
     throw new Error(
-      'APIMart\x20Kling\x20V3\x20Omni\x20image\x20mode\x20does\x20not\x20support\x20video_list\x20input',
+      'APIMart Kling V3 Omni image mode does not support video_list input',
     );
   const value23 =
       Object['prototype']['hasOwnProperty']['call'](inputUrlsBySlot4, 'firstFrame') ||
       Object['prototype']['hasOwnProperty']['call'](inputUrlsBySlot4, 'lastFrame'),
-    url3 = value23 ? inputUrlsBySlot4['firstFrame'] || '' : list16[0x0] || '',
+    url3 = value23 ? inputUrlsBySlot4['firstFrame'] || '' : list16[0] || '',
     url4 = value23
       ? inputUrlsBySlot4['lastFrame'] || ''
       : list16['find']((value24) => value24 && value24 !== url3) || '';
@@ -518,7 +518,7 @@ export function apimartKlingV3OmniVideo({
   return (
     url3 && list20['push']({ url: url3, role: 'first_frame' }),
     url4 && list20['push']({ url: url4, role: 'last_frame' }),
-    list20['length'] > 0x0
+    list20['length'] > 0
       ? ((value21['image_with_roles'] = list20), delete value21['image_urls'])
       : delete value21['image_urls'],
     value21
@@ -551,7 +551,7 @@ function isSeedanceAdaptiveRatio(value30) {
 }
 function normalizeSeedanceBoolean(count3, value32 = ![]) {
   if (typeof count3 === 'boolean') return count3;
-  if (typeof count3 === 'number') return count3 !== 0x0;
+  if (typeof count3 === 'number') return count3 !== 0;
   const value33 = String(count3 ?? '')
     ['trim']()
     ['toLowerCase']();
@@ -560,16 +560,16 @@ function normalizeSeedanceBoolean(count3, value32 = ![]) {
   return value32 === !![];
 }
 function normalizeSeedanceVideoDuration(value34, value35 = {}) {
-  const value36 = Number(value35['defaultDuration'] ?? 0x5),
-    value37 = Number['isFinite'](value36) ? Math['trunc'](value36) : 0x5,
+  const value36 = Number(value35['defaultDuration'] ?? 5),
+    value37 = Number['isFinite'](value36) ? Math['trunc'](value36) : 5,
     value38 = Number(value34 ?? value37);
   if (!Number['isFinite'](value38)) return value37;
   const value39 = Math['trunc'](value38);
-  if (value35['allowAutoDuration'] === !![] && value39 === -0x1) return -0x1;
+  if (value35['allowAutoDuration'] === !![] && value39 === -1) return -1;
   const value40 = Number(value35['minDuration']),
     value41 = Number(value35['maxDuration']);
   if (Number['isFinite'](value40) && value39 < value40)
-    throw new Error('APIMart Seedance duration must be at least ' + value40 + '\x20seconds');
+    throw new Error('APIMart Seedance duration must be at least ' + value40 + ' seconds');
   if (Number['isFinite'](value41) && value39 > value41)
     throw new Error('APIMart Seedance duration must be at most ' + value41 + ' seconds');
   return value39;
@@ -590,9 +590,9 @@ function normalizeSeedanceVideoResolution(value42, value43 = {}) {
           )
           ['filter'](Boolean)
       : [];
-  if (list21['length'] === 0x0) return value45 || value44;
+  if (list21['length'] === 0) return value45 || value44;
   if (list21['includes'](value45)) return value45;
-  return list21['includes'](value44) ? value44 : list21[0x0];
+  return list21['includes'](value44) ? value44 : list21[0];
 }
 function getApimartSeedanceVideoPolicy(value47) {
   const value48 = value47?.['extensions']?.['seedanceVideo'];
@@ -621,22 +621,22 @@ function collectAudioInputUrls(value50) {
   );
 }
 async function resolveInputVideos(list22, value51) {
-  if (list22['length'] === 0x0) return [];
+  if (list22['length'] === 0) return [];
   const list23 = await uploadModelApiMediaInputs('video', list22, value51, {
     fallbackProvider: 'runninghub',
     strictUpload: !![],
   });
-  if (!Array['isArray'](list23) || list23['length'] === 0x0)
+  if (!Array['isArray'](list23) || list23['length'] === 0)
     throw new Error('APIMART 视频上传失败：未返回有效视频地址，请重试或重新选择视频');
   return list23['map']((value52) => String(value52 || '')['trim']())['filter'](Boolean);
 }
 async function resolveInputAudios(list24, value53) {
-  if (list24['length'] === 0x0) return [];
+  if (list24['length'] === 0) return [];
   const list25 = await uploadModelApiMediaInputs('audio', list24, value53, {
     fallbackProvider: 'runninghub',
     strictUpload: !![],
   });
-  if (!Array['isArray'](list25) || list25['length'] === 0x0)
+  if (!Array['isArray'](list25) || list25['length'] === 0)
     throw new Error('APIMART 音频上传失败：未返回有效音频地址，请重试或重新选择音频');
   return list25['map']((value54) => String(value54 || '')['trim']())['filter'](Boolean);
 }
@@ -657,9 +657,9 @@ export async function apimartSeedanceVideo({
       sourceKind: 'video',
       enabled: enabled9,
     });
-  if (!enabled10 && list26['length'] > 0x0)
+  if (!enabled10 && list26['length'] > 0)
     throw new Error('APIMart Seedance model does not support video references');
-  const list27 = list26['length'] > 0x0 && enabled10 ? await resolveInputVideos(list26, ctx) : [],
+  const list27 = list26['length'] > 0 && enabled10 ? await resolveInputVideos(list26, ctx) : [],
     list28 = applyApimartPrivateAvatarAssetsToUrls(
       [
         String(payload2['first'] || payload2['firstFrameUrl'] || '')['trim'](),
@@ -668,14 +668,14 @@ export async function apimartSeedanceVideo({
       payload2,
       { sourceKind: 'image', enabled: enabled9 },
     ),
-    positiveInteger = normalizePositiveInteger(apimartSeedanceVideoPolicy['maxRoleImageCount'], 0x2);
+    positiveInteger = normalizePositiveInteger(apimartSeedanceVideoPolicy['maxRoleImageCount'], 2);
   if (list28['length'] > positiveInteger)
     throw new Error(
       apimartSeedanceVideoPolicy['roleImageLimitError'] ||
-        'APIMart\x20Seedance\x20model\x20does\x20not\x20support\x20this\x20many\x20role\x20images',
+        'APIMart Seedance model does not support this many role images',
     );
   let list29 = [];
-  if (list28['length'] > 0x0) {
+  if (list28['length'] > 0) {
     const uploadModelApiMediaInputs2 = await uploadModelApiMediaInputs('image', list28, ctx, {
       apiKey: apiKey,
       fallbackProvider: 'apimart',
@@ -683,11 +683,11 @@ export async function apimartSeedanceVideo({
       strictUpload: !![],
     });
     list29 = [
-      uploadModelApiMediaInputs2?.[0x0]
-        ? { url: String(uploadModelApiMediaInputs2[0x0])['trim'](), role: 'first_frame' }
+      uploadModelApiMediaInputs2?.[0]
+        ? { url: String(uploadModelApiMediaInputs2[0])['trim'](), role: 'first_frame' }
         : null,
-      uploadModelApiMediaInputs2?.[0x1]
-        ? { url: String(uploadModelApiMediaInputs2[0x1])['trim'](), role: 'last_frame' }
+      uploadModelApiMediaInputs2?.[1]
+        ? { url: String(uploadModelApiMediaInputs2[1])['trim'](), role: 'last_frame' }
         : null,
     ]['filter'](Boolean);
   }
@@ -702,12 +702,12 @@ export async function apimartSeedanceVideo({
     }),
     map = new Set(list28),
     list31 =
-      list29['length'] > 0x0 && apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![]
+      list29['length'] > 0 && apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![]
         ? list30['filter']((value56) => !map['has'](value56))
         : list30,
     list32 =
-      list31['length'] > 0x0 &&
-      (list29['length'] <= 0x0 || apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![])
+      list31['length'] > 0 &&
+      (list29['length'] <= 0 || apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![])
         ? await uploadModelApiMediaInputs('image', list31, ctx, {
             apiKey: apiKey,
             fallbackProvider: 'apimart',
@@ -719,9 +719,9 @@ export async function apimartSeedanceVideo({
       sourceKind: 'audio',
       enabled: enabled9,
     });
-  if (!enabled11 && list33['length'] > 0x0)
+  if (!enabled11 && list33['length'] > 0)
     throw new Error('APIMart Seedance model does not support audio references');
-  const list34 = enabled11 && list33['length'] > 0x0 ? await resolveInputAudios(list33, ctx) : [],
+  const list34 = enabled11 && list33['length'] > 0 ? await resolveInputAudios(list33, ctx) : [],
     seedanceVideoParam = readSeedanceVideoParam(payload2, 'duration'),
     seedanceVideoParam2 = readSeedanceVideoParam(payload2, 'resolution'),
     seedanceVideoParam3 = readSeedanceVideoParam(payload2, 'aspectRatio', 'size', 'aspect_ratio'),
@@ -742,7 +742,7 @@ export async function apimartSeedanceVideo({
         value57 || apimartSeedanceVideoPolicy['defaultRatio'],
       ));
   const optionalIntegerInRange = normalizeOptionalIntegerInRange(readSeedanceVideoParam(payload2, 'seed'), {
-    min: 0x0,
+    min: 0,
     max: 0x7fffffff,
   });
   if (optionalIntegerInRange !== null) value58['seed'] = optionalIntegerInRange;
@@ -771,10 +771,10 @@ export async function apimartSeedanceVideo({
   apimartSeedanceVideoPolicy['supportsCameraFixedParam'] === !![] &&
     normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'camerafixed', 'cameraFixed'), ![]) &&
     (value58['camerafixed'] = !![]);
-  const positiveInteger2 = normalizePositiveInteger(apimartSeedanceVideoPolicy['maxImageCount'], 0x1);
-  if (list29['length'] > 0x0) {
+  const positiveInteger2 = normalizePositiveInteger(apimartSeedanceVideoPolicy['maxImageCount'], 1);
+  if (list29['length'] > 0) {
     const value61 = apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] === !![],
-      value62 = list27['length'] > 0x0 || list34['length'] > 0x0,
+      value62 = list27['length'] > 0 || list34['length'] > 0,
       list35 =
         value61 && value62 ? list29['map']((args2) => ({ ...args2, role: 'reference_image' })) : list29,
       map2 = new Set(list35['map']((response) => String(response?.['url'] || '')['trim']()));
@@ -786,7 +786,7 @@ export async function apimartSeedanceVideo({
             role: 'reference_image',
           }))
         : []),
-    ]['slice'](0x0, positiveInteger2);
+    ]['slice'](0, positiveInteger2);
     const value64 = value58['image_with_roles']['some'](
       (value65) => value65['role'] === 'first_frame' || value65['role'] === 'last_frame',
     );
@@ -794,22 +794,22 @@ export async function apimartSeedanceVideo({
       const value66 = apimartSeedanceVideoPolicy['ratioField'] === 'size' ? 'size' : 'aspect_ratio';
       value58[value66] = 'adaptive';
     }
-  } else list32['length'] > 0x0 && (value58['image_urls'] = list32['slice'](0x0, positiveInteger2));
-  const enabled12 = list29['length'] > 0x0 && apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] !== !![];
+  } else list32['length'] > 0 && (value58['image_urls'] = list32['slice'](0, positiveInteger2));
+  const enabled12 = list29['length'] > 0 && apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] !== !![];
   return (
     enabled10 &&
       !enabled12 &&
-      list27['length'] > 0x0 &&
+      list27['length'] > 0 &&
       (value58['video_urls'] = list27['slice'](
-        0x0,
-        normalizePositiveInteger(apimartSeedanceVideoPolicy['maxVideoReferenceCount'], 0x3),
+        0,
+        normalizePositiveInteger(apimartSeedanceVideoPolicy['maxVideoReferenceCount'], 3),
       )),
     enabled11 &&
       !enabled12 &&
-      list34['length'] > 0x0 &&
+      list34['length'] > 0 &&
       (value58['audio_urls'] = list34['slice'](
-        0x0,
-        normalizePositiveInteger(apimartSeedanceVideoPolicy['maxAudioReferenceCount'], 0x3),
+        0,
+        normalizePositiveInteger(apimartSeedanceVideoPolicy['maxAudioReferenceCount'], 3),
       )),
     value58
   );

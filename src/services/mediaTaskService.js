@@ -10,20 +10,20 @@ import { logDiagnosticEvent } from './diagnosticsService.js';
 import { desktopBridge } from './desktopBridge.js';
 let installed = ![],
   pendingUpdateTimer = null,
-  lastPendingUpdateFlushAt = 0x0;
+  lastPendingUpdateFlushAt = 0;
 const pendingUpdates = new Map(),
-  COALESCED_UPDATE_INTERVAL_MS = 0xfa,
+  COALESCED_UPDATE_INTERVAL_MS = 250,
   COALESCED_STATUSES = new Set(['waiting', 'processing']),
   TERMINAL_STATUSES = new Set(['complete', 'failed', 'cancelled']),
   ACTIVE_TASK_STATUSES = new Set(['waiting', 'processing']),
   SHARED_ASSET_RESULT_TASK_KINDS = new Set(['videoPoster', 'videoFirstFrame', 'audioWaveform']),
-  PROXY_MIGRATION_TASK_LIST_CACHE_MS = 0x1f4,
+  PROXY_MIGRATION_TASK_LIST_CACHE_MS = 500,
   VIDEO_PROXY_MIGRATION_PURPOSE = 'video-proxy-migration',
-  VIDEO_PROXY_MIGRATION_PRIORITY = -0x64,
-  MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT = 0x80,
+  VIDEO_PROXY_MIGRATION_PRIORITY = -100,
+  MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT = 128,
   videoProxyMigrationUpdateListeners = new Set();
 export function createProxyMigrationRequestTracker({
-  retryDelayMs: retryDelayMs = 0x3e8,
+  retryDelayMs: retryDelayMs = 1000,
   schedule: schedule = (value, item) => setTimeout(value, item),
   maxPendingTerminalCount: maxPendingTerminalCount = MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
 } = {}) {
@@ -31,10 +31,10 @@ export function createProxyMigrationRequestTracker({
     map = new Map(),
     map2 = new Map(),
     key = Math['max'](
-      0x1,
+      1,
       Math['min'](
         MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
-        Math['trunc'](Number(maxPendingTerminalCount) || 0x0) || MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
+        Math['trunc'](Number(maxPendingTerminalCount) || 0) || MAX_PENDING_PROXY_MIGRATION_TERMINAL_COUNT,
       ),
     ),
     release = (response = {}) => {
@@ -63,7 +63,7 @@ export function createProxyMigrationRequestTracker({
         return (requestedKeys2['delete'](enabled), response);
       return (
         result === 'failed' &&
-          schedule(() => requestedKeys2['delete'](enabled), Math['max'](0x0, Number(retryDelayMs) || 0x0)),
+          schedule(() => requestedKeys2['delete'](enabled), Math['max'](0, Number(retryDelayMs) || 0)),
         response
       );
     },
@@ -90,10 +90,10 @@ export function createMediaTaskListCache({
   let next = null;
   return {
     async get(enabled5 = '') {
-      const createdAt = Number(now()) || 0x0;
+      const createdAt = Number(now()) || 0;
       if (
         next &&
-        createdAt - next['createdAt'] < Math['max'](0x0, Number(ttlMs) || 0x0) &&
+        createdAt - next['createdAt'] < Math['max'](0, Number(ttlMs) || 0) &&
         (next['pending'] || !enabled5 || next['taskIds']['has'](enabled5))
       )
         return next['promise'];
@@ -134,7 +134,7 @@ export function createMediaTaskListCache({
   };
 }
 const mediaTaskListCache = createMediaTaskListCache({
-  list: () => desktopBridge['mediaTask']['list']({ limit: 0x1f4 }),
+  list: () => desktopBridge['mediaTask']['list']({ limit: 500 }),
 });
 function normalizeStatus(state) {
   return String(state || '')['trim']();
@@ -145,7 +145,7 @@ function buildStatusPatch(nodeId = {}) {
       mediaTaskId: String(nodeId['taskId'] || ''),
       mediaTaskKind: String(nodeId['kind'] || ''),
       mediaTaskStatus: mediaTaskStatus,
-      mediaTaskProgress: Number(nodeId['progress'] || 0x0) || 0x0,
+      mediaTaskProgress: Number(nodeId['progress'] || 0) || 0,
       mediaTaskError: String(nodeId['error'] || ''),
     };
   if (mediaTaskStatus === 'waiting' || mediaTaskStatus === 'processing')
@@ -186,7 +186,7 @@ function publishVideoProxyMigrationUpdate(options3 = {}) {
     try {
       run(options3);
     } catch (config) {
-      console['warn']('[mediaTaskService]\x20video\x20proxy\x20migration\x20listener\x20failed:', config);
+      console['warn']('[mediaTaskService] video proxy migration listener failed:', config);
     }
   }
 }
@@ -225,7 +225,7 @@ function buildResultPatch(options5 = {}, value2 = {}) {
   const pendingVideoProxyLocalPath =
       options5['result'] && typeof options5['result'] === 'object' ? options5['result'] : {},
     value3 = String(options5['kind'] || '');
-  if (!pendingVideoProxyLocalPath || Object['keys'](pendingVideoProxyLocalPath)['length'] === 0x0) return {};
+  if (!pendingVideoProxyLocalPath || Object['keys'](pendingVideoProxyLocalPath)['length'] === 0) return {};
   if (value3 === 'videoPoster' && isVideoProxyMigrationEvent(options5))
     return buildCanvasLocalVideoFields({
       pendingVideoProxyLocalPath: pendingVideoProxyLocalPath['displayLocalPath'] || '',
@@ -285,7 +285,7 @@ function getUpdateKey(options6 = {}) {
   ]['join']('|');
 }
 function nowMs() {
-  return Number(globalThis['performance']?.['now']?.() || Date['now']()) || 0x0;
+  return Number(globalThis['performance']?.['now']?.() || Date['now']()) || 0;
 }
 function flushPendingUpdates() {
   ((pendingUpdateTimer = null), (lastPendingUpdateFlushAt = nowMs()));
@@ -302,7 +302,7 @@ function flushPendingUpdates() {
 function schedulePendingUpdateFlush() {
   if (pendingUpdateTimer !== null) return;
   const nowMs2 = nowMs() - lastPendingUpdateFlushAt,
-    value7 = Math['max'](0x0, COALESCED_UPDATE_INTERVAL_MS - nowMs2);
+    value7 = Math['max'](0, COALESCED_UPDATE_INTERVAL_MS - nowMs2);
   pendingUpdateTimer = setTimeout(flushPendingUpdates, value7);
 }
 function handleMediaTaskUpdate(response5 = {}) {
@@ -365,7 +365,7 @@ function applyMediaTaskUpdate(options9 = {}) {
   });
   const list6 = Object['keys'](value14);
   if (!list6['length']) return;
-  if (typeof appStore['updateNodesData'] === 'function' && list6['length'] > 0x1) {
+  if (typeof appStore['updateNodesData'] === 'function' && list6['length'] > 1) {
     appStore['updateNodesData'](value14);
     return;
   }
@@ -382,11 +382,11 @@ export function getLegacyVideoProxyAssetId(value23) {
   const list7 = normalizeProxyPath(value23);
   if (!list7) return '';
   let value24 = 0xcbf29ce484222325n;
-  for (let value25 = 0x0; value25 < list7['length']; value25 += 0x1) {
+  for (let value25 = 0; value25 < list7['length']; value25 += 1) {
     ((value24 ^= BigInt(list7['charCodeAt'](value25))),
-      (value24 = BigInt['asUintN'](0x40, value24 * 0x100000001b3n)));
+      (value24 = BigInt['asUintN'](64, value24 * 0x100000001b3n)));
   }
-  return 'legacy-' + value24['toString'](0x10)['padStart'](0x10, '0');
+  return 'legacy-' + value24['toString'](16)['padStart'](16, '0');
 }
 export function getLegacyProjectImportVideoProxyMigration(response7 = {}) {
   if (

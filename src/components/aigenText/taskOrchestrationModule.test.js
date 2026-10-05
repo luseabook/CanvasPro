@@ -127,7 +127,7 @@ typeof globalThis.window.showToast !== 'function' && (globalThis.window.showToas
           outputText: 'old text',
           isGenerating: false,
           jobStatus: 'success',
-          generationDuration: 0x4d2,
+          generationDuration: 1234,
         },
         promptText: 'write summary',
         apiImpl: { generateText: async () => target },

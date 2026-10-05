@@ -13,7 +13,7 @@ const LABELS = {
 export function createCollaborationActivity({ root: root, getState: getState, actions: actions }) {
   const el = reviewElement('details', 'collaboration-activity'),
     reviewElement2 = reviewElement('summary', '', '协作动态');
-  reviewElement2['tabIndex'] = 0x0;
+  reviewElement2['tabIndex'] = 0;
   const el2 = reviewElement('p', 'collaboration-feedback');
   el2['setAttribute']('role', 'status');
   const el3 = reviewElement('button', 'collaboration-button', '重试加载');
@@ -38,7 +38,7 @@ export function createCollaborationActivity({ root: root, getState: getState, ac
       map['clear'](),
       el4['replaceChildren']());
     if (!el['open']) return;
-    const index = !!enabled?.['loading'] && enabled['revision'] < 0x0,
+    const index = !!enabled?.['loading'] && enabled['revision'] < 0,
       result = enabled?.['error'] || (index ? '正在加载动态…' : '最近 100 条操作');
     if (el2['textContent'] !== result) el2['textContent'] = result;
     (el2['classList']['toggle']('is-pending', index),
@@ -50,7 +50,7 @@ export function createCollaborationActivity({ root: root, getState: getState, ac
       const count = el4['scrollTop'],
         options = el4['getBoundingClientRect']()['top'],
         el5 =
-          count > 0x0
+          count > 0
             ? [...el4['children']]['find']((el6) => el6['getBoundingClientRect']()['bottom'] > options)
             : null,
         target = el5?.['getBoundingClientRect']()['top'],
@@ -63,7 +63,7 @@ export function createCollaborationActivity({ root: root, getState: getState, ac
           ((el8 = reviewElement('div', 'collaboration-activity-item')),
             el8['classList']['toggle']('is-mentioned', error['mentions']?.['includes'](key['actorId'])),
             el8['append'](
-              reviewElement('span', '', error['name'] + '\x20' + (LABELS[error['kind']] || '操作了')),
+              reviewElement('span', '', error['name'] + ' ' + (LABELS[error['kind']] || '操作了')),
             ));
           for (const error2 of error['nodes']) {
             const el9 = reviewElement(

@@ -100,7 +100,7 @@ function buildCustomProviderAudioLogoHtml(options2 = {}, state = 'node-menu-icon
   const config =
     String(options2?.['badge'] || 'CP')
       ['trim']()
-      ['slice'](0x0, 0x2) || 'CP';
+      ['slice'](0, 2) || 'CP';
   return (
     '<div class="' +
     escapeNodeMenuHtml(state) +
@@ -125,21 +125,21 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
     subtitle: '自定义 RunningHub AI App',
     icon: 'images/RH.png',
     iconAlt: 'runninghub',
-    order: 0x5,
+    order: 5,
   }),
   comfyUiCloudWorkflow: Object['freeze']({
     id: 'comfyUiCloudWorkflow',
     label: '云端工作流',
     subtitle: '保存的 ComfyUI 云端工作流',
     iconHtml: renderComfyUiCloudWorkflowLogoHtml({ className: 'node-menu-icon' }),
-    order: 0x6,
+    order: 6,
   }),
   comfyUiLocalWorkflow: Object['freeze']({
     id: 'comfyUiLocalWorkflow',
     label: '本地工作流',
     subtitle: '保存的 ComfyUI 本地工作流',
     iconHtml: renderComfyUiLocalWorkflowLogoHtml({ className: 'node-menu-icon' }),
-    order: 0x7,
+    order: 7,
   }),
   runninghubWorkflow: Object['freeze']({
     id: 'runninghub',
@@ -147,15 +147,15 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
     subtitleKey: 'runninghub.subtitle',
     icon: 'images/RH.png',
     iconAlt: 'runninghub',
-    order: 0xa,
+    order: 10,
   }),
   runninghubModel: Object['freeze']({
     id: 'runninghubModel',
     label: 'RunningHub模型',
-    subtitle: '语音合成\x20·\x20音乐创作\x20·\x20声音克隆',
+    subtitle: '语音合成 · 音乐创作 · 声音克隆',
     icon: 'images/RH.png',
     iconAlt: 'runninghub',
-    order: 0xf,
+    order: 15,
   }),
   volcengineSpeech: Object['freeze']({
     id: 'volcengineSpeech',
@@ -163,7 +163,7 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
     subtitle: '豆包语音大模型',
     icon: 'images/volcengine.svg',
     iconAlt: 'volcengine-speech',
-    order: 0x14,
+    order: 20,
   }),
 });
 
@@ -176,7 +176,7 @@ function getGroupConfig(input) {
     subtitle: '',
     icon: 'images/RH.png',
     iconAlt: output || '',
-    order: 0x64,
+    order: 100,
   });
 }
 
@@ -207,7 +207,7 @@ function groupWorkflowItems(list2 = []) {
             : args['iconHtml'],
           icon: value6 ? undefined : args['icon'],
           iconAlt: value6 ? '' : args['iconAlt'],
-          order: value6 ? 0x1e : args['order'],
+          order: value6 ? 30 : args['order'],
           items: [],
         }),
         map['get'](args['id'])['items']['push']({
@@ -225,7 +225,7 @@ function groupWorkflowItems(list2 = []) {
     Array['from'](map['values']())['sort']((value7, value8) => {
       const value9 = Number(value7['order']),
         value10 = Number(value8['order']);
-      return (Number['isFinite'](value9) ? value9 : 0x0) - (Number['isFinite'](value10) ? value10 : 0x0);
+      return (Number['isFinite'](value9) ? value9 : 0) - (Number['isFinite'](value10) ? value10 : 0);
     })
   );
 }

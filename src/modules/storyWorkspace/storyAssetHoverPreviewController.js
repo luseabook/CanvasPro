@@ -17,20 +17,20 @@ export function createStoryAssetHoverPreviewController({
     typeof isStoryAssetHoverLandscape !== 'function'
   )
     throw new Error('story asset hover preview requires presentation adapters');
-  let item = 0x0,
-    key = 0x0,
-    index = 0x0,
+  let item = 0,
+    key = 0,
+    index = 0,
     el = null,
     result = '',
     data = ![];
   const run = () => {
-      item = 0x0;
+      item = 0;
       if (!previewElement?.['classList']['contains']('is-visible')) return;
       const box = previewElement['getBoundingClientRect'](),
-        options = windowObject['innerWidth'] || documentObject['documentElement']?.['clientWidth'] || 0x400,
-        target = windowObject['innerHeight'] || documentObject['documentElement']?.['clientHeight'] || 0x300,
-        source = 0xe,
-        next = 0xa,
+        options = windowObject['innerWidth'] || documentObject['documentElement']?.['clientWidth'] || 1024,
+        target = windowObject['innerHeight'] || documentObject['documentElement']?.['clientHeight'] || 768,
+        source = 14,
+        next = 10,
         current = Math['max'](next, options - box['width'] - next),
         entry = Math['max'](next, target - box['height'] - next),
         box2 = el?.['getBoundingClientRect']?.();
@@ -45,7 +45,7 @@ export function createStoryAssetHoverPreviewController({
           else {
             const config = box2['bottom'] + source,
               scope = box2['top'] - box['height'] - source;
-            record = Math['min'](Math['max'](next, key - box['width'] / 0x2), current);
+            record = Math['min'](Math['max'](next, key - box['width'] / 2), current);
             if (config <= entry) payload = config;
             else {
               if (scope >= next) payload = scope;
@@ -53,13 +53,13 @@ export function createStoryAssetHoverPreviewController({
           }
         }
         (record === handle || record === state) &&
-          (payload = Math['min'](Math['max'](next, index - 0x12), entry));
+          (payload = Math['min'](Math['max'](next, index - 18), entry));
       }
       ((previewElement['style']['left'] = Math['round'](record) + 'px'),
         (previewElement['style']['top'] = Math['round'](payload) + 'px'));
     },
     handler = (event) => {
-      ((key = Number(event?.['clientX'] || 0x0)), (index = Number(event?.['clientY'] || 0x0)));
+      ((key = Number(event?.['clientX'] || 0)), (index = Number(event?.['clientY'] || 0)));
       if (item) return;
       if (typeof windowObject['requestAnimationFrame'] === 'function') {
         item = windowObject['requestAnimationFrame'](run);
@@ -76,7 +76,7 @@ export function createStoryAssetHoverPreviewController({
     },
     handler3 = () => {
       previewElement?.['querySelectorAll']('[data-story-asset-hover-image]')['forEach']((el3) => {
-        if (el3['complete'] && Number(el3['naturalWidth']) > 0x0) {
+        if (el3['complete'] && Number(el3['naturalWidth']) > 0) {
           handler2(el3);
           return;
         }
@@ -147,7 +147,7 @@ export function createStoryAssetHoverPreviewController({
         item &&
           typeof windowObject['cancelAnimationFrame'] === 'function' &&
           windowObject['cancelAnimationFrame'](item),
-        (item = 0x0),
+        (item = 0),
         (data = !![]));
     },
   });

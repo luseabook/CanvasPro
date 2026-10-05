@@ -147,23 +147,23 @@ const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
   LEGACY_PACKAGED_FILES_ROOT =
     LEGACY_PACKAGED_FILES_ROOTS[0] || (process.env.AIC_STORAGE_ROOT ? PACKAGED_FILES_ROOT : APP_ROOT),
   HOST = '127.0.0.1',
-  PORT = Number.parseInt(process.env.AICANVAS_PORT || '8777', 10) || 0x2249,
+  PORT = Number.parseInt(process.env.AICANVAS_PORT || '8777', 10) || 8777,
   APP_ORIGIN = 'http://' + HOST + ':' + PORT,
   APP_URL = APP_ORIGIN + '/',
-  SERVER_READY_TIMEOUT_MS = 0x7530,
-  SERVER_READY_INTERVAL_MS = 0x190,
+  SERVER_READY_TIMEOUT_MS = 30000,
+  SERVER_READY_INTERVAL_MS = 400,
   LOCAL_ACCESS_TOKEN = randomBytes(32).toString('hex'),
   SERVER_ID_HEADER = 'x-aicanvas-server',
   SERVER_ID_VALUE = APP_DISPLAY_NAME,
   LOCAL_PREVIEW_SCHEME = 'aic-local-preview',
-  LOCAL_PREVIEW_TTL_MS = 12 * 60 * 60 * 0x3e8,
+  LOCAL_PREVIEW_TTL_MS = 12 * 60 * 60 * 1000,
   CLIPBOARD_FILE_REFERENCES_FORMAT = 'application/x-ai-canvas-file-references',
   RECOVERY_SNAPSHOT_FILENAME = 'recovery-snapshot.json',
   GLOBAL_SCREENSHOT_ACCELERATOR = 'Alt+Q',
   GLOBAL_CAPTURE_LAUNCHER_ACCELERATOR = 'Control+Alt+Shift+C',
-  SERVER_RESTART_BASE_DELAY_MS = 0x3e8,
-  SERVER_RESTART_MAX_DELAY_MS = 0x7530,
-  SERVER_RESTART_MAX_ATTEMPTS = 0x5;
+  SERVER_RESTART_BASE_DELAY_MS = 1000,
+  SERVER_RESTART_MAX_DELAY_MS = 30000,
+  SERVER_RESTART_MAX_ATTEMPTS = 5;
 let mainWindow = null,
   spawnedServer = null,
   serverRestartTimer = null,
@@ -246,7 +246,7 @@ const LOG_DIR = path.join(USER_DATA_DIR, 'logs'),
   SERVER_LOG_PATH = path.join(LOG_DIR, 'server.log'),
   WINDOW_STATE_PATH = path.join(USER_DATA_DIR, 'window-state.json');
 mkdirSync(LOG_DIR, { recursive: true });
-const DEFAULT_WINDOW_STATE = { width: 0x5a0, height: 0x3c0, isMaximized: false },
+const DEFAULT_WINDOW_STATE = { width: 1440, height: 960, isMaximized: false },
   diagnostics = createDiagnosticsManager({
     app: app,
     logDir: LOG_DIR,
@@ -370,8 +370,8 @@ function normalizeWindowState(scope) {
     input = Number.parseInt(box.x, 10),
     output = Number.parseInt(box.y, 10),
     box2 = {
-      width: Number.isFinite(count2) && count2 >= 0x400 ? count2 : DEFAULT_WINDOW_STATE.width,
-      height: Number.isFinite(count3) && count3 >= 0x2d0 ? count3 : DEFAULT_WINDOW_STATE.height,
+      width: Number.isFinite(count2) && count2 >= 1024 ? count2 : DEFAULT_WINDOW_STATE.width,
+      height: Number.isFinite(count3) && count3 >= 720 ? count3 : DEFAULT_WINDOW_STATE.height,
       isMaximized: isMaximized.isMaximized === true,
     };
   return (Number.isFinite(input) && Number.isFinite(output) && ((box2.x = input), (box2.y = output)), box2);
@@ -415,7 +415,7 @@ function installWindowStatePersistence(value4) {
     if (setTimeout2) clearTimeout(setTimeout2);
     setTimeout2 = setTimeout(() => {
       ((setTimeout2 = null), writeWindowState(value4));
-    }, 0x190);
+    }, 400);
   };
   (value4.on('move', value5),
     value4.on('resize', value5),
@@ -434,7 +434,7 @@ const { delay, loadStartupStatus, isLocalAppUrl, openExternalUrl } = createStart
   normalizeExternalUrl: normalizeExternalUrl,
   formatExternalUrlForLog: formatExternalUrlForLog,
 });
-function probeServer(timeout = 0x4b0) {
+function probeServer(timeout = 1200) {
   return new Promise((handler) => {
     const value6 = http.get(
       APP_ORIGIN + '/api/v2/runtime/info',
@@ -452,7 +452,7 @@ function probeServer(timeout = 0x4b0) {
       }));
   });
 }
-function requestLocalJson(path2, timeout2 = 0x640) {
+function requestLocalJson(path2, timeout2 = 1600) {
   return new Promise((handler2, handler3) => {
     const value8 = http.request(
       {
@@ -468,7 +468,7 @@ function requestLocalJson(path2, timeout2 = 0x640) {
         (value9.on('data', (value10) => list.push(Buffer.from(value10))),
           value9.on('end', () => {
             const value11 = Buffer.concat(list).toString('utf8');
-            if (value9.statusCode < 200 || value9.statusCode >= 0x12c) {
+            if (value9.statusCode < 200 || value9.statusCode >= 300) {
               handler3(new Error(value11 || 'HTTP ' + value9.statusCode));
               return;
             }
@@ -547,7 +547,7 @@ async function clearPortBeforeStart(value13 = null) {
     onReclaim: () =>
       value13?.({
         kind: 'loading',
-        title: APP_DISPLAY_NAME + '\x20正在启动',
+        title: APP_DISPLAY_NAME + ' 正在启动',
         detail: '正在恢复上次未关闭的运行环境。',
         hint: '启动完成后会自动进入画布。',
       }),
@@ -868,7 +868,7 @@ function allocateUniqueUploadPath(value31, value32) {
     value33 = error3.name || 'upload',
     value34 = error3.ext || '',
     value35 = Date.now();
-  for (let count4 = 0; count4 < 0x3e8; count4 += 1) {
+  for (let count4 = 0; count4 < 1000; count4 += 1) {
     const storedFilename =
         count4 === 0
           ? safeFilename
@@ -956,8 +956,8 @@ function writeLocalImageDerivatives(value48, value49, value50) {
     value56 = path.join(value48, value54);
   (mkdirSync(path.dirname(value55), { recursive: true }),
     mkdirSync(path.dirname(value56), { recursive: true }));
-  const maxEdge = resizeImageToMaxEdge(value51, 0x500),
-    maxEdge2 = resizeImageToMaxEdge(value51, 0x140);
+  const maxEdge = resizeImageToMaxEdge(value51, 1280),
+    maxEdge2 = resizeImageToMaxEdge(value51, 320);
   if (!maxEdge || !maxEdge2) return {};
   (writeFileSync(value55, maxEdge.toPNG()), writeFileSync(value56, maxEdge2.toPNG()));
   const localPath = 'data/uploads/' + value49,
@@ -1063,7 +1063,7 @@ function buildWaveformJsonFromFloat32(value62, value63 = 190) {
   const value64 = value62.buffer.slice(value62.byteOffset, value62.byteOffset + value62.byteLength),
     list4 = new Float32Array(value64, 0, Math.floor(value62.byteLength / 4)),
     value65 = list4.length,
-    samples = Math.max(40, Math.min(0x190, Number(value63) || 190)),
+    samples = Math.max(40, Math.min(400, Number(value63) || 190)),
     value66 = Math.max(1, Math.floor(value65 / samples)),
     peaks = [];
   for (let value67 = 0; value67 < samples; value67 += 1) {
@@ -1192,9 +1192,9 @@ async function waitForServerReady(value76 = null) {
       detail: '正在准备画布环境。',
       hint:
         '已等待 ' +
-        Math.ceil(value78 / 0x3e8) +
+        Math.ceil(value78 / 1000) +
         ' 秒，预计最多需要 ' +
-        Math.ceil(SERVER_READY_TIMEOUT_MS / 0x3e8) +
+        Math.ceil(SERVER_READY_TIMEOUT_MS / 1000) +
         ' 秒。',
     }),
       await delay(SERVER_READY_INTERVAL_MS));
@@ -1216,9 +1216,9 @@ function scheduleServerRestart() {
     });
     return;
   }
-  const attempt = serverRestartAttempts + 0x1,
+  const attempt = serverRestartAttempts + 1,
     delayMs = Math['min'](
-      SERVER_RESTART_BASE_DELAY_MS * Math['pow'](0x2, serverRestartAttempts),
+      SERVER_RESTART_BASE_DELAY_MS * Math['pow'](2, serverRestartAttempts),
       SERVER_RESTART_MAX_DELAY_MS,
     );
   serverRestartAttempts = attempt;
@@ -1842,7 +1842,7 @@ function normalizeDialogOptionText(value115, value116 = '', value117 = 180) {
 }
 async function selectDirectory(options12 = {}) {
   const title = normalizeDialogOptionText(options12?.title, '选择保存目录', 80),
-    dialogOptionText = normalizeDialogOptionText(options12?.defaultPath, '', 0x400),
+    dialogOptionText = normalizeDialogOptionText(options12?.defaultPath, '', 1024),
     value118 = { title: title, properties: ['openDirectory', 'createDirectory'] };
   if (dialogOptionText) value118.defaultPath = dialogOptionText;
   const path4 = await foregroundDialogs['showOpenDialog'](value118);
@@ -2072,8 +2072,8 @@ function createMainWindow() {
   ((rendererProjectState = { hasUnsavedChanges: false, projectName: '' }),
     (mainWindow = new BrowserWindow({
       ...args5,
-      minWidth: 0x400,
-      minHeight: 0x2d0,
+      minWidth: 1024,
+      minHeight: 720,
       title: APP_DISPLAY_NAME,
       show: false,
       autoHideMenuBar: true,

@@ -37,7 +37,7 @@ export function createCollaborationApplication({
     actorId: '',
     rooms: [],
     session: null,
-    nodeCount: 0x0,
+    nodeCount: 0,
   };
   let api = null,
     resumeRoom = null,
@@ -45,13 +45,13 @@ export function createCollaborationApplication({
     serverUrl = null,
     displayName = '成员',
     clientId = crypto['randomUUID'](),
-    value = 0x0,
+    value = 0,
     enabled = ![],
     item = ![],
     enabled2 = null,
-    key = 0x0,
+    key = 0,
     value2 = null,
-    index = 0x0;
+    index = 0;
   const run = () => {
       if (enabled) throw new DOMException('Aborted', 'AbortError');
     },
@@ -206,7 +206,7 @@ export function createCollaborationApplication({
       onAttention(input) {
         if (current === value && !enabled)
           onNotice(
-            input ? '房主已召集你到\x20TA\x20的视角' : '房主发起了召集；你已关闭自动跟随，当前视角保持不变',
+            input ? '房主已召集你到 TA 的视角' : '房主发起了召集；你已关闭自动跟随，当前视角保持不变',
           );
       },
       onNotice: onNotice,
@@ -214,7 +214,7 @@ export function createCollaborationApplication({
       onDetach() {
         if (current !== value) return;
         (handler(),
-          (value += 0x1),
+          (value += 1),
           (resumeRoom = null),
           (actorId['session'] = null),
           (actorId['resumeRoom'] = null),
@@ -258,7 +258,7 @@ export function createCollaborationApplication({
       (storage2?.['setItem'](RESUME_KEY, JSON['stringify'](output)),
         entry['remember'](room['roomId'], canvasId, payload, output));
     } catch (value3) {
-      ((value += 0x1), (handler = () => {}));
+      ((value += 1), (handler = () => {}));
       const value4 = label && actorId['session']?.['mediaNodes']?.['some']((enabled6) => !enabled6['owned']);
       canvasTabs['setCanvasProjectAccess']?.(
         canvasId,
@@ -289,7 +289,7 @@ export function createCollaborationApplication({
         !enabled &&
         resumeRoom &&
         (await resumeRoom['destroy'](),
-        (value += 0x1),
+        (value += 1),
         (resumeRoom = null),
         (actorId['session'] = null),
         resetHistory(),
@@ -338,10 +338,10 @@ export function createCollaborationApplication({
             if (value9 !== key) return;
             ((displayName = String(
               options2['displayName'] ||
-                (displayName !== '成员' ? displayName : '成员 ' + args3['actorId']['slice'](0x0, 0x4)),
+                (displayName !== '成员' ? displayName : '成员 ' + args3['actorId']['slice'](0, 4)),
             )
               ['trim']()
-              ['slice'](0x0, 0x20)),
+              ['slice'](0, 32)),
               (actorId['authenticated'] = !![]),
               (actorId['actorId'] = args3['actorId']),
               (index = args3['expiresAt']),
@@ -379,7 +379,7 @@ export function createCollaborationApplication({
         (displayName =
           String(value11 || '')
             ['trim']()
-            ['slice'](0x0, 0x20) || '成员 ' + actorId['actorId']['slice'](0x0, 0x4)));
+            ['slice'](0, 32) || '成员 ' + actorId['actorId']['slice'](0, 4)));
       try {
         const args4 = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
         if (args4)
@@ -434,7 +434,7 @@ export function createCollaborationApplication({
             if (
               value23['presence']?.['some'](
                 (value24) =>
-                  value24['clientId'] === roomId2['clientId'] && value24['expiresAt'] * 0x3e8 > Date['now'](),
+                  value24['clientId'] === roomId2['clientId'] && value24['expiresAt'] * 1000 > Date['now'](),
               )
             )
               throw new Error('原窗口仍在协作；如果它已关闭，请稍后重试恢复');
@@ -450,7 +450,7 @@ export function createCollaborationApplication({
       const value25 = await resumeRoom['command']('invite', { role: role, validity: validity }),
         response2 = api['getConnection']()['endpoint'];
       return encodeCollaborationInvite(
-        { ...response2, url: url || response2['addresses']?.[0x0] || response2['url'] },
+        { ...response2, url: url || response2['addresses']?.[0] || response2['url'] },
         value25['invite'],
       );
     },
@@ -473,7 +473,7 @@ export function createCollaborationApplication({
           (enabled10) =>
             enabled10['actorId'] === value28 &&
             enabled10['clientId'] !== clientId &&
-            (!enabled10['expiresAt'] || enabled10['expiresAt'] * 0x3e8 > Date['now']()),
+            (!enabled10['expiresAt'] || enabled10['expiresAt'] * 1000 > Date['now']()),
         )
       )
         throw new Error('该成员当前不在线');
@@ -534,7 +534,7 @@ export function createCollaborationApplication({
     signOut() {
       (run4(),
         (enabled2 = null),
-        (key += 0x1),
+        (key += 1),
         void api?.['disconnect'](),
         (api = null),
         (actorId['authenticated'] = ![]),
@@ -553,7 +553,7 @@ export function createCollaborationApplication({
       const token = JSON['parse'](storage?.['getItem'](STORAGE_KEY) || 'null');
       if (token?.['clientId']) clientId = token['clientId'];
       actorId['resumeRoom'] = JSON['parse'](storage2?.['getItem'](RESUME_KEY) || 'null');
-      if (!token || token['expiresAt'] * 0x3e8 <= Date['now']()) return;
+      if (!token || token['expiresAt'] * 1000 <= Date['now']()) return;
       const fetchConfig3 = await fetchConfig();
       if (enabled || value37 !== key) return;
       serverUrl = fetchConfig3;
@@ -581,20 +581,20 @@ export function createCollaborationApplication({
       run();
       if (resumeRoom) return;
       const value39 = key;
-      (!actorId['authenticated'] || index * 0x3e8 <= Date['now']()) &&
+      (!actorId['authenticated'] || index * 1000 <= Date['now']()) &&
         ((actorId['authenticating'] = !![]), refreshCanvas());
       (await ready, run());
       if (value2) return value2;
       if (value39 !== key) return;
-      if (!actorId['authenticated'] || index * 0x3e8 <= Date['now']()) await actions['authenticate']();
+      if (!actorId['authenticated'] || index * 1000 <= Date['now']()) await actions['authenticate']();
       else ((actorId['authenticating'] = ![]), refreshCanvas());
     },
     destroy() {
       if (enabled) return value38;
       return (
         (enabled = !![]),
-        (value += 0x1),
-        (key += 0x1),
+        (value += 1),
+        (key += 1),
         handler(),
         (value38 = Promise['resolve'](resumeRoom ? resumeRoom['destroy']() : api?.['disconnect']())[
           'finally'

@@ -3,10 +3,10 @@ import { createWriteStream } from 'node:fs';
 import { mkdir, readFile, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
-const REMOTE_ASSET_DOWNLOAD_TIMEOUT_MS = 0x7530,
-  REMOTE_VIDEO_DOWNLOAD_TIMEOUT_MS = 5 * 0xea60,
-  REMOTE_IMAGE_MAX_BYTES = 50 * 0x400 * 0x400,
-  REMOTE_VIDEO_MAX_BYTES = 0x12c * 0x400 * 0x400,
+const REMOTE_ASSET_DOWNLOAD_TIMEOUT_MS = 30000,
+  REMOTE_VIDEO_DOWNLOAD_TIMEOUT_MS = 5 * 60000,
+  REMOTE_IMAGE_MAX_BYTES = 50 * 1024 * 1024,
+  REMOTE_VIDEO_MAX_BYTES = 300 * 1024 * 1024,
   REMOTE_VIDEO_CACHE_DIR = 'ai-canvas-remote-video',
   REMOTE_IMAGE_EXTENSION_RE = /\.(?:png|jpe?g|webp|gif|bmp|svg|avif)(?:[?#].*)?$/i,
   REMOTE_VIDEO_EXTENSION_RE = /\.(?:mp4|webm|mov|m4v|ogv)(?:[?#].*)?$/i,
@@ -110,7 +110,7 @@ function getRemoteAssetDownloadTimeoutMs(value2) {
   return value2 === 'video' ? REMOTE_VIDEO_DOWNLOAD_TIMEOUT_MS : REMOTE_ASSET_DOWNLOAD_TIMEOUT_MS;
 }
 function createRemoteAssetSizeError(value3, value4) {
-  return new Error('远程' + value3 + '超过 ' + Math.round(value4 / 0x400 / 0x400) + 'MB 限制');
+  return new Error('远程' + value3 + '超过 ' + Math.round(value4 / 1024 / 1024) + 'MB 限制');
 }
 function getRemoteVideoTempRoot(options2 = {}) {
   const value5 = String(options2?.tempRoot || options2?.tempDir || '').trim();
@@ -410,7 +410,7 @@ async function fetchRemoteVideoAssetBytes(value62, signal2 = {}) {
         headers: headers4,
         signal: signal2.signal,
       });
-    if (response4?.status === 0x1a0 && initialBytes > 0 && count === 0) {
+    if (response4?.status === 416 && initialBytes > 0 && count === 0) {
       (await removeRemoteTempFile(remoteVideoTempFilePath), (initialBytes = 0));
       continue;
     }

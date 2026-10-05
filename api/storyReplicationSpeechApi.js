@@ -18,10 +18,10 @@ export async function transcribeReplicationSource({
     throw new Error('录音识别需要桌面媒体服务，请重启桌面应用后重试。');
   const setInterval2 = setInterval(() => {
     if (!isActive()) void cancelElectronMediaTask(enqueueElectronMediaTask2['taskId'])['catch'](() => {});
-  }, 0x1f4);
+  }, 500);
   try {
     const waitForElectronMediaTask2 = await waitForElectronMediaTask(enqueueElectronMediaTask2['taskId'], {
-      timeout: 0x7 * 0xea60,
+      timeout: 7 * 60000,
     });
     if (!isActive()) throw new Error('视频分析所属项目已失效。');
     return waitForElectronMediaTask2;

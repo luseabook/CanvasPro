@@ -40,8 +40,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
   const index = String(item ?? '')['trim']();
@@ -62,7 +62,7 @@ function getCharacterAppearance(options, target = '') {
   return (
     list['find']((source) => source['id'] === target) ||
     getWorkspaceAssetBaseAppearance(options) ||
-    list[0x0] ||
+    list[0] ||
     null
   );
 }
@@ -85,10 +85,10 @@ function renderPersonReplacementVoiceReferenceStatus(options2 = {}, next = '') {
     current = Boolean(mediaUrl);
   return (
     '<span class="person-replacement-target-voice-status' +
-    (next ? '\x20' + escapeHtml(next) : '') +
-    '\x20' +
+    (next ? ' ' + escapeHtml(next) : '') +
+    ' ' +
     (current ? 'has-reference' : 'is-missing') +
-    '\x22><i\x20aria-hidden=\x22true\x22></i>' +
+    '"><i aria-hidden="true"></i>' +
     (current ? '有声音参考' : '无声音参考') +
     '</span>'
   );
@@ -112,21 +112,21 @@ function renderPersonDetectionPicker({
   return (
     '<span class="person-replacement-detection-picker is-' +
     escapeHtml(kind) +
-    '\x22\x20data-person-replacement-detection-picker=\x22' +
+    '" data-person-replacement-detection-picker="' +
     escapeHtml(kind) +
     '">\n    <button type="button" class="person-replacement-detection-picker-trigger" data-person-replacement-action="toggle-detection-picker" data-person-replacement-detection-picker-trigger="' +
     escapeHtml(kind) +
-    '\x22\x20' +
+    '" ' +
     record +
-    '\x20value=\x22' +
+    ' value="' +
     escapeHtml(text2) +
-    '\x22' +
+    '"' +
     (entry
-      ? ' data-person-replacement-selected-source-character-id="' + escapeHtml(sourceCharacterId) + '\x22'
+      ? ' data-person-replacement-selected-source-character-id="' + escapeHtml(sourceCharacterId) + '"'
       : '') +
     ' aria-label="' +
     escapeHtml(ariaLabel) +
-    '\x22\x20aria-haspopup=\x22listbox\x22\x20aria-expanded=\x22false\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20data-person-replacement-detection-picker-value>' +
+    '" aria-haspopup="listbox" aria-expanded="false">\n      <span data-person-replacement-detection-picker-value>' +
     escapeHtml(text3) +
     '</span><span class="story-project-sort-chevron" aria-hidden="true"></span>\n    </button>\n    ' +
     (entry
@@ -151,21 +151,21 @@ function renderPersonDetectionPickerOptions(list2 = [], payload = '') {
             escapeHtml(text5) +
             '" aria-label="删除自定义名称' +
             escapeHtml(text6) +
-            '\x22>' +
+            '">' +
             renderWorkspaceActionIcon('delete') +
             '</button>'
           : '',
         config = el?.['sourceCharacterId']
-          ? ' data-person-replacement-source-character-id="' + escapeHtml(el['sourceCharacterId']) + '\x22'
+          ? ' data-person-replacement-source-character-id="' + escapeHtml(el['sourceCharacterId']) + '"'
           : '';
       return (
         '<span class="person-replacement-detection-picker-option-row' +
-        (el?.['deletable'] ? '\x20is-deletable' : '') +
+        (el?.['deletable'] ? ' is-deletable' : '') +
         '"><button type="button" class="story-project-sort-option' +
         (handle ? ' is-selected' : '') +
         '" data-person-replacement-action="select-detection-picker-option" data-person-replacement-detection-picker-option="' +
         escapeHtml(text5) +
-        '\x22' +
+        '"' +
         config +
         ' role="option" aria-selected="' +
         handle +
@@ -190,7 +190,7 @@ function renderPersonMappingScopeMenu({
     escapeHtml(targetName) +
     ' · ' +
     escapeHtml(appearanceName) +
-    '</small>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-mapping-scope-option\x22\x20data-person-replacement-action=\x22confirm-person-mapping-scope\x22\x20data-person-replacement-mapping-scope=\x22current\x22\x20role=\x22menuitem\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-copy\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-title\x22>仅当前片段</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22person-replacement-mapping-scope-option-subtitle\x22>只替换这个片段中的人物形象</small>\x0a\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-mapping-scope-option\x22\x20data-person-replacement-action=\x22confirm-person-mapping-scope\x22\x20data-person-replacement-mapping-scope=\x22all\x22\x20role=\x22menuitem\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-copy\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-mapping-scope-option-title\x22>应用全部片段</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22person-replacement-mapping-scope-option-subtitle\x22>同步替换该人物在所有片段中的形象</small>\x0a\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20</div>'
+    '</small>\n    </div>\n    <button type="button" class="person-replacement-mapping-scope-option" data-person-replacement-action="confirm-person-mapping-scope" data-person-replacement-mapping-scope="current" role="menuitem">\n      <span class="person-replacement-mapping-scope-option-copy">\n        <span class="person-replacement-mapping-scope-option-title">仅当前片段</span>\n        <small class="person-replacement-mapping-scope-option-subtitle">只替换这个片段中的人物形象</small>\n      </span>\n    </button>\n    <button type="button" class="person-replacement-mapping-scope-option" data-person-replacement-action="confirm-person-mapping-scope" data-person-replacement-mapping-scope="all" role="menuitem">\n      <span class="person-replacement-mapping-scope-option-copy">\n        <span class="person-replacement-mapping-scope-option-title">应用全部片段</span>\n        <small class="person-replacement-mapping-scope-option-subtitle">同步替换该人物在所有片段中的形象</small>\n      </span>\n    </button>\n  </div>'
   );
 }
 function hasTargetAssetBinding(scope, input) {
@@ -220,15 +220,15 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
       const list7 = getWorkspaceAssetAppearances(asset),
         appearances = list7['filter']((value5) => value5['imageUrl']),
         value6 = Math['max'](
-          0x0,
+          0,
           Math['min'](
-            list7['length'] - 0x1,
-            Math['trunc'](Number(args3['workspace']['assetAppearanceIndexes']?.[asset['id']]) || 0x0),
+            list7['length'] - 1,
+            Math['trunc'](Number(args3['workspace']['assetAppearanceIndexes']?.[asset['id']]) || 0),
           ),
         ),
         value7 = list7[value6]?.['id'],
         selectedIndex = Math['max'](
-          0x0,
+          0,
           appearances['findIndex']((value8) => value8['id'] === value7),
         );
       return {
@@ -248,7 +248,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
         if (characters)
           return renderPersonReplacementAssetCard(value4, asset2, {
             previewAppearance: appearance,
-            statusText: '场景图\x20' + (selectedIndex2 + 0x1) + '/' + appearances2['length'],
+            statusText: '场景图 ' + (selectedIndex2 + 1) + '/' + appearances2['length'],
             draggable: !![],
             cardClassName: 'person-replacement-target-asset person-replacement-scene-reference-asset',
             cardAttributes:
@@ -256,18 +256,18 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
               escapeHtml(asset2['id']) +
               '" data-person-replacement-target-scene-appearance-id="' +
               escapeHtml(appearance['id']) +
-              '\x22\x20aria-label=\x22' +
+              '" aria-label="' +
               escapeHtml('拖拽' + asset2['name'] + '到首帧画面作为场景参考') +
-              '\x22',
+              '"',
             shellClassName: 'person-replacement-target-asset-shell',
           });
-        const value10 = appearances2['length'] > 0x1,
+        const value10 = appearances2['length'] > 1,
           accessoryHtml = value10
             ? '<span class="person-replacement-target-appearance-controls" data-person-replacement-target-controls="' +
               escapeHtml(asset2['id']) +
               '" data-story-asset-hover-id="' +
               escapeHtml(asset2['id']) +
-              '\x22>' +
+              '">' +
               renderPersonReplacementPreviewArrow('previous', {
                 action: 'target-previous-appearance',
                 label: asset2['name'] + '上一个形象',
@@ -283,7 +283,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
           hasTargetAssetBinding2 = hasTargetAssetBinding(asset2, value3);
         return renderPersonReplacementAssetCard(value4, asset2, {
           previewAppearance: appearance,
-          statusText: '形象 ' + (selectedIndex2 + 0x1) + '/' + appearances2['length'],
+          statusText: '形象 ' + (selectedIndex2 + 1) + '/' + appearances2['length'],
           cardMetaHtml: renderPersonReplacementVoiceReferenceStatus(asset2),
           draggable: !![],
           cardClassName:
@@ -292,7 +292,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
           cardAttributes:
             'data-person-replacement-target-character-id="' +
             escapeHtml(asset2['id']) +
-            '\x22\x20data-person-replacement-target-appearance-id=\x22' +
+            '" data-person-replacement-target-appearance-id="' +
             escapeHtml(appearance['id']) +
             '" data-person-replacement-target-appearance-index="' +
             selectedIndex2 +
@@ -300,7 +300,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
             appearances2['length'] +
             '" data-person-replacement-target-appearance-wheel="' +
             value10 +
-            '\x22\x20aria-label=\x22拖拽' +
+            '" aria-label="拖拽' +
             escapeHtml(asset2['name']) +
             '的' +
             escapeHtml(appearance['name']) +
@@ -314,16 +314,16 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
   const value11 = characters ? '场景' : '角色',
     value12 = '请先在素材设定上传基础形象';
   return (
-    '<div\x20class=\x22person-replacement-target-asset-group\x22\x20data-person-replacement-target-asset-group=\x22' +
+    '<div class="person-replacement-target-asset-group" data-person-replacement-target-asset-group="' +
     characterAssetTab +
     '" role="group" aria-labelledby="person-replacement-target-asset-group-' +
     characterAssetTab +
     '">\n    <h3 class="person-replacement-target-asset-group-heading" id="person-replacement-target-asset-group-' +
     characterAssetTab +
-    '\x22>' +
+    '">' +
     value11 +
     '：</h3>\n    <div class="person-replacement-target-asset-group-items">' +
-    (enabled || '<p\x20class=\x22person-replacement-inline-empty\x22>' + value12 + '</p>') +
+    (enabled || '<p class="person-replacement-inline-empty">' + value12 + '</p>') +
     '</div>\n  </div>'
   );
 }
@@ -351,25 +351,25 @@ function renderVideoReplacementReferenceRail(value16, value17) {
           value23['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
         value25 = value23['reference'] || {},
         text7 = normalizeText(value23['sourceShotId']),
-        value26 = Math['max'](0x0, Math['trunc'](Number(value23['sourceShotIndex']) || 0x0)),
-        value27 = Math['max'](0x0, Math['trunc'](Number(value23['resultIndex']) || 0x0)),
-        count = Math['max'](0x1, Math['trunc'](Number(value23['resultCount']) || 0x1)),
+        value26 = Math['max'](0, Math['trunc'](Number(value23['sourceShotIndex']) || 0)),
+        value27 = Math['max'](0, Math['trunc'](Number(value23['resultIndex']) || 0)),
+        count = Math['max'](1, Math['trunc'](Number(value23['resultCount']) || 1)),
         label2 = isCharacterReference
           ? normalizeText(value25['characterName']) || '人物参考图'
-          : '片段' + (value26 + 0x1) + '.图片' + (value27 + 0x1),
+          : '片段' + (value26 + 1) + '.图片' + (value27 + 1),
         value28 = isCharacterReference
           ? '角色绑定图 · ' + (normalizeText(value25['appearanceName']) || '基础形象')
           : '图像替换结果',
         value29 = isCharacterReference
           ? '<small>' + escapeHtml(value28) + '</small>'
           : '<span class="person-replacement-video-reference-status" aria-label="图像替换结果 ' +
-            (value27 + 0x1) +
+            (value27 + 1) +
             '/' +
             count +
-            '\x22>' +
+            '">' +
             escapeHtml(value28) +
-            '\x20' +
-            (value27 + 0x1) +
+            ' ' +
+            (value27 + 1) +
             '/' +
             count +
             '</span>',
@@ -386,26 +386,26 @@ function renderVideoReplacementReferenceRail(value16, value17) {
         value32 = isCharacterReference ? 'character:' + characterReferenceId : 'shot:' + text7,
         value33 = isCharacterReference
           ? ''
-          : '\x20data-person-replacement-video-reference-source-shot-id=\x22' +
+          : ' data-person-replacement-video-reference-source-shot-id="' +
             escapeHtml(text7) +
             '" data-person-replacement-video-reference-result-index="' +
             value27 +
             '" data-person-replacement-video-reference-result-count="' +
             count +
-            '\x22' +
-            (count > 0x1 ? ' data-person-replacement-video-reference-wheel="true"' : ''),
+            '"' +
+            (count > 1 ? ' data-person-replacement-video-reference-wheel="true"' : ''),
         value34 =
-          !isCharacterReference && count > 0x1
+          !isCharacterReference && count > 1
             ? '<span class="person-replacement-target-appearance-controls person-replacement-video-reference-controls" data-person-replacement-video-reference-controls="' +
               escapeHtml(text7) +
               '" data-person-replacement-video-reference-result-index="' +
               value27 +
-              '\x22>' +
+              '">' +
               renderPersonReplacementPreviewArrow('previous', {
                 action: 'video-reference-previous-result',
                 label: label2 + '的上一张图片',
                 className:
-                  'person-replacement-target-appearance-arrow\x20person-replacement-video-reference-arrow',
+                  'person-replacement-target-appearance-arrow person-replacement-video-reference-arrow',
               }) +
               renderPersonReplacementPreviewArrow('next', {
                 action: 'video-reference-next-result',
@@ -416,34 +416,34 @@ function renderVideoReplacementReferenceRail(value16, value17) {
               '</span>'
             : '',
         cardHtml =
-          '<span\x20class=\x22story-asset-card-shell\x20person-replacement-target-asset-shell\x20person-replacement-video-reference-shell\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-video-reference-card\x20' +
+          '<span class="story-asset-card-shell person-replacement-target-asset-shell person-replacement-video-reference-shell">\n      <button type="button" class="person-replacement-video-reference-card ' +
           (value30 ? 'is-selected' : '') +
           '" data-story-action="select-video-shot-reference" data-shot-id="' +
           escapeHtml(value18?.['id'] || '') +
-          '\x22\x20data-person-replacement-video-reference-index=\x22' +
+          '" data-person-replacement-video-reference-index="' +
           value24 +
           '" data-person-replacement-video-reference-key="' +
           escapeHtml(value32) +
           '" data-person-replacement-video-reference-kind="' +
           escapeHtml(value23['kind']) +
-          '\x22' +
+          '"' +
           (isCharacterReference
-            ? '\x20data-person-replacement-video-character-reference=\x22' +
+            ? ' data-person-replacement-video-character-reference="' +
               escapeHtml(characterReferenceId) +
-              '\x22'
+              '"'
             : '') +
           value33 +
           value31 +
-          '\x20aria-pressed=\x22' +
+          ' aria-pressed="' +
           value30 +
-          '\x22\x20aria-label=\x22' +
+          '" aria-label="' +
           escapeHtml(
             '选择' +
               label2 +
               '作为视频替换参考图' +
-              (count > 0x1 && !isCharacterReference ? '，可滚动鼠标滚轮切换图片' : ''),
+              (count > 1 && !isCharacterReference ? '，可滚动鼠标滚轮切换图片' : ''),
           ) +
-          '\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22person-replacement-video-reference-media\x22>' +
+          '">\n      <span class="person-replacement-video-reference-media">' +
           (mediaUrl2
             ? '<img src="' +
               escapeHtml(mediaUrl2) +
@@ -453,15 +453,15 @@ function renderVideoReplacementReferenceRail(value16, value17) {
             : '') +
           '</span>\n      <span class="person-replacement-video-reference-copy' +
           (isCharacterReference ? '' : ' has-result-status') +
-          '\x22><strong>' +
+          '"><strong>' +
           escapeHtml(label2) +
           '</strong>' +
           value29 +
           '</span>\n      <span class="person-replacement-video-reference-selection" aria-hidden="true"' +
           (value30 ? '' : ' hidden') +
-          '>当前</span>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20' +
+          '>当前</span>\n      </button>\n      ' +
           value34 +
-          '\x0a\x20\x20\x20\x20</span>';
+          '\n    </span>';
       return {
         cardHtml: cardHtml,
         characterReferenceId: characterReferenceId,
@@ -487,7 +487,7 @@ function renderVideoReplacementReferenceRail(value16, value17) {
       return value38 || '';
     })['join'](''),
     noteHtml2 =
-      value21 && list10['length'] > 0x1
+      value21 && list10['length'] > 1
         ? '<p class="person-replacement-reference-note">每次生成使用一张人物参考图，请选择本次入参。</p>'
         : '',
     handler = ({
@@ -503,9 +503,9 @@ function renderVideoReplacementReferenceRail(value16, value17) {
       escapeHtml(label3) +
       '">\n      <h3 class="person-replacement-target-asset-group-heading">' +
       escapeHtml(label3) +
-      '：</h3>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-target-asset-group-items\x22>' +
+      '：</h3>\n      <div class="person-replacement-target-asset-group-items">' +
       (cardsHtml3 ||
-        '<p\x20class=\x22person-replacement-inline-empty\x22>' + escapeHtml(emptyText) + '</p>') +
+        '<p class="person-replacement-inline-empty">' + escapeHtml(emptyText) + '</p>') +
       noteHtml +
       '</div>\n    </section>',
     value39 = value21
@@ -526,7 +526,7 @@ function renderVideoReplacementReferenceRail(value16, value17) {
   return (
     '<aside class="person-replacement-target-assets person-replacement-video-reference-assets">\n    <div class="person-replacement-target-assets-heading"><strong>替换参考图</strong><small>' +
     escapeHtml(value22) +
-    '</small></div>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-target-asset-list\x20person-replacement-video-reference-list\x22\x20data-person-replacement-video-reference-list\x20tabindex=\x220\x22>' +
+    '</small></div>\n    <div class="person-replacement-target-asset-list person-replacement-video-reference-list" data-person-replacement-video-reference-list tabindex="0">' +
     value39 +
     value40 +
     '</div>\n  </aside>'
@@ -552,7 +552,7 @@ function renderDetectionBox(
     error2 = error ? getCharacterAppearance(error, value41['targetAppearanceId']) : null,
     value47 =
       value41['identityReviewStatus'] === 'needs_review' || value41['identityReviewRequired'] === !![],
-    value48 = Object['keys'](value45)['length'] > 0x0,
+    value48 = Object['keys'](value45)['length'] > 0,
     text10 = normalizeText(value45['orientation'], normalizeText(value41['orientation'])),
     formatPersonOrientation2 = formatPersonOrientation(text10),
     value49 = resolvePersonReplacementDetectionLabel(value41, value42, value43, text9),
@@ -598,7 +598,7 @@ function renderDetectionBox(
       value55 +
       '<span class="person-replacement-detection-separator" aria-hidden="true">·</span><span class="person-replacement-detection-binding-status ' +
       (value50 ? 'is-conflict' : error ? 'is-bound' : 'is-unbound') +
-      '\x22>' +
+      '">' +
       value51 +
       '</span>',
     value59 =
@@ -607,7 +607,7 @@ function renderDetectionBox(
           escapeHtml(error['id']) +
           '" data-story-asset-hover-appearance-id="' +
           escapeHtml(error2['id']) +
-          '\x22'
+          '"'
         : '',
     value60 =
       '<button type="button" class="story-action-icon-button is-danger person-replacement-detection-delete-action" data-person-replacement-action="delete-person" data-shot-id="' +
@@ -624,7 +624,7 @@ function renderDetectionBox(
         (value62) =>
           '<span class="person-replacement-manual-resize-handle is-' +
           value62 +
-          '\x22\x20data-person-replacement-manual-resize=\x22' +
+          '" data-person-replacement-manual-resize="' +
           value62 +
           '" aria-hidden="true"></span>',
       )
@@ -633,29 +633,29 @@ function renderDetectionBox(
       ? ' data-person-replacement-manual-person tabindex="0" aria-keyshortcuts="Delete D"'
       : ' tabindex="0" aria-keyshortcuts="Delete D"',
     value64 =
-      '<svg\x20class=\x22person-replacement-detection-readiness-border\x22\x20width=\x22100%\x22\x20height=\x22100%\x22\x20aria-hidden=\x22true\x22\x20focusable=\x22false\x22><rect\x20class=\x22person-replacement-detection-readiness-stroke\x22></rect></svg>';
+      '<svg class="person-replacement-detection-readiness-border" width="100%" height="100%" aria-hidden="true" focusable="false"><rect class="person-replacement-detection-readiness-stroke"></rect></svg>';
   return (
     '<div class="person-replacement-detection-box has-identity-controls is-movable ' +
     (error ? 'is-mapped' : '') +
-    '\x20' +
+    ' ' +
     (value47 ? 'needs-identity-review' : '') +
-    '\x20' +
+    ' ' +
     (value54 ? 'is-identity-editing' : '') +
-    '\x20' +
+    ' ' +
     value57 +
-    '\x20' +
+    ' ' +
     (value44 ? 'is-manual' : '') +
-    '\x20' +
+    ' ' +
     (value50 ? 'has-role-conflict' : '') +
     '" style="--box-x:' +
-    box['x'] * 0x64 +
+    box['x'] * 100 +
     '%;--box-y:' +
-    box['y'] * 0x64 +
+    box['y'] * 100 +
     '%;--box-width:' +
-    box['width'] * 0x64 +
+    box['width'] * 100 +
     '%;--box-height:' +
-    box['height'] * 0x64 +
-    '%\x22\x20data-person-replacement-person-drop' +
+    box['height'] * 100 +
+    '%" data-person-replacement-person-drop' +
     value59 +
     value63 +
     ' data-person-id="' +
@@ -664,13 +664,13 @@ function renderDetectionBox(
     escapeHtml(text9) +
     '" aria-label="' +
     escapeHtml(value50 ? value49 + '，角色名重复' : value49) +
-    '\x22' +
-    (value50 ? '\x20aria-invalid=\x22true\x22' : '') +
+    '"' +
+    (value50 ? ' aria-invalid="true"' : '') +
     '>' +
     value64 +
     '<div class="person-replacement-detection-label"><span class="person-replacement-detection-summary">' +
     value58 +
-    '</span><span\x20class=\x22person-replacement-detection-actions\x22>' +
+    '</span><span class="person-replacement-detection-actions">' +
     value60 +
     '</span></div>' +
     (error
@@ -678,7 +678,7 @@ function renderDetectionBox(
         escapeHtml(error['name']) +
         ' · ' +
         escapeHtml(error2?.['name'] || '基础形象') +
-        '</span><button\x20type=\x22button\x22\x20class=\x22story-action-icon-button\x20is-danger\x20story-project-delete-trigger\x20person-replacement-mapping-remove\x20person-replacement-detection-delete-action\x22\x20data-person-replacement-action=\x22clear-person-mapping\x22\x20data-shot-id=\x22' +
+        '</span><button type="button" class="story-action-icon-button is-danger story-project-delete-trigger person-replacement-mapping-remove person-replacement-detection-delete-action" data-person-replacement-action="clear-person-mapping" data-shot-id="' +
         escapeHtml(text9) +
         '" data-person-id="' +
         escapeHtml(value41['id']) +
@@ -687,7 +687,7 @@ function renderDetectionBox(
         '的人物绑定">' +
         renderWorkspaceActionIcon('unlink') +
         '</button></div>'
-      : '<div\x20class=\x22person-replacement-mapping-badge\x22>拖入目标形象</div>') +
+      : '<div class="person-replacement-mapping-badge">拖入目标形象</div>') +
     value61 +
     '</div>'
   );
@@ -721,20 +721,20 @@ function renderPromptReferenceInputs(shotId, value67) {
   const map2 = new Map(shotId['characters']['map']((value68) => [value68['id'], value68])),
     map3 = new Map(shotId['scenes']['map']((value69) => [value69['id'], value69])),
     readOnlyInputs = list11['map']((url) => {
-      const value70 = Math['max'](0x1, Number(url['slot']) || 0x1),
+      const value70 = Math['max'](1, Number(url['slot']) || 1),
         error3 = map2['get'](url['targetCharacterId']),
         error4 = map3['get'](url['targetSceneId']),
         name =
           url['role'] === 'source-keyframe'
             ? '图' +
               value70 +
-              '\x20·\x20当前首帧' +
+              ' · 当前首帧' +
               (value67['annotatedSource'] ? '（提交时叠加人物框）' : '')
             : url['role'] === 'person-location-guide'
               ? '图' + value70 + ' · A–H 定位图'
               : url['role'] === 'target-scene'
                 ? '图' + value70 + ' · 场景 · ' + (error4?.['name'] || '场景参考')
-                : '图' + value70 + '\x20·\x20' + (error3?.['name'] || '目标形象'),
+                : '图' + value70 + ' · ' + (error3?.['name'] || '目标形象'),
         removeAction = url['role'] === 'target-character',
         value71 = url['role'] === 'target-scene';
       return {
@@ -791,7 +791,7 @@ export function syncPersonReplacementPromptReferenceInputs(el2, value72, value73
     const count2 = list12['findIndex'](
         (el9) => el9['dataset']['refReadonlyKey'] === el8['dataset']['refReadonlyKey'],
       ),
-      el10 = count2 < 0x0 ? el8 : list12['splice'](count2, 0x1)[0x0];
+      el10 = count2 < 0 ? el8 : list12['splice'](count2, 1)[0];
     if (el10 !== el8)
       for (const { name: name2, value: value76 } of el8['attributes']) {
         if (el10['getAttribute'](name2) !== value76) el10['setAttribute'](name2, value76);

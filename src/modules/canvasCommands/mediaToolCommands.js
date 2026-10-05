@@ -8,8 +8,8 @@ const VIDEO_NODE_TYPES = Object['freeze'](['source-video', 'ai-video', 'video'])
   IMAGE_NODE_TYPES = Object['freeze'](['source-image', 'ai-image', 'image']),
   RESETTABLE_MEDIA_NODE_TYPES = Object['freeze'](['source-image', 'source-video', 'ai-image', 'ai-video']),
   DEFAULT_NODE_SIZES = Object['freeze']({
-    'source-image': Object['freeze']({ width: 0x200, height: 0x120 }),
-    'source-video': Object['freeze']({ width: 0x200, height: 0x120 }),
+    'source-image': Object['freeze']({ width: 512, height: 288 }),
+    'source-video': Object['freeze']({ width: 512, height: 288 }),
   });
 function getState(value) {
   return value['store']?.['getStateRaw']?.() || value['store']?.['getState']?.() || {};
@@ -48,11 +48,11 @@ function normalizeNodeIdForTypes(
     payload = record
       ? []
       : getSelectedNodeIds(entry)['filter']((handle) => isNodeType(getNode(entry, handle), types)),
-    nodeId = record || payload[0x0] || '';
+    nodeId = record || payload[0] || '';
   if (!nodeId)
     throw createCanvasCommandError(
       'MISSING_NODE_ID',
-      commandId + '\x20requires\x20a\x20' + (label || 'media') + '\x20nodeId.',
+      commandId + ' requires a ' + (label || 'media') + ' nodeId.',
     );
   const nodeType = getNode(entry, nodeId);
   if (!nodeType)
@@ -87,50 +87,50 @@ function assertToolResult(error, input, output = 'Media tool did not return a re
     );
   return error;
 }
-function normalizePositiveInt(value2, value3, { min: min = 0x1, max: max = 0xc } = {}) {
+function normalizePositiveInt(value2, value3, { min: min = 1, max: max = 12 } = {}) {
   const value4 = Number(value2),
     value5 = Number['isFinite'](value4) ? Math['trunc'](value4) : value3;
   return Math['max'](min, Math['min'](max, value5));
 }
 function asPositiveNumber(value6) {
   const count = Number(value6);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function getDefaultNodeSize(value7) {
-  return DEFAULT_NODE_SIZES[String(value7 || '')['trim']()] || { width: 0x140, height: 0xb4 };
+  return DEFAULT_NODE_SIZES[String(value7 || '')['trim']()] || { width: 320, height: 180 };
 }
 function getAutoSizeByShortSide(value8, value9, value10 = SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE) {
-  const value11 = Math['max'](0x1, Number(value8) || 0x1),
-    value12 = Math['max'](0x1, Number(value9) || 0x1),
-    value13 = Math['max'](0x1, Number(value10) || SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE),
+  const value11 = Math['max'](1, Number(value8) || 1),
+    value12 = Math['max'](1, Number(value9) || 1),
+    value13 = Math['max'](1, Number(value10) || SOURCE_MEDIA_AUTO_RESIZE_SHORT_SIDE),
     value14 = value13 / Math['min'](value11, value12);
   return {
-    width: Math['max'](0x1, Math['round'](value11 * value14)),
-    height: Math['max'](0x1, Math['round'](value12 * value14)),
+    width: Math['max'](1, Math['round'](value11 * value14)),
+    height: Math['max'](1, Math['round'](value12 * value14)),
   };
 }
 function getDefaultAIGenerationNodeSize(value15, value16) {
-  const count2 = Number(value15) || 0x0,
-    count3 = Number(value16) || 0x0;
-  if (count2 > 0x0 && count3 > 0x0)
+  const count2 = Number(value15) || 0,
+    count3 = Number(value16) || 0;
+  if (count2 > 0 && count3 > 0)
     return getAutoSizeByShortSide(count2, count3, AI_GENERATION_NODE_SHORT_SIDE);
   return { width: AI_GENERATION_NODE_SHORT_SIDE, height: AI_GENERATION_NODE_SHORT_SIDE };
 }
 function pickMainResultItem(list3, value17) {
-  if (!Array['isArray'](list3) || list3['length'] === 0x0) return null;
+  if (!Array['isArray'](list3) || list3['length'] === 0) return null;
   const value18 = Number(value17),
-    value19 = Number['isFinite'](value18) ? Math['max'](0x0, Math['trunc'](value18)) : 0x0;
-  return list3[value19] || list3[0x0] || null;
+    value19 = Number['isFinite'](value18) ? Math['max'](0, Math['trunc'](value18)) : 0;
+  return list3[value19] || list3[0] || null;
 }
 function parseAspectRatio(value20 = '') {
   const enabled = String(value20 || '')['trim']();
-  if (!enabled) return { w: 0x0, h: 0x0 };
+  if (!enabled) return { w: 0, h: 0 };
   const enabled2 = enabled['match'](/(\d+(?:\.\d+)?)\s*[:：xX/]\s*(\d+(?:\.\d+)?)/);
-  if (!enabled2) return { w: 0x0, h: 0x0 };
-  return { w: asPositiveNumber(enabled2[0x1]), h: asPositiveNumber(enabled2[0x2]) };
+  if (!enabled2) return { w: 0, h: 0 };
+  return { w: asPositiveNumber(enabled2[1]), h: asPositiveNumber(enabled2[2]) };
 }
 function resolveMediaResultSize(box) {
-  if (!box || typeof box !== 'object') return { w: 0x0, h: 0x0 };
+  if (!box || typeof box !== 'object') return { w: 0, h: 0 };
   if (isNodeType(box, 'source-image'))
     return { w: asPositiveNumber(box['imageWidth']), h: asPositiveNumber(box['imageHeight']) };
   if (isNodeType(box, 'source-video'))
@@ -148,12 +148,12 @@ function resolveMediaResultSize(box) {
         asPositiveNumber(box2?.['imageHeight']) ||
         asPositiveNumber(box2?.['height']) ||
         asPositiveNumber(box['imageHeight']);
-    if (!(w > 0x0 && h > 0x0)) {
+    if (!(w > 0 && h > 0)) {
       const aspectRatio = parseAspectRatio(box['aspectRatio']);
       ((w = aspectRatio['w']), (h = aspectRatio['h']));
     }
     return (
-      !(w > 0x0 && h > 0x0) && ((w = asPositiveNumber(box['width'])), (h = asPositiveNumber(box['height']))),
+      !(w > 0 && h > 0) && ((w = asPositiveNumber(box['width'])), (h = asPositiveNumber(box['height']))),
       { w: w, h: h }
     );
   }
@@ -167,24 +167,24 @@ function resolveMediaResultSize(box) {
         asPositiveNumber(box['selectedVideoHeight']) ||
         asPositiveNumber(mainResultItem?.['videoHeight']) ||
         asPositiveNumber(box['videoHeight']);
-    if (!(w2 > 0x0 && h2 > 0x0)) {
+    if (!(w2 > 0 && h2 > 0)) {
       const aspectRatio2 = parseAspectRatio(box['aspectRatio']);
       ((w2 = aspectRatio2['w']), (h2 = aspectRatio2['h']));
     }
     return (
-      !(w2 > 0x0 && h2 > 0x0) &&
+      !(w2 > 0 && h2 > 0) &&
         ((w2 = asPositiveNumber(box['width'])), (h2 = asPositiveNumber(box['height']))),
       { w: w2, h: h2 }
     );
   }
-  return { w: 0x0, h: 0x0 };
+  return { w: 0, h: 0 };
 }
 function resolveMediaResetSize(enabled3, value21 = {}) {
   const run = value21['getNodeDefaultSize'] || getDefaultNodeSize,
     handler = value21['getAIGenerationNodeSize'] || getDefaultAIGenerationNodeSize;
   if (!enabled3 || typeof enabled3 !== 'object') return run('source-image');
   const { w: w3, h: h3 } = resolveMediaResultSize(enabled3);
-  if (w3 > 0x0 && h3 > 0x0) {
+  if (w3 > 0 && h3 > 0) {
     if (isNodeType(enabled3, ['ai-image', 'ai-video'])) return handler(w3, h3);
     return getAutoSizeByShortSide(w3, h3);
   }
@@ -196,7 +196,7 @@ function resolveMediaResetSize(enabled3, value21 = {}) {
 function normalizeResetIds(options3 = {}, value22 = {}) {
   const enabled4 = !!String(options3['nodeId'] || '')['trim'](),
     value23 =
-      Array['isArray'](options3['ids']) && options3['ids']['length'] > 0x0
+      Array['isArray'](options3['ids']) && options3['ids']['length'] > 0
         ? options3['ids']
         : options3['nodeId']
           ? [options3['nodeId']]
@@ -223,10 +223,10 @@ function normalizeResetIds(options3 = {}, value22 = {}) {
     }
     (list4['push'](nodeId2), map['add'](nodeId2));
   }
-  if (list4['length'] === 0x0)
+  if (list4['length'] === 0)
     throw createCanvasCommandError(
       'MISSING_NODE_ID',
-      'media.resetSize\x20requires\x20ids,\x20nodeId,\x20or\x20selected\x20media\x20nodes.',
+      'media.resetSize requires ids, nodeId, or selected media nodes.',
     );
   return list4;
 }
@@ -285,7 +285,7 @@ export function registerMediaToolCommands(value29) {
   }),
     value29['register']({
       id: 'video.extractKeyframes',
-      description: 'Extract\x20keyframes\x20from\x20a\x20video\x20node\x20into\x20source\x20image\x20nodes.',
+      description: 'Extract keyframes from a video node into source image nodes.',
       riskLevel: 'confirm',
       argsSchema: {
         required: ['nodeId'],
@@ -332,7 +332,7 @@ export function registerMediaToolCommands(value29) {
           nodeIds = Array['isArray'](value33['nodeIds'])
             ? value33['nodeIds']['map']((value34) => String(value34 || '')['trim']())['filter'](Boolean)
             : [];
-        if (nodeIds['length'] === 0x0)
+        if (nodeIds['length'] === 0)
           throw createCanvasCommandError('MEDIA_TOOL_NO_RESULT', 'No keyframe nodes were created.', value33);
         return { nodeId: nodeId6['nodeId'], nodeIds: nodeIds, value: value33 };
       },
@@ -380,7 +380,7 @@ export function registerMediaToolCommands(value29) {
       argsSchema: {
         required: ['nodeId'],
         properties: { nodeId: { type: 'string' }, cols: { type: 'number' }, rows: { type: 'number' } },
-        defaults: { cols: 0x2, rows: 0x2 },
+        defaults: { cols: 2, rows: 2 },
         selectionFallback: !![],
       },
       capabilitySchema: {
@@ -399,8 +399,8 @@ export function registerMediaToolCommands(value29) {
         return {
           args: {
             nodeId: nodeId9['nodeId'],
-            cols: normalizePositiveInt(options6['cols'], 0x2),
-            rows: normalizePositiveInt(options6['rows'], 0x2),
+            cols: normalizePositiveInt(options6['cols'], 2),
+            rows: normalizePositiveInt(options6['rows'], 2),
           },
         };
       },
@@ -415,7 +415,7 @@ export function registerMediaToolCommands(value29) {
           nodeIds2 = Array['isArray'](value39['newIds'])
             ? value39['newIds']['map']((value40) => String(value40 || '')['trim']())['filter'](Boolean)
             : [];
-        if (nodeIds2['length'] === 0x0)
+        if (nodeIds2['length'] === 0)
           throw createCanvasCommandError(
             'MEDIA_TOOL_NO_RESULT',
             'No image grid nodes were created.',
@@ -455,8 +455,8 @@ export function registerMediaToolCommands(value29) {
             args['ids']['forEach']((value42) => {
               const node = getNode(store, value42),
                 box3 = resolveMediaResetSize(node, store),
-                width2 = Math['max'](0x1, Math['round'](Number(box3['width']) || 0x1)),
-                height2 = Math['max'](0x1, Math['round'](Number(box3['height']) || 0x1));
+                width2 = Math['max'](1, Math['round'](Number(box3['width']) || 1)),
+                height2 = Math['max'](1, Math['round'](Number(box3['height']) || 1));
               ((sizes[value42] = { width: width2, height: height2 }),
                 store2['updateNodeData'](value42, {
                   width: width2,

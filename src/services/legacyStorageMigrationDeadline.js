@@ -1,10 +1,10 @@
-export const LEGACY_STORAGE_MIGRATION_TIMEOUT_MS = 0x4e20;
+export const LEGACY_STORAGE_MIGRATION_TIMEOUT_MS = 20000;
 export function createMigrationDeadline(value = LEGACY_STORAGE_MIGRATION_TIMEOUT_MS) {
   const abortController = new AbortController(),
     item = Object['assign'](new Error('Legacy storage migration timed out'), {
       code: 'LEGACY_STORAGE_MIGRATION_TIMEOUT',
     }),
-    setTimeout2 = setTimeout(() => abortController['abort'](item), Math['max'](0x1, value)),
+    setTimeout2 = setTimeout(() => abortController['abort'](item), Math['max'](1, value)),
     { signal: signal } = abortController;
   return {
     signal: signal,

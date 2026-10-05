@@ -14,27 +14,27 @@ function normalizeSignaturePart(part) {
   }
   return String(part);
 }
-function toFiniteNumber(value, fallback = 0x0) {
+function toFiniteNumber(value, fallback = 0) {
   const numeric = Number(value);
   return Number['isFinite'](numeric) ? numeric : fallback;
 }
 function quantizeSigned(value, step) {
-  const safeStep = Math['max'](0x1, Number(step) || 0x1);
+  const safeStep = Math['max'](1, Number(step) || 1);
   return Math['trunc'](toFiniteNumber(value) / safeStep) * safeStep;
 }
 function normalizeViewportForSignature(viewport, nodeCount) {
-  const zoom = toFiniteNumber(viewport?.['zoom'], 0x1),
-    count = toFiniteNumber(nodeCount, 0x0),
+  const zoom = toFiniteNumber(viewport?.['zoom'], 1),
+    count = toFiniteNumber(nodeCount, 0),
     veryDense =
       zoom <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
       count >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'],
     dense =
       zoom <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
       count >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
-    quantizeStep = veryDense ? 0x60 : dense ? 0x40 : 0x0,
-    x = toFiniteNumber(viewport?.['x'], 0x0),
-    y = toFiniteNumber(viewport?.['y'], 0x0);
-  if (!(quantizeStep > 0x0)) return { x: x, y: y, zoom: zoom };
+    quantizeStep = veryDense ? 96 : dense ? 64 : 0,
+    x = toFiniteNumber(viewport?.['x'], 0),
+    y = toFiniteNumber(viewport?.['y'], 0);
+  if (!(quantizeStep > 0)) return { x: x, y: y, zoom: zoom };
   return {
     x: quantizeSigned(x, quantizeStep),
     y: quantizeSigned(y, quantizeStep),
@@ -83,12 +83,12 @@ export function buildRendererVirtualizationSignature({
       dragContext: {
         isDragging: !!dragContext?.['isDragging'],
         targetNodeId: dragContext?.['targetNodeId'] ?? null,
-        pendingDx: Number['isFinite'](dragContext?.['pendingDx']) ? dragContext['pendingDx'] : 0x0,
-        pendingDy: Number['isFinite'](dragContext?.['pendingDy']) ? dragContext['pendingDy'] : 0x0,
+        pendingDx: Number['isFinite'](dragContext?.['pendingDx']) ? dragContext['pendingDx'] : 0,
+        pendingDy: Number['isFinite'](dragContext?.['pendingDy']) ? dragContext['pendingDy'] : 0,
       },
       pinnedNodeIds: pinnedIds,
-      containerW: Number['isFinite'](containerW) ? containerW : 0x0,
-      containerH: Number['isFinite'](containerH) ? containerH : 0x0,
+      containerW: Number['isFinite'](containerW) ? containerW : 0,
+      containerH: Number['isFinite'](containerH) ? containerH : 0,
     }),
   );
 }

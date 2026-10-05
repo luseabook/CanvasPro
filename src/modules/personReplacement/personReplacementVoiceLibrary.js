@@ -3,7 +3,7 @@ function normalizeText(value) {
 }
 const GENERIC_AUDIO_ITEM_NAMES = new Set(['人声', '声音', '音频', '源音频', '生成音频', 'AI音频', 'AI 音频']);
 function normalizeItemIndex(item) {
-  return Math['max'](0x0, Math['trunc'](Number(item) || 0x0));
+  return Math['max'](0, Math['trunc'](Number(item) || 0));
 }
 function getLibrarySourceKey(options = {}) {
   const text = normalizeText(options['sourceAssetId'] || options['assetId']);

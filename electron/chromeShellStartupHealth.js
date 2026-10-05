@@ -4,16 +4,16 @@ import {
   isChromeShellStartupAttemptId,
   readChromeShellStartupMetadata,
 } from '../src/services/chromeShellStartupReadiness.js';
-const DEFAULT_READY_TIMEOUT_MS = 0x7530,
-  MIN_READY_TIMEOUT_MS = 0x3e8,
-  MAX_READY_TIMEOUT_MS = 0x1d4c0;
+const DEFAULT_READY_TIMEOUT_MS = 30000,
+  MIN_READY_TIMEOUT_MS = 1000,
+  MAX_READY_TIMEOUT_MS = 120000;
 function createStartupHealthError(message, code) {
   const error = new Error(message);
   return ((error['code'] = code), error);
 }
 export function resolveChromeShellStartupReadyTimeoutMs(env = process['env']) {
   const raw = Number(env?.['AIC_CHROME_SHELL_READY_TIMEOUT_MS']);
-  if (!Number['isFinite'](raw) || raw <= 0x0) return DEFAULT_READY_TIMEOUT_MS;
+  if (!Number['isFinite'](raw) || raw <= 0) return DEFAULT_READY_TIMEOUT_MS;
   return Math['max'](MIN_READY_TIMEOUT_MS, Math['min'](MAX_READY_TIMEOUT_MS, Math['round'](raw)));
 }
 export function createChromeShellStartupHealthController({
@@ -49,7 +49,7 @@ export function createChromeShellStartupHealthController({
     const startedAt = now(),
       effectiveTimeoutMs = Math['max'](
         MIN_READY_TIMEOUT_MS,
-        Math['min'](MAX_READY_TIMEOUT_MS, Math['round'](Number(timeoutMs) || 0x0)),
+        Math['min'](MAX_READY_TIMEOUT_MS, Math['round'](Number(timeoutMs) || 0)),
       );
     return new Promise((resolve, reject) => {
       const timer = setTimeoutFn(() => {
@@ -91,7 +91,7 @@ export function createChromeShellStartupHealthController({
     if (metadata['readyTimeoutMs'] !== pending['readyTimeoutMs']) return false;
     if (isFailure) {
       const failureError = createStartupHealthError(
-          'Canvas\x20renderer\x20initialization\x20failed',
+          'Canvas renderer initialization failed',
           'CHROME_SHELL_RENDERER_STARTUP_FAILED',
         ),
         knownStages = ['entry', 'initialization', 'storage-migration', 'project-hydration'];
@@ -114,7 +114,7 @@ export function createChromeShellStartupHealthController({
       clearTimeoutFn(entry['timer']),
       entry['resolve']({
         ready: true,
-        elapsedMs: Math['max'](0x0, now() - entry['startedAt']),
+        elapsedMs: Math['max'](0, now() - entry['startedAt']),
         href: String(event?.['context']?.['href'] || ''),
         startupAttemptId: entry['startupAttemptId'],
       }),

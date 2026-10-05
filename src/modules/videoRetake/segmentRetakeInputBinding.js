@@ -14,7 +14,7 @@ export function getSegmentRetakeVideoEdges(store, value) {
 }
 function createClipNode(state2, targetNode, key, localPath) {
   const name = state2['nodes']?.[key['sourceNodeId']] || targetNode,
-    itemWidth = getAutoMediaSizeByShortSide(targetNode['width'] || 0x230, targetNode['height'] || 0x13b),
+    itemWidth = getAutoMediaSizeByShortSide(targetNode['width'] || 560, targetNode['height'] || 315),
     { spacing: spacing, direction: direction, avoidOverlap: avoidOverlap } = getNodeSpawnPrefs(),
     box = calcSegmentRetakeInputStart({
       targetNode: targetNode,

@@ -1,7 +1,7 @@
 import { isNodeType } from '../modules/registry.js';
 import { resolveGenerationUiState } from './generationTaskUiState.js';
 import { formatRendererNodeTimerText } from './rendererNodePresentation.js';
-const DEFAULT_UPDATE_INTERVAL_MS = 0xfa,
+const DEFAULT_UPDATE_INTERVAL_MS = 250,
   RUNNING_TIMER_STATES = new Set(['idle', 'submitting', 'queued', 'running', 'recovering']);
 function hasResolvedMediaValue(value, list) {
   return !!(
@@ -65,7 +65,7 @@ function defaultCancelFrame(result) {
 function setTimerText(el, data) {
   if (el['textContent'] === data) return;
   const options = el['firstChild'];
-  options?.['nodeType'] === 0x3 && options === el['lastChild']
+  options?.['nodeType'] === 3 && options === el['lastChild']
     ? (options['data'] = data)
     : (el['textContent'] = data);
 }
@@ -81,7 +81,7 @@ export function createRendererNodeTimerController({
   if (typeof getWrapper !== 'function')
     throw new TypeError('[rendererNodeTimerController] getWrapper must be a function');
   let enabled2 = null,
-    current = -0x1,
+    current = -1,
     requestFrame2 = null,
     setTimer2 = null;
   const map = new Set();
@@ -92,7 +92,7 @@ export function createRendererNodeTimerController({
       if (el2['style']['display'] !== 'none') el2['style']['display'] = 'none';
     }
     map['delete'](entry);
-    if (map['size'] === 0x0) run();
+    if (map['size'] === 0) run();
   }
   function run() {
     if (requestFrame2 !== null) cancelFrame(requestFrame2);
@@ -100,23 +100,23 @@ export function createRendererNodeTimerController({
     ((requestFrame2 = null), (setTimer2 = null));
   }
   function run2(record = updateIntervalMs) {
-    if (map['size'] === 0x0 || requestFrame2 !== null || setTimer2 !== null) return;
+    if (map['size'] === 0 || requestFrame2 !== null || setTimer2 !== null) return;
     const run3 = () => {
         setTimer2 = null;
-        if (map['size'] === 0x0) return;
+        if (map['size'] === 0) return;
         requestFrame2 = requestFrame(run4);
       },
-      count = Math['max'](0x0, Number(record) || 0x0);
-    if (count > 0x0) setTimer2 = setTimer(run3, count);
+      count = Math['max'](0, Number(record) || 0);
+    if (count > 0) setTimer2 = setTimer(run3, count);
     else run3();
   }
   function trackNode(payload, handle) {
     if (isRunningTimerNode(handle)) {
-      (map['add'](payload), run2(0x0));
+      (map['add'](payload), run2(0));
       return;
     }
     map['delete'](payload);
-    if (map['size'] === 0x0) run();
+    if (map['size'] === 0) run();
   }
   function run5(state, config) {
     const el3 = getWrapper(state)?.['__v2_timer_el'];
@@ -130,7 +130,7 @@ export function createRendererNodeTimerController({
   }
   function run4() {
     requestFrame2 = null;
-    if (!enabled2 || map['size'] === 0x0) return;
+    if (!enabled2 || map['size'] === 0) return;
     const list3 = [];
     for (const scope of map) {
       const enabled3 = enabled2['nodes']?.[scope];
@@ -141,7 +141,7 @@ export function createRendererNodeTimerController({
       run5(scope, enabled3);
     }
     list3['forEach']((input) => hideNode(input));
-    if (map['size'] > 0x0) run2();
+    if (map['size'] > 0) run2();
   }
   function renderNode(output, value2, { selected: selected = ![] } = {}) {
     const el4 = getWrapper(output)?.['__v2_timer_el'];
@@ -168,7 +168,7 @@ export function createRendererNodeTimerController({
       ? value6['_persistRev']
       : Number['isFinite'](value6?.['_nodeCount'])
         ? value6['_nodeCount']
-        : 0x0;
+        : 0;
     if (value7 === current) return;
     current = value7;
     const value8 = value6?.['nodes'] || {};
@@ -180,10 +180,10 @@ export function createRendererNodeTimerController({
       const value12 = String(value11?.['id'] || value10 || '')['trim']();
       value12 && (trackNode(value12, value11), run5(value12, value11));
     }
-    if (map['size'] > 0x0) run2(0x0);
+    if (map['size'] > 0) run2(0);
   }
   function clear() {
-    (run(), map['clear'](), (current = -0x1), (enabled2 = null));
+    (run(), map['clear'](), (current = -1), (enabled2 = null));
   }
   return {
     clear: clear,

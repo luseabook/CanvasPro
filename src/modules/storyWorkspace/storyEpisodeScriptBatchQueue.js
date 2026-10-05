@@ -10,9 +10,9 @@ export async function runStoryEpisodeScriptBatchQueue({
 } = {}) {
   const total = Array['isArray'](targets) ? [...targets] : [];
   if (typeof runTarget !== 'function') throw new TypeError('runTarget 必须是函数。');
-  let completed = 0x0;
-  for (let index = 0x0; index < total['length']; index += 0x1) {
-    if (!isLive()) return { status: 'interrupted', completed: completed, cancelled: 0x0 };
+  let completed = 0;
+  for (let index = 0; index < total['length']; index += 1) {
+    if (!isLive()) return { status: 'interrupted', completed: completed, cancelled: 0 };
     const target = total[index];
     await beforeTarget({
       target: target,
@@ -26,8 +26,8 @@ export async function runStoryEpisodeScriptBatchQueue({
       completed: completed,
       total: total['length'],
     });
-    if (!enabled || !isLive()) return { status: 'interrupted', completed: completed, cancelled: 0x0 };
-    completed += 0x1;
+    if (!enabled || !isLive()) return { status: 'interrupted', completed: completed, cancelled: 0 };
+    completed += 1;
     const cancelRequested = Boolean(isCancellationRequested(batchId)),
       pendingTargets = cancelRequested ? [] : total['slice'](completed);
     await afterTarget({
@@ -42,8 +42,8 @@ export async function runStoryEpisodeScriptBatchQueue({
       return {
         status: 'cancelled',
         completed: completed,
-        cancelled: Math['max'](0x0, total['length'] - completed),
+        cancelled: Math['max'](0, total['length'] - completed),
       };
   }
-  return { status: 'completed', completed: completed, cancelled: 0x0 };
+  return { status: 'completed', completed: completed, cancelled: 0 };
 }

@@ -1,14 +1,14 @@
 import { createStoryboard3DImagePoseEstimator } from './imagePoseEstimator.js';
 import { retargetMediaPipePoseToStoryboard3D } from './imagePoseRetargeter.js';
-const MIN_APPLIED_BONES = 0x6;
+const MIN_APPLIED_BONES = 6;
 function idleState(value = '') {
   return Object['freeze']({
     status: 'idle',
     objectId: String(value || ''),
     fileName: '',
-    confidence: 0x0,
-    boneCount: 0x0,
-    warningCount: 0x0,
+    confidence: 0,
+    boneCount: 0,
+    warningCount: 0,
     poseSignature: '',
     error: '',
   });
@@ -19,7 +19,7 @@ export function createStoryboard3DBoneOverridesSignature(item) {
       ['sort'](([key], [index]) => key['localeCompare'](index))
       ['map'](([result, list]) => [
         result,
-        Array['isArray'](list) ? list['map']((data) => Number(Number(data)['toFixed'](0x8))) : [],
+        Array['isArray'](list) ? list['map']((data) => Number(Number(data)['toFixed'](8))) : [],
       ]),
   );
 }
@@ -37,7 +37,7 @@ export function createStoryboard3DCharacterImagePoseController({
   if (typeof getCharacter !== 'function') throw new TypeError('getCharacter is required.');
   if (typeof applyPose !== 'function') throw new TypeError('applyPose is required.');
   let source = ![],
-    next = 0x0,
+    next = 0,
     value2 = null;
   const map = new Map(),
     handler = (current, args) => {
@@ -75,18 +75,18 @@ export function createStoryboard3DCharacterImagePoseController({
         await applyPose({
           objectId: objectId2,
           boneOverrides: boneOverrides['boneOverrides'],
-          confidence: Math['max'](0x0, Math['min'](0x1, Number(boneOverrides['confidence']) || 0x0)),
+          confidence: Math['max'](0, Math['min'](1, Number(boneOverrides['confidence']) || 0)),
           warnings: Array['isArray'](boneOverrides['warnings']) ? boneOverrides['warnings'] : [],
         });
         if (source || requestId !== next) return null;
         const state = handler(objectId2, {
           status: 'success',
           fileName: String(file?.['name'] || '参考图'),
-          confidence: Math['max'](0x0, Math['min'](0x1, Number(boneOverrides['confidence']) || 0x0)),
+          confidence: Math['max'](0, Math['min'](1, Number(boneOverrides['confidence']) || 0)),
           boneCount: boneCount,
           warningCount: Array['isArray'](boneOverrides['warnings'])
             ? boneOverrides['warnings']['length']
-            : 0x0,
+            : 0,
           poseSignature: createStoryboard3DBoneOverridesSignature(boneOverrides['boneOverrides']),
         });
         return ((value2 = null), { ...boneOverrides, state: state });
@@ -107,14 +107,14 @@ export function createStoryboard3DCharacterImagePoseController({
       const scope = String(config || '');
       return (
         value2?.['objectId'] === scope &&
-          (value2['abortController']['abort']('姿势已重置。'), (value2 = null), (next += 0x1)),
+          (value2['abortController']['abort']('姿势已重置。'), (value2 = null), (next += 1)),
         handler(scope, { status: 'idle' })
       );
     },
     dispose = () => {
       if (source) return;
       ((source = !![]),
-        (next += 0x1),
+        (next += 1),
         value2?.['abortController']['abort']('编辑器已关闭。'),
         (value2 = null),
         estimator['dispose']?.(),

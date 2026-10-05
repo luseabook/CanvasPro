@@ -9,10 +9,10 @@ export function createRhAiAppPreviewDragController({
 } = {}) {
   const {
       PREVIEW_DROP_ZONES: PREVIEW_DROP_ZONES = Object['freeze'](['input', 'prompt', 'params', 'advanced']),
-      PREVIEW_CUSTOM_COMPONENT_LIMIT: PREVIEW_CUSTOM_COMPONENT_LIMIT = 0x4,
-      PREVIEW_DRAG_START_THRESHOLD_PX: PREVIEW_DRAG_START_THRESHOLD_PX = 0xa,
-      PREVIEW_RENAME_CLICK_TOLERANCE_PX: PREVIEW_RENAME_CLICK_TOLERANCE_PX = 0x3,
-      PREVIEW_MOVE_ANIMATION_MS: PREVIEW_MOVE_ANIMATION_MS = 0x104,
+      PREVIEW_CUSTOM_COMPONENT_LIMIT: PREVIEW_CUSTOM_COMPONENT_LIMIT = 4,
+      PREVIEW_DRAG_START_THRESHOLD_PX: PREVIEW_DRAG_START_THRESHOLD_PX = 10,
+      PREVIEW_RENAME_CLICK_TOLERANCE_PX: PREVIEW_RENAME_CLICK_TOLERANCE_PX = 3,
+      PREVIEW_MOVE_ANIMATION_MS: PREVIEW_MOVE_ANIMATION_MS = 260,
       assignSequentialOrder: assignSequentialOrder,
       buildComponentByIndex: buildComponentByIndex,
       canPreviewComponentBecomePrompt: canPreviewComponentBecomePrompt,
@@ -33,7 +33,7 @@ export function createRhAiAppPreviewDragController({
     constructor() {
       ((this['previewDrag'] = null),
         (this['suppressPreviewRenameClick'] = ![]),
-        (this['suppressPreviewRenameClickTimer'] = 0x0),
+        (this['suppressPreviewRenameClickTimer'] = 0),
         (this['parameterGroups'] = createParameterGroupInteraction(this)));
     }
     get ['panel']() {
@@ -85,7 +85,7 @@ export function createRhAiAppPreviewDragController({
         this['_clearPreviewDragState'](),
         value?.['clearTimeout']?.(this['suppressPreviewRenameClickTimer']),
         (this['suppressPreviewRenameClick'] = ![]),
-        (this['suppressPreviewRenameClickTimer'] = 0x0));
+        (this['suppressPreviewRenameClickTimer'] = 0));
     }
     ['_isPreviewControlTarget'](entry) {
       return actions['isPreviewControlTarget']?.(entry) === !![];
@@ -126,8 +126,8 @@ export function createRhAiAppPreviewDragController({
         '.rh-ai-app-preview-advanced-param',
         '.rh-ai-app-preview-input-slot',
       ]
-        ['map']((value7) => value7 + '[data-preview-component-index=\x22' + value5 + '\x22]')
-        ['join'](',\x20');
+        ['map']((value7) => value7 + '[data-preview-component-index="' + value5 + '"]')
+        ['join'](', ');
       return this['nodePreviewEl']?.['querySelector']?.(value6) || null;
     }
     ['_snapshotPreviewRect'](el3) {
@@ -151,12 +151,12 @@ export function createRhAiAppPreviewDragController({
       if (!box3) return ![];
       const value10 = Math['round'](Number(box2['left']) - box3['left']),
         value11 = Math['round'](Number(box2['top']) - box3['top']);
-      if (Math['abs'](value10) < 0x1 && Math['abs'](value11) < 0x1) return ![];
+      if (Math['abs'](value10) < 1 && Math['abs'](value11) < 1) return ![];
       return (
         el4['animate'](
           [
-            { transform: 'translate(' + value10 + 'px,\x20' + value11 + 'px)', opacity: 0.72 },
-            { transform: 'translate(0, 0)', opacity: 0x1 },
+            { transform: 'translate(' + value10 + 'px, ' + value11 + 'px)', opacity: 0.72 },
+            { transform: 'translate(0, 0)', opacity: 1 },
           ],
           { duration: PREVIEW_MOVE_ANIMATION_MS, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
         ),
@@ -208,15 +208,15 @@ export function createRhAiAppPreviewDragController({
       (value['clearTimeout'](this['suppressPreviewRenameClickTimer']),
         (this['suppressPreviewRenameClick'] = !![]),
         (this['suppressPreviewRenameClickTimer'] = value['setTimeout'](() => {
-          ((this['suppressPreviewRenameClick'] = ![]), (this['suppressPreviewRenameClickTimer'] = 0x0));
-        }, 0xa0)));
+          ((this['suppressPreviewRenameClick'] = ![]), (this['suppressPreviewRenameClickTimer'] = 0));
+        }, 160)));
     }
     ['_consumeSuppressedPreviewRenameClick'](event4) {
       if (!this['suppressPreviewRenameClick']) return ![];
       return (
         (this['suppressPreviewRenameClick'] = ![]),
         value['clearTimeout'](this['suppressPreviewRenameClickTimer']),
-        (this['suppressPreviewRenameClickTimer'] = 0x0),
+        (this['suppressPreviewRenameClickTimer'] = 0),
         event4?.['preventDefault']?.(),
         event4?.['stopPropagation']?.(),
         !![]
@@ -277,20 +277,20 @@ export function createRhAiAppPreviewDragController({
     }
     ['_getPreviewDropOrder'](value21, value22, value23, value24 = null) {
       const el7 = this['_getPreviewZoneElement'](value21);
-      if (!el7) return 0x0;
+      if (!el7) return 0;
       const list2 = Array['from'](el7['querySelectorAll'](value23))['filter'](
           (el8) => !el8['classList']['contains']('is-dragging'),
         ),
         value25 = value21 === 'advanced' && Number['isFinite'](Number(value24));
-      let value26 = 0x0;
+      let value26 = 0;
       return (
         list2['forEach']((el9) => {
           const box4 = el9['getBoundingClientRect']();
           if (value25) {
-            if (value24 > box4['top'] + box4['height'] / 0x2) value26 += 0x1;
+            if (value24 > box4['top'] + box4['height'] / 2) value26 += 1;
             return;
           }
-          if (value22 > box4['left'] + box4['width'] / 0x2) value26 += 0x1;
+          if (value22 > box4['left'] + box4['width'] / 2) value26 += 1;
         }),
         value26
       );
@@ -315,10 +315,10 @@ export function createRhAiAppPreviewDragController({
         if (value28 === 'params' && list4['length'] >= PREVIEW_CUSTOM_COMPONENT_LIMIT) return list4;
       }
       const list5 = list4['filter']((value32) => value32 !== value30),
-        value33 = Math['max'](0x0, Math['min'](list5['length'], Number(value29) || 0x0));
+        value33 = Math['max'](0, Math['min'](list5['length'], Number(value29) || 0));
       return (
-        list5['splice'](value33, 0x0, value30),
-        value28 === 'params' ? list5['slice'](0x0, PREVIEW_CUSTOM_COMPONENT_LIMIT) : list5
+        list5['splice'](value33, 0, value30),
+        value28 === 'params' ? list5['slice'](0, PREVIEW_CUSTOM_COMPONENT_LIMIT) : list5
       );
     }
     ['_animatePreviewZoneOrder'](value34, value35, list6 = []) {
@@ -358,14 +358,14 @@ export function createRhAiAppPreviewDragController({
             value41['removeAttribute']('data-preview-component-index');
           }));
       const value42 = value38
-          ? Math['min'](Math['max'](0x78, Math['round'](box5['width'] * 0.46)), 0x104)
+          ? Math['min'](Math['max'](120, Math['round'](box5['width'] * 0.46)), 260)
           : Math['round'](box5['width']),
-        value43 = value38 ? 0x28 : Math['round'](box5['height']),
+        value43 = value38 ? 40 : Math['round'](box5['height']),
         offsetX = value38
-          ? Math['max'](0x12, Math['min'](value42 - 0x12, event7['clientX'] - box5['left']))
+          ? Math['max'](18, Math['min'](value42 - 18, event7['clientX'] - box5['left']))
           : event7['clientX'] - box5['left'],
         offsetY = value38
-          ? Math['max'](0xc, Math['min'](value43 - 0xc, event7['clientY'] - box5['top']))
+          ? Math['max'](12, Math['min'](value43 - 12, event7['clientY'] - box5['top']))
           : event7['clientY'] - box5['top'];
       return (
         element['style']['setProperty']('--rh-ghost-width', value42 + 'px'),
@@ -383,7 +383,7 @@ export function createRhAiAppPreviewDragController({
       const el15 = el['createElement']('div');
       ((el15['className'] =
         'img-pill-btn ui-schema-menu-trigger rh-ai-app-preview-component ' +
-        'rh-ai-app-preview-draggable\x20rh-ai-app-preview-param-chip\x20' +
+        'rh-ai-app-preview-draggable rh-ai-app-preview-param-chip ' +
         'rh-ai-app-preview-drop-placeholder is-dragging is-drag-placeholder'),
         (el15['dataset']['previewDragKind'] = 'param'),
         (el15['dataset']['previewComponentIndex'] = String(enabled5['index'])),
@@ -427,7 +427,7 @@ export function createRhAiAppPreviewDragController({
       const el21 = el['createElement']('div');
       ((el21['className'] =
         'ui-schema-field rh-vram-adv-row rh-ai-app-preview-draggable ' +
-        'rh-ai-app-preview-advanced-param\x20rh-ai-app-preview-drop-placeholder\x20' +
+        'rh-ai-app-preview-advanced-param rh-ai-app-preview-drop-placeholder ' +
         'is-dragging is-drag-placeholder'),
         (el21['dataset']['previewDragKind'] = 'advanced-param'),
         (el21['dataset']['previewComponentIndex'] = String(enabled7['index'])),
@@ -471,7 +471,7 @@ export function createRhAiAppPreviewDragController({
     ['_reorderPreviewInputsDuringDrag'](enabled9) {
       if (!enabled9 || enabled9['dragKind'] !== 'input') return;
       const list8 = getPreviewInputComponents(this['componentDrafts']);
-      if (list8['length'] <= 0x1) return;
+      if (list8['length'] <= 1) return;
       const value51 = this['_getPreviewDropOrder'](
         'input',
         enabled9['currentClientX'],
@@ -652,10 +652,10 @@ export function createRhAiAppPreviewDragController({
       if (enabled19['dragKind'] === 'advanced-param') enabled19['didLiveOrder'] = !![];
     }
     ['_handlePreviewPointerDown'](pointerId) {
-      if (pointerId['button'] !== 0x0) return;
+      if (pointerId['button'] !== 0) return;
       if (
         pointerId['target']?.['closest']?.('.rh-ai-app-group-panel') &&
-        !pointerId['target']?.['closest']?.('[data-preview-drag-kind=\x22group-param\x22]')
+        !pointerId['target']?.['closest']?.('[data-preview-drag-kind="group-param"]')
       )
         return;
       if (this['_isPreviewControlTarget'](pointerId['target'])) return;

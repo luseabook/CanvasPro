@@ -3,30 +3,30 @@ export const STORYBOARD_3D_NAVIGATION_PRESETS = Object['freeze']({
   unity: Object['freeze']({
     id: 'unity',
     label: 'Unity',
-    summary: '中键平移\x20·\x20Alt+左键环绕\x20·\x20Alt+右键缩放',
+    summary: '中键平移 · Alt+左键环绕 · Alt+右键缩放',
     toolShortcuts: Object['freeze']({ select: 'Q', move: 'W', rotate: 'E', scale: 'R' }),
-    defaults: Object['freeze']({ orbitSensitivity: 0x1, panSensitivity: 0x1, zoomSensitivity: 0x1 }),
+    defaults: Object['freeze']({ orbitSensitivity: 1, panSensitivity: 1, zoomSensitivity: 1 }),
   }),
   blender: Object['freeze']({
     id: 'blender',
     label: 'Blender',
     summary: '中键环绕 · Shift+中键平移 · Ctrl+中键缩放',
     toolShortcuts: Object['freeze']({ select: 'W', move: 'G', rotate: 'R', scale: 'S' }),
-    defaults: Object['freeze']({ orbitSensitivity: 0x1, panSensitivity: 0x1, zoomSensitivity: 0x1 }),
+    defaults: Object['freeze']({ orbitSensitivity: 1, panSensitivity: 1, zoomSensitivity: 1 }),
   }),
   c4d: Object['freeze']({
     id: 'c4d',
     label: 'Cinema 4D',
     summary: 'Alt+左键环绕 · Alt+中键平移 · Alt+右键缩放',
     toolShortcuts: Object['freeze']({ select: '0', move: 'E', rotate: 'R', scale: 'T' }),
-    defaults: Object['freeze']({ orbitSensitivity: 0.9, panSensitivity: 0x1, zoomSensitivity: 0.9 }),
+    defaults: Object['freeze']({ orbitSensitivity: 0.9, panSensitivity: 1, zoomSensitivity: 0.9 }),
   }),
   maya: Object['freeze']({
     id: 'maya',
     label: 'Maya',
-    summary: 'Alt+左键环绕\x20·\x20Alt+中键平移\x20·\x20Alt+右键缩放',
+    summary: 'Alt+左键环绕 · Alt+中键平移 · Alt+右键缩放',
     toolShortcuts: Object['freeze']({ select: 'Q', move: 'W', rotate: 'E', scale: 'R' }),
-    defaults: Object['freeze']({ orbitSensitivity: 0x1, panSensitivity: 0x1, zoomSensitivity: 0x1 }),
+    defaults: Object['freeze']({ orbitSensitivity: 1, panSensitivity: 1, zoomSensitivity: 1 }),
   }),
 });
 export const DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET = 'unity';
@@ -62,9 +62,9 @@ export function normalizeStoryboard3DNavigationSettings(invertOrbitX = {}) {
     entry = STORYBOARD_3D_NAVIGATION_PRESETS[preset]['defaults'];
   return {
     preset: preset,
-    orbitSensitivity: clamp(invertOrbitX['orbitSensitivity'], 0.2, 0x3, entry['orbitSensitivity']),
-    panSensitivity: clamp(invertOrbitX['panSensitivity'], 0.2, 0x3, entry['panSensitivity']),
-    zoomSensitivity: clamp(invertOrbitX['zoomSensitivity'], 0.2, 0x3, entry['zoomSensitivity']),
+    orbitSensitivity: clamp(invertOrbitX['orbitSensitivity'], 0.2, 3, entry['orbitSensitivity']),
+    panSensitivity: clamp(invertOrbitX['panSensitivity'], 0.2, 3, entry['panSensitivity']),
+    zoomSensitivity: clamp(invertOrbitX['zoomSensitivity'], 0.2, 3, entry['zoomSensitivity']),
     invertOrbitX: invertOrbitX['invertOrbitX'] === !![],
     invertOrbitY: invertOrbitX['invertOrbitY'] === !![],
     invertWheel: invertOrbitX['invertWheel'] === !![],

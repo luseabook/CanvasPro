@@ -14,7 +14,7 @@ const RH_V54_SOURCE_VIDEO_MISSING_MESSAGE = '未获取到源视频 URL，请重�
   RH_V54_SOURCE_VIDEO_UPLOAD_FAILED_MESSAGE =
     '源视频上传失败，可能是网络延迟或视频文件暂时无法访问，请稍后重试，或重新上传源视频。',
   RH_VIDEO_FPS_OPTIONS = Object.freeze([16, 24, 30]),
-  RH_MIN_VIDEO_RESOLUTION = 0x340,
+  RH_MIN_VIDEO_RESOLUTION = 832,
   RUNNINGHUB_WORKFLOW_DEFAULT_RATIO = '1:1',
   RUNNINGHUB_WORKFLOW_RATIO_SET = new Set([
     '1:1',
@@ -85,7 +85,7 @@ function normalizeQwenImageEditQuality(handle) {
 }
 function resolveQwenImageEditDimensions(config, scope) {
   const qwenImageEditQuality = normalizeQwenImageEditQuality(config),
-    input = qwenImageEditQuality === '1K' ? 0x400 : qwenImageEditQuality === '1.5K' ? 0x600 : 0x780,
+    input = qwenImageEditQuality === '1K' ? 1024 : qwenImageEditQuality === '1.5K' ? 1536 : 1920,
     runningHubWorkflowRatio = normalizeRunningHubWorkflowRatio(scope),
     [output, value2] = runningHubWorkflowRatio.split(':'),
     value3 = Number.parseFloat(output) || 1,
@@ -94,7 +94,7 @@ function resolveQwenImageEditDimensions(config, scope) {
     value6 = value5 ? input : (input * value3) / value4,
     value7 = value5 ? (input * value4) / value3 : input,
     value8 = 64,
-    width = (value9) => Math.max(0x200, Math.round(Number(value9 || 0) / value8) * value8);
+    width = (value9) => Math.max(512, Math.round(Number(value9 || 0) / value8) * value8);
   return { width: width(value6), height: width(value7) };
 }
 function normalizeManifestMappedValue(value10, value11) {
@@ -866,7 +866,7 @@ function getImageWorkflowLongSideMap(options4 = {}) {
     options4?.['longSideByImageSize'] && typeof options4['longSideByImageSize'] === 'object'
       ? options4['longSideByImageSize']
       : null;
-  return value113 || Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 });
+  return value113 || Object['freeze']({ '1K': 1024, '1.5K': 1536, '2K': 1920 });
 }
 
 function resolveImageWorkflowQualityKey(value114, value115 = {}) {
@@ -881,26 +881,26 @@ function resolveImageWorkflowQualityKey(value114, value115 = {}) {
   return (
     list15['find']((value118) => String(value118)['trim']()['toUpperCase']() === value117) ||
     list15['find']((value119) => String(value119)['trim']()['toUpperCase']() === value116) ||
-    list15[0x0] ||
+    list15[0] ||
     '2K'
   );
 }
 
 function resolveImageWorkflowDimensions(value120, value121, value122 = {}) {
   const imageWorkflowQualityKey = resolveImageWorkflowQualityKey(value120, value122),
-    value123 = Number(getImageWorkflowLongSideMap(value122)[imageWorkflowQualityKey]) || 0x780,
+    value123 = Number(getImageWorkflowLongSideMap(value122)[imageWorkflowQualityKey]) || 1920,
     value124 = String(value122?.['defaultAspectRatio'] || RUNNINGHUB_WORKFLOW_DEFAULT_RATIO)['trim'](),
     runningHubWorkflowRatio2 = normalizeRunningHubWorkflowRatio(value121, value124),
     [value125, value126] = runningHubWorkflowRatio2['split'](':'),
-    value127 = Number['parseFloat'](value125) || 0x1,
-    value128 = Number['parseFloat'](value126) || 0x1,
+    value127 = Number['parseFloat'](value125) || 1,
+    value128 = Number['parseFloat'](value126) || 1,
     value129 = value127 >= value128,
     value130 = value129 ? value123 : (value123 * value127) / value128,
     value131 = value129 ? (value123 * value128) / value127 : value123,
-    value132 = Math['max'](0x1, Number(value122?.['align']) || 0x40),
-    value133 = Math['max'](0x1, Number(value122?.['minDimension']) || 0x200),
+    value132 = Math['max'](1, Number(value122?.['align']) || 64),
+    value133 = Math['max'](1, Number(value122?.['minDimension']) || 512),
     width2 = (value134) =>
-      Math['max'](value133, Math['round'](Number(value134 || 0x0) / value132) * value132);
+      Math['max'](value133, Math['round'](Number(value134 || 0) / value132) * value132);
   return { width: width2(value130), height: width2(value131) };
 }
 
@@ -995,7 +995,7 @@ async function uploadRunningHubMediaInputs(
   value144,
   apiKey10,
   value145,
-  { uploadFailedMessage: uploadFailedMessage = 'RunningHUB\x20素材上传失败' } = {},
+  { uploadFailedMessage: uploadFailedMessage = 'RunningHUB 素材上传失败' } = {},
 ) {
   try {
     return await uploadModelApiMediaInputs(kind, value143, value145, {

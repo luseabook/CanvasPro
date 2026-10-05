@@ -28,12 +28,12 @@ function hasError(key) {
 }
 function normalizeIndex(index, result) {
   const data = Number(index);
-  if (!Number['isFinite'](data)) return 0x0;
-  return Math['max'](0x0, Math['min'](Math['trunc'](data), Math['max'](0x0, result - 0x1)));
+  if (!Number['isFinite'](data)) return 0;
+  return Math['max'](0, Math['min'](Math['trunc'](data), Math['max'](0, result - 1)));
 }
 function pickSuccessfulItem(list, options, handler) {
   const list2 = Array['isArray'](list) ? list['filter']((target) => isPlainObject(target)) : [];
-  if (list2['length'] === 0x0) return null;
+  if (list2['length'] === 0) return null;
   const index2 = normalizeIndex(options, list2['length']),
     source = list2[index2];
   if (source && !hasError(source) && handler(source)) return source;
@@ -98,7 +98,7 @@ export function resolvePresetDefaultCoverCandidate(options3 = {}) {
   const text2 = normalizeText(options3['type']);
   if (text2 === 'ai-image') {
     const list3 = Array['isArray'](options3['images']) ? options3['images'] : [];
-    if (list3['length'] > 0x0) {
+    if (list3['length'] > 0) {
       const successfulItem = pickSuccessfulItem(list3, options3['mainImageIndex'], resolveImageCoverUrl);
       return { coverUrl: resolveImageCoverUrl(successfulItem), videoUrl: '' };
     }
@@ -106,7 +106,7 @@ export function resolvePresetDefaultCoverCandidate(options3 = {}) {
   }
   if (text2 === 'ai-video') {
     const list4 = Array['isArray'](options3['videos']) ? options3['videos'] : [];
-    if (list4['length'] > 0x0) {
+    if (list4['length'] > 0) {
       const successfulItem2 = pickSuccessfulItem(
           list4,
           options3['mainVideoIndex'],
@@ -127,7 +127,7 @@ export async function imageUrlToDataUrl(entry, record = {}) {
   const run =
       typeof record['getBlob'] === 'function'
         ? record['getBlob']
-        : (payload) => get(payload, { responseType: 'blob', provider: 'local', timeout: 0x7530 }),
+        : (payload) => get(payload, { responseType: 'blob', provider: 'local', timeout: 30000 }),
     handler2 =
       typeof record['blobToDataUrl'] === 'function' ? record['blobToDataUrl'] : convertImageBlobToDataUrl;
   try {

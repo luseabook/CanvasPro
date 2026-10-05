@@ -20,8 +20,8 @@ function escapeHtml(result) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#039;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#039;');
 }
 function encodeMentionPart(data, options = '__asset__') {
   return encodeURIComponent(normalizeText(data, options));
@@ -41,7 +41,7 @@ function parseMentionId(current = '') {
   const list = normalizeText(current);
   if (!list['startsWith'](PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX)) return null;
   const list2 = list['slice'](PERSON_REPLACEMENT_PROMPT_ASSET_PREFIX['length'])['split'](':');
-  if (list2['length'] !== 0x3) return null;
+  if (list2['length'] !== 3) return null;
   try {
     const [entry, record, payload] = list2['map']((handle) => decodeURIComponent(handle));
     return entry && record ? { kind: entry, assetId: record, itemId: payload } : null;
@@ -72,7 +72,7 @@ function createImageMentionCandidate({
   thumbUrl: thumbUrl,
   menuGroup: menuGroup,
   menuSection: menuSection,
-  sourceItemIndex: sourceItemIndex = 0x0,
+  sourceItemIndex: sourceItemIndex = 0,
 } = {}) {
   const text3 = normalizeText(label, '图片素材'),
     mediaUrl = normalizeMediaUrl(thumbUrl);
@@ -81,7 +81,7 @@ function createImageMentionCandidate({
     menuDirect: !![],
     suppressTooltip: !![],
     assetId: buildMentionId(kind, assetId, itemId),
-    assetIndex: 0x0,
+    assetIndex: 0,
     type: 'image',
     label: text3,
     pillLabel: text3,
@@ -99,7 +99,7 @@ function createImageMentionCandidate({
 function getSelectedShot(options2 = {}) {
   const text4 = normalizeText(options2['workspace']?.['selectedShotId']),
     output = Array['isArray'](options2['shots']) ? options2['shots'] : [];
-  return output['find']((value2) => normalizeText(value2?.['id']) === text4) || output[0x0] || null;
+  return output['find']((value2) => normalizeText(value2?.['id']) === text4) || output[0] || null;
 }
 function resolvePromptPackage(
   options3 = {},
@@ -111,7 +111,7 @@ function resolvePromptPackage(
   return buildPersonReplacementPromptPackage({ project: options3, shot: enabled });
 }
 function describePromptReference(options4 = {}, value3 = {}) {
-  const value4 = Math['max'](0x1, Number(options4['slot']) || 0x1),
+  const value4 = Math['max'](1, Number(options4['slot']) || 1),
     text5 = normalizeText(options4['label'], '图' + value4);
   if (options4['role'] === 'source-keyframe')
     return { slotLabel: text5, subtitle: '当前首帧', assetName: '当前首帧' };
@@ -131,7 +131,7 @@ function buildCurrentReferenceCandidates(
     list3 = Array['isArray'](promptPackage2?.['referenceImages']) ? promptPackage2['referenceImages'] : [];
   return list3['filter']((value6) => normalizeMediaUrl(value6?.['ref']))
     ['map']((value7, value8) => {
-      const value9 = Math['max'](0x1, Number(value7['slot']) || value8 + 0x1),
+      const value9 = Math['max'](1, Number(value7['slot']) || value8 + 1),
         {
           slotLabel: slotLabel,
           subtitle: subtitle2,
@@ -167,10 +167,10 @@ function buildProjectAssetCandidates(options6 = {}) {
       );
       if (!list4['length']) return null;
       const value12 = Math['max'](
-          0x0,
+          0,
           Math['min'](
-            list4['length'] - 0x1,
-            Math['trunc'](Number(options6['workspace']?.['assetAppearanceIndexes']?.[error2['id']]) || 0x0),
+            list4['length'] - 1,
+            Math['trunc'](Number(options6['workspace']?.['assetAppearanceIndexes']?.[error2['id']]) || 0),
           ),
         ),
         args = list4['map']((value13) =>
@@ -180,7 +180,7 @@ function buildProjectAssetCandidates(options6 = {}) {
             itemId: value13['id'],
             label:
               normalizeText(error2['name'], '人物素材') +
-              '\x20·\x20' +
+              ' · ' +
               normalizeText(value13['name'], '形象'),
             subtitle: '项目素材',
             assetName: normalizeText(error2['name'], '人物素材'),
@@ -201,10 +201,10 @@ function buildProjectSceneCandidates(options7 = {}, value15 = '') {
       );
       if (!workspaceAssetAppearances['length']) return null;
       const value18 = Math['max'](
-          0x0,
+          0,
           Math['min'](
-            workspaceAssetAppearances['length'] - 0x1,
-            Math['trunc'](Number(options7['workspace']?.['assetAppearanceIndexes']?.[value16['id']]) || 0x0),
+            workspaceAssetAppearances['length'] - 1,
+            Math['trunc'](Number(options7['workspace']?.['assetAppearanceIndexes']?.[value16['id']]) || 0),
           ),
         ),
         args2 = workspaceAssetAppearances['map']((value19) =>
@@ -238,8 +238,8 @@ function buildLibraryAssetCandidates(options8 = {}) {
         assetId: normalizeText(value22['sourceAssetId'] || value22['assetId'] || value22['id']),
         itemId: normalizeText(value22['sourceItemIndex'] ?? value22['itemIndex'], '0'),
         sourceItemIndex: Math['max'](
-          0x0,
-          Math['trunc'](Number(value22['sourceItemIndex'] ?? value22['itemIndex']) || 0x0),
+          0,
+          Math['trunc'](Number(value22['sourceItemIndex'] ?? value22['itemIndex']) || 0),
         ),
         label: normalizeText(value22['name'], '画布图片'),
         subtitle: normalizeText(value22['assetName'], '总素材'),
@@ -281,7 +281,7 @@ export function resolvePersonReplacementPromptMentionRef(
     if (typeof resolveExternalAssetRef !== 'function') return null;
     return resolveExternalAssetRef({
       assetId: el?.['dataset']?.['assetId'] || el?.['getAttribute']?.('data-asset-id'),
-      itemIndex: Number(el?.['dataset']?.['assetIndex'] || el?.['getAttribute']?.('data-asset-index') || 0x0),
+      itemIndex: Number(el?.['dataset']?.['assetIndex'] || el?.['getAttribute']?.('data-asset-index') || 0),
     });
   }
   if (mentionId['kind'] === 'reference') {
@@ -301,7 +301,7 @@ export function resolvePersonReplacementPromptMentionRef(
     return {
       origin: 'asset',
       assetId: mentionId['assetId'],
-      itemIndex: 0x0,
+      itemIndex: 0,
       type: 'image',
       name: slotLabel2 + ' · ' + subtitle3,
       label: slotLabel2,
@@ -323,7 +323,7 @@ export function resolvePersonReplacementPromptMentionRef(
     return {
       origin: 'asset',
       assetId: mentionId['assetId'],
-      itemIndex: 0x0,
+      itemIndex: 0,
       type: 'image',
       name:
         normalizeText(enabled3['name'], '人物素材') +
@@ -350,7 +350,7 @@ export function resolvePersonReplacementPromptMentionRef(
     return {
       origin: 'asset',
       assetId: mentionId['assetId'],
-      itemIndex: 0x0,
+      itemIndex: 0,
       type: 'image',
       name:
         normalizeText(enabled4['name'], '场景素材') +
@@ -358,7 +358,7 @@ export function resolvePersonReplacementPromptMentionRef(
         normalizeText(workspaceAssetAppearances3['name'], '场景图'),
       label:
         normalizeText(enabled4['name'], '场景素材') +
-        '\x20·\x20' +
+        ' · ' +
         normalizeText(workspaceAssetAppearances3['name'], '场景图'),
       url: mediaUrl4,
       thumbUrl: mediaUrl4,
@@ -366,14 +366,14 @@ export function resolvePersonReplacementPromptMentionRef(
     };
   }
   if (mentionId['kind'] === 'library') {
-    const value31 = Math['max'](0x0, Math['trunc'](Number(mentionId['itemId']) || 0x0)),
+    const value31 = Math['max'](0, Math['trunc'](Number(mentionId['itemId']) || 0)),
       enabled5 = (Array['isArray'](project['libraryAssets']) ? project['libraryAssets'] : [])['find'](
         (value32) =>
           normalizeText(value32?.['sourceAssetId'] || value32?.['assetId'] || value32?.['id']) ===
             mentionId['assetId'] &&
           Math['max'](
-            0x0,
-            Math['trunc'](Number(value32?.['sourceItemIndex'] ?? value32?.['itemIndex']) || 0x0),
+            0,
+            Math['trunc'](Number(value32?.['sourceItemIndex'] ?? value32?.['itemIndex']) || 0),
           ) === value31,
       ),
       mediaUrl5 = normalizeMediaUrl(enabled5?.['sourceUrl'] || enabled5?.['imageUrl']);

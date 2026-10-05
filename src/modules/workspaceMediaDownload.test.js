@@ -74,7 +74,7 @@ test('workspaceMediaDownload: 文件名会被清洗并限长', () => {
     mediaRef: 'data/uploads/a.png',
     filenameBase: 'x'.repeat(200),
   });
-  assert.equal(longName.filename.length, 0x60 + '.png'.length);
+  assert.equal(longName.filename.length, 96 + '.png'.length);
   const blankName = buildWorkspaceMediaDownloadPayload({
     kind: 'video',
     mediaRef: 'data/uploads/a.mp4',

@@ -3,19 +3,19 @@ import {
   createThreeObjStoryboard3DParser,
   createThreeStlStoryboard3DParser,
 } from './legacyModelImportAdapters.js';
-export const DEFAULT_STORYBOARD_3D_WORKER_IMPORT_MIN_BYTES = 0x400 * 0x400;
+export const DEFAULT_STORYBOARD_3D_WORKER_IMPORT_MIN_BYTES = 1024 * 1024;
 export const STORYBOARD_3D_WORKER_IMPORT_FORMATS = Object['freeze'](['obj', 'stl']);
 export const STORYBOARD_3D_GEOMETRY_WORKER_URL = new URL(
   './modelGeometryImport.worker.js',
   import.meta['url'],
 );
-function abortError(error = 'Model\x20geometry\x20worker\x20import\x20was\x20cancelled.') {
+function abortError(error = 'Model geometry worker import was cancelled.') {
   const error2 = new Error(
     String(error?.['message'] || error || 'Model geometry worker import was cancelled.'),
   );
   return ((error2['name'] = 'AbortError'), (error2['code'] = 'ABORT_ERR'), error2);
 }
-function workerError(value, item = 'Model\x20geometry\x20worker\x20import\x20failed.') {
+function workerError(value, item = 'Model geometry worker import failed.') {
   const error3 = value?.['error'] || value || {},
     error4 = new Error(String(error3['message'] || item));
   return (
@@ -74,7 +74,7 @@ export function createStoryboard3DWorkerGeometryImportTask({
     handler4 = () => {};
   const requestId =
       globalThis['crypto']?.['randomUUID']?.() ||
-      'geometry-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x9),
+      'geometry-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 9),
     handler5 = ({ terminate: terminate = !![] } = {}) => {
       (handler2(), handler3(), handler4());
       if (terminate) enabled?.['terminate']?.();
@@ -97,7 +97,7 @@ export function createStoryboard3DWorkerGeometryImportTask({
           handler6(
             workerError({
               code: 'MODEL_WORKER_UNAVAILABLE',
-              message: 'Worker\x20factory\x20returned\x20an\x20invalid\x20Worker.',
+              message: 'Worker factory returned an invalid Worker.',
             }),
           ));
         return;
@@ -110,7 +110,7 @@ export function createStoryboard3DWorkerGeometryImportTask({
         const payload = record?.['data'] || {};
         if (payload['requestId'] !== requestId) return;
         if (payload['type'] === 'progress') {
-          const handle = Math['max'](0x0, Math['min'](0x1, Number(payload['progress']) || 0x0));
+          const handle = Math['max'](0, Math['min'](1, Number(payload['progress']) || 0));
           onProgress?.(handle, { format: format2, worker: !![] });
         } else {
           if (payload['type'] === 'result') run2(next, payload['payload']);
@@ -125,7 +125,7 @@ export function createStoryboard3DWorkerGeometryImportTask({
         (signal['addEventListener']('abort', config, { once: !![] }),
           (handler4 = () => signal['removeEventListener']?.('abort', config)));
       }
-      onProgress?.(0x0, { format: format2, worker: !![] });
+      onProgress?.(0, { format: format2, worker: !![] });
       try {
         enabled['postMessage'](
           {
@@ -169,7 +169,7 @@ function attributeFromPayload(output) {
   const float32Array = new Float32Array(output['array']);
   return new threeRuntime['BufferAttribute'](
     float32Array,
-    Math['max'](0x1, Number(output['itemSize']) || 0x1),
+    Math['max'](1, Number(output['itemSize']) || 1),
   );
 }
 export function rebuildStoryboard3DWorkerGeometryPayload(
@@ -187,7 +187,7 @@ export function rebuildStoryboard3DWorkerGeometryPayload(
   if (!format3 || !Array['isArray'](format3['meshes']) || !format3['meshes']['length'])
     throw workerError({
       code: 'MODEL_WORKER_RESULT_INVALID',
-      message: 'Worker\x20returned\x20no\x20model\x20geometry.',
+      message: 'Worker returned no model geometry.',
     });
   const scene = new threeRuntime['Group']();
   scene['name'] = String(format3['name'] || 'Imported model');
@@ -220,9 +220,9 @@ export function rebuildStoryboard3DWorkerGeometryPayload(
       scenes: [scene],
       animations: [],
       cameras: [],
-      geometry: format3['format'] === 'stl' && list['length'] === 0x1 ? list[0x0] : undefined,
+      geometry: format3['format'] === 'stl' && list['length'] === 1 ? list[0] : undefined,
       bounds: format3['bounds'] || null,
-      triangleCount: Math['max'](0x0, Number(format3['triangleCount']) || 0x0),
+      triangleCount: Math['max'](0, Number(format3['triangleCount']) || 0),
       materialLibraries: [...(format3['materialLibraries'] || [])],
       workerImport: { used: !![], format: format3['format'] },
     }
@@ -244,7 +244,7 @@ function createWorkerBackedParser({
   onProgress: onProgress2,
 } = {}) {
   if (typeof fallbackParser !== 'function')
-    throw new TypeError('A\x20main-thread\x20fallback\x20parser\x20is\x20required.');
+    throw new TypeError('A main-thread fallback parser is required.');
   return async function run3(value5, signal2 = {}) {
     if (typeof value5?.['arrayBuffer'] !== 'function')
       throw new Error(format4['toUpperCase']() + ' file is unreadable.');
@@ -252,7 +252,7 @@ function createWorkerBackedParser({
     if (!(buffer2 instanceof ArrayBuffer))
       throw new Error(format4['toUpperCase']() + ' file did not return an ArrayBuffer.');
     const name2 = cachedFileLike(value5, buffer2),
-      value6 = Math['max'](0x0, Number(signal2['workerMinBytes'] ?? minBytes) || 0x0),
+      value6 = Math['max'](0, Number(signal2['workerMinBytes'] ?? minBytes) || 0),
       onProgress3 = signal2['onWorkerProgress'] || onProgress2,
       supportsStoryboard3DGeometryImportWorker2 = supportsStoryboard3DGeometryImportWorker({
         WorkerConstructor: WorkerConstructor,
@@ -264,7 +264,7 @@ function createWorkerBackedParser({
       signal2['disableWorker'] === !![]
     )
       return (
-        onProgress3?.(0x0, {
+        onProgress3?.(0, {
           format: format4,
           worker: ![],
           reason: !supportsStoryboard3DGeometryImportWorker2 ? 'unavailable' : 'below-threshold',
@@ -274,7 +274,7 @@ function createWorkerBackedParser({
     try {
       const storyboard3DWorkerGeometryImportTask = createStoryboard3DWorkerGeometryImportTask({
           format: format4,
-          buffer: buffer2['slice'](0x0),
+          buffer: buffer2['slice'](0),
           name: name2['name'],
           signal: signal2['signal'],
           onProgress: onProgress3,
@@ -287,7 +287,7 @@ function createWorkerBackedParser({
     } catch (error8) {
       if (isAbort(error8, signal2['signal'])) throw error8;
       return (
-        onProgress3?.(0x0, { format: format4, worker: ![], reason: 'worker-fallback', error: error8 }),
+        onProgress3?.(0, { format: format4, worker: ![], reason: 'worker-fallback', error: error8 }),
         fallbackParser(name2, signal2)
       );
     }

@@ -1,7 +1,7 @@
 import { migrateStoryboard3DProject } from './projectModel.js';
 import { saveStoryboard3DProjectAsCopy } from './sceneProjectOperations.js';
 const MAGIC = 'AIC3DP01',
-  MAX_SIZE = 0x400 * 0x400 * 0x400;
+  MAX_SIZE = 1024 * 1024 * 1024;
 export function downloadDirectorProjectPackage(value, item, key) {
   const index = key['URL']['createObjectURL'](value),
     el = key['document']['createElement']('a');
@@ -10,7 +10,7 @@ export function downloadDirectorProjectPackage(value, item, key) {
     key['document']['body']['append'](el),
     el['click'](),
     el['remove'](),
-    key['setTimeout'](() => key['URL']['revokeObjectURL'](index), 0x2710));
+    key['setTimeout'](() => key['URL']['revokeObjectURL'](index), 10000));
 }
 function referencedAssets(result) {
   const args = new Set(),
@@ -61,7 +61,7 @@ export async function exportDirectorProjectPackage(state, config) {
   const migrateStoryboard3DProject2 = migrateStoryboard3DProject(structuredClone(state)),
     list2 = (await config['getMany'](referencedAssets(migrateStoryboard3DProject2)))['filter'](Boolean),
     args3 = [];
-  let scope = 0x0;
+  let scope = 0;
   const enabled3 = new Set(list2['map']((input) => input['assetId']));
   if (requiredAssets(migrateStoryboard3DProject2)['some']((output) => !enabled3['has'](output)))
     throw new Error('项目引用的素材文件缺失，请恢复素材后再打包。');
@@ -74,33 +74,33 @@ export async function exportDirectorProjectPackage(state, config) {
   });
   if (scope > MAX_SIZE) throw new Error('项目素材超过 1 GB，请拆分场景后打包。');
   const value5 = JSON['stringify'](
-      { version: 0x1, project: migrateStoryboard3DProject2, assets: value2 },
+      { version: 1, project: migrateStoryboard3DProject2, assets: value2 },
       (value6, value7) => (typeof value7 === 'string' && value7['startsWith']('blob:') ? '' : value7),
     ),
     textEncoder = new TextEncoder()['encode'](value5),
-    arrayBuffer = new ArrayBuffer(0xc),
+    arrayBuffer = new ArrayBuffer(12),
     uint8Array = new Uint8Array(arrayBuffer);
-  if (textEncoder['byteLength'] > 0x20 * 0x400 * 0x400)
+  if (textEncoder['byteLength'] > 32 * 1024 * 1024)
     throw new Error('项目清单超过 32 MB，请拆分项目后打包。');
   return (
     uint8Array['set'](new TextEncoder()['encode'](MAGIC)),
-    new DataView(arrayBuffer)['setUint32'](0x8, textEncoder['byteLength'], !![]),
+    new DataView(arrayBuffer)['setUint32'](8, textEncoder['byteLength'], !![]),
     new Blob([arrayBuffer, textEncoder, ...args3], { type: 'application/octet-stream' })
   );
 }
 export async function importDirectorProjectPackage(value8, el2) {
-  if (value8['size'] < 0xc || value8['size'] > MAX_SIZE + 0x20 * 0x400 * 0x400)
+  if (value8['size'] < 12 || value8['size'] > MAX_SIZE + 32 * 1024 * 1024)
     throw new Error('项目包大小无效。');
-  const value9 = await value8['slice'](0x0, 0xc)['arrayBuffer']();
-  if (new TextDecoder()['decode'](new Uint8Array(value9, 0x0, 0x8)) !== MAGIC)
+  const value9 = await value8['slice'](0, 12)['arrayBuffer']();
+  if (new TextDecoder()['decode'](new Uint8Array(value9, 0, 8)) !== MAGIC)
     throw new Error('请选择有效的 .aic3d 项目包。');
-  const dataView = new DataView(value9)['getUint32'](0x8, !![]);
-  if (dataView > 0x20 * 0x400 * 0x400 || dataView + 0xc > value8['size']) throw new Error('项目包清单无效。');
-  const enabled4 = JSON['parse'](await value8['slice'](0xc, 0xc + dataView)['text']());
+  const dataView = new DataView(value9)['getUint32'](8, !![]);
+  if (dataView > 32 * 1024 * 1024 || dataView + 12 > value8['size']) throw new Error('项目包清单无效。');
+  const enabled4 = JSON['parse'](await value8['slice'](12, 12 + dataView)['text']());
   if (
-    enabled4['version'] !== 0x1 ||
+    enabled4['version'] !== 1 ||
     !Array['isArray'](enabled4['assets']) ||
-    enabled4['assets']['length'] > 0x1f4
+    enabled4['assets']['length'] > 500
   )
     throw new Error('项目包版本或素材清单不受支持。');
   const enabled5 = new Map(
@@ -116,7 +116,7 @@ export async function importDirectorProjectPackage(value8, el2) {
   )
     throw new Error('项目包素材重复或缺失。');
   const value12 = [],
-    value13 = dataView + 0xc;
+    value13 = dataView + 12;
   for (const enabled6 of enabled4['assets']) {
     if (
       typeof enabled6['assetId'] !== 'string' ||
@@ -128,8 +128,8 @@ export async function importDirectorProjectPackage(value8, el2) {
       if (
         !Number['isSafeInteger'](value14['offset']) ||
         !Number['isSafeInteger'](value14['size']) ||
-        value14['offset'] < 0x0 ||
-        value14['size'] < 0x0 ||
+        value14['offset'] < 0 ||
+        value14['size'] < 0 ||
         value13 + value14['offset'] + value14['size'] > value8['size']
       )
         throw new Error('项目素材范围越界。');
@@ -149,8 +149,8 @@ export async function importDirectorProjectPackage(value8, el2) {
         assetId: value17,
         kind: value15['kind'],
         descriptor: remapReferences(value15['descriptor'], enabled5),
-        primaryFile: value16[0x0],
-        relatedFiles: value16['slice'](0x1),
+        primaryFile: value16[0],
+        relatedFiles: value16['slice'](1),
       }),
         value12['push'](value17));
     }

@@ -1,6 +1,6 @@
 import { isStoryContinuousTimelinePromptMode } from './promptModes.js';
 export const REPLICATION_INTEGER_TIMING_RULE =
-  'shot.startSec/endSec\x20使用片段局部整数秒，durationSec/d=endSec-startSec；首镜从0开始，各镜连续无空档重叠，末镜结束等于计划\x20durationSec。原片小数切点由\x20timingContract\x20就近映射；审查和修补也必须使用同一整数切点，不提出小数秒修补。已有切点和片段总时长不得改变。';
+  'shot.startSec/endSec 使用片段局部整数秒，durationSec/d=endSec-startSec；首镜从0开始，各镜连续无空档重叠，末镜结束等于计划 durationSec。原片小数切点由 timingContract 就近映射；审查和修补也必须使用同一整数切点，不提出小数秒修补。已有切点和片段总时长不得改变。';
 export const REPLICATION_SOURCE_CUT_RULE =
   'sourceShotsComplete=false 表示来源缺少逐镜依据：不得均分或猜测切点，不根据多轮对白虚构镜头；保留已识别人声和候选内容，标记需核对原片。修补只可补入 observedBoundaries 中已有证据的切点。';
 export function isValidIntegerTimelineShot(value) {
@@ -10,13 +10,13 @@ export function isValidIntegerTimelineShot(value) {
     value?.['startSec'] != null &&
     value?.['endSec'] != null &&
     Number['isInteger'](count) &&
-    count >= 0x0 &&
+    count >= 0 &&
     Number['isInteger'](item) &&
     item > count &&
     item - count === Number(value['durationSec'] ?? value['d'])
   );
 }
-export function getReplicationVisualGaps(list = [], key = 0x0, endSec = 0x0) {
+export function getReplicationVisualGaps(list = [], key = 0, endSec = 0) {
   if (!Number['isFinite'](key) || !Number['isFinite'](endSec) || endSec <= key) return [];
   const index = list['flatMap']((result) => result['shots'] || [])
       ['filter'](
@@ -50,13 +50,13 @@ export function getReplicationClipTiming(ref, source = {}, next = 'seedance-2.5'
       ),
     durationSec = Number(sourceStartSec['durationSec']),
     handler = (record) =>
-      isStoryContinuousTimelinePromptMode(next) ? Math['round'](record) : Number(record['toFixed'](0x3)),
+      isStoryContinuousTimelinePromptMode(next) ? Math['round'](record) : Number(record['toFixed'](3)),
     observedBoundaries = [
       ...new Set(
         sourceShotsComplete['flatMap']((payload) => payload['shots'] || [])
           ['flatMap']((handle) => [handle['startSec'], handle['endSec']])
           ['map']((state) => handler(state - Number(sourceStartSec['sourceStartSec'])))
-          ['filter']((count2) => count2 > 0x0 && count2 < durationSec),
+          ['filter']((count2) => count2 > 0 && count2 < durationSec),
       ),
     ]['sort']((config, scope) => config - scope);
   return {
@@ -65,7 +65,7 @@ export function getReplicationClipTiming(ref, source = {}, next = 'seedance-2.5'
     sourceStartSec: sourceStartSec['sourceStartSec'],
     sourceEndSec: sourceStartSec['sourceEndSec'],
     sourceShotsComplete:
-      sourceShotsComplete['length'] > 0x0 &&
+      sourceShotsComplete['length'] > 0 &&
       sourceShotsComplete['every']((input) => input['shots']?.['length']) &&
       !getReplicationVisualGaps(
         sourceShotsComplete,

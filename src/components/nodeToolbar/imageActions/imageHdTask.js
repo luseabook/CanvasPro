@@ -83,7 +83,7 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
     localPath = '';
   try {
     const data = getNodeData(),
-      options = data?.['images']?.[data['mainImageIndex'] || 0x0] || data,
+      options = data?.['images']?.[data['mainImageIndex'] || 0] || data,
       target = options?.['originalLocalPath'] || options?.['localPath'],
       imgUrl = target ? '/' + target : options?.['sourceUrl'] || options?.['imageUrl'] || options?.['src'];
     if (!imgUrl) {
@@ -116,7 +116,7 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
         providerProfileId: providerId,
       }),
       modelId = modelManifest['modelId'],
-      id = 'source-image-hd-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x6),
+      id = 'source-image-hd-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 6),
       outputText3 = imageHdOutputText({ model: modelManifest['displayName'], resolution: resolution2 }),
       response = await submitTask(
         {
@@ -179,8 +179,8 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
               provider: 'runninghub',
               apiUrl: apiUrl['runningHubApiUrl'],
             });
-            if (list['length'] === 0x0) throw new Error(imageHdText('uploadEmpty'));
-            const enabled = String(list[0x0] || '')['trim']();
+            if (list['length'] === 0) throw new Error(imageHdText('uploadEmpty'));
+            const enabled = String(list[0] || '')['trim']();
             if (!enabled) throw new Error(imageHdText('uploadFailed'));
             throwIfToolbarTaskCancelled(outNodeId['targetNodeId']);
             const next = await handler(

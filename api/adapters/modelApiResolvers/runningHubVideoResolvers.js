@@ -70,7 +70,7 @@ export function runninghubHappyHorseVideo({
       modelManifest,
     ),
     enabled = String(current['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
-  if (!enabled) throw new Error('RunningHub\x20HappyHorse\x201.0\x20prompt\x20is\x20required');
+  if (!enabled) throw new Error('RunningHub HappyHorse 1.0 prompt is required');
   const list2 = normalizeInputList(inputImages),
     list3 = normalizeInputList(inputVideos),
     inputUrlsBySlot = normalizeInputUrlsBySlot(finalUrlsBySlot),
@@ -88,11 +88,11 @@ export function runninghubHappyHorseVideo({
     };
   let runningHubHappyHorseMode = getRunningHubHappyHorseMode(payload, current);
   const enabled2 =
-    list2['length'] > 0x0 || list3['length'] > 0x0 || Object['keys'](inputUrlsBySlot)['length'] > 0x0;
+    list2['length'] > 0 || list3['length'] > 0 || Object['keys'](inputUrlsBySlot)['length'] > 0;
   runningHubHappyHorseMode !== 'auto' && !enabled2 && (runningHubHappyHorseMode = 'auto');
   current['prompt'] = enabled;
   const optionalIntegerInRange = normalizeOptionalIntegerInRange(current['seed'], {
-    min: 0x0,
+    min: 0,
     max: 0x7fffffff,
   });
   if (optionalIntegerInRange === null) delete current['seed'];
@@ -101,15 +101,15 @@ export function runninghubHappyHorseVideo({
     delete current['imageUrl'],
     delete current['imageUrls'],
     delete current['videoUrl']);
-  if (isRunningHubHappyHorse11Model2 && list3['length'] > 0x0)
+  if (isRunningHubHappyHorse11Model2 && list3['length'] > 0)
     throw new Error('RunningHub HappyHorse 1.1 does not support video edit mode');
   if (runningHubHappyHorseMode === 'edit') {
     if (isRunningHubHappyHorse11Model2)
       throw new Error('RunningHub HappyHorse 1.1 does not support video edit mode');
-    if (!list3[0x0]) throw new Error('RunningHub HappyHorse 1.0 video edit requires videoUrl input');
+    if (!list3[0]) throw new Error('RunningHub HappyHorse 1.0 video edit requires videoUrl input');
     const list6 = handler(['editRefImage'], list2);
-    current['videoUrl'] = list3[0x0];
-    if (list6['length'] > 0x0) current['imageUrls'] = list6['slice'](0x0, 0x5);
+    current['videoUrl'] = list3[0];
+    if (list6['length'] > 0) current['imageUrls'] = list6['slice'](0, 5);
     return (
       (current['audioSetting'] = normalizeRunningHubHappyHorseAudioSettingValue(
         current['audioSetting'] ??
@@ -127,9 +127,9 @@ export function runninghubHappyHorseVideo({
   delete current['audioSetting'];
   if (runningHubHappyHorseMode === 'image') {
     const enabled3 = handler(['firstFrame'], list2);
-    if (!enabled3[0x0]) throw new Error('RunningHub HappyHorse 1.0 image-to-video requires imageUrl input');
+    if (!enabled3[0]) throw new Error('RunningHub HappyHorse 1.0 image-to-video requires imageUrl input');
     return (
-      (current['imageUrl'] = enabled3[0x0]),
+      (current['imageUrl'] = enabled3[0]),
       delete current['imageUrls'],
       delete current['videoUrl'],
       delete current['aspectRatio'],
@@ -138,16 +138,16 @@ export function runninghubHappyHorseVideo({
   }
   if (runningHubHappyHorseMode === 'reference') {
     const list7 = handler(['referenceImage'], list2);
-    if (list7['length'] <= 0x0)
+    if (list7['length'] <= 0)
       throw new Error('RunningHub HappyHorse 1.0 reference mode requires imageUrls input');
     return (
-      (current['imageUrls'] = list7['slice'](0x0, 0x9)),
+      (current['imageUrls'] = list7['slice'](0, 9)),
       delete current['imageUrl'],
       delete current['videoUrl'],
       current
     );
   }
-  if (list2['length'] > 0x0 || list3['length'] > 0x0)
+  if (list2['length'] > 0 || list3['length'] > 0)
     throw new Error('RunningHub HappyHorse 1.0 media inputs require an explicit mode selection');
   return (delete current['imageUrl'], delete current['imageUrls'], delete current['videoUrl'], current);
 }
@@ -158,11 +158,11 @@ function hasRunningHubHappyHorseEndpointMedia({
   inputVideos: inputVideos = [],
 } = {}) {
   return (
-    normalizeInputList(inputImages)['length'] > 0x0 ||
-    normalizeInputList(inputVideos)['length'] > 0x0 ||
-    Object['keys'](normalizeInputUrlsBySlot(finalUrlsBySlot))['length'] > 0x0 ||
+    normalizeInputList(inputImages)['length'] > 0 ||
+    normalizeInputList(inputVideos)['length'] > 0 ||
+    Object['keys'](normalizeInputUrlsBySlot(finalUrlsBySlot))['length'] > 0 ||
     Boolean(String(currentBody?.['imageUrl'] || currentBody?.['videoUrl'] || '')['trim']()) ||
-    normalizeInputList(currentBody?.['imageUrls'])['length'] > 0x0
+    normalizeInputList(currentBody?.['imageUrls'])['length'] > 0
   );
 }
 export function runninghubHappyHorseVideoEndpoint(options3 = {}) {
@@ -304,7 +304,7 @@ function removeRunningHubSeedance2TransientFields(value10) {
 function normalizeRunningHubSeedance2ConversionSlots(value11) {
   const list10 = Array['isArray'](value11) ? value11 : ['all'],
     list11 = list10['map']((value12) => String(value12 || '')['trim']())['filter'](Boolean);
-  return list11['length'] > 0x0 ? list11 : ['all'];
+  return list11['length'] > 0 ? list11 : ['all'];
 }
 export function runninghubSeedance2Video({
   currentBody: currentBody3,
@@ -320,7 +320,7 @@ export function runninghubSeedance2Video({
 }) {
   const value13 = { ...currentBody3 },
     enabled4 = String(value13['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
-  if (!enabled4) throw new Error('RunningHub\x20Seedance\x202.0\x20prompt\x20is\x20required');
+  if (!enabled4) throw new Error('RunningHub Seedance 2.0 prompt is required');
   const runningHubSeedance2Mode2 = getRunningHubSeedance2Mode(payload, value13),
     list12 = collectRunningHubSeedance2FrameImages({
       inputImages: inputImages,
@@ -336,30 +336,30 @@ export function runninghubSeedance2Video({
     runningHubKlingV3RawMediaCount2 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
   value13['prompt'] = enabled4;
   const optionalIntegerInRange2 = normalizeOptionalIntegerInRange(value13['seed'], {
-    min: -0x1,
+    min: -1,
     max: 0x7fffffff,
   });
   if (optionalIntegerInRange2 === null) delete value13['seed'];
   else value13['seed'] = optionalIntegerInRange2;
   removeRunningHubSeedance2TransientFields(value13);
   if (runningHubSeedance2Mode2 === 'multimodal2video') {
-    if (list13['length'] + list14['length'] <= 0x0)
+    if (list13['length'] + list14['length'] <= 0)
       throw new Error('RunningHub Seedance 2.0 multimodal mode requires image or video input');
-    if (list13['length'] > 0x9)
+    if (list13['length'] > 9)
       throw new Error('RunningHub Seedance 2.0 multimodal mode supports at most 9 image inputs');
-    if (runningHubKlingV3RawMediaCount > 0x3)
+    if (runningHubKlingV3RawMediaCount > 3)
       throw new Error(
-        'RunningHub\x20Seedance\x202.0\x20multimodal\x20mode\x20supports\x20at\x20most\x203\x20video\x20inputs',
+        'RunningHub Seedance 2.0 multimodal mode supports at most 3 video inputs',
       );
-    if (runningHubKlingV3RawMediaCount2 > 0x3)
+    if (runningHubKlingV3RawMediaCount2 > 3)
       throw new Error(
-        'RunningHub\x20Seedance\x202.0\x20multimodal\x20mode\x20supports\x20at\x20most\x203\x20audio\x20inputs',
+        'RunningHub Seedance 2.0 multimodal mode supports at most 3 audio inputs',
       );
-    if (list15['length'] > 0x0 && list13['length'] + list14['length'] <= 0x0)
+    if (list15['length'] > 0 && list13['length'] + list14['length'] <= 0)
       throw new Error('RunningHub Seedance 2.0 audio input requires image or video input');
-    if (list13['length'] > 0x0) value13['imageUrls'] = list13['slice'](0x0, 0x9);
-    if (list14['length'] > 0x0) value13['videoUrls'] = list14['slice'](0x0, 0x3);
-    if (list15['length'] > 0x0) value13['audioUrls'] = list15['slice'](0x0, 0x3);
+    if (list13['length'] > 0) value13['imageUrls'] = list13['slice'](0, 9);
+    if (list14['length'] > 0) value13['videoUrls'] = list14['slice'](0, 3);
+    if (list15['length'] > 0) value13['audioUrls'] = list15['slice'](0, 3);
     return (
       value13['realPersonMode'] === !![]
         ? (value13['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(
@@ -370,27 +370,27 @@ export function runninghubSeedance2Video({
       value13
     );
   }
-  if (runningHubKlingV3RawMediaCount > 0x0)
+  if (runningHubKlingV3RawMediaCount > 0)
     throw new Error(
       'RunningHub Seedance 2.0 text/image/frame modes do not accept video input; use multimodal mode',
     );
-  if (runningHubKlingV3RawMediaCount2 > 0x0)
+  if (runningHubKlingV3RawMediaCount2 > 0)
     throw new Error(
       'RunningHub Seedance 2.0 text/image/frame modes do not accept audio input; use multimodal mode',
     );
   if (runningHubSeedance2Mode2 === 'text2video') {
-    if (list12['length'] > 0x0)
+    if (list12['length'] > 0)
       throw new Error('RunningHub Seedance 2.0 text-to-video mode does not accept image input');
     return (delete value13['realPersonMode'], delete value13['conversionSlots'], value13);
   }
-  if (runningHubSeedance2Mode2 === 'image2video' && list12['length'] !== 0x1)
+  if (runningHubSeedance2Mode2 === 'image2video' && list12['length'] !== 1)
     throw new Error('RunningHub Seedance 2.0 image-to-video mode requires exactly 1 image input');
-  if (runningHubSeedance2Mode2 === 'frames2video' && list12['length'] !== 0x2)
+  if (runningHubSeedance2Mode2 === 'frames2video' && list12['length'] !== 2)
     throw new Error(
-      'RunningHub\x20Seedance\x202.0\x20first-last-frame\x20mode\x20requires\x20exactly\x202\x20image\x20inputs',
+      'RunningHub Seedance 2.0 first-last-frame mode requires exactly 2 image inputs',
     );
-  value13['firstFrameUrl'] = list12[0x0];
-  if (list12[0x1]) value13['lastFrameUrl'] = list12[0x1];
+  value13['firstFrameUrl'] = list12[0];
+  if (list12[1]) value13['lastFrameUrl'] = list12[1];
   return (
     delete value13['webSearch'],
     value13['realPersonMode'] === !![]
@@ -440,7 +440,7 @@ function normalizeRunningHubKlingO1AspectRatio(value18) {
 }
 function normalizeRunningHubKlingO1Duration(value20) {
   const value21 = Number(value20);
-  return Number['isFinite'](value21) && Math['trunc'](value21) === 0xa ? '10' : '5';
+  return Number['isFinite'](value21) && Math['trunc'](value21) === 10 ? '10' : '5';
 }
 function getRunningHubKlingO1GenerationMode(options6 = {}, value22 = {}) {
   return normalizeRunningHubKlingO1GenerationMode(
@@ -488,10 +488,10 @@ function resolveRunningHubKlingO1Route({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   })['length'];
-  if (runningHubKlingO1FrameImages >= 0x2) return 'frames';
-  if (runningHubKlingO1FrameImages === 0x1) return 'image';
+  if (runningHubKlingO1FrameImages >= 2) return 'frames';
+  if (runningHubKlingO1FrameImages === 1) return 'image';
   const inputList = normalizeInputList(inputVideos)['length'];
-  return inputList > 0x0 ? 'reference' : 'text';
+  return inputList > 0 ? 'reference' : 'text';
 }
 export function runninghubKlingO1Video({
   currentBody: currentBody4,
@@ -511,7 +511,7 @@ export function runninghubKlingO1Video({
         value27['keep_original_sound'],
     ),
     enabled5 = String(value27['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!enabled5) throw new Error('RunningHub\x20Kling\x20O1\x20prompt\x20is\x20required');
+  if (!enabled5) throw new Error('RunningHub Kling O1 prompt is required');
   ((value27['prompt'] = enabled5),
     (value27['mode'] = normalizeRunningHubKlingO1QualityMode(value27['mode'])),
     (value27['aspectRatio'] = normalizeRunningHubKlingO1AspectRatio(value27['aspectRatio'])),
@@ -528,7 +528,7 @@ export function runninghubKlingO1Video({
       list16['length'],
       normalizeInputList(payload?.['videos'])['length'],
       normalizeInputList(payload?.['videoUrls'])['length'],
-      String(payload?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
+      String(payload?.['videoUrl'] || '')['trim']() ? 1 : 0,
     );
   if (runningHubKlingO1GenerationMode2 === 'edit') {
     const list17 = [];
@@ -538,13 +538,13 @@ export function runninghubKlingO1Video({
       collectRunningHubKlingO1ReferenceImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
         'forEach'
       ]((value29) => appendUniqueUrl(list17, value29)));
-    if (list17['length'] > 0x0)
-      throw new Error('RunningHub\x20Kling\x20O1\x20edit\x20mode\x20does\x20not\x20accept\x20image\x20input');
-    if (count < 0x1 || !list16[0x0]) throw new Error('RunningHub Kling O1 edit mode requires 1 video input');
-    if (count > 0x1) throw new Error('RunningHub Kling O1 edit mode supports at most 1 video input');
+    if (list17['length'] > 0)
+      throw new Error('RunningHub Kling O1 edit mode does not accept image input');
+    if (count < 1 || !list16[0]) throw new Error('RunningHub Kling O1 edit mode requires 1 video input');
+    if (count > 1) throw new Error('RunningHub Kling O1 edit mode supports at most 1 video input');
     return (
       (value27['mode'] = 'std'),
-      (value27['videoUrl'] = list16[0x0]),
+      (value27['videoUrl'] = list16[0]),
       (value27['keepOriginalSound'] = klingKeepOriginalSound),
       delete value27['aspectRatio'],
       delete value27['duration'],
@@ -556,19 +556,19 @@ export function runninghubKlingO1Video({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (list18['length'] < 0x1)
+    if (list18['length'] < 1)
       throw new Error('RunningHub Kling O1 reference mode requires at least 1 image input');
-    if (list18['length'] > 0x7)
+    if (list18['length'] > 7)
       throw new Error('RunningHub Kling O1 reference mode supports at most 7 image inputs');
-    if (count < 0x1 || !list16[0x0])
+    if (count < 1 || !list16[0])
       throw new Error('RunningHub Kling O1 reference mode requires 1 video input');
-    if (count > 0x1)
+    if (count > 1)
       throw new Error(
-        'RunningHub\x20Kling\x20O1\x20reference\x20mode\x20supports\x20at\x20most\x201\x20video\x20input',
+        'RunningHub Kling O1 reference mode supports at most 1 video input',
       );
     return (
       (value27['imageUrls'] = list18),
-      (value27['videoUrl'] = list16[0x0]),
+      (value27['videoUrl'] = list16[0]),
       (value27['keepOriginalSound'] = klingKeepOriginalSound),
       (value27['prompt'] = replaceKlingO1PromptImageReferences(value27['prompt'], list18['length'])),
       value27
@@ -578,12 +578,12 @@ export function runninghubKlingO1Video({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (list16['length'] > 0x0)
+  if (list16['length'] > 0)
     throw new Error('RunningHub Kling O1 frame mode does not accept video input; use reference mode');
-  if (list19['length'] > 0x2)
+  if (list19['length'] > 2)
     throw new Error('RunningHub Kling O1 frame mode supports at most 2 image inputs');
-  if (list19[0x0]) value27['firstImageUrl'] = list19[0x0];
-  if (list19[0x1]) value27['lastImageUrl'] = list19[0x1];
+  if (list19[0]) value27['firstImageUrl'] = list19[0];
+  if (list19[1]) value27['lastImageUrl'] = list19[1];
   return (
     (value27['prompt'] = replaceKlingO1PromptImageReferences(value27['prompt'], list19['length'])),
     value27
@@ -665,7 +665,7 @@ function getRunningHubKlingV3RawMediaCount(options8 = {}, value38 = [], value39 
     normalizeInputList(value38)['length'],
     normalizeInputList(options8?.[value41])['length'],
     normalizeInputList(options8?.[value42])['length'],
-    String(options8?.[value40] || '')['trim']() ? 0x1 : 0x0,
+    String(options8?.[value40] || '')['trim']() ? 1 : 0,
   );
 }
 function resolveRunningHubKlingV3Route({
@@ -688,7 +688,7 @@ function resolveRunningHubKlingV3Route({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     })['length'];
-  return { model: model3, route: route2 > 0x0 ? 'image' : 'text' };
+  return { model: model3, route: route2 > 0 ? 'image' : 'text' };
 }
 export function runninghubKlingV3Video({
   currentBody: currentBody5,
@@ -712,10 +712,10 @@ export function runninghubKlingV3Video({
     enabled6 = String(value43['prompt'] || payload?.['prompt'] || '')['trim']();
   if (!enabled6) throw new Error('RunningHub Kling V3.0 prompt is required');
   const runningHubKlingV3RawMediaCount3 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video');
-  if (runningHubKlingV3RawMediaCount3 > 0x0)
+  if (runningHubKlingV3RawMediaCount3 > 0)
     throw new Error('RunningHub Kling V3.0 does not accept video input');
   const runningHubKlingV3RawMediaCount4 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  if (runningHubKlingV3RawMediaCount4 > 0x0)
+  if (runningHubKlingV3RawMediaCount4 > 0)
     throw new Error('RunningHub Kling V3.0 does not accept audio input');
   ((value43['prompt'] = enabled6),
     delete value43['rh_kling_v3_model'],
@@ -727,16 +727,16 @@ export function runninghubKlingV3Video({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (list22['length'] > 0x2) throw new Error('RunningHub Kling V3.0 supports at most 2 image inputs');
-  if (list22['length'] > 0x0) {
+  if (list22['length'] > 2) throw new Error('RunningHub Kling V3.0 supports at most 2 image inputs');
+  if (list22['length'] > 0) {
     delete value43['aspectRatio'];
     if (runningHubKlingV3Model === '4k') {
-      if (list22['length'] > 0x1)
+      if (list22['length'] > 1)
         throw new Error('RunningHub Kling V3.0 4K image-to-video supports only one imageUrl');
-      return ((value43['imageUrl'] = list22[0x0]), value43);
+      return ((value43['imageUrl'] = list22[0]), value43);
     }
-    value43['firstImageUrl'] = list22[0x0];
-    if (list22[0x1]) value43['lastImageUrl'] = list22[0x1];
+    value43['firstImageUrl'] = list22[0];
+    if (list22[1]) value43['lastImageUrl'] = list22[1];
   }
   return value43;
 }
@@ -846,7 +846,7 @@ function resolveRunningHubKlingO3Route({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   })['length'];
-  return { model: model5, route: route4 > 0x0 ? 'image' : 'text' };
+  return { model: model5, route: route4 > 0 ? 'image' : 'text' };
 }
 export function runninghubKlingO3Video({
   currentBody: currentBody6,
@@ -862,7 +862,7 @@ export function runninghubKlingO3Video({
     enabled7 = String(value53['prompt'] || payload?.['prompt'] || '')['trim']();
   if (!enabled7) throw new Error('RunningHub Kling O3 prompt is required');
   const runningHubKlingV3RawMediaCount5 = getRunningHubKlingV3RawMediaCount(payload, inputAudios, 'audio');
-  if (runningHubKlingV3RawMediaCount5 > 0x0)
+  if (runningHubKlingV3RawMediaCount5 > 0)
     throw new Error('RunningHub Kling O3 does not accept direct audio input');
   const inputList2 = normalizeInputList(inputVideos),
     runningHubKlingV3RawMediaCount6 = getRunningHubKlingV3RawMediaCount(payload, inputVideos, 'video'),
@@ -886,19 +886,19 @@ export function runninghubKlingO3Video({
     delete value53['videoUrl']);
   if (runningHubKlingO3GenerationMode2 === 'edit') {
     if (runningHubKlingO3Model === '4k')
-      throw new Error('RunningHub\x20Kling\x20O3\x204K\x20does\x20not\x20support\x20video\x20edit');
-    if (runningHubKlingV3RawMediaCount6 < 0x1 || !inputList2[0x0])
+      throw new Error('RunningHub Kling O3 4K does not support video edit');
+    if (runningHubKlingV3RawMediaCount6 < 1 || !inputList2[0])
       throw new Error('RunningHub Kling O3 edit mode requires 1 video input');
-    if (runningHubKlingV3RawMediaCount6 > 0x1)
+    if (runningHubKlingV3RawMediaCount6 > 1)
       throw new Error('RunningHub Kling O3 edit mode supports at most 1 video input');
     const list23 = collectRunningHubKlingO3EditImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (list23['length'] > 0x7)
+    if (list23['length'] > 7)
       throw new Error('RunningHub Kling O3 edit mode supports at most 7 image inputs');
-    value53['videoUrl'] = inputList2[0x0];
-    if (list23['length'] > 0x0) value53['imageUrls'] = list23;
+    value53['videoUrl'] = inputList2[0];
+    if (list23['length'] > 0) value53['imageUrls'] = list23;
     return (
       (value53['keepOriginalSound'] = klingKeepOriginalSound2),
       delete value53['aspectRatio'],
@@ -914,35 +914,35 @@ export function runninghubKlingO3Video({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (list24['length'] < 0x1)
+    if (list24['length'] < 1)
       throw new Error('RunningHub Kling O3 reference mode requires at least 1 image input');
-    if (runningHubKlingV3RawMediaCount6 > 0x1)
+    if (runningHubKlingV3RawMediaCount6 > 1)
       throw new Error('RunningHub Kling O3 reference mode supports at most 1 video input');
-    if (inputList2[0x0] && list24['length'] > 0x4)
+    if (inputList2[0] && list24['length'] > 4)
       throw new Error('RunningHub Kling O3 reference mode supports at most 4 image inputs with video input');
-    if (list24['length'] > 0x7)
+    if (list24['length'] > 7)
       throw new Error('RunningHub Kling O3 reference mode supports at most 7 image inputs');
     value53['imageUrls'] = list24;
-    if (inputList2[0x0]) value53['videoUrl'] = inputList2[0x0];
+    if (inputList2[0]) value53['videoUrl'] = inputList2[0];
     value53['keepOriginalSound'] = klingKeepOriginalSound2;
     if (runningHubKlingO3Model !== '4k') delete value53['shotType'];
     return value53;
   }
-  if (runningHubKlingV3RawMediaCount6 > 0x0)
+  if (runningHubKlingV3RawMediaCount6 > 0)
     throw new Error('RunningHub Kling O3 frame mode does not accept video input; use reference or edit mode');
   const list25 = collectRunningHubKlingO3FrameImages({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (list25['length'] > 0x2)
+  if (list25['length'] > 2)
     throw new Error('RunningHub Kling O3 frame mode supports at most 2 image inputs');
-  if (runningHubKlingO3Model === '4k' && list25['length'] > 0x1)
+  if (runningHubKlingO3Model === '4k' && list25['length'] > 1)
     throw new Error(
-      'RunningHub\x20Kling\x20O3\x204K\x20image-to-video\x20supports\x20only\x20one\x20firstImageUrl',
+      'RunningHub Kling O3 4K image-to-video supports only one firstImageUrl',
     );
-  if (list25['length'] > 0x0) {
-    (delete value53['aspectRatio'], (value53['firstImageUrl'] = list25[0x0]));
-    if (list25[0x1]) value53['lastImageUrl'] = list25[0x1];
+  if (list25['length'] > 0) {
+    (delete value53['aspectRatio'], (value53['firstImageUrl'] = list25[0]));
+    if (list25[1]) value53['lastImageUrl'] = list25[1];
   }
   return value53;
 }
@@ -977,7 +977,7 @@ function normalizeRunningHubHailuo23Quality(value54) {
 }
 function normalizeRunningHubHailuo23Duration(value56) {
   const value57 = Number(value56);
-  return Number['isFinite'](value57) && Math['trunc'](value57) === 0xa ? '10' : '6';
+  return Number['isFinite'](value57) && Math['trunc'](value57) === 10 ? '10' : '6';
 }
 function getRunningHubHailuo23Quality(options11 = {}, value58 = {}) {
   return normalizeRunningHubHailuo23Quality(
@@ -1003,7 +1003,7 @@ function getRunningHubHailuo23RawVideoCount(options12 = {}, value61 = []) {
     normalizeInputList(value61)['length'],
     normalizeInputList(options12?.['videos'])['length'],
     normalizeInputList(options12?.['videoUrls'])['length'],
-    String(options12?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
+    String(options12?.['videoUrl'] || '')['trim']() ? 1 : 0,
   );
 }
 function resolveRunningHubHailuo23Route({
@@ -1019,8 +1019,8 @@ function resolveRunningHubHailuo23Route({
     })['length'];
   if (runningHubHailuo23Quality === 'fast') return 'i2vFast';
   if (runningHubHailuo23Quality === 'fastPro') return 'i2vFastPro';
-  if (runningHubHailuo23Quality === 'pro') return runningHubHailuo23FrameImages > 0x0 ? 'i2vPro' : 't2vPro';
-  return runningHubHailuo23FrameImages > 0x0 ? 'i2vStandard' : 't2vStandard';
+  if (runningHubHailuo23Quality === 'pro') return runningHubHailuo23FrameImages > 0 ? 'i2vPro' : 't2vPro';
+  return runningHubHailuo23FrameImages > 0 ? 'i2vStandard' : 't2vStandard';
 }
 export function runninghubHailuo23Video({
   currentBody: currentBody7,
@@ -1031,17 +1031,17 @@ export function runninghubHailuo23Video({
 }) {
   const value62 = { ...currentBody7 },
     enabled8 = String(value62['prompt'] || payload?.['prompt'] || '')['trim']();
-  if (!enabled8) throw new Error('RunningHub\x20Hailuo\x202.3\x20prompt\x20is\x20required');
+  if (!enabled8) throw new Error('RunningHub Hailuo 2.3 prompt is required');
   const runningHubHailuo23Quality2 = getRunningHubHailuo23Quality(payload, value62),
     list26 = collectRunningHubHailuo23FrameImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     }),
     runningHubHailuo23RawVideoCount = getRunningHubHailuo23RawVideoCount(payload, inputVideos);
-  if (runningHubHailuo23RawVideoCount > 0x0)
-    throw new Error('RunningHub\x20Hailuo\x202.3\x20does\x20not\x20accept\x20video\x20input');
-  if (list26['length'] > 0x1)
-    throw new Error('RunningHub\x20Hailuo\x202.3\x20supports\x20only\x20imageUrl\x20input');
+  if (runningHubHailuo23RawVideoCount > 0)
+    throw new Error('RunningHub Hailuo 2.3 does not accept video input');
+  if (list26['length'] > 1)
+    throw new Error('RunningHub Hailuo 2.3 supports only imageUrl input');
   ((value62['prompt'] = enabled8),
     (value62['duration'] = normalizeRunningHubHailuo23Duration(value62['duration'])),
     delete value62['rh_hailuo_23_quality'],
@@ -1051,15 +1051,15 @@ export function runninghubHailuo23Video({
     delete value62['imageUrls'],
     delete value62['videoUrl']);
   if (runningHubHailuo23Quality2 === 'fast' || runningHubHailuo23Quality2 === 'fastPro') {
-    if (!list26[0x0]) throw new Error('RunningHub Hailuo 2.3 Fast requires imageUrl input');
+    if (!list26[0]) throw new Error('RunningHub Hailuo 2.3 Fast requires imageUrl input');
     return (
-      (value62['imageUrl'] = list26[0x0]),
+      (value62['imageUrl'] = list26[0]),
       runningHubHailuo23Quality2 === 'fastPro' && (value62['duration'] = '6'),
       value62
     );
   }
   runningHubHailuo23Quality2 === 'pro' && delete value62['duration'];
-  if (list26[0x0]) value62['imageUrl'] = list26[0x0];
+  if (list26[0]) value62['imageUrl'] = list26[0];
   return value62;
 }
 export function runninghubHailuo23VideoEndpoint({
@@ -1185,7 +1185,7 @@ function getRunningHubVeo3RawVideoCount(options16 = {}, value75 = []) {
     normalizeInputList(value75)['length'],
     normalizeInputList(options16?.['videos'])['length'],
     normalizeInputList(options16?.['videoUrls'])['length'],
-    String(options16?.['videoUrl'] || '')['trim']() ? 0x1 : 0x0,
+    String(options16?.['videoUrl'] || '')['trim']() ? 1 : 0,
   );
 }
 function resolveRunningHubVeo3Route({
@@ -1198,7 +1198,7 @@ function resolveRunningHubVeo3Route({
   const channel3 = getRunningHubVeo3Channel(payload, currentBody),
     mode = getRunningHubVeo3Mode(payload, currentBody),
     runningHubVeo3GenerationType = getRunningHubVeo3GenerationType(payload, currentBody);
-  if (runningHubVeo3GenerationType === 'extend' || normalizeInputList(inputVideos)['length'] > 0x0)
+  if (runningHubVeo3GenerationType === 'extend' || normalizeInputList(inputVideos)['length'] > 0)
     return Object['freeze']({ channel: channel3, mode: mode, route: 'extend' });
   if (runningHubVeo3GenerationType === 'reference')
     return Object['freeze']({ channel: channel3, mode: mode, route: 'reference' });
@@ -1206,8 +1206,8 @@ function resolveRunningHubVeo3Route({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (list27['length'] >= 0x2) return Object['freeze']({ channel: channel3, mode: mode, route: 'frames' });
-  if (list27['length'] === 0x1)
+  if (list27['length'] >= 2) return Object['freeze']({ channel: channel3, mode: mode, route: 'frames' });
+  if (list27['length'] === 1)
     return Object['freeze']({
       channel: channel3,
       mode: mode,
@@ -1227,8 +1227,8 @@ function normalizeRunningHubVeo3BodyResolution(value76, { channel: channel4, mod
 function normalizeRunningHubVeo3BodyDuration(value78, { channel: channel5, mode: mode3 }) {
   if (channel5 === 'lowCost') return '8';
   const count2 = Math['trunc'](Number(value78));
-  if (mode3 === 'lite') return count2 === 0x8 ? '8' : '6';
-  return [0x4, 0x6, 0x8]['includes'](count2) ? String(count2) : '8';
+  if (mode3 === 'lite') return count2 === 8 ? '8' : '6';
+  return [4, 6, 8]['includes'](count2) ? String(count2) : '8';
 }
 function removeRunningHubVeo3TransientFields(value79) {
   (delete value79['rh_veo3_channel'],
@@ -1261,7 +1261,7 @@ export function runninghubVeo3Video({
     { channel: channel6, mode: mode4, route: route6 } = runningHubVeo3Route,
     runningHubVeo3GenerationType2 = getRunningHubVeo3GenerationType(payload, currentBody9),
     runningHubVeo3RawVideoCount = getRunningHubVeo3RawVideoCount(payload, inputVideos);
-  if (runningHubVeo3RawVideoCount > 0x0 && route6 !== 'extend')
+  if (runningHubVeo3RawVideoCount > 0 && route6 !== 'extend')
     throw new Error('RunningHub Veo3 does not accept video input');
   const enabled9 = String(currentBody9['prompt'] || payload?.['prompt'] || '')['trim']();
   if (route6 !== 'extend') {
@@ -1281,9 +1281,9 @@ export function runninghubVeo3Video({
     if (channel6 !== 'official' || mode4 === 'lite')
       throw new Error('RunningHub Veo3 video extend only supports official Fast or Pro');
     const inputList3 = normalizeInputList(inputVideos);
-    if (runningHubVeo3RawVideoCount < 0x1 || !inputList3[0x0])
+    if (runningHubVeo3RawVideoCount < 1 || !inputList3[0])
       throw new Error('RunningHub Veo3 video extend requires 1 video input');
-    if (runningHubVeo3RawVideoCount > 0x1)
+    if (runningHubVeo3RawVideoCount > 1)
       throw new Error('RunningHub Veo3 video extend supports at most 1 video input');
     const list28 = [];
     (collectRunningHubVeo3FrameImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
@@ -1292,9 +1292,9 @@ export function runninghubVeo3Video({
       collectRunningHubVeo3ReferenceImages({ inputImages: inputImages, finalUrlsBySlot: finalUrlsBySlot })[
         'forEach'
       ]((value81) => appendUniqueUrl(list28, value81)));
-    if (list28['length'] > 0x0) throw new Error('RunningHub Veo3 video extend does not accept image input');
+    if (list28['length'] > 0) throw new Error('RunningHub Veo3 video extend does not accept image input');
     return (
-      (currentBody9['video'] = inputList3[0x0]),
+      (currentBody9['video'] = inputList3[0]),
       delete currentBody9['prompt'],
       delete currentBody9['duration'],
       delete currentBody9['aspectRatio'],
@@ -1305,15 +1305,15 @@ export function runninghubVeo3Video({
   if (runningHubVeo3GenerationType2 === 'reference') {
     if (channel6 !== 'official' || mode4 === 'lite')
       throw new Error(
-        'RunningHub\x20Veo3\x20reference\x20mode\x20only\x20supports\x20official\x20Fast\x20or\x20Pro',
+        'RunningHub Veo3 reference mode only supports official Fast or Pro',
       );
     const list29 = collectRunningHubVeo3ReferenceImages({
       inputImages: inputImages,
       finalUrlsBySlot: finalUrlsBySlot,
     });
-    if (list29['length'] < 0x1)
-      throw new Error('RunningHub\x20Veo3\x20reference\x20mode\x20requires\x201-3\x20image\x20inputs');
-    if (list29['length'] > 0x3)
+    if (list29['length'] < 1)
+      throw new Error('RunningHub Veo3 reference mode requires 1-3 image inputs');
+    if (list29['length'] > 3)
       throw new Error('RunningHub Veo3 reference mode supports at most 3 image inputs');
     ((currentBody9['imageUrls'] = list29), delete currentBody9['duration']);
     if (mode4 === 'pro') delete currentBody9['aspectRatio'];
@@ -1323,24 +1323,24 @@ export function runninghubVeo3Video({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (list30['length'] > 0x2) throw new Error('RunningHub Veo3 frame mode supports at most 2 image inputs');
-  if (list30['length'] >= 0x2 && channel6 === 'official' && mode4 !== 'lite')
+  if (list30['length'] > 2) throw new Error('RunningHub Veo3 frame mode supports at most 2 image inputs');
+  if (list30['length'] >= 2 && channel6 === 'official' && mode4 !== 'lite')
     throw new Error(
       'RunningHub Veo3 official Fast/Pro start-end endpoint is not published; use official Lite or low-cost channel',
     );
-  if (list30['length'] === 0x1) {
-    if (channel6 === 'official') currentBody9['imageUrl'] = list30[0x0];
+  if (list30['length'] === 1) {
+    if (channel6 === 'official') currentBody9['imageUrl'] = list30[0];
     else
       mode4 === 'pro'
-        ? (currentBody9['firstFrameUrl'] = list30[0x0])
-        : (currentBody9['imageUrls'] = [list30[0x0]]);
+        ? (currentBody9['firstFrameUrl'] = list30[0])
+        : (currentBody9['imageUrls'] = [list30[0]]);
   } else
-    list30['length'] === 0x2 &&
+    list30['length'] === 2 &&
       (channel6 === 'official'
-        ? ((currentBody9['firstImageUrl'] = list30[0x0]),
-          (currentBody9['lastImageUrl'] = list30[0x1]),
+        ? ((currentBody9['firstImageUrl'] = list30[0]),
+          (currentBody9['lastImageUrl'] = list30[1]),
           delete currentBody9['duration'])
-        : ((currentBody9['firstFrameUrl'] = list30[0x0]), (currentBody9['lastFrameUrl'] = list30[0x1])));
+        : ((currentBody9['firstFrameUrl'] = list30[0]), (currentBody9['lastFrameUrl'] = list30[1])));
   return ((channel6 === 'lowCost' || mode4 === 'lite') && delete currentBody9['generateAudio'], currentBody9);
 }
 export function runninghubVeo3VideoEndpoint({
@@ -1421,13 +1421,13 @@ function resolveRunningHubWan27Route({
   const mode7 = getRunningHubWan27Mode(payload, currentBody);
   if (mode7 === 'reference' || mode7 === 'edit') return mode7;
   const list31 = normalizeInputList(inputVideos);
-  if (mode7 === 'video' && list31['length'] > 0x0) return 'video';
+  if (mode7 === 'video' && list31['length'] > 0) return 'video';
   const list32 = collectRunningHubWan27Images({
     mode: mode7,
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (list32['length'] > 0x0) return 'image';
+  if (list32['length'] > 0) return 'image';
   return 'text';
 }
 export function runninghubWan27Video({
@@ -1448,44 +1448,44 @@ export function runninghubWan27Video({
       finalUrlsBySlot: finalUrlsBySlot,
     }),
     list34 = normalizeInputList(inputVideos),
-    value88 = String(value87['audioUrl'] || '')['trim']() || normalizeInputList(inputAudios)[0x0] || '';
+    value88 = String(value87['audioUrl'] || '')['trim']() || normalizeInputList(inputAudios)[0] || '';
   value87['prompt'] = enabled11;
   if (value88) value87['audioUrl'] = value88;
   removeRunningHubWan27TransientFields(value87);
   if (mode8 === 'reference') {
     const count3 = list33['length'] + list34['length'];
-    if (count3 <= 0x0) throw new Error('RunningHub Wan2.7 reference mode requires image or video input');
-    if (count3 > 0x5) throw new Error('RunningHub Wan2.7 reference mode supports at most 5 inputs');
+    if (count3 <= 0) throw new Error('RunningHub Wan2.7 reference mode requires image or video input');
+    if (count3 > 5) throw new Error('RunningHub Wan2.7 reference mode supports at most 5 inputs');
     if (value88) throw new Error('RunningHub Wan2.7 reference mode does not accept audio input');
-    if (list33['length'] > 0x0) value87['imageUrls'] = list33;
-    if (list34['length'] > 0x0) value87['videoUrls'] = list34;
+    if (list33['length'] > 0) value87['imageUrls'] = list33;
+    if (list34['length'] > 0) value87['videoUrls'] = list34;
     return value87;
   }
   if (mode8 === 'edit') {
-    if (!list34[0x0]) throw new Error('RunningHub Wan2.7 video edit requires original video input');
-    if (list34['length'] > 0x1)
+    if (!list34[0]) throw new Error('RunningHub Wan2.7 video edit requires original video input');
+    if (list34['length'] > 1)
       throw new Error('RunningHub Wan2.7 video edit accepts only one original video');
-    if (list33['length'] > 0x3)
+    if (list33['length'] > 3)
       throw new Error(
-        'RunningHub\x20Wan2.7\x20video\x20edit\x20supports\x20at\x20most\x203\x20image\x20inputs',
+        'RunningHub Wan2.7 video edit supports at most 3 image inputs',
       );
     if (value88) throw new Error('RunningHub Wan2.7 video edit does not accept audio input');
-    value87['videoUrl'] = list34[0x0];
-    if (list33['length'] > 0x0) value87['imageUrls'] = list33['slice'](0x0, 0x3);
+    value87['videoUrl'] = list34[0];
+    if (list33['length'] > 0) value87['imageUrls'] = list33['slice'](0, 3);
     return value87;
   }
   if (mode8 === 'video') {
-    if (list33['length'] > 0x0) throw new Error('RunningHub Wan2.7 video extend does not accept image input');
-    if (list34['length'] > 0x1)
-      throw new Error('RunningHub\x20Wan2.7\x20video\x20extend\x20accepts\x20only\x20one\x20video\x20input');
-    if (list34[0x0]) value87['videoUrl'] = list34[0x0];
+    if (list33['length'] > 0) throw new Error('RunningHub Wan2.7 video extend does not accept image input');
+    if (list34['length'] > 1)
+      throw new Error('RunningHub Wan2.7 video extend accepts only one video input');
+    if (list34[0]) value87['videoUrl'] = list34[0];
     return value87;
   }
-  if (list34['length'] > 0x0)
-    throw new Error('RunningHub\x20Wan2.7\x20image\x20mode\x20does\x20not\x20accept\x20video\x20input');
-  if (list33['length'] > 0x2) throw new Error('RunningHub Wan2.7 image mode supports at most 2 image inputs');
-  list33[0x0] && (delete value87['aspectRatio'], (value87['firstImageUrl'] = list33[0x0]));
-  if (list33[0x1]) value87['lastImageUrl'] = list33[0x1];
+  if (list34['length'] > 0)
+    throw new Error('RunningHub Wan2.7 image mode does not accept video input');
+  if (list33['length'] > 2) throw new Error('RunningHub Wan2.7 image mode supports at most 2 image inputs');
+  list33[0] && (delete value87['aspectRatio'], (value87['firstImageUrl'] = list33[0]));
+  if (list33[1]) value87['lastImageUrl'] = list33[1];
   return value87;
 }
 export function runninghubWan27VideoEndpoint({

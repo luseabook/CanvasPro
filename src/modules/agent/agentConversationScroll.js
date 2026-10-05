@@ -1,5 +1,5 @@
 export function scrollAgentMessageListToEnd(value) {
-  scrollAgentMessageListTo(value, value?.['scrollHeight'] || 0x0);
+  scrollAgentMessageListTo(value, value?.['scrollHeight'] || 0);
 }
 export function scrollAgentMessageListTo(el, item) {
   if (!el) return;

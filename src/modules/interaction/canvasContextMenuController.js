@@ -36,33 +36,33 @@ const AI_GENERATION_TYPES = Object['freeze'](['ai-text', 'ai-image', 'ai-video',
       shortcutActionId: 'context-canvas-create-grid-4',
       labelKey: 'canvasInteraction.grids.grid4',
       nameKey: 'canvasInteraction.grids.grid4',
-      cols: 0x2,
-      rows: 0x2,
-      baseShortSide: 0x190,
+      cols: 2,
+      rows: 2,
+      baseShortSide: 400,
     },
     {
       shortcutActionId: 'context-canvas-create-grid-9',
       labelKey: 'canvasInteraction.grids.grid9',
       nameKey: 'canvasInteraction.grids.grid9',
-      cols: 0x3,
-      rows: 0x3,
-      baseShortSide: 0x1c2,
+      cols: 3,
+      rows: 3,
+      baseShortSide: 450,
     },
     {
       shortcutActionId: 'context-canvas-create-grid-16',
       labelKey: 'canvasInteraction.grids.grid16',
       nameKey: 'canvasInteraction.grids.grid16',
-      cols: 0x4,
-      rows: 0x4,
-      baseShortSide: 0x1f4,
+      cols: 4,
+      rows: 4,
+      baseShortSide: 500,
     },
     {
       shortcutActionId: 'context-canvas-create-grid-25',
       labelKey: 'canvasInteraction.grids.grid25',
       nameKey: 'canvasInteraction.grids.grid25',
-      cols: 0x5,
-      rows: 0x5,
-      baseShortSide: 0x226,
+      cols: 5,
+      rows: 5,
+      baseShortSide: 550,
     },
   ]),
   NODE_CREATION_SHORTCUT_ACTIONS = Object['freeze']({
@@ -128,8 +128,8 @@ function calcNodesBBox(result, data) {
   for (const options of data) {
     const box = result[options];
     if (!box) continue;
-    const target = box['width'] || 0x104,
-      source = box['height'] || 0x64;
+    const target = box['width'] || 260,
+      source = box['height'] || 100;
     ((x = Math['min'](x, box['x'])),
       (y = Math['min'](y, box['y'])),
       (width2 = Math['max'](width2, box['x'] + target)),
@@ -158,7 +158,7 @@ export function createCanvasContextMenuController({
       next = Number(el?.['getBoundingClientRect']?.()?.['top']);
     return {
       ensureItemIcons: !![],
-      viewportTop: Number['isFinite'](next) ? Math['max'](0x0, next) : 0x0,
+      viewportTop: Number['isFinite'](next) ? Math['max'](0, next) : 0,
     };
   };
   if (!store || !commandAdapter)
@@ -169,9 +169,9 @@ export function createCanvasContextMenuController({
     handler3 = (handle, state = '') => {
       const map = getShortcuts?.()?.[handle];
       if (!map || !Array['isArray'](map['keys'])) return state;
-      return map['keys']['join']('\x20');
+      return map['keys']['join'](' ');
     },
-    handler4 = (ids, dx = 0x10, dy = 0x10) => {
+    handler4 = (ids, dx = 16, dy = 16) => {
       const response = handler2('node.duplicate', {
         ids: ids,
         dx: dx,
@@ -209,9 +209,9 @@ export function createCanvasContextMenuController({
       enabled = state2['nodes'] || {},
       list3 = Array['isArray'](input['targetNodeIds']) ? input['targetNodeIds'] : [],
       list4 = list3['filter']((output) => !!enabled[output]);
-    if (list4['length'] === 0x0) return null;
+    if (list4['length'] === 0) return null;
     const sourceId2 =
-        input['primaryNodeId'] && enabled[input['primaryNodeId']] ? input['primaryNodeId'] : list4[0x0],
+        input['primaryNodeId'] && enabled[input['primaryNodeId']] ? input['primaryNodeId'] : list4[0],
       value2 = sourceId2 ? enabled[sourceId2] : null,
       list5 = [],
       handler5 = (value3, value4, value5, value6) => pushRow(list5, value3, value4, value5, value6),
@@ -270,7 +270,7 @@ export function createCanvasContextMenuController({
         },
         { icon: 'compare', shortcutActionId: 'context-canvas-material-comparison' },
       );
-    list6['length'] >= 0x2 &&
+    list6['length'] >= 2 &&
       handler5(
         t('canvasInteraction.contextMenu.createCollage'),
         '',
@@ -279,7 +279,7 @@ export function createCanvasContextMenuController({
         },
         { icon: 'collage', shortcutActionId: 'context-canvas-create-collage' },
       );
-    if (value2 && list4['length'] === 0x1) {
+    if (value2 && list4['length'] === 1) {
       const value10 = ['ai-image', 'source-image', 'storyboard']['includes'](value2['type']),
         value11 = value2['imageUrl'] || value2['sourceUrl'] || value2['src'] || value2['localPath'];
       value10 &&
@@ -313,7 +313,7 @@ export function createCanvasContextMenuController({
       canShowItemInFolder2 = ![],
       canOpenKnownFolder2 = ![];
     value2 &&
-      list4['length'] === 0x1 &&
+      list4['length'] === 1 &&
       ((nodeLocalPathForNativeAction = resolveNodeLocalPathForNativeAction(value2)),
       (canShowItemInFolder2 = canShowItemInFolder(nodeLocalPathForNativeAction)),
       (canOpenKnownFolder2 = canOpenKnownFolder('output')));
@@ -355,10 +355,10 @@ export function createCanvasContextMenuController({
         const state3 = run2(),
           enabled2 = state3['nodes'] || {},
           list7 = (state3['selectedNodeIds'] || [])['filter']((value13) => !!enabled2[value13]),
-          value14 = list7['length'] > 0x0 ? list7 : [...list4],
+          value14 = list7['length'] > 0 ? list7 : [...list4],
           box2 = calcNodesBBox(enabled2, value14),
-          value15 = Math['max'](0x118, box2?.['width'] || 0x0),
-          value16 = Math['max'](0x12c, box2?.['height'] || 0x0),
+          value15 = Math['max'](280, box2?.['width'] || 0),
+          value16 = Math['max'](300, box2?.['height'] || 0),
           box3 = (sourceId2 && enabled2[sourceId2]) || box2;
         if (!box3) return;
         const box4 = calcSafeSpawnPosNearNode(enabled2, box3, value15, value16);
@@ -368,7 +368,7 @@ export function createCanvasContextMenuController({
       { icon: 'duplicate', shortcutActionId: 'context-canvas-duplicate' },
     );
     value2 &&
-      list4['length'] === 0x1 &&
+      list4['length'] === 1 &&
       ['ai-text', 'source-text']['includes'](value2['type']) &&
       handler5(
         t('canvasInteraction.contextMenu.copyText'),
@@ -399,7 +399,7 @@ export function createCanvasContextMenuController({
       },
       { danger: !![], icon: 'delete', shortcutActionId: 'delete' },
     );
-    if (value2 && list4['length'] === 0x1) {
+    if (value2 && list4['length'] === 1) {
       handler6();
       const list8 = AI_GENERATION_TYPES['map'](getAiGenerationMenuItem)['filter']((type2) =>
         isValidConnection(value2, { id: '__fake_' + type2['type'], type: type2['type'] }),
@@ -483,8 +483,8 @@ export function createCanvasContextMenuController({
                 });
               handler('create_node', {
                 type: label5['type'],
-                x: x2 - width3['width'] / 0x2,
-                y: y2 - width3['height'] / 0x2,
+                x: x2 - width3['width'] / 2,
+                y: y2 - width3['height'] / 2,
                 width: width3['width'],
                 height: width3['height'],
                 name: label5['defaultName'] || label5['label'],
@@ -531,12 +531,12 @@ export function createCanvasContextMenuController({
     const historyInfo = getHistoryInfo();
     return (
       handler8(t('canvasInteraction.contextMenu.undo'), handler3('undo', 'Ctrl Z'), () => undo(), {
-        disabled: !(Number(historyInfo?.['undoCount']) > 0x0),
+        disabled: !(Number(historyInfo?.['undoCount']) > 0),
         iconEl: createNodeCreationMenuIcon('undo', { documentObject: documentObject }),
         shortcutActionId: 'undo',
       }),
       handler8(t('canvasInteraction.contextMenu.redo'), handler3('redo', 'Ctrl Y'), () => redo(), {
-        disabled: !(Number(historyInfo?.['redoCount']) > 0x0),
+        disabled: !(Number(historyInfo?.['redoCount']) > 0),
         iconEl: createNodeCreationMenuIcon('redo', { documentObject: documentObject }),
         shortcutActionId: 'redo',
       }),
@@ -568,7 +568,7 @@ export function createCanvasContextMenuController({
         ),
         handler10(
           t('canvasInteraction.contextMenu.cutNode'),
-          handler3('cut', 'Ctrl\x20X'),
+          handler3('cut', 'Ctrl X'),
           () => {
             (handler('copy', { ids: [value36] }),
               handler('delete_nodes', { ids: [value36] }),
@@ -582,8 +582,8 @@ export function createCanvasContextMenuController({
           () => {
             const list11 = run2()['selectedNodeIds'] || [],
               list12 = list11['includes'](value36) ? [...list11] : [value36],
-              value37 = list12['length'] === 0x1 ? box5['height'] || 0x118 : 0x12c,
-              box6 = calcSafeSpawnPosNearNode(value34, box5, 0x118, value37);
+              value37 = list12['length'] === 1 ? box5['height'] || 280 : 300,
+              box6 = calcSafeSpawnPosNearNode(value34, box5, 280, value37);
             (handler4(list12, box6['x'] - box5['x'], box6['y'] - box5['y']),
               windowObject?.['showToast']?.(
                 t('canvasInteraction.toasts.duplicateWithEdgesCreated'),
@@ -637,8 +637,8 @@ export function createCanvasContextMenuController({
               type4 === 'ai-image' || type4 === 'ai-video'
                 ? getAIGenerationNodeSize(width4['width'], width4['height'])
                 : { width: width4['width'], height: width4['height'] };
-            let x4 = x3 - width5['width'] / 0x2,
-              y4 = y3 - width5['height'] / 0x2;
+            let x4 = x3 - width5['width'] / 2,
+              y4 = y3 - width5['height'] / 2;
             if (box5) {
               const box7 = calcSafeSpawnPosNearNode(value34, box5, width5['width'], width5['height']);
               ((x4 = box7['x']), (y4 = box7['y']));

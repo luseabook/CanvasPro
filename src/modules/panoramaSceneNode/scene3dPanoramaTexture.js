@@ -1,19 +1,19 @@
 import * as threeRuntime from './threeRuntime.js';
 import { fetchRemoteBlob } from '../../../api/projectsV2Api.js';
-const PANORAMA_TEXTURE_FETCH_TIMEOUT_MS = 0x3a98;
+const PANORAMA_TEXTURE_FETCH_TIMEOUT_MS = 15000;
 function createAbortError() {
   if (typeof DOMException === 'function')
-    return new DOMException('Panorama\x20texture\x20load\x20aborted', 'AbortError');
-  const error = new Error('Panorama\x20texture\x20load\x20aborted');
+    return new DOMException('Panorama texture load aborted', 'AbortError');
+  const error = new Error('Panorama texture load aborted');
   return ((error['name'] = 'AbortError'), error);
 }
 function isUsableBlob(value) {
   return Boolean(value && typeof value['arrayBuffer'] === 'function');
 }
 function createTextureFromImageBitmap(box) {
-  const count = Number(box?.['width']) || 0x0,
-    count2 = Number(box?.['height']) || 0x0;
-  if (count <= 0x0 || count2 <= 0x0) return (box?.['close']?.(), null);
+  const count = Number(box?.['width']) || 0,
+    count2 = Number(box?.['height']) || 0;
+  if (count <= 0 || count2 <= 0) return (box?.['close']?.(), null);
   const el = new threeRuntime['Texture'](box);
   el['flipY'] = ![];
   let item = ![];
@@ -98,9 +98,9 @@ export function configureInsideSpherePanoramaTexture(enabled3, handle, { isPrevi
     (enabled3['magFilter'] = threeRuntime['LinearFilter']),
     (enabled3['generateMipmaps'] = !isPreview),
     (enabled3['anisotropy'] = isPreview
-      ? 0x1
-      : Math['min'](0x8, handle?.['capabilities']?.['getMaxAnisotropy']?.() || 0x1)),
-    enabled3['repeat']['set'](-0x1, 0x1),
-    enabled3['offset']['set'](0x1, 0x0),
+      ? 1
+      : Math['min'](8, handle?.['capabilities']?.['getMaxAnisotropy']?.() || 1)),
+    enabled3['repeat']['set'](-1, 1),
+    enabled3['offset']['set'](1, 0),
     (enabled3['needsUpdate'] = !![]));
 }

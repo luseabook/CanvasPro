@@ -10,14 +10,14 @@ export async function startFileSavePathMigration(settings, { confirmed = false }
   return await post(
     '/api/v2/user/file-save-paths/migration/start',
     { settings: settings || {}, confirmed: confirmed === true },
-    { provider: 'local', timeout: 0x2710 },
+    { provider: 'local', timeout: 10000 },
   );
 }
 export async function fetchFileSavePathMigrationStatus(item) {
   const encodeURIComponent2 = encodeURIComponent(String(item || ''));
   return await get('/api/v2/user/file-save-paths/migration/status?jobId=' + encodeURIComponent2, {
     provider: 'local',
-    timeout: 0x2710,
+    timeout: 10000,
   });
 }
 export async function fetchLegacyFileSaveCandidates() {

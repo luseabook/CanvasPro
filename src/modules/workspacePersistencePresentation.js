@@ -1,6 +1,6 @@
 export function createWorkspacePersistencePresentation({
   getRoot: getRoot,
-  showDelayMs: showDelayMs = 0x12c,
+  showDelayMs: showDelayMs = 300,
   setTimeoutFn: setTimeoutFn = globalThis['setTimeout']?.['bind'](globalThis),
   clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout']?.['bind'](globalThis),
 } = {}) {
@@ -30,7 +30,7 @@ export function createWorkspacePersistencePresentation({
         el['setAttribute']('role', 'status'),
         el['setAttribute']('aria-live', 'polite'),
         (el3 = el5['createElement']('span')),
-        (el3['className'] = 'storyboard-script-loading-spinner\x20workspace-persistence-spinner'),
+        (el3['className'] = 'storyboard-script-loading-spinner workspace-persistence-spinner'),
         el3['setAttribute']('aria-hidden', 'true'),
         (el2 = el5['createElement']('span')),
         el['appendChild'](el3),
@@ -39,7 +39,7 @@ export function createWorkspacePersistencePresentation({
       const key = response2['status'] || 'idle';
       if (key === 'error') value = String(response2['error'] || '');
       if (key === 'saved' || key === 'idle') value = '';
-      const index = key === 'saving' && Number(response2['retryAttempt']) > 0x0,
+      const index = key === 'saving' && Number(response2['retryAttempt']) > 0,
         result = key === 'error' || index || Boolean(value);
       if (key !== 'saving' || result) run();
       if (result) el['hidden'] = ![];
@@ -61,7 +61,7 @@ export function createWorkspacePersistencePresentation({
           ? '保存失败，正在重试' + (value ? '：' + value : '')
           : key === 'error' || (value && key === 'pending')
             ? '尚未保存' +
-              (Number(response2['retryAttempt']) > 0x0 ? '，将自动重试' : '') +
+              (Number(response2['retryAttempt']) > 0 ? '，将自动重试' : '') +
               (value ? '：' + value : '')
             : '正在保存…'));
     },

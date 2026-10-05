@@ -98,7 +98,7 @@ export function buildFileManagerHistoryEntryKey({
   canvasId: canvasId = '',
   generationRunId: generationRunId = '',
   mediaKind: mediaKind = '',
-  sourceIndex: sourceIndex = 0x0,
+  sourceIndex: sourceIndex = 0,
   localPath: localPath = '',
   resultFingerprint: resultFingerprint = '',
 } = {}) {
@@ -112,7 +112,7 @@ export function buildFileManagerHistoryEntryKey({
       String(mediaKind || '')
         ['trim']()
         ['toLowerCase'](),
-      Math['max'](0x0, Math['trunc'](Number(sourceIndex) || 0x0)),
+      Math['max'](0, Math['trunc'](Number(sourceIndex) || 0)),
     ]['join'](':');
   return buildFileManagerHistoryMediaKey({
     projectId: projectId,
@@ -124,7 +124,7 @@ export function buildFileManagerHistoryEntryKey({
 }
 
 function defaultHistoryLocalPath(state) {
-  const handle = Array['isArray'](state?.['nodes']) ? state['nodes'][0x0] : null;
+  const handle = Array['isArray'](state?.['nodes']) ? state['nodes'][0] : null;
   return String(
     state?.['localPath'] ||
       handle?.['originalLocalPath'] ||
@@ -142,10 +142,10 @@ export function isFileManagerHistoryBackfillRecord(config) {
   const scope = String(config?.['historyCaptureSource'] || '')['trim']();
   if (scope) return scope === 'backfill';
   if (!String(config?.['generationRunId'] || '')['trim']()) return ![];
-  const count = Number(config?.['generationStartedAt'] || 0x0),
-    input = Number(config?.['createdAt'] || 0x0),
-    output = Math['max'](0x0, Math['trunc'](Number(config?.['sourceIndex']) || 0x0));
-  return Number['isFinite'](count) && count > 0x0 && Number['isFinite'](input) && input === count + output;
+  const count = Number(config?.['generationStartedAt'] || 0),
+    input = Number(config?.['createdAt'] || 0),
+    output = Math['max'](0, Math['trunc'](Number(config?.['sourceIndex']) || 0));
+  return Number['isFinite'](count) && count > 0 && Number['isFinite'](input) && input === count + output;
 }
 
 function buildFileManagerBackfillMatchKey(
@@ -167,7 +167,7 @@ function buildFileManagerBackfillMatchKey(
   if (!fileManagerHistoryMediaKey) return '';
   return [
     enabled2,
-    Math['max'](0x0, Math['trunc'](Number(value2?.['sourceIndex']) || 0x0)),
+    Math['max'](0, Math['trunc'](Number(value2?.['sourceIndex']) || 0)),
     fileManagerHistoryMediaKey,
   ]['join'](':');
 }
@@ -201,11 +201,11 @@ export function resolveFileManagerBackfillStartedAt(value7) {
     value7?.['createdAt'],
   ]) {
     const count2 = Number(value8);
-    if (Number['isFinite'](count2) && count2 > 0x0) return Math['trunc'](count2);
+    if (Number['isFinite'](count2) && count2 > 0) return Math['trunc'](count2);
   }
   const value9 = String(value7?.['id'] || '')['match'](/\d{13}/g) || [],
-    count3 = Number(value9[value9['length'] - 0x1] || 0x0);
-  return Number['isFinite'](count3) && count3 > 0x0 ? Math['trunc'](count3) : 0x1;
+    count3 = Number(value9[value9['length'] - 1] || 0);
+  return Number['isFinite'](count3) && count3 > 0 ? Math['trunc'](count3) : 1;
 }
 
 export function dedupeFileManagerHistoryRecords(
@@ -216,8 +216,8 @@ export function dedupeFileManagerHistoryRecords(
   } = {},
 ) {
   const value12 = [...(Array['isArray'](value10) ? value10 : [])]['sort']((value13, value14) => {
-      const value15 = Number(value13?.['updatedAt'] || value13?.['createdAt'] || 0x0),
-        value16 = Number(value14?.['updatedAt'] || value14?.['createdAt'] || 0x0);
+      const value15 = Number(value13?.['updatedAt'] || value13?.['createdAt'] || 0),
+        value16 = Number(value14?.['updatedAt'] || value14?.['createdAt'] || 0);
       return value16 - value15;
     }),
     value17 = value12['filter']((value18) => !isFileManagerHistoryBackfillRecord(value18)),

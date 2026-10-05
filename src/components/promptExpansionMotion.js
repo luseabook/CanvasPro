@@ -22,21 +22,21 @@ export function createPromptExpansionMotion(el) {
     const transform = (box4) =>
         'translate(' +
         (box4['x'] - box2['x']) +
-        'px,\x20' +
+        'px, ' +
         (box4['y'] - box2['y']) +
         'px) scale(' +
         box4['width'] / box2['width'] +
-        ',\x20' +
+        ', ' +
         box4['height'] / box2['height'] +
         ')',
       result = {
-        duration: closing ? 0xf0 : 0x140,
-        easing: 'cubic-bezier(0.22,\x201,\x200.36,\x201)',
+        duration: closing ? 240 : 320,
+        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
         fill: 'both',
       },
       data = el['animate'](
         [
-          { transform: transform(box), transformOrigin: '0\x200', filter: 'blur(0px)' },
+          { transform: transform(box), transformOrigin: '0 0', filter: 'blur(0px)' },
           { offset: 0.35, filter: 'blur(1.5px)' },
           { transform: transform(box3), transformOrigin: '0 0', filter: 'blur(0px)' },
         ],
@@ -44,7 +44,7 @@ export function createPromptExpansionMotion(el) {
       );
     ((data['id'] = 'prompt-expansion'),
       (value2 = data),
-      overlay && (value3 = overlay['animate']({ opacity: closing ? [index, 0x0] : [0x0, 0x1] }, result)),
+      overlay && (value3 = overlay['animate']({ opacity: closing ? [index, 0] : [0, 1] }, result)),
       data['finished']
         ['then'](() => {
           if (value2 !== data) return;

@@ -33,8 +33,8 @@ const RH_HAILUO_H3_MODE_FIELD_ID = 'rh_hailuo_h3_mode',
     Object['freeze']({ value: 'ultra', label: '超清' }),
   ]),
   RH_HAILUO_H3_DURATION_OPTIONS = Object['freeze'](
-    Array['from']({ length: 0xd }, (value, item) => {
-      const value2 = item + 0x3;
+    Array['from']({ length: 13 }, (value, item) => {
+      const value2 = item + 3;
       return Object['freeze']({ value: value2, label: value2 + 's', displayLabel: value2 + 'S' });
     }),
   );
@@ -63,7 +63,7 @@ const RH_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([
       label: '首帧',
       mode: 'frames',
       description: '可选；不接图片时自动使用文生视频',
-      displayOrder: 0xa,
+      displayOrder: 10,
     }),
     createModeSlot({
       id: 'lastFrame',
@@ -71,14 +71,14 @@ const RH_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([
       label: '尾帧',
       mode: 'frames',
       description: '可选；可单独接入尾帧，也可与首帧配合',
-      displayOrder: 0x14,
+      displayOrder: 20,
     }),
   ]),
   RH_HAILUO_H3_INPUT_POLICY_VARIANTS = Object['freeze']([
     Object['freeze']({
       when: Object['freeze']({ field: RH_HAILUO_H3_MODE_FIELD_ID, value: 'frames' }),
       allowedKinds: Object['freeze'](['text', 'image']),
-      maxByKind: Object['freeze']({ image: 0x2, video: 0x0, audio: 0x0 }),
+      maxByKind: Object['freeze']({ image: 2, video: 0, audio: 0 }),
     }),
   ]);
 export const RH_VIDEO_HAILUO_H3_OMNI_HELP_TOOLTIP = [
@@ -86,7 +86,7 @@ export const RH_VIDEO_HAILUO_H3_OMNI_HELP_TOOLTIP = [
   '首尾帧：不接图片时为文生视频；可单独接首帧或尾帧，也可同时接入。',
   '全能参考：至少接入一种素材，最多支持 9 张图片、3 个视频和 3 个音频；支持仅音频搭配提示词。',
   '清晰度决定长边尺寸，比例决定横竖构图，最终宽高会对齐到 32 的倍数。',
-]['join']('\x0a');
+]['join']('\n');
 export const rhVideoHailuoH3OmniModelManifest = createRunningHubVideoModelManifest({
   modelId: RH_VIDEO_HAILUO_H3_OMNI_MODEL_ID,
   executionId: RH_VIDEO_HAILUO_H3_OMNI_EXECUTION_ID,
@@ -99,11 +99,11 @@ export const rhVideoHailuoH3OmniModelManifest = createRunningHubVideoModelManife
   inputSlots: {
     allowedKinds: ['text', 'image', 'video', 'audio'],
     minByKind: {},
-    maxByKind: { image: 0x9, video: 0x3, audio: 0x3 },
+    maxByKind: { image: 9, video: 3, audio: 3 },
     displayAspectRatioSource: Object['freeze']({
       kind: 'image',
       slots: Object['freeze'](['firstFrame', 'lastFrame']),
-      fallbackIndex: 0x0,
+      fallbackIndex: 0,
     }),
     fixedSlots: RH_HAILUO_H3_FIXED_INPUT_SLOTS,
     cycleFixedInputWhenFull: !![],
@@ -150,10 +150,10 @@ export const rhVideoHailuoH3OmniModelManifest = createRunningHubVideoModelManife
       placement: 'resolution',
       variant: 'durationPill',
       label: '视频时长',
-      defaultValue: 0x5,
-      min: 0x3,
-      max: 0xf,
-      step: 0x1,
+      defaultValue: 5,
+      min: 3,
+      max: 15,
+      step: 1,
       options: RH_HAILUO_H3_DURATION_OPTIONS,
     }),
     Object['freeze']({
@@ -187,7 +187,7 @@ export const rhVideoHailuoH3OmniModelManifest = createRunningHubVideoModelManife
 });
 export const rhVideoHailuoH3OmniExecutionManifest = createRunningHubVideoExecutionManifest({
   id: RH_VIDEO_HAILUO_H3_OMNI_EXECUTION_ID,
-  label: '海螺H3\x20全能版',
+  label: '海螺H3 全能版',
   workflowId: '2084286867645755393',
   submitMode: 'runninghub-task-create',
   queryMode: 'runninghubwf-query',
@@ -197,7 +197,7 @@ export const rhVideoHailuoH3OmniExecutionManifest = createRunningHubVideoExecuti
     }),
     payloadResolver: 'runninghubHailuoH3Omni',
     collectMediaInputs: !![],
-    taskCreate: Object['freeze']({ retainSeconds: 0x3c }),
+    taskCreate: Object['freeze']({ retainSeconds: 60 }),
   }),
   mapping: {
     promptNode: Object['freeze']({ nodeId: '59', fieldName: 'value' }),
@@ -214,9 +214,9 @@ export const rhVideoHailuoH3OmniExecutionManifest = createRunningHubVideoExecuti
     secondsNode: Object['freeze']({
       nodeId: '14',
       fieldName: 'value',
-      defaultValue: 0x5,
-      min: 0x3,
-      max: 0xf,
+      defaultValue: 5,
+      min: 3,
+      max: 15,
     }),
     widthNode: Object['freeze']({ nodeId: '46', fieldName: 'value' }),
     heightNode: Object['freeze']({ nodeId: '78', fieldName: 'value' }),
@@ -228,15 +228,15 @@ export const rhVideoHailuoH3OmniExecutionManifest = createRunningHubVideoExecuti
       valueMap: Object['freeze']({ none: '0', turbo: '1', fourStepLora: '2' }),
     }),
     qualityLongEdges: Object['freeze']({
-      draft: 0x260,
-      economy: 0x3c0,
-      standard: 0x560,
-      high: 0x680,
-      ultra: 0x780,
+      draft: 608,
+      economy: 960,
+      standard: 1376,
+      high: 1664,
+      ultra: 1920,
     }),
     defaultQuality: 'economy',
     defaultAspectRatio: '自适应',
-    dimensionMultiple: 0x20,
+    dimensionMultiple: 32,
     imageLoaderNodes: Object['freeze'](
       ['60', '72', '128', '129', '164', '165', '178', '179', '180']['map']((nodeId) =>
         Object['freeze']({ nodeId: nodeId, fieldName: 'image' }),

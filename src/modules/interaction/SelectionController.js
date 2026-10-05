@@ -69,7 +69,7 @@ export function createSelectionController({
     if (enabled2 && enabled2.active) {
       for (const box of Object.values(nodes)) {
         if (box.id === enabled2.sourceNodeId || isNodeType(box, 'group')) continue;
-        const payload = box.x + (box.width || 0x104) / 2,
+        const payload = box.x + (box.width || 260) / 2,
           handle = box.y + (box.height || 100) / 2;
         if (payload >= x && payload <= x2 && handle >= y && handle <= y2) {
           const state = enabled2.handleDirection === 'left',
@@ -88,7 +88,7 @@ export function createSelectionController({
     }
     const list = [];
     for (const box2 of Object.values(nodes)) {
-      const config = box2.x + (box2.width || 0x104),
+      const config = box2.x + (box2.width || 260),
         scope = box2.y + (box2.height || 100);
       if (isNodeType(box2, 'group')) {
         const input = box2.x >= x && config <= x2 && box2.y >= y && scope <= y2;

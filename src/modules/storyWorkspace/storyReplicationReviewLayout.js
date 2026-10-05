@@ -3,17 +3,17 @@ export function bindStoryReplicationReviewLayout(el, box) {
   const layout = el['querySelector']('.story-source-review-layout');
   let signal = null;
   function run(value, item) {
-    const key = value === 'left' ? 0xc : box['left'] + 0x14,
-      index = value === 'left' ? Math['min'](0x26, box['right'] - 0x14) : 0x4b;
+    const key = value === 'left' ? 12 : box['left'] + 20,
+      index = value === 'left' ? Math['min'](38, box['right'] - 20) : 75;
     ((box[value] = Math['max'](key, Math['min'](index, item))),
       layout['style']['setProperty']('--review-left', box['left'] + 'fr'),
       layout['style']['setProperty']('--review-middle', box['right'] - box['left'] + 'fr'),
-      layout['style']['setProperty']('--review-right', 0x64 - box['right'] + 'fr'),
+      layout['style']['setProperty']('--review-right', 100 - box['right'] + 'fr'),
       layout['querySelectorAll']('[data-review-splitter]')['forEach']((el2) => {
         const result = el2['dataset']['reviewSplitter'] === 'left';
         (el2['setAttribute']('aria-valuenow', Math['round'](box[el2['dataset']['reviewSplitter']])),
-          el2['setAttribute']('aria-valuemin', result ? 0xc : box['left'] + 0x14),
-          el2['setAttribute']('aria-valuemax', result ? Math['min'](0x26, box['right'] - 0x14) : 0x4b));
+          el2['setAttribute']('aria-valuemin', result ? 12 : box['left'] + 20),
+          el2['setAttribute']('aria-valuemax', result ? Math['min'](38, box['right'] - 20) : 75));
       }));
   }
   function run2(event) {
@@ -37,7 +37,7 @@ export function bindStoryReplicationReviewLayout(el, box) {
       event2['stopPropagation'](),
       run(
         el3['dataset']['reviewSplitter'],
-        box[el3['dataset']['reviewSplitter']] + (event2['key'] === 'ArrowLeft' ? -0x2 : 0x2),
+        box[el3['dataset']['reviewSplitter']] + (event2['key'] === 'ArrowLeft' ? -2 : 2),
       ));
     const args = event2['target']['closest']('.story-source-tabs [data-replication-tab]');
     if (!args || !['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](event2['key'])) return;
@@ -45,10 +45,10 @@ export function bindStoryReplicationReviewLayout(el, box) {
     const list = [...args['parentElement']['querySelectorAll']('button')],
       options =
         event2['key'] === 'Home'
-          ? 0x0
+          ? 0
           : event2['key'] === 'End'
-            ? list['length'] - 0x1
-            : (list['indexOf'](args) + (event2['key'] === 'ArrowLeft' ? -0x1 : 0x1) + list['length']) %
+            ? list['length'] - 1
+            : (list['indexOf'](args) + (event2['key'] === 'ArrowLeft' ? -1 : 1) + list['length']) %
               list['length'];
     (list[options]['focus']({ preventScroll: !![] }), list[options]['click']());
   }

@@ -41,8 +41,8 @@ function resolveNodeSrc(index, data) {
 }
 function getResultNodeSize(source, box) {
   if (source === 'audio')
-    return { width: Number(box?.width || 0) || 0x140, height: Number(box?.height || 0) || 140 };
-  return getAutoMediaSizeByShortSide(box?.width || 0x200, box?.height || 0x120);
+    return { width: Number(box?.width || 0) || 320, height: Number(box?.height || 0) || 140 };
+  return getAutoMediaSizeByShortSide(box?.width || 512, box?.height || 288);
 }
 function buildComposedNodePayload(
   next,
@@ -83,19 +83,19 @@ async function runMediaComposeRequest(kind, srcs2) {
   if (canUseElectronMediaTask())
     return await enqueueElectronMediaTask(
       { kind: kind.taskKind, srcs: srcs2, args: { srcs: srcs2 } },
-      { wait: true, timeout: 0x927c0 },
+      { wait: true, timeout: 600000 },
     );
   const response = await requester({
     url: kind.endpoint,
     method: 'POST',
     provider: 'local',
-    timeout: 0x493e0,
+    timeout: 300000,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ srcs: srcs2 }),
     allow404Null: true,
     returnMeta: true,
   });
-  if (response?.status === 0x194 || response?.data == null)
+  if (response?.status === 404 || response?.data == null)
     throw new Error(mediaComposeText(kind, 'missingApi'));
   return response.data || {};
 }
@@ -204,11 +204,11 @@ function buildAudioVoiceComposedNodePayload(
     thumbLocalPath: String(result?.['thumbLocalPath'] || value9)['trim'](),
     posterUrl: value10,
     thumbUrl: String(result?.['thumbUrl'] || value10)['trim'](),
-    videoDuration: Number(result?.['videoDuration'] || result?.['duration'] || 0x0) || 0x0,
-    videoWidth: Number(result?.['videoWidth'] || result?.['width'] || 0x0) || 0x0,
-    videoHeight: Number(result?.['videoHeight'] || result?.['height'] || 0x0) || 0x0,
-    videoFps: Number(result?.['videoFps'] || result?.['fps'] || 0x0) || 0x0,
-    fps: Number(result?.['fps'] || result?.['videoFps'] || 0x0) || 0x0,
+    videoDuration: Number(result?.['videoDuration'] || result?.['duration'] || 0) || 0,
+    videoWidth: Number(result?.['videoWidth'] || result?.['width'] || 0) || 0,
+    videoHeight: Number(result?.['videoHeight'] || result?.['height'] || 0) || 0,
+    videoFps: Number(result?.['videoFps'] || result?.['fps'] || 0) || 0,
+    fps: Number(result?.['fps'] || result?.['videoFps'] || 0) || 0,
     needsAutoResize: ![],
     fixedSize: !![],
   });
@@ -225,7 +225,7 @@ async function composeMediaSourcesNearNode({
   const list4 = (Array['isArray'](srcs) ? srcs : [])
     ['map']((value11) => String(value11 || '')['trim']())
     ['filter'](Boolean);
-  if (list4['length'] < 0x2)
+  if (list4['length'] < 2)
     return (window['showToast']?.(mediaComposeText(enabled3, 'invalidSource'), 'error'), null);
   triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = !![]));
   window['showToast']?.(mediaComposeText(enabled3, 'progress'), 'info');
@@ -288,14 +288,14 @@ export async function composeAudioVoiceTimelineNearNode({
   sourceKind: sourceKind = 'video',
   src: src = '',
   clips: clips = [],
-  durationSec: durationSec = 0x0,
+  durationSec: durationSec = 0,
   anchorNode: anchorNode = null,
   triggerEl: triggerEl = null,
 } = {}) {
   const value16 = sourceKind === 'audio' ? 'audio' : 'video',
     enabled4 = String(src || '')['trim'](),
     value17 = (Array['isArray'](clips) ? clips : [])['filter']((value18) => value18?.['src']);
-  if (!enabled4 || value17['length'] <= 0x0)
+  if (!enabled4 || value17['length'] <= 0)
     return (window['showToast']?.(audioVoiceComposeText('invalidSource'), 'error'), null);
   if (!canUseElectronMediaTask())
     return (window['showToast']?.(audioVoiceComposeText('missingTask'), 'error'), null);
@@ -311,7 +311,7 @@ export async function composeAudioVoiceTimelineNearNode({
           src: enabled4,
           args: { sourceKind: value16, durationSec: durationSec, clips: value17 },
         },
-        { wait: !![], timeout: 0x927c0 },
+        { wait: !![], timeout: 600000 },
       ),
       resultLocalPath2 = pickResultLocalPath(enqueueElectronMediaTask2);
     if (!enqueueElectronMediaTask2?.['success'] || !resultLocalPath2)

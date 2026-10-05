@@ -14,7 +14,7 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
     value = list['length'] ? '正在显示缓存的更新说明' : '',
     el = null,
     enabled3 = ![];
-  const map = new Set(list['slice'](0x0, 0x1)['map']((item) => item['tag_name']));
+  const map = new Set(list['slice'](0, 1)['map']((item) => item['tag_name']));
   function run() {
     if (!el?.['isConnected'] || enabled3) return;
     const key = el['scrollTop'];
@@ -26,7 +26,7 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
     const el3 = document['createElement']('button');
     ((el3['type'] = 'button'),
       (el3['className'] = 'tutorial-action'),
-      (el3['textContent'] = 'GitHub\x20全部版本\x20↗'),
+      (el3['textContent'] = 'GitHub 全部版本 ↗'),
       (el3['onclick'] = () => void external(TUTORIAL_RELEASES_URL)),
       index['append'](el2, el3),
       el['append'](index));
@@ -38,7 +38,7 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
       el5['textContent'] = dom['tag_name'];
       const el6 = document['createElement']('time');
       ((el6['className'] = 'tutorial-description'),
-        (el6['textContent'] = dom['published_at']['slice'](0x0, 0xa)),
+        (el6['textContent'] = dom['published_at']['slice'](0, 10)),
         result['append'](el5, el6));
       const el7 = document['createElement']('div');
       ((el7['className'] = 'tutorial-notes'),
@@ -59,17 +59,17 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
     try {
       const list2 = await fetchTutorialReleases({ signal: signal['signal'] });
       if (enabled3 || enabled !== signal) return;
-      if (!list['length'] && list2['length']) map['add'](list2[0x0]['tag_name']);
+      if (!list['length'] && list2['length']) map['add'](list2[0]['tag_name']);
       ((list = list2),
         (enabled2 = !![]),
-        (value = list['length'] ? '来自\x20GitHub\x20正式发布记录' : '暂无正式发布记录'));
+        (value = list['length'] ? '来自 GitHub 正式发布记录' : '暂无正式发布记录'));
       try {
         storage?.['setItem'](CACHE_KEY, JSON['stringify'](list));
       } catch {}
     } catch {
       if (enabled3 || enabled !== signal) return;
       value = list['length']
-        ? 'GitHub\x20暂不可用，显示上次获取的更新说明'
+        ? 'GitHub 暂不可用，显示上次获取的更新说明'
         : 'GitHub 暂不可用，请刷新重试或打开仓库查看';
     } finally {
       !enabled3 && enabled === signal && ((enabled = null), run());

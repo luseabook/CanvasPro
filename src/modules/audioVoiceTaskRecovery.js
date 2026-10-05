@@ -9,7 +9,7 @@ export function patchAudioVoicePersistedAnalysisSegment(segments2 = {}, item = '
   const text = normalizeText(item);
   if (!text || !args || typeof args !== 'object' || !Array['isArray'](segments2?.['segments'])) return null;
   const count = segments2['segments']['findIndex']((key) => normalizeText(key?.['id']) === text);
-  if (count < 0x0) return null;
+  if (count < 0) return null;
   return {
     ...segments2,
     segments: segments2['segments']['map']((args2, index) =>
@@ -69,7 +69,7 @@ export function createAudioVoiceTaskRecoveryManager({
       adapterType = normalizeText(modelOption?.['adapterType']) || 'workflow',
       audioWorkflowKey = resolveAudioVoiceTaskModelId(segment, modelOption),
       startedAt =
-        Number(segment?.['generationStartTime'] || segment?.['rhTaskStartedAt'] || 0x0) || Date['now'](),
+        Number(segment?.['generationStartTime'] || segment?.['rhTaskStartedAt'] || 0) || Date['now'](),
       cancelledBuilder = () => ({ status: 'edited', error: '', rhStatusMessage: cancelledMessage2 });
     if (!taskId)
       return cancelTaskFn(targetNodeId, {

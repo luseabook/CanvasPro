@@ -11,12 +11,12 @@ export function animatePreviewOrder(list, handler) {
         box2 = el2['getBoundingClientRect'](),
         value = box['left'] - box2['left'],
         item = box['top'] - box2['top'];
-      if (Math['abs'](value) + Math['abs'](item) < 0x1) return;
+      if (Math['abs'](value) + Math['abs'](item) < 1) return;
       motions['set'](
         el2,
         el2['animate']?.(
           [{ transform: 'translate(' + value + 'px, ' + item + 'px)' }, { transform: 'translate(0, 0)' }],
-          { duration: 0xd2, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
+          { duration: 210, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
         ),
       );
     }));
@@ -29,11 +29,11 @@ export function showGroupPanel(el3, duration) {
     return;
   }
   const list2 = [
-      { opacity: 0x0, transform: 'translateY(6px) scale(.98)' },
-      { opacity: 0x1, transform: 'translateY(0) scale(1)' },
+      { opacity: 0, transform: 'translateY(6px) scale(.98)' },
+      { opacity: 1, transform: 'translateY(0) scale(1)' },
     ],
     key = el3['animate'](duration ? list2 : list2['slice']()['reverse'](), {
-      duration: duration ? 0xb4 : 0x78,
+      duration: duration ? 180 : 120,
       easing: 'ease-out',
     });
   (motions['set'](el3, key),

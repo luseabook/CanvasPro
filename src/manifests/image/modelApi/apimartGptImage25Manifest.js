@@ -15,7 +15,7 @@ const MODE_FIELD = Object['freeze']({
     menuTooltip: 'Flare 侧重生成速度，Sunburst 侧重编辑精度。两种模式计费标准相同。',
   }),
   QUALITY_DESCRIPTION =
-    '支持\x20low\x20/\x20medium\x20/\x20high\x20/\x20xhigh\x20/\x20max\x20五档质量。auto\x20由模型决定质量，提交时按当前尺寸的\x20max\x20档预留额度，完成后按实际用量结算。',
+    '支持 low / medium / high / xhigh / max 五档质量。auto 由模型决定质量，提交时按当前尺寸的 max 档预留额度，完成后按实际用量结算。',
   QUALITY_FIELD = Object['freeze']({
     ...APIMART_GPT_IMAGE_2_QUALITY_FIELD,
     showWhen: null,
@@ -34,7 +34,7 @@ export const apimartGptImage25ModelManifest = createImageModelApiManifest({
   modelId: APIMART_GPT_IMAGE_2_5_MODEL_ID,
   executionId: APIMART_GPT_IMAGE_2_5_EXECUTION_ID,
   provider: 'apimart',
-  displayName: 'GPT\x20image\x202.5',
+  displayName: 'GPT image 2.5',
   icon: 'AM',
   description: 'APIMart GPT Image 2.5 图像生成与编辑，支持 Flare / Sunburst。',
   inputSlots: IMAGE_MODEL_API_16_IMAGE_INPUT_SLOTS,
@@ -49,11 +49,11 @@ export const apimartGptImage25ModelManifest = createImageModelApiManifest({
     imageFunctionMenu: Object['freeze']({ enabled: !![] }),
     imageMenu: Object['freeze']({
       group: 'apimart',
-      order: 0x29,
+      order: 41,
       title: 'GPT image 2.5',
       subtitle: 'Flare 快速生成 / Sunburst 精细编辑，最多 16 张参考图',
       iconKind: 'apimartBadge',
-      gap: 0xa,
+      gap: 10,
     }),
   }),
 });
@@ -70,7 +70,7 @@ export const apimartGptImage25ExecutionManifest = createModelApiExecutionManifes
       path: 'n',
       from: 'param',
       field: Object['freeze'](['generationParams.batchSize', 'batchSize']),
-      defaultValue: 0x1,
+      defaultValue: 1,
       transform: 'apimartImageCount',
     }),
     Object['freeze']({
@@ -107,5 +107,5 @@ export const apimartGptImage25ExecutionManifest = createModelApiExecutionManifes
     urlTemplate: '{baseUrl}/v1/tasks/{taskId}?language=zh',
     headersMode: 'bearer',
   }),
-  extensions: Object['freeze']({ batchSubmitMode: 'providerN', maxBatchSize: 0x4 }),
+  extensions: Object['freeze']({ batchSubmitMode: 'providerN', maxBatchSize: 4 }),
 });

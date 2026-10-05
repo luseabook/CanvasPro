@@ -2,7 +2,7 @@ import { normalizePositiveNumber, normalizeText } from '../utils/storyGeneration
 import { parseStrictJson } from '../utils/strictJson.js';
 import { getResultText } from './storyTextRequest.js';
 import { invokeStoryGenerationRequest } from './storyInvocationEvidence.js';
-const MAX_NATURAL_SPOKEN_UNITS_PER_SECOND = 0x5;
+const MAX_NATURAL_SPOKEN_UNITS_PER_SECOND = 5;
 function countSpokenUnits(value) {
   const text = normalizeText(value),
     item = (text['match'](/[\p{Script=Han}]/gu) || [])['length'],
@@ -16,18 +16,18 @@ function extractSceneSpokenText(index) {
     ['filter'](Boolean)
     ['flatMap']((list) => {
       const count = [list['indexOf']('：'), list['indexOf'](':')]
-        ['filter']((count2) => count2 >= 0x0)
+        ['filter']((count2) => count2 >= 0)
         ['reduce']((data, options) => Math['min'](data, options), Number['POSITIVE_INFINITY']);
-      if (count < 0x0 || count > 0x18) return [];
-      const target = list['slice'](0x0, count)['trim']();
+      if (count < 0 || count > 24) return [];
+      const target = list['slice'](0, count)['trim']();
       if (/字幕|屏幕|文字|音效/u['test'](target)) return [];
-      const args = list['slice'](count + 0x1)['trim']();
+      const args = list['slice'](count + 1)['trim']();
       if (!args) return [];
-      const list2 = [...args['matchAll'](/[“"]([^”"]+)[”"]/gu)]['map']((source) => source[0x1]);
+      const list2 = [...args['matchAll'](/[“"]([^”"]+)[”"]/gu)]['map']((source) => source[1]);
       if (list2['length']) return list2;
       return /^(旁白|VO|OS|画外音)$/iu['test'](target) ? [args] : [];
     })
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function createStoryEpisodeScriptRuntimeGuidance(options2 = {}) {
   const outlineEstimateSeconds = normalizePositiveNumber(
@@ -54,11 +54,11 @@ export function inspectStoryEpisodeScriptTiming(options3 = {}, next = {}) {
     current = (Array['isArray'](options3?.['scenes']) ? options3['scenes'] : [])
       ['map']((dom) => extractSceneSpokenText(dom?.['body']))
       ['filter'](Boolean)
-      ['join']('\x0a'),
+      ['join']('\n'),
     spokenUnits = countSpokenUnits(current),
     minimumSpokenDurationSeconds = spokenUnits
-      ? Number((spokenUnits / MAX_NATURAL_SPOKEN_UNITS_PER_SECOND)['toFixed'](0x1))
-      : 0x0;
+      ? Number((spokenUnits / MAX_NATURAL_SPOKEN_UNITS_PER_SECOND)['toFixed'](1))
+      : 0;
   return {
     status: 'observed',
     outlineEstimateSeconds: outlineEstimateSeconds2,
@@ -83,9 +83,9 @@ export function resolveStoryEpisodeSplitTimingBudget(options4 = {}) {
     targetDurationSeconds =
       positiveNumber && positiveNumber >= minimum && positiveNumber <= maximum
         ? positiveNumber
-        : Number(((minimum + maximum) / 0x2)['toFixed'](0x1)),
-    minimum2 = Number((minimum * 0.8)['toFixed'](0x1)),
-    maximum2 = Number((maximum * 1.2)['toFixed'](0x1)),
+        : Number(((minimum + maximum) / 2)['toFixed'](1)),
+    minimum2 = Number((minimum * 0.8)['toFixed'](1)),
+    maximum2 = Number((maximum * 1.2)['toFixed'](1)),
     sceneTimings = (Array['isArray'](enabled?.['sceneTimings']) ? enabled['sceneTimings'] : [])
       ['map']((entry) => ({
         sceneRef: normalizeText(entry?.['sceneRef']),
@@ -112,8 +112,8 @@ export function assertStoryEpisodeSplitTiming(options5 = {}, payload = {}) {
     totalDurationSeconds =
       normalizePositiveNumber(options5?.['totalDurationSeconds']) ||
       (Array['isArray'](options5?.['clips']) ? options5['clips'] : [])['reduce'](
-        (handle, state) => handle + (normalizePositiveNumber(state?.['durationSec']) || 0x0),
-        0x0,
+        (handle, state) => handle + (normalizePositiveNumber(state?.['durationSec']) || 0),
+        0,
       ),
     { minimum: minimum4, maximum: maximum4 } = storyEpisodeSplitTimingBudget['allowedProductionRangeSeconds'];
   if (totalDurationSeconds >= minimum4 && totalDurationSeconds <= maximum4) return options5;
@@ -145,10 +145,10 @@ function buildStoryEpisodeScriptTimingReviewPrompt({
 } = {}) {
   return JSON['stringify']({
     task: 'review_story_episode_script_timing',
-    schemaVersion: 0x2,
+    schemaVersion: 2,
     reviewMode: priorReview ? 'challenge_previous_review' : 'independent',
     episode: {
-      number: Math['max'](0x1, Math['trunc'](Number(episode?.['number']) || 0x1)),
+      number: Math['max'](1, Math['trunc'](Number(episode?.['number']) || 1)),
       title: normalizeText(episode?.['title']),
       synopsis: normalizeText(episode?.['synopsis']),
       hook: normalizeText(episode?.['hook']),
@@ -188,7 +188,7 @@ function normalizeTimingReviewFinding(config) {
       text4 ? '证据：' + text4 : '',
       text5 ? '建议：' + text5 : '',
     ]['filter'](Boolean);
-  if (list3['length']) return list3['join']('\x20');
+  if (list3['length']) return list3['join'](' ');
   try {
     return normalizeText(JSON['stringify'](config));
   } catch {
@@ -197,20 +197,20 @@ function normalizeTimingReviewFinding(config) {
 }
 function normalizeNonNegativeTimingNumber(scope) {
   const count3 = Number(scope);
-  if (!Number['isFinite'](count3) || count3 < 0x0) return null;
-  return Number(count3['toFixed'](0x1));
+  if (!Number['isFinite'](count3) || count3 < 0) return null;
+  return Number(count3['toFixed'](1));
 }
-function normalizeStoryEpisodeSceneTimings(options6 = {}, input = {}, output = 0x0) {
+function normalizeStoryEpisodeSceneTimings(options6 = {}, input = {}, output = 0) {
   const list4 = Array['isArray'](input?.['scenes']) ? input['scenes'] : [];
   if (!list4['length']) return [];
   if (!Array['isArray'](options6?.['sceneTimings']) || options6['sceneTimings']['length'] !== list4['length'])
     throw new Error('时长审查 Agent 未返回覆盖全部场次的逐场时长账本。');
   const list5 = list4['map']((value2, value3) => {
-      const text6 = normalizeText(value2?.['ref'] || value2?.['sceneRef'] || 'scene-' + (value3 + 0x1)),
+      const text6 = normalizeText(value2?.['ref'] || value2?.['sceneRef'] || 'scene-' + (value3 + 1)),
         value4 = options6['sceneTimings'][value3] || {},
         sceneRef = normalizeText(value4?.['sceneRef']);
       if (sceneRef !== text6)
-        throw new Error('时长审查\x20Agent\x20的逐场账本顺序或场次引用无效：应为\x20' + text6 + '。');
+        throw new Error('时长审查 Agent 的逐场账本顺序或场次引用无效：应为 ' + text6 + '。');
       const spokenSeconds = normalizeNonNegativeTimingNumber(value4?.['spokenSeconds']),
         nonOverlappingActionSeconds = normalizeNonNegativeTimingNumber(
           value4?.['nonOverlappingActionSeconds'],
@@ -227,9 +227,9 @@ function normalizeStoryEpisodeSceneTimings(options6 = {}, input = {}, output = 0
       )
         throw new Error('时长审查 Agent 的 ' + text6 + ' 逐场账本不完整。');
       const value5 = spokenSeconds + nonOverlappingActionSeconds + pauseAndTransitionSeconds,
-        value6 = Math['max'](0x2, totalSeconds * 0.05);
+        value6 = Math['max'](2, totalSeconds * 0.05);
       if (Math['abs'](value5 - totalSeconds) > value6)
-        throw new Error('时长审查 Agent 的 ' + text6 + '\x20分项时间无法合计到本场总时长。');
+        throw new Error('时长审查 Agent 的 ' + text6 + ' 分项时间无法合计到本场总时长。');
       return {
         sceneRef: sceneRef,
         spokenSeconds: spokenSeconds,
@@ -240,8 +240,8 @@ function normalizeStoryEpisodeSceneTimings(options6 = {}, input = {}, output = 0
         basis: basis,
       };
     }),
-    value7 = list5['reduce']((value8, value9) => value8 + value9['totalSeconds'], 0x0),
-    value10 = Math['max'](0x5, output * 0.05);
+    value7 = list5['reduce']((value8, value9) => value8 + value9['totalSeconds'], 0),
+    value10 = Math['max'](5, output * 0.05);
   if (Math['abs'](value7 - output) > value10)
     throw new Error('时长审查 Agent 的逐场总计与整集自然时长不一致。');
   return list5;
@@ -252,7 +252,7 @@ export async function requestStoryEpisodeScriptTimingReview({
   episode: episode = {},
   script: script = {},
   onInvocation: onInvocation = null,
-  attempt: attempt = 0x1,
+  attempt: attempt = 1,
   phase: phase = 'timing-review',
   priorReview: priorReview = null,
 } = {}) {
@@ -266,10 +266,10 @@ export async function requestStoryEpisodeScriptTimingReview({
           priorReview: priorReview,
         }),
         systemPrompt:
-          '你是短剧分集剧本的独立时长审查员。只测量自然表演时长并诊断可定位的问题；不得改写、压缩或输出替代正文，不按固定字数或固定集长套模板。只返回严格\x20JSON。',
+          '你是短剧分集剧本的独立时长审查员。只测量自然表演时长并诊断可定位的问题；不得改写、压缩或输出替代正文，不按固定字数或固定集长套模板。只返回严格 JSON。',
         temperature: 0.1,
         thinking: { type: 'disabled' },
-        maxOutputTokens: 0x2000,
+        maxOutputTokens: 8192,
       },
       stepId: phase,
       attempt: attempt,
@@ -291,7 +291,7 @@ export async function requestStoryEpisodeScriptTimingReview({
     throw new Error('时长审查 Agent 返回的自然时长区间无效。');
   let reason = normalizeText(strictJson?.['reason']),
     findings = Array['isArray'](strictJson?.['findings'])
-      ? strictJson['findings']['map'](normalizeTimingReviewFinding)['filter'](Boolean)['slice'](0x0, 0xc)
+      ? strictJson['findings']['map'](normalizeTimingReviewFinding)['filter'](Boolean)['slice'](0, 12)
       : [];
   if (verdict !== 'pass' && (!reason || !findings['length']))
     throw new Error('时长审查 Agent 的问题结论缺少可定位证据。');
@@ -313,8 +313,8 @@ function isOutlineEstimateOutsideReview(enabled2, value11 = {}) {
 }
 function mergeTimingReviewFindings(...args2) {
   return [...new Set(args2['flat']()['map'](normalizeTimingReviewFinding)['filter'](Boolean))]['slice'](
-    0x0,
-    0xc,
+    0,
+    12,
   );
 }
 export function preserveStoryEpisodeScriptWithoutTimingReview(args3, value12, error2 = null) {
@@ -331,7 +331,7 @@ export function preserveStoryEpisodeScriptWithoutTimingReview(args3, value12, er
         ? '时长审查未完成，已保留正文，不再阻塞本集。原因：' + reason2
         : '时长审查未完成，已保留正文，不再阻塞本集。',
       findings: [],
-      reviewPasses: 0x0,
+      reviewPasses: 0,
       reviewAgreement: 'review-unavailable',
       outlineEstimateSeconds: outlineEstimateSeconds3['outlineEstimateSeconds'] || null,
       outlineEstimateMismatch: ![],
@@ -349,7 +349,7 @@ export async function ensureStoryEpisodeScriptTiming({
     const outlineEstimateSeconds4 = inspectStoryEpisodeScriptTiming(scriptResult, episode2),
       previousReview = await review(scriptResult, 'timing-review', null),
       value13 =
-        outlineEstimateSeconds4['minimumSpokenDurationSeconds'] > 0x0 &&
+        outlineEstimateSeconds4['minimumSpokenDurationSeconds'] > 0 &&
         previousReview['reasonableRangeSeconds']['maximum'] <
           outlineEstimateSeconds4['minimumSpokenDurationSeconds'],
       reviewPasses = previousReview['verdict'] !== 'pass' || value13;
@@ -363,7 +363,7 @@ export async function ensureStoryEpisodeScriptTiming({
           Math['max'](value14['minimum'], value15['minimum']) <=
           Math['min'](value14['maximum'], value15['maximum']),
         enabled3 =
-          outlineEstimateSeconds4['minimumSpokenDurationSeconds'] > 0x0 &&
+          outlineEstimateSeconds4['minimumSpokenDurationSeconds'] > 0 &&
           value15['maximum'] < outlineEstimateSeconds4['minimumSpokenDurationSeconds'];
       if (value16 && !enabled3) {
         const reason3 = previousReview['verdict'] === args5['verdict'],
@@ -389,7 +389,7 @@ export async function ensureStoryEpisodeScriptTiming({
                 '两次模型审时均低于对白本身至少需要的 ' +
                 outlineEstimateSeconds4['minimumSpokenDurationSeconds'] +
                 ' 秒。当前只标记时长不确定，不改写正文，也不据此限制后续分镜。',
-              findings: [...args5['findings'], outlineEstimateSeconds4['reason']]['slice'](0x0, 0xc),
+              findings: [...args5['findings'], outlineEstimateSeconds4['reason']]['slice'](0, 12),
             }),
             (reviewAgreement = 'below-spoken-floor'))
           : ((args4 = {
@@ -405,7 +405,7 @@ export async function ensureStoryEpisodeScriptTiming({
                 '-' +
                 value15['maximum'] +
                 ' 秒。当前只标记时长不确定，不改写正文，也不据此限制后续分镜。',
-              findings: [...args5['findings'], '第一次审时：' + previousReview['reason']]['slice'](0x0, 0xc),
+              findings: [...args5['findings'], '第一次审时：' + previousReview['reason']]['slice'](0, 12),
             }),
             (reviewAgreement = 'conflicting-ranges'));
     }
@@ -416,7 +416,7 @@ export async function ensureStoryEpisodeScriptTiming({
       ...scriptResult,
       timingReview: {
         ...args4,
-        reviewPasses: reviewPasses ? 0x2 : 0x1,
+        reviewPasses: reviewPasses ? 2 : 1,
         reviewAgreement: reviewAgreement,
         ...(reviewPasses ? { previousReview: previousReview } : {}),
         outlineEstimateSeconds: outlineEstimateSeconds4['outlineEstimateSeconds'] || null,

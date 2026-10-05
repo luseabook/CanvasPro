@@ -1,9 +1,9 @@
 function toFiniteNumber(value) {
   const item = Number(value);
-  return Number['isFinite'](item) ? item : 0x0;
+  return Number['isFinite'](item) ? item : 0;
 }
 export function createViewportScreenFrame() {
-  let _screenOriginX = { x: 0x0, y: 0x0 };
+  let _screenOriginX = { x: 0, y: 0 };
   return {
     set(key, index) {
       const box = { x: toFiniteNumber(key), y: toFiniteNumber(index) };
@@ -12,7 +12,7 @@ export function createViewportScreenFrame() {
     },
     attach(result) {
       return {
-        ...(result || { x: 0x0, y: 0x0, zoom: 0x1 }),
+        ...(result || { x: 0, y: 0, zoom: 1 }),
         _screenOriginX: _screenOriginX['x'],
         _screenOriginY: _screenOriginX['y'],
       };

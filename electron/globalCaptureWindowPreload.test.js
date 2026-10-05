@@ -9,7 +9,7 @@ const read = (relativePath) => readFileSync(new URL(relativePath, import.meta.ur
 test('the capture window preload is a CommonJS contextBridge module', () => {
   const preload = read('./globalCaptureWindowPreload.cjs');
   assert.match(preload, /const \{ contextBridge, ipcRenderer \} = require\('electron'\);/);
-  assert.equal((preload.match(/contextBridge\.exposeInMainWorld\(/g) || []).length, 0x1);
+  assert.equal((preload.match(/contextBridge\.exposeInMainWorld\(/g) || []).length, 1);
   assert.match(preload, /contextBridge\.exposeInMainWorld\('globalCaptureWindow', \{/);
 });
 
@@ -31,7 +31,7 @@ test('every invoke channel of the preload is registered exactly once by the IPC 
   ]);
   for (const channel of channels) {
     const registered = ipc.match(new RegExp(`ipcMain\\.handle\\('${channel}'`, 'g')) || [];
-    assert.equal(registered.length, 0x1, channel);
+    assert.equal(registered.length, 1, channel);
   }
 });
 

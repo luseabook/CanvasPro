@@ -104,7 +104,7 @@ export const DEFAULT_SHORTCUTS = {
   'toggle-node-avoid-overlap': { label: '新节点自动避让', keys: [], group: '设置开关' },
   'reset-media-size': { label: '恢复节点默认大小', keys: ['Shift', 'R'], group: '编辑与选择' },
   'add-reference': { label: '添加参考', keys: ['X'], group: '编辑与选择' },
-  'toggle-agent': { label: '打开/关闭\x20SHUO\x20Agent', keys: ['T'], group: '侧边栏' },
+  'toggle-agent': { label: '打开/关闭 SHUO Agent', keys: ['T'], group: '侧边栏' },
   'create-text': { label: '创建源文本节点', keys: [], group: '创建节点' },
   'create-comment-note': { label: '创建注释节点', keys: ['N'], group: '创建节点' },
   'create-ai-text': { label: '创建生成文本节点', keys: ['Q'], group: '创建节点' },
@@ -171,12 +171,12 @@ export const DEFAULT_SHORTCUTS = {
   'panorama-scene-camera-2': { label: '跳转机位书签 2', keys: ['2'], group: '3D导演台' },
   'panorama-scene-camera-3': { label: '跳转机位书签 3', keys: ['3'], group: '3D导演台' },
   'panorama-scene-camera-4': { label: '跳转机位书签 4', keys: ['4'], group: '3D导演台' },
-  'panorama-scene-camera-5': { label: '跳转机位书签\x205', keys: ['5'], group: '3D导演台' },
+  'panorama-scene-camera-5': { label: '跳转机位书签 5', keys: ['5'], group: '3D导演台' },
   'panorama-scene-camera-6': { label: '跳转机位书签 6', keys: ['6'], group: '3D导演台' },
   'panorama-scene-camera-7': { label: '跳转机位书签 7', keys: ['7'], group: '3D导演台' },
-  'panorama-scene-camera-8': { label: '跳转机位书签\x208', keys: ['8'], group: '3D导演台' },
+  'panorama-scene-camera-8': { label: '跳转机位书签 8', keys: ['8'], group: '3D导演台' },
   'panorama-scene-camera-9': { label: '跳转机位书签 9', keys: ['9'], group: '3D导演台' },
-  'panorama-scene-camera-0': { label: '跳转机位书签\x2010', keys: [], group: '3D导演台' },
+  'panorama-scene-camera-0': { label: '跳转机位书签 10', keys: [], group: '3D导演台' },
   'panorama-scene-camera-save-1': {
     label: '保存当前视图到机位书签 1',
     keys: ['Ctrl', '1'],
@@ -198,7 +198,7 @@ export const DEFAULT_SHORTCUTS = {
     group: '3D导演台',
   },
   'panorama-scene-camera-save-5': {
-    label: '保存当前视图到机位书签\x205',
+    label: '保存当前视图到机位书签 5',
     keys: ['Ctrl', '5'],
     group: '3D导演台',
   },
@@ -208,7 +208,7 @@ export const DEFAULT_SHORTCUTS = {
     group: '3D导演台',
   },
   'panorama-scene-camera-save-7': {
-    label: '保存当前视图到机位书签\x207',
+    label: '保存当前视图到机位书签 7',
     keys: ['Ctrl', '7'],
     group: '3D导演台',
   },
@@ -250,7 +250,7 @@ let _shortcuts = {},
   _currentPreset = ASHUO_PRESET_NAME,
   _recordingAction = null,
   _shortcutSearchQuery = '',
-  _saveRevision = 0x0,
+  _saveRevision = 0,
   _saveLoopPromise = null;
 function _setRecordingAction(payload) {
   ((_recordingAction = payload || null),
@@ -339,7 +339,7 @@ function _isPanoramaSceneEditingContext(value3) {
 function _filterShortcutMatchesByContext(args, value4 = {}) {
   let list = Array['isArray'](args) ? [...args] : [];
   return (
-    !(Number(value4['selectedSyncPlayableVideoCount']) >= 0x2) &&
+    !(Number(value4['selectedSyncPlayableVideoCount']) >= 2) &&
       (list = list['filter']((value5) => value5 !== 'ms-sync-video-play')),
     value4['featureModeActive'] &&
       (list = list['filter']((value6) => !_isNodeToolbarAction(value6))),
@@ -360,7 +360,7 @@ function _resolveToolbarShortcutMatch(list2, value10) {
   return list2['find']((value11) => value11['startsWith'](enabled2)) || null;
 }
 function _resolveShortcutMatch(list3, value12 = {}) {
-  if (!Array['isArray'](list3) || list3['length'] === 0x0) return null;
+  if (!Array['isArray'](list3) || list3['length'] === 0) return null;
   if (value12['mattingActive'] || value12['annotateActive'] || value12['videoKeyingActive']) {
     const value13 = list3['find']((value14) => _isEditorShortcut(value14));
     if (value13) return value13;
@@ -381,11 +381,11 @@ function _getShortcutBindingStrings(value21, el) {
   if (el?.['disabled'] === !![]) return [];
   const list4 = [];
   Array['isArray'](el?.['keys']) &&
-    el['keys']['length'] > 0x0 &&
+    el['keys']['length'] > 0 &&
     list4['push'](el['keys']);
   Array['isArray'](el?.['alternateKeys']) &&
     el['alternateKeys']['forEach']((list5) => {
-      Array['isArray'](list5) && list5['length'] > 0x0 && list4['push'](list5);
+      Array['isArray'](list5) && list5['length'] > 0 && list4['push'](list5);
     });
   const list6 = FIXED_GLOBAL_SHORTCUT_BINDINGS[value21] || [];
   return (
@@ -402,7 +402,7 @@ function _normalizeShortcutToken(value24) {
   if (value25 === 'alt') return 'Alt';
   if (value25 === 'space') return 'Space';
   if (value25 === 'backquote' || list7 === '`' || list7 === '~') return '`';
-  if (list7['length'] === 0x1) return list7['toUpperCase']();
+  if (list7['length'] === 1) return list7['toUpperCase']();
   return list7;
 }
 function _normalizeShortcutMainKey(event) {
@@ -412,7 +412,7 @@ function _normalizeShortcutMainKey(event) {
   if (value26 === 'Space') return 'Space';
   if (value26 === 'Delete' || value27 === 'Del') return 'Delete';
   if (value26 === 'Backspace') return 'Backspace';
-  return _normalizeShortcutToken(event?.['key'] === '\x20' ? 'Space' : event?.['key']);
+  return _normalizeShortcutToken(event?.['key'] === ' ' ? 'Space' : event?.['key']);
 }
 function _normalizeShortcutKeys(list8) {
   if (!Array['isArray'](list8)) return [];
@@ -432,7 +432,7 @@ function _buildShortcutKeysFromEvent(event2) {
   if (event2['shiftKey']) list11['push']('Shift');
   list11['push'](...physicalShortcutTokens(event2));
   if (event2['type'] === 'pointerdown') {
-    if (event2['button'] === 0x0) list11['push']('MouseLeft');
+    if (event2['button'] === 0) list11['push']('MouseLeft');
     return list11;
   }
   const _normalizeShortcutMainKey2 = _normalizeShortcutMainKey(event2);
@@ -494,7 +494,7 @@ function _resolveSavedAlternateKeys(value43, value44, value45) {
       : value44;
   if (!Array['isArray'](list12)) return [];
   return list12['map']((value46) => _normalizeShortcutKeys(value46))['filter'](
-    (list13) => list13['length'] > 0x0,
+    (list13) => list13['length'] > 0,
   );
 }
 function _normalizePresetName(value47) {
@@ -532,7 +532,7 @@ async function _loadFromServer() {
   try {
     const fetchUserShortcutsFromServer2 = await fetchUserShortcutsFromServer();
     if (value58 !== _saveRevision) return;
-    if (fetchUserShortcutsFromServer2 && fetchUserShortcutsFromServer2['shortcuts'] && Object['keys'](fetchUserShortcutsFromServer2['shortcuts'])['length'] > 0x0) {
+    if (fetchUserShortcutsFromServer2 && fetchUserShortcutsFromServer2['shortcuts'] && Object['keys'](fetchUserShortcutsFromServer2['shortcuts'])['length'] > 0) {
       const rawSavedPresetName = String(fetchUserShortcutsFromServer2['preset'] || '')['trim'](),
         savedPresetName = _normalizePresetName(rawSavedPresetName),
         value59 = BUILTIN_PRESET_NAMES['has'](savedPresetName) ? savedPresetName : ASHUO_PRESET_NAME,
@@ -584,7 +584,7 @@ function _createShortcutSavePayload() {
   };
 }
 function _saveToServer() {
-  _saveRevision += 0x1;
+  _saveRevision += 1;
   if (_saveLoopPromise) return _saveLoopPromise;
   return (
     (_saveLoopPromise = (async () => {
@@ -594,7 +594,7 @@ function _saveToServer() {
         try {
           (await saveUserShortcutsToServer(_createShortcutSavePayload2), _syncShortcutsToGlobal());
         } catch (value63) {
-          console['warn']('[shortcuts]\x20save\x20failed:', value63);
+          console['warn']('[shortcuts] save failed:', value63);
         }
         if (value62 === _saveRevision) break;
       }
@@ -616,8 +616,8 @@ function _syncShortcutsToGlobal() {
   const value66 = {},
     list14 = ['editor-tool-brush', 'editor-tool-eraser', 'editor-tool-bucket', 'editor-clear'];
   (list14['forEach']((value67) => {
-    if (_shortcuts[value67]?.['keys']?.['length'] > 0x0) {
-      const value68 = _shortcuts[value67]['keys'][_shortcuts[value67]['keys']['length'] - 0x1];
+    if (_shortcuts[value67]?.['keys']?.['length'] > 0) {
+      const value68 = _shortcuts[value67]['keys'][_shortcuts[value67]['keys']['length'] - 1];
       value66[value67] = value68['toUpperCase']();
     }
   }),
@@ -744,12 +744,12 @@ function _selectPresetFromUi(value78) {
 function _movePresetOptionFocus(value79) {
   const { options: options5 } = _getPresetControls(),
     list15 = options5['filter']((el8) => !el8['disabled']);
-  if (list15['length'] === 0x0) return;
+  if (list15['length'] === 0) return;
   const value80 = document['activeElement'];
   let count = list15['indexOf'](value80);
-  count < 0x0 &&
+  count < 0 &&
     (count = list15['findIndex']((el9) => el9['dataset']?.['value'] === _currentPreset));
-  const value81 = (Math['max'](count, 0x0) + value79 + list15['length']) % list15['length'];
+  const value81 = (Math['max'](count, 0) + value79 + list15['length']) % list15['length'];
   list15[value81]?.['focus']?.();
 }
 function _updatePresetSelect() {
@@ -779,7 +779,7 @@ function _initPresetSelect() {
       _setPresetMenuOpen(!_isPresetMenuOpen(), { focusOption: !![] });
     }),
     trigger3['addEventListener']('keydown', (event3) => {
-      (event3['key'] === 'ArrowDown' || event3['key'] === 'Enter' || event3['key'] === '\x20') &&
+      (event3['key'] === 'ArrowDown' || event3['key'] === 'Enter' || event3['key'] === ' ') &&
         (event3['preventDefault'](), _setPresetMenuOpen(!![], { focusOption: !![] }));
     }),
     menu3['addEventListener']('click', (event4) => {
@@ -791,11 +791,11 @@ function _initPresetSelect() {
       if (event5['key'] === 'Escape')
         (event5['preventDefault'](), _setPresetMenuOpen(![], { focusTrigger: !![] }));
       else {
-        if (event5['key'] === 'ArrowDown') (event5['preventDefault'](), _movePresetOptionFocus(0x1));
+        if (event5['key'] === 'ArrowDown') (event5['preventDefault'](), _movePresetOptionFocus(1));
         else {
-          if (event5['key'] === 'ArrowUp') (event5['preventDefault'](), _movePresetOptionFocus(-0x1));
+          if (event5['key'] === 'ArrowUp') (event5['preventDefault'](), _movePresetOptionFocus(-1));
           else {
-            if (event5['key'] === 'Enter' || event5['key'] === '\x20') {
+            if (event5['key'] === 'Enter' || event5['key'] === ' ') {
               event5['preventDefault']();
               const el12 = document['activeElement']?.['closest']?.('.settings-preset-option');
               if (el12 && !el12['disabled']) _selectPresetFromUi(el12['dataset']['value']);
@@ -821,8 +821,8 @@ function _matchesShortcutSearch(value84, value85, value86, value87) {
   if (!_normalizeShortcutSearchText2) return !![];
   const list16 = _getShortcutBindingStrings(value84, value85),
     args3 =
-      list16['length'] > 0x0
-        ? list16['flatMap']((value88) => [value88, value88['replaceAll']('+', '\x20')])
+      list16['length'] > 0
+        ? list16['flatMap']((value88) => [value88, value88['replaceAll']('+', ' ')])
         : [_tShortcut('unset', '未设置')],
     list17 = _normalizeShortcutSearchText(
       [
@@ -832,7 +832,7 @@ function _matchesShortcutSearch(value84, value85, value86, value87) {
         value86,
         _translateShortcutGroup(value86),
         ...args3,
-      ]['join']('\x20'),
+      ]['join'](' '),
     );
   return _normalizeShortcutSearchText2['split'](/\s+/)
     ['filter'](Boolean)
@@ -849,7 +849,7 @@ function _render() {
     if (!enabled4[el14['group']]) enabled4[el14['group']] = [];
     enabled4[el14['group']]['push']({ id: id, ...el14 });
   });
-  if (Object['keys'](enabled4)['length'] === 0x0 && _normalizeShortcutSearchText(_shortcutSearchQuery)) {
+  if (Object['keys'](enabled4)['length'] === 0 && _normalizeShortcutSearchText(_shortcutSearchQuery)) {
     const el15 = document['createElement']('div');
     ((el15['className'] = 'sc-empty'),
       el15['setAttribute']('role', 'status'),
@@ -889,7 +889,7 @@ function _render() {
                 : _tShortcut('recording', '录制中...')),
             el20['appendChild'](el21));
         } else {
-          if (map5['keys']['length'] > 0x0)
+          if (map5['keys']['length'] > 0)
             map5['keys']['forEach']((value91) => {
               const el22 = document['createElement']('kbd');
               ((el22['className'] = 'kbd-v2'),
@@ -952,7 +952,7 @@ export function detectShortcutConflict(enabled5, value93, value94) {
 }
 function _stopRecording(list19) {
   if (!_recordingAction) return;
-  if (list19 && list19['length'] > 0x0) {
+  if (list19 && list19['length'] > 0) {
     const detectShortcutConflict2 = detectShortcutConflict(_shortcuts, _recordingAction, list19);
     if (detectShortcutConflict2) {
       (window['showToast']?.(
@@ -995,7 +995,7 @@ export function getShortcutLabel(value95, value96 = '') {
   const enabled6 = String(value95 || '')['trim']();
   if (!enabled6) return value96;
   const list20 = getShortcutKeys(enabled6);
-  return list20['length'] > 0x0 ? list20['join']('\x20') : '';
+  return list20['length'] > 0 ? list20['join'](' ') : '';
 }
 export function getShortcutKeys(value97) {
   const enabled7 = String(value97 || '')['trim']();
@@ -1031,7 +1031,7 @@ export function handleShortcutKeydown(ctrlKey, value102 = {}) {
     _getShortcutBindingStrings(value103, value104)['includes'](_toShortcutBindingString4) && list21['push'](value103);
   }
   list21 = _filterShortcutMatchesByContext(list21, value102);
-  if (list21['length'] === 0x0) {
+  if (list21['length'] === 0) {
     if (ctrlKey?.['shiftKey'] === !![] && value102?.['featureModeActive'] !== !![]) {
       const value105 = _shortcuts['ms-sync-video-play'],
         _toShortcutBindingString5 = _toShortcutBindingString(
@@ -1045,7 +1045,7 @@ export function handleShortcutKeydown(ctrlKey, value102 = {}) {
           }),
         ),
         _getShortcutBindingStrings2 = _getShortcutBindingStrings('ms-sync-video-play', value105)['includes'](_toShortcutBindingString5);
-      if (_getShortcutBindingStrings2 && Number(value102?.['selectedSyncPlayableVideoCount']) >= 0x2)
+      if (_getShortcutBindingStrings2 && Number(value102?.['selectedSyncPlayableVideoCount']) >= 2)
         return 'ms-sync-video-loop-play';
     }
     return null;
@@ -1063,7 +1063,7 @@ function _handleRecordingKeydown(event9) {
     _normalizeShortcutMainKey3 = _normalizeShortcutMainKey(event9),
     value106 = MODIFIER_ONLY_SHORTCUT_ACTIONS['has'](_recordingAction);
   if (
-    list22['length'] > 0x0 &&
+    list22['length'] > 0 &&
     (value106 || list22['includes']('AltRight') || !['Ctrl', 'Shift', 'Alt', '']['includes'](_normalizeShortcutMainKey3))
   ) {
     if (_shortcuts[_recordingAction]?.['inputType'] === 'pointer') return;
@@ -1087,7 +1087,7 @@ if (typeof document !== 'undefined' && document?.['addEventListener']) {
         if (
           !_recordingAction ||
           _shortcuts[_recordingAction]?.['inputType'] !== 'pointer' ||
-          event10['button'] !== 0x0
+          event10['button'] !== 0
         )
           return;
         (event10['preventDefault'](),

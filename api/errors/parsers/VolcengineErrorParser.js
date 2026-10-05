@@ -20,8 +20,8 @@ function parseModelActivationError(value) {
     !/activate\s+the\s+model\s+service/i['test'](value)
   )
     return null;
-  const item = value['match'](/activated\s+the\s+model\s+([^.,\s]+)/i)?.[0x1] || '',
-    key = value['match'](/request\s*id\s*:\s*([^\s]+)/i)?.[0x1] || '',
+  const item = value['match'](/activated\s+the\s+model\s+([^.,\s]+)/i)?.[1] || '',
+    key = value['match'](/request\s*id\s*:\s*([^\s]+)/i)?.[1] || '',
     index = item ? '「' + item + '」' : '该模型',
     result = key ? ' 请求 ID：' + key : '';
   return (
@@ -31,7 +31,7 @@ function parseModelActivationError(value) {
     result
   );
 }
-export function parseError(raw, status = 0x0) {
+export function parseError(raw, status = 0) {
   const errorText = getErrorText(raw)['trim'](),
     message = parseModelActivationError(errorText);
   if (!message) return null;

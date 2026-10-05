@@ -27,13 +27,13 @@ function escapeHtml(value) {
     ['replace'](/'/g, '&#39;');
 }
 function clamp(item, key, index) {
-  return Math['min'](index, Math['max'](key, Number(item) || 0x0));
+  return Math['min'](index, Math['max'](key, Number(item) || 0));
 }
 function getSceneContext(result) {
   const list = Array['isArray'](result?.['scenes']) ? result['scenes'] : [],
-    scene = list['find']((data) => data['id'] === result?.['activeSceneId']) || list[0x0] || null,
+    scene = list['find']((data) => data['id'] === result?.['activeSceneId']) || list[0] || null,
     list2 = Array['isArray'](scene?.['shots']) ? scene['shots'] : [],
-    shot = list2['find']((options) => options['id'] === scene?.['activeShotId']) || list2[0x0] || null;
+    shot = list2['find']((options) => options['id'] === scene?.['activeShotId']) || list2[0] || null;
   return { scene: scene, shot: shot };
 }
 function createObjectTransforms(target) {
@@ -59,9 +59,9 @@ function getKeyframeCount(entry) {
         record +
         STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['reduce'](
           (handle, state) => handle + payload[state + 'Keyframes']['length'],
-          0x0,
+          0,
         ),
-      0x0,
+      0,
     )
   );
 }
@@ -70,14 +70,14 @@ function formatFrameTime(config, scope) {
 }
 function renderKeyframes(list3, input, output = {}) {
   return list3['map']((value2) => {
-    const value3 = input['duration'] > 0x0 ? (value2['time'] / input['duration']) * 0x64 : 0x0,
+    const value3 = input['duration'] > 0 ? (value2['time'] / input['duration']) * 100 : 0,
       value4 = output['keyframeId'] === value2['id'];
     return (
       '<button type="button" class="storyboard-3d-timeline-keyframe ' +
       (value4 ? 'is-selected' : '') +
       '" style="--storyboard-3d-keyframe-position:' +
       value3 +
-      '%\x22\x20data-storyboard-3d-action=\x22timeline-select-keyframe\x22\x20data-keyframe-id=\x22' +
+      '%" data-storyboard-3d-action="timeline-select-keyframe" data-keyframe-id="' +
       escapeHtml(value2['id']) +
       '" data-keyframe-type="' +
       escapeHtml(output['type'] || '') +
@@ -88,11 +88,11 @@ function renderKeyframes(list3, input, output = {}) {
       '" data-keyframe-time="' +
       value2['time'] +
       '" aria-label="关键帧 ' +
-      value2['time']['toFixed'](0x2) +
-      '\x20秒，第\x20' +
+      value2['time']['toFixed'](2) +
+      ' 秒，第 ' +
       formatFrameTime(value2['time'], input['fps']) +
       '" title="' +
-      value2['time']['toFixed'](0x2) +
+      value2['time']['toFixed'](2) +
       's · ' +
       formatFrameTime(value2['time'], input['fps']) +
       '"></button>'
@@ -106,9 +106,9 @@ function renderPropertyLinks(value5, value6) {
       (value6 === value7 ? 'is-active' : '') +
       '" data-storyboard-3d-action="timeline-set-object-property" data-object-id="' +
       escapeHtml(value5) +
-      '\x22\x20data-property=\x22' +
+      '" data-property="' +
       value7 +
-      '\x22>' +
+      '">' +
       PROPERTY_LABELS[value7] +
       '</button>',
   )['join']('<span aria-hidden="true">/</span>');
@@ -122,11 +122,11 @@ function renderAddKeyframeButton({
   return (
     '<button type="button" class="storyboard-3d-timeline-row-add" data-storyboard-3d-action="' +
     action +
-    '\x22\x20data-object-id=\x22' +
+    '" data-object-id="' +
     escapeHtml(objectId) +
     '" data-property="' +
     escapeHtml(property) +
-    '\x22\x20aria-label=\x22为' +
+    '" aria-label="为' +
     escapeHtml(label) +
     '添加关键帧" title="为' +
     escapeHtml(label) +
@@ -141,11 +141,11 @@ function renderTimelineLane({
   label: label2,
 }) {
   return (
-    '<div\x20class=\x22storyboard-3d-timeline-lane\x20' +
+    '<div class="storyboard-3d-timeline-lane ' +
     className +
     '" data-timeline-lane-label="' +
     escapeHtml(label2 || '') +
-    '\x22>\x0a\x20\x20\x20\x20<span\x20class=\x22storyboard-3d-timeline-lane-line\x22\x20aria-hidden=\x22true\x22></span>\x0a\x20\x20\x20\x20' +
+    '">\n    <span class="storyboard-3d-timeline-lane-line" aria-hidden="true"></span>\n    ' +
     renderKeyframes(keyframes, animation, selection) +
     '\n  </div>'
   );
@@ -178,7 +178,7 @@ function renderObjectTrack({
       rotationKeyframes: [],
       scaleKeyframes: [],
     },
-    label3 = object['name'] + '\x20·\x20' + PROPERTY_LABELS[activeProperty],
+    label3 = object['name'] + ' · ' + PROPERTY_LABELS[activeProperty],
     value8 =
       '<div class="storyboard-3d-timeline-object-summary ' +
       (selected ? 'is-selected' : '') +
@@ -191,7 +191,7 @@ function renderObjectTrack({
       escapeHtml(object['name']) +
       '轨道" aria-expanded="' +
       expanded +
-      '\x22>' +
+      '">' +
       (expanded ? '折叠' : '展开') +
       '</button>\n    <div><strong>' +
       escapeHtml(object['name']) +
@@ -211,7 +211,7 @@ function renderObjectTrack({
     return (
       '<div class="storyboard-3d-timeline-row is-object is-' +
       activeProperty +
-      '\x20' +
+      ' ' +
       (selected ? 'is-selected' : '') +
       '">\n      ' +
       value8 +
@@ -233,7 +233,7 @@ function renderObjectTrack({
       PROPERTY_LABELS[property2] +
       renderAddKeyframeButton({
         action: 'timeline-add-object-keyframe',
-        label: object['name'] + '\x20·\x20' + PROPERTY_LABELS[property2],
+        label: object['name'] + ' · ' + PROPERTY_LABELS[property2],
         objectId: object['id'],
         property: property2,
       }) +
@@ -248,7 +248,7 @@ function renderObjectTrack({
       '\n    </div>',
   )['join']('');
   return (
-    '<div\x20class=\x22storyboard-3d-timeline-object-group\x20' +
+    '<div class="storyboard-3d-timeline-object-group ' +
     (selected ? 'is-selected' : '') +
     '">\n    <div class="storyboard-3d-timeline-row is-object-summary">' +
     value8 +
@@ -258,14 +258,14 @@ function renderObjectTrack({
   );
 }
 function renderRuler(value10, value11) {
-  const length = 0x6,
-    value12 = Array['from']({ length: length + 0x1 }, (value13, value14) => {
+  const length = 6,
+    value12 = Array['from']({ length: length + 1 }, (value13, value14) => {
       const value15 = (value10['duration'] * value14) / length;
       return (
         '<span style="--storyboard-3d-tick-position:' +
-        (value14 / length) * 0x64 +
-        '%\x22><strong>' +
-        value15['toFixed'](value15 % 0x1 === 0x0 ? 0x0 : 0x1) +
+        (value14 / length) * 100 +
+        '%"><strong>' +
+        value15['toFixed'](value15 % 1 === 0 ? 0 : 1) +
         's</strong><small>' +
         formatFrameTime(value15, value10['fps']) +
         '</small></span>'
@@ -274,10 +274,10 @@ function renderRuler(value10, value11) {
   return (
     '<div class="storyboard-3d-timeline-row is-ruler">\n    <div class="storyboard-3d-timeline-ruler-label">轨道</div>\n    <div class="storyboard-3d-timeline-ruler">\n      ' +
     value12 +
-    '\x0a\x20\x20\x20\x20\x20\x20<input\x20type=\x22range\x22\x20min=\x220\x22\x20max=\x22' +
+    '\n      <input type="range" min="0" max="' +
     value10['duration'] +
-    '\x22\x20step=\x22' +
-    0x1 / value10['fps'] +
+    '" step="' +
+    1 / value10['fps'] +
     '" value="' +
     value11 +
     '" data-storyboard-3d-timeline-scrubber aria-label="镜头动画播放头">\n    </div>\n  </div>'
@@ -302,7 +302,7 @@ function renderSelectedKeyframeEditor(value21, value22, value23) {
   const { keyframe: keyframe3 } = selectedKeyframe3,
     value24 =
       '<label class="storyboard-3d-timeline-easing">时间 / 秒<input type="number" min="0" max="3600" step="' +
-      0x1 / value21['fps'] +
+      1 / value21['fps'] +
       '" value="' +
       keyframe3['time'] +
       '" data-storyboard-3d-timeline-key-time></label><button type="button" data-storyboard-3d-action="timeline-copy-keyframe">复制到播放头</button>',
@@ -310,20 +310,20 @@ function renderSelectedKeyframeEditor(value21, value22, value23) {
   if (selectedKeyframe3['type'] === 'camera')
     return (
       '<footer class="storyboard-3d-timeline-key-editor">\n      <strong>摄像机关键帧</strong><span>' +
-      keyframe3['time']['toFixed'](0x2) +
+      keyframe3['time']['toFixed'](2) +
       's · ' +
       formatFrameTime(keyframe3['time'], value21['fps']) +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20<span>焦距\x20' +
-      Number(keyframe3['camera']['focalLength'])['toFixed'](0x1) +
+      '</span>\n      <span>焦距 ' +
+      Number(keyframe3['camera']['focalLength'])['toFixed'](1) +
       'mm</span>\n      ' +
       renderDirectorCameraKeyEditor(keyframe3) +
-      '\x0a\x20\x20\x20\x20\x20\x20' +
+      '\n      ' +
       value24 +
-      '\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20data-storyboard-3d-action=\x22timeline-delete-keyframe\x22>删除关键帧</button>\x0a\x20\x20\x20\x20</footer>'
+      '\n      <button type="button" data-storyboard-3d-action="timeline-delete-keyframe">删除关键帧</button>\n    </footer>'
     );
   const value26 = selectedKeyframe3['property'] === 'rotation';
   return (
-    '<footer\x20class=\x22storyboard-3d-timeline-key-editor\x22\x20data-selected-object-id=\x22' +
+    '<footer class="storyboard-3d-timeline-key-editor" data-selected-object-id="' +
     escapeHtml(selectedKeyframe3['objectId']) +
     '" data-selected-property="' +
     selectedKeyframe3['property'] +
@@ -332,7 +332,7 @@ function renderSelectedKeyframeEditor(value21, value22, value23) {
     ' · ' +
     PROPERTY_LABELS[selectedKeyframe3['property']] +
     '</strong>\n    <span>' +
-    keyframe3['time']['toFixed'](0x2) +
+    keyframe3['time']['toFixed'](2) +
     's · ' +
     formatFrameTime(keyframe3['time'], value21['fps']) +
     '</span>\n    ' +
@@ -346,11 +346,11 @@ function renderSelectedKeyframeEditor(value21, value22, value23) {
           (value26 ? '°' : '') +
           '</span><input type="number" step="' +
           (value26 ? '1' : '0.01') +
-          '\x22\x20value=\x22' +
+          '" value="' +
           (value26
-            ? (Number(keyframe3['value'][value28]) * 0xb4) / Math['PI']
-            : Number(keyframe3['value'][value28]))['toFixed'](value26 ? 0x1 : 0x2) +
-          '\x22\x20data-storyboard-3d-timeline-key-value=\x22' +
+            ? (Number(keyframe3['value'][value28]) * 180) / Math['PI']
+            : Number(keyframe3['value'][value28]))['toFixed'](value26 ? 1 : 2) +
+          '" data-storyboard-3d-timeline-key-value="' +
           value28 +
           '"></label>',
       )
@@ -364,9 +364,9 @@ function renderSelectedKeyframeEditor(value21, value22, value23) {
     ]
       ['map'](
         ([value29, value30]) =>
-          '<option\x20value=\x22' +
+          '<option value="' +
           value29 +
-          '\x22\x20' +
+          '" ' +
           (keyframe3['easing'] === value29 ? 'selected' : '') +
           '>' +
           value30 +
@@ -381,7 +381,7 @@ export function renderStoryboard3DShotTimeline({
   shot: shot2,
   selectedObjectIds: selectedObjectIds = [],
   activeTool: activeTool = 'select',
-  currentTime: currentTime = 0x0,
+  currentTime: currentTime = 0,
   playing: playing = ![],
   autoKey: autoKey = ![],
   expandedObjectIds: expandedObjectIds = new Set(),
@@ -393,8 +393,8 @@ export function renderStoryboard3DShotTimeline({
 } = {}) {
   if (!scene2 || !shot2) return '';
   const animation4 = normalizeAnimation(scene2, shot2),
-    clamp2 = clamp(currentTime, 0x0, animation4['duration']),
-    value31 = selectedObjectIds['at'](-0x1) || '',
+    clamp2 = clamp(currentTime, 0, animation4['duration']),
+    value31 = selectedObjectIds['at'](-1) || '',
     list4 = (scene2['objects'] || [])['filter'](
       (value32) => value32['visible'] !== ![] && value32['type'] !== 'group' && value32['type'] !== 'camera',
     ),
@@ -408,14 +408,14 @@ export function renderStoryboard3DShotTimeline({
         selectedKeyframe: selectedKeyframe,
       }),
     )['join'](''),
-    value34 = animation4['duration'] > 0x0 ? (clamp2 / animation4['duration']) * 0x64 : 0x0,
+    value34 = animation4['duration'] > 0 ? (clamp2 / animation4['duration']) * 100 : 0,
     value35 = Math['round'](animation4['duration'] * animation4['fps']);
   return (
-    '<section\x20class=\x22storyboard-3d-shot-timeline\x20' +
+    '<section class="storyboard-3d-shot-timeline ' +
     (playing ? 'is-playing' : '') +
     '" data-storyboard-3d-shot-timeline data-shot-id="' +
     escapeHtml(shot2['id']) +
-    '\x22\x20style=\x22--storyboard-3d-playhead-position:' +
+    '" style="--storyboard-3d-playhead-position:' +
     value34 +
     '%">\n    <header class="storyboard-3d-timeline-toolbar">\n      <div class="storyboard-3d-timeline-playback">\n        <button type="button" data-storyboard-3d-action="timeline-go-start">首帧</button>\n        <button type="button" class="storyboard-3d-timeline-play" data-storyboard-3d-action="timeline-toggle-play">' +
     (playing ? '暂停' : '播放') +
@@ -425,20 +425,20 @@ export function renderStoryboard3DShotTimeline({
     value35 +
     'f</span>\n      <label><span>时长</span><input type="number" min="0.1" max="3600" step="0.5" value="' +
     animation4['duration'] +
-    '\x22\x20data-storyboard-3d-timeline-setting=\x22duration\x22></label>\x0a\x20\x20\x20\x20\x20\x20<label><span>FPS</span><select\x20data-storyboard-3d-timeline-setting=\x22fps\x22>' +
-    [0xc, 0x18, 0x19, 0x1e, 0x32, 0x3c]
+    '" data-storyboard-3d-timeline-setting="duration"></label>\n      <label><span>FPS</span><select data-storyboard-3d-timeline-setting="fps">' +
+    [12, 24, 25, 30, 50, 60]
       ['map'](
         (value36) =>
-          '<option\x20value=\x22' +
+          '<option value="' +
           value36 +
-          '\x22\x20' +
+          '" ' +
           (animation4['fps'] === value36 ? 'selected' : '') +
           '>' +
           value36 +
           '</option>',
       )
       ['join']('') +
-    '</select></label>\x0a\x20\x20\x20\x20\x20\x20<label\x20class=\x22storyboard-3d-timeline-auto-key\x22><input\x20type=\x22checkbox\x22\x20data-storyboard-3d-timeline-auto-key\x20' +
+    '</select></label>\n      <label class="storyboard-3d-timeline-auto-key"><input type="checkbox" data-storyboard-3d-timeline-auto-key ' +
     (autoKey ? 'checked' : '') +
     '><span>自动 K 帧</span></label>\n      <label><input type="checkbox" data-storyboard-3d-timeline-setting="loop" ' +
     (animation4['loop'] ? 'checked' : '') +
@@ -460,7 +460,7 @@ export function renderStoryboard3DShotTimeline({
     clipTracks +
     '\n      ' +
     (value33 ||
-      '<div\x20class=\x22storyboard-3d-timeline-empty\x22>选择或添加模型后即可创建变换关键帧</div>') +
+      '<div class="storyboard-3d-timeline-empty">选择或添加模型后即可创建变换关键帧</div>') +
     '\n      <div class="storyboard-3d-timeline-playhead" aria-hidden="true"><span></span></div>\n      </div>\n    </div>\n    ' +
     renderSelectedKeyframeEditor(animation4, selectedKeyframe, scene2) +
     '\n  </section>'
@@ -513,8 +513,8 @@ export class Storyboard3DShotTimelineController {
       (this['autoKey'] = ![]),
       (this['playing'] = ![]),
       (this['playbackFrame'] = null),
-      (this['playbackStartedAt'] = 0x0),
-      (this['playbackStartTime'] = 0x0),
+      (this['playbackStartedAt'] = 0),
+      (this['playbackStartTime'] = 0),
       (this['activeShotId'] = ''),
       (this['hasPreview'] = ![]),
       (this['directorPanel'] = new DirectorTimelinePanel(this)),
@@ -535,17 +535,17 @@ export class Storyboard3DShotTimelineController {
       camera: camera2?.['camera'],
     });
     return clamp(
-      this['currentTimes']['get'](camera2?.['id']) || 0x0,
-      0x0,
+      this['currentTimes']['get'](camera2?.['id']) || 0,
+      0,
       storyboard3DShotAnimation['duration'],
     );
   }
   ['_setTime'](camera3, value37) {
-    if (!camera3?.['id']) return 0x0;
+    if (!camera3?.['id']) return 0;
     const storyboard3DShotAnimation2 = normalizeStoryboard3DShotAnimation(camera3['animation'], {
         camera: camera3['camera'],
       }),
-      clamp3 = clamp(value37, 0x0, storyboard3DShotAnimation2['duration']);
+      clamp3 = clamp(value37, 0, storyboard3DShotAnimation2['duration']);
     return (this['currentTimes']['set'](camera3['id'], clamp3), clamp3);
   }
   ['_syncShot'](value38) {
@@ -591,7 +591,7 @@ export class Storyboard3DShotTimelineController {
           scene: scene5,
           shot: shot5,
         });
-        const value41 = shot5['animation']['cameraKeyframes'][0x0];
+        const value41 = shot5['animation']['cameraKeyframes'][0];
         return (
           value41?.['camera'] &&
             ((shot5['camera'] = cloneCameraState(value41['camera'])),
@@ -624,9 +624,9 @@ export class Storyboard3DShotTimelineController {
         camera: camera4['camera'],
       }),
       value45 =
-        storyboard3DShotAnimation3['duration'] > 0x0
-          ? (value44 / storyboard3DShotAnimation3['duration']) * 0x64
-          : 0x0;
+        storyboard3DShotAnimation3['duration'] > 0
+          ? (value44 / storyboard3DShotAnimation3['duration']) * 100
+          : 0;
     el2['style']['setProperty']('--storyboard-3d-playhead-position', value45 + '%');
     const el3 = el2['querySelector']?.('[data-storyboard-3d-timeline-frame]');
     if (el3) el3['textContent'] = Math['round'](value44 * storyboard3DShotAnimation3['fps']) + 'f';
@@ -645,9 +645,9 @@ export class Storyboard3DShotTimelineController {
       const storyboard3DShotAnimation4 = normalizeStoryboard3DShotAnimation(shot7['animation'], {
           camera: shot7['camera'],
         }),
-        value47 = Math['max'](0x0, (value46 - this['playbackStartedAt']) / 0x3e8);
-      let value48 = this['playbackStartTime'] + value47 * (this['playbackRate'] || 0x1);
-      if (storyboard3DShotAnimation4['loop'] && storyboard3DShotAnimation4['duration'] > 0x0)
+        value47 = Math['max'](0, (value46 - this['playbackStartedAt']) / 1000);
+      let value48 = this['playbackStartTime'] + value47 * (this['playbackRate'] || 1);
+      if (storyboard3DShotAnimation4['loop'] && storyboard3DShotAnimation4['duration'] > 0)
         value48 %= storyboard3DShotAnimation4['duration'];
       if (!storyboard3DShotAnimation4['loop'] && value48 >= storyboard3DShotAnimation4['duration']) {
         (this['_sampleAt'](storyboard3DShotAnimation4['duration']), this['stopPlayback']({ clear: ![] }));
@@ -665,7 +665,7 @@ export class Storyboard3DShotTimelineController {
       value49 = this['_timeForShot'](shot8);
     return (
       (this['playing'] = !![]),
-      (this['playbackStartTime'] = value49 >= storyboard3DShotAnimation5['duration'] ? 0x0 : value49),
+      (this['playbackStartTime'] = value49 >= storyboard3DShotAnimation5['duration'] ? 0 : value49),
       this['currentTimes']['set'](shot8['id'], this['playbackStartTime']),
       (this['playbackStartedAt'] =
         this['window']?.['performance']?.['now']?.() ||
@@ -748,7 +748,7 @@ export class Storyboard3DShotTimelineController {
       this['stopPlayback']({ render: ![], clear: ![] });
       const animation5 = normalizeAnimation(scene7, shot9);
       return (
-        this['_sampleAt'](value56 === 'timeline-go-start' ? 0x0 : animation5['duration']),
+        this['_sampleAt'](value56 === 'timeline-go-start' ? 0 : animation5['duration']),
         this['requestRender']?.(),
         !![]
       );
@@ -777,7 +777,7 @@ export class Storyboard3DShotTimelineController {
           upsertStoryboard3DCameraKeyframe(value61, { time: time, camera: camera5 }),
         ),
         this['setMessage']?.(
-          '已在\x20' +
+          '已在 ' +
             formatFrameTime(time, normalizeAnimation(scene7, shot9)['fps']) +
             ' 添加摄像机关键帧。',
         ),
@@ -785,7 +785,7 @@ export class Storyboard3DShotTimelineController {
       );
     }
     if (value56 === 'timeline-add-object-keyframe') {
-      const objectId2 = type2['dataset']['objectId'] || editorState3['selectedObjectIds']?.['at'](-0x1),
+      const objectId2 = type2['dataset']['objectId'] || editorState3['selectedObjectIds']?.['at'](-1),
         property3 =
           type2['dataset']['property'] || this['_activeProperty'](objectId2, editorState3['activeTool']),
         transform = scene7['objects']['find']((value62) => value62['id'] === objectId2);
@@ -816,7 +816,7 @@ export class Storyboard3DShotTimelineController {
           property: type2['dataset']['property'] || '',
           keyframeId: type2['dataset']['keyframeId'],
         }),
-        this['_sampleAt'](Number(type2['dataset']['keyframeTime']) || 0x0),
+        this['_sampleAt'](Number(type2['dataset']['keyframeTime']) || 0),
         this['requestRender']?.(),
         !![]
       );
@@ -842,7 +842,7 @@ export class Storyboard3DShotTimelineController {
       if (!this['selectedKeyframe']) return !![];
       const value65 = { ...this['selectedKeyframe'] };
       return (
-        this['_mutateAnimation']('delete-animation-keyframe', 'Delete\x20animation\x20keyframe', (value66) =>
+        this['_mutateAnimation']('delete-animation-keyframe', 'Delete animation keyframe', (value66) =>
           removeStoryboard3DAnimationKeyframe(value66, value65),
         ),
         (this['selectedKeyframe'] = null),
@@ -855,7 +855,7 @@ export class Storyboard3DShotTimelineController {
     if (event2['target']?.['matches']?.('[data-storyboard-3d-timeline-scrubber]'))
       return (
         this['stopPlayback']({ render: ![], clear: ![] }),
-        this['_sampleAt'](Number(event2['target']['value']) || 0x0),
+        this['_sampleAt'](Number(event2['target']['value']) || 0),
         !![]
       );
     return ![];
@@ -885,8 +885,8 @@ export class Storyboard3DShotTimelineController {
           const selectedKeyframe4 = findSelectedKeyframe(value71, this['selectedKeyframe']);
           if (!selectedKeyframe4) return value71;
           const value72 = Math['max'](
-              0x0,
-              Math['min'](0xe10, Math['round'](value70 * value71['fps']) / value71['fps']),
+              0,
+              Math['min'](3600, Math['round'](value70 * value71['fps']) / value71['fps']),
             ),
             list5 =
               selectedKeyframe4['type'] === 'camera'
@@ -915,7 +915,7 @@ export class Storyboard3DShotTimelineController {
       if (!enabled3 || enabled3['type'] !== 'object') return !![];
       const count = Number(event3['target']['dataset']['storyboard3dTimelineKeyValue']),
         value75 = Number(event3['target']['value']),
-        value76 = enabled3['property'] === 'rotation' ? (value75 * Math['PI']) / 0xb4 : value75;
+        value76 = enabled3['property'] === 'rotation' ? (value75 * Math['PI']) / 180 : value75;
       return (
         this['_mutateAnimation']('update-animation-keyframe', 'Update animation keyframe', (value77) => {
           const value78 = value77['objectTracks']['find'](
@@ -926,8 +926,8 @@ export class Storyboard3DShotTimelineController {
             );
           return (
             el11 &&
-              count >= 0x0 &&
-              count < 0x3 &&
+              count >= 0 &&
+              count < 3 &&
               Number['isFinite'](value76) &&
               (el11['value'][count] = value76),
             normalizeStoryboard3DShotAnimation(value77)
@@ -941,7 +941,7 @@ export class Storyboard3DShotTimelineController {
       if (!enabled4 || enabled4['type'] !== 'object') return !![];
       const value81 = String(event3['target']['value'] || 'ease-in-out');
       return (
-        this['_mutateAnimation']('update-animation-easing', 'Update\x20animation\x20easing', (value82) => {
+        this['_mutateAnimation']('update-animation-easing', 'Update animation easing', (value82) => {
           const value83 = value82['objectTracks']['find'](
               (value84) => value84['objectId'] === enabled4['objectId'],
             ),

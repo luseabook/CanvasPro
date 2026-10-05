@@ -7,7 +7,7 @@ export function requestCanvasMcp(value, signal) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON['stringify'](value),
     signal: signal,
-    timeout: 0x61a8,
-    retries: 0x0,
+    timeout: 25000,
+    retries: 0,
   });
 }

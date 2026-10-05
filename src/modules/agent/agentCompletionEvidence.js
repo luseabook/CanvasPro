@@ -67,7 +67,7 @@ export function verifyAgentLoopCompletionEvidence({
     matchingNodeIds = createdNodeIds['filter'](
       (current) => String(next?.[current]?.['type'] || '')['trim']() === requestedNodeType,
     );
-  if (matchingNodeIds['length'] > 0x0)
+  if (matchingNodeIds['length'] > 0)
     return { ok: !![], requestedNodeType: requestedNodeType, matchingNodeIds: matchingNodeIds };
   return {
     ok: ![],

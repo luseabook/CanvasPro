@@ -10,23 +10,23 @@ import {
 } from './runningHubAudioCatalogShared.js';
 const FORMAT = audioSelect('format', '音频格式', ['mp3', 'wav', 'ogg_opus'], 'mp3'),
   rates = (value) => audioSelect('sampleRate', '采样率', value, '24000'),
-  speed = audioSlider('speechRate', '语速', -0x32, 0x64, 0x0),
-  volume = audioSlider('loudnessRate', '音量', -0x32, 0x64, 0x0),
-  pitch = audioSlider('pitch', '音调', -0xc, 0xc, 0x0),
+  speed = audioSlider('speechRate', '语速', -50, 100, 0),
+  volume = audioSlider('loudnessRate', '音量', -50, 100, 0),
+  pitch = audioSlider('pitch', '音调', -12, 12, 0),
   VOICE = { ...VOLCENGINE_VOICE_TYPE_FIELD },
   CUSTOM_VOICE = {
     ...VOLCENGINE_SPEAKER_ID_FIELD,
-    description: '填写\x20RunningHub\x20支持的音色\x20ID，留空使用预设音色。',
+    description: '填写 RunningHub 支持的音色 ID，留空使用预设音色。',
   };
 export const runningHubDoubaoAudioEntries = Object['freeze']([
   createRunningHubAudioCatalogEntry({
     id: 'doubao-seed-tts-2.0',
-    name: '豆包\x20语音合成\x202.0',
+    name: '豆包 语音合成 2.0',
     endpoint: '/openapi/v2/bytedance/doubao-seed-tts-2.0',
     docId: 0x1d7ef041,
-    order: 0xd2,
-    promptMaxLength: 0x2710,
-    promptPlaceholder: '输入要朗读的文本，最多\x2010000\x20字符',
+    order: 210,
+    promptMaxLength: 10000,
+    promptPlaceholder: '输入要朗读的文本，最多 10000 字符',
     fields: [
       VOICE,
       CUSTOM_VOICE,
@@ -35,12 +35,12 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
       speed,
       volume,
       pitch,
-      audioSlider('bitRate', 'MP3 码率', 0xfa00, 0x27100, 0x1f400, 0x3e8, {
+      audioSlider('bitRate', 'MP3 码率', 64000, 160000, 128000, 1000, {
         showWhen: { field: 'format', value: 'mp3' },
       }),
       audioToggle('filterParentheses', '过滤括号内容', !![]),
-      audioSlider('silenceDuration', '末尾静音（毫秒）', 0x0, 0x7530, 0x0, 0x64),
-      audioToggle('filterMarkdown', '过滤\x20Markdown\x20标记'),
+      audioSlider('silenceDuration', '末尾静音（毫秒）', 0, 30000, 0, 100),
+      audioToggle('filterMarkdown', '过滤 Markdown 标记'),
       audioToggle('filterEmoji', '过滤 Emoji'),
       audioToggle('enableLatex', '朗读数学公式'),
       audioSelect(
@@ -96,10 +96,10 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
     name: '豆包 音频生成 1.0',
     endpoint: '/openapi/v2/bytedance/doubao-seed-audio-1.0',
     docId: 0x1d7ef042,
-    order: 0xd3,
+    order: 211,
     promptField: 'text_prompt',
-    promptMaxLength: 0xbb8,
-    promptPlaceholder: '输入声音脚本，可引用\x20@音频1、@音频2、@音频3，最多\x203000\x20字符',
+    promptMaxLength: 3000,
+    promptPlaceholder: '输入声音脚本，可引用 @音频1、@音频2、@音频3，最多 3000 字符',
     slots: [
       audioSlot('audio1', '参考音频1'),
       audioSlot('audio2', '参考音频2'),

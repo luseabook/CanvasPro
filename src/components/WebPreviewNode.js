@@ -41,8 +41,8 @@ const WEB_PREVIEW_REVERSE_PROMPT_GENERATE_EVENT = 'reverse-image-prompt-generate
   WEB_PREVIEW_TEXT_IMAGE_PROMPT_GENERATE_EVENT = 'send-selected-text-to-image-generate',
   WEB_PREVIEW_TEXT_VIDEO_PROMPT_EVENT = 'send-selected-text-to-video',
   WEB_PREVIEW_TEXT_VIDEO_PROMPT_GENERATE_EVENT = 'send-selected-text-to-video-generate',
-  WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS = 0x1e,
-  WEB_PREVIEW_REVERSE_PROMPT_MOUNT_DELAY_MS = 0x10;
+  WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS = 30,
+  WEB_PREVIEW_REVERSE_PROMPT_MOUNT_DELAY_MS = 16;
 function dispatchWebPreviewForceSync(nodeId) {
   globalThis['window']?.['dispatchEvent']?.(
     new CustomEvent('web-preview:force-sync', { detail: { nodeId: nodeId } }),
@@ -71,7 +71,7 @@ function isCanvasNodeMounted(index) {
   return result ? globalThis['window']?.['v2Renderer']?.['isNodeMounted']?.(result) === !![] : ![];
 }
 async function waitForMountedCanvasNode(data) {
-  for (let options = 0x0; options < WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS; options += 0x1) {
+  for (let options = 0; options < WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS; options += 1) {
     if (isCanvasNodeMounted(data)) return !![];
     await waitForNextFrame();
   }
@@ -86,7 +86,7 @@ function getCanvasCommandFailureText(error) {
   );
 }
 function getPendingVisitKey(target, source) {
-  return (target || '') + '\x0a' + (source || '');
+  return (target || '') + '\n' + (source || '');
 }
 export function commitWebPreviewNodeUrl({
   nodeId: nodeId2,
@@ -144,7 +144,7 @@ export class WebPreviewNode {
       (this['_fullscreenSlot'] = null),
       (this['_freezeLayer'] = null),
       (this['_freezeImage'] = null),
-      (this['_freezeSnapshotSerial'] = 0x0),
+      (this['_freezeSnapshotSerial'] = 0),
       (this['_fullscreenKeyHandler'] = null),
       (this['_unregisterSlot'] = null),
       (this['_unregisterFullscreenSlot'] = null),
@@ -210,7 +210,7 @@ export class WebPreviewNode {
     ((scope['className'] = 'web-preview-freeze-image'),
       (scope['alt'] = ''),
       el3['appendChild'](scope),
-      (el3['tabIndex'] = 0x0),
+      (el3['tabIndex'] = 0),
       el3['addEventListener']('pointerdown', (output) => {
         this['_handleRemotePointerInput']('mousePressed', output);
       }),
@@ -245,7 +245,7 @@ export class WebPreviewNode {
     ((el4['className'] = 'web-preview-status'),
       (el4['textContent'] = getWebPreviewDefaultStatusText()));
     const value8 = document['createElement']('div');
-    value8['className'] = 'node-port\x20out-port';
+    value8['className'] = 'node-port out-port';
     const el5 = document['createElement']('div');
     return (
       (el5['className'] = 'group-resizer'),
@@ -333,12 +333,12 @@ export class WebPreviewNode {
     if (!box?.['width'] || !box?.['height']) return null;
     return {
       xRatio: Math['max'](
-        0x0,
-        Math['min'](0x1, (Number(event5?.['clientX']) - box['left']) / box['width']),
+        0,
+        Math['min'](1, (Number(event5?.['clientX']) - box['left']) / box['width']),
       ),
       yRatio: Math['max'](
-        0x0,
-        Math['min'](0x1, (Number(event5?.['clientY']) - box['top']) / box['height']),
+        0,
+        Math['min'](1, (Number(event5?.['clientY']) - box['top']) / box['height']),
       ),
     };
   }
@@ -362,7 +362,7 @@ export class WebPreviewNode {
       ...args,
       button: Number(altKey['button']),
       buttons: Number(altKey['buttons']),
-      clickCount: Math['max'](0x1, Number(altKey['detail']) || 0x1),
+      clickCount: Math['max'](1, Number(altKey['detail']) || 1),
       altKey: altKey['altKey'] === !![],
       ctrlKey: altKey['ctrlKey'] === !![],
       metaKey: altKey['metaKey'] === !![],
@@ -374,13 +374,13 @@ export class WebPreviewNode {
     const args2 = this['_getRemotePointerPosition'](altKey2);
     if (!args2) return;
     (altKey2['preventDefault'](), altKey2['stopPropagation']());
-    const buttons = Math['max'](0x0, Number(altKey2['buttons']) || 0x0),
+    const buttons = Math['max'](0, Number(altKey2['buttons']) || 0),
       button =
-        (buttons & 0x1) !== 0x0
+        (buttons & 1) !== 0
           ? 'left'
-          : (buttons & 0x4) !== 0x0
+          : (buttons & 4) !== 0
             ? 'middle'
-            : (buttons & 0x2) !== 0x0
+            : (buttons & 2) !== 0
               ? 'right'
               : 'none';
     this['_dispatchRemoteInput']({
@@ -389,7 +389,7 @@ export class WebPreviewNode {
       ...args2,
       button: button,
       buttons: buttons,
-      clickCount: 0x0,
+      clickCount: 0,
       altKey: altKey2['altKey'] === !![],
       ctrlKey: altKey2['ctrlKey'] === !![],
       metaKey: altKey2['metaKey'] === !![],
@@ -407,10 +407,10 @@ export class WebPreviewNode {
       type: 'mouseWheel',
       ...args3,
       button: 'none',
-      buttons: 0x0,
-      clickCount: 0x0,
-      deltaX: (Number(event6?.['deltaX']) || 0x0) + (Number(altKey3['deltaX']) || 0x0),
-      deltaY: (Number(event6?.['deltaY']) || 0x0) + (Number(altKey3['deltaY']) || 0x0),
+      buttons: 0,
+      clickCount: 0,
+      deltaX: (Number(event6?.['deltaX']) || 0) + (Number(altKey3['deltaX']) || 0),
+      deltaY: (Number(event6?.['deltaY']) || 0) + (Number(altKey3['deltaY']) || 0),
       altKey: altKey3['altKey'] === !![],
       ctrlKey: altKey3['ctrlKey'] === !![],
       metaKey: altKey3['metaKey'] === !![],
@@ -422,14 +422,14 @@ export class WebPreviewNode {
       const value12 = this['_remoteWheelInput'];
       this['_remoteWheelInput'] = null;
       if (value12) this['_dispatchRemoteInput'](value12);
-    }, 0x10);
+    }, 16);
   }
   ['_handleRemoteKeyInput'](type3, repeat) {
     if (!this['_isRemoteBrowserSurface']()) return;
     (repeat['preventDefault'](), repeat['stopPropagation']());
     const text =
       type3 === 'keyDown' &&
-      String(repeat['key'] || '')['length'] === 0x1 &&
+      String(repeat['key'] || '')['length'] === 1 &&
       !repeat['altKey'] &&
       !repeat['ctrlKey'] &&
       !repeat['metaKey'];
@@ -439,7 +439,7 @@ export class WebPreviewNode {
       key: String(repeat['key'] || ''),
       code: String(repeat['code'] || ''),
       text: text ? String(repeat['key'] || '') : '',
-      keyCode: Number(repeat['keyCode']) || 0x0,
+      keyCode: Number(repeat['keyCode']) || 0,
       repeat: repeat['repeat'] === !![],
       altKey: repeat['altKey'] === !![],
       ctrlKey: repeat['ctrlKey'] === !![],
@@ -885,8 +885,8 @@ export class WebPreviewNode {
       (this['_fullscreenSlot'] = el8),
       this['_unregisterFullscreenSlot']?.(),
       (this['_unregisterFullscreenSlot'] = registerWebPreviewSlot(this['id'], el8)),
-      (this['_backButtons'] = [this['_backButtons'][0x0], webPreviewToolbar2['backButton']]['filter'](Boolean)),
-      (this['_forwardButtons'] = [this['_forwardButtons'][0x0], webPreviewToolbar2['forwardButton']]['filter'](
+      (this['_backButtons'] = [this['_backButtons'][0], webPreviewToolbar2['backButton']]['filter'](Boolean)),
+      (this['_forwardButtons'] = [this['_forwardButtons'][0], webPreviewToolbar2['forwardButton']]['filter'](
         Boolean,
       )),
       (this['_fullscreenKeyHandler'] = (event8) => {
@@ -909,8 +909,8 @@ export class WebPreviewNode {
       this['_fullscreenKeyHandler'] &&
         (globalThis['window']?.['removeEventListener']?.('keydown', this['_fullscreenKeyHandler']),
         (this['_fullscreenKeyHandler'] = null)),
-      (this['_backButtons'] = [this['_backButtons'][0x0]]['filter'](Boolean)),
-      (this['_forwardButtons'] = [this['_forwardButtons'][0x0]]['filter'](Boolean)),
+      (this['_backButtons'] = [this['_backButtons'][0]]['filter'](Boolean)),
+      (this['_forwardButtons'] = [this['_forwardButtons'][0]]['filter'](Boolean)),
       dispatchWebPreviewForceSync(this['id']));
   }
   ['_applyNavigatedUrl'](value30, tabId8 = this['_getActiveTabId']()) {
@@ -976,19 +976,19 @@ export class WebPreviewNode {
       count = Number(box2['width']),
       count2 = Number(box2['height']),
       count3 = Number(box2['zoomFactor']),
-      value35 = this['_freezeSnapshotSerial'] + 0x1;
+      value35 = this['_freezeSnapshotSerial'] + 1;
     this['_freezeSnapshotSerial'] = value35;
     if (box2['streaming'] === !![]) {
       ((this['_freezeImage']['src'] = enabled6),
         (this['el']['dataset']['webPreviewSnapshotToken'] = value34));
       Number['isFinite'](count) &&
-        count > 0x0 &&
+        count > 0 &&
         (this['el']['dataset']['webPreviewSnapshotWidth'] = String(count));
       Number['isFinite'](count2) &&
-        count2 > 0x0 &&
+        count2 > 0 &&
         (this['el']['dataset']['webPreviewSnapshotHeight'] = String(count2));
       Number['isFinite'](count3) &&
-        count3 > 0x0 &&
+        count3 > 0 &&
         (this['el']['dataset']['webPreviewSnapshotZoomFactor'] = String(count3));
       this['el']['classList']['add']('is-remote-browser-surface', 'has-freeze-snapshot');
       return;
@@ -1000,13 +1000,13 @@ export class WebPreviewNode {
         ((value36 = !![]),
           (this['_freezeImage']['src'] = enabled6),
           (this['el']['dataset']['webPreviewSnapshotToken'] = value34),
-          Number['isFinite'](count) && count > 0x0
+          Number['isFinite'](count) && count > 0
             ? (this['el']['dataset']['webPreviewSnapshotWidth'] = String(count))
             : delete this['el']['dataset']['webPreviewSnapshotWidth'],
-          Number['isFinite'](count2) && count2 > 0x0
+          Number['isFinite'](count2) && count2 > 0
             ? (this['el']['dataset']['webPreviewSnapshotHeight'] = String(count2))
             : delete this['el']['dataset']['webPreviewSnapshotHeight'],
-          Number['isFinite'](count3) && count3 > 0x0
+          Number['isFinite'](count3) && count3 > 0
             ? (this['el']['dataset']['webPreviewSnapshotZoomFactor'] = String(count3))
             : delete this['el']['dataset']['webPreviewSnapshotZoomFactor'],
           box2['surfaceMode'] === 'remote-snapshot' &&
@@ -1041,7 +1041,7 @@ export class WebPreviewNode {
     else enabled7['complete'] && run();
   }
   ['_clearSnapshot']() {
-    this['_freezeSnapshotSerial'] += 0x1;
+    this['_freezeSnapshotSerial'] += 1;
     if (this['_freezeImage']) this['_freezeImage']['removeAttribute']('src');
     (delete this['el']['dataset']['webPreviewSnapshotToken'],
       delete this['el']['dataset']['webPreviewSnapshotWidth'],

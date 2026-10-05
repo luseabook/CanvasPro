@@ -90,7 +90,7 @@ const MascotManager = {
       clearInterval(this._rotationTimer),
       (this._rotationTimer = setInterval(() => {
         if (this._visible) this._updateTip();
-      }, 0x1f40)));
+      }, 8000)));
   },
   _hideMascot() {
     if (!this._visible || !this._mascotWrap) return;
@@ -136,7 +136,7 @@ const MascotManager = {
               clearInterval(this._rotationTimer),
               (this._rotationTimer = setInterval(() => {
                 if (this._visible) this._updateTip();
-              }, 0x1f40))));
+              }, 8000))));
       }),
       this._mascotWrap.addEventListener('click', (event2) => {
         (event2.stopPropagation(), this._hideMascot());

@@ -1,9 +1,9 @@
 import { existsSync, renameSync } from 'node:fs';
 import path from 'node:path';
 const CHROME_SHELL_RENDERER_READY_TIMEOUT = 'CHROME_SHELL_RENDERER_READY_TIMEOUT',
-  DEFAULT_MAX_RECOVERY_ATTEMPTS = 0x1,
+  DEFAULT_MAX_RECOVERY_ATTEMPTS = 1,
   PROFILE_DIR_PATTERN = /^(chrome|chromium|edge)-shell-profile$/i,
-  RENAME_RETRY_DELAYS_MS = [0xc8, 0x190, 0x320, 0x4b0, 0x578],
+  RENAME_RETRY_DELAYS_MS = [200, 400, 800, 1200, 1400],
   RETRYABLE_RENAME_CODES = new Set(['EPERM', 'EACCES', 'EBUSY']);
 function createProfileRecoveryError(message, code, cause = null) {
   const error = new Error(message, cause ? { cause: cause } : undefined);
@@ -16,7 +16,7 @@ function formatRecoveryTimestamp(value) {
       'Chrome shell profile recovery timestamp is invalid',
       'CHROME_SHELL_PROFILE_RECOVERY_TIMESTAMP_INVALID',
     );
-  return timestamp['toISOString']()['replace'](/[-:]/g, '')['replace']('T', '-')['slice'](0x0, 0xf);
+  return timestamp['toISOString']()['replace'](/[-:]/g, '')['replace']('T', '-')['slice'](0, 15);
 }
 function resolveRecoveryPaths({ sessionDataRoot: sessionDataRoot, profileDir: profileDir } = {}) {
   const resolvedSessionRoot = path['resolve'](String(sessionDataRoot || '')),
@@ -28,7 +28,7 @@ function resolveRecoveryPaths({ sessionDataRoot: sessionDataRoot, profileDir: pr
     !PROFILE_DIR_PATTERN['test'](path['basename'](resolvedProfileDir))
   )
     throw createProfileRecoveryError(
-      'Chrome\x20shell\x20profile\x20recovery\x20path\x20is\x20outside\x20sessionData',
+      'Chrome shell profile recovery path is outside sessionData',
       'CHROME_SHELL_PROFILE_RECOVERY_PATH_INVALID',
     );
   return { profileDir: resolvedProfileDir, sessionDataRoot: resolvedSessionRoot };
@@ -37,7 +37,7 @@ function resolveAvailableBackupDir({ profileDir: profileDir, exists: exists, now
   const timestamp = formatRecoveryTimestamp(now()),
     baseName = profileDir + '.recovery-' + timestamp;
   if (!exists(baseName)) return baseName;
-  for (let suffix = 0x1; suffix <= 0x3e7; suffix += 0x1) {
+  for (let suffix = 1; suffix <= 999; suffix += 1) {
     const candidate = baseName + '-' + suffix;
     if (!exists(candidate)) return candidate;
   }
@@ -78,11 +78,11 @@ export function createChromeShellProfileRecovery({
     return { rotated: true, profileDir: paths['profileDir'], backupDir: backupDir };
   }
   async function rotateWhenReleased() {
-    for (let attemptIndex = 0x0; ; attemptIndex += 0x1) {
+    for (let attemptIndex = 0; ; attemptIndex += 1) {
       try {
-        return { ...rotate(), renameAttempts: attemptIndex + 0x1 };
+        return { ...rotate(), renameAttempts: attemptIndex + 1 };
       } catch (attemptError) {
-        attemptError['renameAttempts'] = attemptIndex + 0x1;
+        attemptError['renameAttempts'] = attemptIndex + 1;
         if (
           attemptError['code'] !== 'CHROME_SHELL_PROFILE_RECOVERY_RENAME_FAILED' ||
           !RETRYABLE_RENAME_CODES['has'](attemptError['cause']?.['code']) ||
@@ -105,31 +105,31 @@ export async function runChromeShellStartupWithProfileRecovery({
   logEvent: logEvent = null,
 } = {}) {
   if (typeof startAttempt !== 'function')
-    throw new TypeError('Chrome\x20shell\x20startup\x20attempt\x20factory\x20is\x20required');
+    throw new TypeError('Chrome shell startup attempt factory is required');
   if (typeof rotateProfile !== 'function')
-    throw new TypeError('Chrome\x20shell\x20profile\x20recovery\x20operation\x20is\x20required');
-  const recoveryLimit = Math['max'](0x0, Math['min'](0x1, Math['trunc'](Number(maxRecoveryAttempts) || 0x0)));
-  let recoveryCount = 0x0,
+    throw new TypeError('Chrome shell profile recovery operation is required');
+  const recoveryLimit = Math['max'](0, Math['min'](1, Math['trunc'](Number(maxRecoveryAttempts) || 0)));
+  let recoveryCount = 0,
     backupDir = '';
   while (true) {
     try {
       const runtime = await startAttempt({
-        attemptNumber: recoveryCount + 0x1,
+        attemptNumber: recoveryCount + 1,
         recoveryCount: recoveryCount,
       });
       return (
-        recoveryCount > 0x0 &&
+        recoveryCount > 0 &&
           logEvent?.({
             type: 'chrome_shell.profile_recovery_succeeded',
             level: 'info',
             source: 'main',
-            message: 'Chrome\x20shell\x20started\x20with\x20a\x20recovered\x20browser\x20profile',
+            message: 'Chrome shell started with a recovered browser profile',
             context: { recoveryCount: recoveryCount, backupName: path['basename'](backupDir) },
           }),
         {
           runtime: runtime,
           profileRecovery: {
-            recovered: recoveryCount > 0x0,
+            recovered: recoveryCount > 0,
             recoveryCount: recoveryCount,
             backupDir: backupDir,
           },
@@ -137,7 +137,7 @@ export async function runChromeShellStartupWithProfileRecovery({
       );
     } catch (startupError) {
       if (!isRendererReadyTimeout(startupError) || recoveryCount >= recoveryLimit) {
-        recoveryCount > 0x0 &&
+        recoveryCount > 0 &&
           logEvent?.({
             type: 'chrome_shell.profile_recovery_failed',
             level: 'error',
@@ -169,7 +169,7 @@ export async function runChromeShellStartupWithProfileRecovery({
             error: rotationError,
             context: {
               recoveryCount: recoveryCount,
-              renameAttempts: rotationError['renameAttempts'] || 0x1,
+              renameAttempts: rotationError['renameAttempts'] || 1,
               filesystemCode: rotationError['cause']?.['code'] || '',
             },
           }));
@@ -183,17 +183,17 @@ export async function runChromeShellStartupWithProfileRecovery({
         startupError['profileRecoveryError'] = notRotatedError;
         throw startupError;
       }
-      ((recoveryCount += 0x1),
+      ((recoveryCount += 1),
         (backupDir = String(rotationResult['backupDir'] || '')),
         logEvent?.({
           type: 'chrome_shell.profile_rotated',
           level: 'warn',
           source: 'main',
-          message: 'Chrome\x20shell\x20browser\x20profile\x20was\x20backed\x20up\x20before\x20retry',
+          message: 'Chrome shell browser profile was backed up before retry',
           context: {
             recoveryCount: recoveryCount,
             backupName: path['basename'](backupDir),
-            renameAttempts: rotationResult['renameAttempts'] || 0x1,
+            renameAttempts: rotationResult['renameAttempts'] || 1,
           },
         }));
     }

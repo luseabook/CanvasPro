@@ -12,7 +12,7 @@ function syncStaticText(el) {
   if (el2) el2['textContent'] = sceneText('title');
   const el3 = el['querySelector']('.panorama-pose-panel__preset');
   if (el3) el3['setAttribute']('aria-label', sceneText('presetAria'));
-  const el4 = el3?.['querySelector']?.('[value=\x22custom\x22]');
+  const el4 = el3?.['querySelector']?.('[value="custom"]');
   if (el4) el4['textContent'] = sceneText('custom');
   const el5 = el['querySelector']('.panorama-pose-panel__bone');
   el5 &&
@@ -42,30 +42,30 @@ function selectedMannequin(index) {
   return index['mannequins']?.['find']((data) => data['id'] === result) || null;
 }
 function radiansToDegrees(options) {
-  return Math['round'](((Number(options) || 0x0) * 0xb4) / Math['PI']);
+  return Math['round'](((Number(options) || 0) * 180) / Math['PI']);
 }
 function degreesToRadians(target) {
-  return ((Number(target) || 0x0) * Math['PI']) / 0xb4;
+  return ((Number(target) || 0) * Math['PI']) / 180;
 }
 function syncAxisControls(el12) {
   const source = el12['querySelector']('.panorama-pose-panel__bone')?.['value'] || 'pelvis',
-    next = el12['_draftBonePose']?.[source] || { x: 0x0, y: 0x0, z: 0x0 };
+    next = el12['_draftBonePose']?.[source] || { x: 0, y: 0, z: 0 };
   el12['querySelectorAll']('[data-pose-axis]')['forEach']((el13) => {
     const current = el13['dataset']['poseAxis'];
     el13['value'] = String(radiansToDegrees(next[current]));
-    const el14 = el12['querySelector']('[data-pose-value=\x22' + current + '\x22]');
+    const el14 = el12['querySelector']('[data-pose-value="' + current + '"]');
     if (el14) el14['textContent'] = el13['value'] + '°';
   });
 }
 function updateDraftFromControl(el15, el16) {
   const entry = el15['querySelector']('.panorama-pose-panel__bone')?.['value'] || 'pelvis',
     record = el16['dataset']['poseAxis'],
-    args = el15['_draftBonePose']?.[entry] || { x: 0x0, y: 0x0, z: 0x0 };
+    args = el15['_draftBonePose']?.[entry] || { x: 0, y: 0, z: 0 };
   el15['_draftBonePose'] = normalizeBonePose({
     ...(el15['_draftBonePose'] || {}),
     [entry]: { ...args, [record]: degreesToRadians(el16['value']) },
   });
-  const el17 = el15['querySelector']('[data-pose-value=\x22' + record + '\x22]');
+  const el17 = el15['querySelector']('[data-pose-value="' + record + '"]');
   if (el17) el17['textContent'] = el16['value'] + '°';
 }
 export function createMannequinPosePanel({
@@ -146,7 +146,7 @@ export function createMannequinPosePanel({
     }),
     el28['addEventListener']('click', () => {
       onSaveCustom?.({
-        name: sceneText('customName', { suffix: Date['now']()['toString']()['slice'](-0x4) }),
+        name: sceneText('customName', { suffix: Date['now']()['toString']()['slice'](-4) }),
         bones: bones['_draftBonePose'],
       });
     }),

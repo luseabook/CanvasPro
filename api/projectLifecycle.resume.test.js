@@ -177,7 +177,7 @@ function createMemoryLocalStorage(options = {}) {
                     provider: 'runninghubwf',
                     rhTaskId: 'rh-video-1',
                     rhTaskStatus: 'running',
-                    rhTaskStartedAt: 0x14d,
+                    rhTaskStartedAt: 333,
                   },
                   {
                     id: 'src-image-running',
@@ -186,7 +186,7 @@ function createMemoryLocalStorage(options = {}) {
                     provider: 'runninghubwf',
                     rhTaskId: 'rh-src-image-1',
                     rhTaskStatus: 'pending',
-                    rhTaskStartedAt: 0x1bc,
+                    rhTaskStartedAt: 444,
                     rhTaskUseOpenapiQuery: false,
                   },
                   {
@@ -196,7 +196,7 @@ function createMemoryLocalStorage(options = {}) {
                     provider: 'runninghubwf',
                     rhTaskId: 'rh-src-audio-1',
                     rhTaskStatus: 'running',
-                    rhTaskStartedAt: 0x22b,
+                    rhTaskStartedAt: 555,
                     rhTaskUseOpenapiQuery: true,
                     audioSplitRole: 'vocals',
                     audioSplitPeerId: 'src-audio-peer',
@@ -327,7 +327,7 @@ function createMemoryLocalStorage(options = {}) {
                     dreaminaSubmitId: 'dm-submit-1',
                     dreaminaTaskStatus: 'pending',
                     dreaminaTaskPhase: 'generating',
-                    dreaminaTaskStartedAt: 0x3e9,
+                    dreaminaTaskStartedAt: 1001,
                   },
                   {
                     id: 'dreamina-img-error-result',
@@ -337,7 +337,7 @@ function createMemoryLocalStorage(options = {}) {
                     dreaminaSubmitId: 'dm-submit-error',
                     dreaminaTaskStatus: 'pending',
                     dreaminaTaskPhase: 'syncing',
-                    dreaminaTaskStartedAt: 0x3ef,
+                    dreaminaTaskStartedAt: 1007,
                     dreaminaTaskRecovering: true,
                     images: [
                       {
@@ -356,7 +356,7 @@ function createMemoryLocalStorage(options = {}) {
                     asyncTaskKind: 'video',
                     asyncTaskId: 'async-video-1',
                     asyncTaskStatus: 'running',
-                    asyncTaskStartedAt: 0x3ea,
+                    asyncTaskStartedAt: 1002,
                   },
                   {
                     id: 'async-image-running',
@@ -367,7 +367,7 @@ function createMemoryLocalStorage(options = {}) {
                     asyncTaskKind: 'image',
                     asyncTaskId: 'async-image-1',
                     asyncTaskStatus: 'pending',
-                    asyncTaskStartedAt: 0x3eb,
+                    asyncTaskStartedAt: 1003,
                   },
                   {
                     id: 'async-success',
@@ -386,7 +386,7 @@ function createMemoryLocalStorage(options = {}) {
                     asyncTaskKind: 'image',
                     asyncTaskId: 'async-ppio-1',
                     asyncTaskStatus: 'running',
-                    asyncTaskStartedAt: 0x3ec,
+                    asyncTaskStartedAt: 1004,
                   },
                   {
                     id: 'async-ppio-model-with-stale-provider',
@@ -396,7 +396,7 @@ function createMemoryLocalStorage(options = {}) {
                     asyncTaskKind: 'image',
                     asyncTaskId: 'async-ppio-2',
                     asyncTaskStatus: 'running',
-                    asyncTaskStartedAt: 0x3ed,
+                    asyncTaskStartedAt: 1005,
                   },
                   {
                     id: 'async-grsai-bare-model-with-stale-provider',
@@ -406,7 +406,7 @@ function createMemoryLocalStorage(options = {}) {
                     asyncTaskKind: 'image',
                     asyncTaskId: 'async-grsai-1',
                     asyncTaskStatus: 'running',
-                    asyncTaskStartedAt: 0x3ee,
+                    asyncTaskStartedAt: 1006,
                   },
                 ],
                 edges: [],

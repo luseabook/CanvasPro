@@ -16,9 +16,9 @@ import { stopActiveSyncVideoPlayback, syncPlaySelectedVideos } from '../modules/
 import { t } from '../i18n/index.js';
 let _inited = ![],
   _guardInstalled = ![];
-const LABEL_RENAME_CLICK_THRESHOLD_PX = 0x5,
+const LABEL_RENAME_CLICK_THRESHOLD_PX = 5,
   NODE_LABEL_RENAMING_CLASS = 'is-renaming-label',
-  EDGE_SCISSOR_HOVER_DELAY_MS = 0x1f4,
+  EDGE_SCISSOR_HOVER_DELAY_MS = 500,
   EDGE_POINTER_HIT_DISABLED_BODY_CLASSES = [
     'is-panning',
     'is-dragging',
@@ -38,7 +38,7 @@ export function shouldResolvePooledEdgePointerHit({
   if (scissorBtn && (target === scissorBtn || scissorBtn['contains']?.(target))) return ![];
   if (target['closest']?.('g.connection-group[data-conn-id]')) return ![];
   if (target['closest']?.('.v2-node')) return ![];
-  if (target['closest']?.('[data-ui-stop=\x221\x22]')) return ![];
+  if (target['closest']?.('[data-ui-stop="1"]')) return ![];
   if (target['closest']?.('button')) return ![];
   if (target['closest']?.('input')) return ![];
   if (target['closest']?.('textarea')) return ![];
@@ -50,7 +50,7 @@ function _formatNodeLabelText(item) {
   const list = String(item || '')['trim']();
   if (!list) return '';
   const key = /^[\x00-\x7F]*$/['test'](list);
-  if (key && list['length'] > 0x14) return list['slice'](0x0, 0x14) + '...';
+  if (key && list['length'] > 20) return list['slice'](0, 20) + '...';
   return list;
 }
 function _escapeHtml(index) {
@@ -58,7 +58,7 @@ function _escapeHtml(index) {
     if (result === '&') return '&amp;';
     if (result === '<') return '&lt;';
     if (result === '>') return '&gt;';
-    if (result === '\x22') return '&quot;';
+    if (result === '"') return '&quot;';
     return '&#39;';
   });
 }
@@ -72,11 +72,11 @@ function _stackHasRendererJs(data) {
   );
 }
 function _getGuardCallsite(options) {
-  const source = String(options || '')['split']('\x0a');
+  const source = String(options || '')['split']('\n');
   for (const list3 of source) {
     if (!list3['includes']('at ')) continue;
     const next = list3['match'](/\(([^)]+)\)/),
-      list4 = (next ? next[0x1] : list3['replace'](/^\s*at\s+/, ''))['trim']();
+      list4 = (next ? next[1] : list3['replace'](/^\s*at\s+/, ''))['trim']();
     if (!list4['includes']('.js')) continue;
     const list5 = list4['replace'](/:\d+:\d+$/, '');
     if (
@@ -90,7 +90,7 @@ function _getGuardCallsite(options) {
   return '';
 }
 function _createGuardError() {
-  return new Error('[架构守卫]\x20禁止在\x20renderer.js\x20中绑定\x20DOM\x20事件，请迁移到\x20UI\x20层');
+  return new Error('[架构守卫] 禁止在 renderer.js 中绑定 DOM 事件，请迁移到 UI 层');
 }
 export function installRendererEventBindingGuard() {
   if (_guardInstalled) return;
@@ -150,7 +150,7 @@ export function initRendererUiEvents({
     setTimeout3 = null,
     config = '',
     setTimeout4 = null,
-    box = { x: 0x0, y: 0x0 };
+    box = { x: 0, y: 0 };
   const canvasEl2 = document['getElementById']('v2-canvas'),
     scope = !!canvasEl2,
     handler = (edgeId, event = null) =>
@@ -187,7 +187,7 @@ export function initRendererUiEvents({
             action: () => handler4(),
           },
           'sep',
-          ...[0x2, 0x3, 0x4, 0x5]['map']((count) => ({
+          ...[2, 3, 4, 5]['map']((count) => ({
             label: t('coreUi.renderer.align.gridColumns', { count: count }),
             icon: 'grid',
             shortcutActionId: 'context-align-grid-' + count,
@@ -244,11 +244,11 @@ export function initRendererUiEvents({
         if (value7 && value8 && value7['contains'](value8)) return;
         (window['v2Renderer']?.['unpinNode']?.(enabled6, 'focus'),
           config === enabled6 && ((config = ''), window['v2Renderer']?.['flushNode']?.(enabled6)));
-      }, 0x4b0);
+      }, 1200);
     },
     handler11 = (value9, value10) => {
       window['v2Renderer']?.['setEdgeInteractionHighlight']?.(value9, value10);
-      const el3 = document['querySelector']('g.connection-group[data-conn-id="' + value9 + '\x22]');
+      const el3 = document['querySelector']('g.connection-group[data-conn-id="' + value9 + '"]');
       el3 &&
         (value10
           ? el3['classList']['add']('connection-highlighted')
@@ -376,7 +376,7 @@ export function initRendererUiEvents({
       if (id !== value18) return;
       setTimeout3 = setTimeout(() => {
         if (id === value18) handler13();
-      }, 0x64);
+      }, 100);
     };
   (store?.['subscribeRaw'] &&
     store['subscribeRaw']((enabled8) => {
@@ -388,7 +388,7 @@ export function initRendererUiEvents({
       (event4) => {
         const value20 = handler6(event4['target']);
         if (value20) handler7(value20);
-        const value21 = event4['target']?.['closest']?.('.node-label[contenteditable=\x22true\x22]');
+        const value21 = event4['target']?.['closest']?.('.node-label[contenteditable="true"]');
         if (value21) event4['stopPropagation']();
       },
       !![],
@@ -437,8 +437,8 @@ export function initRendererUiEvents({
         const value25 = store?.['getState']?.(),
           x3 = value25?.['picker'],
           type = el13['dataset']['nodeType'],
-          width = Number(el13['dataset']['width']) || 0x12c,
-          height = Number(el13['dataset']['height']) || 0x12c,
+          width = Number(el13['dataset']['width']) || 300,
+          height = Number(el13['dataset']['height']) || 300,
           label = el13['dataset']['defaultLabel'] || t('coreUi.renderer.defaultNodeNames.node');
         x3 &&
           x3['visible'] &&
@@ -477,14 +477,14 @@ export function initRendererUiEvents({
           if (stopActiveSyncVideoPlayback()) return;
           const state2 = store?.['getState']?.(),
             selectedIds = state2?.['selectedNodeIds'] || [];
-          selectedIds['length'] >= 0x2 &&
+          selectedIds['length'] >= 2 &&
             void syncPlaySelectedVideos({
               selectedIds: selectedIds,
               state: state2,
               loop: loop['shiftKey'] === !![],
               shouldStopOnPointerEvent: (event8) =>
                 event8?.['target']?.['closest']?.(
-                  '.v2-multi-select-tab\x20button[data-ui-action=\x22ms-sync-video-play\x22]',
+                  '.v2-multi-select-tab button[data-ui-action="ms-sync-video-play"]',
                 ) !== el15,
             });
           return;
@@ -516,7 +516,7 @@ export function initRendererUiEvents({
             (cancelSelectedGenerateButtons({ selectedIds: selectedIds2, state: state3 }), onStateChange(![]));
             return;
           }
-          selectedIds2['length'] > 0x0 &&
+          selectedIds2['length'] > 0 &&
             executeSelectedGenerateButtons({
               selectedIds: selectedIds2,
               state: state3,
@@ -526,7 +526,7 @@ export function initRendererUiEvents({
         }
         if (value27 === 'ms-asset') {
           const list6 = store?.['getState']?.()?.['selectedNodeIds'] || [];
-          list6['length'] > 0x0 &&
+          list6['length'] > 0 &&
             import('../modules/AssetManager.js')['then'](({ assetManager: assetManager }) => {
               assetManager['showLibrarySavePanel']([...list6], el15);
             });
@@ -539,7 +539,7 @@ export function initRendererUiEvents({
         }
         if (value27 === 'ms-group') {
           const ids = store?.['getState']?.()?.['selectedNodeIds'] || [];
-          ids['length'] >= 0x2 && executeCommand('group', { ids: ids });
+          ids['length'] >= 2 && executeCommand('group', { ids: ids });
           return;
         }
         if (value27 === 'ms-material-comparison') {
@@ -569,13 +569,13 @@ export function initRendererUiEvents({
         }
         if (value27 === 'ms-create-collage') {
           const ids2 = store?.['getState']?.()?.['selectedNodeIds'] || [];
-          ids2['length'] >= 0x2 && executeCommand('create_collage_from_selection', { ids: ids2 });
+          ids2['length'] >= 2 && executeCommand('create_collage_from_selection', { ids: ids2 });
           return;
         }
         if (value27 === 'ms-compose-video') {
           const value34 = store?.['getState']?.(),
             list8 = value34?.['selectedNodeIds'] || [];
-          list8['length'] >= 0x2 &&
+          list8['length'] >= 2 &&
             import('../modules/VideoComposeController.js')['then'](
               ({ composeSelectedAudios: composeSelectedAudios, composeSelectedVideos: composeSelectedVideos }) => {
                 const selectedMediaComposeKind =
@@ -588,7 +588,7 @@ export function initRendererUiEvents({
         }
         if (value27 === 'ms-reset-image-size') {
           const ids3 = store?.['getState']?.()?.['selectedNodeIds'] || [];
-          ids3['length'] > 0x0 && executeCommand('reset_source_media_size', { ids: ids3 });
+          ids3['length'] > 0 && executeCommand('reset_source_media_size', { ids: ids3 });
           return;
         }
         return;
@@ -636,7 +636,7 @@ export function initRendererUiEvents({
       if (el18 && value39) {
         (event10['preventDefault'](), event10['stopPropagation']());
         const box4 = el18['getBoundingClientRect']();
-        handler5(el18, box4['left'] + box4['width'] / 0x2, box4['bottom'] + 0x8);
+        handler5(el18, box4['left'] + box4['width'] / 2, box4['bottom'] + 8);
         return;
       }
       const enabled11 = event10['target']?.['closest']?.('.node-label[data-node-id]');
@@ -727,7 +727,7 @@ export function initRendererUiEvents({
       handler15(target2['clientX'], target2['clientY']);
     }),
     wrap?.['addEventListener']?.('pointerdown', (event14) => {
-      const value47 = event14['target']?.['closest']?.('[data-ui-stop=\x221\x22]');
+      const value47 = event14['target']?.['closest']?.('[data-ui-stop="1"]');
       if (value47) event14['stopPropagation']();
     }),
     window['addEventListener']('v2-align-feature-changed', () => {
@@ -742,7 +742,7 @@ export function initRendererUiEvents({
         )['length'],
       }),
       ({ enabled: enabled14, alignableCount: alignableCount }) => {
-        (!enabled14 || alignableCount < 0x2) && handler3();
+        (!enabled14 || alignableCount < 2) && handler3();
       },
     ));
 }

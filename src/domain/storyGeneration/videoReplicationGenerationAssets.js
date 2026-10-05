@@ -11,7 +11,7 @@ export function buildVideoReplicationGenerationAssets(list = [], value = {}) {
         (item = !![]),
         {
           ...args2,
-          name: '参考形象' + (key + 0x1),
+          name: '参考形象' + (key + 1),
           description: REPLICATION_IMAGE_APPEARANCE_GUIDANCE,
           prompt: '',
         }

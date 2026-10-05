@@ -21,7 +21,7 @@ export const REPLICATION_SOURCE_SPEECH_RULE =
 export const REPLICATION_TIMELINE_RULE =
   '时间以已确定的 segmentPlan 为准：片段 ref、原片起止、片段总时长固定，生成和修补均不得延长、缩短或另拆 clip。在原时间范围内按原片 shots 的切点组织镜头；修补缺镜只补回对应切点，不改变其他镜头的时间位置。原语言人声已有原片节奏，不按字数估算重新分配时间；译后确实无法容纳时保留疑点，不能删词、加速或擅改时间。';
 export const REPLICATION_CONTENT_RULE =
-  '人声原文、类型、说话人和\x20speechOrder\x20是声音依据，shots\x20与\x20speechRefs\x20是画面及对应关系依据；不根据\x20scriptMode\x20或剧情摘要重新分类。source\x20语言逐字保留，其他目标语言只翻译一次并保留信息、语气、类型与顺序。已有译文和人物替换沿用当前候选，不改回原演员。没有的人声不得补写，无旁白不作为缺失错误。只修有证据的错误，不确定就保留并指出需核对的事件；不从叙述推演新动作、表演、对白或音效。';
+  '人声原文、类型、说话人和 speechOrder 是声音依据，shots 与 speechRefs 是画面及对应关系依据；不根据 scriptMode 或剧情摘要重新分类。source 语言逐字保留，其他目标语言只翻译一次并保留信息、语气、类型与顺序。已有译文和人物替换沿用当前候选，不改回原演员。没有的人声不得补写，无旁白不作为缺失错误。只修有证据的错误，不确定就保留并指出需核对的事件；不从叙述推演新动作、表演、对白或音效。';
 export const REPLICATION_VISUAL_RULE =
   '逐镜将来源 shots 的可见信息组织成可执行的视频画面描述，不压缩成剧情摘要。visual 写清出镜主体在场景中的位置与朝向、人物之间及人物与道具的关系，再按发生顺序描述主要动作及结果，并保留来源已记录的视线、可见表情、身体状态和背景变化。动作先清楚概括，影响还原的动作衔接再写具体；静物镜头可简短，不设最低字数，不为凑细节逐项补全。camera 写来源明确的景别、机位、构图和运镜；过肩镜头说清谁的肩背在前景、主要看谁，固定或跟随及运动方向仅在来源有依据时写。来源没记录的信息不从台词或剧情推演，不把缺失信息猜成黑屏、过渡或无动作。人声进入独立声音字段；文字逐项进入 textElements，以 kind 区分物体文字、设计图文与转录字幕，程序按路由组织呈现。场景切换可作为新 shot 的开始，不在同一个 shot 串写多次切镜，不虚构转身、走位或连续运镜。以素材绑定替换主体身份和外貌，保留原片场景、道具及动作关系，不重复整段人设。';
 export const REPLICATION_SPEECH_OUTPUT_RULE =
@@ -31,10 +31,10 @@ const speechOutput = REPLICATION_SPEECH_OUTPUT_RULE,
     'assetUsages 只引用素材清单中实际可见的人物、场景和道具及其 appearanceRef；仅被提及的人物不算出镜。正文不写 @、URL、图片编号或内部 ID，最终素材声明与时间轴格式由编译器生成。';
 export function getReplicationGenerationSystemPrompt() {
   return [
-    '你将原片观察记录转换成可执行的视频分镜，不重新创作故事。只返回输入\x20outputFormat/output\x20指定的完整\x20JSON。',
+    '你将原片观察记录转换成可执行的视频分镜，不重新创作故事。只返回输入 outputFormat/output 指定的完整 JSON。',
     REPLICATION_CONTENT_RULE,
     REPLICATION_TIMELINE_RULE,
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 export function projectReplicationPromptEvidence(sourceDurationSec, map) {
   if (!sourceDurationSec) return sourceDurationSec;
@@ -103,12 +103,12 @@ export function serializeReplicationGenerationPrompt(task, enabled) {
       REPLICATION_SOURCE_CUT_RULE,
       isStoryContinuousTimelinePromptMode2
         ? REPLICATION_INTEGER_TIMING_RULE
-        : '镜头\x20durationSec/d\x20使用当前模式允许的秒数，按顺序合计等于计划\x20durationSec，不重新估算动作时长。',
+        : '镜头 durationSec/d 使用当前模式允许的秒数，按顺序合计等于计划 durationSec，不重新估算动作时长。',
       'visual/v 与 camera/c 使用简体中文；声音使用 adaptation.targetLocale 指定语言。v 与 c 保留来源逐镜记录中有助于还原的具体信息，不把动作过程缩成‘交谈、递东西、离开’等结果摘要；a 仅写有依据的声音。不写创作解释、审片结论或重复素材外观。来源细节不足时如实沿用，不靠扩写编造，直接交给用户编辑。',
     ],
     shotVisualSchema: replicationVisualSchema(),
     outputFormat:
-      '{\x22contentType\x22:\x22story/narrated_story/advertisement/unknown\x22,\x22clips\x22:[{\x22ref\x22:\x22计划ref\x22,\x22s\x22:\x22scenes.code\x22,\x22durationSec\x22:计划秒数,\x22shots\x22:[{\x22d\x22:镜头秒数,' +
+      '{"contentType":"story/narrated_story/advertisement/unknown","clips":[{"ref":"计划ref","s":"scenes.code","durationSec":计划秒数,"shots":[{"d":镜头秒数,' +
       (isStoryContinuousTimelinePromptMode2 ? '"startSec":局部起秒,"endSec":局部止秒,' : '') +
       '"v":"画面","c":"摄影","sceneKey":"场戏标识","textElements":[],"spatialStart":[],"spatialEnd":[],"q":"人物对白","o":"画外音","a":"环境声音及画外音时间","assetUsages":[{"assetRef":"素材ref","appearanceRef":"形象ref"}]}]}]}',
   });
@@ -117,13 +117,13 @@ export function getReplicationLockedTiming(item, key) {
   const sourceStartSec = key['replication']?.['segmentPlan']?.['find'](
     (index) => index['ref'] === item['ref'],
   );
-  let result = 0x0;
+  let result = 0;
   return {
     durationSec: Number(sourceStartSec?.['durationSec'] ?? item['durationSec']),
     sourceStartSec: sourceStartSec?.['sourceStartSec'] ?? item['sourceStartSec'],
     sourceEndSec: sourceStartSec?.['sourceEndSec'] ?? item['sourceEndSec'],
     shotBoundaries: (item['shots'] || [])
-      ['slice'](0x0, -0x1)
+      ['slice'](0, -1)
       ['map']((data) => (result += Number(data['durationSec']))),
   };
 }
@@ -148,7 +148,7 @@ export function buildReplicationReviewRequest(args, options, target, source = {}
       assets: task2['assets'],
       productionLimits: { maxClipDurationSeconds: task2['productionLimits']['maxClipDurationSeconds'] },
       promptRoute: replicationRoutePolicy(
-        resolveReplicationContentType(options['contentType'], list[0x0]?.['replicationContentType']),
+        resolveReplicationContentType(options['contentType'], list[0]?.['replicationContentType']),
       ),
       outputContract:
         (task2['outputContract'] || '') +
@@ -169,7 +169,7 @@ export function buildReplicationReviewRequest(args, options, target, source = {}
             REPLICATION_VISUAL_RULE,
             speechOutput,
             references,
-            '只修改\x20issues\x20指出的字段。未涉及的台词、声音类型、顺序和时间保持；相邻片段只读。已有镜头可按原片证据补切点，不能移动其他切点。无法确定的保留原候选，不能造内容通过校验。',
+            '只修改 issues 指出的字段。未涉及的台词、声音类型、顺序和时间保持；相邻片段只读。已有镜头可按原片证据补切点，不能移动其他切点。无法确定的保留原候选，不能造内容通过校验。',
           ],
         }
       : {
@@ -202,15 +202,15 @@ export function buildReplicationReviewRequest(args, options, target, source = {}
         ? [REPLICATION_INTEGER_TIMING_RULE]
         : []),
       ...(options['adaptation']?.['audioLanguage'] ? [options['adaptation']['audioLanguage']] : []),
-    ]['join']('\x0a'),
+    ]['join']('\n'),
   };
 }
 export function assertReplicationRepairTiming(list2, payload, handle, state = {}) {
   const replicationLockedTiming = getReplicationLockedTiming(payload, handle);
-  if (list2['length'] !== 0x1 || list2[0x0]['ref'] !== payload['ref'])
+  if (list2['length'] !== 1 || list2[0]['ref'] !== payload['ref'])
     throw new Error('复刻修补不得改变片段数量或引用。');
-  const config = list2[0x0],
-    scope = (config['shots'] || [])['reduce']((input, output) => input + Number(output['durationSec']), 0x0);
+  const config = list2[0],
+    scope = (config['shots'] || [])['reduce']((input, output) => input + Number(output['durationSec']), 0);
   if (
     !Number['isFinite'](scope) ||
     !Number['isFinite'](Number(config['durationSec'])) ||
@@ -224,11 +224,11 @@ export function assertReplicationRepairTiming(list2, payload, handle, state = {}
     )
   )
     throw new Error(
-      '复刻修补时间已锁定为\x20' +
+      '复刻修补时间已锁定为 ' +
         replicationLockedTiming['durationSec'] +
         ' 秒，禁止改变原片范围或片段总时长。',
     );
-  let value3 = 0x0;
+  let value3 = 0;
   const list3 = [];
   for (const value4 of config['shots'] || []) {
     if (isStoryContinuousTimelinePromptMode(state['promptMode']) && !isValidIntegerTimelineShot(value4))
@@ -253,7 +253,7 @@ export function assertReplicationRepairTiming(list2, payload, handle, state = {}
     replicationLockedTiming['shotBoundaries']['some'](
       (count) =>
         Number['isFinite'](count) &&
-        count > 0x0 &&
+        count > 0 &&
         count < replicationLockedTiming['durationSec'] &&
         !list3['some']((value8) => Math['abs'](value8 - count) <= 0.001),
     )
@@ -262,7 +262,7 @@ export function assertReplicationRepairTiming(list2, payload, handle, state = {}
   const replicationClipTiming = getReplicationClipTiming(payload, handle, state['promptMode']);
   if (
     handle['replication']?.['segmentPlan']?.['length'] &&
-    list3['slice'](0x0, -0x1)['some'](
+    list3['slice'](0, -1)['some'](
       (value9) =>
         !replicationLockedTiming['shotBoundaries']['includes'](value9) &&
         !replicationClipTiming['observedBoundaries']['includes'](value9),

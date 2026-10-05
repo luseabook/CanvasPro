@@ -29,8 +29,8 @@ export function drawCollaborationCommentMarkers({
   if (!state) return;
   const list = [...(selected || [])]['filter']((key) => nodes[key]),
     box = readNodeGeometryPreview(comments['nodeId'](), nodes[comments['nodeId']()]);
-  if (box) comments['position'](worldToScreen(box['x'] + (box['width'] || 0xc8), box['y'], viewport));
-  if (list['length'] > 0x1) {
+  if (box) comments['position'](worldToScreen(box['x'] + (box['width'] || 200), box['y'], viewport));
+  if (list['length'] > 1) {
     const enabled = document['querySelector']('#v2-multi-select-box .v2-multi-select-tab');
     if (!enabled || !chat) return;
     const el2 = entryFor('chat:selection', 'collaboration-toolbar-actions');
@@ -40,14 +40,14 @@ export function drawCollaborationCommentMarkers({
     if (el2['parentElement'] !== enabled) enabled['append'](el2);
     return;
   }
-  const index = list[0x0],
+  const index = list[0],
     error = readNodeGeometryPreview(index, nodes[index]);
   if (!error) return;
-  const el3 = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](index) + '\x22]'),
+  const el3 = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](index) + '"]'),
     el4 =
       document['querySelector'](
-        '.group-toolbar--detached[data-group-toolbar-for=\x22' + CSS['escape'](index) + '\x22]',
-      ) || el3?.['querySelector']('.node-floating-toolbar,\x20.group-toolbar');
+        '.group-toolbar--detached[data-group-toolbar-for="' + CSS['escape'](index) + '"]',
+      ) || el3?.['querySelector']('.node-floating-toolbar, .group-toolbar');
   if (!el4) return;
   const result = el4['querySelector']('.act-more-tools'),
     el5 = result?.['parentElement'] || el4,
@@ -56,12 +56,12 @@ export function drawCollaborationCommentMarkers({
   if (!el6['firstChild']) {
     const el7 = document['createElement']('button');
     ((el7['type'] = 'button'),
-      (el7['className'] = 'ftb-btn\x20icon-only\x20collaboration-comment-button'),
+      (el7['className'] = 'ftb-btn icon-only collaboration-comment-button'),
       el7['append'](createContextMenuIcon('comment'), document['createElement']('span')),
       el7['addEventListener']('pointerdown', (event3) => event3['stopPropagation']()),
       el7['addEventListener']('click', (event4) => {
         (event4['stopPropagation'](), comments['open'](index, el7));
-        const el8 = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](index) + '\x22]');
+        const el8 = document['querySelector']('.v2-node[data-node-id="' + CSS['escape'](index) + '"]');
         if (el8) {
           const x = el8['getBoundingClientRect']();
           comments['position']?.({ x: x['right'], y: x['top'] });
@@ -78,12 +78,12 @@ export function drawCollaborationCommentMarkers({
       el9['classList']['toggle']('icon-only', !enabled2));
   }
   const data = state['review']?.['summaries']?.['find']((options) => options['node'] === index),
-    target = data?.['unresolved'] || 0x0;
+    target = data?.['unresolved'] || 0;
   ((el6['dataset']['status'] = target ? 'unresolved' : data?.['count'] ? 'resolved' : 'empty'),
     (el6['firstChild']['lastChild']['textContent'] = target ? String(target) : ''),
     el6['firstChild']['setAttribute'](
       'aria-label',
-      (error['name'] || index) + '的评论，' + target + '\x20条未解决',
+      (error['name'] || index) + '的评论，' + target + ' 条未解决',
     ));
   if (!chat) return;
   el6['lastChild']['setAttribute']('aria-label', '将' + (error['name'] || index) + '加入聊天');
@@ -93,7 +93,7 @@ export function drawCollaborationCommentMarkers({
   el6['lastChild']['hidden'] = ![];
   if (next) {
     const enabled3 =
-      el4['getBoundingClientRect']()['width'] > Math['min'](bounds['width'], window['innerWidth']) - 0x30;
+      el4['getBoundingClientRect']()['width'] > Math['min'](bounds['width'], window['innerWidth']) - 48;
     el6['lastChild']['hidden'] = enabled3;
     const el10 = entryFor('chat:more:' + index, 'collaboration-toolbar-overflow');
     if (el10['parentElement'] !== next) next['append'](el10);

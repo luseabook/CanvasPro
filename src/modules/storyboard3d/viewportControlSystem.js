@@ -5,12 +5,12 @@ import {
 import { estimateSceneContentBounds } from '../panoramaSceneNode/scene3dCameraNavigation.js';
 import { normalizeTransformInteractionOptions } from '../panoramaSceneNode/transformInteractionAdapter.js';
 const DEFAULT_SCENE_VIEW = Object['freeze']({
-  target: Object['freeze']({ x: 0x0, y: 1.2, z: 0x0 }),
-  orbitYaw: Math['PI'] / 0x4,
+  target: Object['freeze']({ x: 0, y: 1.2, z: 0 }),
+  orbitYaw: Math['PI'] / 4,
   orbitPitch: 0.35,
-  orbitDistance: 0x8,
+  orbitDistance: 8,
 });
-function finite(value, item = 0x0) {
+function finite(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -21,7 +21,7 @@ function positive(options, target, source, next) {
   return clamp(finite(options, target), source, next);
 }
 function vector3(x, box = DEFAULT_SCENE_VIEW['target']) {
-  const box2 = Array['isArray'](x) ? { x: x[0x0], y: x[0x1], z: x[0x2] } : x;
+  const box2 = Array['isArray'](x) ? { x: x[0], y: x[1], z: x[2] } : x;
   return {
     x: finite(box2?.['x'], box['x']),
     y: finite(box2?.['y'], box['y']),
@@ -46,12 +46,12 @@ export function normalizeStoryboard3DSceneView(event = {}) {
   };
 }
 function normalizeFrame(options2 = {}, entry = {}) {
-  const center = vector3(options2['center'] || entry['center'], { x: 0x0, y: 0x0, z: 0x0 });
+  const center = vector3(options2['center'] || entry['center'], { x: 0, y: 0, z: 0 });
   return {
     center: center,
-    radius: positive(options2['radius'], finite(entry['radius'], 0x1), 0.05, 0x186a0),
-    aspect: positive(options2['aspect'], finite(entry['aspect'], 0x10 / 0x9), 0.1, 0x14),
-    fov: positive(options2['fov'], finite(entry['fov'], 0x32), 0x1, 0xb3),
+    radius: positive(options2['radius'], finite(entry['radius'], 1), 0.05, 100000),
+    aspect: positive(options2['aspect'], finite(entry['aspect'], 16 / 9), 0.1, 20),
+    fov: positive(options2['fov'], finite(entry['fov'], 50), 1, 179),
   };
 }
 export function createStoryboard3DFocusSceneView({
@@ -68,7 +68,7 @@ export function createStoryboard3DFocusSceneView({
       radius: target2['radius'],
       fov: target2['fov'],
       aspect: target2['aspect'],
-      padding: positive(padding, 1.22, 0x1, 0x5),
+      padding: positive(padding, 1.22, 1, 5),
     }),
   };
 }
@@ -76,8 +76,8 @@ export function createStoryboard3DFitAllSceneView({
   sceneView: sceneView2,
   sceneState: sceneState,
   bounds: bounds,
-  aspect: aspect = 0x10 / 0x9,
-  fov: fov = 0x32,
+  aspect: aspect = 16 / 9,
+  fov: fov = 50,
   padding: padding = 1.28,
 } = {}) {
   const center2 = bounds || estimateSceneContentBounds(sceneState);
@@ -96,7 +96,7 @@ export function createStoryboard3DAxisView({
   sceneView: sceneView3,
   sceneState: sceneState2,
   bounds: bounds2,
-  aspect: aspect = 0x10 / 0x9,
+  aspect: aspect = 16 / 9,
   padding: padding = 1.2,
 } = {}) {
   const viewMode = normalizeStoryboard3DOrthographicAxis(axis),
@@ -105,19 +105,19 @@ export function createStoryboard3DAxisView({
       center: center3?.['center'],
       radius: center3?.['radius'],
       aspect: aspect,
-      fov: 0x2d,
+      fov: 45,
     }),
     sceneView4 = normalizeStoryboard3DSceneView(sceneView3),
-    padding2 = positive(padding, 1.2, 0x1, 0x5),
+    padding2 = positive(padding, 1.2, 1, 5),
     sceneView5 = createStoryboard3DFocusSceneView({
       sceneView: sceneView4,
       frame: frame2,
       padding: padding2,
     });
   return (
-    (sceneView5['orbitYaw'] = viewMode === 'right' ? Math['PI'] / 0x2 : 0x0),
+    (sceneView5['orbitYaw'] = viewMode === 'right' ? Math['PI'] / 2 : 0),
     (sceneView5['orbitPitch'] =
-      viewMode === 'top' ? PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene']['orbitPitch']['max'] : 0x0),
+      viewMode === 'top' ? PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene']['orbitPitch']['max'] : 0),
     {
       viewMode: viewMode,
       projection: 'orthographic',
@@ -125,10 +125,10 @@ export function createStoryboard3DAxisView({
       orthographic: {
         axis: viewMode,
         center: frame2['center'],
-        verticalSize: Math['max'](0.1, frame2['radius'] * 0x2 * padding2),
+        verticalSize: Math['max'](0.1, frame2['radius'] * 2 * padding2),
         aspect: frame2['aspect'],
         near: 0.01,
-        far: Math['max'](0x64, frame2['radius'] * 0x8),
+        far: Math['max'](100, frame2['radius'] * 8),
         top: viewMode === 'top',
       },
     }
@@ -156,14 +156,14 @@ export function normalizeStoryboard3DViewportSettings(transformSpace = {}) {
     groundLock: transformSpace['groundLock'] === !![],
     uniformScale: transformSpace['uniformScale'] === !![],
     snapEnabled: transformSpace['snapEnabled'] === !![] || box3['enabled'] === !![],
-    translationSnap: positive(transformSpace['translationSnap'] ?? box3['translation'], 0.25, 0.01, 0xa),
+    translationSnap: positive(transformSpace['translationSnap'] ?? box3['translation'], 0.25, 0.01, 10),
     rotationSnap: positive(
       transformSpace['rotationSnap'] ?? box3['rotation'],
-      Math['PI'] / 0xc,
+      Math['PI'] / 12,
       0.001,
       Math['PI'],
     ),
-    scaleSnap: positive(transformSpace['scaleSnap'] ?? box3['scale'], 0.1, 0.01, 0xa),
+    scaleSnap: positive(transformSpace['scaleSnap'] ?? box3['scale'], 0.1, 0.01, 10),
   };
 }
 export function createStoryboard3DTransformInteractionOptions(
@@ -213,13 +213,13 @@ export class Storyboard3DWebGLContextController {
       (this['onRestored'] = onRestored),
       (this['restore'] = restore),
       (this['state'] = 'ready'),
-      (this['lossCount'] = 0x0),
+      (this['lossCount'] = 0),
       (this['destroyed'] = ![]),
-      (this['restoreRevision'] = 0x0),
+      (this['restoreRevision'] = 0),
       (this['_onContextLost'] = (event2) => {
         if (this['destroyed']) return;
         (event2?.['preventDefault']?.(),
-          (this['lossCount'] += 0x1),
+          (this['lossCount'] += 1),
           (this['state'] = 'lost'),
           this['onLost']?.({ event: event2, lossCount: this['lossCount'] }),
           this['_notify']('context-lost'));
@@ -251,7 +251,7 @@ export class Storyboard3DWebGLContextController {
   ['destroy']() {
     if (this['destroyed']) return;
     ((this['destroyed'] = !![]),
-      (this['restoreRevision'] += 0x1),
+      (this['restoreRevision'] += 1),
       this['canvas']['removeEventListener']('webglcontextlost', this['_onContextLost'], ![]),
       this['canvas']['removeEventListener']('webglcontextrestored', this['_onContextRestored'], ![]),
       (this['state'] = 'destroyed'));
@@ -339,19 +339,19 @@ export class Storyboard3DViewportControlSystem {
     if (!sceneState3 && !args4['bounds']) return null;
     const value3 = this['runtime']?.['readCurrentCamera']?.(),
       box4 = this['canvas']?.['getBoundingClientRect']?.(),
-      count = Number(box4?.['width']) / Math['max'](0x1, Number(box4?.['height'])),
+      count = Number(box4?.['width']) / Math['max'](1, Number(box4?.['height'])),
       args5 = {
         ...args4,
         aspect:
-          Number['isFinite'](Number(args4['aspect'])) && Number(args4['aspect']) > 0x0
+          Number['isFinite'](Number(args4['aspect'])) && Number(args4['aspect']) > 0
             ? Number(args4['aspect'])
-            : Number['isFinite'](count) && count > 0x0
+            : Number['isFinite'](count) && count > 0
               ? count
-              : 0x10 / 0x9,
+              : 16 / 9,
         fov:
-          Number['isFinite'](Number(args4['fov'])) && Number(args4['fov']) > 0x0
+          Number['isFinite'](Number(args4['fov'])) && Number(args4['fov']) > 0
             ? Number(args4['fov'])
-            : Number(value3?.['fov']) || 0x32,
+            : Number(value3?.['fov']) || 50,
       },
       sceneView9 = createStoryboard3DFitAllSceneView({
         ...args5,

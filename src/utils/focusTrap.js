@@ -12,8 +12,8 @@ function isFocusable(el) {
   if (!isVisible(el)) return ![];
   if (!el || el['disabled'] === !![] || el['hidden'] === !![]) return ![];
   if (el['inert'] === !![] || el['getAttribute']?.('aria-hidden') === 'true') return ![];
-  if (el['closest']?.('[hidden],\x20[aria-hidden=\x27true\x27],\x20[inert]')) return ![];
-  if (Number['isFinite'](Number(el['tabIndex'])) && Number(el['tabIndex']) < 0x0) return ![];
+  if (el['closest']?.('[hidden], [aria-hidden=\'true\'], [inert]')) return ![];
+  if (Number['isFinite'](Number(el['tabIndex'])) && Number(el['tabIndex']) < 0) return ![];
   return typeof el['focus'] === 'function';
 }
 function focusProgrammatically(el2) {
@@ -25,7 +25,7 @@ function focusProgrammatically(el2) {
   return (el2['focus']({ preventScroll: !![] }), !![]);
 }
 function isVisible(value) {
-  if (value?.['getClientRects'] && value['getClientRects']()['length'] === 0x0) return ![];
+  if (value?.['getClientRects'] && value['getClientRects']()['length'] === 0) return ![];
   const item = value?.['ownerDocument']?.['defaultView']?.['getComputedStyle']?.(value);
   return item?.['visibility'] !== 'hidden' && item?.['visibility'] !== 'collapse';
 }
@@ -34,7 +34,7 @@ export function listFocusableElements(el3) {
 }
 export function focusFirstElement(el4, { preferredSelector: preferredSelector = '' } = {}) {
   const key = preferredSelector ? el4?.['querySelector']?.(preferredSelector) : null,
-    isFocusable2 = isFocusable(key) ? key : listFocusableElements(el4)[0x0] || el4;
+    isFocusable2 = isFocusable(key) ? key : listFocusableElements(el4)[0] || el4;
   return focusProgrammatically(isFocusable2);
 }
 export function trapTabKey(event, enabled, dom = globalThis['document']) {
@@ -43,13 +43,13 @@ export function trapTabKey(event, enabled, dom = globalThis['document']) {
     index = dom?.['activeElement'] || null,
     enabled2 = enabled['contains']?.(index) === !![];
   let enabled3 = null;
-  if (list['length'] === 0x0) enabled3 = enabled;
+  if (list['length'] === 0) enabled3 = enabled;
   else {
-    if (!enabled2 || index === enabled) enabled3 = event['shiftKey'] ? list['at'](-0x1) : list[0x0];
+    if (!enabled2 || index === enabled) enabled3 = event['shiftKey'] ? list['at'](-1) : list[0];
     else {
-      if (event['shiftKey'] && index === list[0x0]) enabled3 = list['at'](-0x1);
+      if (event['shiftKey'] && index === list[0]) enabled3 = list['at'](-1);
       else {
-        if (!event['shiftKey'] && index === list['at'](-0x1)) enabled3 = list[0x0];
+        if (!event['shiftKey'] && index === list['at'](-1)) enabled3 = list[0];
       }
     }
   }

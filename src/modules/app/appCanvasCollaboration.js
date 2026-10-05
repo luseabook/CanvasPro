@@ -51,17 +51,17 @@ export function initCanvasCollaboration({
       el4['setAttribute']('aria-label', '查看协作成员，' + list['length'] + ' 人在线'));
     if (key === value) return;
     ((value = key), el4['replaceChildren']());
-    for (const error2 of list['slice'](0x0, 0x3)) {
+    for (const error2 of list['slice'](0, 3)) {
       const el6 = document['createElement']('span');
       ((el6['className'] = 'collaboration-avatar'),
-        (el6['textContent'] = error2['name']['slice'](0x0, 0x1)),
+        (el6['textContent'] = error2['name']['slice'](0, 1)),
         el6['style']['setProperty']('--member-color', collaborationMemberColor(error2)),
         (el6['title'] = error2['name']),
         el4['append'](el6));
     }
-    if (list['length'] > 0x3 || !list['length']) {
+    if (list['length'] > 3 || !list['length']) {
       const el7 = document['createElement']('span');
-      ((el7['textContent'] = list['length'] ? '+' + (list['length'] - 0x3) : '成员'), el4['append'](el7));
+      ((el7['textContent'] = list['length'] ? '+' + (list['length'] - 3) : '成员'), el4['append'](el7));
     }
   }
   const getSession = createCollaborationApplication({
@@ -89,7 +89,7 @@ export function initCanvasCollaboration({
     comments = createCollaborationComments({ store: store, getSession: getSession['getSession'] });
   function openNode(target, source) {
     if (!store['getStateRaw']()['nodes'][target]) return;
-    (getSession['getSession']()?.['follow'](''), focusNode?.(target, 0x60, 0x1f4));
+    (getSession['getSession']()?.['follow'](''), focusNode?.(target, 96, 500));
     if (source) comments['open'](target);
   }
   const run2 = createCollaborationCommentNotifications({
@@ -121,7 +121,7 @@ export function initCanvasCollaboration({
     const error3 = getSession['getState']()['session'];
     (collaborationConnectionIndicator['update'](error3),
       (el5['textContent'] = error3
-        ? '协作中\x20·\x20' + (error3['hosting'] ? '房主' : '成员')
+        ? '协作中 · ' + (error3['hosting'] ? '房主' : '成员')
         : isSubscriptionActive(store['getStateRaw']()['subscription'] || {})
           ? '开启协作'
           : '协作 · 需激活'),
@@ -156,7 +156,7 @@ export function initCanvasCollaboration({
     },
     getState: getSession['getState'],
     anchor: anchor,
-    keepOpenOnOutside: (el8) => !!el8['closest']?.('#fabBtn,\x20.agent-sidebar'),
+    keepOpenOnOutside: (el8) => !!el8['closest']?.('#fabBtn, .agent-sidebar'),
   });
   function show() {
     (collaborationPanel['show'](), void getSession['ensureAuthenticated']()['catch'](() => {}));

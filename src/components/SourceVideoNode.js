@@ -44,7 +44,7 @@ const SOURCE_VIDEO_MIN_SIZE = 150,
   SOURCE_VIDEO_POSTER_PRELOAD = 'metadata',
   SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS = 120,
   SOURCE_VIDEO_BUSY_RETRY_MS = 80,
-  SOURCE_VIDEO_MAX_BUSY_WAIT_MS = 0x384;
+  SOURCE_VIDEO_MAX_BUSY_WAIT_MS = 900;
 function sourceVideoText(value, item = {}) {
   return t('sourceVideoNode.' + value, item);
 }
@@ -186,7 +186,7 @@ function readVideoFileNaturalSize(enabled) {
         run2(uploadMediaDimensions);
       }),
       (payload.onerror = () => run2(null)),
-      (setTimeout3 = setTimeout(() => run2(null), 0xbb8)),
+      (setTimeout3 = setTimeout(() => run2(null), 3000)),
       (payload.src = record));
   });
 }
@@ -511,8 +511,8 @@ export class SourceVideoNode {
         if (this._data.fixedSize) return;
         if (!this._data.needsAutoResize) return;
         const { width: width3, height: height2 } = getAutoMediaSizeByShortSide(
-          count || 0x3e8,
-          count2 || 0x3e8,
+          count || 1000,
+          count2 || 1000,
         );
         appStore.updateNodeData(this.id, { width: width3, height: height2, needsAutoResize: false });
       }));
@@ -685,7 +685,7 @@ export class SourceVideoNode {
                 (this._timeTotal.textContent = this._fmt(value64)));
             }
           };
-          (el5.addEventListener('seeked', value61, { once: true }), window.setTimeout(value61, 0x12c));
+          (el5.addEventListener('seeked', value61, { once: true }), window.setTimeout(value61, 300));
         },
         value67 = (event8) => {
           if (!enabled11) return;
@@ -1346,9 +1346,9 @@ export class SourceVideoNode {
       attachVideoPlaybackRecovery(controls, {
         label: this._getPlaybackLabel('fullscreen'),
         minBufferAhead: 0.5,
-        readyTimeoutMs: 0x15e,
+        readyTimeoutMs: 350,
         recoveryDebounceMs: 150,
-        recoveryCooldownMs: 0x1f4,
+        recoveryCooldownMs: 500,
         shouldRecover: () => controls.isConnected !== false && !controls.paused,
       }));
     let value129 = false;
@@ -1388,9 +1388,9 @@ export class SourceVideoNode {
       void playVideoWithRecovery(controls, {
         label: this._getPlaybackLabel('fullscreen'),
         minBufferAhead: 0.5,
-        readyTimeoutMs: 0x15e,
+        readyTimeoutMs: 350,
         recoveryDebounceMs: 150,
-        recoveryCooldownMs: 0x1f4,
+        recoveryCooldownMs: 500,
         shouldRecover: () => controls.isConnected !== false && !controls.paused,
       }));
   }
@@ -1419,9 +1419,9 @@ export class SourceVideoNode {
       label: this._getPlaybackLabel(value130),
       ensureSrc: () => this._ensurePlaybackVideoSrc({ forPlayback: true }),
       minBufferAhead: minBufferAhead ? 0.5 : undefined,
-      readyTimeoutMs: minBufferAhead ? 0x15e : undefined,
+      readyTimeoutMs: minBufferAhead ? 350 : undefined,
       recoveryDebounceMs: minBufferAhead ? 150 : undefined,
-      recoveryCooldownMs: minBufferAhead ? 0x1f4 : undefined,
+      recoveryCooldownMs: minBufferAhead ? 500 : undefined,
       shouldRecover: () =>
         this._video?.isConnected !== false &&
         (this._isHovered || this._isManualControl || !this._video?.paused),
@@ -1436,9 +1436,9 @@ export class SourceVideoNode {
         label: this._getPlaybackLabel(minBufferAhead2),
         ensureSrc: () => this._ensurePlaybackVideoSrc({ forPlayback: true }),
         minBufferAhead: minBufferAhead2 === 'hover' ? 0.5 : undefined,
-        readyTimeoutMs: minBufferAhead2 === 'hover' ? 0x15e : undefined,
+        readyTimeoutMs: minBufferAhead2 === 'hover' ? 350 : undefined,
         recoveryDebounceMs: minBufferAhead2 === 'hover' ? 150 : undefined,
-        recoveryCooldownMs: minBufferAhead2 === 'hover' ? 0x1f4 : undefined,
+        recoveryCooldownMs: minBufferAhead2 === 'hover' ? 500 : undefined,
         shouldRecover: () =>
           this._video?.isConnected !== false &&
           (this._isHovered || this._isManualControl || !this._video?.paused),
@@ -1624,7 +1624,7 @@ export class SourceVideoNode {
         if (value138 === 'pause') this._showPausedCenterIndicator();
         else this._hideCenterIndicator();
         this._centerIndicatorTimer = null;
-      }, 0x208)));
+      }, 520)));
   }
   ['_updatePlayIcon'](value139) {
     if (!this._playBtn) return;
@@ -1795,7 +1795,7 @@ export class SourceVideoNode {
     let resultLocalPath = '';
     try {
       const signal = new AbortController(),
-        setTimeout5 = setTimeout(() => signal.abort(), 0x1d4c0);
+        setTimeout5 = setTimeout(() => signal.abort(), 120000);
       let fetchRemoteBlob2 = null;
       try {
         fetchRemoteBlob2 = await fetchRemoteBlob(url3, { signal: signal.signal });

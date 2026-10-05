@@ -1,7 +1,7 @@
 import { isNodeType } from '../modules/registry.js';
 import { createRendererMediaSlotLifecycle, isRendererMediaSlotStable } from './rendererMediaSlotLifecycle.js';
-function getSlotKey(value, item = 0x0) {
-  return String(value || '') + ':' + Math['max'](0x0, Math['trunc'](Number(item) || 0x0));
+function getSlotKey(value, item = 0) {
+  return String(value || '') + ':' + Math['max'](0, Math['trunc'](Number(item) || 0));
 }
 function clearReleasedPreviewDataset(el) {
   if (!el?.['dataset']) return;
@@ -18,14 +18,14 @@ export function createRendererSourceVideoSlotLifecycle({
   function isManagedNode(key) {
     return isNodeType(getNode?.(key), 'source-video');
   }
-  function read(index, result = 0x0) {
+  function read(index, result = 0) {
     return rendererMediaSlotLifecycle['read'](getSlotKey(index, result));
   }
   function resolveMediaPresentationReady(data) {
     if (!isManagedNode(data)) return undefined;
     return read(data)['surface'] === 'media';
   }
-  function prepareSource(enabled, sourceKey, { slotIndex: slotIndex = 0x0, rebind: rebind = ![] } = {}) {
+  function prepareSource(enabled, sourceKey, { slotIndex: slotIndex = 0, rebind: rebind = ![] } = {}) {
     if (!enabled || !isManagedNode(enabled)) return null;
     const options = rendererMediaSlotLifecycle['transition'](getSlotKey(enabled, slotIndex), {
       type: 'source-intent',
@@ -54,7 +54,7 @@ export function createRendererSourceVideoSlotLifecycle({
       !![]
     );
   }
-  function syncVisibility(enabled4, visibilityTier, target = 0x0) {
+  function syncVisibility(enabled4, visibilityTier, target = 0) {
     if (!enabled4 || !isManagedNode(enabled4)) return null;
     return rendererMediaSlotLifecycle['transition'](getSlotKey(enabled4, target), {
       type: 'visibility',
@@ -74,7 +74,7 @@ export function createRendererSourceVideoSlotLifecycle({
       isSelected ? 'focused' : isVisible ? 'visible' : isPreviewCandidate ? 'near' : 'far',
     );
   }
-  function setResidency(enabled5, residency, next = 0x0) {
+  function setResidency(enabled5, residency, next = 0) {
     if (!enabled5 || !isManagedNode(enabled5)) return null;
     const current = rendererMediaSlotLifecycle['transition'](getSlotKey(enabled5, next), {
       type: 'residency',
@@ -85,12 +85,12 @@ export function createRendererSourceVideoSlotLifecycle({
       current['state']
     );
   }
-  function shouldRetainPresentedSurface(entry, record = 0x0) {
+  function shouldRetainPresentedSurface(entry, record = 0) {
     if (!isManagedNode(entry)) return ![];
     const payload = read(entry, record);
     return payload['surface'] === 'media' && payload['visibilityTier'] !== 'far';
   }
-  function suspendPresentedSurface(enabled6, handle = 0x0) {
+  function suspendPresentedSurface(enabled6, handle = 0) {
     if (!enabled6 || !isManagedNode(enabled6)) return null;
     const sourceKey3 = read(enabled6, handle),
       state = rendererMediaSlotLifecycle['transition'](getSlotKey(enabled6, handle), {
@@ -100,7 +100,7 @@ export function createRendererSourceVideoSlotLifecycle({
       });
     return (clearReleasedPreviewDataset(getWrapper?.(enabled6)), state['state']);
   }
-  function forget(config, scope = 0x0) {
+  function forget(config, scope = 0) {
     return rendererMediaSlotLifecycle['forget'](getSlotKey(config, scope));
   }
   function reset() {

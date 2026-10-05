@@ -202,7 +202,7 @@ test('waitForGlobalCaptureNodeMounted defaults to 30 mount attempts', async () =
     scheduleFrame: (callback) => callback(),
   });
   assert.equal(mounted, false);
-  assert.equal(calls, 0x1e);
+  assert.equal(calls, 30);
 });
 
 test('waitForGlobalCaptureNodeMounted falls back to a timer when no frame scheduler is usable', async () => {

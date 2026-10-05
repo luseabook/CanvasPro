@@ -10,7 +10,7 @@ import {
   normalizeDirectorGeneratedLayers,
   normalizeDirectorGenerationJobs,
 } from './directorGeneratedLayers.js';
-export const STORYBOARD_3D_PROJECT_VERSION = 0x2;
+export const STORYBOARD_3D_PROJECT_VERSION = 2;
 export const STORYBOARD_3D_SHOT_SIZES = Object['freeze']([
   'EST',
   'ELS',
@@ -53,69 +53,69 @@ function normalizeOptionalString(next) {
 function normalizeVector3(entry, record) {
   const payload = Array['isArray'](entry) ? entry : [];
   return [
-    toFiniteNumber(payload[0x0], record[0x0]),
-    toFiniteNumber(payload[0x1], record[0x1]),
-    toFiniteNumber(payload[0x2], record[0x2]),
+    toFiniteNumber(payload[0], record[0]),
+    toFiniteNumber(payload[1], record[1]),
+    toFiniteNumber(payload[2], record[2]),
   ];
 }
 function normalizeVector2(handle, state) {
   const config = Array['isArray'](handle) ? handle : [];
-  return [toFiniteNumber(config[0x0], state[0x0]), toFiniteNumber(config[0x1], state[0x1])];
+  return [toFiniteNumber(config[0], state[0]), toFiniteNumber(config[1], state[1])];
 }
 function normalizeVector2List(scope) {
   return (Array['isArray'](scope) ? scope : [])
-    ['slice'](0x0, 0x18)
+    ['slice'](0, 24)
     ['filter']((input) => Array['isArray'](input))
-    ['map']((output) => normalizeVector2(output, [0x0, 0x0]));
+    ['map']((output) => normalizeVector2(output, [0, 0]));
 }
 function createDefaultId(value2 = 'item') {
   const value3 = globalThis['crypto']?.['randomUUID']?.();
   if (value3) return value2 + '_' + value3;
-  return value2 + '_' + Date['now']() + '_' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa);
+  return value2 + '_' + Date['now']() + '_' + Math['random']()['toString'](36)['slice'](2, 10);
 }
 function resolveIdFactory(value4) {
   return typeof value4 === 'function' ? value4 : createDefaultId;
 }
 function normalizeTimestamp(value5, value6) {
-  return Math['max'](0x0, toFiniteNumber(value5, value6));
+  return Math['max'](0, toFiniteNumber(value5, value6));
 }
 export function cloneStoryboard3DProject(value7) {
   if (typeof structuredClone === 'function') return structuredClone(value7);
   return JSON['parse'](JSON['stringify'](value7));
 }
 export function createDefaultStoryboard3DTransform() {
-  return { position: [0x0, 0x0, 0x0], rotation: [0x0, 0x0, 0x0], scale: [0x1, 0x1, 0x1] };
+  return { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] };
 }
 export function createDefaultStoryboard3DCameraState() {
   return {
-    position: [0x5, 0x4, 0x7],
-    target: [0x0, 1.2, 0x0],
-    focalLength: 0x23,
+    position: [5, 4, 7],
+    target: [0, 1.2, 0],
+    focalLength: 35,
     near: 0.1,
-    far: 0x3e8,
+    far: 1000,
     aspectRatio: '16:9',
   };
 }
 function cameraRotationFromState(value8) {
-  const vector3 = normalizeVector3(value8?.['position'], [0x5, 0x4, 0x7]),
-    vector32 = normalizeVector3(value8?.['target'], [0x0, 1.2, 0x0]),
+  const vector3 = normalizeVector3(value8?.['position'], [5, 4, 7]),
+    vector32 = normalizeVector3(value8?.['target'], [0, 1.2, 0]),
     args = vector32['map']((value9, value10) => value9 - vector3[value10]),
     value11 = Math['max'](0.0001, Math['hypot'](...args));
   return [
-    Math['asin'](Math['max'](-0x1, Math['min'](0x1, args[0x1] / value11))),
-    Math['atan2'](-args[0x0], -args[0x2]),
-    toFiniteNumber(value8?.['roll'], 0x0),
+    Math['asin'](Math['max'](-1, Math['min'](1, args[1] / value11))),
+    Math['atan2'](-args[0], -args[2]),
+    toFiniteNumber(value8?.['roll'], 0),
   ];
 }
 function cameraTargetFromRotation(value12, value13, value14) {
-  const vector33 = normalizeVector3(value12, [0x5, 0x4, 0x7]),
-    vector34 = normalizeVector3(value13, [0x0, 0x0, 0x0]),
-    value15 = Math['max'](0.25, toFiniteNumber(value14, 0x5)),
-    value16 = Math['cos'](vector34[0x0]);
+  const vector33 = normalizeVector3(value12, [5, 4, 7]),
+    vector34 = normalizeVector3(value13, [0, 0, 0]),
+    value15 = Math['max'](0.25, toFiniteNumber(value14, 5)),
+    value16 = Math['cos'](vector34[0]);
   return [
-    vector33[0x0] - Math['sin'](vector34[0x1]) * value16 * value15,
-    vector33[0x1] + Math['sin'](vector34[0x0]) * value15,
-    vector33[0x2] - Math['cos'](vector34[0x1]) * value16 * value15,
+    vector33[0] - Math['sin'](vector34[1]) * value16 * value15,
+    vector33[1] + Math['sin'](vector34[0]) * value15,
+    vector33[2] - Math['cos'](vector34[1]) * value16 * value15,
   ];
 }
 function boundCameraName(value17) {
@@ -140,7 +140,7 @@ export function createStoryboard3DCameraObject({
     transform: {
       position: [...args2['position']],
       rotation: cameraRotationFromState(args2),
-      scale: [0x1, 0x1, 0x1],
+      scale: [1, 1, 1],
     },
     target: [...args2['target']],
     focalLength: args2['focalLength'],
@@ -161,11 +161,11 @@ export function getStoryboard3DCameraStateFromObject(value18, value19) {
       far: value18?.['far'] ?? event['far'],
       aspectRatio: value18?.['aspectRatio'] ?? event['aspectRatio'],
       fov: value18?.['fov'] ?? event['fov'],
-      roll: value18?.['transform']?.['rotation']?.[0x2] ?? event['roll'],
+      roll: value18?.['transform']?.['rotation']?.[2] ?? event['roll'],
     });
   return (
     value19?.['roll'] == null &&
-      Math['abs'](cameraState['roll'] || 0x0) < 0.000001 &&
+      Math['abs'](cameraState['roll'] || 0) < 0.000001 &&
       delete cameraState['roll'],
     cameraState
   );
@@ -174,8 +174,8 @@ export function syncStoryboard3DCameraObjectFromShot(value20, enabled) {
   const count =
     value20?.['objects']?.['findIndex']?.(
       (value21) => value21['id'] === enabled?.['cameraId'] && value21['type'] === 'camera',
-    ) ?? -0x1;
-  if (count < 0x0 || !enabled?.['camera']) return null;
+    ) ?? -1;
+  if (count < 0 || !enabled?.['camera']) return null;
   const args3 = value20['objects'][count],
     args4 = normalizeCameraState(enabled['camera']),
     value22 = {
@@ -184,7 +184,7 @@ export function syncStoryboard3DCameraObjectFromShot(value20, enabled) {
       transform: {
         position: [...args4['position']],
         rotation: cameraRotationFromState(args4),
-        scale: [...(args3['transform']?.['scale'] || [0x1, 0x1, 0x1])],
+        scale: [...(args3['transform']?.['scale'] || [1, 1, 1])],
       },
       target: [...args4['target']],
       focalLength: args4['focalLength'],
@@ -230,7 +230,7 @@ export function syncStoryboard3DShotFromCameraObject(
   return (
     (enabled2['camera'] = storyboard3DCameraStateFromObject),
     (enabled2['animation'] = upsertStoryboard3DCameraKeyframe(enabled2['animation'], {
-      time: 0x0,
+      time: 0,
       camera: storyboard3DCameraStateFromObject,
     })),
     enabled2
@@ -242,7 +242,7 @@ export function createDefaultStoryboard3DEnvironment(value35 = 'empty') {
     showGrid: !![],
     showOutline: !![],
     enableShadows: !![],
-    groundSize: 0x64,
+    groundSize: 100,
   };
 }
 export function createStoryboard3DShot({
@@ -252,7 +252,7 @@ export function createStoryboard3DShot({
   description: description = '',
   camera: camera2,
   cameraId: cameraId,
-  order: order = 0x0,
+  order: order = 0,
   now: now = Date['now'](),
   idFactory: idFactory2,
 } = {}) {
@@ -261,13 +261,13 @@ export function createStoryboard3DShot({
     value36 = {
       id: normalizeString(id2, run2('shot')),
       sceneId: normalizeString(sceneId, 'scene'),
-      name: normalizeString(name, 'Shot\x201'),
+      name: normalizeString(name, 'Shot 1'),
       description: String(description || ''),
       camera: cameraState2,
       animation: createStoryboard3DShotAnimation({ camera: cameraState2, idFactory: run2 }),
       shotSize: 'MED',
       shotAngle: 'eye',
-      order: Math['max'](0x0, Math['round'](toFiniteNumber(order, 0x0))),
+      order: Math['max'](0, Math['round'](toFiniteNumber(order, 0))),
       createdAt: now,
       updatedAt: now,
     },
@@ -287,7 +287,7 @@ export function createStoryboard3DScene({
     string = normalizeString(id3, run3('scene')),
     defaultStoryboard3DCameraState = createDefaultStoryboard3DCameraState(),
     storyboard3DCameraObject = createStoryboard3DCameraObject({
-      name: shotName + '\x20摄像机',
+      name: shotName + ' 摄像机',
       camera: defaultStoryboard3DCameraState,
       idFactory: run3,
     }),
@@ -301,7 +301,7 @@ export function createStoryboard3DScene({
     });
   return {
     id: string,
-    name: normalizeString(name, 'Scene\x201'),
+    name: normalizeString(name, 'Scene 1'),
     environment: createDefaultStoryboard3DEnvironment(environmentType),
     objects: [storyboard3DCameraObject],
     shots: [storyboard3DShot],
@@ -311,8 +311,8 @@ export function createStoryboard3DScene({
 export function createStoryboard3DProject({
   id: id4,
   name: name = '3D Storyboard',
-  sceneName: sceneName = 'Scene\x201',
-  shotName: shotName = 'Shot\x201',
+  sceneName: sceneName = 'Scene 1',
+  shotName: shotName = 'Shot 1',
   environmentType: environmentType = 'empty',
   now: now = Date['now'](),
   idFactory: idFactory4,
@@ -337,9 +337,9 @@ export function createStoryboard3DProject({
 }
 function normalizeTransform(value37) {
   return {
-    position: normalizeVector3(value37?.['position'], [0x0, 0x0, 0x0]),
-    rotation: normalizeVector3(value37?.['rotation'], [0x0, 0x0, 0x0]),
-    scale: normalizeVector3(value37?.['scale'], [0x1, 0x1, 0x1])['map']((value38) =>
+    position: normalizeVector3(value37?.['position'], [0, 0, 0]),
+    rotation: normalizeVector3(value37?.['rotation'], [0, 0, 0]),
+    scale: normalizeVector3(value37?.['scale'], [1, 1, 1])['map']((value38) =>
       Math['max'](0.001, value38),
     ),
   };
@@ -374,7 +374,7 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
       type: 'character',
       colorKey: DIRECTOR_CHARACTER_COLORS['includes'](error['colorKey']) ? error['colorKey'] : 'blue',
       ...(Number['isFinite'](error['heightCm'])
-        ? { heightCm: Math['max'](0x37, Math['min'](0xe6, error['heightCm'])) }
+        ? { heightCm: Math['max'](55, Math['min'](230, error['heightCm'])) }
         : {}),
       bodyPresetId: normalizeString(error['bodyPresetId'], 'default'),
       characterStyle: error['characterStyle'] === 'anatomical' ? 'anatomical' : 'articulated',
@@ -382,7 +382,7 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
         ? { actionId: normalizeOptionalString(error['actionId']) }
         : {}),
       ...(Number['isFinite'](Number(error['actionTime']))
-        ? { actionTime: Math['max'](0x0, Number(error['actionTime'])) }
+        ? { actionTime: Math['max'](0, Number(error['actionTime'])) }
         : {}),
       actionPlaying: error['actionPlaying'] === !![],
       ...(normalizeOptionalString(error['leftHandPoseId'])
@@ -394,7 +394,7 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
       ...(normalizeOptionalString(error['hairId'])
         ? { hairId: normalizeOptionalString(error['hairId']) }
         : {}),
-      ...(args6['length'] > 0x0 ? { attachmentIds: args6 } : {}),
+      ...(args6['length'] > 0 ? { attachmentIds: args6 } : {}),
       ...(error['boneOverrides'] && typeof error['boneOverrides'] === 'object'
         ? { boneOverrides: cloneStoryboard3DProject(error['boneOverrides']) }
         : {}),
@@ -406,15 +406,15 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
       type: 'light',
       lightType: LIGHT_TYPES['has'](error['lightType']) ? error['lightType'] : 'directional',
       color: normalizeString(error['color'], '#ffffff'),
-      intensity: Math['max'](0x0, toFiniteNumber(error['intensity'], 0x1)),
+      intensity: Math['max'](0, toFiniteNumber(error['intensity'], 1)),
       ...(Number['isFinite'](Number(error['distance']))
-        ? { distance: Math['max'](0x0, Number(error['distance'])) }
+        ? { distance: Math['max'](0, Number(error['distance'])) }
         : {}),
       ...(Number['isFinite'](Number(error['decay']))
-        ? { decay: Math['max'](0x0, Number(error['decay'])) }
+        ? { decay: Math['max'](0, Number(error['decay'])) }
         : {}),
       ...(Number['isFinite'](Number(error['angle']))
-        ? { angle: Math['max'](0x0, Number(error['angle'])) }
+        ? { angle: Math['max'](0, Number(error['angle'])) }
         : {}),
       castShadow: error['castShadow'] === !![],
     };
@@ -422,30 +422,30 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
     return {
       ...args5,
       type: 'camera',
-      focalLength: toPositiveNumber(error['focalLength'], 0x23, 0x1),
+      focalLength: toPositiveNumber(error['focalLength'], 35, 1),
       near: toPositiveNumber(error['near'], 0.1, 0.001),
-      far: toPositiveNumber(error['far'], 0x3e8, 0x1),
-      target: normalizeVector3(error['target'], [0x0, 1.2, 0x0]),
+      far: toPositiveNumber(error['far'], 1000, 1),
+      target: normalizeVector3(error['target'], [0, 1.2, 0]),
       aspectRatio: normalizeString(error['aspectRatio'], '16:9'),
       ...(error['fov'] != null && Number['isFinite'](Number(error['fov']))
-        ? { fov: Math['max'](0x1, Math['min'](0xb3, Number(error['fov']))) }
+        ? { fov: Math['max'](1, Math['min'](179, Number(error['fov']))) }
         : {}),
     };
   return { ...args5, type: 'group' };
 }
 function normalizeCameraState(value40) {
   const value41 = {
-    position: normalizeVector3(value40?.['position'], [0x5, 0x4, 0x7]),
-    target: normalizeVector3(value40?.['target'], [0x0, 1.2, 0x0]),
-    focalLength: toPositiveNumber(value40?.['focalLength'], 0x23, 0x1),
+    position: normalizeVector3(value40?.['position'], [5, 4, 7]),
+    target: normalizeVector3(value40?.['target'], [0, 1.2, 0]),
+    focalLength: toPositiveNumber(value40?.['focalLength'], 35, 1),
     near: toPositiveNumber(value40?.['near'], 0.1, 0.001),
-    far: toPositiveNumber(value40?.['far'], 0x3e8, 0x1),
+    far: toPositiveNumber(value40?.['far'], 1000, 1),
     aspectRatio: normalizeString(value40?.['aspectRatio'], '16:9'),
   };
   return (
     value40?.['fov'] != null &&
       Number['isFinite'](Number(value40['fov'])) &&
-      (value41['fov'] = Math['max'](0x1, Math['min'](0xb3, Number(value40['fov'])))),
+      (value41['fov'] = Math['max'](1, Math['min'](179, Number(value40['fov'])))),
     value40?.['roll'] != null &&
       Number['isFinite'](Number(value40['roll'])) &&
       (value41['roll'] = Math['max'](-Math['PI'], Math['min'](Math['PI'], Number(value40['roll'])))),
@@ -468,18 +468,18 @@ function normalizeShot(
       idFactory: run6,
     }),
     cameraState4 = normalizeCameraState(
-      storyboard3DShotAnimation['cameraKeyframes'][0x0]?.['camera'] || cameraState3,
+      storyboard3DShotAnimation['cameraKeyframes'][0]?.['camera'] || cameraState3,
     ),
     value45 = {
       id: normalizeString(value42?.['id'], run6('shot')),
       sceneId: value43,
-      name: normalizeString(value42?.['name'], 'Shot\x20' + (value44 + 0x1)),
+      name: normalizeString(value42?.['name'], 'Shot ' + (value44 + 1)),
       description: String(value42?.['description'] || ''),
       camera: cameraState4,
       animation: storyboard3DShotAnimation,
       shotSize: SHOT_SIZE_SET['has'](value42?.['shotSize']) ? value42['shotSize'] : 'MED',
       shotAngle: SHOT_ANGLE_SET['has'](value42?.['shotAngle']) ? value42['shotAngle'] : 'eye',
-      order: Math['max'](0x0, Math['round'](toFiniteNumber(value42?.['order'], value44))),
+      order: Math['max'](0, Math['round'](toFiniteNumber(value42?.['order'], value44))),
       createdAt: timestamp,
       updatedAt: normalizeTimestamp(value42?.['updatedAt'], timestamp),
     },
@@ -496,39 +496,39 @@ function normalizeBackground(args7) {
     value46 = {
       imageUrl: optionalString5,
       ...(args8 ? { binaryAssetId: args8 } : {}),
-      horizontalFov: toPositiveNumber(args7?.['horizontalFov'], 0x32, 0x1),
+      horizontalFov: toPositiveNumber(args7?.['horizontalFov'], 50, 1),
       ...(args7?.['verticalFov'] != null && Number['isFinite'](Number(args7['verticalFov']))
-        ? { verticalFov: toPositiveNumber(args7['verticalFov'], 0x23, 0x1) }
+        ? { verticalFov: toPositiveNumber(args7['verticalFov'], 35, 1) }
         : {}),
       ...(Number['isFinite'](Number(args7?.['horizonY'])) ? { horizonY: Number(args7['horizonY']) } : {}),
       ...(Number['isFinite'](Number(args7?.['horizonSlope']))
-        ? { horizonSlope: Math['max'](-0x1, Math['min'](0x1, Number(args7['horizonSlope']))) }
+        ? { horizonSlope: Math['max'](-1, Math['min'](1, Number(args7['horizonSlope']))) }
         : {}),
       ...(Array['isArray'](args7?.['vanishingPoint'])
         ? { vanishingPoint: normalizeVector2(args7['vanishingPoint'], [0.5, 0.5]) }
         : {}),
       cameraHeight: toPositiveNumber(args7?.['cameraHeight'], 1.6, 0.2),
-      imageScale: toPositiveNumber(args7?.['imageScale'], 0x1, 0.01),
-      imageOffset: normalizeVector2(args7?.['imageOffset'], [0x0, 0x0]),
+      imageScale: toPositiveNumber(args7?.['imageScale'], 1, 0.01),
+      imageOffset: normalizeVector2(args7?.['imageOffset'], [0, 0]),
       lockedCamera: args7?.['lockedCamera'] === !![],
       ...(args7?.['lockedCameraSnapshot']
         ? { lockedCameraSnapshot: normalizeCameraState(args7['lockedCameraSnapshot']) }
         : {}),
     },
-    count2 = Math['max'](0x0, Math['round'](toFiniteNumber(args7?.['imageWidth'], 0x0))),
-    count3 = Math['max'](0x0, Math['round'](toFiniteNumber(args7?.['imageHeight'], 0x0)));
-  if (count2 > 0x0) value46['imageWidth'] = count2;
-  if (count3 > 0x0) value46['imageHeight'] = count3;
+    count2 = Math['max'](0, Math['round'](toFiniteNumber(args7?.['imageWidth'], 0))),
+    count3 = Math['max'](0, Math['round'](toFiniteNumber(args7?.['imageHeight'], 0)));
+  if (count2 > 0) value46['imageWidth'] = count2;
+  if (count3 > 0) value46['imageHeight'] = count3;
   const vector2List = normalizeVector2List(args7?.['groundRegion']);
-  if (vector2List['length'] >= 0x3) value46['groundRegion'] = vector2List;
+  if (vector2List['length'] >= 3) value46['groundRegion'] = vector2List;
   const optionalString6 = normalizeOptionalString(args7?.['calibrationMethod']);
   if (optionalString6) value46['calibrationMethod'] = optionalString6;
   return (
     args7?.['calibrationConfidence'] != null &&
       Number['isFinite'](Number(args7['calibrationConfidence'])) &&
       (value46['calibrationConfidence'] = Math['max'](
-        0x0,
-        Math['min'](0x1, Number(args7['calibrationConfidence'])),
+        0,
+        Math['min'](1, Number(args7['calibrationConfidence'])),
       )),
     value46
   );
@@ -599,14 +599,14 @@ function normalizeScene(value47, value48, { now: now3, idFactory: idFactory7 } =
       showGrid: value47?.['environment']?.['showGrid'] !== ![],
       showOutline: value47?.['environment']?.['showOutline'] !== ![],
       enableShadows: value47?.['environment']?.['enableShadows'] !== ![],
-      groundSize: toPositiveNumber(value47?.['environment']?.['groundSize'], 0x64, 0x1),
+      groundSize: toPositiveNumber(value47?.['environment']?.['groundSize'], 100, 1),
     },
     optionalString7 = normalizeOptionalString(value47?.['environment']?.['backgroundColor']);
   if (optionalString7) value69['backgroundColor'] = optionalString7;
   const args9 = normalizeBackground(value47?.['background']);
   return {
     id: string2,
-    name: normalizeString(value47?.['name'], 'Scene ' + (value48 + 0x1)),
+    name: normalizeString(value47?.['name'], 'Scene ' + (value48 + 1)),
     directorSettings: normalizeDirectorSceneSettings(value47?.['directorSettings']),
     generatedLayers: normalizeDirectorGeneratedLayers(value47?.['generatedLayers'], (value70) =>
       normalizeSceneObject(value70, { idFactory: run7 }),
@@ -617,7 +617,7 @@ function normalizeScene(value47, value48, { now: now3, idFactory: idFactory7 } =
     shots: value59,
     activeShotId: value66['has'](value47?.['activeShotId'])
       ? value47['activeShotId']
-      : value59[0x0]?.['id'] || '',
+      : value59[0]?.['id'] || '',
   };
 }
 export function migrateStoryboard3DProject(
@@ -629,14 +629,14 @@ export function migrateStoryboard3DProject(
     return fallbackProject
       ? cloneStoryboard3DProject(fallbackProject)
       : createStoryboard3DProject({ now: now, idFactory: run8 });
-  const value71 = Math['max'](0x1, Math['round'](toFiniteNumber(enabled4['version'], 0x1)));
+  const value71 = Math['max'](1, Math['round'](toFiniteNumber(enabled4['version'], 1)));
   if (value71 > STORYBOARD_3D_PROJECT_VERSION)
     throw new Error('Unsupported 3D storyboard project version: ' + value71);
   const value72 = Array['isArray'](enabled4['scenes']) ? enabled4['scenes'] : [],
     value73 = value72['map']((value74, value75) =>
       normalizeScene(value74, value75, { now: now, idFactory: run8 }),
     );
-  value73['length'] === 0x0 && value73['push'](createStoryboard3DScene({ now: now, idFactory: run8 }));
+  value73['length'] === 0 && value73['push'](createStoryboard3DScene({ now: now, idFactory: run8 }));
   const value76 = new Set(value73['map']((value77) => value77['id'])),
     timestamp2 = normalizeTimestamp(enabled4['createdAt'], now);
   return {
@@ -649,7 +649,7 @@ export function migrateStoryboard3DProject(
       normalizeScene(value78, value79, { now: now, idFactory: run8 }),
     ),
     generationJobs: normalizeDirectorGenerationJobs(enabled4['generationJobs']),
-    activeSceneId: value76['has'](enabled4['activeSceneId']) ? enabled4['activeSceneId'] : value73[0x0]['id'],
+    activeSceneId: value76['has'](enabled4['activeSceneId']) ? enabled4['activeSceneId'] : value73[0]['id'],
     createdAt: timestamp2,
     updatedAt: normalizeTimestamp(enabled4['updatedAt'], timestamp2),
   };
@@ -660,19 +660,19 @@ export function summarizeStoryboard3DProject(value80) {
     sceneCount: value81['length'],
     shotCount: value81['reduce'](
       (value82, value83) =>
-        value82 + (Array['isArray'](value83?.['shots']) ? value83['shots']['length'] : 0x0),
-      0x0,
+        value82 + (Array['isArray'](value83?.['shots']) ? value83['shots']['length'] : 0),
+      0,
     ),
     objectCount: value81['reduce'](
       (value84, value85) =>
-        value84 + (Array['isArray'](value85?.['objects']) ? value85['objects']['length'] : 0x0),
-      0x0,
+        value84 + (Array['isArray'](value85?.['objects']) ? value85['objects']['length'] : 0),
+      0,
     ),
   };
 }
 export function getActiveStoryboard3DScene(value86) {
   const value87 = Array['isArray'](value86?.['scenes']) ? value86['scenes'] : [];
-  return value87['find']((value88) => value88['id'] === value86?.['activeSceneId']) || value87[0x0] || null;
+  return value87['find']((value88) => value88['id'] === value86?.['activeSceneId']) || value87[0] || null;
 }
 export function getActiveStoryboard3DShot(value89) {
   const activeStoryboard3DScene = getActiveStoryboard3DScene(value89);
@@ -681,7 +681,7 @@ export function getActiveStoryboard3DShot(value89) {
     activeStoryboard3DScene['shots']?.['find'](
       (value90) => value90['id'] === activeStoryboard3DScene['activeShotId'],
     ) ||
-    activeStoryboard3DScene['shots']?.[0x0] ||
+    activeStoryboard3DScene['shots']?.[0] ||
     null
   );
 }

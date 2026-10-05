@@ -37,17 +37,17 @@ class FakeVideo {
 (test('videoFrameCapture: 已有可读帧时直接判定 ready', () => {
   const fakeVideo = new FakeVideo();
   ((fakeVideo.readyState = 2),
-    (fakeVideo.videoWidth = 0x280),
-    (fakeVideo.videoHeight = 0x168),
+    (fakeVideo.videoWidth = 640),
+    (fakeVideo.videoHeight = 360),
     assert.equal(isVideoFrameReady(fakeVideo), true));
 }),
   test('videoFrameCapture: 等待 loadeddata 后再判定可截帧', async () => {
     const store = new FakeVideo(),
-      waitForVideoFrame2 = waitForVideoFrame(store, { timeoutMs: 0x3e8 });
+      waitForVideoFrame2 = waitForVideoFrame(store, { timeoutMs: 1000 });
     (assert.equal(store.loadCount, 1),
       (store.readyState = 2),
-      (store.videoWidth = 0x280),
-      (store.videoHeight = 0x168),
+      (store.videoWidth = 640),
+      (store.videoHeight = 360),
       store.dispatch('loadeddata'),
       assert.equal(await waitForVideoFrame2, true));
   }),
@@ -81,11 +81,11 @@ class FakeVideo {
     try {
       const fakeVideo2 = new FakeVideo();
       ((fakeVideo2.readyState = 2),
-        (fakeVideo2.videoWidth = 0x140),
+        (fakeVideo2.videoWidth = 320),
         (fakeVideo2.videoHeight = 180),
         assert.equal(captureVideoFrameDataUrl(fakeVideo2), 'data:image/png;base64,ok'),
         assert.equal(list.length, 1),
-        assert.deepEqual(list[0], [fakeVideo2, 0, 0, 0x140, 180]));
+        assert.deepEqual(list[0], [fakeVideo2, 0, 0, 320, 180]));
     } finally {
       typeof result === 'undefined' ? delete globalThis.document : (globalThis.document = result);
     }
@@ -119,11 +119,11 @@ class FakeVideo {
     };
     try {
       const fakeVideo3 = new FakeVideo();
-      ((fakeVideo3.readyState = 2), (fakeVideo3.videoWidth = 0x280), (fakeVideo3.videoHeight = 0x168));
+      ((fakeVideo3.readyState = 2), (fakeVideo3.videoWidth = 640), (fakeVideo3.videoHeight = 360));
       const response = await captureVideoFrameBlob(fakeVideo3);
       (assert.equal(response.type, 'image/png'),
         assert.equal(await response.text(), 'frame'),
-        assert.deepEqual(list2[0], [fakeVideo3, 0, 0, 0x280, 0x168]));
+        assert.deepEqual(list2[0], [fakeVideo3, 0, 0, 640, 360]));
     } finally {
       typeof source === 'undefined' ? delete globalThis.document : (globalThis.document = source);
     }
@@ -150,12 +150,12 @@ class FakeVideo {
     };
     try {
       const fakeVideo4 = new FakeVideo();
-      ((fakeVideo4.readyState = 2), (fakeVideo4.videoWidth = 0x320), (fakeVideo4.videoHeight = 0x1c2));
+      ((fakeVideo4.readyState = 2), (fakeVideo4.videoWidth = 800), (fakeVideo4.videoHeight = 450));
       const box = await captureVideoFrameSnapshot(fakeVideo4, { fileNamePrefix: 'snap' });
-      (assert.equal(box.width, 0x320),
-        assert.equal(box.height, 0x1c2),
-        assert.equal(box.originalWidth, 0x320),
-        assert.equal(box.originalHeight, 0x1c2),
+      (assert.equal(box.width, 800),
+        assert.equal(box.height, 450),
+        assert.equal(box.originalWidth, 800),
+        assert.equal(box.originalHeight, 450),
         assert.equal(box.ext, 'png'),
         assert.match(box.fileName, /^snap_\d+\.png$/),
         assert.equal(box.blob.type, 'image/png'),
@@ -186,7 +186,7 @@ class FakeVideo {
     };
     try {
       const fakeVideo5 = new FakeVideo();
-      ((fakeVideo5.readyState = 2), (fakeVideo5.videoWidth = 0x280), (fakeVideo5.videoHeight = 0x168));
+      ((fakeVideo5.readyState = 2), (fakeVideo5.videoWidth = 640), (fakeVideo5.videoHeight = 360));
       const saveVideoFrameCapture2 = await saveVideoFrameCapture(fakeVideo5, async (input, output) => {
         return (
           assert.equal(output.ext, 'png'),
@@ -200,8 +200,8 @@ class FakeVideo {
         originalLocalPath: 'output/frame.png',
         displayLocalPath: '',
         thumbLocalPath: '',
-        originalWidth: 0x280,
-        originalHeight: 0x168,
+        originalWidth: 640,
+        originalHeight: 360,
         fileName: 'frame.png',
       });
     } finally {

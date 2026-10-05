@@ -11,7 +11,7 @@ export function collectAudioWorkflowImageInputs(value, list = [], sourceType = {
     edgeId: edgeId['id'],
     sourceId: edgeId['sourceId'],
     sourceType: sourceType[edgeId['sourceId']]['type'],
-    refSlot: String(edgeId['refSlot'] || list2[0x0]['id']),
+    refSlot: String(edgeId['refSlot'] || list2[0]['id']),
     url: resolveGenerationInputImageUrl(sourceType[edgeId['sourceId']]),
   }));
 }

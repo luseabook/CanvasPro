@@ -1,5 +1,5 @@
-export const WEB_PREVIEW_MIN_WIDTH = 0x400;
-export const WEB_PREVIEW_MIN_HEIGHT = 0x240;
+export const WEB_PREVIEW_MIN_WIDTH = 1024;
+export const WEB_PREVIEW_MIN_HEIGHT = 576;
 export const WEB_PREVIEW_MIN_SIZE = Object.freeze({
   width: WEB_PREVIEW_MIN_WIDTH,
   height: WEB_PREVIEW_MIN_HEIGHT,

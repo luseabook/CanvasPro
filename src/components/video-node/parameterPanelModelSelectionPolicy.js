@@ -40,12 +40,12 @@ function normalizeRhV54SpecialModeValue(key) {
 }
 function normalizeRhV54MaskExpandValue(result) {
   const data = Number(result);
-  return Number['isFinite'](data) ? Math['max'](-0x270f, Math['min'](0x270f, Math['trunc'](data))) : 0x19;
+  return Number['isFinite'](data) ? Math['max'](-9999, Math['min'](9999, Math['trunc'](data))) : 25;
 }
 function normalizeRhV54BreastJiggleValue(options) {
   const target = Number(options);
-  if (!Number['isFinite'](target)) return 0x0;
-  return Math['max'](0x0, Math['min'](0x1, Math['round'](target * 0x14) / 0x14));
+  if (!Number['isFinite'](target)) return 0;
+  return Math['max'](0, Math['min'](1, Math['round'](target * 20) / 20));
 }
 function isApimartPanelModel(options2 = {}, source = '') {
   const providerHint = String(options2?.['provider'] || '')
@@ -138,13 +138,13 @@ export function getManifestInputPolicyEdgeIdsToRemove({
     const panelInputKind = getPanelInputKind(nodes?.[value4?.['sourceId']], value4);
     if (!panelInputKind) continue;
     const count = Number(targetInputPolicy?.['maxByKind']?.[panelInputKind]),
-      value5 = Number['isFinite'](count) && count >= 0x0 ? count : Infinity,
-      value6 = value3[panelInputKind] || 0x0;
+      value5 = Number['isFinite'](count) && count >= 0 ? count : Infinity,
+      value6 = value3[panelInputKind] || 0;
     if (!map['has'](panelInputKind) || value6 >= value5) {
       if (value4?.['id']) list2['push'](value4['id']);
       continue;
     }
-    value3[panelInputKind] = value6 + 0x1;
+    value3[panelInputKind] = value6 + 1;
   }
   return list2;
 }
@@ -155,31 +155,31 @@ export function getHappyHorseModeEdgeIdsToRemove({
 } = {}) {
   const happyHorsePanelMode = normalizeHappyHorsePanelMode(nextMode),
     list3 = [];
-  let count2 = 0x0,
-    count3 = 0x0;
+  let count2 = 0,
+    count3 = 0;
   for (const value7 of Array['isArray'](inEdges) ? inEdges : []) {
     const value8 = nodes?.[value7?.['sourceId']],
       panelInputKind2 = getPanelInputKind(value8, value7);
     if (panelInputKind2 === 'video') {
-      if (happyHorsePanelMode === 'edit' && count3 < 0x1) count3 += 0x1;
+      if (happyHorsePanelMode === 'edit' && count3 < 1) count3 += 1;
       else value7?.['id'] && list3['push'](value7['id']);
       continue;
     }
     if (panelInputKind2 === 'image') {
       if (happyHorsePanelMode === 'image') {
-        if (count2 < 0x1) count2 += 0x1;
+        if (count2 < 1) count2 += 1;
         else {
           if (value7?.['id']) list3['push'](value7['id']);
         }
       } else {
         if (happyHorsePanelMode === 'edit') {
-          if (count2 < 0x5) count2 += 0x1;
+          if (count2 < 5) count2 += 1;
           else {
             if (value7?.['id']) list3['push'](value7['id']);
           }
         } else {
           if (happyHorsePanelMode === 'reference') {
-            if (count2 < 0x9) count2 += 0x1;
+            if (count2 < 9) count2 += 1;
             else {
               if (value7?.['id']) list3['push'](value7['id']);
             }
@@ -199,33 +199,33 @@ export function getWan27ModeEdgeIdsToRemove({
 } = {}) {
   const wan27PanelMode = normalizeWan27PanelMode(nextMode2),
     list4 = [];
-  let count4 = 0x0,
-    count5 = 0x0,
-    count6 = 0x0;
+  let count4 = 0,
+    count5 = 0,
+    count6 = 0;
   for (const value9 of Array['isArray'](inEdges) ? inEdges : []) {
     const value10 = nodes?.[value9?.['sourceId']],
       panelInputKind3 = getPanelInputKind(value10, value9);
     if (panelInputKind3 === 'image') {
-      if (wan27PanelMode === 'image' && count4 < 0x2) count4 += 0x1;
+      if (wan27PanelMode === 'image' && count4 < 2) count4 += 1;
       else {
-        if (wan27PanelMode === 'reference' && count4 < 0x1) count4 += 0x1;
+        if (wan27PanelMode === 'reference' && count4 < 1) count4 += 1;
         else value9?.['id'] && list4['push'](value9['id']);
       }
       continue;
     }
     if (panelInputKind3 === 'video') {
-      if (wan27PanelMode === 'video' && count5 < 0x1) count5 += 0x1;
+      if (wan27PanelMode === 'video' && count5 < 1) count5 += 1;
       else {
-        if (wan27PanelMode === 'reference' && count5 < 0x1) count5 += 0x1;
+        if (wan27PanelMode === 'reference' && count5 < 1) count5 += 1;
         else {
-          if (wan27PanelMode === 'edit' && count5 < 0x2) count5 += 0x1;
+          if (wan27PanelMode === 'edit' && count5 < 2) count5 += 1;
           else value9?.['id'] && list4['push'](value9['id']);
         }
       }
       continue;
     }
     if (panelInputKind3 === 'audio') {
-      if ((wan27PanelMode === 'image' || wan27PanelMode === 'reference') && count6 < 0x1) count6 += 0x1;
+      if ((wan27PanelMode === 'image' || wan27PanelMode === 'reference') && count6 < 1) count6 += 1;
       else value9?.['id'] && list4['push'](value9['id']);
     }
   }
@@ -238,22 +238,22 @@ export function getKlingV3OmniModeEdgeIdsToRemove({
 } = {}) {
   const klingV3OmniPanelMode = normalizeKlingV3OmniPanelMode(nextMode3),
     list5 = [];
-  let count7 = 0x0,
-    count8 = 0x0;
+  let count7 = 0,
+    count8 = 0;
   for (const value11 of Array['isArray'](inEdges) ? inEdges : []) {
     const value12 = nodes?.[value11?.['sourceId']],
       panelInputKind4 = getPanelInputKind(value12, value11);
     if (panelInputKind4 === 'image') {
-      if (klingV3OmniPanelMode === 'image' && count7 < 0x2) count7 += 0x1;
+      if (klingV3OmniPanelMode === 'image' && count7 < 2) count7 += 1;
       else {
-        if (klingV3OmniPanelMode === 'reference' && count7 < 0x1) count7 += 0x1;
+        if (klingV3OmniPanelMode === 'reference' && count7 < 1) count7 += 1;
         else value11?.['id'] && list5['push'](value11['id']);
       }
       continue;
     }
     if (panelInputKind4 === 'video') {
-      if ((klingV3OmniPanelMode === 'reference' || klingV3OmniPanelMode === 'edit') && count8 < 0x1)
-        count8 += 0x1;
+      if ((klingV3OmniPanelMode === 'reference' || klingV3OmniPanelMode === 'edit') && count8 < 1)
+        count8 += 1;
       else value11?.['id'] && list5['push'](value11['id']);
       continue;
     }

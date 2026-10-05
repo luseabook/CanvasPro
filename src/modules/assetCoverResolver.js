@@ -11,7 +11,7 @@ const IMAGE_NODE_TYPES = new Set(['image', 'source-image', 'ai-image']),
   VIDEO_NODE_TYPES = new Set(['video', 'source-video', 'ai-video']),
   NON_IMAGE_MEDIA_RE = /\.(?:mp4|webm|mov|mkv|m4v|mp3|wav|m4a|aac|flac|ogg|opus|wma)(?:[?#].*)?$/i,
   ASSET_MATERIAL_THUMB_RE = /(?:^|\/)data\/assets\/thumbs\//i;
-export const ASSET_MATERIAL_VIDEO_THUMB_MAX_EDGE = 0x3c0;
+export const ASSET_MATERIAL_VIDEO_THUMB_MAX_EDGE = 960;
 const ASSET_MATERIAL_VIDEO_THUMB_VERSION = 'video-v2-' + ASSET_MATERIAL_VIDEO_THUMB_MAX_EDGE;
 function normalizeText(value) {
   return String(value || '')['trim']();
@@ -25,10 +25,10 @@ function firstUsableCoverUrl(...args) {
   return '';
 }
 function pickIndexedItem(list, key) {
-  if (!Array['isArray'](list) || list['length'] === 0x0) return null;
+  if (!Array['isArray'](list) || list['length'] === 0) return null;
   const index = Number(key),
-    result = Number['isFinite'](index) ? Math['max'](0x0, Math['trunc'](index)) : 0x0;
-  return list[result] || list[0x0] || null;
+    result = Number['isFinite'](index) ? Math['max'](0, Math['trunc'](index)) : 0;
+  return list[result] || list[0] || null;
 }
 function resolveImageCoverUrl(response = {}) {
   if (!response || typeof response !== 'object') return '';
@@ -108,10 +108,10 @@ function resolveNodeMediaKind(options2 = {}) {
   const text2 = normalizeText(options2['type'])['toLowerCase']();
   if (VIDEO_NODE_TYPES['has'](text2)) return 'video';
   if (IMAGE_NODE_TYPES['has'](text2)) return 'image';
-  if (Array['isArray'](options2['videos']) && options2['videos']['length'] > 0x0) return 'video';
+  if (Array['isArray'](options2['videos']) && options2['videos']['length'] > 0) return 'video';
   if (
-    (Array['isArray'](options2['images']) && options2['images']['length'] > 0x0) ||
-    (Array['isArray'](options2['outputImages']) && options2['outputImages']['length'] > 0x0)
+    (Array['isArray'](options2['images']) && options2['images']['length'] > 0) ||
+    (Array['isArray'](options2['outputImages']) && options2['outputImages']['length'] > 0)
   )
     return 'image';
   return 'other';
@@ -128,12 +128,12 @@ function getCurrentVideo(options4 = {}) {
 function resolvePositiveDimension(...args2) {
   for (const data of args2) {
     const count = Number(data);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 function resolveSourceAspectRatio(box = {}) {
-  if (!box || typeof box !== 'object') return 0x0;
+  if (!box || typeof box !== 'object') return 0;
   const positiveDimension = resolvePositiveDimension(
       box['originalWidth'],
       box['imageWidth'],
@@ -151,8 +151,8 @@ function resolveSourceAspectRatio(box = {}) {
       box['height'],
     ),
     count2 =
-      positiveDimension > 0x0 && positiveDimension2 > 0x0 ? positiveDimension / positiveDimension2 : 0x0;
-  return count2 >= 0.1 && count2 <= 0xa ? count2 : 0x0;
+      positiveDimension > 0 && positiveDimension2 > 0 ? positiveDimension / positiveDimension2 : 0;
+  return count2 >= 0.1 && count2 <= 10 ? count2 : 0;
 }
 export function resolveAssetNodeCoverUrl(options5 = {}) {
   const nodeMediaKind = resolveNodeMediaKind(options5);
@@ -188,7 +188,7 @@ export function resolveAssetNodePreviewAspectRatio(options7 = {}) {
         : nodeMediaKind3 === 'video'
           ? getCurrentVideo(options7)
           : null;
-  return resolveSourceAspectRatio(target) || resolveSourceAspectRatio(options7) || 0x4 / 0x3;
+  return resolveSourceAspectRatio(target) || resolveSourceAspectRatio(options7) || 4 / 3;
 }
 export function resolveAssetNodeCoverThumbId(options8 = {}) {
   if (resolveNodeMediaKind(options8) !== 'image') return '';
@@ -201,7 +201,7 @@ export function isAssetMaterialThumbnailUrl(source) {
   return ASSET_MATERIAL_THUMB_RE['test'](normalizeText(source));
 }
 export function getAssetMaterialVideoThumbnailKey(next) {
-  const current = Number['isFinite'](Number(next)) ? Math['max'](0x0, Math['trunc'](Number(next))) : 0x0;
+  const current = Number['isFinite'](Number(next)) ? Math['max'](0, Math['trunc'](Number(next))) : 0;
   return ASSET_MATERIAL_VIDEO_THUMB_VERSION + '-' + current;
 }
 export function isAssetMaterialVideoThumbnailUrl(entry) {
@@ -234,13 +234,13 @@ export function fitAssetMaterialVideoThumbnail(
   payload,
   handle = ASSET_MATERIAL_VIDEO_THUMB_MAX_EDGE,
 ) {
-  const count3 = Number(record) || 0x0,
-    count4 = Number(payload) || 0x0,
-    state = Math['max'](0x1, Number(handle) || ASSET_MATERIAL_VIDEO_THUMB_MAX_EDGE);
-  if (count3 <= 0x0 || count4 <= 0x0) return { width: 0x0, height: 0x0 };
-  const config = Math['min'](0x1, state / count3, state / count4);
+  const count3 = Number(record) || 0,
+    count4 = Number(payload) || 0,
+    state = Math['max'](1, Number(handle) || ASSET_MATERIAL_VIDEO_THUMB_MAX_EDGE);
+  if (count3 <= 0 || count4 <= 0) return { width: 0, height: 0 };
+  const config = Math['min'](1, state / count3, state / count4);
   return {
-    width: Math['max'](0x1, Math['round'](count3 * config)),
-    height: Math['max'](0x1, Math['round'](count4 * config)),
+    width: Math['max'](1, Math['round'](count3 * config)),
+    height: Math['max'](1, Math['round'](count4 * config)),
   };
 }

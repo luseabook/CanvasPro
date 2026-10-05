@@ -39,7 +39,7 @@ function resolveProjectSourceVideoRef(options2 = {}, key = {}) {
 export function appendPersonReplacementVideoResults(options3 = {}, list = []) {
   const args = getPersonReplacementVideoResults(options3),
     results = [...args];
-  let activeIndex = -0x1;
+  let activeIndex = -1;
   return (
     list['forEach']((args2) => {
       const personReplacementVideoResultRef = resolvePersonReplacementVideoResultRef(args2);
@@ -47,22 +47,22 @@ export function appendPersonReplacementVideoResults(options3 = {}, list = []) {
       const count = results['findIndex'](
         (data) => resolvePersonReplacementVideoResultRef(data) === personReplacementVideoResultRef,
       );
-      if (count >= 0x0) {
-        if (activeIndex < 0x0) activeIndex = count;
+      if (count >= 0) {
+        if (activeIndex < 0) activeIndex = count;
         return;
       }
-      if (activeIndex < 0x0) activeIndex = results['length'];
+      if (activeIndex < 0) activeIndex = results['length'];
       results['push']({ ...args2 });
     }),
     {
       results: results,
-      activeIndex: activeIndex >= 0x0 ? activeIndex : Math['max'](0x0, results['length'] - 0x1),
+      activeIndex: activeIndex >= 0 ? activeIndex : Math['max'](0, results['length'] - 1),
     }
   );
 }
 export function applyPersonReplacementVideoCrop(
   options4 = {},
-  { shotId: shotId = '', cutLocalPath: cutLocalPath = '', videoUrl: videoUrl = '', fps: fps = 0x0 } = {},
+  { shotId: shotId = '', cutLocalPath: cutLocalPath = '', videoUrl: videoUrl = '', fps: fps = 0 } = {},
 ) {
   const shots = normalizePersonReplacementWorkspaceProject(options4),
     shotId2 = normalizeText(shotId || shots['workspace']['selectedShotId']),
@@ -70,7 +70,7 @@ export function applyPersonReplacementVideoCrop(
   if (!shotId2 || !videoIterationInputRef) return shots;
   const enabled = shots['shots']['find']((target) => target['id'] === shotId2);
   if (!enabled) return shots;
-  const outputFps = Number(fps) > 0x0 ? Number(fps) : enabled['outputFps'],
+  const outputFps = Number(fps) > 0 ? Number(fps) : enabled['outputFps'],
     source = {
       ...shots,
       shots: shots['shots']['map']((args3) =>
@@ -82,7 +82,7 @@ export function applyPersonReplacementVideoCrop(
                 : { videoRef: videoIterationInputRef, videoRefIsCropped: !![] }),
               outputFps: outputFps,
               materializationStatus: 'succeeded',
-              materializationProgress: 0x64,
+              materializationProgress: 100,
               error: '',
             }
           : args3,
@@ -155,12 +155,12 @@ export function resolvePersonReplacementVideoSlotState(generationParams2 = {}, t
         )
         ['map'](([handle, response3]) => [handle, { ...response3, url: normalizeText(response3['url']) }]),
     ),
-    referenceCounts = { imageCount: 0x0, videoCount: 0x0, audioCount: 0x0 };
+    referenceCounts = { imageCount: 0, videoCount: 0, audioCount: 0 };
   return (
     Object['entries'](inputsBySlot)['forEach'](([state, config]) => {
       const text3 = normalizeText(fixedInputConfig?.['slotKindById']?.[state] || config?.['kind']),
         scope = text3 + 'Count';
-      Object['hasOwn'](referenceCounts, scope) && (referenceCounts[scope] += 0x1);
+      Object['hasOwn'](referenceCounts, scope) && (referenceCounts[scope] += 1);
     }),
     {
       modelId: model,

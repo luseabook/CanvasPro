@@ -1,6 +1,6 @@
 import { desktopBridge } from '../../services/desktopBridge.js';
 import { beginModalInteraction } from '../../services/modalInteractionScope.js';
-let sequence = 0x0;
+let sequence = 0;
 export function createPersonReplacementTimelineExportPrompt({
   documentObject: documentObject = globalThis['document'],
   openJianying: openJianying = () => desktopBridge['nodeExport']['openJianying'](),
@@ -17,11 +17,11 @@ export function createPersonReplacementTimelineExportPrompt({
         ((el['innerHTML'] =
           '<section class="custom-confirm-box" role="dialog" aria-modal="true" aria-labelledby="' +
           key +
-          '\x22\x20aria-describedby=\x22' +
+          '" aria-describedby="' +
           key +
           '-message" tabindex="-1">\n        <div class="confirm-title" id="' +
           key +
-          '\x22>是否立即打开剪映？</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22confirm-msg\x22\x20id=\x22' +
+          '">是否立即打开剪映？</div>\n        <div class="confirm-msg" id="' +
           key +
           '-message"></div>\n        <div class="confirm-btns">\n          <button type="button" class="confirm-btn confirm-cancel">稍后</button>\n          <button type="button" class="confirm-btn confirm-ok">打开剪映</button>\n        </div>\n      </section>'),
           (el['querySelector']('.confirm-msg')['textContent'] =

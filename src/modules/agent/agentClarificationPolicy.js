@@ -16,9 +16,9 @@ export function shouldUseCreativeDefaults({
   userMessage: userMessage = '',
   plan: plan = {},
   agentContext: agentContext = {},
-  toolResultCount: toolResultCount = 0x0,
+  toolResultCount: toolResultCount = 0,
 } = {}) {
-  if (plan?.['status'] !== 'need_clarification' || Number(toolResultCount || 0x0) > 0x0) return ![];
+  if (plan?.['status'] !== 'need_clarification' || Number(toolResultCount || 0) > 0) return ![];
   const key = String(userMessage || '')['trim']();
   if (!matchesAny(key, EXPLICIT_CREATIVE_CREATE_PATTERNS)) return ![];
   const map = new Set(

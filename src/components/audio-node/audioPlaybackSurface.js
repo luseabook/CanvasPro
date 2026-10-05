@@ -16,14 +16,14 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeClassName(key) {
   return normalizeText(key)
     ['split'](/\s+/)
     ['filter']((index) => /^[a-zA-Z0-9_-]+$/['test'](index))
-    ['join']('\x20');
+    ['join'](' ');
 }
 function normalizeWaveformUrl(result) {
   const text = normalizeText(result);
@@ -37,17 +37,17 @@ function renderDataAttributes(options = {}) {
         ? ''
         : source === ''
           ? target
-          : target + '=\x22' + escapeHtml(source) + '\x22',
+          : target + '="' + escapeHtml(source) + '"',
     )
     ['filter'](Boolean)
-    ['join']('\x20');
+    ['join'](' ');
 }
 function renderWaveform(enabled = ![]) {
   return (
     '<div class="waveform ' +
     (enabled ? 'waveform-unplayed' : 'waveform-bg') +
-    '\x22' +
-    (enabled ? '\x20data-audio-playback-wave-progress' : '') +
+    '"' +
+    (enabled ? ' data-audio-playback-wave-progress' : '') +
     '>\n    <svg width="100%" height="80" viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true">\n      <path d="" data-audio-playback-wave-path stroke="var(--blue)" stroke-width="2" stroke-linecap="round"/>\n      <path d="M0,40 L200,40" stroke="var(--blue)" stroke-width="1" stroke-dasharray="2 4" opacity="0.4"/>\n    </svg>\n  </div>'
   );
 }
@@ -68,24 +68,24 @@ export function renderAudioPlaybackSurface({
     renderDataAttributes2 = renderDataAttributes(dataAttributes);
   return (
     '<div class="audio-card audio-playback-surface' +
-    (className2 ? '\x20' + className2 : '') +
+    (className2 ? ' ' + className2 : '') +
     '" data-audio-playback-surface data-audio-playback-play-label="' +
     escapeHtml(playLabel) +
     '" data-audio-playback-pause-label="' +
     escapeHtml(pauseLabel) +
-    '\x22' +
-    (waveformUrl2 ? ' data-audio-playback-waveform-url="' + escapeHtml(waveformUrl2) + '\x22' : '') +
+    '"' +
+    (waveformUrl2 ? ' data-audio-playback-waveform-url="' + escapeHtml(waveformUrl2) + '"' : '') +
     ' aria-busy="' +
     Boolean(ariaBusy) +
-    '\x22' +
-    (renderDataAttributes2 ? '\x20' + renderDataAttributes2 : '') +
+    '"' +
+    (renderDataAttributes2 ? ' ' + renderDataAttributes2 : '') +
     '>\n    ' +
     renderWaveform(![]) +
     '\n    ' +
     renderWaveform(!![]) +
     '\n    <div class="media-progress-line" data-audio-playback-progress-line></div>\n    <div class="media-progress-bar" data-audio-playback-progress-bar></div>\n    <div class="audio-controls">\n      <button type="button" class="audio-play-btn" data-audio-playback-toggle aria-label="' +
     escapeHtml(playLabel) +
-    '\x22\x20' +
+    '" ' +
     (disabled || !text2 ? 'disabled' : '') +
     '>\n        <svg class="audio-playback-play-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>\n        <svg class="audio-playback-pause-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>\n      </button>\n      <div class="audio-time-wrap"><span class="audio-time-display" data-audio-playback-time>0:00 / 0:00</span></div>\n    </div>\n    <audio class="audio-player" preload="metadata" data-audio-playback-audio data-audio-playback-url="' +
     escapeHtml(text2) +
@@ -129,7 +129,7 @@ export function createAudioPlaybackSurfaceController(
       : Promise['resolve'](''),
     list = Array['from'](wavePlayedEl['querySelectorAll']?.('[data-audio-playback-wave-path]') || []);
   void (async () => {
-    const current = { width: 0xc8, height: 0x50, samples: 0xbe };
+    const current = { width: 200, height: 80, samples: 190 };
     let waveformBarsPathFromPersistedUrl = '';
     waveformUrl3 &&
       (waveformBarsPathFromPersistedUrl = await getWaveformBarsPathFromPersistedUrl(waveformUrl3, current));
@@ -157,7 +157,7 @@ export function createAudioPlaybackSurfaceController(
         try {
           (onBeforePlay(), await ready);
           if (enabled2 || !text3) return;
-          if (audioEl['ended']) audioEl['currentTime'] = 0x0;
+          if (audioEl['ended']) audioEl['currentTime'] = 0;
           const promise = audioEl['play']?.();
           promise && typeof promise['then'] === 'function' && (await promise);
         } catch (payload) {
@@ -171,10 +171,10 @@ export function createAudioPlaybackSurfaceController(
     handle = (event2) => {
       const duration = Number(audioEl['duration']),
         box = trackEl['getBoundingClientRect']?.();
-      if (!(duration > 0x0) || !box?.['width']) return;
+      if (!(duration > 0) || !box?.['width']) return;
       const state = Math['max'](
-          0x0,
-          Math['min'](0x1, (Number(event2['clientX']) - box['left']) / box['width']),
+          0,
+          Math['min'](1, (Number(event2['clientX']) - box['left']) / box['width']),
         ),
         currentTime = state * duration;
       ((audioEl['currentTime'] = currentTime),

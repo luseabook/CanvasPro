@@ -159,7 +159,7 @@ function getPendingMediaClipSourcePromise(value28) {
   const promise = value28?.__mediaClipSourcePromise;
   return promise && typeof promise.then === 'function' ? promise : null;
 }
-function waitForMediaClipReady(el, count = 1, value29 = 0x384) {
+function waitForMediaClipReady(el, count = 1, value29 = 900) {
   if (!el || toNumber(el.readyState, 0) >= count) return Promise.resolve(true);
   const list =
     count >= 2
@@ -187,14 +187,14 @@ function waitForMediaClipReady(el, count = 1, value29 = 0x384) {
         () => {
           (run(), handler(toNumber(el.readyState, 0) >= count));
         },
-        Math.max(100, toNumber(value29, 0x384)),
+        Math.max(100, toNumber(value29, 900)),
       );
     list.forEach((item3) => {
       el.addEventListener?.(item3, value31);
     });
   });
 }
-function waitForMediaClipPlaybackStart(el2, value33 = 0x384) {
+function waitForMediaClipPlaybackStart(el2, value33 = 900) {
   if (!el2) return Promise.resolve(false);
   const run2 = () => el2.paused === false && el2.ended !== true;
   if (run2()) return Promise.resolve(true);
@@ -219,7 +219,7 @@ function waitForMediaClipPlaybackStart(el2, value33 = 0x384) {
         }
         (run2() || value37?.type === 'timeupdate' || value37?.type === 'playing') && handler3(true);
       },
-      setTimeout3 = setTimeout(() => handler3(run2()), Math.max(100, toNumber(value33, 0x384)));
+      setTimeout3 = setTimeout(() => handler3(run2()), Math.max(100, toNumber(value33, 900)));
     list2.forEach((item5) => {
       el2.addEventListener?.(item5, value35);
     });
@@ -251,7 +251,7 @@ export function resetPlaybackClock(value40, value41 = value40._playheadSec) {
 export function playbackClockTimelineSec(value42, value43 = value42._playheadSec) {
   if (!Number.isFinite(value42._playbackStartedAtMs))
     return (value42._resetPlaybackClock(value43), Math.max(0, toNumber(value43, 0)));
-  const value44 = Math.max(0, (mediaClipNowMs() - value42._playbackStartedAtMs) / 0x3e8);
+  const value44 = Math.max(0, (mediaClipNowMs() - value42._playbackStartedAtMs) / 1000);
   return Math.max(0, value42._playbackStartSec + value44);
 }
 export async function preparePreviewMediaForPlayback(value45, value46, value47 = null) {
@@ -269,7 +269,7 @@ export async function preparePreviewMediaForPlayback(value45, value46, value47 =
     waitForMediaClipReady2 = await waitForMediaClipReady(
       enabled6,
       value48,
-      value46 === 'video' ? 0x578 : 0x384,
+      value46 === 'video' ? 1400 : 900,
     );
   if (!waitForMediaClipReady2) return false;
   return (
@@ -361,7 +361,7 @@ export async function playPreview(value52) {
     }
     await enabled9.play?.();
     if (enabled7 === 'video') {
-      const waitForMediaClipPlaybackStart2 = await waitForMediaClipPlaybackStart(enabled9, 0x384);
+      const waitForMediaClipPlaybackStart2 = await waitForMediaClipPlaybackStart(enabled9, 900);
       if (!waitForMediaClipPlaybackStart2) throw new Error('Media clip preview video did not start');
       await value52._playReplacementAudioFromVideo(value53);
     }
@@ -490,7 +490,7 @@ export function startPlaybackLoop(enabled21, value73) {
               Math.min(value80, enabled21._playheadSec),
             )),
             enabled21._syncVideoPreviewSourceForTimelineSec(enabled21._imagePlaybackStartSec));
-          const value83 = Math.max(0, (value82 - enabled21._imagePlaybackStartedAt) / 0x3e8),
+          const value83 = Math.max(0, (value82 - enabled21._imagePlaybackStartedAt) / 1000),
             value84 = enabled21._imagePlaybackStartSec + value83;
           if (value84 >= value80) {
             const value85 = value77[value78 + 1] || null;

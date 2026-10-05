@@ -111,7 +111,7 @@ export function computePreparedStoryboardSize({
   rows: rows3,
   sourceWidth: sourceWidth2,
   sourceHeight: sourceHeight2,
-  minCellShortSide: minCellShortSide = 0x12c,
+  minCellShortSide: minCellShortSide = 300,
 }) {
   const { width: width4, height: height3 } = _parseAspectLabel(aspectLabel),
     _getSafeGridCount2 = _getSafeGridCount(cols3),
@@ -121,7 +121,7 @@ export function computePreparedStoryboardSize({
       Number.isFinite(_asPositiveNumber6) && _asPositiveNumber6 > 0
         ? _asPositiveNumber6 * (_getSafeGridCount3 / _getSafeGridCount2)
         : width4 / height3,
-    handle = Math.max(1, Math.round(_asPositiveNumber(minCellShortSide) || 0x12c));
+    handle = Math.max(1, Math.round(_asPositiveNumber(minCellShortSide) || 300));
   let state = handle,
     config = handle;
   return (

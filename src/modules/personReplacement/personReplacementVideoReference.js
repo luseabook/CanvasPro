@@ -55,7 +55,7 @@ export function selectPersonReplacementVideoReference(
       text3 = normalizeText(referencePersonId),
       enabled =
         list['find']((target) => normalizeText(target?.['reference']?.['personId']) === text3) ||
-        (!text3 ? list[0x0] : null),
+        (!text3 ? list[0] : null),
       replacementVideoReferencePersonId = normalizeText(enabled?.['reference']?.['personId']);
     if (!enabled || !replacementVideoReferencePersonId) return { changed: ![], project: project };
     if (
@@ -82,7 +82,7 @@ export function selectPersonReplacementVideoReference(
   const shot2 = getShot(project, sourceShotId2),
     list2 = getPersonReplacementImageResults(shot2),
     resultIndex2 = Math['trunc'](Number(resultIndex));
-  if (!shot2 || !Number['isInteger'](resultIndex2) || resultIndex2 < 0x0 || resultIndex2 >= list2['length'])
+  if (!shot2 || !Number['isInteger'](resultIndex2) || resultIndex2 < 0 || resultIndex2 >= list2['length'])
     return { changed: ![], project: project };
   const updateSourceImageResult2 = updateSourceImageResult(shot2, list2, resultIndex2),
     imageRef = normalizeText(updateSourceImageResult2?.['replacementImageRef']);
@@ -131,13 +131,13 @@ export function switchPersonReplacementVideoReferenceResult(
     shot3 = getShot(project2, targetShotId3),
     shot4 = getShot(project2, sourceShotId4),
     list3 = getPersonReplacementImageResults(shot4);
-  if (!shot3 || !shot4 || list3['length'] < 0x2) return { changed: ![], project: project2 };
+  if (!shot3 || !shot4 || list3['length'] < 2) return { changed: ![], project: project2 };
   const count = Math['trunc'](Number(currentResultIndex)),
     entry =
-      Number['isInteger'](count) && count >= 0x0 && count < list3['length']
+      Number['isInteger'](count) && count >= 0 && count < list3['length']
         ? count
         : getPersonReplacementActiveImageResultIndex(shot4, list3),
-    enabled2 = Math['sign'](Number(delta) || 0x0);
+    enabled2 = Math['sign'](Number(delta) || 0);
   if (!enabled2) return { changed: ![], project: project2 };
   const resultIndex3 = (entry + enabled2 + list3['length']) % list3['length'],
     personReplacementVideoImageInput = resolvePersonReplacementVideoImageInput(

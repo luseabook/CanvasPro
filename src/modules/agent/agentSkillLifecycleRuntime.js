@@ -17,9 +17,9 @@ const TEXT = Object['freeze']({
     updated: '已更新 Skill「{title}」（${id}），ID 保持不变。',
     cloned: '已复制为 Skill「{title}」（${id}）。',
     disabled: '已停用 Skill「{title}」（${id}）。',
-    enabled: '已启用\x20Skill「{title}」（${id}）。',
+    enabled: '已启用 Skill「{title}」（${id}）。',
     deleteConfirm:
-      '确认删除\x20Skill「{title}」（${id}）吗？此操作会移除本地安装包。请回复“确认删除”或“取消删除”。',
+      '确认删除 Skill「{title}」（${id}）吗？此操作会移除本地安装包。请回复“确认删除”或“取消删除”。',
     deleted: '已删除 Skill「{title}」（${id}）。',
     cancelled: '已取消 Skill 操作。',
     inspect:
@@ -32,26 +32,26 @@ const TEXT = Object['freeze']({
     operationDisable: '停用',
     operationClone: '复制',
     operationDelete: '删除',
-    stopped: 'Skill\x20操作已停止。',
+    stopped: 'Skill 操作已停止。',
   }),
   'en-US': Object['freeze']({
     target: 'Specify the Skill to {operation}, for example “${id}”.',
-    targetFallback: 'Specify\x20a\x20Skill,\x20for\x20example\x20“$skill-id”.',
-    notFound: 'Skill\x20${id}\x20was\x20not\x20found.\x20Check\x20the\x20id\x20and\x20try\x20again.',
+    targetFallback: 'Specify a Skill, for example “$skill-id”.',
+    notFound: 'Skill ${id} was not found. Check the id and try again.',
     readOnly: 'Skill ${id} is a third-party package and cannot be edited or cloned in chat.',
     unavailable:
-      'Skill\x20management\x20is\x20unavailable.\x20Make\x20sure\x20the\x20desktop\x20app\x20is\x20running\x20and\x20try\x20again.',
+      'Skill management is unavailable. Make sure the desktop app is running and try again.',
     failed: 'The Skill operation failed. Please try again.',
     updated: 'Updated Skill “{title}” (${id}) while keeping its id unchanged.',
-    cloned: 'Cloned\x20Skill\x20as\x20“{title}”\x20(${id}).',
+    cloned: 'Cloned Skill as “{title}” (${id}).',
     disabled: 'Disabled Skill “{title}” (${id}).',
     enabled: 'Enabled Skill “{title}” (${id}).',
     deleteConfirm:
       'Delete Skill “{title}” (${id})? This removes its local package. Reply “confirm” or “cancel”.',
-    deleted: 'Deleted\x20Skill\x20“{title}”\x20(${id}).',
+    deleted: 'Deleted Skill “{title}” (${id}).',
     cancelled: 'Skill operation cancelled.',
     inspect:
-      'Skill\x20“{title}”\x20(${id})\x0aStatus:\x20{status}\x0aDescription:\x20{description}\x0aTriggers:\x20{triggers}\x0aInstructions:\x0a{instructions}',
+      'Skill “{title}” (${id})\nStatus: {status}\nDescription: {description}\nTriggers: {triggers}\nInstructions:\n{instructions}',
     statusEnabled: 'enabled',
     statusDisabled: 'disabled',
     operationInspect: 'inspect',
@@ -148,9 +148,9 @@ export function createAgentSkillLifecycleRuntime({
       });
     };
   function run2({ operation: operation3, originalMessage: originalMessage3, runId: runId2 }) {
-    const id = existingSkills()[0x0]?.['id'] || 'skill-id',
+    const id = existingSkills()[0]?.['id'] || 'skill-id',
       operation4 = formatText(
-        'operation' + operation3['charAt'](0x0)['toUpperCase']() + operation3['slice'](0x1),
+        'operation' + operation3['charAt'](0)['toUpperCase']() + operation3['slice'](1),
         {},
         localeProvider?.(),
       ),

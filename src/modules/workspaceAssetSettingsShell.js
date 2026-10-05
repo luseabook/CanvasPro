@@ -3,15 +3,15 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#039;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#039;');
 }
-export const WORKSPACE_ASSET_SPLIT_RATIO_MIN = 0x1c;
-export const WORKSPACE_ASSET_SPLIT_RATIO_MAX = 0x48;
-export const WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT = 0x32;
-export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MIN = 0x20;
+export const WORKSPACE_ASSET_SPLIT_RATIO_MIN = 28;
+export const WORKSPACE_ASSET_SPLIT_RATIO_MAX = 72;
+export const WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT = 50;
+export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MIN = 32;
 export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MAX = 0x44;
-export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT = 0x32;
+export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT = 50;
 export function normalizeWorkspaceAssetSplitRatio(item) {
   const key = Number(item);
   return Math['max'](
@@ -72,12 +72,12 @@ export function renderWorkspaceAssetSettingsShell({
   emptyText: emptyText = '暂无素材',
   detailHtml: detailHtml = '',
   footerHtml: footerHtml = '',
-  splitRatio: splitRatio = 0x32,
+  splitRatio: splitRatio = 50,
   activeTab: activeTab = '',
-  tabCount: tabCount = 0x1,
+  tabCount: tabCount = 1,
 } = {}) {
   const workspaceAssetSplitRatio2 = normalizeWorkspaceAssetSplitRatio(splitRatio),
-    target = Math['max'](0x1, Math['trunc'](Number(tabCount) || 0x1)),
+    target = Math['max'](1, Math['trunc'](Number(tabCount) || 1)),
     source =
       activeTab === 'library'
         ? 'story-asset-grid story-asset-grid--workspace-library'
@@ -85,24 +85,24 @@ export function renderWorkspaceAssetSettingsShell({
     next =
       '<div class="story-assets-callout' +
       (calloutInHeading ? ' story-assets-callout--toolbar' : '') +
-      '\x22>\x0a\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20' +
+      '">\n    <div>\n      ' +
       (calloutInHeading
         ? '<strong tabindex="0" data-tooltip="' +
           escapeHtml(calloutDescription) +
           '" aria-label="' +
           escapeHtml(calloutTitle + '。' + calloutDescription) +
-          '\x22>' +
+          '">' +
           escapeHtml(calloutTitle) +
-          '\x20<span\x20aria-hidden=\x22true\x22>ⓘ</span></strong>' +
-          (calloutStatus ? '<span\x20role=\x22status\x22>' + escapeHtml(calloutStatus) + '</span>' : '')
+          ' <span aria-hidden="true">ⓘ</span></strong>' +
+          (calloutStatus ? '<span role="status">' + escapeHtml(calloutStatus) + '</span>' : '')
         : '<strong>' + escapeHtml(calloutTitle) + '</strong><p>' + escapeHtml(calloutDescription) + '</p>') +
       '\n    </div>\n    <div class="story-assets-callout-actions">' +
       calloutActionsHtml +
       '</div>\n  </div>',
     current =
-      '<header\x20class=\x22story-page-heading\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-asset-tabs\x22\x20role=\x22tablist\x22\x20aria-label=\x22' +
+      '<header class="story-page-heading">\n      <div class="story-asset-tabs" role="tablist" aria-label="' +
       escapeHtml(tablistLabel) +
-      '\x22\x20data-active-tab=\x22' +
+      '" data-active-tab="' +
       escapeHtml(activeTab) +
       '" data-tab-count="' +
       target +
@@ -113,8 +113,8 @@ export function renderWorkspaceAssetSettingsShell({
       '\n    </header>';
   return (
     '<div class="story-assets-page story-content-page' +
-    (className ? '\x20' + escapeHtml(className) : '') +
-    '\x22\x20data-story-marquee-page-surface=\x22assets\x22\x20data-workspace-marquee-page-surface=\x22assets\x22>\x0a\x20\x20\x20\x20' +
+    (className ? ' ' + escapeHtml(className) : '') +
+    '" data-story-marquee-page-surface="assets" data-workspace-marquee-page-surface="assets">\n    ' +
     (headingInListColumn ? '' : current) +
     '\n    <div class="story-assets-switch-region" data-story-assets-switch-region data-workspace-assets-switch-region>\n      <div class="story-assets-layout' +
     (headingInListColumn ? ' story-assets-layout--column-heading' : '') +
@@ -127,7 +127,7 @@ export function renderWorkspaceAssetSettingsShell({
     '\n          <div class="' +
     source +
     '">\n            ' +
-    (cardsHtml || '<div\x20class=\x22story-inline-empty\x22>' + escapeHtml(emptyText) + '</div>') +
+    (cardsHtml || '<div class="story-inline-empty">' + escapeHtml(emptyText) + '</div>') +
     '\n          </div>\n        </section>\n        <div class="story-assets-splitter panel-resize-handle panel-resize-handle--transient" data-story-assets-splitter data-workspace-assets-splitter role="separator" aria-orientation="vertical" aria-label="调整素材列表与详情区域宽度" aria-valuemin="28" aria-valuemax="72" aria-valuenow="' +
     Math['round'](workspaceAssetSplitRatio2) +
     '" tabindex="0"></div>\n        ' +

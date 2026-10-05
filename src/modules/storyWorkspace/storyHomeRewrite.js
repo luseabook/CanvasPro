@@ -34,9 +34,9 @@ export function buildNovelAdaptationInstruction({
 } = {}) {
   const count = Number(episodeCount),
     count2 = Number(sceneMaxSeconds),
-    item = Number['isFinite'](count) && count > 0x0 ? '改编为 ' + Math['trunc'](count) + ' 集' : '改编为分集',
+    item = Number['isFinite'](count) && count > 0 ? '改编为 ' + Math['trunc'](count) + ' 集' : '改编为分集',
     key =
-      Number['isFinite'](count2) && count2 > 0x0 ? '，单个场景不超过 ' + Math['trunc'](count2) + ' 秒' : '';
+      Number['isFinite'](count2) && count2 > 0 ? '，单个场景不超过 ' + Math['trunc'](count2) + ' 秒' : '';
   return (
     '把这部小说' +
     item +
@@ -59,7 +59,7 @@ export function getStoryHomeSummaryTaskCopy(index = 'generate') {
   };
 }
 function getStoryHomeDocumentDropZone(el) {
-  return el?.['closest']?.('[data-story-rewrite-drop],\x20[data-story-script-drop]') || null;
+  return el?.['closest']?.('[data-story-rewrite-drop], [data-story-script-drop]') || null;
 }
 export function handleStoryHomeDocumentDragOver(event) {
   const el2 = getStoryHomeDocumentDropZone(event?.['target']);
@@ -79,7 +79,7 @@ export async function handleStoryHomeDocumentDrop(event3, handler) {
   (event3['preventDefault']?.(),
     event3['stopPropagation']?.(),
     el4['classList']?.['remove']?.('is-dragover'));
-  const result = event3['dataTransfer']?.['files']?.[0x0];
+  const result = event3['dataTransfer']?.['files']?.[0];
   if (result && typeof handler === 'function') await handler(result);
   return !![];
 }

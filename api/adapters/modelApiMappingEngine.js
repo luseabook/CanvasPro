@@ -185,9 +185,9 @@ function normalizeImageBase64DataUrl(value23, value24) {
   const list8 = value25.replace(/\s+/g, '');
   if (!list8 || !/^[a-z0-9+/=_-]+$/i.test(list8)) return '';
   try {
-    const list9 = atob(list8.slice(0, 0x18).replace(/-/g, '+').replace(/_/g, '/'));
+    const list9 = atob(list8.slice(0, 24).replace(/-/g, '+').replace(/_/g, '/'));
     if (list9.startsWith('ÿØÿ')) value24 = 'image/jpeg';
-    else if (list9.startsWith('PNG\r\n\u001a\n')) value24 = 'image/png';
+    else if (list9.startsWith('PNG\r\n\x1a\n')) value24 = 'image/png';
     else if (/^GIF8[79]a/.test(list9)) value24 = 'image/gif';
     else if (list9.startsWith('RIFF') && list9.slice(8, 12) === 'WEBP') value24 = 'image/webp';
   } catch {}

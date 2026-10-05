@@ -20,11 +20,11 @@ export const rhImageHdModelManifest = Object['freeze']({
     imageMenu: { group: 'runninghubWorkflow' },
     imageHdMenu: { enabled: !![] },
   },
-  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 0x1 },
+  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 1 },
   inputSlots: {
     allowedKinds: ['image'],
-    minByKind: { image: 0x1 },
-    maxByKind: { text: 0x0, image: 0x1, video: 0x0, audio: 0x0 },
+    minByKind: { image: 1 },
+    maxByKind: { text: 0, image: 1, video: 0, audio: 0 },
   },
   uiSchema: {
     fields: [
@@ -35,8 +35,8 @@ export const rhImageHdModelManifest = Object['freeze']({
         placement: 'resolution',
         label: '分辨率',
         menuTitle: '分辨率',
-        defaultValue: 0x780,
-        options: [0x500, 0x780, 0xa00]['map']((value) => ({
+        defaultValue: 1920,
+        options: [1280, 1920, 2560]['map']((value) => ({
           value: value,
           label: String(value),
           selectedLabel: '分辨率' + value,
@@ -70,11 +70,11 @@ export const rhImageHdExecutionManifest = Object['freeze']({
         nodeId: '413',
         fieldName: 'value',
         field: 'generationParams.rhResolution',
-        defaultValue: 0x780,
+        defaultValue: 1920,
         transform: 'integer',
       },
     ],
   },
   result: { taskIdPath: 'data.taskId', urlFields: ['url', 'imageUrl'] },
-  validation: { minInputImages: 0x1, missingInputMessage: '请提供待高清的源图片' },
+  validation: { minInputImages: 1, missingInputMessage: '请提供待高清的源图片' },
 });

@@ -30,10 +30,10 @@ export function previewReplicationCardOrder(el3, enabled, enabled2) {
       box3 = el5['getBoundingClientRect'](),
       index = box2['left'] - box3['left'],
       result = box2['top'] - box3['top'];
-    if (Math['abs'](index) + Math['abs'](result) < 0x1) continue;
+    if (Math['abs'](index) + Math['abs'](result) < 1) continue;
     const data = el5['animate'](
       [{ transform: 'translate(' + index + 'px, ' + result + 'px)' }, { transform: 'translate(0, 0)' }],
-      { duration: 0xdc, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
+      { duration: 220, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
     );
     (motions['set'](el5, data),
       (data['onfinish'] = () => {

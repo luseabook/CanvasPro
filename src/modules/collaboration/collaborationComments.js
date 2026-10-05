@@ -25,8 +25,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     el8 = reviewElement('button', 'collaboration-button', '取消回复');
   (el6['append'](el7, el8), (el6['hidden'] = !![]));
   const input = reviewElement('textarea', 'collaboration-input');
-  ((input['maxLength'] = 0x7d0),
-    (input['rows'] = 0x3),
+  ((input['maxLength'] = 2000),
+    (input['rows'] = 3),
     input['setAttribute']('aria-label', '评论内容输入'),
     (input['placeholder'] = '写下建议，可 @成员'));
   const reviewElement4 = reviewElement('div', 'collaboration-actions'),
@@ -34,7 +34,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
   (trigger['setAttribute']('aria-label', '提及成员'), reviewElement4['append'](trigger));
   const menu = reviewElement('div');
   menu['setAttribute']('aria-label', '提及成员');
-  const el9 = reviewElement('button', 'collaboration-button\x20collaboration-primary', '发送');
+  const el9 = reviewElement('button', 'collaboration-button collaboration-primary', '发送');
   ((el9['type'] = 'submit'),
     reviewSendButton(el9),
     reviewElement4['append'](el9),
@@ -56,8 +56,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     },
     onSelect(error2, { start: start, end: end }) {
       if (enabled || !dom) return;
-      const list2 = '@' + error2['name'] + '\x20';
-      if (input['value']['length'] - (end - start) + list2['length'] > 0x7d0) return;
+      const list2 = '@' + error2['name'] + ' ';
+      if (input['value']['length'] - (end - start) + list2['length'] > 2000) return;
       (input['setRangeText'](list2, start, end, 'end'),
         (dom['mentions'][error2['id']] = error2['name']),
         run());
@@ -65,8 +65,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
   });
   let session = null,
     nodeId = '',
-    item = 0x0,
-    key = -0x1,
+    item = 0,
+    key = -1,
     enabled2 = ![],
     enabled = ![],
     comments = [],
@@ -74,8 +74,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     handler = () => {},
     enabled3 = null,
     dom = null,
-    result = -0x1,
-    data = { x: 0x0, y: 0x0 },
+    result = -1,
+    data = { x: 0, y: 0 },
     enabled4 = !![];
   const map = new Map(),
     handler2 = () => !!nodeId && root['matches'](':popover-open');
@@ -99,15 +99,15 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     ((data = { x: x['x'], y: x['y'] }),
       root['style']['setProperty'](
         '--comment-left',
-        Math['max'](0x8, Math['min'](x['x'] + 0xa, window['innerWidth'] - root['offsetWidth'] - 0x8)) + 'px',
+        Math['max'](8, Math['min'](x['x'] + 10, window['innerWidth'] - root['offsetWidth'] - 8)) + 'px',
       ),
       root['style']['setProperty'](
         '--comment-top',
-        Math['max'](0x8, Math['min'](x['y'], window['innerHeight'] - root['offsetHeight'] - 0x8)) + 'px',
+        Math['max'](8, Math['min'](x['y'], window['innerHeight'] - root['offsetHeight'] - 8)) + 'px',
       ));
   }
   function run4() {
-    const target = enabled4 || list['scrollHeight'] - list['clientHeight'] - list['scrollTop'] < 0x28,
+    const target = enabled4 || list['scrollHeight'] - list['clientHeight'] - list['scrollTop'] < 40,
       source = JSON['stringify']([comments, session['state']['members'], session['state']['role']]);
     source !== index &&
       ((index = source),
@@ -240,7 +240,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
   };
   document['addEventListener']('pointerdown', value4, !![]);
   function update() {
-    getSession() !== session && (onClose(![]), (session = getSession()), map['clear'](), (result = -0x1));
+    getSession() !== session && (onClose(![]), (session = getSession()), map['clear'](), (result = -1));
     if (!handler2()) return;
     const error6 = store['getStateRaw']()['nodes'][nodeId];
     (updateNodeReference(reviewElement3, error6, nodeId),
@@ -265,8 +265,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
       if (!session?.['review']) return;
       ((nodeId = value7),
         (enabled3 = returnFocus),
-        (key = -0x1),
-        (result = -0x1),
+        (key = -1),
+        (result = -1),
         (comments = []),
         (index = ''),
         (enabled4 = !![]));
@@ -279,7 +279,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
       if (returnFocus) {
         const x2 = returnFocus['getBoundingClientRect']();
         position({ x: x2['right'], y: x2['bottom'] });
-      } else position({ x: window['innerWidth'] / 0x2, y: window['innerHeight'] / 0x3 });
+      } else position({ x: window['innerWidth'] / 2, y: window['innerHeight'] / 3 });
       ((handler = beginModalInteraction({
         root: root,
         onClose: onClose,

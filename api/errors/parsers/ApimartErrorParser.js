@@ -1,29 +1,29 @@
 import { ApiError, ErrorType } from '../ApiError.js';
 const APIMART_HTTP_STATUS_MAP = {
-    0x190: {
+    400: {
       type: ErrorType.INVALID_PARAMS,
       message: '无效的请求参数：请检查请求参数是否正确',
       retryable: false,
     },
-    0x191: { type: ErrorType.AUTH_ERROR, message: '认证失败：请检查 API Key 是否正确', retryable: false },
-    0x192: { type: ErrorType.INSUFFICIENT_BALANCE, message: '余额不足：请充值', retryable: false },
-    0x193: { type: ErrorType.FORBIDDEN, message: '没有访问权限：无法访问该资源', retryable: false },
-    0x194: {
+    401: { type: ErrorType.AUTH_ERROR, message: '认证失败：请检查 API Key 是否正确', retryable: false },
+    402: { type: ErrorType.INSUFFICIENT_BALANCE, message: '余额不足：请充值', retryable: false },
+    403: { type: ErrorType.FORBIDDEN, message: '没有访问权限：无法访问该资源', retryable: false },
+    404: {
       type: ErrorType.MODEL_UNAVAILABLE,
       message: '找不到指定的模型：请检查模型 ID 是否正确',
       retryable: false,
     },
-    0x1ad: { type: ErrorType.RATE_LIMIT, message: '请求过于频繁：请稍后重试', retryable: true },
-    0x1f4: { type: ErrorType.SERVER_ERROR, message: '服务器内部错误：请稍后重试', retryable: true },
-    0x1f6: {
+    429: { type: ErrorType.RATE_LIMIT, message: '请求过于频繁：请稍后重试', retryable: true },
+    500: { type: ErrorType.SERVER_ERROR, message: '服务器内部错误：请稍后重试', retryable: true },
+    502: {
       type: ErrorType.SERVICE_UNAVAILABLE,
       message: '网关错误：服务暂时不可用，请稍后重试',
       retryable: true,
     },
-    0x1f7: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务暂时不可用：请稍后重试', retryable: true },
+    503: { type: ErrorType.SERVICE_UNAVAILABLE, message: '服务暂时不可用：请稍后重试', retryable: true },
   },
   APIMART_BUSINESS_CODES = {
-    0x25d: {
+    605: {
       type: ErrorType.INSUFFICIENT_BALANCE,
       message: '账户余额不足：请充值或更换 API Key',
       retryable: false,
@@ -165,7 +165,7 @@ export function parseError(enabled, status) {
         retryable: false,
       });
   }
-  if (status >= 0x190) return ApiError.fromHttpStatus(status, 'apimart', message);
+  if (status >= 400) return ApiError.fromHttpStatus(status, 'apimart', message);
   return null;
 }
 export function parseTaskError(enabled2) {

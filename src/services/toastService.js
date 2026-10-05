@@ -8,8 +8,8 @@ import {
   openSubscriptionAccessSettings,
 } from '../modules/subscriptionAccessMissingToast.js';
 import { logDiagnosticEvent } from './diagnosticsService.js';
-const DEFAULT_DURATION = 0xb54,
-  ALERT_DURATION = 0x1388,
+const DEFAULT_DURATION = 2900,
+  ALERT_DURATION = 5000,
   SETTINGS_ACTION_LABEL = '去设置',
   ICONS = { ok: '', warn: '⚠️', error: '✕', success: '✓' };
 function resolveToastActionOptions(message, value = {}) {
@@ -41,7 +41,7 @@ export function showToast(item, key = 'ok', index, result = {}) {
       type: 'ui.alert_presented',
       level: level,
       source: 'renderer',
-      message: String(item || 'User-visible\x20alert'),
+      message: String(item || 'User-visible alert'),
       context: { toastType: level },
     });
   const el = document['getElementById']('v2-toast-wrap');
@@ -51,18 +51,18 @@ export function showToast(item, key = 'ok', index, result = {}) {
   }
   const enabled = level === 'error' || level === 'warn',
     data = enabled ? ALERT_DURATION : DEFAULT_DURATION,
-    options = Number['isFinite'](Number(index)) ? Math['max'](0x0, Number(index)) : data,
+    options = Number['isFinite'](Number(index)) ? Math['max'](0, Number(index)) : data,
     target = enabled ? Math['max'](ALERT_DURATION, options) : options,
     source = ICONS[level] ?? '',
     el2 = document['createElement']('div'),
     handler = () => {
       (el2['remove'](),
-        el['childElementCount'] === 0x0 &&
+        el['childElementCount'] === 0 &&
           el['matches']?.(':popover-open') &&
           el['hidePopover']());
     };
-  (el2['style']?.['setProperty']('--toast-exit-delay', Math['max'](0x0, target - 0x12c) + 'ms'),
-    (el2['className'] = 'v2-toast' + (level !== 'ok' ? '\x20' + level : '')));
+  (el2['style']?.['setProperty']('--toast-exit-delay', Math['max'](0, target - 300) + 'ms'),
+    (el2['className'] = 'v2-toast' + (level !== 'ok' ? ' ' + level : '')));
   target > DEFAULT_DURATION && !enabled && el2['classList']['add']('is-long');
   if (source) {
     const el3 = document['createElement']('span');
@@ -76,7 +76,7 @@ export function showToast(item, key = 'ok', index, result = {}) {
   if (typeof toastActionOptions?.['renderContent'] === 'function') toastActionOptions['renderContent'](el4);
   if (typeof toastActionOptions?.['onClick'] === 'function') {
     const next = (event) => {
-      if (event?.['type'] === 'keydown' && !['Enter', '\x20']['includes'](event['key'])) return;
+      if (event?.['type'] === 'keydown' && !['Enter', ' ']['includes'](event['key'])) return;
       event?.['preventDefault']?.();
       try {
         toastActionOptions['onClick']();

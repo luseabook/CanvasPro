@@ -15,10 +15,10 @@ export async function cutVideoRangeToLocal({
   nodeId: nodeId = '',
 } = {}) {
   const src2 = String(src || '')['trim'](),
-    start = Math['max'](0x0, Number(startSec) || 0x0),
-    end = Math['max'](start, Number(endSec) || 0x0);
+    start = Math['max'](0, Number(startSec) || 0),
+    end = Math['max'](start, Number(endSec) || 0);
   if (!src2 || end <= start)
-    throw new VideoCutServiceError('Invalid\x20video\x20cut\x20range', 'invalid_range');
+    throw new VideoCutServiceError('Invalid video cut range', 'invalid_range');
   let data = null;
   if (canUseElectronMediaTask())
     data = await enqueueElectronMediaTask(
@@ -28,7 +28,7 @@ export async function cutVideoRangeToLocal({
         src: src2,
         args: { start: start, end: end },
       },
-      { wait: !![], timeout: 0x493e0 },
+      { wait: !![], timeout: 300000 },
     );
   else {
     const response = await requester({
@@ -40,15 +40,15 @@ export async function cutVideoRangeToLocal({
       allow404Null: !![],
       returnMeta: !![],
     });
-    if (response?.['status'] === 0x194 || response?.['data'] == null)
-      throw new VideoCutServiceError('Video\x20cut\x20endpoint\x20is\x20unavailable', 'endpoint_unavailable');
+    if (response?.['status'] === 404 || response?.['data'] == null)
+      throw new VideoCutServiceError('Video cut endpoint is unavailable', 'endpoint_unavailable');
     data = response['data'] || {};
   }
   const result = data?.['result'] && typeof data['result'] === 'object' ? data['result'] : data,
     localPath = pickResultLocalPath(data);
   if (!localPath || data?.['success'] === ![] || result?.['success'] === ![])
     throw new VideoCutServiceError(
-      result?.['error'] || data?.['error'] || data?.['message'] || 'Video\x20cut\x20failed',
+      result?.['error'] || data?.['error'] || data?.['message'] || 'Video cut failed',
     );
   return { localPath: localPath, durationSec: end - start, data: data, result: result };
 }

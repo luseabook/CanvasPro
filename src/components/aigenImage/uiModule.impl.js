@@ -136,7 +136,7 @@ import {
 import { onLocaleChange, t } from '../../i18n/index.js';
 import { getTaskMessage, resolveGenerationButtonMode } from '../../core/generationTaskUiState.js';
 import { DEFAULT_IMAGE_NODE_MODEL, DEFAULT_IMAGE_NODE_PROVIDER } from './defaults.js';
-const AIGEN_IMAGE_HIDDEN_SOURCE_CLEAR_DELAY_MS = 0x4b0,
+const AIGEN_IMAGE_HIDDEN_SOURCE_CLEAR_DELAY_MS = 1200,
   AIGEN_IMAGE_LOD_HOVER_REFRESH_DELAY_MS = 160;
 function getPlainUiSchemaParams(value) {
   return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -394,7 +394,7 @@ export function createAIGenerateNodeUiModule(entry) {
           ((value8 = true),
             setTimeout(() => {
               value8 = false;
-            }, 0x1c2));
+            }, 450));
         },
         image = () => {
           const value9 = this._getResultImageDragOutNodeData(),
@@ -408,12 +408,12 @@ export function createAIGenerateNodeUiModule(entry) {
               : null;
           return {
             width:
-              Number(box?.width) || Number(this.previewEl?.offsetWidth) || Number(this._data?.width) || 0x140,
+              Number(box?.width) || Number(this.previewEl?.offsetWidth) || Number(this._data?.width) || 320,
             height:
               Number(box?.height) ||
               Number(this.previewEl?.offsetHeight) ||
               Number(this._data?.height) ||
-              0x140,
+              320,
           };
         };
       return (
@@ -621,13 +621,13 @@ export function createAIGenerateNodeUiModule(entry) {
               fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(box2 || {}),
               x2 = Number(box2?.x) || 0,
               value25 = Number(box2?.y) || 0,
-              value26 = Number(box2?.width) || 0x168,
-              value27 = Number(box2?.height) || 0x168,
+              value26 = Number(box2?.width) || 360,
+              value27 = Number(box2?.height) || 360,
               localPath = assetId.localPath || String(src || '').replace(/^\//, ''),
               args2 = buildImageNodeStorageFields(assetId),
               id = generateId('source-image'),
-              width2 = 0x104,
-              height = 0x104,
+              width2 = 260,
+              height = 260,
               value28 = 24,
               x3 = x2 - value28 - width2,
               value29 = value25 + Math.round((value27 - height) / 2);
@@ -751,8 +751,8 @@ export function createAIGenerateNodeUiModule(entry) {
               await new Promise((handler4) => {
                 const image2 = new Image();
                 ((image2.onload = () => {
-                  const value44 = image2.naturalWidth || 0x3e8,
-                    value45 = image2.naturalHeight || 0x3e8,
+                  const value44 = image2.naturalWidth || 1000,
+                    value45 = image2.naturalHeight || 1000,
                     { width: width3, height: height2 } = getAutoMediaSizeByShortSide(value44, value45);
                   (store.getState().nodes?.[id] &&
                     store.updateNodeData(id, {
@@ -1023,7 +1023,7 @@ export function createAIGenerateNodeUiModule(entry) {
             const value67 = await api.buildGenerateImageRequest(enabled19),
               outputText = formatFinalApiDebugRequest(value67),
               value68 = store.getState(),
-              x4 = this._data.x + (this._data.width || 0x17c) + 50,
+              x4 = this._data.x + (this._data.width || 380) + 50,
               y3 = this._data.y;
             let enabled20 = Object.values(value68.nodes).find((item17) => item17.type === 'debug');
             (!enabled20
@@ -1032,8 +1032,8 @@ export function createAIGenerateNodeUiModule(entry) {
                   type: 'debug',
                   x: x4,
                   y: y3,
-                  width: 0x17c,
-                  height: 0x12c,
+                  width: 380,
+                  height: 300,
                   name: t('aigenImage.debug.nodeName'),
                   outputText: outputText,
                 })
@@ -1669,11 +1669,11 @@ export function createAIGenerateNodeUiModule(entry) {
         (this._multiImagesContainer.style.height = '100%'),
         (this._multiImagesContainer.style.display = 'block'));
       const imageCount2 = imageCount.length,
-        value117 = 0x1f4;
+        value117 = 500;
       let run5 = () => {};
       const items = buildMultiResultBackplateItems({ imageCount: imageCount2, mainIndex: mainIndex }),
         multiResultBackplateKey = getMultiResultBackplateKey(items),
-        value118 = this._data.width || this._root.clientWidth || 0x140,
+        value118 = this._data.width || this._root.clientWidth || 320,
         value119 = this._data.height || this._root.clientHeight || Math.round((value118 * 9) / 16),
         handler10 = (value120) => {
           for (let value121 = 0; value121 < imageCount2; value121 += 1) {
@@ -1795,8 +1795,8 @@ export function createAIGenerateNodeUiModule(entry) {
                 response4.url ||
                 '',
               getFallbackSize: () => ({
-                width: this.previewEl?.offsetWidth || this._data?.width || 0x140,
-                height: this.previewEl?.offsetHeight || this._data?.height || 0x140,
+                width: this.previewEl?.offsetWidth || this._data?.width || 320,
+                height: this.previewEl?.offsetHeight || this._data?.height || 320,
               }),
             });
             (el28.addEventListener('pointerdown', (event17) => {
@@ -1837,8 +1837,8 @@ export function createAIGenerateNodeUiModule(entry) {
             getGhostSourceElement: () => el30,
             getFallbackSrc: () => el30.currentSrc || el30.src || '',
             getFallbackSize: () => ({
-              width: this.previewEl?.offsetWidth || this._data?.width || 0x140,
-              height: this.previewEl?.offsetHeight || this._data?.height || 0x140,
+              width: this.previewEl?.offsetWidth || this._data?.width || 320,
+              height: this.previewEl?.offsetHeight || this._data?.height || 320,
             }),
           });
           (el30.addEventListener('click', (event20) => {
@@ -1871,7 +1871,7 @@ export function createAIGenerateNodeUiModule(entry) {
             position: 'absolute',
             top: '8px',
             right: '8px',
-            zIndex: 0x3ed,
+            zIndex: 1005,
             padding: '6px 12px',
             borderRadius: '6px',
             display: 'flex',
@@ -2336,8 +2336,8 @@ export function createAIGenerateNodeUiModule(entry) {
   return record.prototype;
 }
 
-const AIGEN_IMAGE_MULTI_STACK_MOTION_DURATION_MS = 0x1f4;
-const AIGEN_IMAGE_BACKPLATE_MEDIA_HIDE_CLEAR_DELAY_MS = 0xb4;
+const AIGEN_IMAGE_MULTI_STACK_MOTION_DURATION_MS = 500;
+const AIGEN_IMAGE_BACKPLATE_MEDIA_HIDE_CLEAR_DELAY_MS = 180;
 
 export function shouldShowImagePromptInput(enabled36) {
   if (!enabled36 || typeof enabled36 !== 'object') return !![];
@@ -2349,8 +2349,8 @@ export function shouldShowImagePromptInput(enabled36) {
 function getRhAiAppImageResultMediaKey(options3 = {}) {
   const value192 = Array['isArray'](options3?.['images']) ? options3['images'] : [],
     value193 = Number(options3?.['mainImageIndex']),
-    value194 = Number['isFinite'](value193) ? Math['max'](0x0, Math['trunc'](value193)) : 0x0,
-    value195 = value192[Math['min'](value194, Math['max'](0x0, value192['length'] - 0x1))] || {};
+    value194 = Number['isFinite'](value193) ? Math['max'](0, Math['trunc'](value193)) : 0,
+    value195 = value192[Math['min'](value194, Math['max'](0, value192['length'] - 1))] || {};
   return (
     [
       value195['displayLocalPath'],
@@ -2387,7 +2387,7 @@ function flushAIGenImageReferenceUploadNodes(list21 = []) {
   const value197 = Array['from'](
     new Set(list21['map']((value198) => String(value198 || '')['trim']())['filter'](Boolean)),
   );
-  if (value197['length'] === 0x0) return ![];
+  if (value197['length'] === 0) return ![];
   const value199 = globalThis['window']?.['v2Renderer'];
   if (typeof value199?.['flushNodes'] === 'function')
     try {

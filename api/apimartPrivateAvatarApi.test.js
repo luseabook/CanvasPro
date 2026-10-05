@@ -86,7 +86,7 @@ async function withMockFetch(item, handler) {
           name: 'avatar.png',
           assetType: 'Image',
           pollIntervalMs: 0,
-          maxWaitMs: 0x3e8,
+          maxWaitMs: 1000,
         });
         (assert.equal(response.status, 'passed'),
           assert.equal(response.taskId, 'task-avatar-1'),

@@ -4,20 +4,20 @@ import {
 } from './storyAssetRequirementEvidence.js';
 import { createStoryAssetPromptContracts } from './storyAssetExtractionRequest.js';
 import { stripStoryAssetInternalEvidenceMetadata } from '../utils/storyAssetPublicText.js';
-export const STORY_ASSET_EVIDENCE_BODY_MAX_CHARACTERS = 0x2ee0;
-export const STORY_ASSET_CANDIDATE_MAX_ITEMS_PER_KIND = 0x40;
-export const STORY_ASSET_CANDIDATE_MAX_CHARACTERS_PER_KIND = 0x1f40;
-export const STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS = 0x4000;
-const STORY_ASSET_OUTPUT_BASE_TOKENS = 0x300,
-  STORY_ASSET_OUTPUT_TOKENS_PER_REQUIRED = Object['freeze']({ character: 0x2d0, scene: 0x1e0, prop: 0x1a4 }),
+export const STORY_ASSET_EVIDENCE_BODY_MAX_CHARACTERS = 12000;
+export const STORY_ASSET_CANDIDATE_MAX_ITEMS_PER_KIND = 64;
+export const STORY_ASSET_CANDIDATE_MAX_CHARACTERS_PER_KIND = 8000;
+export const STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS = 16384;
+const STORY_ASSET_OUTPUT_BASE_TOKENS = 768,
+  STORY_ASSET_OUTPUT_TOKENS_PER_REQUIRED = Object['freeze']({ character: 720, scene: 480, prop: 420 }),
   STORY_ASSET_VERBOSE_OUTPUT_SAFE_RATIO = 0.8,
-  STORY_ASSET_VERBOSE_MAX_ITEMS_PER_KIND = 0x10,
+  STORY_ASSET_VERBOSE_MAX_ITEMS_PER_KIND = 16,
   STORY_ASSET_COMPACT_OUTPUT_SAFE_RATIO = 0.8,
-  STORY_ASSET_COMPACT_OUTPUT_BASE_TOKENS = 0x80,
+  STORY_ASSET_COMPACT_OUTPUT_BASE_TOKENS = 128,
   STORY_ASSET_COMPACT_OUTPUT_TOKENS_PER_ASSET = Object['freeze']({
-    character: 0x300,
-    scene: 0x240,
-    prop: 0x200,
+    character: 768,
+    scene: 576,
+    prop: 512,
   });
 function cloneValue(enabled) {
   if (!enabled || typeof enabled !== 'object') return enabled;
@@ -30,23 +30,23 @@ function cloneValue(enabled) {
 function normalizeText(value) {
   return typeof value === 'string' ? value['trim']() : '';
 }
-function selectFairStoryAssetCandidateSubset(list = [], item = 0x0) {
+function selectFairStoryAssetCandidateSubset(list = [], item = 0) {
   const list2 = Array['isArray'](list) ? list : [],
-    enabled2 = Math['max'](0x0, Math['trunc'](Number(item) || 0x0));
+    enabled2 = Math['max'](0, Math['trunc'](Number(item) || 0));
   if (list2['length'] <= enabled2) return list2;
   if (!enabled2) return [];
   const list3 = [],
     map = new Set(),
     handler = (key) => {
-      const index = Math['max'](0x0, Math['min'](list2['length'] - 0x1, Math['trunc'](key)));
+      const index = Math['max'](0, Math['min'](list2['length'] - 1, Math['trunc'](key)));
       if (map['has'](index) || list3['length'] >= enabled2) return;
       (map['add'](index), list3['push'](index));
     };
-  (handler(0x0), handler(Math['floor']((list2['length'] - 0x1) / 0x2)), handler(list2['length'] - 0x1));
+  (handler(0), handler(Math['floor']((list2['length'] - 1) / 2)), handler(list2['length'] - 1));
   while (list3['length'] < enabled2) {
-    let result = -0x1,
-      data = -0x1;
-    for (let options = 0x0; options < list2['length']; options += 0x1) {
+    let result = -1,
+      data = -1;
+    for (let options = 0; options < list2['length']; options += 1) {
       if (map['has'](options)) continue;
       const target = Math['min'](...list3['map']((source) => Math['abs'](source - options)));
       target > data && ((result = options), (data = target));
@@ -63,10 +63,10 @@ function selectFairCompactCandidatesWithinSerializedBudget(
 ) {
   const list4 = Array['isArray'](entry) ? entry : [],
     handle = Number['isFinite'](Number(record))
-      ? Math['max'](0x0, Math['min'](list4['length'], Math['trunc'](Number(record) || 0x0)))
+      ? Math['max'](0, Math['min'](list4['length'], Math['trunc'](Number(record) || 0)))
       : list4['length'],
-    state = Math['max'](0x0, Math['trunc'](Number(payload) || 0x0));
-  for (let count = handle; count >= 0x0; count -= 0x1) {
+    state = Math['max'](0, Math['trunc'](Number(payload) || 0));
+  for (let count = handle; count >= 0; count -= 1) {
     const fairStoryAssetCandidateSubset = selectFairStoryAssetCandidateSubset(list4, count),
       storyAssetPromptContracts = createStoryAssetPromptContracts(
         [current],
@@ -82,34 +82,34 @@ function selectFairCompactCandidatesWithinSerializedBudget(
   }
   return [];
 }
-function sampleTextAcrossValue(config = '', scope = 0x0) {
+function sampleTextAcrossValue(config = '', scope = 0) {
   const list5 = normalizeText(config),
-    enabled3 = Math['max'](0x0, Math['trunc'](Number(scope) || 0x0));
+    enabled3 = Math['max'](0, Math['trunc'](Number(scope) || 0));
   if (!enabled3 || !list5) return '';
   if (list5['length'] <= enabled3) return list5;
-  if (enabled3 < 0xc) return list5['slice'](0x0, enabled3);
+  if (enabled3 < 12) return list5['slice'](0, enabled3);
   const list6 = '\n…\n',
-    input = enabled3 - list6['length'] * 0x2,
-    output = Math['ceil'](input / 0x3),
-    value2 = Math['floor'](input / 0x3),
-    value3 = Math['max'](0x1, input - output - value2),
-    value4 = Math['max'](output, Math['floor']((list5['length'] - value2) / 0x2));
-  return [list5['slice'](0x0, output), list5['slice'](value4, value4 + value2), list5['slice'](-value3)]
+    input = enabled3 - list6['length'] * 2,
+    output = Math['ceil'](input / 3),
+    value2 = Math['floor'](input / 3),
+    value3 = Math['max'](1, input - output - value2),
+    value4 = Math['max'](output, Math['floor']((list5['length'] - value2) / 2));
+  return [list5['slice'](0, output), list5['slice'](value4, value4 + value2), list5['slice'](-value3)]
     ['join'](list6)
-    ['slice'](0x0, enabled3);
+    ['slice'](0, enabled3);
 }
-function allocateFairStoryEvidenceCharacters(list7 = [], value5 = 0x0) {
+function allocateFairStoryEvidenceCharacters(list7 = [], value5 = 0) {
   const list8 = list7['map']((value6) => normalizeText(value6)['length']),
-    value7 = list8['map'](() => 0x0);
-  let count2 = Math['max'](0x0, Math['trunc'](Number(value5) || 0x0)),
+    value7 = list8['map'](() => 0);
+  let count2 = Math['max'](0, Math['trunc'](Number(value5) || 0)),
     list9 = list8['map']((length, index2) => ({ index: index2, length: length }))['filter'](
-      ({ length: length2 }) => length2 > 0x0,
+      ({ length: length2 }) => length2 > 0,
     );
-  while (count2 > 0x0 && list9['length']) {
-    const value8 = Math['max'](0x1, Math['floor'](count2 / list9['length'])),
+  while (count2 > 0 && list9['length']) {
+    const value8 = Math['max'](1, Math['floor'](count2 / list9['length'])),
       list10 = [];
     for (const list11 of list9) {
-      if (count2 <= 0x0) break;
+      if (count2 <= 0) break;
       const value9 = list11['length'] - value7[list11['index']],
         value10 = Math['min'](value9, value8, count2);
       ((value7[list11['index']] += value10), (count2 -= value10));
@@ -169,8 +169,8 @@ export function createBudgetedStoryAssetEvidenceProject(
               map3['get'](text2) || '',
             ]
               ['filter'](Boolean)
-              ['join']('\x0a');
-          })['join']('\x0a\x0a'),
+              ['join']('\n');
+          })['join']('\n\n'),
         };
       }),
     }
@@ -178,16 +178,16 @@ export function createBudgetedStoryAssetEvidenceProject(
 }
 function updateFingerprint(value17, value18) {
   const list15 = String(value18 ?? '');
-  let value19 = value17 >>> 0x0;
-  for (let value20 = 0x0; value20 < list15['length']; value20 += 0x1) {
+  let value19 = value17 >>> 0;
+  for (let value20 = 0; value20 < list15['length']; value20 += 1) {
     ((value19 ^= list15['charCodeAt'](value20)), (value19 = Math['imul'](value19, 0x1000193)));
   }
-  return value19 >>> 0x0;
+  return value19 >>> 0;
 }
 export function createStoryAssetAuthoritativeSourceFingerprint(list16 = []) {
   const list17 = Array['isArray'](list16) ? list16 : [];
   let updateFingerprint2 = 0x811c9dc5,
-    value21 = 0x0;
+    value21 = 0;
   return (
     list17['forEach']((dom2) => {
       [
@@ -204,33 +204,33 @@ export function createStoryAssetAuthoritativeSourceFingerprint(list16 = []) {
           (updateFingerprint2 = updateFingerprint(updateFingerprint2, '\x00')));
       });
     }),
-    'source-v1-' + list17['length'] + '-' + value21 + '-' + updateFingerprint2['toString'](0x10)
+    'source-v1-' + list17['length'] + '-' + value21 + '-' + updateFingerprint2['toString'](16)
   );
 }
 export function estimateStoryAssetFocusedOutputTokens({
   kind: kind = '',
-  requiredAssetCount: requiredAssetCount = 0x0,
-  candidateAssetCount: candidateAssetCount = 0x0,
+  requiredAssetCount: requiredAssetCount = 0,
+  candidateAssetCount: candidateAssetCount = 0,
 } = {}) {
   const value23 =
     STORY_ASSET_OUTPUT_TOKENS_PER_REQUIRED[kind] || STORY_ASSET_OUTPUT_TOKENS_PER_REQUIRED['scene'];
   return (
     STORY_ASSET_OUTPUT_BASE_TOKENS +
-    Math['max'](0x0, Math['trunc'](Number(requiredAssetCount) || 0x0)) * value23 +
-    Math['max'](0x0, Math['trunc'](Number(candidateAssetCount) || 0x0)) * value23
+    Math['max'](0, Math['trunc'](Number(requiredAssetCount) || 0)) * value23 +
+    Math['max'](0, Math['trunc'](Number(candidateAssetCount) || 0)) * value23
   );
 }
 export function estimateStoryAssetCompactOutputTokens({
   kind: kind = '',
-  requiredAssetCount: requiredAssetCount = 0x0,
-  candidateAssetCount: candidateAssetCount = 0x0,
+  requiredAssetCount: requiredAssetCount = 0,
+  candidateAssetCount: candidateAssetCount = 0,
 } = {}) {
   const value24 =
     STORY_ASSET_COMPACT_OUTPUT_TOKENS_PER_ASSET[kind] || STORY_ASSET_COMPACT_OUTPUT_TOKENS_PER_ASSET['scene'];
   return (
     STORY_ASSET_COMPACT_OUTPUT_BASE_TOKENS +
-    (Math['max'](0x0, Math['trunc'](Number(requiredAssetCount) || 0x0)) +
-      Math['max'](0x0, Math['trunc'](Number(candidateAssetCount) || 0x0))) *
+    (Math['max'](0, Math['trunc'](Number(requiredAssetCount) || 0)) +
+      Math['max'](0, Math['trunc'](Number(candidateAssetCount) || 0))) *
       value24
   );
 }
@@ -239,13 +239,13 @@ export function resolveStoryAssetFocusedOutputMode({
   candidateAssetsByKind: candidateAssetsByKind = {},
   maxOutputTokens: maxOutputTokens = STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
 } = {}) {
-  const maxOutputTokens2 = Math['max'](0x1, Math['trunc'](Number(maxOutputTokens) || 0x0)),
+  const maxOutputTokens2 = Math['max'](1, Math['trunc'](Number(maxOutputTokens) || 0)),
     verboseSafeMaximum = Math['max'](
-      0x1,
+      1,
       Math['floor'](maxOutputTokens2 * STORY_ASSET_VERBOSE_OUTPUT_SAFE_RATIO),
     ),
     compactSafeMaximum = Math['max'](
-      0x1,
+      1,
       Math['floor'](maxOutputTokens2 * STORY_ASSET_COMPACT_OUTPUT_SAFE_RATIO),
     ),
     value25 = Object['fromEntries'](
@@ -274,8 +274,8 @@ export function resolveStoryAssetFocusedOutputMode({
     list19 = ['character', 'scene', 'prop']['map']((kind2) => {
       const requiredAssetCount2 = Array['isArray'](requiredAssetNamesByKind?.[kind2])
           ? requiredAssetNamesByKind[kind2]['length']
-          : 0x0,
-        candidateAssetCount2 = Array['isArray'](value25?.[kind2]) ? value25[kind2]['length'] : 0x0;
+          : 0,
+        candidateAssetCount2 = Array['isArray'](value25?.[kind2]) ? value25[kind2]['length'] : 0;
       return {
         kind: kind2,
         requiredAssetCount: requiredAssetCount2,
@@ -314,10 +314,10 @@ export function resolveStoryAssetFocusedOutputMode({
         );
       const value30 = STORY_ASSET_COMPACT_OUTPUT_TOKENS_PER_ASSET[selectedCandidateAssetCount['kind']],
         value31 = Math['max'](
-          0x0,
+          0,
           Math['floor']((compactSafeMaximum - STORY_ASSET_COMPACT_OUTPUT_BASE_TOKENS) / value30),
         ),
-        value32 = Math['max'](0x0, value31 - selectedCandidateAssetCount['requiredAssetCount']);
+        value32 = Math['max'](0, value31 - selectedCandidateAssetCount['requiredAssetCount']);
       candidateAssetsByKind2[selectedCandidateAssetCount['kind']] =
         selectFairCompactCandidatesWithinSerializedBudget(
           selectedCandidateAssetCount['kind'],
@@ -348,7 +348,7 @@ export function resolveStoryAssetFocusedOutputMode({
   if (!kind3) {
     const mode = new Set(Object['values'](modeByKind));
     return {
-      mode: mode['size'] === 0x1 ? [...mode][0x0] : 'mixed',
+      mode: mode['size'] === 1 ? [...mode][0] : 'mixed',
       modeByKind: modeByKind,
       candidateAssetsByKind: candidateAssetsByKind2,
       laneDetails: laneDetails,
@@ -382,14 +382,14 @@ export function assertStoryAssetFocusedOutputCapacity({
   candidateAssetsByKind: candidateAssetsByKind = {},
   maxOutputTokens: maxOutputTokens = STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
 } = {}) {
-  const maxOutputTokens3 = Math['max'](0x1, Math['trunc'](Number(maxOutputTokens) || 0x0));
+  const maxOutputTokens3 = Math['max'](1, Math['trunc'](Number(maxOutputTokens) || 0));
   for (const kind4 of ['character', 'scene', 'prop']) {
     const requiredAssetCount3 = Array['isArray'](requiredAssetNamesByKind?.[kind4])
         ? requiredAssetNamesByKind[kind4]['length']
-        : 0x0,
+        : 0,
       candidateAssetCount4 = Array['isArray'](candidateAssetsByKind?.[kind4])
         ? candidateAssetsByKind[kind4]['length']
-        : 0x0,
+        : 0,
       estimatedOutputTokens = estimateStoryAssetFocusedOutputTokens({
         kind: kind4,
         requiredAssetCount: requiredAssetCount3,
@@ -402,7 +402,7 @@ export function assertStoryAssetFocusedOutputCapacity({
         estimatedOutputTokens +
         ' tokens，超过单次输出容量 ' +
         maxOutputTokens3 +
-        '；已在调用\x20API\x20前安全停止。',
+        '；已在调用 API 前安全停止。',
     );
     ((error3['type'] = 'ASSET_OUTPUT_CAPACITY'),
       (error3['capacityDetails'] = {

@@ -3,7 +3,7 @@ import appStore from '../core/stores/appStore.js';
 import { ensureConfig, getProviderConfig } from '../../api/configApi.js';
 const RH_KEYING_FPS_OPTIONS = Object.freeze([16, 24, 30]);
 export const RH_DEFAULT_KEYING_FPS = 24;
-export const RH_DEFAULT_KEYING_RESOLUTION = 0x400;
+export const RH_DEFAULT_KEYING_RESOLUTION = 1024;
 export const RH_DEFAULT_KEYING_MASK_MODE = 'Sec';
 export const RH_DEFAULT_INSTANCE_TYPE = 'default';
 const SOURCE_VIDEO_KEYING_MEMORY_KEY = 'source-video';

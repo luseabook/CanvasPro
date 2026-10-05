@@ -1,6 +1,6 @@
-export const AGENT_PROJECT_MEMORY_SCHEMA_VERSION = 0x1;
-export const AGENT_PROJECT_MEMORY_ENTRY_LIMIT = 0xc;
-export const AGENT_PROJECT_MEMORY_TEXT_LIMIT = 0xf0;
+export const AGENT_PROJECT_MEMORY_SCHEMA_VERSION = 1;
+export const AGENT_PROJECT_MEMORY_ENTRY_LIMIT = 12;
+export const AGENT_PROJECT_MEMORY_TEXT_LIMIT = 240;
 export const AGENT_PROJECT_MEMORY_CATEGORIES = Object['freeze']([
   'brandVoice',
   'preferredModels',
@@ -34,12 +34,12 @@ const CATEGORY_PATTERNS = Object['freeze']([
   FORGET_PREFIX_PATTERN = /^(?:(?:请)?(?:忘记|移除|不要再记住|删除这条记忆)|forget|remove)\s*[:：,，]?\s*/i;
 function normalizeText(value, item = AGENT_PROJECT_MEMORY_TEXT_LIMIT) {
   return String(value || '')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']()
-    ['slice'](0x0, item);
+    ['slice'](0, item);
 }
 function normalizeProjectId(key = '') {
-  return normalizeText(key, 0xa0) || 'default_v2_project';
+  return normalizeText(key, 160) || 'default_v2_project';
 }
 function normalizeEntries(index) {
   const map = new Set();
@@ -53,7 +53,7 @@ function normalizeEntries(index) {
     ['slice'](-AGENT_PROJECT_MEMORY_ENTRY_LIMIT);
 }
 function detectCategory(options = '') {
-  return CATEGORY_PATTERNS['find'](([, target]) => target['test'](options))?.[0x0] || 'preferences';
+  return CATEGORY_PATTERNS['find'](([, target]) => target['test'](options))?.[0] || 'preferences';
 }
 function stripCategoryLabel(source = '', next = 'preferences') {
   const current = {
@@ -79,7 +79,7 @@ function cleanMemoryValue(entry = '', record = 'preferences') {
   );
 }
 function parseRememberRecords(handle = '') {
-  const text2 = normalizeText(handle, 0x4b0)
+  const text2 = normalizeText(handle, 1200)
       ['split'](/[；;\n]+/)
       ['map']((state) => state['trim']())
       ['filter'](Boolean),
@@ -92,7 +92,7 @@ function parseRememberRecords(handle = '') {
   return list;
 }
 function hasExplicitRememberIntent(scope = '') {
-  const text3 = normalizeText(scope, 0x4b0);
+  const text3 = normalizeText(scope, 1200);
   if (!text3 || MEMORY_QUESTION_PATTERN['test'](text3)) return ![];
   if (REMEMBER_PREFIX_PATTERN['test'](text3) || FUTURE_PREFIX_PATTERN['test'](text3)) return !![];
   if (PROJECT_SCOPE_PREFIX_PATTERN['test'](text3))
@@ -101,7 +101,7 @@ function hasExplicitRememberIntent(scope = '') {
 }
 export function normalizeAgentProjectMemory(
   options2 = {},
-  { projectId: projectId = '', now: now = 0x0 } = {},
+  { projectId: projectId = '', now: now = 0 } = {},
 ) {
   const output = options2 && typeof options2 === 'object' && !Array['isArray'](options2) ? options2 : {};
   return {
@@ -111,14 +111,14 @@ export function normalizeAgentProjectMemory(
     preferredModels: normalizeEntries(output['preferredModels']),
     namingRules: normalizeEntries(output['namingRules']),
     preferences: normalizeEntries(output['preferences']),
-    updatedAt: Math['max'](0x0, Number(output['updatedAt'] || now) || 0x0),
+    updatedAt: Math['max'](0, Number(output['updatedAt'] || now) || 0),
   };
 }
 export function isAgentProjectMemoryEmpty(projectId2 = {}) {
   const agentProjectMemory = normalizeAgentProjectMemory(projectId2, {
     projectId: projectId2?.['projectId'],
   });
-  return AGENT_PROJECT_MEMORY_CATEGORIES['every']((value3) => agentProjectMemory[value3]['length'] === 0x0);
+  return AGENT_PROJECT_MEMORY_CATEGORIES['every']((value3) => agentProjectMemory[value3]['length'] === 0);
 }
 export function compactAgentProjectMemoryForPrompt(projectId3 = {}) {
   const agentProjectMemory2 = normalizeAgentProjectMemory(projectId3, {
@@ -126,13 +126,13 @@ export function compactAgentProjectMemoryForPrompt(projectId3 = {}) {
   });
   if (isAgentProjectMemoryEmpty(agentProjectMemory2)) return null;
   return Object['fromEntries'](
-    AGENT_PROJECT_MEMORY_CATEGORIES['filter']((value4) => agentProjectMemory2[value4]['length'] > 0x0)['map'](
+    AGENT_PROJECT_MEMORY_CATEGORIES['filter']((value4) => agentProjectMemory2[value4]['length'] > 0)['map'](
       (value5) => [value5, agentProjectMemory2[value5]],
     ),
   );
 }
 export function detectAgentProjectMemoryIntent(value6 = '') {
-  const text4 = normalizeText(value6, 0x4b0);
+  const text4 = normalizeText(value6, 1200);
   if (!text4) return null;
   if (INSPECT_PATTERNS['some']((value7) => value7['test'](text4))) return { operation: 'inspect' };
   if (CLEAR_PATTERNS['some']((value8) => value8['test'](text4))) return { operation: 'clear' };
@@ -149,5 +149,5 @@ export function detectAgentProjectMemoryIntent(value6 = '') {
   }
   if (!hasExplicitRememberIntent(text4)) return null;
   const records = parseRememberRecords(text4);
-  return records['length'] > 0x0 ? { operation: 'remember', records: records } : null;
+  return records['length'] > 0 ? { operation: 'remember', records: records } : null;
 }

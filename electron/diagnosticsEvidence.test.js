@@ -70,7 +70,7 @@ test('summarizeBackendLog caps each excerpt at 1800 characters', () => {
   const long = 'x'.repeat(3000);
   const summary = summarizeBackendLog(long + '\n[ERROR] ' + long);
   assert.equal(summary.matchedLineCount, 1);
-  assert.equal(summary.recentFindings[0].excerpt.length, 0x708);
+  assert.equal(summary.recentFindings[0].excerpt.length, 1800);
 });
 
 test('mergeDiagnosticEvidence merges structured logs with incident evidence', () => {

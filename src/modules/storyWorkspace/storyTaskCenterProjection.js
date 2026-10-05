@@ -23,7 +23,7 @@ function resultThumbnail(value, item) {
   if (item['type'] === 'clip-video') {
     const data = value['episodes']?.['find']((options) => options['id'] === item['scope']?.['episodeId']),
       target = data?.['clips']?.['find']((source) => source['id'] === item['scope']?.['clipId']);
-    return resolveTaskCenterThumbnail(target?.['video']?.['results']?.['at'](-0x1), 'video');
+    return resolveTaskCenterThumbnail(target?.['video']?.['results']?.['at'](-1), 'video');
   }
   return null;
 }

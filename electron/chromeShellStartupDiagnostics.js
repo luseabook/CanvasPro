@@ -1,9 +1,9 @@
 import { sanitizeDiagnosticValue } from './diagnostics.js';
-const MAX_STDERR_BYTES = 0x708;
+const MAX_STDERR_BYTES = 1800;
 export function attachChromeShellStartupDiagnostics(childProcess) {
   let active = true,
-    stderrBuffer = Buffer['alloc'](0x0),
-    stderrBytes = 0x0,
+    stderrBuffer = Buffer['alloc'](0),
+    stderrBytes = 0,
     stderrReadError = '';
   return (
     childProcess?.['stderr']?.['on']?.('data', (chunk) => {
@@ -28,7 +28,7 @@ export function attachChromeShellStartupDiagnostics(childProcess) {
         });
       },
       stop() {
-        ((active = false), (stderrBuffer = Buffer['alloc'](0x0)));
+        ((active = false), (stderrBuffer = Buffer['alloc'](0)));
       },
     }
   );

@@ -4,7 +4,7 @@ import {
   unregisterManifestBundle,
 } from '../../manifests/index.js';
 export function getCustomAiAppBundleModelId(value) {
-  return String(value?.['models']?.[0x0]?.['modelId'] || '')['trim']();
+  return String(value?.['models']?.[0]?.['modelId'] || '')['trim']();
 }
 export function getCustomAiAppBundleKey(item) {
   return String(item?.['sourceId'] || getCustomAiAppBundleModelId(item))['trim']();

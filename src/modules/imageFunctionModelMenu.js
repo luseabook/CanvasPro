@@ -105,8 +105,8 @@ function buildImageGenerationNodeCatalog() {
           imageMenu?.group && isAllowedImageFunctionManifest(manifest2),
       )
       .sort((item2, target) => {
-        const source = Number(item2.imageMenu?.order ?? 0x3e7),
-          next = Number(target.imageMenu?.order ?? 0x3e7);
+        const source = Number(item2.imageMenu?.order ?? 999),
+          next = Number(target.imageMenu?.order ?? 999);
         return source - next;
       })
       .forEach(({ manifest: manifest3, imageMenu: imageMenu2 }) => {

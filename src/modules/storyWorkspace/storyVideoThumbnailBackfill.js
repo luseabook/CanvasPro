@@ -58,19 +58,19 @@ function pickThumbnailFields(options = {}) {
 }
 export async function backfillStoryVideoThumbnails(
   target,
-  { concurrency: concurrency = 0x1, ensureThumbnail: ensureThumbnail = ensureVideoResultThumbnail } = {},
+  { concurrency: concurrency = 1, ensureThumbnail: ensureThumbnail = ensureVideoResultThumbnail } = {},
 ) {
   const sourceCount = collectBackfillGroups(target),
     args = new Set();
-  let next = 0x0,
-    updatedCount = 0x0,
-    failedCount = 0x0;
+  let next = 0,
+    updatedCount = 0,
+    failedCount = 0;
   const run = async () => {
       while (next < sourceCount['length']) {
         const current = sourceCount[next];
-        next += 0x1;
+        next += 1;
         try {
-          const thumbnail = await ensureThumbnail(current['references'][0x0]['result']);
+          const thumbnail = await ensureThumbnail(current['references'][0]['result']);
           if (!hasStableVideoResultThumbnail(thumbnail)) continue;
           const args2 = pickThumbnailFields(thumbnail);
           for (const entry of current['references']) {
@@ -84,16 +84,16 @@ export async function backfillStoryVideoThumbnails(
               continue;
             ((entry['results'][entry['index']] = { ...args3, ...args2 }),
               args['add'](String(entry['episode']?.['id'] || '')['trim']()),
-              (updatedCount += 0x1));
+              (updatedCount += 1));
           }
         } catch {
-          failedCount += 0x1;
+          failedCount += 1;
         }
       }
     },
     length = Math['max'](
-      0x1,
-      Math['min'](sourceCount['length'] || 0x1, Math['trunc'](Number(concurrency) || 0x1)),
+      1,
+      Math['min'](sourceCount['length'] || 1, Math['trunc'](Number(concurrency) || 1)),
     );
   return (
     await Promise['all'](Array['from']({ length: length }, () => run())),

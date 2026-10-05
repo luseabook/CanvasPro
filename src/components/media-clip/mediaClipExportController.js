@@ -229,7 +229,7 @@ export async function exportMaterialToCanvas(videoTrack, config = 'video', scope
     if (enabled) videoTrack._addImageOutputNodeFromSource(enabled, value2);
     else {
       const runLocalMediaClipExport2 = await runLocalMediaClipExport(mediaClipExportPayload, {
-        timeout: 0x927c0,
+        timeout: 600000,
       });
       videoTrack._addOutputNode(
         output || mediaClipExportPayload.outputType,
@@ -313,7 +313,7 @@ export async function exportAndUse(nodeId, value11) {
     )
       args = { ...nodeId._mediaClip.lastOutput };
     else {
-      args = await runLocalMediaClipExport(storyClipGuard?.request || payload2, { timeout: 0x927c0 });
+      args = await runLocalMediaClipExport(storyClipGuard?.request || payload2, { timeout: 600000 });
       if (storyClipGuard) {
         storyClipResult = { ...args, localPath: validateStoryClipOutput(args) };
         storyClipGuard.assertCurrent();
@@ -385,13 +385,13 @@ export function addOutputNode(value16, value17, fileName2 = {}, name2 = {}) {
   const src2 = localPathToUrl(localPath3);
   if (value17 === 'audio') {
     const id2 = generateId('source-audio'),
-      x2 = value16._resolveOutputNodePosition(0x140, 140),
+      x2 = value16._resolveOutputNodePosition(320, 140),
       sourceAudioNodePayload = buildSourceAudioNodePayload({
         id: id2,
         type: 'source-audio',
         x: x2.x,
         y: x2.y,
-        width: 0x140,
+        width: 320,
         height: 140,
         name: name2.name || mediaClipText('outputNames.audio'),
         src: src2,

@@ -1,8 +1,8 @@
 import { normalizeStoryAssetReference } from './storyAssetExtractionResult.js';
-export function resolveStoryGenerationAssetRef(options = {}, value = 0x0) {
+export function resolveStoryGenerationAssetRef(options = {}, value = 0) {
   return normalizeStoryAssetReference(
     options['ref'] || options['planningRef'] || options['id'],
-    'asset-' + (value + 0x1),
+    'asset-' + (value + 1),
   );
 }
 export function resolveStoryGenerationAppearanceRef(item) {

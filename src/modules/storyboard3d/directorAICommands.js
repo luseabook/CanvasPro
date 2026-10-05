@@ -17,21 +17,21 @@ export function normalizeDirectorAIArgs(
   if (!DIRECTOR_AI_TOOLS['includes'](value)) return null;
   const key = {
     shotId: requiredId(item['shotId'], 'args.shotId'),
-    start: finiteNumber(item['start'] ?? 0x0, 'args.start', { min: 0x0, max: 3599.9 }),
-    duration: finiteNumber(item['duration'] ?? 0x3, 'args.duration', { min: 0.1, max: 0xe10 }),
+    start: finiteNumber(item['start'] ?? 0, 'args.start', { min: 0, max: 3599.9 }),
+    duration: finiteNumber(item['duration'] ?? 3, 'args.duration', { min: 0.1, max: 3600 }),
   };
-  if (key['start'] + key['duration'] > 0xe10) throw new Error('导演命令结束时间超过\x203600\x20秒。');
+  if (key['start'] + key['duration'] > 3600) throw new Error('导演命令结束时间超过 3600 秒。');
   if (value === 'setObjectPath' || value === 'addActionClip')
     key['objectId'] = requiredId(item['objectId'], 'args.objectId');
   if (value === 'setCameraPath' || value === 'setObjectPath') {
     if (
       !Array['isArray'](item['points']) ||
-      item['points']['length'] < 0x2 ||
-      item['points']['length'] > 0x64
+      item['points']['length'] < 2 ||
+      item['points']['length'] > 100
     )
       throw new Error('轨迹需要 2–100 个三维控制点。');
     ((key['points'] = item['points']['map']((index, result) =>
-      vector3(index, 'args.points[' + result + ']', [0x0, 0x0, 0x0]),
+      vector3(index, 'args.points[' + result + ']', [0, 0, 0]),
     )),
       (key['smooth'] = item['smooth'] === !![]));
   }
@@ -39,17 +39,17 @@ export function normalizeDirectorAIArgs(
     if (!DIRECTOR_CAMERA_MOTIONS['some'](([data]) => data === item['preset']))
       throw new Error('运镜预设不存在。');
     ((key['preset'] = item['preset']),
-      (key['amount'] = finiteNumber(item['amount'] ?? 0x3, 'args.amount', { min: 0.1, max: 0x64 })));
+      (key['amount'] = finiteNumber(item['amount'] ?? 3, 'args.amount', { min: 0.1, max: 100 })));
   }
   if (value === 'setCameraFollow') {
     if (!['relative', 'path', 'fixed']['includes'](item['mode']))
-      throw new Error('跟拍模式必须为\x20relative、path\x20或\x20fixed。');
+      throw new Error('跟拍模式必须为 relative、path 或 fixed。');
     Object['assign'](key, {
       mode: item['mode'],
       followObjectId: item['followObjectId'] ? requiredId(item['followObjectId'], 'args.followObjectId') : '',
       lookAtObjectId: item['lookAtObjectId'] ? requiredId(item['lookAtObjectId'], 'args.lookAtObjectId') : '',
-      followOffset: vector3(item['followOffset'], 'args.followOffset', [0x0, 0x2, 0x5]),
-      lookAtOffset: vector3(item['lookAtOffset'], 'args.lookAtOffset', [0x0, 1.2, 0x0]),
+      followOffset: vector3(item['followOffset'], 'args.followOffset', [0, 2, 5]),
+      lookAtOffset: vector3(item['lookAtOffset'], 'args.lookAtOffset', [0, 1.2, 0]),
       followHeading: item['followHeading'] === !![],
     });
   }
@@ -57,7 +57,7 @@ export function normalizeDirectorAIArgs(
     if (!STORYBOARD_3D_ACTIONS['some']((options) => options['id'] === item['actionId']))
       throw new Error('动作不存在。');
     ((key['actionId'] = item['actionId']),
-      (key['speed'] = finiteNumber(item['speed'] ?? 0x1, 'args.speed', { min: 0.1, max: 0x4 })));
+      (key['speed'] = finiteNumber(item['speed'] ?? 1, 'args.speed', { min: 0.1, max: 4 })));
   }
   return key;
 }
@@ -95,7 +95,7 @@ export function executeDirectorAICommand(enabled, target, args) {
       ...args,
       id: 'action-' + globalThis['crypto']['randomUUID'](),
       end: args['start'] + args['duration'],
-      offset: 0x0,
+      offset: 0,
     });
   }
   return (

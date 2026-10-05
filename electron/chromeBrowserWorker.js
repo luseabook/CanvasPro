@@ -3,7 +3,7 @@ import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 function terminateProcessTree(childProcess, platform = process['platform']) {
   if (!childProcess) return;
-  if (platform === 'win32' && Number['isInteger'](childProcess['pid']) && childProcess['pid'] > 0x0)
+  if (platform === 'win32' && Number['isInteger'](childProcess['pid']) && childProcess['pid'] > 0)
     try {
       const killer = spawn('taskkill.exe', ['/pid', String(childProcess['pid']), '/T', '/F'], {
         stdio: 'ignore',
@@ -61,8 +61,8 @@ export function launchChromeBrowserWorker({
     profileDir: profileDir,
     process: childProcess,
     devToolsPipe:
-      childProcess?.['stdio']?.[0x3] && childProcess?.['stdio']?.[0x4]
-        ? { writable: childProcess['stdio'][0x3], readable: childProcess['stdio'][0x4] }
+      childProcess?.['stdio']?.[3] && childProcess?.['stdio']?.[4]
+        ? { writable: childProcess['stdio'][3], readable: childProcess['stdio'][4] }
         : null,
     dispose() {
       if (disposed) return;

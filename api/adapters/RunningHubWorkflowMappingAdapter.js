@@ -5,7 +5,7 @@ function hasOwnManifestValue(value, item) {
 function isPresentManifestValue(list) {
   if (list === undefined || list === null) return ![];
   if (typeof list === 'string') return list['trim']() !== '';
-  if (Array['isArray'](list)) return list['length'] > 0x0;
+  if (Array['isArray'](list)) return list['length'] > 0;
   return !![];
 }
 function getManifestPayloadPathValue(options = {}, key = '') {
@@ -124,18 +124,18 @@ function applyManifestNodeTransform(value14, value15 = {}, value16 = {}) {
     }
     case 'integer': {
       const value18 = Number(value14),
-        value19 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
+        value19 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0),
         value20 = Number['isFinite'](value18)
           ? Math['trunc'](value18)
           : Number['isFinite'](value19)
             ? Math['trunc'](value19)
-            : 0x0;
+            : 0;
       return clampManifestNumber(value20, error);
     }
     case 'number': {
       const value21 = Number(value14),
-        value22 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0x0),
-        value23 = Number['isFinite'](value21) ? value21 : Number['isFinite'](value22) ? value22 : 0x0;
+        value22 = Number(error['defaultValue'] ?? value15['defaultValue'] ?? 0),
+        value23 = Number['isFinite'](value21) ? value21 : Number['isFinite'](value22) ? value22 : 0;
       return clampManifestNumber(value23, error);
     }
     default:
@@ -209,7 +209,7 @@ export async function buildRunningHubNodeInfoListFromManifest({
   transforms: transforms = {},
 }) {
   const list7 = Array['isArray'](mapping?.['nodeInfoList']) ? mapping['nodeInfoList'] : [];
-  if (list7['length'] === 0x0) return mapping?.['allowEmptyNodeInfoList'] === !![] ? [] : null;
+  if (list7['length'] === 0) return mapping?.['allowEmptyNodeInfoList'] === !![] ? [] : null;
   const value33 = [];
   for (const item3 of list7) {
     if (!item3?.['nodeId'] || !item3?.['fieldName']) continue;
@@ -234,7 +234,7 @@ export async function buildRunningHubNodeInfoListFromManifest({
         if (item3['required'])
           throw new Error(
             item3['missingMessage'] ||
-              'Missing\x20RunningHub\x20workflow\x20node\x20input:\x20' + item3['fieldName'],
+              'Missing RunningHub workflow node input: ' + item3['fieldName'],
           );
         else continue;
       }

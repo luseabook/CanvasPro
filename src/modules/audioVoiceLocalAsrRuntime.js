@@ -1,7 +1,7 @@
 import { enqueueElectronMediaTask, waitForElectronMediaTask } from '../../api/localMediaTaskApi.js';
 import { fetchUserSettingsFromServer } from '../../api/userSettingsApi.js';
 import { desktopBridge } from '../services/desktopBridge.js';
-export const AUDIO_VOICE_ASR_RUNTIME_INSTALL_TIMEOUT_MS = 0x5a * 0x3c * 0x3e8;
+export const AUDIO_VOICE_ASR_RUNTIME_INSTALL_TIMEOUT_MS = 90 * 60 * 1000;
 function normalizeEngine(value) {
   return String(value || '')
     ['trim']()
@@ -13,7 +13,7 @@ const AUDIO_VOICE_LOCAL_ASR_RUNTIME_FAILURE_PATTERN =
   /python runtime is unavailable|asr python runtime is unavailable|funasr runtime is not bundled|nvidia nemo is not installed|sortformer runtime is unavailable|no module named|modulenotfounderror|importerror|dll load failed|cannot import name|specified module could not be found/i;
 function clampProgress(item) {
   const key = Number(item);
-  return Number['isFinite'](key) ? Math['max'](0x0, Math['min'](0x1, key)) : 0x0;
+  return Number['isFinite'](key) ? Math['max'](0, Math['min'](1, key)) : 0;
 }
 export function createAudioVoiceTaskProgressTracker({
   getMediaTask: getMediaTask = () => desktopBridge['mediaTask'],
@@ -26,7 +26,7 @@ export function createAudioVoiceTaskProgressTracker({
   };
   return {
     clear: clear,
-    install(result, { progressOffset: progressOffset = 0x0, progressScale: progressScale = 0x1 } = {}) {
+    install(result, { progressOffset: progressOffset = 0, progressScale: progressScale = 1 } = {}) {
       clear();
       const enabled = String(result || '')['trim'](),
         handler = getMediaTask()?.['onUpdate'];

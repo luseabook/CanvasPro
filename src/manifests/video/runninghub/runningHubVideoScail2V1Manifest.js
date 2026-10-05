@@ -10,7 +10,7 @@ export const RH_VIDEO_SCAIL2_V1_EXECUTION_ID = 'runninghub.workflow.video-scail2
 export const RH_VIDEO_SCAIL_V2_MODEL_ID = 'runninghub/2065463417577762818';
 export const RH_VIDEO_SCAIL_V2_EXECUTION_ID = 'runninghub.workflow.video-scail-v2.v1';
 const RH_VIDEO_SCAIL_VIP_ALIASES = Object.freeze(['video_edit_v54', 'video_edit.pro']),
-  RH_VIDEO_SCAIL_RESOLUTION_FIELD = Object.freeze({ ...RH_VIDEO_RESOLUTION_FIELD, defaultValue: 0x400 });
+  RH_VIDEO_SCAIL_RESOLUTION_FIELD = Object.freeze({ ...RH_VIDEO_RESOLUTION_FIELD, defaultValue: 1024 });
 export const RH_VIDEO_SCAIL2_V1_HELP_TOOLTIP = [
   '视频编辑Scail V1用法',
   '接入 [[red:源视频]] + [[red:参考图]]，按提示词和高级参数做视频编辑',
@@ -24,7 +24,7 @@ export const RH_VIDEO_SCAIL_V2_HELP_TOOLTIP = [
 const RH_VIDEO_SCAIL_PANEL_EXTENSION = Object.freeze({
     sourceFrameCountFps: 'v54',
     submitScopeTargetEdges: true,
-    frameStateDefaults: Object.freeze({ frameRate: 24, frameCount: 0x12c }),
+    frameStateDefaults: Object.freeze({ frameRate: 24, frameCount: 300 }),
     adaptiveRatio: Object.freeze({
       scopeTargetEdges: true,
       preferSlot: 'sourceVideo',
@@ -44,7 +44,7 @@ const RH_VIDEO_SCAIL_PANEL_EXTENSION = Object.freeze({
       type: 'stepper',
       placement: 'videoParams',
       label: '帧数',
-      defaultValue: 0x12c,
+      defaultValue: 300,
       min: 0,
       max: 0xf423f,
       step: 1,
@@ -130,8 +130,8 @@ const RH_VIDEO_SCAIL_PANEL_EXTENSION = Object.freeze({
       fieldName: 'value',
       source: 'param',
       fields: Object.freeze(['generationParams.rhVideoResolution', 'rhVideoResolution']),
-      defaultValue: 0x400,
-      transform: Object.freeze({ name: 'integer', min: 0x340 }),
+      defaultValue: 1024,
+      transform: Object.freeze({ name: 'integer', min: 832 }),
       description: '分辨率',
     }),
     Object.freeze({
@@ -174,7 +174,7 @@ const RH_VIDEO_SCAIL_PANEL_EXTENSION = Object.freeze({
       fieldName: 'frame_load_cap',
       source: 'param',
       fields: Object.freeze(['generationParams.rhVideoFrames', 'rhVideoFrames', 'frameCount']),
-      defaultValue: 0x12c,
+      defaultValue: 300,
       transform: Object.freeze({ name: 'integer', min: 0 }),
       description: '生成时长（帧数）',
     }),

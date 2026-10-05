@@ -38,12 +38,12 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
     run(title);
     const list = (state['projects'] ||= []),
       count = list['findIndex']((source) => getEntryId(source) === id),
-      args = count >= 0x0 ? list[count] : {},
+      args = count >= 0 ? list[count] : {},
       next = {
         ...args,
         id: id,
         title: title['project']['title'],
-        createdAt: Number(args['createdAt'] || 0x0) || Date['now'](),
+        createdAt: Number(args['createdAt'] || 0) || Date['now'](),
         updatedAt: Date['now'](),
         projectTitleEdited: isCurrent
           ? state['projectTitleEdited'] === !![]
@@ -54,7 +54,7 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
             : cloneData(args['ui'] || (isCurrent ? createStoryProjectUiState(state) : {})),
         data: cloneData(title),
       };
-    if (count >= 0x0) list[count] = next;
+    if (count >= 0) list[count] = next;
     else list['unshift'](next);
     return !![];
   }

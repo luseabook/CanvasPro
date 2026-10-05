@@ -40,7 +40,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
     handler2 = (el, data) => {
       handler();
       if (!el) return ![];
-      const options = Math['max'](0x0, Number(data) || 0x0),
+      const options = Math['max'](0, Number(data) || 0),
         handler3 = () => {
           handler();
           try {
@@ -51,7 +51,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
               el['currentTime'] = options;
           } catch {}
         };
-      if (Number(el['readyState']) >= 0x1) return (handler3(), !![]);
+      if (Number(el['readyState']) >= 1) return (handler3(), !![]);
       return (
         el['addEventListener']?.('loadedmetadata', handler3, { once: !![] }),
         (enabled['bufferedWarmupCleanup'] = () => {
@@ -166,11 +166,11 @@ export function createPersonReplacementShotCutPreviewMediaController({
     },
     preparePreviewVideo = () => {
       const project2 = getProject(),
-        payload = Math['trunc'](Number(project2['workspace']['step']) || 0x1);
+        payload = Math['trunc'](Number(project2['workspace']['step']) || 1);
       if (
         enabled['isOpen'] ||
         project2['workspace']['view'] !== 'project' ||
-        ![0x1, 0x2]['includes'](payload)
+        ![1, 2]['includes'](payload)
       ) {
         if (!enabled['isOpen']) releaseBufferedVideo();
         return ![];
@@ -179,7 +179,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
         selectedShot = getSelectedShot(project2),
         text7 = normalizeText(selectedShot?.['sourceId']),
         enabled3 = getSourceMediaRef(text7),
-        state = Math['max'](0x0, Number(selectedShot?.['startTimeSec']) || 0x0);
+        state = Math['max'](0, Number(selectedShot?.['startTimeSec']) || 0);
       if (!text7 || !enabled3) return (releaseBufferedVideo(), ![]);
       if (
         enabled['bufferedVideo'] &&

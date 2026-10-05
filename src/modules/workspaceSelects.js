@@ -6,8 +6,8 @@ export function bindWorkspaceSelects(root) {
     list = [...root['querySelectorAll']('select')]['map']((select) => {
       const item =
           select['getAttribute']('aria-label') ||
-          [...(select['labels']?.[0x0]?.['childNodes'] || [])]
-            ['filter']((key) => key['nodeType'] === 0x3)
+          [...(select['labels']?.[0]?.['childNodes'] || [])]
+            ['filter']((key) => key['nodeType'] === 3)
             ['map']((el2) => el2['textContent'])
             ['join']('')
             ['trim'](),
@@ -49,7 +49,7 @@ export function bindWorkspaceSelects(root) {
             el5['classList']['add']('has-character-thumbnail'),
             el5['append'](el6));
         }
-        ((el5['disabled'] = el4['disabled']), (el5['tabIndex'] = -0x1), menu['append'](el5));
+        ((el5['disabled'] = el4['disabled']), (el5['tabIndex'] = -1), menu['append'](el5));
       }
       const hidden = select['hidden'];
       return (
@@ -74,7 +74,7 @@ export function bindWorkspaceSelects(root) {
       optionSelector: '.story-replication-select-option',
     });
   let enabled = null,
-    index = 0x0;
+    index = 0;
   function close(enabled2 = ![]) {
     const result = enabled;
     ((enabled = null),
@@ -91,7 +91,7 @@ export function bindWorkspaceSelects(root) {
     for (const data of list) {
       const { select: select2, trigger: trigger2, text: text2, menu: menu2 } = data;
       ((trigger2['disabled'] = select2['matches'](':disabled')),
-        (text2['textContent'] = select2['selectedOptions'][0x0]?.['textContent'] || '请选择'),
+        (text2['textContent'] = select2['selectedOptions'][0]?.['textContent'] || '请选择'),
         (trigger2['title'] = text2['textContent']));
       for (const el7 of menu2['children'])
         el7['setAttribute']('aria-selected', String(el7['dataset']['value'] === select2['value']));
@@ -106,16 +106,16 @@ export function bindWorkspaceSelects(root) {
       return;
     }
     const box = trigger3['getBoundingClientRect'](),
-      options = Math['min'](Math['max'](box['width'], 0xa0), value['innerWidth'] - 0x18),
-      count = value['innerHeight'] - box['bottom'] - 0x10,
-      target = box['top'] - 0x10,
-      source = count < 0xa0 && target > count;
+      options = Math['min'](Math['max'](box['width'], 160), value['innerWidth'] - 24),
+      count = value['innerHeight'] - box['bottom'] - 16,
+      target = box['top'] - 16,
+      source = count < 160 && target > count;
     ((menu3['style']['width'] = options + 'px'),
       (menu3['style']['left'] =
-        Math['max'](0xc, Math['min'](box['left'], value['innerWidth'] - options - 0xc)) + 'px'),
-      (menu3['style']['maxHeight'] = Math['max'](0x28, Math['min'](0x118, source ? target : count)) + 'px'),
-      (menu3['style']['top'] = source ? 'auto' : box['bottom'] + 0x4 + 'px'),
-      (menu3['style']['bottom'] = source ? value['innerHeight'] - box['top'] + 0x4 + 'px' : 'auto'),
+        Math['max'](12, Math['min'](box['left'], value['innerWidth'] - options - 12)) + 'px'),
+      (menu3['style']['maxHeight'] = Math['max'](40, Math['min'](280, source ? target : count)) + 'px'),
+      (menu3['style']['top'] = source ? 'auto' : box['bottom'] + 4 + 'px'),
+      (menu3['style']['bottom'] = source ? value['innerHeight'] - box['top'] + 4 + 'px' : 'auto'),
       (index = value['requestAnimationFrame'](run2)));
   }
   function run3(next) {
@@ -137,7 +137,7 @@ export function bindWorkspaceSelects(root) {
       else {
         if (run3(enabled3)) {
           const el8 =
-            enabled3['menu']['querySelector']('[aria-selected=\x22true\x22]:not(:disabled)') ||
+            enabled3['menu']['querySelector']('[aria-selected="true"]:not(:disabled)') ||
             enabled3['menu']['querySelector']('button:not(:disabled)');
           (el8?.['focus']({ preventScroll: !![] }), el8?.['scrollIntoView']({ block: 'nearest' }));
         }

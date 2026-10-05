@@ -116,8 +116,8 @@ const graphStore = appStore?.['graphStore'] || graphStore_2 || appStore,
   EDGE_INTERACTION_LITE_CLASS = 'is-edge-interaction-lite',
   EDGE_INTERACTION_LITE_MIN_ZOOM = 0.24,
   EDGE_INTERACTION_LITE_MAX_ZOOM = 0.48,
-  EDGE_INTERACTION_LITE_MIN_EDGES = 0x3,
-  PAN_ACTIVATION_DISTANCE_PX = 0x3;
+  EDGE_INTERACTION_LITE_MIN_EDGES = 3,
+  PAN_ACTIVATION_DISTANCE_PX = 3;
 function isDevModeOn() {
   return window['DEV_MODE'] === !![] || document['body']?.['classList']?.['contains']('dev-mode');
 }
@@ -139,7 +139,7 @@ function openCanvasUploadAt(clientX, clientY) {
   });
 }
 function _shouldUseEdgeInteractionLite(index) {
-  const result = Number(index?.['viewport']?.['zoom']) || 0x1,
+  const result = Number(index?.['viewport']?.['zoom']) || 1,
     data = Object['keys'](index?.['edges'] || {})['length'],
     options = typeof window !== 'undefined' ? window['_edgeDomCache'] : null;
   return (
@@ -147,7 +147,7 @@ function _shouldUseEdgeInteractionLite(index) {
     result <= EDGE_INTERACTION_LITE_MAX_ZOOM &&
     data >= EDGE_INTERACTION_LITE_MIN_EDGES &&
     options &&
-    options['size'] > 0x0
+    options['size'] > 0
   );
 }
 function _setEdgeInteractionLite(enabled) {
@@ -169,8 +169,8 @@ function getMountedNodeCountForPerf() {
   const target =
     typeof window !== 'undefined' && typeof window['v2Renderer']?.['getMountedNodeCount'] === 'function'
       ? window['v2Renderer']['getMountedNodeCount']()
-      : 0x0;
-  return Number['isFinite'](target) ? target : 0x0;
+      : 0;
+  return Number['isFinite'](target) ? target : 0;
 }
 function markViewportInteractionBusyForRenderer() {
   try {
@@ -182,8 +182,8 @@ function releaseViewportInteractionBusyForRenderer() {
     window['v2Renderer']?.['releaseViewportInteractionBusy']?.();
   } catch {}
 }
-const VIEWPORT_MEDIA_PRELOAD_HOLD_MS = 0x384,
-  VIEWPORT_MEDIA_PRELOAD_RESUME_AFTER_PAN_MS = 0xdc;
+const VIEWPORT_MEDIA_PRELOAD_HOLD_MS = 900,
+  VIEWPORT_MEDIA_PRELOAD_RESUME_AFTER_PAN_MS = 220;
 let viewportMediaPreloadPauseHeld = ![];
 function holdViewportMediaPreloadsForPan() {
   ((viewportMediaPreloadPauseHeld = !![]),
@@ -209,47 +209,47 @@ function _createIdleDragContext() {
   return {
     isDragging: ![],
     targetNodeId: null,
-    lastWorldX: 0x0,
-    lastWorldY: 0x0,
-    pendingDx: 0x0,
-    pendingDy: 0x0,
+    lastWorldX: 0,
+    lastWorldY: 0,
+    pendingDx: 0,
+    pendingDy: 0,
     hasMoved: ![],
     wasSelectedOnDown: ![],
     dragSource: null,
     titleDragPendingSelectNodeId: null,
     titleDragActivated: ![],
-    titleDragStartScreenX: 0x0,
-    titleDragStartScreenY: 0x0,
+    titleDragStartScreenX: 0,
+    titleDragStartScreenY: 0,
     isPanning: ![],
     panActivated: ![],
-    panStartX: 0x0,
-    panStartY: 0x0,
-    panStartViewportX: 0x0,
-    panStartViewportY: 0x0,
-    panStartZoom: 0x1,
-    panStartPerf: 0x0,
-    panMoveCount: 0x0,
-    panMinimapPreviewCount: 0x0,
+    panStartX: 0,
+    panStartY: 0,
+    panStartViewportX: 0,
+    panStartViewportY: 0,
+    panStartZoom: 1,
+    panStartPerf: 0,
+    panMoveCount: 0,
+    panMinimapPreviewCount: 0,
     assistPanActive: ![],
     assistPanViewport: null,
     isConnecting: ![],
     connectSourceId: null,
     isBoxSelecting: ![],
-    boxStartX: 0x0,
-    boxStartY: 0x0,
+    boxStartX: 0,
+    boxStartY: 0,
     isDraggingCell: ![],
-    sourceCellIndex: -0x1,
+    sourceCellIndex: -1,
     draggedCellData: null,
     ghostEl: null,
     sourceCellEl: null,
     lastHoverNodeId: null,
-    lastHoverCellIndex: -0x1,
+    lastHoverCellIndex: -1,
   };
 }
 let dragContext = _createIdleDragContext();
 function _clearStoryboardHighlight(enabled2) {
   if (!enabled2) return;
-  window['v2Renderer']?.['highlightDropSlot']?.(enabled2, { kind: 'storyboard', index: -0x1 });
+  window['v2Renderer']?.['highlightDropSlot']?.(enabled2, { kind: 'storyboard', index: -1 });
 }
 function _resetDragContext() {
   dragContext?.['isDragging'] && endDragFpsSession('node-drag');
@@ -295,7 +295,7 @@ function _resetCellDragContext() {
 }
 function _deferCommit() {
   requestAnimationFrame(() => {
-    setTimeout(() => commit(), 0x0);
+    setTimeout(() => commit(), 0);
   });
 }
 const dragController = createDragController({
@@ -329,7 +329,7 @@ const dragController = createDragController({
 setDragContextGetter(() => dragContext);
 let viewportRafId = null,
   pendingViewportUpdate = null,
-  assistPanMirrorTimer = 0x0,
+  assistPanMirrorTimer = 0,
   pendingAssistPanMirrorViewport = null;
 function syncSidePlusToLastPointer(options2 = {}) {
   const run =
@@ -340,7 +340,7 @@ function syncSidePlusToLastPointer(options2 = {}) {
         : null;
   typeof run === 'function' && run(lastMouseScreenX, lastMouseScreenY, options2);
 }
-let sidePlusPostPanSyncToken = 0x0;
+let sidePlusPostPanSyncToken = 0;
 function scheduleSidePlusSyncAfterPanPaint() {
   const current = ++sidePlusPostPanSyncToken;
   requestAnimationFrame(() => {
@@ -355,7 +355,7 @@ function scheduleSidePlusSyncAfterPanPaint() {
       )
         return;
       syncSidePlusToLastPointer();
-    }, 0x0);
+    }, 0);
   });
 }
 function updateViewportBatched(x, y, zoom) {
@@ -376,7 +376,7 @@ function cancelPendingViewportUpdate() {
     (pendingViewportUpdate = null));
 }
 function flushAssistPanStoreMirror() {
-  assistPanMirrorTimer = 0x0;
+  assistPanMirrorTimer = 0;
   const box2 = pendingAssistPanMirrorViewport;
   pendingAssistPanMirrorViewport = null;
   if (!box2 || !dragContext?.['assistPanActive']) return;
@@ -386,10 +386,10 @@ function flushAssistPanStoreMirror() {
 function scheduleAssistPanStoreMirror(args2) {
   pendingAssistPanMirrorViewport = args2 ? { ...args2 } : null;
   if (assistPanMirrorTimer) return;
-  assistPanMirrorTimer = window['setTimeout'](flushAssistPanStoreMirror, 0x20);
+  assistPanMirrorTimer = window['setTimeout'](flushAssistPanStoreMirror, 32);
 }
 function cancelAssistPanStoreMirror() {
-  (assistPanMirrorTimer && (window['clearTimeout'](assistPanMirrorTimer), (assistPanMirrorTimer = 0x0)),
+  (assistPanMirrorTimer && (window['clearTimeout'](assistPanMirrorTimer), (assistPanMirrorTimer = 0)),
     (pendingAssistPanMirrorViewport = null));
 }
 function _commitAssistPanPreview() {
@@ -413,9 +413,9 @@ function _commitAssistPanPreview() {
   );
 }
 let autoPanReqId = null,
-  autoPanState = { dx: 0x0, dy: 0x0 },
-  lastMouseScreenX = 0x0,
-  lastMouseScreenY = 0x0,
+  autoPanState = { dx: 0, dy: 0 },
+  lastMouseScreenX = 0,
+  lastMouseScreenY = 0,
   _autoPanPendingDx = null,
   _autoPanPendingDy = null;
 export function stopAutoPan() {
@@ -461,10 +461,10 @@ function checkAutoPan(entry, record) {
     stopAutoPan();
     return;
   }
-  const payload = 0x3c,
-    handle = 0xf;
-  let count = 0x0,
-    count2 = 0x0;
+  const payload = 60,
+    handle = 15;
+  let count = 0,
+    count2 = 0;
   const stateRaw2 = getStateRaw()['viewport'] || {},
     box4 = getViewportScreenBounds(stateRaw2, window['innerWidth'], window['innerHeight']);
   if (entry < box4['left'] + payload) count = -handle;
@@ -475,7 +475,7 @@ function checkAutoPan(entry, record) {
   else {
     if (record > box4['bottom'] - payload) count2 = handle;
   }
-  count !== 0x0 || count2 !== 0x0
+  count !== 0 || count2 !== 0
     ? ((_autoPanPendingDx = count),
       (_autoPanPendingDy = count2),
       !autoPanReqId && (autoPanReqId = requestAnimationFrame(autoPanLoop)))
@@ -488,7 +488,7 @@ export function handlePointerDown(state, config, enabled3 = ![], scope = ![], ev
     { x: x5, y: y5 } = screenToWorld(state, config, viewport2),
     input = stateRaw3['pickConnectMode'];
   if (input && input['active']) {
-    if (event?.['button'] === 0x2) {
+    if (event?.['button'] === 2) {
       (event['stopPropagation']?.(), event['stopImmediatePropagation']?.());
       return;
     }
@@ -512,9 +512,9 @@ export function handlePointerDown(state, config, enabled3 = ![], scope = ![], ev
       (dragContext['panStartViewportX'] = viewport2['x']),
       (dragContext['panStartViewportY'] = viewport2['y']),
       (dragContext['panStartZoom'] = viewport2['zoom']),
-      (dragContext['panStartPerf'] = 0x0),
-      (dragContext['panMoveCount'] = 0x0),
-      (dragContext['panMinimapPreviewCount'] = 0x0));
+      (dragContext['panStartPerf'] = 0),
+      (dragContext['panMoveCount'] = 0),
+      (dragContext['panMinimapPreviewCount'] = 0));
     return;
   }
   if (
@@ -550,7 +550,7 @@ function _activateCanvasPanIfNeeded(value2, value3) {
   return (
     (dragContext['panActivated'] = !![]),
     (dragContext['panStartPerf'] = nowMs()),
-    (dragContext['panMinimapPreviewCount'] = Number(window['_v2GetMinimapPreviewFlushCount']?.()) || 0x0),
+    (dragContext['panMinimapPreviewCount'] = Number(window['_v2GetMinimapPreviewFlushCount']?.()) || 0),
     markViewportInteractionBusyForRenderer(),
     holdViewportMediaPreloadsForPan(),
     beginPanFpsSession('canvas-pan'),
@@ -574,7 +574,7 @@ function _handlePointerMoveImpl(value7, value8, enabled4 = ![], e = null) {
         y: dragContext['panStartViewportY'] + value12,
         zoom: dragContext['panStartZoom'],
       };
-    ((dragContext['panMoveCount'] = (dragContext['panMoveCount'] || 0x0) + 0x1),
+    ((dragContext['panMoveCount'] = (dragContext['panMoveCount'] || 0) + 1),
       updateViewportPanPreview(box5['x'], box5['y'], box5['zoom']),
       window['_v2ScheduleMinimapViewportPreview']?.(box5));
     return;
@@ -677,7 +677,7 @@ function _handlePointerMoveImpl(value7, value8, enabled4 = ![], e = null) {
 const _sampledPointerMove = rafSampleLatest(_handlePointerMoveImpl);
 export function handlePointerMove(value19, value20, value21 = null) {
   const enabled5 = value21?.['__aiCanvasLeftDragHeld'] === !![];
-  if (value21 && value21['buttons'] === 0x0 && !enabled5) {
+  if (value21 && value21['buttons'] === 0 && !enabled5) {
     if (
       dragContext['isDragging'] ||
       dragContext['isPanning'] ||
@@ -693,13 +693,13 @@ export function handlePointerMove(value19, value20, value21 = null) {
     (_sampledPointerMove['cancel']?.(), _handlePointerMoveImpl(value19, value20, ![], value21));
     return;
   }
-  const value22 = !!(value21 && (value21['buttons'] & 0x4) !== 0x0),
+  const value22 = !!(value21 && (value21['buttons'] & 4) !== 0),
     value23 =
       (dragContext['isDragging'] || dragContext['isConnecting']) &&
       (value22 || window['_spaceHeld'] === !![]);
   _sampledPointerMove(value19, value20, value23, value21);
 }
-export function handlePointerUp(value24 = 0x0, value25 = 0x0, value26 = ![]) {
+export function handlePointerUp(value24 = 0, value25 = 0, value26 = ![]) {
   if (
     !dragContext['isDragging'] &&
     !dragContext['isPanning'] &&
@@ -715,8 +715,8 @@ export function handlePointerUp(value24 = 0x0, value25 = 0x0, value26 = ![]) {
     value29 = !!dragContext['isDragging'],
     value30 = value28 && dragContext['panActivated'] === !![],
     value31 = dragContext['panStartPerf'] || nowMs(),
-    moveCount = dragContext['panMoveCount'] || 0x0,
-    value32 = dragContext['panMinimapPreviewCount'] || 0x0;
+    moveCount = dragContext['panMoveCount'] || 0,
+    value32 = dragContext['panMinimapPreviewCount'] || 0;
   stopAutoPan();
   if (value30) {
     markViewportInteractionBusyForRenderer();
@@ -743,7 +743,7 @@ export function handlePointerUp(value24 = 0x0, value25 = 0x0, value26 = ![]) {
         : Object['keys'](value34?.['nodes'] || {})['length'],
       edgeCount: Object['keys'](value34?.['edges'] || {})['length'],
       mountedNodeCount: getMountedNodeCountForPerf(),
-      minimapPreviewCount: Math['max'](0x0, value33 - value32),
+      minimapPreviewCount: Math['max'](0, value33 - value32),
       finalX: finalX['x'],
       finalY: finalX['y'],
       finalZoom: finalX['zoom'],
@@ -806,8 +806,8 @@ export function getInteractionRenderState() {
     isPanning: !!dragContext['isPanning'] && dragContext['panActivated'] === !![],
     assistPanActive: !!dragContext['assistPanActive'],
     targetNodeId: dragContext['targetNodeId'] || null,
-    pendingDx: Number['isFinite'](dragContext['pendingDx']) ? dragContext['pendingDx'] : 0x0,
-    pendingDy: Number['isFinite'](dragContext['pendingDy']) ? dragContext['pendingDy'] : 0x0,
+    pendingDx: Number['isFinite'](dragContext['pendingDx']) ? dragContext['pendingDx'] : 0,
+    pendingDy: Number['isFinite'](dragContext['pendingDy']) ? dragContext['pendingDy'] : 0,
     hasMoved: !!dragContext['hasMoved'],
     wasSelectedOnDown: !!dragContext['wasSelectedOnDown'],
   };
@@ -831,7 +831,7 @@ export function handleDoubleClick(value45, value46) {
 export function handleContextMenu(value47, value48) {
   return canvasContextMenuController['handleNodeContextMenu'](value47, value48);
 }
-export function cloneNodesWithEdges(ids, dx2 = 0x10, dy2 = 0x10) {
+export function cloneNodesWithEdges(ids, dx2 = 16, dy2 = 16) {
   const response = interactionCommandAdapter['executeCanvasCommand']('node.duplicate', {
     ids: ids,
     dx: dx2,
@@ -886,8 +886,8 @@ export function initCanvasContextMenu(el3) {
           : {};
     executeCommand('create_node', {
       type: type['type'],
-      x: x10 - width['width'] / 0x2,
-      y: y9 - width['height'] / 0x2,
+      x: x10 - width['width'] / 2,
+      y: y9 - width['height'] / 2,
       width: width['width'],
       height: width['height'],
       name: type['defaultName'] || type['label'],
@@ -909,13 +909,13 @@ export function initCanvasContextMenu(el3) {
     const el4 = document['createElement']('div');
     el4['id'] = 'v2PickerOverlay';
     const box11 = getViewportScreenBounds(viewport6, window['innerWidth'], window['innerHeight']),
-      value63 = Math['min'](0x1b8, Math['max'](0xdc, box11['right'] - box11['left'] - 0x18)),
+      value63 = Math['min'](440, Math['max'](220, box11['right'] - box11['left'] - 24)),
       value64 = Math['max'](
-        box11['left'] + 0xc,
-        Math['min'](value58, box11['right'] - value63 - 0xc),
+        box11['left'] + 12,
+        Math['min'](value58, box11['right'] - value63 - 12),
       ),
-      value65 = box11['top'] + 0xc,
-      value66 = Math['max'](value65, Math['min'](value59, box11['bottom'] - 0x1f4)),
+      value65 = box11['top'] + 12,
+      value66 = Math['max'](value65, Math['min'](value59, box11['bottom'] - 500)),
       el5 = document['createElement']('div');
     ((el5['className'] = 'v2-node-picker v2-node-menu-compact'),
       (el5['style']['left'] = value64 + 'px'),
@@ -1089,7 +1089,7 @@ export function initCanvasContextMenu(el3) {
         return (
           el36['setAttribute'](
             'd',
-            'M14.7\x206.3a1\x201\x200\x200\x200\x200\x201.4l1.6\x201.6a1\x201\x200\x200\x200\x201.4\x200l3.77-3.77a6\x206\x200\x200\x201-7.94\x207.94l-6.91\x206.91a2.12\x202.12\x200\x200\x201-3-3l6.91-6.91a6\x206\x200\x200\x201\x207.94-7.94l-3.76\x203.76z',
+            'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
           ),
           el35['appendChild'](el36),
           el35
@@ -1100,7 +1100,7 @@ export function initCanvasContextMenu(el3) {
           el38 = document['createElementNS'](value70, 'path');
         el38['setAttribute'](
           'd',
-          'M21\x2015v4a2\x202\x200\x200\x201-2\x202H5a2\x202\x200\x200\x201-2-2v-4',
+          'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4',
         );
         const el39 = document['createElementNS'](value70, 'polyline');
         el39['setAttribute']('points', '17 8 12 3 7 8');
@@ -1119,9 +1119,9 @@ export function initCanvasContextMenu(el3) {
       handler9 = (value79) => {
         const el41 = handler3(value79, 1.8),
           el42 = document['createElementNS'](value70, 'path');
-        el42['setAttribute']('d', 'M6\x203v12a3\x203\x200\x200\x200\x203\x203h12');
+        el42['setAttribute']('d', 'M6 3v12a3 3 0 0 0 3 3h12');
         const el43 = document['createElementNS'](value70, 'path');
-        el43['setAttribute']('d', 'M3\x206h12a3\x203\x200\x200\x201\x203\x203v12');
+        el43['setAttribute']('d', 'M3 6h12a3 3 0 0 1 3 3v12');
         const el44 = document['createElementNS'](value70, 'path');
         return (
           el44['setAttribute']('d', 'M3 3l18 18'),
@@ -1164,7 +1164,7 @@ export function initCanvasContextMenu(el3) {
         el52['setAttribute']('d', 'M7 15c2.2-3 4.6-3 6.8 0 1.1 1.5 2.2 1.5 3.2 0');
         const el53 = document['createElementNS'](value70, 'path');
         return (
-          el53['setAttribute']('d', 'M14.5\x2011.5l2.5-2.5\x202\x202-2.5\x202.5-2.7.7.7-2.7z'),
+          el53['setAttribute']('d', 'M14.5 11.5l2.5-2.5 2 2-2.5 2.5-2.7.7.7-2.7z'),
           el49['appendChild'](el50),
           el49['appendChild'](el51),
           el49['appendChild'](el52),
@@ -1274,7 +1274,7 @@ export function initCanvasContextMenu(el3) {
       el4['appendChild'](el5),
       document['body']['appendChild'](el4));
     const box12 = el5['getBoundingClientRect'](),
-      value84 = Math['max'](value65, box11['bottom'] - box12['height'] - 0xc),
+      value84 = Math['max'](value65, box11['bottom'] - box12['height'] - 12),
       value85 = Number['parseFloat'](el5['style']['top']) || value59;
     ((el5['style']['top'] = Math['min'](Math['max'](value65, value85), value84) + 'px'),
       el4['addEventListener']('click', () => el4['remove']()));
@@ -1300,9 +1300,9 @@ export function initCanvasContextMenu(el3) {
         } catch {}
       const value86 = enabled7 ? enabled7['toString']()['trim']() : '';
       let value87 = ![];
-      if (enabled7 && value86 && enabled7['rangeCount'] > 0x0 && !enabled7['isCollapsed']) {
+      if (enabled7 && value86 && enabled7['rangeCount'] > 0 && !enabled7['isCollapsed']) {
         const value88 = screenX2['target'];
-        for (let value89 = 0x0; value89 < enabled7['rangeCount']; value89++) {
+        for (let value89 = 0; value89 < enabled7['rangeCount']; value89++) {
           const value90 = enabled7['getRangeAt'](value89);
           try {
             if (value90['intersectsNode'](value88)) {

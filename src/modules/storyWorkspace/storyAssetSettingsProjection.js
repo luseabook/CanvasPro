@@ -55,20 +55,20 @@ export function formatStoryAssetOccurrences(options = '') {
       ['filter'](Boolean),
     list3 = list2['map']((source) => {
       const next = /(?:^|[-_])episode-(\d+)$/iu['exec'](source);
-      return next ? String(Math['max'](0x1, Number(next[0x1]) || 0x1)) : '';
+      return next ? String(Math['max'](1, Number(next[1]) || 1)) : '';
     });
   if (list2['length'] && list3['every'](Boolean)) {
     const list4 = [...new Set(list3['map'](Number))]['sort']((current, entry) => current - entry);
-    return '第\x20' + list4['join']('、') + '\x20集';
+    return '第 ' + list4['join']('、') + ' 集';
   }
-  return list2['map']((record, payload) => (list3[payload] ? '第\x20' + list3[payload] + '\x20集' : record))[
+  return list2['map']((record, payload) => (list3[payload] ? '第 ' + list3[payload] + ' 集' : record))[
     'join'
   ]('、');
 }
 export function getSelectedAppearanceIndex(handle, state) {
   const config = Number(handle['assetAppearanceIndexes']?.[state?.['id']]),
-    scope = Math['max'](0x0, getStoryAssetAppearances(state)['length'] - 0x1);
-  return Math['max'](0x0, Math['min'](scope, Number['isFinite'](config) ? Math['trunc'](config) : 0x0));
+    scope = Math['max'](0, getStoryAssetAppearances(state)['length'] - 1);
+  return Math['max'](0, Math['min'](scope, Number['isFinite'](config) ? Math['trunc'](config) : 0));
 }
 function getSelectedAppearance(input, output) {
   return output?.['isLibraryAsset']
@@ -105,20 +105,20 @@ function getCardPromptPreview(options4 = {}, value3 = {}, value4 = {}) {
           ['replace'](/^[\s，,。；;:：|/·-]+|[\s，,。；;:：|/·-]+$/gu, ''),
       )
       ['filter'](Boolean)
-      ['join']('\x0a')
+      ['join']('\n')
   );
 }
 function formatVoiceHistoryTime(value7) {
   const value8 = new Date(Number(value7));
   if (!Number['isFinite'](value8['getTime']())) return '历史版本';
-  const run = (value9) => String(value9)['padStart'](0x2, '0');
+  const run = (value9) => String(value9)['padStart'](2, '0');
   return (
     value8['getFullYear']() +
     '/' +
-    run(value8['getMonth']() + 0x1) +
+    run(value8['getMonth']() + 1) +
     '/' +
     run(value8['getDate']()) +
-    '\x20' +
+    ' ' +
     run(value8['getHours']()) +
     ':' +
     run(value8['getMinutes']())
@@ -135,7 +135,7 @@ function projectPreset(disabled, assetKind, value10, value11) {
     selectedId = label
       ? getStorySceneAssetPromptPreset(disabled['sceneAssetPromptPresetId'])
       : list5?.['find']((value12) => value12['id'] === disabled['assetPromptPresetId']) ||
-        list5?.[0x0] ||
+        list5?.[0] ||
         getStoryCharacterAssetPromptPreset(disabled['assetPromptPresetId']),
     el =
       value10 && value11
@@ -161,7 +161,7 @@ function projectLibrarySyncState(value13, handler) {
         ? value13['totalAssetRef']
         : null,
     assetId = normalizeText(value14?.['assetId']),
-    itemIndex = Math['max'](0x0, Math['trunc'](Number(value14?.['itemIndex']) || 0x0));
+    itemIndex = Math['max'](0, Math['trunc'](Number(value14?.['itemIndex']) || 0));
   if (!assetId) return { exists: ![], synced: ![] };
   const response = handler({ assetId: assetId, itemIndex: itemIndex });
   if (!response) return { exists: ![], synced: ![] };
@@ -193,8 +193,8 @@ function projectPreviewActions(value15, value16, value17, el2, value18, value19)
     showDeleteAppearance = deleteAppearanceLabel
       ? Boolean(normalizeText(value17?.['imageUrl'])) ||
         (['character', 'scene', 'prop']['includes'](value16['kind']) &&
-          getStoryAssetAppearances(value16)['length'] > 0x1)
-      : isAddedAppearance(value17) && getStoryAssetAppearances(value16)['length'] > 0x1,
+          getStoryAssetAppearances(value16)['length'] > 1)
+      : isAddedAppearance(value17) && getStoryAssetAppearances(value16)['length'] > 1,
     saveToLibraryLabel =
       normalizeText(value15['exportingAssetAppearanceKey']) === getAppearanceActionKey(value16, value17),
     canSaveToLibrary = Boolean(
@@ -244,7 +244,7 @@ function projectVoicePanel(value20, value21, isActive) {
       label:
         label2['modelLabel'] ||
         label2['fileName'] ||
-        (label2['source'] === 'generated' ? 'AI\x20生成声音' : '上传声音'),
+        (label2['source'] === 'generated' ? 'AI 生成声音' : '上传声音'),
       timeLabel: formatVoiceHistoryTime(label2['updatedAt']),
     })),
     isGenerating = isStoryAssetVoiceLoading(value20, value21['id']);
@@ -272,10 +272,10 @@ export function createStoryAssetSettingsProjection({
     const appearanceCount = generated['isLibraryAsset'] ? [generated] : getStoryAssetAppearances(generated),
       stats = generated['isLibraryAsset']
         ? {
-            total: 0x1,
-            generated: generated['imageUrl'] ? 0x1 : 0x0,
-            failed: 0x0,
-            pending: generated['imageUrl'] ? 0x0 : 0x1,
+            total: 1,
+            generated: generated['imageUrl'] ? 1 : 0,
+            failed: 0,
+            pending: generated['imageUrl'] ? 0 : 1,
           }
         : getStoryAssetAppearanceStats(generated),
       preview =
@@ -283,11 +283,11 @@ export function createStoryAssetSettingsProjection({
         (!generated['isLibraryAsset'] && getSelectedAppearance(showRoleTag, generated)) ||
         getStoryAssetBaseAppearance(generated) ||
         appearanceCount['find']((value22) => normalizeText(value22['imageUrl'])) ||
-        appearanceCount[0x0] ||
+        appearanceCount[0] ||
         generated,
       isChecked = Array['isArray'](showRoleTag['selectedAssetIds']) ? showRoleTag['selectedAssetIds'] : [],
       isSelectionMode = showRoleTag['assetSelectionMode'] === !![],
-      enabled = isSelectionMode && isChecked['length'] > 0x1,
+      enabled = isSelectionMode && isChecked['length'] > 1,
       isCurrent = isChecked['includes'](generated['id']),
       isLoading = isStoryAssetCardLoading(showRoleTag, generated['id']),
       showCardUpload =
@@ -314,7 +314,7 @@ export function createStoryAssetSettingsProjection({
       showCardUpload: showCardUpload,
       showCardImageActions:
         !showCardUpload && !generated['isLibraryAsset'] && generated['kind'] === 'character',
-      canNavigateAppearances: !generated['isLibraryAsset'] && appearanceCount['length'] > 0x1,
+      canNavigateAppearances: !generated['isLibraryAsset'] && appearanceCount['length'] > 1,
       showAppearanceDelete:
         !generated['isLibraryAsset'] &&
         !enabled &&
@@ -329,7 +329,7 @@ export function createStoryAssetSettingsProjection({
         (showCardUpload
           ? stats['generated'] + ' / ' + stats['total']
           : !generated['isLibraryAsset'] && ['character', 'scene', 'prop']['includes'](generated['kind'])
-            ? getSelectedAppearanceIndex(showRoleTag, generated) + 0x1 + ' / ' + appearanceCount['length']
+            ? getSelectedAppearanceIndex(showRoleTag, generated) + 1 + ' / ' + appearanceCount['length']
             : ''),
       cardStatusHtml: statusText['cardStatusHtml'] || '',
       isCurrent: isCurrent,
@@ -350,7 +350,7 @@ export function createStoryAssetSettingsProjection({
         showCardUpload ? 'story-replication-portrait-card' : '',
       ]
         ['filter'](Boolean)
-        ['join']('\x20'),
+        ['join'](' '),
       cardAttributes: statusText['cardAttributes'] || '',
       shellClassName: statusText['shellClassName'] || '',
       accessoryHtml: statusText['accessoryHtml'] || '',
@@ -365,7 +365,7 @@ export function createStoryAssetSettingsProjection({
       const value24 = selectionMode['state'] || selectionMode,
         selectedCount = Array['isArray'](value24['selectedAssetIds'])
           ? value24['selectedAssetIds']['length']
-          : 0x0,
+          : 0,
         action = value24['isBatchGenerating'] === !![],
         cancelRequested = value24['assetBatchCancelRequested'] === !![];
       return {
@@ -378,8 +378,8 @@ export function createStoryAssetSettingsProjection({
         label: action
           ? '' +
             (cancelRequested ? '已取消后续生成' : '取消后续生成') +
-            (selectedCount ? '\x20(' + selectedCount + ')' : '')
-          : '批量生成' + (selectedCount ? '\x20(' + selectedCount + ')' : ''),
+            (selectedCount ? ' (' + selectedCount + ')' : '')
+          : '批量生成' + (selectedCount ? ' (' + selectedCount + ')' : ''),
         directMode: action ? '' : getStoryAssetBatchDirectMode(value24['assetFilter']),
       };
     }
@@ -388,8 +388,8 @@ export function createStoryAssetSettingsProjection({
         el3 = selectionMode['generationControl'] || {},
         selectedCount2 = Array['isArray'](value25['selectedAssetIds'])
           ? value25['selectedAssetIds']['length']
-          : 0x0,
-        isMultiSelection = value25['assetSelectionMode'] === !![] && selectedCount2 > 0x1,
+          : 0,
+        isMultiSelection = value25['assetSelectionMode'] === !![] && selectedCount2 > 1,
         action2 = isMultiSelection && value25['isBatchGenerating'] === !![],
         cancelRequested2 = value25['assetBatchCancelRequested'] === !![];
       return {
@@ -402,13 +402,13 @@ export function createStoryAssetSettingsProjection({
         disabled: isMultiSelection ? action2 && cancelRequested2 : Boolean(el3['disabled']),
         label: isMultiSelection
           ? action2
-            ? (cancelRequested2 ? '已取消后续生成' : '取消后续生成') + '\x20(' + selectedCount2 + ')'
-            : '批量生成\x20(' + selectedCount2 + ')'
+            ? (cancelRequested2 ? '已取消后续生成' : '取消后续生成') + ' (' + selectedCount2 + ')'
+            : '批量生成 (' + selectedCount2 + ')'
           : el3['label'] || '生成素材图',
       };
     }
     if (value23 === 'library-selection') {
-      const selectedCount3 = Math['max'](0x0, Math['trunc'](Number(selectionMode['selectedCount']) || 0x0)),
+      const selectedCount3 = Math['max'](0, Math['trunc'](Number(selectionMode['selectedCount']) || 0)),
         targets = Array['isArray'](selectionMode['projectAssets']) ? selectionMode['projectAssets'] : [];
       return {
         selectionMode: selectionMode['selectionMode'] === !![],
@@ -432,7 +432,7 @@ export function createStoryAssetSettingsProjection({
               preview:
                 getStoryAssetBaseAppearance(id2) ||
                 appearanceCount2['find']((value27) => normalizeText(value27?.['imageUrl'])) ||
-                appearanceCount2[0x0] ||
+                appearanceCount2[0] ||
                 {},
             };
           }),
@@ -502,7 +502,7 @@ export function createStoryAssetSettingsProjection({
     const appearanceCount3 = id4['isLibraryAsset'] ? [id4] : getStoryAssetAppearances(id4),
       appearanceIndex = getSelectedAppearanceIndex(emptyDescription, id4),
       appearance = getSelectedAppearance(emptyDescription, id4) || id4,
-      hasMultipleAppearances = !id4['isLibraryAsset'] && !readOnly && appearanceCount3['length'] > 0x1,
+      hasMultipleAppearances = !id4['isLibraryAsset'] && !readOnly && appearanceCount3['length'] > 1,
       supportsBaseAppearance = id4['kind'] === 'character' && !id4['isLibraryAsset'] && !readOnly,
       isBaseAppearance = supportsBaseAppearance && isStoryAssetBaseAppearance(id4, appearance),
       generationControl = getStoryAssetGenerationControlState(emptyDescription, id4['id'], appearance['id']),
@@ -589,7 +589,7 @@ export function createStoryAssetSettingsProjection({
         (appearance['name'] || id4['role'] || '素材') +
         ' · ' +
         formatStoryAssetOccurrences(appearance['occurrences'] || id4['occurrences'] || '当前项目') +
-        (hasMultipleAppearances ? ' · ' + (appearanceIndex + 0x1) + '/' + appearanceCount3['length'] : ''),
+        (hasMultipleAppearances ? ' · ' + (appearanceIndex + 1) + '/' + appearanceCount3['length'] : ''),
     };
   }
   return Object['freeze']({

@@ -7,15 +7,15 @@ export function captureCharacterModelBodyProfileBase(modelRoot) {
   const head = modelRoot?.['getObjectByName']?.('Head');
   return {
     rootScale: {
-      x: Number(modelRoot?.['scale']?.['x']) || 0x1,
-      y: Number(modelRoot?.['scale']?.['y']) || 0x1,
-      z: Number(modelRoot?.['scale']?.['z']) || 0x1,
+      x: Number(modelRoot?.['scale']?.['x']) || 1,
+      y: Number(modelRoot?.['scale']?.['y']) || 1,
+      z: Number(modelRoot?.['scale']?.['z']) || 1,
     },
     headScale: head?.['scale']
       ? {
-          x: Number(head['scale']['x']) || 0x1,
-          y: Number(head['scale']['y']) || 0x1,
-          z: Number(head['scale']['z']) || 0x1,
+          x: Number(head['scale']['x']) || 1,
+          y: Number(head['scale']['y']) || 1,
+          z: Number(head['scale']['z']) || 1,
         }
       : null,
   };
@@ -24,11 +24,11 @@ export function applyCharacterBodyProfile(character, profile = {}) {
   if (!character) return;
   const height = finiteBodyValue(profile?.['height'], DEFAULT_CHARACTER_BODY_HEIGHT, 0.55, 2.3),
     heightRatio = height / DEFAULT_CHARACTER_BODY_HEIGHT,
-    shoulderScale = finiteBodyValue(profile?.['shoulderScale'], 0x1, 0.65, 1.35),
-    hipScale = finiteBodyValue(profile?.['hipScale'], 0x1, 0.65, 1.35),
-    bodyScale = (shoulderScale + hipScale) / 0x2,
-    depthScale = finiteBodyValue(profile?.['depthScale'], 0x1, 0.75, 1.25),
-    headScale = finiteBodyValue(profile?.['headScale'], 0x1, 0.85, 1.45);
+    shoulderScale = finiteBodyValue(profile?.['shoulderScale'], 1, 0.65, 1.35),
+    hipScale = finiteBodyValue(profile?.['hipScale'], 1, 0.65, 1.35),
+    bodyScale = (shoulderScale + hipScale) / 2,
+    depthScale = finiteBodyValue(profile?.['depthScale'], 1, 0.75, 1.25),
+    headScale = finiteBodyValue(profile?.['headScale'], 1, 0.85, 1.45);
   (character['proxyRoot']?.['scale']?.['set']?.(
     heightRatio * bodyScale,
     heightRatio,

@@ -16,28 +16,28 @@ const api = globalThis['globalCaptureWindow'],
   actionIds = actions['map']((actionElement) => actionElement['dataset']['actionId']),
   state = {
     captureId: '',
-    activeIndex: 0x0,
+    activeIndex: 0,
     runImmediately: ![],
     busy: ![],
     phase: 'ready',
     expanded: ![],
-    layoutVersion: 0x0,
-    revision: 0x0,
+    layoutVersion: 0,
+    revision: 0,
     failedAction: null,
   },
   aiLabels = [
-    ['AI 文本', '建文本', 'AI\x20文本节点'],
+    ['AI 文本', '建文本', 'AI 文本节点'],
     ['AI 生图', '建图像', 'AI 图像节点'],
     ['AI 视频', '建视频', 'AI 视频节点'],
   ];
 panel['querySelectorAll']('[data-icon]')['forEach']((iconNode) => {
-  const iconElement = createContextMenuIcon(iconNode['dataset']['icon'], { size: 0x10 });
+  const iconElement = createContextMenuIcon(iconNode['dataset']['icon'], { size: 16 });
   if (iconElement) iconNode['prepend'](iconElement);
 });
 function updateRunImmediately(nextRunImmediately) {
   ((state['runImmediately'] = nextRunImmediately === !![]),
     toggle['setAttribute']('aria-checked', String(state['runImmediately'])),
-    actions['slice'](0x1, 0x4)['forEach']((actionButton, aiIndex) => {
+    actions['slice'](1, 4)['forEach']((actionButton, aiIndex) => {
       const [generatedLabel, createdLabel, nodeLabel] = aiLabels[aiIndex];
       ((actionButton['querySelector']('[data-action-label]')['textContent'] = state['runImmediately']
         ? generatedLabel
@@ -93,9 +93,9 @@ async function setExpanded(nextExpanded, { restoreFocus: restoreFocus = ![] } = 
   }
 }
 function setActiveIndex(nextIndex, { focus: focus = !![] } = {}) {
-  ((state['activeIndex'] = Math['max'](0x0, Math['min'](toolbarButtons['length'] - 0x1, nextIndex))),
+  ((state['activeIndex'] = Math['max'](0, Math['min'](toolbarButtons['length'] - 1, nextIndex))),
     toolbarButtons['forEach']((toolbarButton, toolbarButtonIndex) => {
-      toolbarButton['tabIndex'] = toolbarButtonIndex === state['activeIndex'] ? 0x0 : -0x1;
+      toolbarButton['tabIndex'] = toolbarButtonIndex === state['activeIndex'] ? 0 : -1;
     }));
   const activeButton = toolbarButtons[state['activeIndex']];
   activeButton['scrollIntoView']({ block: 'nearest', inline: 'nearest' });
@@ -136,20 +136,20 @@ async function choose(actionId, runImmediately = state['runImmediately'], rememb
 async function cancel() {
   if (!state['captureId']) return;
   const cancelCaptureId = state['captureId'];
-  ((state['captureId'] = ''), (state['revision'] += 0x1), (state['busy'] = ![]), syncControls());
+  ((state['captureId'] = ''), (state['revision'] += 1), (state['busy'] = ![]), syncControls());
   try {
     await api?.['cancel']?.({ captureId: cancelCaptureId });
   } catch {}
 }
 function captureError(errorReason, shortcutLabel) {
-  if (errorReason === 'shortcut-keys-still-held') return ['请先松开快捷键', '松开后再按\x20' + shortcutLabel];
+  if (errorReason === 'shortcut-keys-still-held') return ['请先松开快捷键', '松开后再按 ' + shortcutLabel];
   if (errorReason === 'copy-command-timeout' || errorReason === 'copy-worker-startup-timeout')
     return ['读取选区超时', '保持文字选中，再按 ' + shortcutLabel];
   return ['未能读取选中文字', '重新选中文字，再按 ' + shortcutLabel];
 }
 function present(presentation = {}) {
-  ((state['revision'] += 0x1),
-    (state['layoutVersion'] += 0x1),
+  ((state['revision'] += 1),
+    (state['layoutVersion'] += 1),
     (state['captureId'] = String(presentation['captureId'] || '')),
     (state['phase'] =
       presentation['phase'] === 'capturing' || presentation['phase'] === 'error'
@@ -161,10 +161,10 @@ function present(presentation = {}) {
     more['setAttribute']('aria-expanded', 'false'),
     panel['classList']['remove']('is-above'),
     (preview['textContent'] = String(presentation['text'] || '')),
-    (preview['scrollTop'] = 0x0),
-    (details['scrollTop'] = 0x0),
+    (preview['scrollTop'] = 0),
+    (details['scrollTop'] = 0),
     (document['getElementById']('textCount')['textContent'] =
-      Array['from'](preview['textContent'])['length'] + '\x20字'),
+      Array['from'](preview['textContent'])['length'] + ' 字'),
     (document['documentElement']['dataset']['theme'] = presentation['theme'] === 'light' ? 'light' : 'dark'),
     updateRunImmediately(presentation['runImmediately'] === !![]),
     syncControls());
@@ -174,7 +174,7 @@ function present(presentation = {}) {
     state['phase'] === 'error'
       ? showFeedback(...captureError(presentation['errorReason'], shortcutLabel))
       : showFeedback();
-  setActiveIndex(Math['max'](0x0, actionIds['indexOf'](presentation['activeActionId'])), { focus: ![] });
+  setActiveIndex(Math['max'](0, actionIds['indexOf'](presentation['activeActionId'])), { focus: ![] });
   const presentRevision = state['revision'];
   (requestAnimationFrame(() => {
     if (!state['captureId'] || state['revision'] !== presentRevision || state['busy']) return;
@@ -249,21 +249,21 @@ function present(presentation = {}) {
     if (eventTarget === preview || eventTarget === toggle || eventTarget?.['closest']?.('#captureFeedback'))
       return;
     if (/^[1-5]$/['test'](keyboardEvent['key'])) {
-      (keyboardEvent['preventDefault'](), void choose(actionIds[Number(keyboardEvent['key']) - 0x1]));
+      (keyboardEvent['preventDefault'](), void choose(actionIds[Number(keyboardEvent['key']) - 1]));
       return;
     }
     if (eventTarget?.['closest']?.('#captureDetails')) return;
     if (keyboardEvent['key'] === 'ArrowDown' && eventTarget === more) {
       (keyboardEvent['preventDefault'](),
         void setExpanded(!![])['then'](() => {
-          if (state['expanded'] && !state['busy']) actions[0x4]['focus']({ preventScroll: !![] });
+          if (state['expanded'] && !state['busy']) actions[4]['focus']({ preventScroll: !![] });
         }));
       return;
     }
     if (['ArrowLeft', 'ArrowRight', 'ArrowDown', 'ArrowUp']['includes'](keyboardEvent['key'])) {
       keyboardEvent['preventDefault']();
       const indexStep =
-        keyboardEvent['key'] === 'ArrowLeft' || keyboardEvent['key'] === 'ArrowUp' ? -0x1 : 0x1;
+        keyboardEvent['key'] === 'ArrowLeft' || keyboardEvent['key'] === 'ArrowUp' ? -1 : 1;
       setActiveIndex(
         (state['activeIndex'] + indexStep + toolbarButtons['length']) % toolbarButtons['length'],
       );
@@ -274,7 +274,7 @@ function present(presentation = {}) {
       const targetActionId =
         eventTarget?.['closest']?.('[data-action-id]')?.['dataset']['actionId'] ||
         actionIds[state['activeIndex']];
-      if (state['activeIndex'] === 0x4 && !eventTarget?.['closest']?.('[data-action-id]')) {
+      if (state['activeIndex'] === 4 && !eventTarget?.['closest']?.('[data-action-id]')) {
         void setExpanded(!state['expanded']);
         return;
       }

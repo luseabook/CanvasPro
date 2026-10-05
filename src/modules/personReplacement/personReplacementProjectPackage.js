@@ -3,7 +3,7 @@ import {
   normalizeReplacementStudioApplicationProject,
   settleInterruptedReplacementStudioProjectTasks,
 } from './personReplacementProjectSession.js';
-export const PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION = 0x1;
+export const PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION = 1;
 const TRANSIENT_TASK_ID_FIELDS = new Set(['requestId', 'taskId', 'remoteTaskId']);
 function normalizeText(value) {
   return String(value ?? '')['trim']();
@@ -20,7 +20,7 @@ function cloneForPackage(item, { stripTaskIds: stripTaskIds = ![] } = {}) {
 export function canCollectPersonReplacementProject(options = {}) {
   return (
     Boolean(normalizeText(options?.['id'])) &&
-    getPersonReplacementProjectTaskSummary(options)['activeCount'] === 0x0
+    getPersonReplacementProjectTaskSummary(options)['activeCount'] === 0
   );
 }
 export function createPersonReplacementProjectPackagePayload(options2 = {}) {
@@ -55,8 +55,8 @@ export function createImportedPersonReplacementProject(
       {
         ...args,
         id: id,
-        title: title + '\x20-\x20导入',
-        archivedAt: 0x0,
+        title: title + ' - 导入',
+        archivedAt: 0,
         createdAt: now,
         updatedAt: now,
         output: { ...(args['output'] || {}), canvasBinding: {} },

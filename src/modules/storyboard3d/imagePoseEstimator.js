@@ -33,7 +33,7 @@ function bindWorkerListener(el, key, index) {
 function createRequestId() {
   return (
     globalThis['crypto']?.['randomUUID']?.() ||
-    'pose-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x9)
+    'pose-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 9)
   );
 }
 export function createStoryboard3DImagePoseEstimator({
@@ -41,7 +41,7 @@ export function createStoryboard3DImagePoseEstimator({
   workerFactory: workerFactory,
   workerUrl: workerUrl = STORYBOARD_3D_IMAGE_POSE_WORKER_URL,
   runtime: runtime = STORYBOARD_3D_IMAGE_POSE_RUNTIME,
-  requestTimeoutMs: requestTimeoutMs = 0x1d4c0,
+  requestTimeoutMs: requestTimeoutMs = 120000,
 } = {}) {
   const run =
     workerFactory ||
@@ -74,7 +74,7 @@ export function createStoryboard3DImagePoseEstimator({
       if (!run)
         throw poseWorkerError({
           code: 'POSE_WORKER_UNAVAILABLE',
-          message: '当前运行环境不支持本地姿势识别\x20Worker。',
+          message: '当前运行环境不支持本地姿势识别 Worker。',
         });
       try {
         enabled = run(workerUrl, { type: 'module', name: 'storyboard3d-image-pose' });
@@ -134,8 +134,8 @@ export function createStoryboard3DImagePoseEstimator({
           removeAbort: removeAbort,
           clearTimer: clearTimer,
         });
-        const count = Math['max'](0x0, Number(requestTimeoutMs) || 0x0);
-        count > 0x0 &&
+        const count = Math['max'](0, Number(requestTimeoutMs) || 0);
+        count > 0 &&
           typeof globalThis['setTimeout'] === 'function' &&
           (input = globalThis['setTimeout'](() => {
             if (!map['has'](requestId)) return;

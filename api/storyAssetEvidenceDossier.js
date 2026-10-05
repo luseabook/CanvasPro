@@ -1,5 +1,5 @@
-export const STORY_ASSET_EVIDENCE_DOSSIER_MAX_SCENES = 0x6;
-export const STORY_ASSET_EVIDENCE_DOSSIER_MAX_CHARACTERS = 0x960;
+export const STORY_ASSET_EVIDENCE_DOSSIER_MAX_SCENES = 6;
+export const STORY_ASSET_EVIDENCE_DOSSIER_MAX_CHARACTERS = 2400;
 const CANDIDATE_KEY_BY_KIND = Object['freeze']({
   character: 'character',
   scene: 'scene',
@@ -14,8 +14,8 @@ function normalizeStringArray(item) {
 function createAssetNameAliases(error = {}) {
   const args = normalizeText(error?.['name']);
   if (!args) return [];
-  const text = normalizeText(args['split'](/[_（(]/u)[0x0]),
-    args2 = [...args['matchAll'](/[（(]([^（）()\r\n]+)[）)]/gu)]['map']((key) => normalizeText(key[0x1]));
+  const text = normalizeText(args['split'](/[_（(]/u)[0]),
+    args2 = [...args['matchAll'](/[（(]([^（）()\r\n]+)[）)]/gu)]['map']((key) => normalizeText(key[1]));
   return normalizeStringArray([args, text, ...args2]);
 }
 function sceneMentionsAsset(dom = {}, index = {}, list = []) {
@@ -25,7 +25,7 @@ function sceneMentionsAsset(dom = {}, index = {}, list = []) {
       list['some']((list4) => list3 === list4 || list3['includes'](list4) || list4['includes'](list3)),
     );
   if (data) return !![];
-  const list5 = normalizeText(dom?.['heading']) + '\x0a' + normalizeText(dom?.['body']);
+  const list5 = normalizeText(dom?.['heading']) + '\n' + normalizeText(dom?.['body']);
   return list['some']((options) => list5['includes'](options));
 }
 function buildPrioritizedSceneRefs(options2 = {}, list6 = []) {
@@ -40,10 +40,10 @@ function buildPrioritizedSceneRefs(options2 = {}, list6 = []) {
   return (
     (Array['isArray'](options2?.['appearances']) ? options2['appearances'] : [])['forEach']((current) => {
       const stringArray = normalizeStringArray(current?.['sourceSceneRefs']);
-      (handler(stringArray[0x0]), handler(stringArray['at'](-0x1)));
+      (handler(stringArray[0]), handler(stringArray['at'](-1)));
     }),
-    handler(list7[0x0]),
-    handler(list7['at'](-0x1)),
+    handler(list7[0]),
+    handler(list7['at'](-1)),
     list6['filter'](
       (entry) =>
         list7['includes'](normalizeText(entry?.['ref'])) &&
@@ -53,27 +53,27 @@ function buildPrioritizedSceneRefs(options2 = {}, list6 = []) {
     list8
   );
 }
-function compactEvidenceExcerpt(payload, list9 = [], handle = 0x258) {
+function compactEvidenceExcerpt(payload, list9 = [], handle = 600) {
   const list10 = normalizeText(payload),
-    state = Math['max'](0xa0, Math['trunc'](Number(handle) || 0x0));
+    state = Math['max'](160, Math['trunc'](Number(handle) || 0));
   if ([...list10]['length'] <= state) return list10;
   const list11 = '证据原文：',
     count = list10['indexOf'](list11),
-    config = count >= 0x0 ? count + list11['length'] : 0x0,
+    config = count >= 0 ? count + list11['length'] : 0,
     list12 = list10['slice'](config),
-    scope = list9['map']((input) => list12['indexOf'](input))['find']((count2) => count2 >= 0x0);
+    scope = list9['map']((input) => list12['indexOf'](input))['find']((count2) => count2 >= 0);
   if (Number['isInteger'](scope)) {
     const output = Math['floor'](state * 0.38),
       value2 = config + scope,
-      value3 = Math['max'](0x0, value2 - output),
+      value3 = Math['max'](0, value2 - output),
       value4 = Math['min'](list10['length'], value3 + state);
-    return list10['slice'](Math['max'](0x0, value4 - state), value4);
+    return list10['slice'](Math['max'](0, value4 - state), value4);
   }
   const list13 = '\n……\n',
-    value5 = Math['max'](0x1, state - list13['length']),
+    value5 = Math['max'](1, state - list13['length']),
     value6 = Math['floor'](value5 * 0.7),
     value7 = value5 - value6;
-  return '' + list10['slice'](0x0, value6) + list13 + list10['slice'](-value7);
+  return '' + list10['slice'](0, value6) + list13 + list10['slice'](-value7);
 }
 export function createStoryAssetEvidenceDossiers(
   list14 = [],
@@ -86,18 +86,18 @@ export function createStoryAssetEvidenceDossiers(
 ) {
   const list15 = Array['isArray'](value8) ? value8 : [],
     map2 = new Map(list15['map']((value9) => [normalizeText(value9?.['ref']), value9])),
-    value10 = Math['max'](0x1, Math['trunc'](Number(maxScenes) || 0x0)),
-    value11 = Math['max'](0x258, Math['trunc'](Number(maxCharacters) || 0x0));
+    value10 = Math['max'](1, Math['trunc'](Number(maxScenes) || 0)),
+    value11 = Math['max'](600, Math['trunc'](Number(maxCharacters) || 0));
   return (Array['isArray'](list14) ? list14 : [])['map']((error2) => {
     const assetNameAliases2 = createAssetNameAliases(error2),
-      list16 = buildPrioritizedSceneRefs(error2, list15)['slice'](0x0, value10),
+      list16 = buildPrioritizedSceneRefs(error2, list15)['slice'](0, value10),
       value12 = Math['max'](
-        0xf0,
-        Math['min'](0x384, Math['floor'](value11 / Math['max'](0x1, list16['length']))),
+        240,
+        Math['min'](900, Math['floor'](value11 / Math['max'](1, list16['length']))),
       );
     let count3 = value11;
     const evidence = list16['flatMap']((sourceSceneRef) => {
-      if (count3 <= 0x0) return [];
+      if (count3 <= 0) return [];
       const dom2 = map2['get'](sourceSceneRef);
       if (!dom2) return [];
       const body = compactEvidenceExcerpt(dom2['body'], assetNameAliases2, Math['min'](value12, count3));
@@ -108,7 +108,7 @@ export function createStoryAssetEvidenceDossiers(
           {
             sourceSceneRef: sourceSceneRef,
             sourceEpisodeRef: normalizeText(dom2?.['episodeRef']),
-            episodeNumber: Math['max'](0x1, Math['trunc'](Number(dom2?.['episodeNumber']) || 0x1)),
+            episodeNumber: Math['max'](1, Math['trunc'](Number(dom2?.['episodeNumber']) || 1)),
             heading: normalizeText(dom2?.['heading']),
             body: body,
           },

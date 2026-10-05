@@ -7,34 +7,34 @@ function normalizeText(value) {
 }
 function normalizeIndex(item) {
   const count = Math['trunc'](Number(item));
-  return Number['isFinite'](count) && count >= 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count >= 0 ? count : 0;
 }
 function normalizeTimeSeconds(key) {
   const count2 = Number(key);
-  return Number['isFinite'](count2) && count2 >= 0x0 ? Number(count2['toFixed'](0x3)) : 0x0;
+  return Number['isFinite'](count2) && count2 >= 0 ? Number(count2['toFixed'](3)) : 0;
 }
 function hashText(index) {
   let result = 0x811c9dc5;
   for (const data of String(index || '')) {
-    ((result ^= data['charCodeAt'](0x0)), (result = Math['imul'](result, 0x1000193)));
+    ((result ^= data['charCodeAt'](0)), (result = Math['imul'](result, 0x1000193)));
   }
-  return (result >>> 0x0)['toString'](0x24);
+  return (result >>> 0)['toString'](36);
 }
 export function formatStoryClipFrameTime(options) {
   const timeSeconds = normalizeTimeSeconds(options),
-    target = Math['floor'](timeSeconds / 0x3c),
-    source = timeSeconds - target * 0x3c;
-  return String(target)['padStart'](0x2, '0') + ':' + source['toFixed'](0x1)['padStart'](0x4, '0');
+    target = Math['floor'](timeSeconds / 60),
+    source = timeSeconds - target * 60;
+  return String(target)['padStart'](2, '0') + ':' + source['toFixed'](1)['padStart'](4, '0');
 }
 export function buildStoryClipFrameId({
   clipId: clipId = '',
-  videoResultIndex: videoResultIndex = 0x0,
+  videoResultIndex: videoResultIndex = 0,
   sourceKey: sourceKey = '',
-  currentTimeSec: currentTimeSec = 0x0,
+  currentTimeSec: currentTimeSec = 0,
 } = {}) {
   const text = normalizeText(clipId) || 'clip',
     index2 = normalizeIndex(videoResultIndex),
-    next = Math['max'](0x0, Math['round'](normalizeTimeSeconds(currentTimeSec) * 0x3e8)),
+    next = Math['max'](0, Math['round'](normalizeTimeSeconds(currentTimeSec) * 1000)),
     current = [text, index2, normalizeText(sourceKey)]['join'](':');
   return 'story-frame-' + hashText(current) + '-' + next;
 }
@@ -98,13 +98,13 @@ export function resolveStoryClipFrameMediaUrl(options4 = {}) {
     );
   return resolveStoryClipFrameImageUrl(options4);
 }
-export function normalizeStoryClipFrame(clipId2 = {}, payload = 0x0) {
+export function normalizeStoryClipFrame(clipId2 = {}, payload = 0) {
   const mediaType = getStoryClipFrameMediaType(clipId2),
     currentTimeSec2 = normalizeTimeSeconds(clipId2['currentTimeSec']),
     id =
       normalizeText(clipId2['id']) ||
       buildStoryClipFrameId({
-        clipId: clipId2['clipId'] || 'clip-' + (payload + 0x1),
+        clipId: clipId2['clipId'] || 'clip-' + (payload + 1),
         videoResultIndex: clipId2['videoResultIndex'],
         sourceKey: clipId2['sourceKey'] || clipId2['sourceUrl'],
         currentTimeSec: currentTimeSec2,
@@ -146,9 +146,9 @@ export function normalizeStoryClipFrame(clipId2 = {}, payload = 0x0) {
       displayLocalPath: normalizeText(clipId2['displayLocalPath']),
       thumbLocalPath: normalizeText(clipId2['thumbLocalPath']),
       fileName: normalizeText(clipId2['fileName']),
-      width: Math['max'](0x0, Math['trunc'](Number(clipId2['width'] || clipId2['originalWidth']) || 0x0)),
-      height: Math['max'](0x0, Math['trunc'](Number(clipId2['height'] || clipId2['originalHeight']) || 0x0)),
-      createdAt: Math['max'](0x0, Number(clipId2['createdAt']) || 0x0),
+      width: Math['max'](0, Math['trunc'](Number(clipId2['width'] || clipId2['originalWidth']) || 0)),
+      height: Math['max'](0, Math['trunc'](Number(clipId2['height'] || clipId2['originalHeight']) || 0)),
+      createdAt: Math['max'](0, Number(clipId2['createdAt']) || 0),
     };
   return (
     (handle['imageUrl'] = resolveStoryClipFrameImageUrl(handle)),
@@ -171,8 +171,8 @@ export function createStoryClipFrameRecord({
   saved: saved = {},
   episode: episode = null,
   clip: clip = null,
-  videoResultIndex: videoResultIndex = 0x0,
-  currentTimeSec: currentTimeSec = 0x0,
+  videoResultIndex: videoResultIndex = 0,
+  currentTimeSec: currentTimeSec = 0,
   sourceKey: sourceKey = '',
   sourceUrl: sourceUrl = '',
   createdAt: createdAt = Date['now'](),
@@ -209,9 +209,9 @@ export function createStoryClipVideoRecord({
   saved: saved = {},
   episode: episode = null,
   clip: clip = null,
-  videoResultIndex: videoResultIndex = 0x0,
-  startTimeSec: startTimeSec = 0x0,
-  endTimeSec: endTimeSec = 0x0,
+  videoResultIndex: videoResultIndex = 0,
+  startTimeSec: startTimeSec = 0,
+  endTimeSec: endTimeSec = 0,
   sourceKey: sourceKey = '',
   sourceUrl: sourceUrl = '',
   createdAt: createdAt = Date['now'](),
@@ -224,7 +224,7 @@ export function createStoryClipVideoRecord({
       sourceKey: sourceKey || sourceUrl,
       currentTimeSec: currentTimeSec3,
     }),
-    scope = Math['max'](0x0, Math['round'](endTimeSec3 * 0x3e8));
+    scope = Math['max'](0, Math['round'](endTimeSec3 * 1000));
   return normalizeStoryClipFrame({
     id: id3 + '-video-' + scope,
     mediaType: STORY_CLIP_MEDIA_TYPE_VIDEO,
@@ -248,8 +248,8 @@ export function createStoryClipVideoRecord({
     fileName: saved['fileName'] || saved['filename'],
     width: saved['videoWidth'] || saved['originalWidth'] || saved['width'],
     height: saved['videoHeight'] || saved['originalHeight'] || saved['height'],
-    videoFps: Math['max'](0x0, Number(saved['videoFps'] || saved['fps']) || 0x0),
-    videoDuration: Math['max'](0x0, Number(saved['videoDuration']) || endTimeSec3 - currentTimeSec3),
+    videoFps: Math['max'](0, Number(saved['videoFps'] || saved['fps']) || 0),
+    videoDuration: Math['max'](0, Number(saved['videoDuration']) || endTimeSec3 - currentTimeSec3),
     createdAt: createdAt,
   });
 }
@@ -310,7 +310,7 @@ export function buildStoryClipFrameMentionCandidates(
         origin: 'asset',
         menuDirect: !![],
         assetId: STORY_CLIP_FRAME_MENTION_PREFIX + 'empty',
-        assetIndex: 0x0,
+        assetIndex: 0,
         type: 'image',
         label: '暂无片段帧',
         subtitle: '在视频预览中截取当前画面',
@@ -342,19 +342,19 @@ export function buildStoryClipFrameMentionCandidates(
     map3['forEach']((frames2, id4) => {
       index4['push']({
         id: id4,
-        title: normalizeText(frames2[0x0]?.['clipTitle']),
+        title: normalizeText(frames2[0]?.['clipTitle']),
         index: index4['length'],
         frames: frames2,
       });
     }),
     index4['flatMap']((value13, value14) => {
-      const value15 = Math['max'](0x1, Number(value13['index']) + 0x1 || value14 + 0x1),
-        label = '片段' + String(value15)['padStart'](0x2, '0'),
+      const value15 = Math['max'](1, Number(value13['index']) + 1 || value14 + 1),
+        label = '片段' + String(value15)['padStart'](2, '0'),
         mentionVariants = value13['frames']['map']((storyClipFrameId) => ({
           origin: 'asset',
           menuDirect: !![],
           assetId: buildStoryClipFrameMentionId(storyClipFrameId['id']),
-          assetIndex: 0x0,
+          assetIndex: 0,
           type: getStoryClipFrameMediaType(storyClipFrameId),
           label: label,
           subtitle:
@@ -395,9 +395,9 @@ export function buildStoryClipFrameMentionCandidates(
                 '片段帧',
               ]['some']((value18) => normalizeText(value18)['toLowerCase']()['includes'](text4)),
             )
-          : -0x1;
-      if (text4 && count3 < 0x0) return [];
-      const mentionVariantIndex = count3 >= 0x0 ? count3 : 0x0;
+          : -1;
+      if (text4 && count3 < 0) return [];
+      const mentionVariantIndex = count3 >= 0 ? count3 : 0;
       return [
         {
           ...mentionVariants[mentionVariantIndex],
@@ -425,7 +425,7 @@ export function resolveStoryClipFrameMentionRef(el, value19 = []) {
     origin: 'asset',
     assetId: buildStoryClipFrameMentionId(storyClipFrameId2['id']),
     storyClipFrameId: storyClipFrameId2['id'],
-    itemIndex: 0x0,
+    itemIndex: 0,
     type: type,
     name: storyClipFrameId2['name'],
     label: storyClipFrameId2['name'],
@@ -442,8 +442,8 @@ export function resolveStoryClipFrameMentionRef(el, value19 = []) {
             thumbUrl: resolveStoryClipFrameImageUrl(storyClipFrameId2),
             videoDuration:
               Number(storyClipFrameId2['videoDuration']) ||
-              Math['max'](0x0, storyClipFrameId2['endTimeSec'] - storyClipFrameId2['currentTimeSec']),
-            videoFps: Number(storyClipFrameId2['videoFps']) || 0x0,
+              Math['max'](0, storyClipFrameId2['endTimeSec'] - storyClipFrameId2['currentTimeSec']),
+            videoFps: Number(storyClipFrameId2['videoFps']) || 0,
           }
         : { imageUrl: url }),
       localPath: storyClipFrameId2['localPath'],

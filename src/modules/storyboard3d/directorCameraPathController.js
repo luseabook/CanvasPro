@@ -16,11 +16,11 @@ export class DirectorCameraPathController {
       (this['curves'] = new DirectorCurveEditor(this)),
       (this['active'] = ![]),
       (this['drawing'] = ![]),
-      (this['plane'] = 0x1),
+      (this['plane'] = 1),
       (this['planeOffset'] = 1.6),
       (this['selectedId'] = ''),
       (this['drawMode'] = 'points'),
-      (this['drawDuration'] = 0x3),
+      (this['drawDuration'] = 3),
       (this['objectId'] = ''),
       (this['frame'] = null),
       (this['onDown'] = (item) => this['pointerDown'](item)),
@@ -30,7 +30,7 @@ export class DirectorCameraPathController {
       (this['onKey'] = (event) => {
         if (this['curves']['key'](event)) return !![];
         const el = event['target']['closest']?.('[data-camera-path-point]');
-        if (this['active'] && el && ['Enter', '\x20']['includes'](event['key']))
+        if (this['active'] && el && ['Enter', ' ']['includes'](event['key']))
           return (
             event['preventDefault'](),
             event['stopImmediatePropagation'](),
@@ -60,7 +60,7 @@ export class DirectorCameraPathController {
         (event2['preventDefault'](),
           event2['stopImmediatePropagation'](),
           this['change']({
-            camera: adjustSpatialCamera(this['selected']()['camera'], 0x0, -event2['deltaY'], !![]),
+            camera: adjustSpatialCamera(this['selected']()['camera'], 0, -event2['deltaY'], !![]),
           }));
       }));
   }
@@ -85,7 +85,7 @@ export class DirectorCameraPathController {
       }));
   }
   ['selected']() {
-    return this['points']()['find']((source) => source['id'] === this['selectedId']) || this['points']()[0x0];
+    return this['points']()['find']((source) => source['id'] === this['selectedId']) || this['points']()[0];
   }
   ['render'](next) {
     return renderDirectorCameraPathPanel(this, next);
@@ -119,8 +119,8 @@ export class DirectorCameraPathController {
         if (args['time'] != null) {
           const count = Math['round'](Number(args['time']) * payload['fps']) / payload['fps'];
           if (
-            count < 0x0 ||
-            count > 0xe10 ||
+            count < 0 ||
+            count > 3600 ||
             handle['positionKeyframes']['some'](
               (scope) =>
                 scope['id'] !== enabled['id'] && Math['abs'](scope['time'] - count) < 0.5 / payload['fps'],
@@ -250,7 +250,7 @@ export class DirectorCameraPathController {
       return ((this['drawMode'] = easing['value']), !![]);
     if (easing['matches']?.('[data-camera-path-draw-duration]'))
       return (
-        (this['drawDuration'] = Math['max'](0.1, Math['min'](0xe10, Number(easing['value']) || 0x3))),
+        (this['drawDuration'] = Math['max'](0.1, Math['min'](3600, Number(easing['value']) || 3))),
         !![]
       );
     if (easing['matches']?.('[data-camera-path-selection]'))
@@ -258,7 +258,7 @@ export class DirectorCameraPathController {
     if (easing['matches']?.('[data-camera-path-plane]'))
       return (
         (this['plane'] = Number(easing['value'])),
-        (this['planeOffset'] = this['selected']()?.['camera']['position'][this['plane']] || 0x0),
+        (this['planeOffset'] = this['selected']()?.['camera']['position'][this['plane']] || 0),
         this['timeline']['requestRender']?.(),
         !![]
       );
@@ -279,7 +279,7 @@ export class DirectorCameraPathController {
       [value24, value25] = value23['split']('-');
     if (value25 != null) camera[value24][Number(value25)] = time;
     else {
-      camera[value24] = value24 === 'roll' ? (time * Math['PI']) / 0xb4 : time;
+      camera[value24] = value24 === 'roll' ? (time * Math['PI']) / 180 : time;
       if (value24 === 'focalLength') delete camera['fov'];
     }
     if (JSON['stringify'](camera) !== JSON['stringify'](enabled3['camera']))
@@ -316,7 +316,7 @@ export class DirectorCameraPathController {
       ((this['layer'] = el3['createElement']('div')),
         (this['layer']['className'] = 'storyboard-3d-camera-path-overlay'),
         (this['layer']['innerHTML'] =
-          '<svg\x20data-camera-path-overlay\x20aria-label=\x22摄像机轨道控制点\x22></svg><div\x20class=\x22storyboard-3d-camera-path-monitor\x22><span>镜头监看</span><canvas\x20data-camera-path-monitor\x20aria-label=\x22镜头监看，拖动调整朝向\x22></canvas></div>'),
+          '<svg data-camera-path-overlay aria-label="摄像机轨道控制点"></svg><div class="storyboard-3d-camera-path-monitor"><span>镜头监看</span><canvas data-camera-path-monitor aria-label="镜头监看，拖动调整朝向"></canvas></div>'),
         value28['append'](this['layer']),
         (this['svg'] = this['layer']['querySelector']('svg')),
         (this['monitorCanvas'] = this['layer']['querySelector']('canvas')),
@@ -344,10 +344,10 @@ export class DirectorCameraPathController {
     if (value30 !== this['svg']['dataset']['keys']) {
       (this['svg']['replaceChildren'](), (this['svg']['dataset']['keys'] = value30));
       const value32 = this['svg']['ownerDocument'];
-      for (let value33 = 0x0; value33 < Math['max'](0x0, list3['length'] - 0x1); value33++) {
+      for (let value33 = 0; value33 < Math['max'](0, list3['length'] - 1); value33++) {
         const el4 = value32['createElementNS'](
           'http://www.w3.org/2000/svg',
-          list3[value33]['outTangent'] || list3[value33 + 0x1]['inTangent'] ? 'path' : 'line',
+          list3[value33]['outTangent'] || list3[value33 + 1]['inTangent'] ? 'path' : 'line',
         );
         ((el4['dataset']['segment'] = String(value33)), this['svg']['append'](el4));
       }
@@ -357,7 +357,7 @@ export class DirectorCameraPathController {
           el5['setAttribute']('r', '9'),
           el5['setAttribute']('tabindex', '0'),
           el5['setAttribute']('role', 'button'),
-          el5['setAttribute']('aria-label', '摄像机控制点 ' + (value35 + 0x1)),
+          el5['setAttribute']('aria-label', '摄像机控制点 ' + (value35 + 1)),
           this['svg']['append'](el5));
       });
     }
@@ -370,22 +370,22 @@ export class DirectorCameraPathController {
     );
     (this['svg']['querySelectorAll']('[data-segment]')['forEach']((el6, value38) => {
       if (el6['tagName'] === 'path') {
-        const list4 = Array['from']({ length: 0x19 }, (value39, value40) =>
+        const list4 = Array['from']({ length: 25 }, (value39, value40) =>
           this['viewport']['project'](
-            sampleSpatialCurve(list3[value38], list3[value38 + 0x1], value40 / 0x18, 'camera'),
+            sampleSpatialCurve(list3[value38], list3[value38 + 1], value40 / 24, 'camera'),
           ),
         );
         let enabled5 = ![];
         const value41 = list4['map']((box) => {
           if (!box) return ((enabled5 = ![]), '');
-          const value42 = '' + (enabled5 ? 'L' : 'M') + box['x'] + '\x20' + box['y'];
+          const value42 = '' + (enabled5 ? 'L' : 'M') + box['x'] + ' ' + box['y'];
           return ((enabled5 = !![]), value42);
-        })['join']('\x20');
+        })['join'](' ');
         el6['setAttribute']('d', value41);
         return;
       }
       const x1 = value36[value38],
-        x2 = value36[value38 + 0x1];
+        x2 = value36[value38 + 1];
       el6['style']['display'] = x1 && x2 ? '' : 'none';
       if (x1 && x2) {
         for (const [value43, value44] of Object['entries']({
@@ -411,7 +411,7 @@ export class DirectorCameraPathController {
         this['context']()['shot']['camera'],
       value47 = this['timeline']['window']['performance']['now']();
     !this['monitorPending'] &&
-      (!this['monitorPaintAt'] || value47 - this['monitorPaintAt'] > 0x21) &&
+      (!this['monitorPaintAt'] || value47 - this['monitorPaintAt'] > 33) &&
       ((this['monitorPaintAt'] = value47),
       (this['monitorPending'] = !![]),
       Promise['resolve'](this['viewport']['renderMonitor'](this['monitorCanvas'], value46))
@@ -424,7 +424,7 @@ export class DirectorCameraPathController {
   }
   ['pointerDown'](x) {
     if (this['curves']['down'](x)) return;
-    if (!this['active'] || x['button'] !== 0x0 || this['timeline']['playing']) return;
+    if (!this['active'] || x['button'] !== 0 || this['timeline']['playing']) return;
     const enabled6 = x['target']['closest']?.('[data-camera-path-monitor]');
     if (enabled6 && this['objectId']) {
       (x['preventDefault'](), x['stopImmediatePropagation']());
@@ -464,11 +464,11 @@ export class DirectorCameraPathController {
                   : [object['transform']['position']]),
                 enabled7,
               ],
-              start: start[0x0]?.['time'] ?? this['timeline']['_timeForShot'](this['context']()['shot']),
-              duration: Math['max'](0x1, start['length']),
+              start: start[0]?.['time'] ?? this['timeline']['_timeForShot'](this['context']()['shot']),
+              duration: Math['max'](1, start['length']),
             }),
           ),
-            (this['selectedId'] = this['points']()['at'](-0x1)?.['id'] || ''),
+            (this['selectedId'] = this['points']()['at'](-1)?.['id'] || ''),
             this['select'](this['selectedId']));
           return;
         }
@@ -479,7 +479,7 @@ export class DirectorCameraPathController {
           this['commit']((value52) => {
             const addDirectorCameraPathPoint2 = addDirectorCameraPathPoint(value52, structuredClone2);
             return (
-              (this['selectedId'] = addDirectorCameraPathPoint2['cameraPath']['pointIds']['at'](-0x1)),
+              (this['selectedId'] = addDirectorCameraPathPoint2['cameraPath']['pointIds']['at'](-1)),
               addDirectorCameraPathPoint2
             );
           }));
@@ -564,8 +564,8 @@ export class DirectorCameraPathController {
       );
       if (
         !list5 ||
-        points['length'] >= 0x64 ||
-        Math['hypot'](...list5['map']((value61, value62) => value61 - points['at'](-0x1)[value62])) < 0.04
+        points['length'] >= 100 ||
+        Math['hypot'](...list5['map']((value61, value62) => value61 - points['at'](-1)[value62])) < 0.04
       )
         return;
       (points['push'](list5),
@@ -574,7 +574,7 @@ export class DirectorCameraPathController {
           points['map']((value63) => this['viewport']['project'](value63))
             ['filter'](Boolean)
             ['map']((box4) => box4['x'] + ',' + box4['y'])
-            ['join']('\x20'),
+            ['join'](' '),
         ));
     };
     (this['timeline']['window']['addEventListener']('pointermove', value60, {

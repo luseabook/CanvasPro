@@ -1,7 +1,7 @@
 import { normalizeStoryPromptMode } from './storyPromptModes.js';
 import { normalizeStoryPromptLanguage } from '../../domain/storyGeneration/promptLanguage.js';
 export const STORY_CLIP_ADJUSTMENT_SCOPES = Object['freeze'](['selection', 'prompt', 'clip']);
-export const STORY_CLIP_PROMPT_HISTORY_LIMIT = 0x14;
+export const STORY_CLIP_PROMPT_HISTORY_LIMIT = 20;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -23,20 +23,20 @@ export function isStoryClipAdjustmentGenerating(options = {}, data = {}, target 
 }
 function normalizeDurationSeconds(next) {
   const current = String(next ?? '')['match'](/\d+(?:\.\d+)?/),
-    count = Number(current?.[0x0]);
-  return Number['isFinite'](count) && count > 0x0 ? Number(count['toFixed'](0x1)) : 0x0;
+    count = Number(current?.[0]);
+  return Number['isFinite'](count) && count > 0 ? Number(count['toFixed'](1)) : 0;
 }
 function formatDurationSeconds(entry) {
   const durationSeconds = normalizeDurationSeconds(entry);
-  return durationSeconds > 0x0 ? durationSeconds['toFixed'](0x1) + 's' : '';
+  return durationSeconds > 0 ? durationSeconds['toFixed'](1) + 's' : '';
 }
 function hashPromptHistoryValue(record) {
   let payload = 0x811c9dc5;
   const handle = String(record || '');
-  for (let state = 0x0; state < handle['length']; state += 0x1) {
+  for (let state = 0; state < handle['length']; state += 1) {
     ((payload ^= handle['charCodeAt'](state)), (payload = Math['imul'](payload, 0x1000193)));
   }
-  return (payload >>> 0x0)['toString'](0x24);
+  return (payload >>> 0)['toString'](36);
 }
 function getPromptHistoryEntryKey(options2 = {}) {
   return [
@@ -58,7 +58,7 @@ export function normalizeStoryClipPromptHistory(list = []) {
         enabled['durationSec'] || enabled['durationSeconds'] || enabled['duration'],
       ),
       count2 = Number(enabled['savedAt'] || enabled['createdAt']),
-      output = Number['isFinite'](count2) && count2 > 0x0 ? Math['trunc'](count2) : 0x0,
+      output = Number['isFinite'](count2) && count2 > 0 ? Math['trunc'](count2) : 0,
       value2 = {
         id:
           normalizeText(enabled['id']) ||
@@ -71,7 +71,7 @@ export function normalizeStoryClipPromptHistory(list = []) {
         promptLanguage: normalizeStoryPromptLanguage(enabled['promptLanguage']),
         durationSec: durationSeconds2,
         duration:
-          durationSeconds2 > 0x0
+          durationSeconds2 > 0
             ? formatDurationSeconds(durationSeconds2)
             : normalizeText(enabled['duration']),
         instruction: normalizeText(enabled['instruction']),
@@ -103,7 +103,7 @@ export function createStoryClipPromptHistoryEntry(
       value3?.['durationSec'] || value3?.['durationSeconds'] || value3?.['duration'],
     ),
     value4 =
-      Number['isFinite'](Number(savedAt)) && Number(savedAt) > 0x0
+      Number['isFinite'](Number(savedAt)) && Number(savedAt) > 0
         ? Math['trunc'](Number(savedAt))
         : Date['now']();
   return {
@@ -117,7 +117,7 @@ export function createStoryClipPromptHistoryEntry(
     promptLanguage: normalizeStoryPromptLanguage(value3?.['promptLanguage']),
     durationSec: durationSeconds3,
     duration:
-      durationSeconds3 > 0x0 ? formatDurationSeconds(durationSeconds3) : normalizeText(value3?.['duration']),
+      durationSeconds3 > 0 ? formatDurationSeconds(durationSeconds3) : normalizeText(value3?.['duration']),
     instruction: normalizeText(instruction),
     source: normalizeText(source) || 'ai-adjustment',
     savedAt: value4,
@@ -149,7 +149,7 @@ export function restoreStoryClipPromptHistoryEntry(enabled3, value6, value7 = Da
     (enabled3['prompt'] = enabled4['promptHtml']),
     (enabled3['promptMode'] = enabled4['promptMode']),
     (enabled3['promptLanguage'] = enabled4['promptLanguage']),
-    enabled4['durationSec'] > 0x0 &&
+    enabled4['durationSec'] > 0 &&
       ((enabled3['durationSec'] = enabled4['durationSec']),
       (enabled3['duration'] = formatDurationSeconds(enabled4['durationSec']))),
     (enabled3['promptHistory'] = normalizeStoryClipPromptHistory(
@@ -163,14 +163,14 @@ export function restoreStoryClipPromptHistoryEntry(enabled3, value6, value7 = Da
 }
 function normalizePromptText(value10) {
   return String(value10 || '')
-    ['replace'](/\r\n?/g, '\x0a')
-    ['replace'](/\u00a0/g, '\x20')
+    ['replace'](/\r\n?/g, '\n')
+    ['replace'](/\u00a0/g, ' ')
     ['trim']();
 }
 function normalizePromptTextRaw(value11) {
   return String(value11 || '')
-    ['replace'](/\r\n?/g, '\x0a')
-    ['replace'](/\u00a0/g, '\x20');
+    ['replace'](/\r\n?/g, '\n')
+    ['replace'](/\u00a0/g, ' ');
 }
 function getNodeChildren(value12) {
   return Array['from'](value12?.['childNodes'] || []);
@@ -189,20 +189,20 @@ function getNodeData(el, value16, value17) {
 }
 function serializeStoryPromptNode(enabled5) {
   if (!enabled5) return '';
-  if (Number(enabled5['nodeType']) === 0x3) return String(enabled5['textContent'] || '');
+  if (Number(enabled5['nodeType']) === 3) return String(enabled5['textContent'] || '');
   if (nodeHasClass(enabled5, 'ref-pill')) {
     const nodeData = getNodeData(enabled5, 'label', 'data-label') || normalizeText(enabled5['textContent']),
       nodeData2 = getNodeData(enabled5, 'promptPillKind', 'data-prompt-pill-kind'),
       nodeData3 = getNodeData(enabled5, 'assetId', 'data-asset-id');
-    if (nodeData2 === 'time' || nodeData3 === 'story-meta:time') return nodeData ? '⏱\x20' + nodeData : '';
+    if (nodeData2 === 'time' || nodeData3 === 'story-meta:time') return nodeData ? '⏱ ' + nodeData : '';
     if (!nodeData) return '';
     return nodeData['startsWith']('@') ? nodeData : '@' + nodeData;
   }
   const nodeTagName = getNodeTagName(enabled5);
-  if (nodeTagName === 'br') return '\x0a';
+  if (nodeTagName === 'br') return '\n';
   const nodeChildren = getNodeChildren(enabled5)['map'](serializeStoryPromptNode)['join']('');
   return ['div', 'p', 'section', 'article', 'blockquote', 'li']['includes'](nodeTagName)
-    ? nodeChildren + '\x0a'
+    ? nodeChildren + '\n'
     : nodeChildren;
 }
 export function serializeStoryClipPromptElement(value18) {
@@ -228,7 +228,7 @@ export function getStoryClipPromptLockedTokens(value19) {
   for (const value26 of serializeStoryClipPromptElement2['matchAll'](
     /⏱\s*\d+(?:\.\d+)?s|\d+(?:\.\d+)?\s*[-–]\s*\d+(?:\.\d+)?\s*(?:秒|s)|\b\d{2}:\d{2}\.\d{3}\b/gu,
   )) {
-    !enabled6['has'](value26[0x0]) && (enabled6['add'](value26[0x0]), list3['push'](value26[0x0]));
+    !enabled6['has'](value26[0]) && (enabled6['add'](value26[0]), list3['push'](value26[0]));
   }
   return { assetTokens: value20, durationTokens: list3 };
 }
@@ -241,8 +241,8 @@ export function captureStoryClipPromptSelection({
   selection: selection2,
   documentObject: documentObject = globalThis['document'],
 } = {}) {
-  if (!promptEl || !selection2 || selection2['rangeCount'] < 0x1 || selection2['isCollapsed']) return null;
-  const value27 = selection2['getRangeAt'](0x0);
+  if (!promptEl || !selection2 || selection2['rangeCount'] < 1 || selection2['isCollapsed']) return null;
+  const value27 = selection2['getRangeAt'](0);
   if (!isNodeInside(promptEl, value27['startContainer']) || !isNodeInside(promptEl, value27['endContainer']))
     return null;
   const promptTextRaw = normalizePromptTextRaw(serializeStoryPromptNode(value27['cloneContents']?.())),
@@ -251,7 +251,7 @@ export function captureStoryClipPromptSelection({
   const promptTextRaw2 = normalizePromptTextRaw(serializeStoryPromptNode(promptEl)),
     enabled9 = promptTextRaw2['trim']();
   if (!enabled9) return null;
-  let count3 = -0x1;
+  let count3 = -1;
   if (typeof documentObject?.['createRange'] === 'function') {
     const value28 = documentObject['createRange']();
     (value28['selectNodeContents'](promptEl),
@@ -261,9 +261,9 @@ export function captureStoryClipPromptSelection({
       value30 = promptTextRaw['length'] - promptTextRaw['trimStart']()['length'];
     count3 = promptTextRaw3['length'] + value30 - value29;
   }
-  (count3 < 0x0 || enabled9['slice'](count3, count3 + list4['length']) !== list4) &&
+  (count3 < 0 || enabled9['slice'](count3, count3 + list4['length']) !== list4) &&
     (count3 = enabled9['indexOf'](list4));
-  if (count3 < 0x0) return null;
+  if (count3 < 0) return null;
   return { start: count3, end: count3 + list4['length'], text: list4, sourcePromptText: enabled9 };
 }
 export function normalizeStoryClipAdjustmentScope(value31, enabled10 = ![]) {
@@ -282,11 +282,11 @@ export function buildStoryClipAdjustmentCandidateText({
   if (!list5) throw new Error('当前片段还没有可调整的视频提示词。');
   if (!promptText) throw new Error('AI 没有返回可用的候选内容。');
   if (normalizeStoryClipAdjustmentScope(scope, Boolean(selection)) !== 'selection') return promptText;
-  const value32 = Math['max'](0x0, Math['trunc'](Number(selection?.['start']) || 0x0)),
+  const value32 = Math['max'](0, Math['trunc'](Number(selection?.['start']) || 0)),
     value33 = Math['max'](value32, Math['trunc'](Number(selection?.['end']) || value32));
   if (value33 > list5['length'] || !normalizeText(list5['slice'](value32, value33)))
     throw new Error('选中文字已经变化，请重新选择后再调整。');
-  return normalizePromptText('' + list5['slice'](0x0, value32) + promptText + list5['slice'](value33));
+  return normalizePromptText('' + list5['slice'](0, value32) + promptText + list5['slice'](value33));
 }
 function getAdjustmentState(value34) {
   return value34?.['promptAdjustment'] && typeof value34['promptAdjustment'] === 'object'
@@ -332,7 +332,7 @@ export function applyStoryClipAdjustmentCandidate(enabled13, value35 = Date['now
       normalizeText(adjustmentState['promptHtml']) !== normalizeText(value36) ||
       normalizeStoryPromptLanguage(adjustmentState['targetLanguage']) !== storyPromptLanguage ||
       storyPromptMode4 !== storyPromptMode3 ||
-      (durationSeconds5 > 0x0 && durationSeconds5 !== durationSeconds4);
+      (durationSeconds5 > 0 && durationSeconds5 !== durationSeconds4);
   return (
     text5 &&
       saveCurrentStoryClipPromptToHistory(enabled13, {
@@ -346,7 +346,7 @@ export function applyStoryClipAdjustmentCandidate(enabled13, value35 = Date['now
     (enabled13['promptLanguage'] =
       normalizeStoryPromptLanguage(adjustmentState['targetLanguage']) || storyPromptLanguage),
     delete enabled13['requiredDialogueLanguage'],
-    durationSeconds5 > 0x0 &&
+    durationSeconds5 > 0 &&
       ((enabled13['durationSec'] = durationSeconds5),
       (enabled13['duration'] = formatDurationSeconds(durationSeconds5))),
     (enabled13['promptAdjustment'] = {
@@ -385,7 +385,7 @@ export function undoStoryClipAdjustment(enabled14) {
       adjustmentState2['lastApplied']['previousDuration'],
   );
   return (
-    durationSeconds6 > 0x0 &&
+    durationSeconds6 > 0 &&
       ((enabled14['durationSec'] = durationSeconds6),
       (enabled14['duration'] = formatDurationSeconds(durationSeconds6))),
     (enabled14['promptAdjustment'] = { candidate: adjustmentState2['candidate'] || null, lastApplied: null }),

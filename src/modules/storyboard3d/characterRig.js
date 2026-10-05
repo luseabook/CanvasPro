@@ -7,10 +7,10 @@ function bodyPreset(
     gender: gender = 'male',
     ageGroup: ageGroup = 'adult',
     height: height = 1.72,
-    shoulderScale: shoulderScale = 0x1,
-    hipScale: hipScale = 0x1,
-    headScale: headScale = 0x1,
-    depthScale: depthScale = 0x1,
+    shoulderScale: shoulderScale = 1,
+    hipScale: hipScale = 1,
+    headScale: headScale = 1,
+    depthScale: depthScale = 1,
     posture: posture = {},
     tags: tags = [],
   } = {},
@@ -30,9 +30,9 @@ function bodyPreset(
   });
 }
 const SENIOR_POSTURE = Object['freeze']({
-  spine_01: Object['freeze']({ x: 0.1, y: 0x0, z: 0x0 }),
-  spine_02: Object['freeze']({ x: 0.07, y: 0x0, z: 0x0 }),
-  neck_01: Object['freeze']({ x: -0.06, y: 0x0, z: 0x0 }),
+  spine_01: Object['freeze']({ x: 0.1, y: 0, z: 0 }),
+  spine_02: Object['freeze']({ x: 0.07, y: 0, z: 0 }),
+  neck_01: Object['freeze']({ x: -0.06, y: 0, z: 0 }),
 });
 export const STORYBOARD_3D_BODY_PRESETS = Object['freeze']([
   bodyPreset('adult-male', '成年男性', {
@@ -91,7 +91,7 @@ export const STORYBOARD_3D_BODY_PRESETS = Object['freeze']([
     gender: 'male',
     ageGroup: 'youth',
     height: 1.7,
-    shoulderScale: 0x1,
+    shoulderScale: 1,
     hipScale: 0.97,
     headScale: 1.03,
     tags: ['青年', '年轻人', '男青年'],
@@ -168,7 +168,7 @@ export const STORYBOARD_3D_BODY_PRESETS = Object['freeze']([
   }),
 ]);
 export const STORYBOARD_3D_ACTIONS = Object['freeze']([
-  Object['freeze']({ id: 'standing', name: '站立', poseId: 'neutral', loop: ![], duration: 0x1 }),
+  Object['freeze']({ id: 'standing', name: '站立', poseId: 'neutral', loop: ![], duration: 1 }),
   Object['freeze']({
     id: 'standing-relaxed',
     name: '放松站立',
@@ -176,7 +176,7 @@ export const STORYBOARD_3D_ACTIONS = Object['freeze']([
     loop: !![],
     duration: 2.4,
   }),
-  Object['freeze']({ id: 'seated', name: '坐姿', poseId: 'sit', loop: ![], duration: 0x1 }),
+  Object['freeze']({ id: 'seated', name: '坐姿', poseId: 'sit', loop: ![], duration: 1 }),
   Object['freeze']({
     id: 'walking-left',
     name: '行走（左脚）',
@@ -224,19 +224,19 @@ export const STORYBOARD_3D_ACTIONS = Object['freeze']([
     ['lean-left', '左侧倾身'],
     ['lean-right', '右侧倾身'],
   ]['map'](([id2, name2]) =>
-    Object['freeze']({ id: id2, name: name2, poseId: id2, loop: ![], duration: 0x1 }),
+    Object['freeze']({ id: id2, name: name2, poseId: id2, loop: ![], duration: 1 }),
   ),
 ]);
 export const STORYBOARD_3D_HAND_POSES = Object['freeze']([
-  Object['freeze']({ id: 'relaxed', name: '自然', rotation: { x: 0x0, y: 0x0, z: 0x0 } }),
-  Object['freeze']({ id: 'open', name: '张开', rotation: { x: 0.08, y: 0x0, z: 0x0 } }),
-  Object['freeze']({ id: 'fist', name: '握拳', rotation: { x: -0.18, y: 0x0, z: 0x0 } }),
-  Object['freeze']({ id: 'point', name: '指向', rotation: { x: -0.05, y: 0.08, z: 0x0 } }),
+  Object['freeze']({ id: 'relaxed', name: '自然', rotation: { x: 0, y: 0, z: 0 } }),
+  Object['freeze']({ id: 'open', name: '张开', rotation: { x: 0.08, y: 0, z: 0 } }),
+  Object['freeze']({ id: 'fist', name: '握拳', rotation: { x: -0.18, y: 0, z: 0 } }),
+  Object['freeze']({ id: 'point', name: '指向', rotation: { x: -0.05, y: 0.08, z: 0 } }),
   Object['freeze']({
     id: 'grip',
     name: '抓握',
-    rotation: { x: -0.22, y: 0.04, z: 0x0 },
-    fingerCurl: 0x1,
+    rotation: { x: -0.22, y: 0.04, z: 0 },
+    fingerCurl: 1,
     thumbCurl: 0.75,
   }),
 ]);
@@ -251,18 +251,18 @@ export const STORYBOARD_3D_BONE_LIMITS = Object['freeze']({
   Head: Object['freeze']({ x: [-0.7, 0.7], y: [-1.15, 1.15], z: [-0.65, 0.65] }),
   lowerarm_l: Object['freeze']({ x: [-2.45, 0.3], y: [-0.65, 0.65], z: [-2.4, 0.25] }),
   lowerarm_r: Object['freeze']({ x: [-2.45, 0.3], y: [-0.65, 0.65], z: [-0.25, 2.4] }),
-  calf_l: Object['freeze']({ x: [0x0, 2.65], y: [-0.25, 0.25], z: [-0.25, 0.25] }),
-  calf_r: Object['freeze']({ x: [0x0, 2.65], y: [-0.25, 0.25], z: [-0.25, 0.25] }),
+  calf_l: Object['freeze']({ x: [0, 2.65], y: [-0.25, 0.25], z: [-0.25, 0.25] }),
+  calf_r: Object['freeze']({ x: [0, 2.65], y: [-0.25, 0.25], z: [-0.25, 0.25] }),
 });
 function clamp(index, result, data) {
-  return Math['max'](result, Math['min'](data, Number(index) || 0x0));
+  return Math['max'](result, Math['min'](data, Number(index) || 0));
 }
 function mergeBonePoses(...list) {
   const options = {};
   return (
     list['forEach']((target) => {
       Object['entries'](normalizeBonePose(target))['forEach'](([source, box]) => {
-        const x2 = options[source] || { x: 0x0, y: 0x0, z: 0x0 };
+        const x2 = options[source] || { x: 0, y: 0, z: 0 };
         options[source] = {
           x: x2['x'] + box['x'],
           y: x2['y'] + box['y'],
@@ -277,21 +277,21 @@ export function clampStoryboard3DBoneEuler(next, box2 = {}) {
   if (!BONE_SET['has'](String(next || ''))) return null;
   const box3 = STORYBOARD_3D_BONE_LIMITS[next] || DEFAULT_LIMIT;
   return {
-    x: clamp(box2['x'], box3['x'][0x0], box3['x'][0x1]),
-    y: clamp(box2['y'], box3['y'][0x0], box3['y'][0x1]),
-    z: clamp(box2['z'], box3['z'][0x0], box3['z'][0x1]),
+    x: clamp(box2['x'], box3['x'][0], box3['x'][1]),
+    y: clamp(box2['y'], box3['y'][0], box3['y'][1]),
+    z: clamp(box2['z'], box3['z'][0], box3['z'][1]),
   };
 }
 export function eulerToStoryboard3DQuaternion(box4 = {}) {
-  const current = Number(box4['x']) || 0x0,
-    entry = Number(box4['y']) || 0x0,
-    record = Number(box4['z']) || 0x0,
-    payload = Math['cos'](current / 0x2),
-    handle = Math['cos'](entry / 0x2),
-    state = Math['cos'](record / 0x2),
-    config = Math['sin'](current / 0x2),
-    scope = Math['sin'](entry / 0x2),
-    input = Math['sin'](record / 0x2);
+  const current = Number(box4['x']) || 0,
+    entry = Number(box4['y']) || 0,
+    record = Number(box4['z']) || 0,
+    payload = Math['cos'](current / 2),
+    handle = Math['cos'](entry / 2),
+    state = Math['cos'](record / 2),
+    config = Math['sin'](current / 2),
+    scope = Math['sin'](entry / 2),
+    input = Math['sin'](record / 2);
   return [
     config * handle * state + payload * scope * input,
     payload * scope * state - config * handle * input,
@@ -302,7 +302,7 @@ export function eulerToStoryboard3DQuaternion(box4 = {}) {
 export function normalizeStoryboard3DBoneOverrides(options2 = {}) {
   const output = {};
   for (const [value2, list2] of Object['entries'](options2 || {})) {
-    if (!BONE_SET['has'](value2) || !Array['isArray'](list2) || list2['length'] !== 0x4) continue;
+    if (!BONE_SET['has'](value2) || !Array['isArray'](list2) || list2['length'] !== 4) continue;
     const list3 = list2['map'](Number);
     if (!list3['every'](Number['isFinite'])) continue;
     const count = Math['hypot'](...list3);
@@ -325,7 +325,7 @@ export function normalizeStoryboard3DCharacterState(actionPlaying = {}) {
       : 'adult-male',
     actionId = ACTION_BY_ID['has'](actionPlaying['actionId'])
       ? actionPlaying['actionId']
-      : STORYBOARD_3D_ACTIONS[0x0]['id'],
+      : STORYBOARD_3D_ACTIONS[0]['id'],
     leftHandPoseId = HAND_BY_ID['has'](actionPlaying['leftHandPoseId'])
       ? actionPlaying['leftHandPoseId']
       : 'relaxed',
@@ -335,7 +335,7 @@ export function normalizeStoryboard3DCharacterState(actionPlaying = {}) {
   return {
     bodyPresetId: bodyPresetId,
     actionId: actionId,
-    actionTime: Math['max'](0x0, Number(actionPlaying['actionTime']) || 0x0),
+    actionTime: Math['max'](0, Number(actionPlaying['actionTime']) || 0),
     actionPlaying: actionPlaying['actionPlaying'] === !![],
     leftHandPoseId: leftHandPoseId,
     rightHandPoseId: rightHandPoseId,
@@ -354,7 +354,7 @@ export function resolveStoryboard3DCharacterPose(options3 = {}) {
       body: {
         ...structuredClone(value7),
         ...(Number['isFinite'](options3['heightCm'])
-          ? { height: Math['max'](0x37, Math['min'](0xe6, options3['heightCm'])) / 0x64 }
+          ? { height: Math['max'](55, Math['min'](230, options3['heightCm'])) / 100 }
           : {}),
       },
       action: structuredClone(value8),
@@ -397,14 +397,14 @@ export function applyStoryboard3DCharacterPoseToModel(
     if (!x3) continue;
     if (typeof enabled['quaternion']['multiply'] === 'function')
       enabled['quaternion']['multiply']({
-        x: x3[0x0],
-        y: x3[0x1],
-        z: x3[0x2],
-        w: x3[0x3],
+        x: x3[0],
+        y: x3[1],
+        z: x3[2],
+        w: x3[3],
       });
     else
       typeof enabled['quaternion']['set'] === 'function' &&
-        enabled['quaternion']['set'](x3[0x0], x3[0x1], x3[0x2], x3[0x3]);
+        enabled['quaternion']['set'](x3[0], x3[1], x3[2], x3[3]);
   }
   return (value14?.['updateMatrixWorld']?.(!![]), value14);
 }
@@ -415,8 +415,8 @@ export function setStoryboard3DCharacterActionPlayback(value17, actionPlaying2) 
 export function seekStoryboard3DCharacterAction(value18, value19) {
   const args5 = normalizeStoryboard3DCharacterState(value18),
     actionTime = ACTION_BY_ID['get'](args5['actionId']),
-    value20 = Math['max'](0.001, Number(actionTime['duration']) || 0x1),
-    value21 = Math['max'](0x0, Number(value19) || 0x0);
+    value20 = Math['max'](0.001, Number(actionTime['duration']) || 1),
+    value21 = Math['max'](0, Number(value19) || 0);
   return {
     ...args5,
     actionTime: actionTime['loop'] ? value21 % value20 : Math['min'](value21, value20),
@@ -426,25 +426,25 @@ export function advanceStoryboard3DCharacterAction(value22, value23) {
   const args6 = normalizeStoryboard3DCharacterState(value22);
   if (!args6['actionPlaying']) return args6;
   const value24 = ACTION_BY_ID['get'](args6['actionId']),
-    actionTime2 = Math['max'](0.001, Number(value24['duration']) || 0x1),
-    actionTime3 = args6['actionTime'] + Math['max'](0x0, Number(value23) || 0x0);
+    actionTime2 = Math['max'](0.001, Number(value24['duration']) || 1),
+    actionTime3 = args6['actionTime'] + Math['max'](0, Number(value23) || 0);
   if (value24['loop']) return { ...args6, actionTime: actionTime3 % actionTime2 };
   if (actionTime3 >= actionTime2) return { ...args6, actionTime: actionTime2, actionPlaying: ![] };
   return { ...args6, actionTime: actionTime3 };
 }
 export function quaternionToStoryboard3DEuler(list4 = []) {
   const list5 = Array['isArray'](list4) ? list4['map'](Number) : [],
-    count2 = list5['length'] === 0x4 && list5['every'](Number['isFinite']) ? Math['hypot'](...list5) : 0x0,
-    value25 = count2 > 1e-8 ? list5['map']((value26) => value26 / count2) : [0x0, 0x0, 0x0, 0x1],
+    count2 = list5['length'] === 4 && list5['every'](Number['isFinite']) ? Math['hypot'](...list5) : 0,
+    value25 = count2 > 1e-8 ? list5['map']((value26) => value26 / count2) : [0, 0, 0, 1],
     [value27, value28, value29, value30] = value25,
-    value31 = 0x1 - 0x2 * (value28 * value28 + value29 * value29),
-    value32 = 0x2 * (value27 * value28 - value29 * value30),
-    value33 = 0x2 * (value27 * value29 + value28 * value30),
-    value34 = 0x1 - 0x2 * (value27 * value27 + value29 * value29),
-    value35 = 0x2 * (value28 * value29 - value27 * value30),
-    value36 = 0x2 * (value28 * value29 + value27 * value30),
-    value37 = 0x1 - 0x2 * (value27 * value27 + value28 * value28),
-    box6 = { x: 0x0, y: Math['asin'](clamp(value33, -0x1, 0x1)), z: 0x0 };
+    value31 = 1 - 2 * (value28 * value28 + value29 * value29),
+    value32 = 2 * (value27 * value28 - value29 * value30),
+    value33 = 2 * (value27 * value29 + value28 * value30),
+    value34 = 1 - 2 * (value27 * value27 + value29 * value29),
+    value35 = 2 * (value28 * value29 - value27 * value30),
+    value36 = 2 * (value28 * value29 + value27 * value30),
+    value37 = 1 - 2 * (value27 * value27 + value28 * value28),
+    box6 = { x: 0, y: Math['asin'](clamp(value33, -1, 1)), z: 0 };
   return (
     Math['abs'](value33) < 0.9999999
       ? ((box6['x'] = Math['atan2'](-value35, value37)), (box6['z'] = Math['atan2'](-value32, value31)))

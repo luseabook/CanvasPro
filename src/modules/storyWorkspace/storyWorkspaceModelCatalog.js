@@ -43,14 +43,14 @@ export function getStoryVideoInputTextModelOptions() {
 export function resolveStoryVideoInputTextModelId(source = '') {
   const next = String(source || '')['trim']();
   if (next && isStoryVideoInputTextModel(next)) return next;
-  return getStoryVideoInputTextModelOptions()[0x0]?.['modelId'] || '';
+  return getStoryVideoInputTextModelOptions()[0]?.['modelId'] || '';
 }
 export function resolveStoryWorkspaceModelId(current, entry = '') {
   const record = String(entry || '')['trim']();
   if (record && isStoryWorkspaceModelVisible(current, record)) return record;
   const payload = DEFAULT_MODEL_IDS[current];
   if (payload && isStoryWorkspaceModelVisible(current, payload)) return payload;
-  return getStoryWorkspaceModelOptions(current)[0x0]?.['modelId'] || '';
+  return getStoryWorkspaceModelOptions(current)[0]?.['modelId'] || '';
 }
 export function getStoryWorkspaceModelChoice(handle, state = '') {
   const storyWorkspaceModelId = resolveStoryWorkspaceModelId(handle, state);

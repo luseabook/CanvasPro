@@ -16,13 +16,13 @@ function isModelPackReady(key) {
     index =
       Boolean(key?.['reidModel']) ||
       list['some']((result) =>
-        /osnet|reid/iu['test']((result?.['id'] || '') + '\x20' + (result?.['filename'] || '')),
+        /osnet|reid/iu['test']((result?.['id'] || '') + ' ' + (result?.['filename'] || '')),
       ),
     data =
       Boolean(key?.['orientationModel']) ||
       list['some']((options) =>
         /pp.?lcnet|orientation|pedestrian.?attribute/iu['test'](
-          (options?.['id'] || '') + '\x20' + (options?.['filename'] || ''),
+          (options?.['id'] || '') + ' ' + (options?.['filename'] || ''),
         ),
       );
   return (
@@ -33,25 +33,25 @@ function isModelPackReady(key) {
   );
 }
 export function formatPersonReplacementModelBytes(target) {
-  const enabled = Math['max'](0x0, Number(target) || 0x0);
+  const enabled = Math['max'](0, Number(target) || 0);
   if (!enabled) return '';
-  if (enabled >= 0x400 * 0x400 * 0x400) return (enabled / (0x400 * 0x400 * 0x400))['toFixed'](0x1) + ' GB';
-  if (enabled >= 0x400 * 0x400)
-    return (enabled / (0x400 * 0x400))['toFixed'](enabled >= 0x64 * 0x400 * 0x400 ? 0x0 : 0x1) + ' MB';
-  return Math['max'](0x1, Math['round'](enabled / 0x400)) + '\x20KB';
+  if (enabled >= 1024 * 1024 * 1024) return (enabled / (1024 * 1024 * 1024))['toFixed'](1) + ' GB';
+  if (enabled >= 1024 * 1024)
+    return (enabled / (1024 * 1024))['toFixed'](enabled >= 100 * 1024 * 1024 ? 0 : 1) + ' MB';
+  return Math['max'](1, Math['round'](enabled / 1024)) + ' KB';
 }
-function normalizeProgress(options2 = {}, source = 0x0) {
-  const downloadedBytes = Math['max'](0x0, Number(options2['downloadedBytes']) || 0x0),
-    totalBytes = Math['max'](0x0, Number(options2['totalBytes']) || Number(source) || 0x0);
+function normalizeProgress(options2 = {}, source = 0) {
+  const downloadedBytes = Math['max'](0, Number(options2['downloadedBytes']) || 0),
+    totalBytes = Math['max'](0, Number(options2['totalBytes']) || Number(source) || 0);
   return {
     state: normalizeText(options2['state']),
     downloadedBytes: downloadedBytes,
     totalBytes: totalBytes,
     percent: Math['min'](
-      0x64,
+      100,
       Math['max'](
-        0x0,
-        Number(options2['percent']) || (totalBytes ? (downloadedBytes / totalBytes) * 0x64 : 0x0),
+        0,
+        Number(options2['percent']) || (totalBytes ? (downloadedBytes / totalBytes) * 100 : 0),
       ),
     ),
   };
@@ -63,7 +63,7 @@ function formatProgressMessage(next) {
 }
 export function renderPersonReplacementModelGate({
   state: state = 'checking',
-  downloadBytes: downloadBytes = 0x0,
+  downloadBytes: downloadBytes = 0,
   installProgress: installProgress = {},
   error: error = '',
 } = {}) {
@@ -82,9 +82,9 @@ export function renderPersonReplacementModelGate({
     escapeHtml(record) +
     '</h2>\n        <p id="personReplacementModelGateDescription">' +
     escapeHtml(payload) +
-    '</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</p>\n        ' +
     (current
-      ? '<div\x20class=\x22person-replacement-model-gate-progress\x22\x20role=\x22status\x22\x20aria-live=\x22polite\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><strong>' +
+      ? '<div class="person-replacement-model-gate-progress" role="status" aria-live="polite">\n              <div><strong>' +
         formatProgressMessage(progress['state']) +
         '</strong><span>' +
         Math['round'](progress['percent']) +
@@ -100,13 +100,13 @@ export function renderPersonReplacementModelGate({
             formatPersonReplacementModelBytes2 ||
             '计算中',
         ) +
-        '</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>'
+        '</small>\n            </div>'
       : '') +
     '\n        ' +
     (entry
-      ? '<div\x20class=\x22person-replacement-model-gate-checking\x22\x20role=\x22status\x22><span\x20aria-hidden=\x22true\x22></span><small>正在读取本地模型状态…</small></div>'
+      ? '<div class="person-replacement-model-gate-checking" role="status"><span aria-hidden="true"></span><small>正在读取本地模型状态…</small></div>'
       : '') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n        ' +
     (error
       ? '<div class="person-replacement-model-gate-error" role="alert">' + escapeHtml(error) + '</div>'
       : '') +
@@ -115,12 +115,12 @@ export function renderPersonReplacementModelGate({
     '>取消</button>\n        ' +
     (entry
       ? ''
-      : '<button\x20type=\x22button\x22\x20class=\x22person-replacement-model-gate-primary\x22\x20data-person-replacement-model-gate-action=\x22install\x22\x20' +
+      : '<button type="button" class="person-replacement-model-gate-primary" data-person-replacement-model-gate-action="install" ' +
         (current ? 'disabled' : '') +
         '>' +
         (current ? '正在下载…' : error ? '重新下载' : '下载模型并进入') +
         '</button>') +
-    '\x0a\x20\x20\x20\x20\x20\x20</footer>\x0a\x20\x20\x20\x20</section>\x0a\x20\x20</div>'
+    '\n      </footer>\n    </section>\n  </div>'
   );
 }
 export class ReplacementStudioModelGate {
@@ -131,7 +131,7 @@ export class ReplacementStudioModelGate {
     onNotify: onNotify = () => {},
     setTimeoutFn: setTimeoutFn = globalThis['setTimeout'],
     clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout'],
-    pollIntervalMs: pollIntervalMs = 0x15e,
+    pollIntervalMs: pollIntervalMs = 350,
   } = {}) {
     ((this['document'] = documentObject),
       (this['modelPackApi'] = modelPackApi),
@@ -139,11 +139,11 @@ export class ReplacementStudioModelGate {
       (this['onNotify'] = onNotify),
       (this['setTimeoutFn'] = setTimeoutFn),
       (this['clearTimeoutFn'] = clearTimeoutFn),
-      (this['pollIntervalMs'] = Math['max'](0x64, Number(pollIntervalMs) || 0x15e)),
+      (this['pollIntervalMs'] = Math['max'](100, Number(pollIntervalMs) || 350)),
       (this['status'] = {
         state: 'idle',
         installed: ![],
-        downloadBytes: 0x0,
+        downloadBytes: 0,
         installProgress: {},
         error: '',
       }),
@@ -153,7 +153,7 @@ export class ReplacementStudioModelGate {
       (this['root'] = null),
       (this['checkPromise'] = null),
       (this['installPromise'] = null),
-      (this['pollTimer'] = 0x0),
+      (this['pollTimer'] = 0),
       (this['pollInFlight'] = ![]),
       (this['returnFocusElement'] = null),
       (this['_handleClick'] = this['_handleClick']['bind'](this)),
@@ -236,9 +236,9 @@ export class ReplacementStudioModelGate {
       error: '',
       installProgress: {
         state: 'downloading',
-        downloadedBytes: 0x0,
+        downloadedBytes: 0,
         totalBytes: this['status']['downloadBytes'],
-        percent: 0x0,
+        percent: 0,
         message: '正在连接模型下载源',
       },
     }),
@@ -322,13 +322,13 @@ export class ReplacementStudioModelGate {
               this['status']['state'] === 'installing' &&
               (this['pollTimer'] =
                 this['setTimeoutFn']?.(() => {
-                  ((this['pollTimer'] = 0x0), this['_pollProgress']());
-                }, this['pollIntervalMs']) || 0x0));
+                  ((this['pollTimer'] = 0), this['_pollProgress']());
+                }, this['pollIntervalMs']) || 0));
         }));
   }
   ['_stopPolling']() {
     if (this['pollTimer']) this['clearTimeoutFn']?.(this['pollTimer']);
-    this['pollTimer'] = 0x0;
+    this['pollTimer'] = 0;
   }
   ['_ensureRoot']() {
     if (this['root'] || !this['document']?.['body']?.['appendChild']) return this['root'];
@@ -365,11 +365,11 @@ export class ReplacementStudioModelGate {
       return;
     }
     const count = list2['indexOf'](this['document']?.['activeElement']),
-      enabled2 = event2['shiftKey'] && count <= 0x0,
-      enabled3 = !event2['shiftKey'] && (count === -0x1 || count === list2['length'] - 0x1);
+      enabled2 = event2['shiftKey'] && count <= 0,
+      enabled3 = !event2['shiftKey'] && (count === -1 || count === list2['length'] - 1);
     if (!enabled2 && !enabled3) return;
     event2['preventDefault']?.();
-    const el3 = enabled2 ? list2['at'](-0x1) : list2[0x0];
+    const el3 = enabled2 ? list2['at'](-1) : list2[0];
     el3?.['focus']?.({ preventScroll: !![] });
   }
   ['_getFocusableElements']() {
@@ -388,7 +388,7 @@ export class ReplacementStudioModelGate {
   ['_focusDialog'](value4 = '') {
     const value5 = value4
         ? this['root']?.['querySelector']?.(
-            '[data-person-replacement-model-gate-action=\x22' + value4 + '"]:not([disabled])',
+            '[data-person-replacement-model-gate-action="' + value4 + '"]:not([disabled])',
           )
         : null,
       el6 =
@@ -396,7 +396,7 @@ export class ReplacementStudioModelGate {
         this['_getFocusableElements']()['find'](
           (el7) => el7['dataset']?.['personReplacementModelGateAction'] === 'install',
         ) ||
-        this['_getFocusableElements']()[0x0] ||
+        this['_getFocusableElements']()[0] ||
         this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
     try {
       el6?.['focus']?.({ preventScroll: !![] });
@@ -408,7 +408,7 @@ export class ReplacementStudioModelGate {
     const value6 =
         this['returnFocusElement']?.['isConnected'] !== ![] &&
         (typeof this['returnFocusElement']?.['getClientRects'] !== 'function' ||
-          this['returnFocusElement']['getClientRects']()['length'] > 0x0)
+          this['returnFocusElement']['getClientRects']()['length'] > 0)
           ? this['returnFocusElement']
           : null,
       value7 = this['document']?.['querySelector']?.('.workspace-mode-current'),

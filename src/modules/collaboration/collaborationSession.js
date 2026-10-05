@@ -81,12 +81,12 @@ export function createCollaborationSession({
   const map = new Set();
   let pending = ![],
     enabled4 = ![],
-    key = -0x1,
+    key = -1,
     value2 = null,
     setTimeout3 = null,
     setTimeout4 = null,
-    index = 0x0,
-    result = 0x0,
+    index = 0,
+    result = 0,
     data = '',
     options = Promise['resolve']();
   const map2 = new WeakSet();
@@ -101,7 +101,7 @@ export function createCollaborationSession({
     map3 = new Set(),
     conflicts = createCollaborationConflicts(),
     handler3 = () =>
-      map3['size'] > 0x0 ||
+      map3['size'] > 0 ||
       [...executing]['some'](([source, enabled6]) => {
         const next = store['getStateRaw']()['nodes'][source];
         return !enabled6['released'] || next?.['isGenerating'] || next?.['isLoading'];
@@ -115,8 +115,8 @@ export function createCollaborationSession({
       if (!enabled2)
         onChange({
           ...revision,
-          pending: pending || enabled3 || !!packet || map3['size'] > 0x0,
-          executing: executing['size'] > 0x0 || map3['size'] > 0x0,
+          pending: pending || enabled3 || !!packet || map3['size'] > 0,
+          executing: executing['size'] > 0 || map3['size'] > 0,
         });
     },
     rpc = (args) => api['rpc']({ ...args, roomId: room['roomId'], clientId: clientId }, signal['signal']),
@@ -139,7 +139,7 @@ export function createCollaborationSession({
             setTimeout4 = setTimeout(() => {
               setTimeout4 = null;
               if (current2()) run2();
-            }, 0x64);
+            }, 100);
         }
       },
       onPreview(state, config, scope) {
@@ -159,7 +159,7 @@ export function createCollaborationSession({
     }),
     current2 = () => !enabled2 && getCanvasId() === value,
     handler5 = () =>
-      map['size'] > 0x0 ||
+      map['size'] > 0 ||
       media['states'](store['getStateRaw']())['some']((value4) => hosting || value4['owned']),
     handler6 = () => {
       if (!current2()) throw new DOMException('Aborted', 'AbortError');
@@ -183,7 +183,7 @@ export function createCollaborationSession({
         );
       return (
         (value8 &&
-          value8['expiresAt'] * 0x3e8 > Date['now']() &&
+          value8['expiresAt'] * 1000 > Date['now']() &&
           (value8['clientId'] !== clientId || value8['actorId'] !== actorId)) ||
         (value9 && (value9['client'] !== clientId || value9['actor'] !== actorId))
       );
@@ -249,7 +249,7 @@ export function createCollaborationSession({
     if (!setTimeout3)
       setTimeout3 = setTimeout(() => {
         void run5();
-      }, 0x64);
+      }, 100);
   }
   const value12 =
       typeof api['presence'] === 'function'
@@ -287,7 +287,7 @@ export function createCollaborationSession({
                 presence3['attention']?.['id'] &&
                 presence3['attention']['id'] !== target &&
                 presence3['attention']['actorId'] !== actorId &&
-                presence3['attention']['expiresAt'] * 0x3e8 > Date['now']()
+                presence3['attention']['expiresAt'] * 1000 > Date['now']()
               ) {
                 target = presence3['attention']['id'];
                 const hostAttention = readHostAttention();
@@ -451,7 +451,7 @@ export function createCollaborationSession({
         (await run8(graphChanges4, graphChanges(graphChanges3, graphChanges4)),
           (base = value43),
           (packet = value42['packet'] || null),
-          (enabled3 = list7['length'] > 0x0),
+          (enabled3 = list7['length'] > 0),
           conflicts['hold'](value42['conflicts'] || []),
           (value2 = null));
       }
@@ -470,7 +470,7 @@ export function createCollaborationSession({
           });
         } catch (value45) {
           if (!['EDIT_CONFLICT', 'NODE_BUSY', 'TASK_BUSY']['includes'](value45['code'])) throw value45;
-          const dom = await rpc({ action: 'sync', revision: -0x1 }),
+          const dom = await rpc({ action: 'sync', revision: -1 }),
             changes2 =
               operationId['historyMode'] || !dom['document']
                 ? { blocked: operationId['changes'], safe: [] }
@@ -494,7 +494,7 @@ export function createCollaborationSession({
         handler6();
         if (value44) {
           const list8 = value44['changes'] || operationId['changes'];
-          if (!list8['length'] && operationId['changes']['length']) revision['revision'] = -0x1;
+          if (!list8['length'] && operationId['changes']['length']) revision['revision'] = -1;
           const graphChanges5 = applyGraphChanges(before2, list8);
           if (operationId['historyMode']) {
             await run8(graphChanges5, list8);
@@ -522,8 +522,8 @@ export function createCollaborationSession({
               })),
             );
             const list10 = list8['filter']((value50) => !handler7(value50));
-            list10['length'] && (undoCount['push'](list10), (redoCount['length'] = 0x0));
-            if (undoCount['length'] > 0x32) undoCount['shift']();
+            list10['length'] && (undoCount['push'](list10), (redoCount['length'] = 0));
+            if (undoCount['length'] > 50) undoCount['shift']();
           }
           ((before2 = graphChanges5), (packet = null));
         }
@@ -613,7 +613,7 @@ export function createCollaborationSession({
       async () => {
         (await run7(), run11());
       },
-      revision['status'] === 'offline' ? 0xbb8 : value16 ? 0x2710 : 0x1f4,
+      revision['status'] === 'offline' ? 3000 : value16 ? 10000 : 500,
     );
   }
   function destroy() {
@@ -642,13 +642,13 @@ export function createCollaborationSession({
     if (!current2()) return ![];
     if (
       name === 'updateNodeData' &&
-      args7[0x2]?.['replace'] !== !![] &&
-      args7[0x1] &&
-      Object['keys'](sharedValue(args7[0x1]))['length'] === 0x0
+      args7[2]?.['replace'] !== !![] &&
+      args7[1] &&
+      Object['keys'](sharedValue(args7[1]))['length'] === 0
     )
       return !![];
     if (packet?.['historyMode']) return ![];
-    const enabled12 = name === 'updateNodeData' && executing['has'](args7[0x0]);
+    const enabled12 = name === 'updateNodeData' && executing['has'](args7[0]);
     if (revision['status'] !== 'online' && !enabled12) return ![];
     if (revision['role'] === 'viewer') return ![];
     if (conflicts['blocks'](nodeIds2, store['getStateRaw']())) return ![];
@@ -662,7 +662,7 @@ export function createCollaborationSession({
       return (
         (!enabled13 ||
           (enabled13['clientId'] === clientId && enabled13['actorId'] === actorId) ||
-          enabled13['expiresAt'] * 0x3e8 <= Date['now']()) &&
+          enabled13['expiresAt'] * 1000 <= Date['now']()) &&
         (!enabled14 || (enabled14['client'] === clientId && enabled14['actor'] === actorId))
       );
     });
@@ -671,7 +671,7 @@ export function createCollaborationSession({
     await run7();
     if (revision['status'] !== 'online' || enabled3 || packet || executing['size'] || map3['size']) return;
     const value56 = historyMode === 'undo' ? undoCount : redoCount,
-      original = media['resolveWire'](value56['at'](-0x1));
+      original = media['resolveWire'](value56['at'](-1));
     if (!original) return;
     const changes3 = historyMode === 'undo' ? invertChanges(original) : original;
     try {
@@ -704,7 +704,7 @@ export function createCollaborationSession({
         const value58 = await journal['read']();
         ((enabled5 = !![]), media['restore'](value58?.['media']));
         if (
-          value58?.['schema'] === 0x1 &&
+          value58?.['schema'] === 1 &&
           value58['base']?.['nodes'] &&
           value58['draft']?.['nodes'] &&
           (value58['packet'] ||
@@ -729,10 +729,10 @@ export function createCollaborationSession({
             if (!run4(value60)) return ![];
             const { name: name2, args: args8 } = value60,
               value61 =
-                name2 === 'updateNodeData' && !args8[0x2]?.['replace']
-                  ? { [args8[0x0]]: args8[0x1] }
+                name2 === 'updateNodeData' && !args8[2]?.['replace']
+                  ? { [args8[0]]: args8[1] }
                   : name2 === 'updateNodesData'
-                    ? args8[0x0]
+                    ? args8[0]
                     : null;
             if (
               value61 &&
@@ -740,7 +740,7 @@ export function createCollaborationSession({
                 ([value62, value63]) =>
                   value63 &&
                   !store['getStateRaw']()['nodes'][value62]?.['_collaborationPendingMedia']?.['some'](
-                    (value64) => Object['hasOwn'](value63, value64['path'][0x0]),
+                    (value64) => Object['hasOwn'](value63, value64['path'][0]),
                   ) &&
                   Object['entries'](sharedValue(value63))['every'](
                     ([value65, value66]) =>
@@ -786,7 +786,7 @@ export function createCollaborationSession({
             redo: () => {
               void run12('redo');
             },
-            getHistoryInfo: () => ({ undoCount: undoCount['length'] + 0x1, redoCount: redoCount['length'] }),
+            getHistoryInfo: () => ({ undoCount: undoCount['length'] + 1, redoCount: redoCount['length'] }),
           },
         })));
       const value70 = {
@@ -803,7 +803,7 @@ export function createCollaborationSession({
               ((enabled3 = !![]), await run3(), handler6());
               if (enabled3 || packet || revision['status'] !== 'online') throw new Error('请先完成画布同步');
               const map6 = new Set([nodeId2]);
-              for (let value73 = -0x1; value73 !== map6['size'];) {
+              for (let value73 = -1; value73 !== map6['size'];) {
                 value73 = map6['size'];
                 for (const value74 of Object['values'](store['getStateRaw']()['edges']))
                   if (map6['has'](value74['targetId'])) map6['add'](value74['sourceId']);
@@ -839,7 +839,7 @@ export function createCollaborationSession({
             } catch (response5) {
               value72 &&
                 current2() &&
-                !(response5['status'] >= 0x190 && response5['status'] < 0x1f4) &&
+                !(response5['status'] >= 400 && response5['status'] < 500) &&
                 (executing['set'](nodeId2, { taskId: taskId2, released: !![], uncertain: !![] }),
                 (enabled3 = !![]),
                 run6(response5));
@@ -906,7 +906,7 @@ export function createCollaborationSession({
     async flush() {
       (await value12?.['flush'](), await run3());
     },
-    async prepareDetach({ signal: signal2, timeoutMs: timeoutMs = 0x2710 } = {}) {
+    async prepareDetach({ signal: signal2, timeoutMs: timeoutMs = 10000 } = {}) {
       const run13 = () => new DOMException('Aborted', 'AbortError');
       if (signal2?.['aborted']) throw run13();
       if (handler3()) throw new Error('请等待当前生成任务结束后退出协作');

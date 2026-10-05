@@ -109,7 +109,7 @@ export class DebugNode {
         (event6.stopPropagation(), event6.preventDefault());
         const result = event6.clientX,
           data = event6.clientY,
-          options = this._data.width || 0x12c,
+          options = this._data.width || 300,
           target = this._data.height || 200,
           source = (event7) => {
             const { viewport: viewport } = appStore.getState(),

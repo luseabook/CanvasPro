@@ -2,7 +2,7 @@ import {
   attachMediaElementPlaybackSource,
   clearDesktopMediaPlaybackSourceMetadata,
 } from './desktopMediaBlobSource.js';
-const DEFAULT_AUDIO_METADATA_TIMEOUT_MS = 0x1770;
+const DEFAULT_AUDIO_METADATA_TIMEOUT_MS = 6000;
 export function normalizeAudioDurationSec(value) {
   const count = Number(value);
   return Number.isFinite(count) && count > 0 ? count : 0;

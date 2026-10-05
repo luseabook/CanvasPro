@@ -24,9 +24,9 @@ export function openShortcutManager({
   if (!canManageCanvasShortcuts()) return null;
   const value = catalogStore['getState'](),
     args = structuredClone(value['catalog']);
-  let item = args['items'][0x0]?.['id'] || '';
+  let item = args['items'][0]?.['id'] || '';
   if (initialGraph) {
-    if (args['items']['length'] >= 0x40) throw new Error('快捷方式最多 64 项');
+    if (args['items']['length'] >= 64) throw new Error('快捷方式最多 64 项');
     const draftItem = createDraftItem(initialGraph);
     (args['items']['push'](draftItem), (item = draftItem['id']));
   }
@@ -42,7 +42,7 @@ export function openShortcutManager({
     key = root['querySelector']('.canvas-shortcuts-list'),
     index = root['querySelector']('.canvas-shortcuts-editor'),
     el2 = root['querySelector']('.canvas-shortcuts-status');
-  el2['tabIndex'] = -0x1;
+  el2['tabIndex'] = -1;
   const run = () => args['items']['find']((result) => result['id'] === item),
     handler2 = (data) => {
       el2['textContent'] = data;
@@ -111,9 +111,9 @@ export function openShortcutManager({
           error2['action']['kind'] === 'graph' ? 'graph' : error2['action']['nodeType']),
         (el['elements']['coverFile']['value'] = ''));
       const count = args['items']['indexOf'](error2);
-      ((root['querySelector']('[data-action="up"]')['disabled'] = count === 0x0),
-        (root['querySelector']('[data-action="down"]')['disabled'] = count === args['items']['length'] - 0x1),
-        (index['scrollTop'] = 0x0),
+      ((root['querySelector']('[data-action="up"]')['disabled'] = count === 0),
+        (root['querySelector']('[data-action="down"]')['disabled'] = count === args['items']['length'] - 1),
+        (index['scrollTop'] = 0),
         handler3());
     },
     handler6 = () => {
@@ -140,11 +140,11 @@ export function openShortcutManager({
       handler4();
       if (event3['target']['name'] !== 'coverFile' || enabled2) return;
       const enabled6 = run(),
-        enabled7 = event3['target']['files']?.[0x0];
+        enabled7 = event3['target']['files']?.[0];
       if (!enabled7 || !enabled6) return;
       try {
-        if (!/^image\/(png|jpeg|webp)$/['test'](enabled7['type']) || enabled7['size'] > 0x400 * 0x400)
-          throw new Error('请选择不超过\x201\x20MB\x20的\x20PNG、JPEG\x20或\x20WebP\x20图片');
+        if (!/^image\/(png|jpeg|webp)$/['test'](enabled7['type']) || enabled7['size'] > 1024 * 1024)
+          throw new Error('请选择不超过 1 MB 的 PNG、JPEG 或 WebP 图片');
         const source = await new Promise((handler7, handler8) => {
           const fileReader = new FileReader();
           ((fileReader['onload'] = () => handler7(fileReader['result'])),
@@ -178,12 +178,12 @@ export function openShortcutManager({
           return;
         }
         if (enabled8 === 'add') {
-          if (args['items']['length'] >= 0x40) throw new Error('快捷方式最多\x2064\x20项');
+          if (args['items']['length'] >= 64) throw new Error('快捷方式最多 64 项');
           const draftItem2 = createDraftItem();
           (args['items']['push'](draftItem2), (item = draftItem2['id']));
         } else {
           if (enabled8 === 'defaults')
-            ((args['items'] = createDefaultShortcutCatalog()['items']), (item = args['items'][0x0]['id']));
+            ((args['items'] = createDefaultShortcutCatalog()['items']), (item = args['items'][0]['id']));
           else {
             if (enabled8 === 'capture' && run())
               run()['action'] = { kind: 'graph', graph: captureShortcutGraph(canvasStore) };
@@ -192,13 +192,13 @@ export function openShortcutManager({
               else {
                 if (enabled8 === 'remove') {
                   const count2 = args['items']['findIndex']((next) => next['id'] === item);
-                  if (count2 >= 0x0) args['items']['splice'](count2, 0x1);
-                  item = args['items'][Math['min'](count2, args['items']['length'] - 0x1)]?.['id'] || '';
+                  if (count2 >= 0) args['items']['splice'](count2, 1);
+                  item = args['items'][Math['min'](count2, args['items']['length'] - 1)]?.['id'] || '';
                 } else {
                   if (['up', 'down']['includes'](enabled8)) {
                     const count3 = args['items']['findIndex']((current) => current['id'] === item),
-                      count4 = count3 + (enabled8 === 'up' ? -0x1 : 0x1);
-                    if (count3 >= 0x0 && count4 >= 0x0 && count4 < args['items']['length'])
+                      count4 = count3 + (enabled8 === 'up' ? -1 : 1);
+                    if (count3 >= 0 && count4 >= 0 && count4 < args['items']['length'])
                       [args['items'][count3], args['items'][count4]] = [
                         args['items'][count4],
                         args['items'][count3],

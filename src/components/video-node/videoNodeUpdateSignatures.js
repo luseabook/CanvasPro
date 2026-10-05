@@ -103,7 +103,7 @@ export function buildVideoNodePromptUiSig(options2 = {}) {
 }
 export function buildVideoNodePromptBoxSizeSig(options3 = {}) {
   const source = options3 && typeof options3 === 'object' ? options3 : {};
-  return String(Number(source['promptBoxHeight'] || 0x0) || 0x0);
+  return String(Number(source['promptBoxHeight'] || 0) || 0);
 }
 export function buildVideoNodeVideoViewSig(options4 = {}) {
   const isGenerating = options4 && typeof options4 === 'object' ? options4 : {},
@@ -136,7 +136,7 @@ export function buildVideoNodeVideoViewSig(options4 = {}) {
     thumbLocalPath: String(isGenerating['thumbLocalPath'] || ''),
     posterUrl: String(isGenerating['posterUrl'] || ''),
     posterLocalPath: String(isGenerating['posterLocalPath'] || ''),
-    mainVideoIndex: Number(isGenerating['mainVideoIndex'] || 0x0),
+    mainVideoIndex: Number(isGenerating['mainVideoIndex'] || 0),
     isVideosExpanded: !!isGenerating['isVideosExpanded'],
     isGenerating: isGenerating['isGenerating'] === !![],
     jobStatus: String(isGenerating['jobStatus'] || ''),
@@ -148,15 +148,15 @@ export function buildVideoNodeVideoViewSig(options4 = {}) {
     rhStatusCode: String(isGenerating['rhStatusCode'] || ''),
     rhTaskId: String(isGenerating['rhTaskId'] || ''),
     rhTaskStatus: String(isGenerating['rhTaskStatus'] || ''),
-    rhTaskStartedAt: Number(isGenerating['rhTaskStartedAt'] || 0x0),
+    rhTaskStartedAt: Number(isGenerating['rhTaskStartedAt'] || 0),
     rhTaskRecovering: !!isGenerating['rhTaskRecovering'],
     rhTaskUseOpenapiQuery: !!isGenerating['rhTaskUseOpenapiQuery'],
     dreaminaSubmitId: String(isGenerating['dreaminaSubmitId'] || ''),
     dreaminaTaskStatus: String(isGenerating['dreaminaTaskStatus'] || ''),
     dreaminaTaskPhase: String(isGenerating['dreaminaTaskPhase'] || ''),
     dreaminaTaskLabel: String(isGenerating['dreaminaTaskLabel'] || ''),
-    dreaminaTaskStartedAt: Number(isGenerating['dreaminaTaskStartedAt'] || 0x0),
-    dreaminaTaskLastCheckedAt: Number(isGenerating['dreaminaTaskLastCheckedAt'] || 0x0),
+    dreaminaTaskStartedAt: Number(isGenerating['dreaminaTaskStartedAt'] || 0),
+    dreaminaTaskLastCheckedAt: Number(isGenerating['dreaminaTaskLastCheckedAt'] || 0),
     dreaminaTaskRecovering: !!isGenerating['dreaminaTaskRecovering'],
     asyncTaskId: String(isGenerating['asyncTaskId'] || ''),
     asyncTaskStatus: String(isGenerating['asyncTaskStatus'] || ''),
@@ -168,12 +168,12 @@ export function buildVideoNodeFooterControlSig(options5 = {}, next = '') {
   return [
     next,
     buildVideoNodePrimitiveDataSig(options5, { ignoredKeys: VIDEO_NODE_FOOTER_CONTROL_SIG_IGNORED_KEYS }),
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 export function buildVideoNodeSubmitButtonSig(options6 = {}, current = '', entry = {}) {
   return [
     current,
     entry['rhCancelInFlight'] === !![] ? 'cancel:1' : 'cancel:0',
     buildVideoNodePrimitiveDataSig(options6),
-  ]['join']('\x0a');
+  ]['join']('\n');
 }

@@ -63,7 +63,7 @@ import {
 import { resolveEffectiveInputKind } from '../../modules/modelInputPolicy.js';
 import { appendApimartPrivateAvatarProviderAssetRefs } from '../../modules/apimartPrivateAvatarAssets.js';
 import { t } from '../../i18n/index.js';
-const DREAMINA_UPLOAD_DURATION_ERROR_TOAST_MS = 0x2328;
+const DREAMINA_UPLOAD_DURATION_ERROR_TOAST_MS = 9000;
 function videoTaskText(value, item = {}) {
   return t('videoTask.' + value, item);
 }
@@ -80,7 +80,7 @@ const APIMART_KLING_V3_OMNI_MODEL_ID = 'apimart/kling-v3-omni',
   HAPPYHORSE_VIDEO_INPUT_MAX_SECONDS = 15,
   WAN27_AUDIO_INPUT_MIN_SECONDS = 2,
   WAN27_AUDIO_INPUT_MAX_SECONDS = 30,
-  WAN27_AUDIO_INPUT_MAX_BYTES = 15 * 0x400 * 0x400,
+  WAN27_AUDIO_INPUT_MAX_BYTES = 15 * 1024 * 1024,
   WAN27_VIDEO_EXTEND_MAX_SECONDS = 10,
   WAN27_REFERENCE_VIDEO_MAX_SECONDS = 30,
   WAN27_EDIT_VIDEO_MIN_SECONDS = 2,
@@ -89,7 +89,7 @@ const APIMART_KLING_V3_OMNI_MODEL_ID = 'apimart/kling-v3-omni',
   KLING_V3_OMNI_EDIT_VIDEO_MAX_SECONDS = 10,
   KLING_O1_VIDEO_MIN_SECONDS = 3,
   KLING_O1_VIDEO_MAX_SECONDS = 10,
-  DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 0x3e8,
+  DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 1000,
   DREAMINA_NON_RECOVERABLE_STATUSES = new Set([
     'cancelled',
     'canceled',
@@ -952,9 +952,9 @@ export function createVideoNodeTaskOrchestrationModule(value69) {
       ensureVipSessionRecheck: ensureVipSessionRecheck,
     } = value69,
     value70 = 'DREAMINA_POLL_TIMEOUT',
-    maxWaitMs = 20 * 60 * 0x3e8,
-    intervalMs = 20 * 0x3e8,
-    maxWaitMs2 = 24 * 60 * 60 * 0x3e8,
+    maxWaitMs = 20 * 60 * 1000,
+    intervalMs = 20 * 1000,
+    maxWaitMs2 = 24 * 60 * 60 * 1000,
     handler14 = () => (typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState());
   class value71 {
     ['_isDreaminaPollTimeoutError'](error2) {
@@ -2084,12 +2084,12 @@ export function createVideoNodeTaskOrchestrationModule(value69) {
                 ? remoteError.message || videoTaskText('cancel.failed')
                 : count18 === 0
                   ? videoTaskText('cancel.success')
-                  : count18 === 0x327
+                  : count18 === 807
                     ? videoTaskText('cancel.taskNotFound')
                     : remoteResult?.msg || videoTaskText('cancel.failed'));
           return {
             rhStatusMessage: rhStatusMessage2,
-            rhStatusCode: rhStatusCode ? 0x32d : Number.isFinite(count18) ? count18 : null,
+            rhStatusCode: rhStatusCode ? 813 : Number.isFinite(count18) ? count18 : null,
             videos: [],
             videoUrl: '',
             localPath: '',
@@ -2488,7 +2488,7 @@ export function createVideoNodeTaskOrchestrationModule(value69) {
                                 ? remoteError2.message || videoTaskText('cancel.failed')
                                 : count19 === 0
                                   ? videoTaskText('cancel.success')
-                                  : count19 === 0x327
+                                  : count19 === 807
                                     ? videoTaskText('cancel.taskNotFound')
                                     : remoteResult2?.msg || videoTaskText('cancel.failed');
                             return {

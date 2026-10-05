@@ -10,14 +10,14 @@ export function createCollaborationCommentNotifications({
 }) {
   return (id2) => {
     const enabled = getSession(),
-      error = id2['nodes']?.[0x0];
+      error = id2['nodes']?.[0];
     if (!enabled || !error) return;
     const value = id2['kind'] === 'resolve';
     if (value && !id2['mentions']?.['includes'](enabled['state']?.['actorId'])) return;
     const ariaLabel = value
-      ? id2['name'] + '\x20已解决你在「' + error['name'] + '」的评论：' + (id2['preview'] || '评论已解决')
-      : id2['name'] + '\x20评论了「' + error['name'] + '」：' + (id2['preview'] || '新评论');
-    notify(ariaLabel, 'ok', 0x1770, {
+      ? id2['name'] + ' 已解决你在「' + error['name'] + '」的评论：' + (id2['preview'] || '评论已解决')
+      : id2['name'] + ' 评论了「' + error['name'] + '」：' + (id2['preview'] || '新评论');
+    notify(ariaLabel, 'ok', 6000, {
       ariaLabel: ariaLabel + '，点击定位节点并查看评论',
       renderContent(el) {
         const el2 = reviewElement('span'),

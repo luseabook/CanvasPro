@@ -27,7 +27,7 @@ function pickAdaptiveSourceSize({
       edge: nodeId,
       includeNodeFrame: !![],
     });
-    if (!(size?.['width'] > 0x0 && size?.['height'] > 0x0)) continue;
+    if (!(size?.['width'] > 0 && size?.['height'] > 0)) continue;
     list2['push']({ edge: nodeId, kind: kind, size: size });
   }
   if (preferConfiguredSource) {
@@ -48,9 +48,9 @@ function pickAdaptiveSourceSize({
       generationDisplayRatioSourceConfig?.['inputIndex'] !== undefined
         ? generationDisplayRatioSourceConfig['inputIndex']
         : generationDisplayRatioSourceConfig?.['fallbackIndex'];
-    if (Number['isInteger'](count) && count >= 0x0 && count < list3['length'])
+    if (Number['isInteger'](count) && count >= 0 && count < list3['length'])
       return list3[count]?.['size'] || null;
-    if (list3[0x0]?.['size']) return list3[0x0]['size'];
+    if (list3[0]?.['size']) return list3[0]['size'];
   }
   return (
     list2['find']((options) => options['kind'] === 'image')?.['size'] ||
@@ -80,9 +80,9 @@ export function applyVideoNodeAdaptiveAspectRatio(
     modelManifest: modelManifest,
     provider: provider,
     model: model,
-    displayWidth: 0x0,
-    displayHeight: 0x0,
-    sourceWidth: sourceWidth?.['width'] || 0x0,
-    sourceHeight: sourceWidth?.['height'] || 0x0,
+    displayWidth: 0,
+    displayHeight: 0,
+    sourceWidth: sourceWidth?.['width'] || 0,
+    sourceHeight: sourceWidth?.['height'] || 0,
   });
 }

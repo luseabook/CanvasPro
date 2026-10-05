@@ -6,7 +6,7 @@ const RESIZE_BODY_CLASS = 'is-node-resizing',
   RESIZE_NODE_CLASS = 'is-resizing';
 function requestFrame(value) {
   if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(value);
-  return setTimeout(value, 0x0);
+  return setTimeout(value, 0);
 }
 function cancelFrame(enabled) {
   if (!enabled) return;
@@ -22,16 +22,16 @@ function toFiniteNumber(item, key) {
 }
 function normalizeSize(box, result, data) {
   return {
-    width: Math['max'](0x1, toFiniteNumber(box?.['width'], result)),
-    height: Math['max'](0x1, toFiniteNumber(box?.['height'], data)),
+    width: Math['max'](1, toFiniteNumber(box?.['width'], result)),
+    height: Math['max'](1, toFiniteNumber(box?.['height'], data)),
   };
 }
 function sizesEqual(box2, box3) {
   return (
-    Math['round'](toFiniteNumber(box2?.['width'], 0x0)) ===
-      Math['round'](toFiniteNumber(box3?.['width'], 0x0)) &&
-    Math['round'](toFiniteNumber(box2?.['height'], 0x0)) ===
-      Math['round'](toFiniteNumber(box3?.['height'], 0x0))
+    Math['round'](toFiniteNumber(box2?.['width'], 0)) ===
+      Math['round'](toFiniteNumber(box3?.['width'], 0)) &&
+    Math['round'](toFiniteNumber(box2?.['height'], 0)) ===
+      Math['round'](toFiniteNumber(box3?.['height'], 0))
   );
 }
 function applyPreviewSize(el, box4) {
@@ -59,8 +59,8 @@ function syncPreviewGeometry(nodeId, width, options, target) {
   );
 }
 function readViewportZoom(handler) {
-  const box5 = (typeof handler === 'function' && handler()) || { zoom: 0x1 };
-  return Math['max'](0.01, toFiniteNumber(box5['zoom'], 0x1));
+  const box5 = (typeof handler === 'function' && handler()) || { zoom: 1 };
+  return Math['max'](0.01, toFiniteNumber(box5['zoom'], 1));
 }
 export function startNodeResizePreview({
   store: store = appStore,
@@ -80,10 +80,10 @@ export function startNodeResizePreview({
   if (!event || !nodeId2 || typeof resolveSize !== 'function') return ![];
   (event['preventDefault']?.(), event['stopPropagation']?.());
   const startNode = (typeof getNode === 'function' && getNode()) || {},
-    toFiniteNumber2 = toFiniteNumber(event['clientX'], 0x0),
-    toFiniteNumber3 = toFiniteNumber(event['clientY'], 0x0),
-    width2 = Math['max'](0x1, toFiniteNumber(startNode['width'], 0x104)),
-    height = Math['max'](0x1, toFiniteNumber(startNode['height'], 0x104)),
+    toFiniteNumber2 = toFiniteNumber(event['clientX'], 0),
+    toFiniteNumber3 = toFiniteNumber(event['clientY'], 0),
+    width2 = Math['max'](1, toFiniteNumber(startNode['width'], 260)),
+    height = Math['max'](1, toFiniteNumber(startNode['height'], 260)),
     startSize = { width: width2, height: height },
     el2 = typeof document !== 'undefined' ? document['getElementById'](nodeId2) : null,
     el3 = typeof document !== 'undefined' ? document['body'] : null;
@@ -91,11 +91,11 @@ export function startNodeResizePreview({
     source = startSize,
     toFiniteNumber4 = toFiniteNumber2,
     toFiniteNumber5 = toFiniteNumber3,
-    requestFrame2 = 0x0,
+    requestFrame2 = 0,
     next = ![];
   const beginNodeEditInteraction2 = beginNodeEditInteraction(store, [nodeId2]),
     handler2 = () => {
-      requestFrame2 = 0x0;
+      requestFrame2 = 0;
       if (!enabled3 || !(beginNodeEditInteraction2['canPreview']?.() ?? beginNodeEditInteraction2['allowed']())) return;
       ((source = enabled3),
         (enabled3 = null),
@@ -110,7 +110,7 @@ export function startNodeResizePreview({
       requestFrame2 = requestFrame(handler2);
     },
     handler4 = () => {
-      (requestFrame2 && (cancelFrame(requestFrame2), (requestFrame2 = 0x0)),
+      (requestFrame2 && (cancelFrame(requestFrame2), (requestFrame2 = 0)),
         window['removeEventListener']('pointermove', run2),
         window['removeEventListener']('pointerup', run3),
         window['removeEventListener']('pointercancel', run3),
@@ -126,7 +126,7 @@ export function startNodeResizePreview({
           (typeof buildFinalPatch === 'function' &&
             buildFinalPatch({ startNode: startNode, startSize: startSize, finalSize: finalSize })) ||
           {},
-        entry = Object['keys'](args)['length'] > 0x0,
+        entry = Object['keys'](args)['length'] > 0,
         record = !sizesEqual(finalSize, startSize);
       let didApply = ![];
       (record || entry) &&

@@ -1,4 +1,4 @@
-export const WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP = 0x18;
+export const WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP = 24;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -32,7 +32,7 @@ export function applyWorkspaceAssetNativeDragPreview(
   if (typeof result?.['setDragImage'] !== 'function') return ![];
   const { element: element4 } = resolveWorkspaceAssetDragPreview(data);
   if (!element4) return ![];
-  const options = Math['max'](0x0, Number(pointerGap) || 0x0);
+  const options = Math['max'](0, Number(pointerGap) || 0);
   try {
     return (result['setDragImage'](element4, -options, -options), !![]);
   } catch {

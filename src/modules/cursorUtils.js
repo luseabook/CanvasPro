@@ -53,12 +53,12 @@ export function createRotateCursor(options2 = {}) {
     scope =
       '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M20.7 8.1A9 9 0 1 0 22 18.3" stroke="' +
       state +
-      '\x22\x20stroke-width=\x224.2\x22\x20stroke-linecap=\x22round\x22/><path\x20d=\x22M20.7\x208.1A9\x209\x200\x201\x200\x2022\x2018.3\x22\x20stroke=\x22' +
+      '" stroke-width="4.2" stroke-linecap="round"/><path d="M20.7 8.1A9 9 0 1 0 22 18.3" stroke="' +
       handle +
       '" stroke-width="2" stroke-linecap="round"/><path d="M16.5 7.9h4.6V3.3" stroke="' +
       state +
-      '\x22\x20stroke-width=\x224.2\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/><path\x20d=\x22M16.5\x207.9h4.6V3.3\x22\x20stroke=\x22' +
+      '" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16.5 7.9h4.6V3.3" stroke="' +
       handle +
-      '\x22\x20stroke-width=\x222\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22/></svg>';
-  return 'url(\x22data:image/svg+xml;charset=utf-8,' + encodeURIComponent(scope) + '") 14 14, ' + config;
+      '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return 'url("data:image/svg+xml;charset=utf-8,' + encodeURIComponent(scope) + '") 14 14, ' + config;
 }

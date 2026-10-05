@@ -1,6 +1,6 @@
 function requestFrame(callback) {
   if (typeof requestAnimationFrame === 'function') return requestAnimationFrame(callback);
-  return (callback(), 0x0);
+  return (callback(), 0);
 }
 function cancelFrame(handle) {
   if (!handle) return;
@@ -9,15 +9,15 @@ function cancelFrame(handle) {
 export function createPreviewCommitSession({ applyPreview: applyPreview } = {}) {
   let active = ![],
     updated = ![],
-    frameHandle = 0x0,
+    frameHandle = 0,
     pending = null,
     latest = null;
   const cancelPendingFrame = () => {
       if (!frameHandle) return;
-      (cancelFrame(frameHandle), (frameHandle = 0x0));
+      (cancelFrame(frameHandle), (frameHandle = 0));
     },
     flushPending = () => {
-      frameHandle = 0x0;
+      frameHandle = 0;
       if (pending == null) return;
       const value = pending;
       ((pending = null), (latest = value), applyPreview?.(value));

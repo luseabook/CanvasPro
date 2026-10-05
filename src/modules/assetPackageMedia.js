@@ -12,7 +12,7 @@ function firstText(...candidates) {
 }
 function normalizePositiveDimension(raw, fallback) {
   const numeric = Number(raw);
-  return Number['isFinite'](numeric) && numeric > 0x0 ? Math['max'](0x1, Math['round'](numeric)) : fallback;
+  return Number['isFinite'](numeric) && numeric > 0 ? Math['max'](1, Math['round'](numeric)) : fallback;
 }
 function buildImageNode({
   existingNode: existingNode = null,
@@ -48,7 +48,7 @@ function buildImageNode({
         existingNode?.['imageWidth'] ||
         existingNode?.['naturalWidth'] ||
         existingNode?.['width'],
-      0x200,
+      512,
     ),
     height = normalizePositiveDimension(
       source['originalHeight'] ||
@@ -60,12 +60,12 @@ function buildImageNode({
         existingNode?.['imageHeight'] ||
         existingNode?.['naturalHeight'] ||
         existingNode?.['height'],
-      0x120,
+      288,
     ),
     autoSize = getAutoMediaSizeByShortSide(width, height),
     nodeId = normalizeText(existingNode?.['id']) || createId('source-image'),
-    column = itemIndex % 0x4,
-    row = Math['floor'](itemIndex / 0x4);
+    column = itemIndex % 4,
+    row = Math['floor'](itemIndex / 4);
   return {
     ...(existingNode && typeof existingNode === 'object' ? existingNode : {}),
     ...source,
@@ -73,8 +73,8 @@ function buildImageNode({
     id: nodeId,
     type: 'source-image',
     name: itemName,
-    x: existingNode ? Number(existingNode['x']) || 0x0 : column * 0x228,
-    y: existingNode ? Number(existingNode['y']) || 0x0 : row * 0x148,
+    x: existingNode ? Number(existingNode['x']) || 0 : column * 552,
+    y: existingNode ? Number(existingNode['y']) || 0 : row * 328,
     width: autoSize['width'],
     height: autoSize['height'],
     fixedSize: existingNode?.['fixedSize'] === !![],
@@ -113,8 +113,8 @@ function buildAudioNode({
     );
   if (!primaryUrl && !localPath) throw new Error('加入素材包失败：音频缺少可用地址。');
   const nodeId = normalizeText(existingNode?.['id']) || createId('source-audio'),
-    column = itemIndex % 0x4,
-    row = Math['floor'](itemIndex / 0x4);
+    column = itemIndex % 4,
+    row = Math['floor'](itemIndex / 4);
   return {
     ...(existingNode && typeof existingNode === 'object' ? existingNode : {}),
     ...source,
@@ -122,10 +122,10 @@ function buildAudioNode({
     id: nodeId,
     type: 'source-audio',
     name: itemName,
-    x: existingNode ? Number(existingNode['x']) || 0x0 : column * 0x168,
-    y: existingNode ? Number(existingNode['y']) || 0x0 : row * 0xb4,
-    width: normalizePositiveDimension(existingNode?.['width'], 0x140),
-    height: normalizePositiveDimension(existingNode?.['height'], 0x8c),
+    x: existingNode ? Number(existingNode['x']) || 0 : column * 360,
+    y: existingNode ? Number(existingNode['y']) || 0 : row * 180,
+    width: normalizePositiveDimension(existingNode?.['width'], 320),
+    height: normalizePositiveDimension(existingNode?.['height'], 140),
     src: primaryUrl || localUrl,
     audioUrl: primaryUrl || localUrl,
     sourceUrl: firstText(source['sourceUrl'], source['originalUrl'], primaryUrl),
@@ -179,7 +179,7 @@ function upsertAssetPackage(
         normalizeText(item?.['packageItemKey'] || item?.['nodeData']?.['assetPackageItemKey']) ===
           normalizedItemKey || normalizeText(nodes[index]?.['assetPackageItemKey']) === normalizedItemKey,
     ),
-    targetIndex = existingIndex >= 0x0 ? existingIndex : items['length'],
+    targetIndex = existingIndex >= 0 ? existingIndex : items['length'],
     node = buildNode({
       existingNode: nodes[targetIndex] || items[targetIndex]?.['nodeData'] || null,
       itemKey: normalizedItemKey,
@@ -189,7 +189,7 @@ function upsertAssetPackage(
       createId: createId,
     }),
     item = buildAssetItem(node, normalizedItemKey, normalizedItemName);
-  existingIndex >= 0x0
+  existingIndex >= 0
     ? ((items[targetIndex] = item), (nodes[targetIndex] = node))
     : (items['push'](item), nodes['push'](node));
   const timestamp = Number(now) || Date['now'](),
@@ -205,8 +205,8 @@ function upsertAssetPackage(
           : {}),
         ...(metadata && typeof metadata === 'object' ? metadata : {}),
       },
-      coverUrl: firstText(items[0x0]?.['thumbSrc'], basePackage?.['coverUrl']),
-      coverType: items[0x0]?.['type'] || basePackage?.['coverType'] || '',
+      coverUrl: firstText(items[0]?.['thumbSrc'], basePackage?.['coverUrl']),
+      coverType: items[0]?.['type'] || basePackage?.['coverType'] || '',
       items: items,
       nodes: nodes,
       edges: Array['isArray'](basePackage?.['edges']) ? basePackage['edges'] : [],
@@ -218,7 +218,7 @@ function upsertAssetPackage(
     item: item,
     itemIndex: targetIndex,
     packageCreated: !basePackage,
-    itemCreated: existingIndex < 0x0,
+    itemCreated: existingIndex < 0,
   };
 }
 export function upsertImageAssetPackage(existingPackage, options = {}, dependencies = {}) {

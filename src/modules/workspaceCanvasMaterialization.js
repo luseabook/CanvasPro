@@ -19,7 +19,7 @@ function normalizeProjectBindingPolicies(result) {
         typeof data?.['getProjectId'] !== 'function' || typeof data?.['findProjectAnchor'] !== 'function',
     )
   )
-    throw new Error('workspace\x20canvas\x20materialization\x20binding\x20policies\x20are\x20incomplete');
+    throw new Error('workspace canvas materialization binding policies are incomplete');
   return list;
 }
 export function createWorkspaceCanvasMaterializationAdapter({
@@ -113,8 +113,8 @@ export function createWorkspaceCanvasMaterializationAdapter({
         value3 = handler2(error),
         box3 = handler3(value3) || box2,
         box4 = asObject(sequenceKey['position']),
-        x2 = Number(box3['x'] || 0x0) + (Number(box4['x']) || 0x0),
-        y2 = Number(box3['y'] || 0x0) + (Number(box4['y']) || 0x0),
+        x2 = Number(box3['x'] || 0) + (Number(box4['x']) || 0),
+        y2 = Number(box3['y'] || 0) + (Number(box4['y']) || 0),
         nodeSpawnPrefs = getNodeSpawnPrefs(),
         map = new Set(
           [normalizeText(args2['id']), normalizeText(sequenceKey['parentNodeId'])]['filter'](Boolean),
@@ -137,11 +137,11 @@ export function createWorkspaceCanvasMaterializationAdapter({
                 y2,
                 Number(box2['width']) || output,
                 Number(box2['height']) || value2,
-                Math['max'](0x0, Number(nodeSpawnPrefs['spacing']) || 0x0),
+                Math['max'](0, Number(nodeSpawnPrefs['spacing']) || 0),
                 value6,
               ),
-        value7 = x3['x'] - Number(box2['x'] || 0x0),
-        value8 = x3['y'] - Number(box2['y'] || 0x0);
+        value7 = x3['x'] - Number(box2['x'] || 0),
+        value8 = x3['y'] - Number(box2['y'] || 0);
       if (value7 || value8) moveNode(args2['id'], value7, value8);
       return handler(args2['id']) || { ...box2, x: x3['x'], y: x3['y'] };
     },
@@ -153,19 +153,19 @@ export function createWorkspaceCanvasMaterializationAdapter({
         height = Number(box5['height']),
         args4 = {
           ...withoutNodeType(value10),
-          ...(width > 0x0 ? { width: width } : {}),
-          ...(height > 0x0 ? { height: height } : {}),
+          ...(width > 0 ? { width: width } : {}),
+          ...(height > 0 ? { height: height } : {}),
         };
       updateNodeData(id2, args4);
       if (box5['position'] && value11) {
         const value12 = handler2(value10, value11),
           box6 = handler3(value12) || handler(id2),
           box7 = asObject(box5['position']),
-          value13 = Number(box6?.['x'] || 0x0) + (Number(box7['x']) || 0x0),
-          value14 = Number(box6?.['y'] || 0x0) + (Number(box7['y']) || 0x0),
+          value13 = Number(box6?.['x'] || 0) + (Number(box7['x']) || 0),
+          value14 = Number(box6?.['y'] || 0) + (Number(box7['y']) || 0),
           box8 = handler(id2) || value11,
-          value15 = value13 - Number(box8?.['x'] || 0x0),
-          value16 = value14 - Number(box8?.['y'] || 0x0);
+          value15 = value13 - Number(box8?.['x'] || 0),
+          value16 = value14 - Number(box8?.['y'] || 0);
         if (value15 || value16) moveNode(id2, value15, value16);
       }
       return handler(id2) || { id: id2, ...args4 };

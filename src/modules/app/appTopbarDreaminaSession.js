@@ -68,10 +68,10 @@ export function getDreaminaQrLoginButtonText(config) {
 }
 export function getDreaminaStatusSessionKey(input) {
   const output = input?.['runtime'] || {},
-    count = Number(output?.['startedAt'] || 0x0);
-  if (count > 0x0) return 'login:' + count;
-  const count2 = Number(output?.['qrVersion'] || 0x0);
-  if (count2 > 0x0) return 'qr:' + count2;
+    count = Number(output?.['startedAt'] || 0);
+  if (count > 0) return 'login:' + count;
+  const count2 = Number(output?.['qrVersion'] || 0);
+  if (count2 > 0) return 'qr:' + count2;
   return '';
 }
 export function mergeDreaminaLoginRuntimeStatus(error = {}, runtime = {}) {
@@ -87,12 +87,12 @@ export function mergeDreaminaLoginRuntimeStatus(error = {}, runtime = {}) {
 export function reconcileDreaminaSessionUiState(enabled6, enabled7 = {}) {
   const dreaminaStatusSessionKey = getDreaminaStatusSessionKey(enabled6),
     enabled8 = !!enabled6?.['runtime']?.['active'],
-    enabled9 = !!enabled7['manualGuideOpen'] && Number(enabled7['loginLaunchRequestedAt'] || 0x0) > 0x0;
+    enabled9 = !!enabled7['manualGuideOpen'] && Number(enabled7['loginLaunchRequestedAt'] || 0) > 0;
   if (dreaminaStatusSessionKey && dreaminaStatusSessionKey !== enabled7['currentSessionKey'])
     return (
       (enabled7['currentSessionKey'] = dreaminaStatusSessionKey),
       (enabled7['dismissedSessionKey'] = ''),
-      !enabled9 && ((enabled7['manualGuideOpen'] = ![]), (enabled7['loginLaunchRequestedAt'] = 0x0)),
+      !enabled9 && ((enabled7['manualGuideOpen'] = ![]), (enabled7['loginLaunchRequestedAt'] = 0)),
       !![]
     );
   if (!enabled8 && !dreaminaStatusSessionKey && !enabled9)
@@ -100,7 +100,7 @@ export function reconcileDreaminaSessionUiState(enabled6, enabled7 = {}) {
       (enabled7['currentSessionKey'] = ''),
       (enabled7['dismissedSessionKey'] = ''),
       (enabled7['manualGuideOpen'] = ![]),
-      (enabled7['loginLaunchRequestedAt'] = 0x0),
+      (enabled7['loginLaunchRequestedAt'] = 0),
       !![]
     );
   return ![];
@@ -124,13 +124,13 @@ export function createDreaminaLoginSessionController({
 } = {}) {
   const settingsCardEl = documentObject,
     value6 = windowObject,
-    value7 = 0x55 * 0x3e8,
+    value7 = 0x55 * 1000,
     enabled11 = {
       pollTimer: null,
       pollInFlight: ![],
-      pollInFlightGeneration: 0x0,
-      pollGeneration: 0x0,
-      statusRequestGeneration: 0x0,
+      pollInFlightGeneration: 0,
+      pollGeneration: 0,
+      statusRequestGeneration: 0,
       lastToastKey: '',
       lastStatus: null,
       modalCloseTimer: null,
@@ -138,13 +138,13 @@ export function createDreaminaLoginSessionController({
       dismissedSessionKey: '',
       qrImageLoadError: ![],
       lastQrImageUrl: '',
-      lastQrImageRequestedAt: 0x0,
-      lastQrImageLoadedAt: 0x0,
-      lastQrImageErrorAt: 0x0,
+      lastQrImageRequestedAt: 0,
+      lastQrImageLoadedAt: 0,
+      lastQrImageErrorAt: 0,
       lastQrImageErrorMessage: '',
       qrImageListenersBound: ![],
       manualGuideOpen: ![],
-      loginLaunchRequestedAt: 0x0,
+      loginLaunchRequestedAt: 0,
       observer: null,
     };
   function run() {
@@ -185,7 +185,7 @@ export function createDreaminaLoginSessionController({
   }
   function run3() {
     (enabled11['pollTimer'] && (clearTimeout(enabled11['pollTimer']), (enabled11['pollTimer'] = null)),
-      (enabled11['pollGeneration'] += 0x1));
+      (enabled11['pollGeneration'] += 1));
   }
   function run4() {
     const value8 = enabled11['pollGeneration'];
@@ -205,7 +205,7 @@ export function createDreaminaLoginSessionController({
         enabled11['pollInFlightGeneration'] === value8 && (enabled11['pollInFlight'] = ![]);
         if (value8 !== enabled11['pollGeneration']) return;
         enabled11['lastStatus']?.['runtime']?.['active'] &&
-          (enabled11['pollTimer'] = setTimeout(run5, 0x320));
+          (enabled11['pollTimer'] = setTimeout(run5, 800));
       }
     };
     void run5();
@@ -213,9 +213,9 @@ export function createDreaminaLoginSessionController({
   function run7() {
     ((enabled11['qrImageLoadError'] = ![]),
       (enabled11['lastQrImageUrl'] = ''),
-      (enabled11['lastQrImageRequestedAt'] = 0x0),
-      (enabled11['lastQrImageLoadedAt'] = 0x0),
-      (enabled11['lastQrImageErrorAt'] = 0x0),
+      (enabled11['lastQrImageRequestedAt'] = 0),
+      (enabled11['lastQrImageLoadedAt'] = 0),
+      (enabled11['lastQrImageErrorAt'] = 0),
       (enabled11['lastQrImageErrorMessage'] = ''));
   }
   function run8(value9, value10 = Date['now']()) {
@@ -225,7 +225,7 @@ export function createDreaminaLoginSessionController({
     return '' + list8 + value11 + 'cb=' + encodeURIComponent(String(value10));
   }
   function run9(value12, { withCacheBust: withCacheBust = ![] } = {}) {
-    const value13 = Number(value12?.['qrVersion'] || 0x0),
+    const value13 = Number(value12?.['qrVersion'] || 0),
       enabled13 = buildDreaminaQrImageUrl?.(value13 || Date['now']()) || '';
     if (!enabled13) return '';
     return withCacheBust ? run8(enabled13) : enabled13;
@@ -322,10 +322,10 @@ export function createDreaminaLoginSessionController({
     const list12 = [];
     list12['push'](list11);
     const value34 = list11['match'](/```(?:json)?\s*([\s\S]*?)```/i);
-    value34?.[0x1] && list12['push'](String(value34[0x1])['trim']());
+    value34?.[1] && list12['push'](String(value34[1])['trim']());
     const count3 = list11['indexOf']('{'),
       value35 = list11['lastIndexOf']('}');
-    count3 >= 0x0 && value35 > count3 && list12['push'](list11['slice'](count3, value35 + 0x1)['trim']());
+    count3 >= 0 && value35 > count3 && list12['push'](list11['slice'](count3, value35 + 1)['trim']());
     for (const enabled18 of list12) {
       if (!enabled18) continue;
       try {
@@ -373,7 +373,7 @@ export function createDreaminaLoginSessionController({
       return;
     }
     ((enabled11['lastQrImageLoadedAt'] = Date['now']()),
-      (enabled11['lastQrImageErrorAt'] = 0x0),
+      (enabled11['lastQrImageErrorAt'] = 0),
       (enabled11['lastQrImageErrorMessage'] = ''));
   }
   function run26(enabled21, value38, enabled22 = {}) {
@@ -404,11 +404,11 @@ export function createDreaminaLoginSessionController({
       (enabled11['qrImageListenersBound'] = !![]));
   }
   function run29(value40) {
-    const count4 = Number(value40?.['startedAt'] || 0x0);
-    if (count4 <= 0x0) return 0x0;
-    const count5 = Number(value40?.['completedAt'] || 0x0),
-      value41 = count5 > 0x0 ? count5 : Date['now']();
-    return Math['max'](0x0, value41 - count4);
+    const count4 = Number(value40?.['startedAt'] || 0);
+    if (count4 <= 0) return 0;
+    const count5 = Number(value40?.['completedAt'] || 0),
+      value41 = count5 > 0 ? count5 : Date['now']();
+    return Math['max'](0, value41 - count4);
   }
   function run30(value42) {
     const enabled24 = value42?.['runtime'] || {};
@@ -440,10 +440,10 @@ export function createDreaminaLoginSessionController({
   }
   function run31(enabled27) {
     if (!enabled27 || typeof enabled27 !== 'object') return trDreamina('creditPlaceholder');
-    const total = Number(enabled27['total_credit'] || 0x0),
-      vip = Number(enabled27['vip_credit'] || 0x0),
-      gift = Number(enabled27['gift_credit'] || 0x0),
-      purchase = Number(enabled27['purchase_credit'] || 0x0);
+    const total = Number(enabled27['total_credit'] || 0),
+      vip = Number(enabled27['vip_credit'] || 0),
+      gift = Number(enabled27['gift_credit'] || 0),
+      purchase = Number(enabled27['purchase_credit'] || 0);
     return trDreamina('creditTotal', {
       total: total,
       vip: vip,
@@ -453,8 +453,8 @@ export function createDreaminaLoginSessionController({
   }
   function run32(value47) {
     const value48 = String(value47?.['phase'] || ''),
-      count6 = Number(value47?.['completedAt'] || 0x0),
-      enabled28 = count6 > 0x0 ? value48 + ':' + count6 + ':' + (value47?.['error'] || '') : '';
+      count6 = Number(value47?.['completedAt'] || 0),
+      enabled28 = count6 > 0 ? value48 + ':' + count6 + ':' + (value47?.['error'] || '') : '';
     if (!enabled28 || enabled28 === enabled11['lastToastKey']) return;
     enabled11['lastToastKey'] = enabled28;
     if (value48 === 'success') {
@@ -509,13 +509,13 @@ export function createDreaminaLoginSessionController({
     if (manualImportJsonEl2) manualImportJsonEl2['value'] = '';
     ((enabled11['manualGuideOpen'] = ![]), run15(enabled11['lastStatus'] || {}));
   }
-  function run38(value55 = 0x0) {
+  function run38(value55 = 0) {
     (run36(),
       (enabled11['modalCloseTimer'] = setTimeout(
         () => {
           run2({ force: !![], rememberDismissal: ![] });
         },
-        Math['max'](0x0, Number(value55) || 0x0),
+        Math['max'](0, Number(value55) || 0),
       )));
   }
   function run39(value56) {
@@ -574,7 +574,7 @@ export function createDreaminaLoginSessionController({
     if (value69) run37();
     else
       ['success', 'reused', 'failed', 'done']['includes'](value64)
-        ? run38(value64 === 'failed' ? 0x0 : 0x258)
+        ? run38(value64 === 'failed' ? 0 : 600)
         : run2({ force: !![], rememberDismissal: ![] });
     (modalCardEl &&
       modalCardEl['classList']['toggle']('dreamina-login-modal--guide-open', !!enabled11['manualGuideOpen']),
@@ -673,8 +673,8 @@ export function createDreaminaLoginSessionController({
         value77 =
           value76 === 'idle' &&
           !enabled36?.['active'] &&
-          !Number(enabled36?.['startedAt'] || 0x0) &&
-          Number(enabled11['loginLaunchRequestedAt'] || 0x0) > 0x0;
+          !Number(enabled36?.['startedAt'] || 0) &&
+          Number(enabled11['loginLaunchRequestedAt'] || 0) > 0;
       if (value77) return enabled11['lastStatus'] || null;
       const dreaminaLoginRuntimeStatus = mergeDreaminaLoginRuntimeStatus(
         enabled11['lastStatus'] || {},
@@ -683,7 +683,7 @@ export function createDreaminaLoginSessionController({
       run24(dreaminaLoginRuntimeStatus);
       const value78 = ['success', 'reused', 'done']['includes'](value76),
         value79 = value78 || value76 === 'failed';
-      if (value79) enabled11['loginLaunchRequestedAt'] = 0x0;
+      if (value79) enabled11['loginLaunchRequestedAt'] = 0;
       return (
         value78 && refreshStatus({ force: !![], silent: !![] })['catch'](() => {}),
         dreaminaLoginRuntimeStatus
@@ -813,7 +813,7 @@ export function createDreaminaLoginSessionController({
     {
       destroy() {
         (globalThis['window']?.['removeEventListener']?.(CLI_COMPONENT_CHANGED, value83),
-          (enabled11['statusRequestGeneration'] += 0x1),
+          (enabled11['statusRequestGeneration'] += 1),
           run3(),
           run36(),
           enabled11['observer']?.['disconnect']?.(),

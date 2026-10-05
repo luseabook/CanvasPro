@@ -56,21 +56,21 @@ export function bindVideoSegmentRetakeAction(index) {
         return;
       }
       const sourceDurationSec = Number(await _resolveCurrentVideoDurationSec?.(result || sourceUrl));
-      if (!Number['isFinite'](sourceDurationSec) || sourceDurationSec < 0x4) {
+      if (!Number['isFinite'](sourceDurationSec) || sourceDurationSec < 4) {
         window['showToast']?.(text('errors.durationTooShort'), 'warn');
         return;
       }
       const state = store['getState'](),
         sourceNodeId = state['nodes']?.[node['id']] || node,
-        data = Number(item2?.['videoWidth'] || sourceNodeId['width']) || 0x200,
-        target = Number(item2?.['videoHeight'] || sourceNodeId['height']) || 0x120,
+        data = Number(item2?.['videoWidth'] || sourceNodeId['width']) || 512,
+        target = Number(item2?.['videoHeight'] || sourceNodeId['height']) || 288,
         box = getAIGenerationNodeSize(data, target),
-        width = Math['max'](0x230, box['width']),
-        height = Math['max'](0x1, Math['round'](box['height'] * (width / Math['max'](0x1, box['width'])))),
+        width = Math['max'](560, box['width']),
+        height = Math['max'](1, Math['round'](box['height'] * (width / Math['max'](1, box['width'])))),
         x = calcSafeSpawnPosNearNode(state['nodes'] || {}, sourceNodeId, width, height),
         id = generateId('ai-video-retake'),
         sourceMediaKey = pickSourceMediaKey(sourceNodeId, item2),
-        endSec = Math['min'](0x1e, sourceDurationSec),
+        endSec = Math['min'](30, sourceDurationSec),
         model = getSegmentRetakePreferredModelId(),
         provider = getModelManifest(model),
         decorateSegmentRetakeParameterNodeData2 = decorateSegmentRetakeParameterNodeData({
@@ -88,23 +88,23 @@ export function bindVideoSegmentRetakeAction(index) {
           provider: provider?.['provider'] || 'apimart',
           aspectRatio: 'adaptive',
           resolution: '720p',
-          duration: -0x1,
+          duration: -1,
           prompt: '',
           generationParams: {
             aspectRatio: 'adaptive',
-            duration: -0x1,
+            duration: -1,
             resolution: '720p',
             omniReferenceTaskType: 'edit',
           },
           segmentRetake: {
-            version: 0x1,
+            version: 1,
             phase: SEGMENT_RETAKE_PHASE_EDITING,
             sourceNodeId: sourceNodeId['id'],
             sourceMediaKey: sourceMediaKey,
             sourceUrl: sourceUrl,
             sourceLocalPath: sourceLocalPath,
             sourceDurationSec: sourceDurationSec,
-            range: { startSec: 0x0, endSec: endSec, durationSec: endSec },
+            range: { startSec: 0, endSec: endSec, durationSec: endSec },
             annotations: [],
           },
         });
@@ -121,7 +121,7 @@ export function bindVideoSegmentRetakeAction(index) {
       }),
         commit(),
         window['_triggerLocalCacheSave']?.(),
-        window['v2FocusOnNode']?.(id, 0x64, 0x1f4, 1.5));
+        window['v2FocusOnNode']?.(id, 100, 500, 1.5));
     } catch (error) {
       window['showToast']?.(error?.['message'] || text('errors.createFailed'), 'error');
     } finally {

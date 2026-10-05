@@ -74,7 +74,7 @@ export function validateFlowSource(state, config, scope = []) {
         value6['endSec'] > value6['startSec'],
       '镜头时间无效：' + value6['id'],
     );
-    const value7 = value5 ? args4['shots'][value5 - 0x1]['endSec'] : 0x0;
+    const value7 = value5 ? args4['shots'][value5 - 1]['endSec'] : 0;
     (requireFlow(
       Math['abs'](value6['startSec'] - value7) < 0.02 && value6['endSec'] <= config + 0.02,
       '镜头时间不连续或越界：' + value6['id'],
@@ -93,24 +93,24 @@ export function validateFlowSource(state, config, scope = []) {
         '镜头内容无效：' + value6['id'],
       ));
   }
-  requireFlow(Math['abs'](args4['shots']['at'](-0x1)['endSec'] - config) < 0.02, '镜头未覆盖至原片结尾');
+  requireFlow(Math['abs'](args4['shots']['at'](-1)['endSec'] - config) < 0.02, '镜头未覆盖至原片结尾');
   for (const [enabled3, value9] of args4['speech']['entries']()) {
     (requireFlow(
       Number['isFinite'](value9['startSec']) &&
         Number['isFinite'](value9['endSec']) &&
-        value9['startSec'] >= 0x0 &&
+        value9['startSec'] >= 0 &&
         value9['endSec'] > value9['startSec'] &&
         value9['endSec'] <= config + 0.02,
       '人声时间无效：' + value9['id'],
     ),
       requireFlow(
-        !enabled3 || value9['startSec'] >= args4['speech'][enabled3 - 0x1]['startSec'],
+        !enabled3 || value9['startSec'] >= args4['speech'][enabled3 - 1]['startSec'],
         '人声记录顺序错误',
       ),
       requireFlow(
         Array['isArray'](value9['parts']) &&
-          value9['parts']['length'] > 0x0 &&
-          value9['parts']['length'] <= 0x10,
+          value9['parts']['length'] > 0 &&
+          value9['parts']['length'] <= 16,
         '人声内容为空：' + value9['id'],
       ));
     for (const value10 of value9['parts']) {
@@ -149,7 +149,7 @@ export function classifyFlowReview(args5, value11, value12) {
       [...args5['characters'], ...args5['shots'], ...args5['speech']]['map']((value18) => value18['id']),
     ),
     value19 = new Set(['speaker', 'identity', 'key_action', 'plot', 'major_omission']);
-  for (const args6 of value11['issues']['slice'](0x0, 0xc)) {
+  for (const args6 of value11['issues']['slice'](0, 12)) {
     try {
       (requireFlow(args6 && typeof args6 === 'object', '审查问题不是对象'),
         requireFlow(
@@ -165,7 +165,7 @@ export function classifyFlowReview(args5, value11, value12) {
         requireFlow(
           Number['isFinite'](args6['startSec']) &&
             Number['isFinite'](args6['endSec']) &&
-            args6['startSec'] >= 0x0 &&
+            args6['startSec'] >= 0 &&
             args6['endSec'] > args6['startSec'] &&
             args6['endSec'] <= value12,
           '审查证据时间无效',
@@ -191,7 +191,7 @@ export function classifyFlowReview(args5, value11, value12) {
       });
     }
   }
-  if (value11['hasMoreIssues'] || value11['issues']['length'] > 0xc)
+  if (value11['hasMoreIssues'] || value11['issues']['length'] > 12)
     value14['push']({ code: 'review-overflow', blocking: ![], detail: '审查仍有未列出的实质问题' });
   return { actionable: value13, notes: value14 };
 }
@@ -209,14 +209,14 @@ export function mapFlowReviewTimes(args7, list3, list4 = []) {
             Number['isFinite'](args8?.['startSec']) &&
             Number['isFinite'](args8?.['endSec']) &&
             args8['endSec'] > args8['startSec'],
-          handler = (value23, value24, value25 = 0x0) =>
+          handler = (value23, value24, value25 = 0) =>
             value22 &&
             args8['startSec'] >= value23[value24 + 'StartSec'] - value25 &&
             args8['endSec'] <= value23[value24 + 'EndSec'] + value25;
         let value26 = args7['timeBasis'],
           enabled5 =
             list3['find']((value27) => handler(value27, value26)) ||
-            list3['find']((value28) => handler(value28, value26, 0x1));
+            list3['find']((value28) => handler(value28, value26, 1));
         if (!enabled5 && value26 === 'reel') {
           enabled5 = list3['find']((value29) => handler(value29, 'source'));
           if (enabled5) value26 = 'source';
@@ -231,7 +231,7 @@ export function mapFlowReviewTimes(args7, list3, list4 = []) {
             }),
             []
           );
-        const value30 = value26 === 'reel' ? enabled5['sourceStartSec'] - enabled5['reelStartSec'] : 0x0,
+        const value30 = value26 === 'reel' ? enabled5['sourceStartSec'] - enabled5['reelStartSec'] : 0,
           value31 = Math['max'](enabled5['sourceStartSec'], args8['startSec'] + value30),
           value32 = Math['min'](enabled5['sourceEndSec'], args8['endSec'] + value30);
         if (value32 <= value31)
@@ -320,7 +320,7 @@ export function applyFlowRepair(value33, value34, value35, value36) {
         value53['startSec'] >= value54['startSec'] && value53['endSec'] <= value54['endSec'],
         '补录人声越过证据范围',
       ));
-    const value57 = 'repair-speech-' + (value52 + 0x1);
+    const value57 = 'repair-speech-' + (value52 + 1);
     (requireFlow(
       ![...args9['characters'], ...args9['shots'], ...args9['speech']]['some'](
         (value58) => value58['id'] === value57,
@@ -382,30 +382,30 @@ export function flowEvidenceWindows(args11, value69, value70) {
       );
       for (const value74 of value72['sourceIds']) {
         const count = args11['speech']['findIndex']((value75) => value75['id'] === value74);
-        if (count > 0x0) list7['push'](args11['speech'][count - 0x1]);
-        if (count >= 0x0 && count + 0x1 < args11['speech']['length'])
-          list7['push'](args11['speech'][count + 0x1]);
+        if (count > 0) list7['push'](args11['speech'][count - 1]);
+        if (count >= 0 && count + 1 < args11['speech']['length'])
+          list7['push'](args11['speech'][count + 1]);
       }
       return {
         sourceStartSec: Math['max'](
-          0x0,
+          0,
           Math['floor'](Math['min'](value72['startSec'], ...list7['map']((value76) => value76['startSec']))) -
-            0x1,
+            1,
         ),
         sourceEndSec: Math['min'](
           value70,
-          Math['ceil'](Math['max'](value72['endSec'], ...list7['map']((value77) => value77['endSec']))) + 0x1,
+          Math['ceil'](Math['max'](value72['endSec'], ...list7['map']((value77) => value77['endSec']))) + 1,
         ),
       };
     })['sort']((value78, value79) => value78['sourceStartSec'] - value79['sourceStartSec']),
     value80 = [];
   for (const args12 of value71) {
-    const value81 = value80['at'](-0x1);
+    const value81 = value80['at'](-1);
     if (value81 && args12['sourceStartSec'] <= value81['sourceEndSec'])
       value81['sourceEndSec'] = Math['max'](value81['sourceEndSec'], args12['sourceEndSec']);
     else value80['push']({ ...args12 });
   }
-  let value82 = 0x0;
+  let value82 = 0;
   return value80['map']((args13) => {
     const value83 = value82;
     return (
@@ -414,8 +414,8 @@ export function flowEvidenceWindows(args11, value69, value70) {
     );
   });
 }
-export function createFlowReviewWindows(value84, value85, count2 = 0x23) {
-  requireFlow(Number['isFinite'](count2) && count2 >= 0xa, '审查窗口上限无效');
+export function createFlowReviewWindows(value84, value85, count2 = 35) {
+  requireFlow(Number['isFinite'](count2) && count2 >= 10, '审查窗口上限无效');
   const value86 = Math['ceil'](value85 / count2),
     value87 = value85 / value86,
     value88 = Array['from']({ length: value86 }, () => ({
@@ -428,24 +428,24 @@ export function createFlowReviewWindows(value84, value85, count2 = 0x23) {
   for (const value89 of ['shots', 'speech']) {
     for (const value90 of value84[value89])
       value88[
-        Math['min'](value86 - 0x1, Math['floor']((value90['startSec'] + value90['endSec']) / 0x2 / value87))
+        Math['min'](value86 - 1, Math['floor']((value90['startSec'] + value90['endSec']) / 2 / value87))
       ][value89]['push'](value90);
   }
   return value88['map']((args14, value91) => {
     if (!args14['shots']['length'] && !args14['speech']['length']) return null;
     const list8 = [...args14['shots'], ...args14['speech']],
       value92 = Math['max'](
-        0x0,
-        Math['min'](value91 * value87, ...list8['map']((value93) => value93['startSec'])) - 0x2,
+        0,
+        Math['min'](value91 * value87, ...list8['map']((value93) => value93['startSec'])) - 2,
       ),
       value94 = Math['min'](
         value85,
-        Math['max']((value91 + 0x1) * value87, ...list8['map']((value95) => value95['endSec'])) + 0x2,
+        Math['max']((value91 + 1) * value87, ...list8['map']((value95) => value95['endSec'])) + 2,
       );
     return {
       scope: args14,
       windows: [
-        { sourceStartSec: value92, sourceEndSec: value94, reelStartSec: 0x0, reelEndSec: value94 - value92 },
+        { sourceStartSec: value92, sourceEndSec: value94, reelStartSec: 0, reelEndSec: value94 - value92 },
       ],
     };
   })['filter'](Boolean);

@@ -7,10 +7,10 @@ export class DirectorNumericDrag {
     (this['destroy'](), (this['root'] = el), el?.['addEventListener']('pointerdown', this['onDown'], !![]));
   }
   ['down'](event) {
-    const el2 = event['target']['closest']?.('[data-storyboard-3d-shot-timeline]\x20label'),
+    const el2 = event['target']['closest']?.('[data-storyboard-3d-shot-timeline] label'),
       el3 = el2?.['querySelector']('input[type="number"]');
     if (
-      event['button'] !== 0x0 ||
+      event['button'] !== 0 ||
       !el3 ||
       el3['disabled'] ||
       event['target']['closest']('input,select,button')
@@ -18,7 +18,7 @@ export class DirectorNumericDrag {
       return;
     const el4 = el3['ownerDocument']['defaultView'],
       key = el3['value'],
-      index = Number(el3['step']) || 0x1,
+      index = Number(el3['step']) || 1,
       result = Number(key);
     if (!Number['isFinite'](result)) return;
     const signal = new el4['AbortController']();
@@ -39,7 +39,7 @@ export class DirectorNumericDrag {
         (event2) => {
           if (
             event2['pointerId'] !== event['pointerId'] ||
-            (Math['abs'](event2['clientX'] - event['clientX']) < 0x4 && !enabled)
+            (Math['abs'](event2['clientX'] - event['clientX']) < 4 && !enabled)
           )
             return;
           ((enabled = !![]), event2['preventDefault']());
@@ -53,11 +53,11 @@ export class DirectorNumericDrag {
                   target,
                   result +
                     Math['round'](
-                      (event2['clientX'] - event['clientX']) / (event2['shiftKey'] ? 0x14 : 0x4),
+                      (event2['clientX'] - event['clientX']) / (event2['shiftKey'] ? 20 : 4),
                     ) *
                       index,
                 ),
-              )['toFixed'](0x6),
+              )['toFixed'](6),
             ),
           );
         },

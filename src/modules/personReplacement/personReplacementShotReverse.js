@@ -2,7 +2,7 @@ import { getPersonReplacementShotCutPositionAtTimelineSec } from './personReplac
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
-export function togglePersonReplacementShotReverseAtTimelineSec(draft = [], item = 0x0) {
+export function togglePersonReplacementShotReverseAtTimelineSec(draft = [], item = 0) {
   const position = getPersonReplacementShotCutPositionAtTimelineSec(draft, item),
     enabled = draft[position['shotIndex']];
   if (!enabled) return null;
@@ -74,7 +74,7 @@ export async function materializePersonReplacementShotPlayback({
         src: sourceVideoRef,
         args: { videoStart: range['startSec'], videoEnd: range['endSec'], fps: outputFps },
       },
-      { wait: !![], timeout: 0x927c0 },
+      { wait: !![], timeout: 600000 },
     );
     src = resolveMediaRef(error);
     if (error?.['success'] === ![] || !src)
@@ -86,7 +86,7 @@ export async function materializePersonReplacementShotPlayback({
   ) {
     const error2 = await enqueueMediaTask(
       { kind: 'videoReverse', src: src },
-      { wait: !![], timeout: 0x927c0 },
+      { wait: !![], timeout: 600000 },
     );
     src = resolveMediaRef(error2);
     if (error2?.['success'] === ![] || !src)

@@ -27,7 +27,7 @@ function libraryAssignmentItems(value, item, key) {
     return [
       {
         label:
-          '加入到音频项目' + (selectionMode['assetSelectionMode'] ? '\x20(' + list2['length'] + ')' : ''),
+          '加入到音频项目' + (selectionMode['assetSelectionMode'] ? ' (' + list2['length'] + ')' : ''),
         icon: 'folder-open',
         action: () => key['addLibraryAssets']?.(list2, 'audio'),
       },
@@ -85,7 +85,7 @@ export function resolvePersonReplacementContextMenuItems({
       scope = (Array['isArray'](projects) ? projects : [])['find'](
         (input) => normalizeText(input?.['id']) === text,
       ),
-      archived = Number(scope?.['archivedAt'] || 0x0) > 0x0;
+      archived = Number(scope?.['archivedAt'] || 0) > 0;
     return createWorkspaceProjectContextMenuItems({
       archived: archived,
       onOpen: () => commands['openProject']?.(text),

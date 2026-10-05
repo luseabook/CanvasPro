@@ -1,11 +1,11 @@
-const finiteNumberOr = (value, item = 0x0) => {
+const finiteNumberOr = (value, item = 0) => {
     const key = Number(value);
     return Number['isFinite'](key) ? key : item;
   },
   addPolygon = (ctx, list) => {
     if (!list['length']) return;
-    (ctx['moveTo'](list[0x0]['x'], list[0x0]['y']),
-      list['slice'](0x1)['forEach']((box) => ctx['lineTo'](box['x'], box['y'])),
+    (ctx['moveTo'](list[0]['x'], list[0]['y']),
+      list['slice'](1)['forEach']((box) => ctx['lineTo'](box['x'], box['y'])),
       ctx['closePath']());
   };
 export function getWhiteboardShapeBounds(index) {
@@ -27,15 +27,15 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
   if (!ctx2) return ![];
   const x = finiteNumberOr(box2?.['x']),
     y = finiteNumberOr(box2?.['y']),
-    options = Math['max'](0x0, finiteNumberOr(box2?.['width'])),
-    target = Math['max'](0x0, finiteNumberOr(box2?.['height'])),
+    options = Math['max'](0, finiteNumberOr(box2?.['width'])),
+    target = Math['max'](0, finiteNumberOr(box2?.['height'])),
     x2 = x + options,
     y2 = y + target,
-    x3 = x + options / 0x2,
-    y3 = y + target / 0x2;
+    x3 = x + options / 2,
+    y3 = y + target / 2;
   switch (data) {
     case 'circle':
-      (ctx2['ellipse'](x3, y3, options / 0x2, target / 0x2, 0x0, 0x0, Math['PI'] * 0x2), ctx2['closePath']());
+      (ctx2['ellipse'](x3, y3, options / 2, target / 2, 0, 0, Math['PI'] * 2), ctx2['closePath']());
       return !![];
     case 'triangle':
       addPolygon(ctx2, [
@@ -63,7 +63,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
       ]);
       return !![];
     case 'pill': {
-      const source = Math['min'](options / 0x2, target / 0x2);
+      const source = Math['min'](options / 2, target / 2);
       return (
         ctx2['moveTo'](x + source, y),
         ctx2['lineTo'](x2 - source, y),
@@ -88,11 +88,11 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
       return !![];
     case 'star': {
       const list2 = [],
-        next = Math['min'](options, target) / 0x2,
+        next = Math['min'](options, target) / 2,
         current = next * 0.46;
-      for (let count = 0x0; count < 0xa; count += 0x1) {
-        const entry = count % 0x2 === 0x0 ? next : current,
-          record = -Math['PI'] / 0x2 + (count * Math['PI']) / 0x5;
+      for (let count = 0; count < 10; count += 1) {
+        const entry = count % 2 === 0 ? next : current,
+          record = -Math['PI'] / 2 + (count * Math['PI']) / 5;
         list2['push']({
           x: x3 + Math['cos'](record) * entry,
           y: y3 + Math['sin'](record) * entry,

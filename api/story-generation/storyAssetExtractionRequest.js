@@ -3,7 +3,7 @@ const REQUIRED_STORY_ASSET_INSTRUCTION =
     'requiredAssets 是由剧本结构确定的最低覆盖清单；每一项都必须按给定 kind 和 name 恰好返回一次，不得改名、合并或省略，同时继续从所提供的剧本证据发现清单外的必要资产。',
   CANDIDATE_STORY_ASSET_INSTRUCTION =
     'candidateAssets 只是本地召回线索，不是已确认资产或最低覆盖清单。必须逐项核验其 evidence 原文片段，只有片段明确支持且确需视觉一致性时才可返回；允许全部省略，禁止为照抄候选而创建资产。';
-export const STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION = 0x2;
+export const STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION = 2;
 function normalizeStoryAssetClientKeyText(value = '') {
   return normalizeText(value)
     ['normalize']('NFKC')
@@ -14,10 +14,10 @@ function normalizeStoryAssetClientKeyText(value = '') {
 function hashStoryAssetClientKeyText(item = '') {
   let key = 0x811c9dc5;
   const list = String(item || '');
-  for (let index = 0x0; index < list['length']; index += 0x1) {
+  for (let index = 0; index < list['length']; index += 1) {
     ((key ^= list['charCodeAt'](index)), (key = Math['imul'](key, 0x1000193)));
   }
-  return (key >>> 0x0)['toString'](0x10)['padStart'](0x8, '0');
+  return (key >>> 0)['toString'](16)['padStart'](8, '0');
 }
 export function createStoryAssetContractClientKey({
   kind: kind = '',
@@ -32,7 +32,7 @@ export function createStoryAssetContractClientKey({
       ['map'](normalizeStoryAssetClientKeyText)
       ['filter'](Boolean)
       ['sort'](),
-    data = '' + (text[0x0] || 'a') + result[0x0] + '-';
+    data = '' + (text[0] || 'a') + result[0] + '-';
   return (
     '' + data + hashStoryAssetClientKeyText([text, result, storyAssetClientKeyText, ...args]['join']('\x00'))
   );
@@ -75,10 +75,10 @@ function createStoryAssetCandidates(entry, record, payload = ![]) {
         const evidence = normalizeText(error2 && typeof error2 === 'object' ? error2['evidence'] : ''),
           sourceSceneRefs3 = normalizeStringArray(
             error2 && typeof error2 === 'object' ? error2['sourceSceneRefs'] : [],
-          )['slice'](0x0, 0x3),
+          )['slice'](0, 3),
           sourceChapterIds2 = normalizeStringArray(
             error2 && typeof error2 === 'object' ? error2['sourceChapterIds'] : [],
-          )['slice'](0x0, 0x3),
+          )['slice'](0, 3),
           handle = {
             kind: kind3,
             name: name3,
@@ -114,7 +114,7 @@ export function createStoryAssetPromptContracts(
   if (includeClientKeys) {
     const list5 = [...requiredAssets, ...candidateAssets]['map']((input) => input['clientKey']);
     if (new Set(list5)['size'] !== list5['length'])
-      throw new Error('资产合同生成了重复\x20clientKey，已在调用\x20API\x20前安全停止。');
+      throw new Error('资产合同生成了重复 clientKey，已在调用 API 前安全停止。');
   }
   return {
     payload: {

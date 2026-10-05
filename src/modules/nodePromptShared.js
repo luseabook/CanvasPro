@@ -27,7 +27,7 @@ const AT_TYPE_MAP = { text: '文本', image: '图片', video: '视频', audio: '
 export const PROMPT_ASSET_INPUT_REFS_FIELD = 'promptAssetInputRefs';
 const PROMPT_INPUT_REF_UNRESOLVED_ATTR = 'data-ref-unresolved',
   PROMPT_INPUT_REF_LABEL_ATTR = 'data-ref-label',
-  PROMPT_HTML_COMMIT_DELAY_MS = 0x140,
+  PROMPT_HTML_COMMIT_DELAY_MS = 320,
   ADVANCED_VOICE_CLONE_WORKFLOW_KEY = 'advanced_voice_clone',
   _pendingPromptHtmlCommitTargets = new Set(),
   AT_TYPE_CANDIDATE_MAP = {
@@ -535,7 +535,7 @@ export function appendMentionPillToPrompt(value63, enabled11, { focus: focus = t
   const value64 = Boolean(String(el14.textContent || '').trim() || el14.childNodes?.length);
   if (value64) el14.appendChild(document.createTextNode(' '));
   el14.appendChild(_createMentionPillForCandidate2);
-  const el15 = document.createTextNode('\u00a0');
+  const el15 = document.createTextNode('\xa0');
   el14.appendChild(el15);
   _updatePromptHtml(value63);
   if (focus) {
@@ -1946,7 +1946,7 @@ function _positionMentionSubmenu(el41, el42) {
     value216 = 6,
     value217 = 12,
     value218 = el42.offsetWidth || 220,
-    value219 = el42.offsetHeight || 0x140;
+    value219 = el42.offsetHeight || 320;
   let value220 = box2.right + value216;
   count10 > 0 &&
     value220 + value218 + value217 > count10 &&
@@ -2567,7 +2567,7 @@ export function _syncPillLabels(enabled74, value255) {
 }
 
 function _findLastMentionTriggerIndex(value259, value260) {
-  const value261 = Number['isFinite'](value260) ? value260 - 0x1 : undefined;
+  const value261 = Number['isFinite'](value260) ? value260 - 1 : undefined;
   return Math['max'](
     String(value259 || '')['lastIndexOf']('@', value261),
     String(value259 || '')['lastIndexOf']('＠', value261),
@@ -2613,7 +2613,7 @@ function _decorateMentionPill(value268, value269, value270 = null) {
 }
 
 export function createPromptMediaReferenceState(list36 = []) {
-  const value271 = { image: 0x0, video: 0x0, audio: 0x0 },
+  const value271 = { image: 0, video: 0, audio: 0 },
     value272 = new Map();
   for (const response7 of list36) {
     const promptMentionType = normalizePromptMentionType(response7['type']),
@@ -2624,7 +2624,7 @@ export function createPromptMediaReferenceState(list36 = []) {
       value272['has'](promptMentionType + ':' + enabled76)
     )
       continue;
-    ((value271[promptMentionType] += 0x1),
+    ((value271[promptMentionType] += 1),
       value272['set'](
         promptMentionType + ':' + enabled76,
         getMentionPlaceholderLabel(promptMentionType, value271[promptMentionType]),
@@ -2746,16 +2746,16 @@ function _populateMentionMenuTree(
   value293,
   value294,
   value295,
-  { triggerRange: triggerRange = null, atIndex: atIndex = -0x1, pillToEdit: pillToEdit = null } = {},
+  { triggerRange: triggerRange = null, atIndex: atIndex = -1, pillToEdit: pillToEdit = null } = {},
 ) {
   let value296 = '',
     value297 = '',
-    count16 = 0x0;
+    count16 = 0;
   (value295['nodeItems']['forEach']((value298) => {
     const value299 = String(value298['menuGroup'] || '')['trim'](),
       value300 = String(value298['menuSection'] || '')['trim']();
     if (value299 && value299 !== value296) {
-      if (count16 > 0x0) _appendMentionDivider(value293);
+      if (count16 > 0) _appendMentionDivider(value293);
       (_appendMentionGroupLabel(value293, value299), (value297 = ''));
     }
     ((value296 = value299),
@@ -2766,7 +2766,7 @@ function _populateMentionMenuTree(
         atIndex: atIndex,
         pillToEdit: pillToEdit,
       }),
-      (count16 += 0x1));
+      (count16 += 1));
   }),
     value295['nodeItems']['length'] && value295['assetItems']['length'] && _appendMentionDivider(value293),
     value295['assetItems']['forEach']((enabled77) => {
@@ -2815,7 +2815,7 @@ function _getMentionMenuPages(value302, value303 = []) {
     typeof value302?.['getMentionMenuPages'] === 'function'
       ? value302['getMentionMenuPages']({ candidates: value303 })
       : [];
-  if (!Array['isArray'](list37) || list37['length'] < 0x2) return [];
+  if (!Array['isArray'](list37) || list37['length'] < 2) return [];
   const value304 = new Set();
   return list37['map']((value305) => ({
     id: String(value305?.['id'] || '')['trim'](),
@@ -2840,14 +2840,14 @@ function _createMentionMenuPageIcon(value306) {
     (value307['innerHTML'] =
       enabled79 === 'tools'
         ? '<svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5l-7.7 7.7a2 2 0 1 0 2.8 2.8z"/><path d="m16 15 4.5 4.5"/></svg>'
-        : '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22><path\x20d=\x22M4\x206.5h6l1.7\x202H20v9.5a2\x202\x200\x200\x201-2\x202H6a2\x202\x200\x200\x201-2-2z\x22/><path\x20d=\x22M4\x209h16\x22/></svg>'),
+        : '<svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5h6l1.7 2H20v9.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 9h16"/></svg>'),
     value307
   );
 }
 
 function _appendMentionMenuPages(value308, value309, value310, value311) {
   const _getMentionMenuPages2 = _getMentionMenuPages(value309, value310);
-  if (_getMentionMenuPages2['length'] < 0x2) return null;
+  if (_getMentionMenuPages2['length'] < 2) return null;
   const value312 = document['createElement']('div');
   ((value312['className'] = 'at-mention-tabs'),
     value312['setAttribute']('role', 'tablist'),
@@ -2857,18 +2857,18 @@ function _appendMentionMenuPages(value308, value309, value310, value311) {
   value313['className'] = 'at-mention-pages';
   const value314 = document['createElement']('div');
   ((value314['className'] = 'at-mention-pages-track'),
-    (value314['style']['width'] = _getMentionMenuPages2['length'] * 0x64 + '%'),
+    (value314['style']['width'] = _getMentionMenuPages2['length'] * 100 + '%'),
     (value314['style']['gridTemplateColumns'] =
       'repeat(' + _getMentionMenuPages2['length'] + ', minmax(0, 1fr))'),
     value313['appendChild'](value314),
     value308['appendChild'](value313));
   const value315 = String(
-      value309?.['getMentionMenuDefaultPage']?.({ candidates: value310 }) || _getMentionMenuPages2[0x0]['id'],
+      value309?.['getMentionMenuDefaultPage']?.({ candidates: value310 }) || _getMentionMenuPages2[0]['id'],
     )['trim'](),
     value316 = _getMentionMenuPages2['map']((args2) => {
       const list38 = value310['filter'](
           (value317) =>
-            String(value317?.['menuPage'] || _getMentionMenuPages2[0x0]['id'])['trim']() === args2['id'],
+            String(value317?.['menuPage'] || _getMentionMenuPages2[0]['id'])['trim']() === args2['id'],
         ),
         el78 = document['createElement']('button');
       ((el78['type'] = 'button'), (el78['className'] = 'at-mention-tab'));
@@ -2894,13 +2894,13 @@ function _appendMentionMenuPages(value308, value309, value310, value311) {
       return (
         value312['appendChild'](el78),
         value314['appendChild'](el79),
-        { ...args2, button: el78, panel: el79, hasCandidates: list38['length'] > 0x0 }
+        { ...args2, button: el78, panel: el79, hasCandidates: list38['length'] > 0 }
       );
     }),
     value320 = value316['find']((value321) => value321['id'] === value315);
   let enabled80 = value320?.['hasCandidates'] ? value320 : null;
   if (!enabled80) enabled80 = value316['find']((value322) => value322['hasCandidates']);
-  if (!enabled80) enabled80 = value320 || value316[0x0];
+  if (!enabled80) enabled80 = value320 || value316[0];
   const run4 = (enabled81, { keyboard: keyboard = ![] } = {}) => {
     if (!enabled81) return;
     const value323 = value316['indexOf'](enabled81);
@@ -2908,12 +2908,12 @@ function _appendMentionMenuPages(value308, value309, value310, value311) {
       const enabled82 = event12 === enabled81;
       (event12['button']['classList']['toggle']('is-active', enabled82),
         event12['button']['setAttribute']('aria-selected', String(enabled82)),
-        (event12['button']['tabIndex'] = enabled82 ? 0x0 : -0x1),
+        (event12['button']['tabIndex'] = enabled82 ? 0 : -1),
         event12['panel']['classList']['toggle']('is-active', enabled82),
         event12['panel']['setAttribute']('aria-hidden', String(!enabled82)),
         (event12['panel']['inert'] = !enabled82));
     }),
-      (value314['style']['transform'] = 'translateX(' + -value323 * (0x64 / value316['length']) + '%)'),
+      (value314['style']['transform'] = 'translateX(' + -value323 * (100 / value316['length']) + '%)'),
       (_mentionMenuState['activeMenu'] = enabled81['panel']),
       _setInitialMentionActiveItem(enabled81['panel'], { keyboard: keyboard }),
       _positionMentionMenu());

@@ -15,7 +15,7 @@ export function beginModalInteraction({
     el2 = el?.['defaultView'] || globalThis['window'],
     value = { root: root2, onSuspend: onSuspend },
     item = returnFocus || el?.['activeElement'],
-    handler = () => scopes['at'](-0x1) === value,
+    handler = () => scopes['at'](-1) === value,
     key = (index) => {
       if (!handler()) return;
       trapTabKey(index, root2, el);
@@ -34,7 +34,7 @@ export function beginModalInteraction({
         (event2['preventDefault'](), onClose?.()),
         event2['stopPropagation']());
     };
-  (scopes['at'](-0x1)?.['onSuspend']?.(),
+  (scopes['at'](-1)?.['onSuspend']?.(),
     scopes['push'](value),
     el2?.['addEventListener']?.('keydown', key, !![]),
     el?.['addEventListener']?.('focusin', result),
@@ -46,7 +46,7 @@ export function beginModalInteraction({
     if (options) return;
     options = !![];
     const target = handler();
-    (scopes['splice'](scopes['indexOf'](value), 0x1),
+    (scopes['splice'](scopes['indexOf'](value), 1),
       el2?.['removeEventListener']?.('keydown', key, !![]),
       el?.['removeEventListener']?.('focusin', result),
       root2['removeEventListener']?.('keydown', data),

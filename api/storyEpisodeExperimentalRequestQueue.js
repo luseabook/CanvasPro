@@ -1,5 +1,5 @@
-export const STORY_EPISODE_EXPERIMENTAL_REQUEST_CONCURRENCY_LIMIT = 0x4;
-let activeRequestCount = 0x0;
+export const STORY_EPISODE_EXPERIMENTAL_REQUEST_CONCURRENCY_LIMIT = 4;
+let activeRequestCount = 0;
 const pendingRequests = [];
 function drainStoryEpisodeExperimentalRequestQueue() {
   while (
@@ -7,14 +7,14 @@ function drainStoryEpisodeExperimentalRequestQueue() {
     pendingRequests['length']
   ) {
     const promise = pendingRequests['shift']();
-    ((activeRequestCount += 0x1),
+    ((activeRequestCount += 1),
       void (async () => {
         try {
           promise['resolve'](await promise['operation']());
         } catch (value) {
           promise['reject'](value);
         } finally {
-          ((activeRequestCount -= 0x1), drainStoryEpisodeExperimentalRequestQueue());
+          ((activeRequestCount -= 1), drainStoryEpisodeExperimentalRequestQueue());
         }
       })());
   }

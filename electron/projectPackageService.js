@@ -35,8 +35,8 @@ export const PROJECT_PACKAGE_FILE_EXTENSION = '.aicpkg';
 export const PROJECT_PACKAGE_MANIFEST_NAME = 'manifest.json';
 export const PROJECT_PACKAGE_PROJECT_FILE = 'project/project.aicanvas';
 const IMPORT_DIR_ROOT = 'ProjectImports',
-  DEFAULT_MAX_IMPORT_PACKAGE_BYTES = 10 * 0x400 * 0x400 * 0x400,
-  DEFAULT_MAX_IMPORT_ASSET_BYTES = 5 * 0x400 * 0x400 * 0x400,
+  DEFAULT_MAX_IMPORT_PACKAGE_BYTES = 10 * 1024 * 1024 * 1024,
+  DEFAULT_MAX_IMPORT_ASSET_BYTES = 5 * 1024 * 1024 * 1024,
   ROOT_DEFINITIONS = Object.freeze([
     { rootKey: 'workflowThumbsRoot', virtualPrefix: 'data/workflows/thumbs/' },
     { rootKey: 'uploadsRoot', virtualPrefix: 'data/uploads/' },
@@ -472,7 +472,7 @@ function allocateUniqueFilePath(value36) {
   if (!existsSync(value36)) return value36;
   const value37 = path.dirname(value36),
     error7 = path.parse(value36);
-  for (let count = 2; count < 0x3e8; count += 1) {
+  for (let count = 2; count < 1000; count += 1) {
     const value38 = path.join(value37, error7.name + ' (' + count + ')' + error7.ext);
     if (!existsSync(value38)) return value38;
   }
@@ -527,7 +527,7 @@ function allocateUniqueProjectPath(value51, value52) {
   const safePathSegment2 = safePathSegment((value52 || '未命名画布') + ' - 导入', 'imported-project'),
     value54 = path.join(value53, safePathSegment2 + '.aicanvas');
   if (!existsSync(value54)) return value54;
-  for (let count2 = 2; count2 < 0x3e8; count2 += 1) {
+  for (let count2 = 2; count2 < 1000; count2 += 1) {
     const value55 = path.join(value53, safePathSegment2 + ' (' + count2 + ').aicanvas');
     if (!existsSync(value55)) return value55;
   }

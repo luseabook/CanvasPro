@@ -5,7 +5,7 @@ import {
   setPerfProbeEnabled,
 } from './perfProbe.js';
 const PERF_PANEL_ID = 'perfProbePanel',
-  REFRESH_INTERVAL_MS = 0x1f4;
+  REFRESH_INTERVAL_MS = 500;
 function getDefaultDocument() {
   if (typeof document === 'undefined') return null;
   return document;

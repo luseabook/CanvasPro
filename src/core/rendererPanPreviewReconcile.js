@@ -11,10 +11,10 @@ import {
   isRendererRuntimeDiagnosticsEnabled,
   recordRendererRuntimeDiagnostic,
 } from './rendererRuntimeDiagnostics.js';
-const DENSE_PAN_PREVIEW_RECONCILE_INTERVAL_MS = 0x60,
-  PAN_MEDIA_LOOKAHEAD_REFRESH_MS = 0xa0,
-  DENSE_PAN_PREVIEW_HIGH_ZOOM_BUCKET_PX = 0xf0,
-  DENSE_ZOOM_PREVIEW_RECONCILE_INTERVAL_MS = 0xa0;
+const DENSE_PAN_PREVIEW_RECONCILE_INTERVAL_MS = 96,
+  PAN_MEDIA_LOOKAHEAD_REFRESH_MS = 160,
+  DENSE_PAN_PREVIEW_HIGH_ZOOM_BUCKET_PX = 240,
+  DENSE_ZOOM_PREVIEW_RECONCILE_INTERVAL_MS = 160;
 function getWindowLike() {
   return typeof window !== 'undefined' ? window : globalThis;
 }
@@ -22,7 +22,7 @@ function requestFrame(handler) {
   const windowLike = getWindowLike();
   if (typeof windowLike?.['requestAnimationFrame'] === 'function')
     return windowLike['requestAnimationFrame'](handler);
-  return setTimeout(() => handler(Date['now']()), 0x10);
+  return setTimeout(() => handler(Date['now']()), 16);
 }
 function cancelFrame(value) {
   const windowLike2 = getWindowLike();
@@ -41,11 +41,11 @@ function normalizeViewport(item, key = null) {
     options = Number(box2['x']),
     target = Number(box2['y']),
     source = Number(box2['zoom']),
-    zoom = Number['isFinite'](data) ? data : Number['isFinite'](source) ? source : 0x1;
+    zoom = Number['isFinite'](data) ? data : Number['isFinite'](source) ? source : 1;
   return {
-    x: Number['isFinite'](index) ? index : Number['isFinite'](options) ? options : 0x0,
-    y: Number['isFinite'](result) ? result : Number['isFinite'](target) ? target : 0x0,
-    zoom: zoom > 0x0 ? zoom : 0x1,
+    x: Number['isFinite'](index) ? index : Number['isFinite'](options) ? options : 0,
+    y: Number['isFinite'](result) ? result : Number['isFinite'](target) ? target : 0,
+    zoom: zoom > 0 ? zoom : 1,
   };
 }
 function nowMs() {
@@ -54,12 +54,12 @@ function nowMs() {
     : Date['now']();
 }
 function quantizeSigned(next, current) {
-  const entry = Math['max'](0x1, Number(current) || 0x1);
-  return Math['trunc'](Number(next || 0x0) / entry) * entry;
+  const entry = Math['max'](1, Number(current) || 1);
+  return Math['trunc'](Number(next || 0) / entry) * entry;
 }
 function getDensePanPreviewBucket(box3, record) {
-  const payload = Number(box3?.['zoom']) || 0x1,
-    handle = Number(record) || 0x0;
+  const payload = Number(box3?.['zoom']) || 1,
+    handle = Number(record) || 0;
   if (handle < RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']) return null;
   const state =
       payload <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
@@ -67,14 +67,14 @@ function getDensePanPreviewBucket(box3, record) {
     config =
       payload <= RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'] &&
       handle >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
-    bucketSize = state ? 0xc0 : config ? 0x40 : DENSE_PAN_PREVIEW_HIGH_ZOOM_BUCKET_PX;
+    bucketSize = state ? 192 : config ? 64 : DENSE_PAN_PREVIEW_HIGH_ZOOM_BUCKET_PX;
   return {
     key:
       quantizeSigned(box3['x'], bucketSize) +
       ':' +
       quantizeSigned(box3['y'], bucketSize) +
       ':' +
-      payload['toFixed'](0x3),
+      payload['toFixed'](3),
     bucketSize: bucketSize,
   };
 }
@@ -104,7 +104,7 @@ function collectActiveDragNodeIds({
   return value2;
 }
 function omitNodeIds(value6, map2) {
-  if (!map2 || map2['size'] === 0x0) return value6;
+  if (!map2 || map2['size'] === 0) return value6;
   const value7 = {};
   for (const [value8, value9] of Object['entries'](value6 || {})) {
     if (!map2['has'](value8)) value7[value8] = value9;
@@ -129,10 +129,10 @@ export function createRendererPanPreviewReconciler({
   let requestFrame2 = null,
     value10 = null,
     value11 = '',
-    value12 = 0x0,
+    value12 = 0,
     value13 = null,
     value14 = null,
-    value15 = 0x0;
+    value15 = 0;
   function run() {
     (requestFrame2 !== null && (cancelFrame(requestFrame2), (requestFrame2 = null)), (value10 = null));
   }
@@ -197,7 +197,7 @@ export function createRendererPanPreviewReconciler({
           { skipped: !![], hasPendingStructuralOps: ![], nodeCount: nodeCount }
         );
       ((value11 = bucketKey['key']), (value12 = now2));
-    } else ((value11 = ''), (value12 = 0x0));
+    } else ((value11 = ''), (value12 = 0));
     (markBusy?.(), renderViewport?.(canvasEl, viewport, snapshot['ui']?.['titleFollowsCanvasZoom'] === !![]));
     if (svgWrapper?.['style']?.['display'] === 'none') svgWrapper['style']['display'] = '';
     const value17 = typeof now === 'function' ? now() : nowMs(),
@@ -205,7 +205,7 @@ export function createRendererPanPreviewReconciler({
     if (
       enabled4 &&
       value14 &&
-      elapsedMs >= 0x0 &&
+      elapsedMs >= 0 &&
       elapsedMs < DENSE_ZOOM_PREVIEW_RECONCILE_INTERVAL_MS &&
       canReuseRendererViewportPreviewCoverage(value14, {
         viewport: viewport,
@@ -223,7 +223,7 @@ export function createRendererPanPreviewReconciler({
           }),
         { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: nodeCount }
       );
-    !enabled4 && ((value14 = null), (value15 = 0x0));
+    !enabled4 && ((value14 = null), (value15 = 0));
     const value18 =
         snapshot['ui']?.['selectionRelatedHighlightEnabled'] === ![]
           ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
@@ -241,8 +241,8 @@ export function createRendererPanPreviewReconciler({
       priorityMediaWork = ![],
       viewportPriorityMediaOnly = ![],
       previewOnly = !![],
-      value20 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0x0,
-      value21 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0x0,
+      value20 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
+      value21 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
       value22 = renderNodes?.(
         canvasEl,
         omitNodeIds2,
@@ -349,10 +349,10 @@ export function createRendererPanPreviewReconciler({
       dispose() {
         (run(),
           (value11 = ''),
-          (value12 = 0x0),
+          (value12 = 0),
           (value13 = null),
           (value14 = null),
-          (value15 = 0x0),
+          (value15 = 0),
           el?.['removeEventListener']?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, value25));
       },
     }

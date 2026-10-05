@@ -646,7 +646,7 @@ function jsonResponse(value) {
       };
       const { pollDreaminaUntilDone: pollDreaminaUntilDone2 } = await import('./dreaminaGenApi.js');
       (await assert.rejects(
-        pollDreaminaUntilDone2('sid-transient-1', { intervalMs: 1, maxWaitMs: 0x1388 }),
+        pollDreaminaUntilDone2('sid-transient-1', { intervalMs: 1, maxWaitMs: 5000 }),
         /查询超时，请稍后重试/,
       ),
         assert.equal(value11, 1));
@@ -685,7 +685,7 @@ function jsonResponse(value) {
       const { pollDreaminaUntilDone: pollDreaminaUntilDone3 } = await import('./dreaminaGenApi.js'),
         response12 = await pollDreaminaUntilDone3('sid-transient-2', {
           intervalMs: 1,
-          maxWaitMs: 0x1388,
+          maxWaitMs: 5000,
           onProgress: (response13) => {
             list13.push(response13.status + ':' + response13.phase);
           },
@@ -713,7 +713,7 @@ function jsonResponse(value) {
       };
       const { pollDreaminaUntilDone: pollDreaminaUntilDone4 } = await import('./dreaminaGenApi.js');
       (await assert.rejects(
-        pollDreaminaUntilDone4('sid-transient-3', { intervalMs: 1, maxWaitMs: 0x1388 }),
+        pollDreaminaUntilDone4('sid-transient-3', { intervalMs: 1, maxWaitMs: 5000 }),
         (error) => {
           return (assert.match(String(error?.message || ''), /网络抖动，请稍后重试/), true);
         },

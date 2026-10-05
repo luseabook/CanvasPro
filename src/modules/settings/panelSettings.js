@@ -18,7 +18,7 @@ const SETTINGS_FIELD_HIGHLIGHT_CLASS = 'is-settings-field-highlight',
 function getTimerHost() {
   return globalThis['window'] || globalThis;
 }
-function scheduleTimer(handler, value = 0x0) {
+function scheduleTimer(handler, value = 0) {
   const timerHost = getTimerHost();
   if (typeof timerHost?.['setTimeout'] === 'function') return timerHost['setTimeout'](handler, value);
   return (handler(), null);
@@ -58,7 +58,7 @@ export function activateSettingsPane(index = 'api-input') {
     result
   );
 }
-export function highlightSettingsField(enabled4, { duration: duration = 0x1068 } = {}) {
+export function highlightSettingsField(enabled4, { duration: duration = 4200 } = {}) {
   if (!enabled4?.['classList']) return ![];
   document['querySelectorAll']?.('.' + SETTINGS_FIELD_HIGHLIGHT_CLASS)?.['forEach']((source) => {
     if (source !== enabled4) source['classList']['remove'](SETTINGS_FIELD_HIGHLIGHT_CLASS);
@@ -101,7 +101,7 @@ export function openSettingsPanelToField({
     activateSettingsPane(paneName),
     scheduleTimer(() => {
       focusSettingsField(fieldIds, { select: select, highlight: highlight });
-    }, 0x0),
+    }, 0),
     !![]
   );
 }

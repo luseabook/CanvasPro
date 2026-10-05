@@ -136,15 +136,15 @@ export function createRendererDeferredMediaController({
   };
 }
 
-const MAX_VISIBLE_AUDIO_WARMUP_COUNT = 0x4;
+const MAX_VISIBLE_AUDIO_WARMUP_COUNT = 4;
 
 export function shouldActivateRendererMediaHoverPlayback({
   viewport: viewport,
-  nodeCount: nodeCount = 0x0,
+  nodeCount: nodeCount = 0,
   isSelected: isSelected = ![],
 } = {}) {
   if (isSelected === !![]) return !![];
-  return resolveRendererLowZoomMountLimit({ viewport: viewport, nodeCount: nodeCount }) <= 0x0;
+  return resolveRendererLowZoomMountLimit({ viewport: viewport, nodeCount: nodeCount }) <= 0;
 }
 
 export function scheduleRendererVisibleAudioSurfaceHydration({
@@ -154,7 +154,7 @@ export function scheduleRendererVisibleAudioSurfaceHydration({
   isSelected: isSelected2,
   viewport: viewport2,
   nodeCount: nodeCount2,
-  visibleAudioRank: visibleAudioRank = 0x1,
+  visibleAudioRank: visibleAudioRank = 1,
   component: component,
   deferredMedia: deferredMedia,
 } = {}) {
@@ -164,7 +164,7 @@ export function scheduleRendererVisibleAudioSurfaceHydration({
   if (isVisible !== !![]) return ![];
   if (
     isSelected2 !== !![] &&
-    (resolveRendererLowZoomMountLimit({ viewport: viewport2, nodeCount: nodeCount2 }) > 0x0 ||
+    (resolveRendererLowZoomMountLimit({ viewport: viewport2, nodeCount: nodeCount2 }) > 0 ||
       Number(visibleAudioRank) > MAX_VISIBLE_AUDIO_WARMUP_COUNT)
   )
     return ![];
@@ -179,7 +179,7 @@ export function createRendererVisibleAudioSurfaceHydrationPass({
   nodeCount: nodeCount3,
   deferredMedia: deferredMedia2,
 } = {}) {
-  let target = 0x0;
+  let target = 0;
   return ({
     node: node2,
     nodeId: nodeId2,
@@ -189,8 +189,8 @@ export function createRendererVisibleAudioSurfaceHydrationPass({
   } = {}) => {
     const source =
       isSelected3 !== !![] && isVisible2 === !![] && isNodeType(node2, ['source-audio', 'ai-audio', 'audio'])
-        ? (target += 0x1)
-        : 0x1;
+        ? (target += 1)
+        : 1;
     return scheduleRendererVisibleAudioSurfaceHydration({
       node: node2,
       nodeId: nodeId2,
@@ -205,7 +205,7 @@ export function createRendererVisibleAudioSurfaceHydrationPass({
   };
 }
 
-const DEFAULT_VIDEO_HYDRATION_BATCH_SIZE = 0x1;
+const DEFAULT_VIDEO_HYDRATION_BATCH_SIZE = 1;
 const VIDEO_MEDIA_NODE_TYPES = new Set(['source-video', 'ai-video', 'video']);
 
 function getDeferredMediaComponentType(next) {

@@ -40,13 +40,13 @@ import { hasAgentCanvasActionIntent, routeAgentTurn } from './agentTurnRouter.js
 import { createAgentConversationCanvasTransferRuntime } from './agentConversationCanvasTransferRuntime.js';
 import { createAgentAssistantConversationRuntime } from './agentAssistantConversationRuntime.js';
 import { getAgentContinuationSkillIds } from './agentAssistantConversation.js';
-const DEFAULT_MAX_LOOP_STEPS = 0x10,
-  PLANNER_NETWORK_RETRY_LIMIT = 0x1;
+const DEFAULT_MAX_LOOP_STEPS = 16,
+  PLANNER_NETWORK_RETRY_LIMIT = 1;
 function isTransientPlannerNetworkError(error) {
   const value = [error?.['name'], error?.['code'], error?.['message']]
     ['map']((item) => String(item || '')['trim']())
     ['filter'](Boolean)
-    ['join']('\x20')
+    ['join'](' ')
     ['toLowerCase']();
   return (
     /failed to fetch|fetch failed|network(?: request)? (?:error|failed|failure)|networkerror/['test'](
@@ -58,25 +58,25 @@ function isTransientPlannerNetworkError(error) {
 }
 const RUNTIME_TEXT = Object['freeze']({
   'zh-CN': Object['freeze']({
-    actionExecutionFailed: 'Agent\x20动作执行失败。',
+    actionExecutionFailed: 'Agent 动作执行失败。',
     done: '已执行。',
     emptyMessage: 'Agent 消息为空。',
     noPendingClarification: '当前没有待回答的问题。',
     noPendingPlan: '当前没有待确认的计划。',
     noPendingRecovery: '当前没有可恢复的失败计划。',
-    noInterruptedRun: '当前没有需要结束的\x20Agent\x20任务。',
+    noInterruptedRun: '当前没有需要结束的 Agent 任务。',
     noUndoableRun: '当前没有可撤销的 Agent 画布操作，或画布在任务后已经发生变化。',
     runResumed: '正在从上次中断的位置继续。',
     runDiscarded: '已结束上次 Agent 任务。已完成的画布操作不会撤销，已经提交的生成仍会继续。',
-    runUndone: '已撤销\x20Agent\x20本轮对画布的修改。',
+    runUndone: '已撤销 Agent 本轮对画布的修改。',
     recoveryKept: '已保留准备步骤。你可以修改提示词或换模型后重新规划。',
     planCancelled: '已取消执行。',
     plannerFailed: 'Agent 规划失败。',
-    plannerRetryAvailable: 'Agent\x20规划失败，但原任务已保留。回复“重试”或“？”即可继续。',
+    plannerRetryAvailable: 'Agent 规划失败，但原任务已保留。回复“重试”或“？”即可继续。',
     plannerReturnedNoAction: 'Agent 没有返回可执行的画布动作，原任务已保留。回复“重试”继续。',
     plannerMissing: 'Agent 文本模型尚未配置。',
-    preActionsFailed: 'Agent\x20准备步骤执行失败。',
-    reset: 'Agent\x20会话已重置。',
+    preActionsFailed: 'Agent 准备步骤执行失败。',
+    reset: 'Agent 会话已重置。',
     runStopped: 'Agent 已停止。',
     loopLimitReached: 'Agent 已达到本轮最大步骤数，已停止以避免重复执行。',
     loopRepeatedAction: 'Agent 尝试重复执行已完成的动作，已停止。',
@@ -120,7 +120,7 @@ const RUNTIME_TEXT = Object['freeze']({
       '我先不动当前画布。可以继续讨论；如果需要我创建、生成、连接、排列或修改节点，请明确告诉我要执行的操作。',
     taskStarted: '生成已开始：{nodeLabel} 正在生成，完成后我会继续更新这里。',
     taskPending: '生成已提交：{nodeLabel} 正在排队或生成中。',
-    taskWaiting: '生成任务正在执行，全部完成后\x20Agent\x20会自动继续后续步骤。',
+    taskWaiting: '生成任务正在执行，全部完成后 Agent 会自动继续后续步骤。',
     taskResumed: '生成任务已结束，Agent 正在继续后续步骤。',
     taskCompleted: '生成已完成：结果已写入 {nodeLabel}。',
     taskFailed: '生成失败：{nodeLabel}。{error}',
@@ -135,9 +135,9 @@ const RUNTIME_TEXT = Object['freeze']({
     actionExecutionFailed: 'Agent action execution failed.',
     done: 'Done.',
     emptyMessage: 'Agent message is empty.',
-    noPendingClarification: 'No\x20pending\x20clarification.',
-    noPendingPlan: 'No\x20pending\x20plan\x20to\x20confirm.',
-    noPendingRecovery: 'No\x20failed\x20plan\x20can\x20be\x20recovered.',
+    noPendingClarification: 'No pending clarification.',
+    noPendingPlan: 'No pending plan to confirm.',
+    noPendingRecovery: 'No failed plan can be recovered.',
     noInterruptedRun: 'There is no Agent run to end.',
     noUndoableRun: 'There is no undoable Agent canvas run, or the canvas changed after it.',
     runResumed: 'Resuming from the interrupted Agent checkpoint.',
@@ -154,11 +154,11 @@ const RUNTIME_TEXT = Object['freeze']({
     plannerMissing: 'Agent planner is not configured.',
     preActionsFailed: 'Agent pre-confirmation actions failed.',
     reset: 'Agent session reset.',
-    runStopped: 'Agent\x20run\x20stopped.',
+    runStopped: 'Agent run stopped.',
     loopLimitReached:
-      'The\x20Agent\x20reached\x20the\x20step\x20limit\x20and\x20stopped\x20to\x20avoid\x20repeated\x20actions.',
+      'The Agent reached the step limit and stopped to avoid repeated actions.',
     loopRepeatedAction:
-      'The\x20Agent\x20tried\x20to\x20repeat\x20a\x20completed\x20action\x20and\x20was\x20stopped.',
+      'The Agent tried to repeat a completed action and was stopped.',
     loopRepeatedActionCorrection:
       'This action already succeeded. Do not execute it again; use the tool result to continue with the next unfinished action, or return empty actions when done.',
     loopDuplicateBudgetCorrection:
@@ -176,12 +176,12 @@ const RUNTIME_TEXT = Object['freeze']({
     changeModel: 'Switch model',
     keepPrepared: 'Keep prepared nodes',
     nodeCreate: 'Create node',
-    nodeCreateImage: 'Create\x20image\x20node',
+    nodeCreateImage: 'Create image node',
     nodeCreateVideo: 'Create video node',
     nodeCreateAudio: 'Create audio node',
     nodeCreateText: 'Create text node',
-    graphConnect: 'Connect\x20nodes',
-    layoutAlign: 'Align\x20nodes',
+    graphConnect: 'Connect nodes',
+    layoutAlign: 'Align nodes',
     layoutArrangeRow: 'Arrange nodes horizontally',
     layoutArrangeColumn: 'Arrange nodes vertically',
     layoutArrangeGrid: 'Arrange nodes in a grid',
@@ -202,11 +202,11 @@ const RUNTIME_TEXT = Object['freeze']({
     taskStarted: 'Generation started: {nodeLabel} is running. I will update this chat when it finishes.',
     taskPending: 'Generation submitted: {nodeLabel} is queued or running.',
     taskWaiting:
-      'Generation\x20is\x20running.\x20The\x20Agent\x20will\x20continue\x20automatically\x20when\x20all\x20tasks\x20finish.',
+      'Generation is running. The Agent will continue automatically when all tasks finish.',
     taskResumed: 'Generation finished. The Agent is continuing with the remaining steps.',
     taskCompleted: 'Generation complete: the result was written to {nodeLabel}.',
     taskFailed: 'Generation failed: {nodeLabel}. {error}',
-    taskCancelled: 'Generation\x20cancelled:\x20{nodeLabel}.',
+    taskCancelled: 'Generation cancelled: {nodeLabel}.',
     textPlacedOnCanvas: 'Placed the copy in a canvas text node.',
     textSourceMissing: 'I could not find a previous assistant draft to place on the canvas.',
     promptTransferTargetRequired:
@@ -251,7 +251,7 @@ function hasExplicitCanvasActionIntent(source = '', next = {}) {
 }
 function shouldHoldCanvasActionsForChat(response = {}, current = '', entry = {}) {
   if (response['status'] !== 'ready' && response['status'] !== 'need_confirmation') return ![];
-  if (!Array['isArray'](response['plan']?.['actions']) || response['plan']['actions']['length'] === 0x0)
+  if (!Array['isArray'](response['plan']?.['actions']) || response['plan']['actions']['length'] === 0)
     return ![];
   return !hasExplicitCanvasActionIntent(current, entry);
 }
@@ -274,7 +274,7 @@ function getProjectId(options3 = {}) {
 function getCollectionSize(list) {
   if (Array['isArray'](list)) return list['length'];
   if (list && typeof list === 'object') return Object['keys'](list)['length'];
-  return 0x0;
+  return 0;
 }
 function buildCanvasSnapshotDigest(options4 = {}) {
   const state = getState(options4);
@@ -312,13 +312,13 @@ export function createAgentRuntime({
   maxLoopSteps: maxLoopSteps = DEFAULT_MAX_LOOP_STEPS,
 } = {}) {
   registerAgentDiscoveryCommands(commandRegistry);
-  let handle = 0x0,
+  let handle = 0,
     agentContext2 = null,
     agentTaskBindingRuntime = null,
     config = null,
     scope = null,
     signal = null,
-    input = 0x0;
+    input = 0;
   const map = new Map(),
     map2 = new Map();
   let runId = null;
@@ -407,7 +407,7 @@ export function createAgentRuntime({
     if (map2['get'](runId2) === value5) return args3;
     return (
       map2['set'](runId2, value5),
-      map2['size'] > 0x64 && map2['delete'](map2['keys']()['next']()['value']),
+      map2['size'] > 100 && map2['delete'](map2['keys']()['next']()['value']),
       sessionStore['recordRunEvent']?.({ runId: runId2, ...args3, status: 'selected' }),
       args3
     );
@@ -464,7 +464,7 @@ export function createAgentRuntime({
       id2 = String(
         value15['agentRunId'] || sessionStore['getCurrentRun']?.()?.['id'] || 'agent-run-' + handle,
       )['trim'](),
-      step = Math['max'](0x0, Math['trunc'](Number(sessionStore['getCurrentRun']?.()?.['step'] || 0x0)));
+      step = Math['max'](0, Math['trunc'](Number(sessionStore['getCurrentRun']?.()?.['step'] || 0)));
     run3(id2);
     const list4 = list3['map']((value16, value17) => {
         const fingerprint = fingerprintAgentAction(value16),
@@ -504,8 +504,8 @@ export function createAgentRuntime({
           errorCode: String(ok?.['errorCode'] || ''),
           verificationStatus: String(ok?.['verification']?.['status'] || ''),
           repairAttempts: Math['max'](
-            0x0,
-            Math['min'](0x1, Math['trunc'](Number(ok?.['verification']?.['attempts'] || 0x0))),
+            0,
+            Math['min'](1, Math['trunc'](Number(ok?.['verification']?.['attempts'] || 0))),
           ),
           createdNodeIds: createdNodeIds['createdNodeIds'],
           createdEdgeIds: createdNodeIds['createdEdgeIds'],
@@ -521,7 +521,7 @@ export function createAgentRuntime({
     { taskMessages: taskMessages = [], recoveryCheckpoint: recoveryCheckpoint = null } = {},
   ) {
     const list5 = agentTaskBindingRuntime['getPending'](id3['runId']);
-    if (list5['length'] === 0x0) return null;
+    if (list5['length'] === 0) return null;
     const waitingTaskBindingIds = (sessionStore['getTaskBindings']?.() || [])['filter'](
         (value21) => value21['turnId'] === id3['runId'],
       ),
@@ -583,7 +583,7 @@ export function createAgentRuntime({
                   errorCode: 'ASYNC_TASK_FAILED',
                   message: message,
                   results: [{ ok: ![], errorCode: 'ASYNC_TASK_FAILED', message: message }],
-                  raw: { result: { failedIndex: 0x0 } },
+                  raw: { result: { failedIndex: 0 } },
                 },
               );
             return run8(runId4, message);
@@ -604,7 +604,7 @@ export function createAgentRuntime({
                   ok: !![],
                   message: runtimeText('taskResumed', localeProvider2()),
                 },
-              ]['slice'](-0x4),
+              ]['slice'](-4),
             })
           );
         })
@@ -682,7 +682,7 @@ export function createAgentRuntime({
       originalMessage: String(message2 || ''),
       plannerExtra: { ...plannerExtra },
       ...run12(),
-      step: 0x0,
+      step: 0,
       toolResults: [],
       validationFeedback: [],
       runtimeProvenance: { createdNodeIds: [], createdEdgeIds: [] },
@@ -690,7 +690,7 @@ export function createAgentRuntime({
       completedFingerprints: [],
       failedFingerprints: {},
       validationFailureCounts: {},
-      noActionRetryCount: 0x0,
+      noActionRetryCount: 0,
       disclosedCommandIds: [],
       disclosedModelIds: [],
     };
@@ -716,8 +716,8 @@ export function createAgentRuntime({
     const precreatedNode = normalizeAgentPrecreatedNode(runtimeProvenance['precreatedNode']);
     return {
       enabled: !![],
-      step: Number(runtimeProvenance['step'] || 0x0),
-      maxSteps: Math['max'](0x1, Number(maxLoopSteps || DEFAULT_MAX_LOOP_STEPS)),
+      step: Number(runtimeProvenance['step'] || 0),
+      maxSteps: Math['max'](1, Number(maxLoopSteps || DEFAULT_MAX_LOOP_STEPS)),
       toolResults: Array['isArray'](runtimeProvenance['toolResults']) ? runtimeProvenance['toolResults'] : [],
       validationFeedback: Array['isArray'](runtimeProvenance['validationFeedback'])
         ? runtimeProvenance['validationFeedback']
@@ -863,7 +863,7 @@ export function createAgentRuntime({
         execution3['ok'] === !![] && doesActionConsumePrecreatedNode(action3, turnId3['precreatedNode'])
           ? null
           : turnId3['precreatedNode'] || null,
-      step: turnId3['step'] + 0x1,
+      step: turnId3['step'] + 1,
       toolResults: [...(turnId3['toolResults'] || []), agentToolResult],
       runtimeProvenance: deriveAgentRuntimeProvenance({
         action: action3,
@@ -882,7 +882,7 @@ export function createAgentRuntime({
           )
         : {
             ...(turnId3['failedFingerprints'] || {}),
-            [fingerprintAgentAction2]: Number(turnId3['failedFingerprints']?.[fingerprintAgentAction2] || 0x0) + 0x1,
+            [fingerprintAgentAction2]: Number(turnId3['failedFingerprints']?.[fingerprintAgentAction2] || 0) + 1,
           },
     };
     return (
@@ -928,7 +928,7 @@ export function createAgentRuntime({
         pendingKind: '',
         plannerFailureMessage: '',
         plannerDiagnostic: null,
-        noActionRetryCount: 0x0,
+        noActionRetryCount: 0,
       })
     );
   }
@@ -1008,7 +1008,7 @@ export function createAgentRuntime({
       !enabled8 ||
       !expectedHead?.['start']?.['id'] ||
       !expectedHead?.['end']?.['id'] ||
-      list6['length'] > 0x0
+      list6['length'] > 0
     )
       return createFailedReply(runtimeText('noUndoableRun', localeProvider2()));
     const errorCode = commandContext2?.['history']?.['undoToCheckpoint']?.(expectedHead['start'], {
@@ -1045,7 +1045,7 @@ export function createAgentRuntime({
   }
   function run19(toolResults, plan = {}) {
     const value34 = Object['values'](toolResults['failedFingerprints'] || {})['some'](
-      (value35) => Number(value35 || 0x0) > 0x0,
+      (value35) => Number(value35 || 0) > 0,
     );
     if (value34) {
       const error4 = [...(toolResults['toolResults'] || [])]
@@ -1058,7 +1058,7 @@ export function createAgentRuntime({
       );
     }
     const content4 = String(plan['reply'] || runtimeText('done', localeProvider2())),
-      value36 = toolResults['toolResults']['length'] > 0x0,
+      value36 = toolResults['toolResults']['length'] > 0,
       status = value36 ? 'success' : 'chat';
     return (
       sessionStore['clearPendingLoopRun']?.(),
@@ -1080,7 +1080,7 @@ export function createAgentRuntime({
   }
   async function run9(id8) {
     if (!run6(id8)) return run8(id8, runtimeText('loopResumeExpired', localeProvider2()));
-    const value37 = Math['max'](0x1, Math['trunc'](Number(maxLoopSteps || DEFAULT_MAX_LOOP_STEPS)));
+    const value37 = Math['max'](1, Math['trunc'](Number(maxLoopSteps || DEFAULT_MAX_LOOP_STEPS)));
     while (id8['step'] <= value37) {
       if (!isActiveRun(id8['runId'])) return createStoppedReply();
       sessionStore['setCurrentRun']?.({
@@ -1098,12 +1098,12 @@ export function createAgentRuntime({
           disclosedCommandIds: id8['disclosedCommandIds'],
           disclosedModelIds: id8['disclosedModelIds'],
         })),
-          (id8['plannerNetworkRetryCount'] = 0x0));
+          (id8['plannerNetworkRetryCount'] = 0));
       } catch (error5) {
         if (!isActiveRun(id8['runId']) || signal?.['signal']?.['aborted']) return createStoppedReply();
-        const value38 = Number(id8['plannerNetworkRetryCount'] || 0x0);
+        const value38 = Number(id8['plannerNetworkRetryCount'] || 0);
         if (isTransientPlannerNetworkError(error5) && value38 < PLANNER_NETWORK_RETRY_LIMIT) {
-          ((id8['plannerNetworkRetryCount'] = value38 + 0x1),
+          ((id8['plannerNetworkRetryCount'] = value38 + 1),
             sessionStore['recordTrace']?.({
               type: 'agent_loop_planner_network_retry',
               step: id8['step'],
@@ -1118,7 +1118,7 @@ export function createAgentRuntime({
       if (!isActiveRun(id8['runId'])) return createStoppedReply();
       const actionTypes = Array['isArray'](status2?.['actions']) ? status2['actions'] : [];
       if (
-        actionTypes['length'] === 0x0 &&
+        actionTypes['length'] === 0 &&
         !['need_clarification', 'failed']['includes'](status2?.['status'])
       ) {
         const hasActionIntent = hasExplicitCanvasActionIntent(
@@ -1133,9 +1133,9 @@ export function createAgentRuntime({
           });
         if (hasActionIntent && errorCode2['ok'] === ![]) {
           const value39 = 'completion:' + (errorCode2['requestedNodeType'] || 'unknown'),
-            retryCount = Number(id8['validationFailureCounts']?.[value39] || 0x0) + 0x1,
+            retryCount = Number(id8['validationFailureCounts']?.[value39] || 0) + 1,
             message3 = runtimeText('loopCompletionEvidenceCorrection', localeProvider2());
-          if (retryCount <= 0x2) {
+          if (retryCount <= 2) {
             ((id8['validationFailureCounts'] = {
               ...id8['validationFailureCounts'],
               [value39]: retryCount,
@@ -1151,7 +1151,7 @@ export function createAgentRuntime({
                   message: message3,
                   details: errorCode2,
                 },
-              ]['slice'](-0x4)),
+              ]['slice'](-4)),
               sessionStore['recordTrace']?.({
                 type: 'agent_loop_completion_evidence_retry',
                 step: id8['step'],
@@ -1164,7 +1164,7 @@ export function createAgentRuntime({
             diagnosticReason: errorCode2['errorCode'],
           });
         }
-        if (id8['toolResults']['length'] > 0x0 || status2?.['status'] === 'chat' || !hasActionIntent)
+        if (id8['toolResults']['length'] > 0 || status2?.['status'] === 'chat' || !hasActionIntent)
           return run19(id8, status2);
         if (
           shouldRetryAgentLoopNoop({
@@ -1174,7 +1174,7 @@ export function createAgentRuntime({
             status: status2?.['status'],
           })
         ) {
-          ((id8['noActionRetryCount'] = Number(id8['noActionRetryCount'] || 0x0) + 0x1),
+          ((id8['noActionRetryCount'] = Number(id8['noActionRetryCount'] || 0) + 1),
             sessionStore['recordTrace']?.({
               type: 'agent_loop_no_action_retry',
               step: id8['step'],
@@ -1186,9 +1186,9 @@ export function createAgentRuntime({
           diagnosticReason: 'no_action',
         });
       }
-      if (id8['step'] >= value37 && actionTypes['length'] > 0x0)
+      if (id8['step'] >= value37 && actionTypes['length'] > 0)
         return run8(id8, runtimeText('loopLimitReached', localeProvider2()));
-      actionTypes['length'] > 0x1 &&
+      actionTypes['length'] > 1 &&
         sessionStore['recordTrace']?.({
           type: 'agent_loop_multiple_actions_compacted',
           step: id8['step'],
@@ -1227,7 +1227,7 @@ export function createAgentRuntime({
           return run15(id8, runtimeText('plannerRetryAvailable', localeProvider2()), {
             validation: validation2,
           });
-        const enabled9 = value43?.['actions']?.[0x0] || null,
+        const enabled9 = value43?.['actions']?.[0] || null,
           value44 = !enabled9 && validation2['errorCode'] === 'AGENT_PLAN_INVALID',
           enabled10 = ['UNKNOWN_AGENT_ACTION', 'DEFERRED_AGENT_ACTION', 'BLOCKED_AGENT_ACTION']['includes'](
             String(validation2['errorCode'] || ''),
@@ -1237,8 +1237,8 @@ export function createAgentRuntime({
             value45 = enabled9
               ? fingerprintAgentAction(enabled9)
               : 'agent.plan:' + String(status2?.['status'] || 'unknown') + ':' + validation2['errorCode'],
-            count = Number(id8['validationFailureCounts']?.[value45] || 0x0) + 0x1;
-          if (count <= 0x2) {
+            count = Number(id8['validationFailureCounts']?.[value45] || 0) + 1;
+          if (count <= 2) {
             ((id8['validationFailureCounts'] = {
               ...id8['validationFailureCounts'],
               [value45]: count,
@@ -1253,7 +1253,7 @@ export function createAgentRuntime({
                   errorCode: validation2['errorCode'],
                   message: validation2['message'],
                 },
-              ]['slice'](-0x4)),
+              ]['slice'](-4)),
               sessionStore['recordTrace']?.({
                 type: 'agent_loop_validation_retry',
                 step: id8['step'],
@@ -1269,7 +1269,7 @@ export function createAgentRuntime({
         return run8(id8, validation2['message'], { validation: validation2 });
       }
       if (
-        id8['step'] === 0x0 &&
+        id8['step'] === 0 &&
         shouldHoldCanvasActionsForChat(validation2, id8['originalMessage'], id8['plannerExtra'])
       )
         return run19(id8, {
@@ -1289,8 +1289,8 @@ export function createAgentRuntime({
           })
         ) {
           const value46 = 'agent.plan:unnecessary_clarification',
-            retryCount2 = Number(id8['validationFailureCounts']?.[value46] || 0x0) + 0x1;
-          if (retryCount2 <= 0x2) {
+            retryCount2 = Number(id8['validationFailureCounts']?.[value46] || 0) + 1;
+          if (retryCount2 <= 2) {
             ((id8['validationFailureCounts'] = {
               ...id8['validationFailureCounts'],
               [value46]: retryCount2,
@@ -1306,7 +1306,7 @@ export function createAgentRuntime({
                   errorCode: 'UNNECESSARY_CLARIFICATION',
                   message: id8['clarificationAnswer'],
                 },
-              ]['slice'](-0x4)),
+              ]['slice'](-4)),
               sessionStore['recordTrace']?.({
                 type: 'agent_loop_clarification_replaced_with_defaults',
                 step: id8['step'],
@@ -1341,12 +1341,12 @@ export function createAgentRuntime({
           }
         );
       }
-      const commandId3 = validation2['plan']['actions'][0x0],
+      const commandId3 = validation2['plan']['actions'][0],
         fingerprintAgentAction3 = fingerprintAgentAction(commandId3);
       if (id8['completedFingerprints']['includes'](fingerprintAgentAction3)) {
         const value49 = 'completed:' + fingerprintAgentAction3,
-          repeatCount = Number(id8['validationFailureCounts']?.[value49] || 0x0) + 0x1;
-        if (repeatCount <= 0x2) {
+          repeatCount = Number(id8['validationFailureCounts']?.[value49] || 0) + 1;
+        if (repeatCount <= 2) {
           const message4 = runtimeText('loopRepeatedActionCorrection', localeProvider2());
           ((id8['validationFailureCounts'] = {
             ...id8['validationFailureCounts'],
@@ -1362,7 +1362,7 @@ export function createAgentRuntime({
                 errorCode: 'ACTION_ALREADY_COMPLETED',
                 message: message4,
               },
-            ]['slice'](-0x4)),
+            ]['slice'](-4)),
             sessionStore['recordTrace']?.({
               type: 'agent_loop_repeated_action_corrected',
               step: id8['step'],
@@ -1376,7 +1376,7 @@ export function createAgentRuntime({
       const errorCode3 = validateAgentLoopActionBudget(commandId3, id8['actionBudget']);
       if (!errorCode3['ok']) {
         const value50 = 'budget:' + errorCode3['errorCode'],
-          count2 = Number(id8['validationFailureCounts']?.[value50] || 0x0) + 0x1,
+          count2 = Number(id8['validationFailureCounts']?.[value50] || 0) + 1,
           message5 = runtimeText('loopDuplicateBudgetCorrection', localeProvider2());
         ((id8['validationFailureCounts'] = {
           ...id8['validationFailureCounts'],
@@ -1393,14 +1393,14 @@ export function createAgentRuntime({
               message: message5,
               details: errorCode3,
             },
-          ]['slice'](-0x4)),
+          ]['slice'](-4)),
           sessionStore['recordTrace']?.({
             type: 'agent_loop_action_budget_rejected',
             step: id8['step'],
             commandId: commandId3['type'],
             ...errorCode3,
           }));
-        if (count2 <= 0x2) continue;
+        if (count2 <= 2) continue;
         return run15(id8, runtimeText('plannerRetryAvailable', localeProvider2()), {
           validation: { errorCode: errorCode3['errorCode'], plan: { actions: [commandId3] } },
         });
@@ -1464,16 +1464,16 @@ export function createAgentRuntime({
         const value52 = { ...id8['failedFingerprints'] };
         (delete value52[fingerprintAgentAction3], (id8['failedFingerprints'] = value52));
       } else {
-        const count3 = Number(id8['failedFingerprints'][fingerprintAgentAction3] || 0x0) + 0x1;
+        const count3 = Number(id8['failedFingerprints'][fingerprintAgentAction3] || 0) + 1;
         id8['failedFingerprints'] = { ...id8['failedFingerprints'], [fingerprintAgentAction3]: count3 };
-        if (count3 > 0x1)
+        if (count3 > 1)
           return run8(
             id8,
             execution4['message'] || runtimeText('actionExecutionFailed', localeProvider2()),
             { execution: execution4 },
           );
       }
-      ((id8['step'] += 0x1),
+      ((id8['step'] += 1),
         sessionStore['recordTrace']?.({
           type: 'agent_loop_tool_result',
           step: id8['step'],
@@ -1491,7 +1491,7 @@ export function createAgentRuntime({
   async function run20(message6, intent = {}) {
     if (typeof planner !== 'function') return createFailedReply(runtimeText('plannerMissing', localeProvider2()));
     const value54 = String(intent['loopState']?.['recoveryInstruction'] || '')['trim'](),
-      userMessage3 = value54 ? String(message6 || '') + '\x0a' + value54 : message6,
+      userMessage3 = value54 ? String(message6 || '') + '\n' + value54 : message6,
       namespaces = buildContext({
         store: store2 || commandContext2?.['store'],
         commandRegistry: commandRegistry,
@@ -1517,7 +1517,7 @@ export function createAgentRuntime({
         modelIds: (namespaces['canvas']?.['availableModels'] || [])['map'](
           (value57) => value57['modelId'],
         ),
-        estimatedChars: Number(namespaces['contextBudget']?.['estimatedChars'] || 0x0),
+        estimatedChars: Number(namespaces['contextBudget']?.['estimatedChars'] || 0),
         schemaIntegrity: namespaces['contextBudget']?.['schemaIntegrity'] !== ![],
       }),
       planner({
@@ -1585,7 +1585,7 @@ export function createAgentRuntime({
     let taskMessages4 = [];
     const content5 = execution5['ok']
         ? initialScope['plan']['completionReply'] ||
-          (initialScope['plan']['preExecutedActions']?.['length'] > 0x0
+          (initialScope['plan']['preExecutedActions']?.['length'] > 0
             ? summarizeExecution(execution5, localeProvider2())
             : initialScope['plan']['reply'] || summarizeExecution(execution5, localeProvider2()))
         : summarizeExecution(execution5, localeProvider2()),
@@ -1598,7 +1598,7 @@ export function createAgentRuntime({
         : buildAgentExecutionDiagnostic({
             execution: execution5,
             recovery: recovery3,
-            step: sessionStore['getCurrentRun']?.()?.['step'] || 0x0,
+            step: sessionStore['getCurrentRun']?.()?.['step'] || 0,
             locale: localeProvider2(),
           });
     if (execution5['ok'])
@@ -1634,7 +1634,7 @@ export function createAgentRuntime({
   async function run22(plan2, { turnId: turnId = '' } = {}) {
     if (!isActiveRun(turnId)) return createStoppedReply();
     const { prefix: prefix, pending: pending } = agentPlanLifecycle['partition'](plan2['plan']);
-    if (prefix['length'] === 0x0) return { ok: !![], plan: plan2['plan'], preExecution: null };
+    if (prefix['length'] === 0) return { ok: !![], plan: plan2['plan'], preExecution: null };
     const execution6 = await executeActions2(prefix, { commandContext: commandContext2, ...buildExecutionOptions(turnId) });
     if (!isActiveRun(turnId)) return { ...createStoppedReply(), execution: execution6 };
     if (!execution6['ok'])
@@ -1704,7 +1704,7 @@ export function createAgentRuntime({
         sessionStore['recordTrace']?.({
           type: 'canvas_action_held_for_chat',
           actionTypes: (content6['plan']['actions'] || [])['map']((value64) => value64['type']),
-          reason: 'missing\x20explicit\x20canvas\x20action\x20intent',
+          reason: 'missing explicit canvas action intent',
         }),
         sessionStore['pushHistory']?.({ role: 'assistant', status: 'chat', content: content8 }),
         createChatReply(content8, {
@@ -1805,7 +1805,7 @@ export function createAgentRuntime({
       run10(),
       sessionStore['setCurrentRun']?.({ id: id9, status: 'planning', stopped: ![] }));
     const value67 =
-      Array['isArray'](selectedSkillIds['documentFiles']) && selectedSkillIds['documentFiles']['length'] > 0x0;
+      Array['isArray'](selectedSkillIds['documentFiles']) && selectedSkillIds['documentFiles']['length'] > 0;
     sessionStore['pushHistory']?.({
       role: 'user',
       content: displayMessage2,
@@ -1915,7 +1915,7 @@ export function createAgentRuntime({
       enabled11 = sessionStore['getPendingPlan']?.();
     if (!enabled11) return createFailedReply(runtimeText('noPendingPlan', localeProvider2()));
     const params = getPlainObject(options6['params'] || options6);
-    if (Object['keys'](params)['length'] === 0x0)
+    if (Object['keys'](params)['length'] === 0)
       return createFailedReply(runtimeText('nodeSetParams', localeProvider2()));
     const debugTraceSummary =
         enabled11['confirmationSummary'] || agentPlanLifecycle['review'](enabled11)['confirmationSummary'],
@@ -1926,7 +1926,7 @@ export function createAgentRuntime({
       )
         ['map']((value74) => String(value74 || '')['trim']())
         ['filter'](Boolean);
-    if (list7['length'] === 0x0) return createFailedReply(runtimeText('noPendingPlan', localeProvider2()));
+    if (list7['length'] === 0) return createFailedReply(runtimeText('noPendingPlan', localeProvider2()));
     const execution7 = await executeActions2(
       list7['map']((nodeId) => ({
         type: 'node.setParams',
@@ -1969,7 +1969,7 @@ export function createAgentRuntime({
       const id12 = loopMode === !![] ? sessionStore['getPendingLoopRun']?.() : null;
       if (id12?.['pendingKind'] === 'confirmation') {
         const value76 = id12['pendingValidatedPlan'],
-          commandId4 = value76?.['actions']?.[0x0];
+          commandId4 = value76?.['actions']?.[0];
         if (!commandId4 || !run6(id12))
           return (
             sessionStore['clearPendingLoopRun']?.(),
@@ -2025,7 +2025,7 @@ export function createAgentRuntime({
         runId: sessionStore['getCurrentRun']?.()?.['id'],
         type: 'approval.confirmed',
         status: 'executing',
-        commandId: commandId5['actions']?.[0x0]?.['type'],
+        commandId: commandId5['actions']?.[0]?.['type'],
       }),
         (config = run21(
           { ok: !![], status: 'ready', plan: { ...commandId5, status: 'ready', requiresConfirmation: ![] } },
@@ -2124,7 +2124,7 @@ export function createAgentRuntime({
         type: 'approval.cancelled',
         status: 'cancelled',
         step: runId7?.['step'],
-        commandId: commandId6?.['actions']?.[0x0]?.['type'],
+        commandId: commandId6?.['actions']?.[0]?.['type'],
       }),
         sessionStore['clearPendingPlan']?.(),
         sessionStore['clearPendingLoopRun']?.(),

@@ -11,10 +11,10 @@ import { saveRemoteAudioLocallyDetailed } from '../../services/projectService.js
 import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../../utils/localMediaPath.js';
 export const STORY_CHARACTER_VOICE_DEFAULT_MODEL_ID = VOLCENGINE_DOUBAO_AUDIO_GENERATION_MODEL_ID;
 export const STORY_CHARACTER_VOICE_FALLBACK_LINE = '你好，我已经准备好了，接下来我会保持冷静。';
-export const STORY_CHARACTER_VOICE_SAMPLE_MIN_SECONDS = 0x5;
-export const STORY_CHARACTER_VOICE_SAMPLE_MAX_SECONDS = 0x5;
-export const STORY_CHARACTER_VOICE_SAMPLE_MAX_CHARACTERS = 0x15;
-const STORY_CHARACTER_VOICE_SPEECH_UNITS_PER_SECOND = 0x4,
+export const STORY_CHARACTER_VOICE_SAMPLE_MIN_SECONDS = 5;
+export const STORY_CHARACTER_VOICE_SAMPLE_MAX_SECONDS = 5;
+export const STORY_CHARACTER_VOICE_SAMPLE_MAX_CHARACTERS = 21;
+const STORY_CHARACTER_VOICE_SPEECH_UNITS_PER_SECOND = 4,
   STORY_CHARACTER_VOICE_SAMPLE_MIN_UNITS =
     STORY_CHARACTER_VOICE_SAMPLE_MIN_SECONDS * STORY_CHARACTER_VOICE_SPEECH_UNITS_PER_SECOND,
   STORY_CHARACTER_VOICE_SAMPLE_MAX_UNITS =
@@ -23,7 +23,7 @@ function normalizeText(value) {
   return String(value || '')['trim']();
 }
 export function createStoryCharacterVoicePreviewGuard() {
-  let item = 0x0,
+  let item = 0,
     key = null;
   return {
     begin({ assetId: assetId = '', source: source = '', audioEl: audioEl = null } = {}) {
@@ -48,7 +48,7 @@ export function createStoryCharacterVoicePreviewGuard() {
       );
     },
     invalidate() {
-      ((item += 0x1), (key = null));
+      ((item += 1), (key = null));
     },
   };
 }
@@ -61,7 +61,7 @@ function countStoryCharacterVoiceSpeechUnits(result) {
 export function estimateStoryCharacterVoiceDurationSec(options) {
   const countStoryCharacterVoiceSpeechUnits2 = countStoryCharacterVoiceSpeechUnits(options);
   return Number(
-    (countStoryCharacterVoiceSpeechUnits2 / STORY_CHARACTER_VOICE_SPEECH_UNITS_PER_SECOND)['toFixed'](0x1),
+    (countStoryCharacterVoiceSpeechUnits2 / STORY_CHARACTER_VOICE_SPEECH_UNITS_PER_SECOND)['toFixed'](1),
   );
 }
 function ensureAuditionSentence(target) {
@@ -71,19 +71,19 @@ function ensureAuditionSentence(target) {
 }
 function truncateStoryCharacterVoiceSample(next) {
   const list2 = [];
-  let current = 0x0;
+  let current = 0;
   for (const entry of [...normalizeText(next)]) {
-    if (list2['length'] >= STORY_CHARACTER_VOICE_SAMPLE_MAX_CHARACTERS - 0x1) break;
+    if (list2['length'] >= STORY_CHARACTER_VOICE_SAMPLE_MAX_CHARACTERS - 1) break;
     const record = !/[\s，。！？!?；;：:、…“”"'‘’（）()《》]/u['test'](entry);
     if (record && current >= STORY_CHARACTER_VOICE_SAMPLE_MAX_UNITS) break;
     list2['push'](entry);
-    if (record) current += 0x1;
+    if (record) current += 1;
   }
   return ensureAuditionSentence(list2['join']('')['replace'](/[，、；;：:\s]+$/u, ''));
 }
 function buildStoryCharacterVoiceSampleFromCandidates(list3 = []) {
   const list4 = [];
-  let handle = 0x0;
+  let handle = 0;
   for (const state of uniqueText(list3)) {
     if (handle >= STORY_CHARACTER_VOICE_SAMPLE_MIN_UNITS) break;
     const auditionSentence = ensureAuditionSentence(state);
@@ -92,7 +92,7 @@ function buildStoryCharacterVoiceSampleFromCandidates(list3 = []) {
   }
   return (
     handle < STORY_CHARACTER_VOICE_SAMPLE_MIN_UNITS && list4['push'](STORY_CHARACTER_VOICE_FALLBACK_LINE),
-    truncateStoryCharacterVoiceSample(list4['join']('\x20'))
+    truncateStoryCharacterVoiceSample(list4['join'](' '))
   );
 }
 function escapeRegExp(config) {
@@ -106,7 +106,7 @@ function stripDialogueSpeaker(scope, input) {
     output = text2['match'](
       new RegExp('(?:^|[\\s，,。！？!?；;])@?' + escapeRegExp2 + '\\s*[：:]\\s*[“"\'‘]?([^\\n”"\'’]+)', 'u'),
     );
-  if (output?.[0x1]) return normalizeText(output[0x1])['replace'](/[”"'’]+$/u, '');
+  if (output?.[1]) return normalizeText(output[1])['replace'](/[”"'’]+$/u, '');
   return '';
 }
 function collectShotDialogues(value2, value3) {
@@ -165,7 +165,7 @@ export function extractStoryCharacterDialogue({
     project: project,
     episodes: episodes,
   });
-  return storyCharacterDialogueCandidates[0x0] || '';
+  return storyCharacterDialogueCandidates[0] || '';
 }
 export function getStoryCharacterVoiceSampleText(options2 = {}) {
   return buildStoryCharacterVoiceSampleFromCandidates(collectStoryCharacterDialogueCandidates(options2));
@@ -193,7 +193,7 @@ export function normalizeStoryCharacterVoiceReference(options3 = {}) {
     updatedAt: Number(args2['updatedAt']) || Date['now'](),
   };
 }
-export const STORY_CHARACTER_VOICE_HISTORY_LIMIT = 0xc;
+export const STORY_CHARACTER_VOICE_HISTORY_LIMIT = 12;
 function getStoryCharacterVoiceReferenceKey(value15 = null) {
   const storyCharacterVoiceReference = normalizeStoryCharacterVoiceReference(value15);
   return normalizeText(
@@ -216,7 +216,7 @@ export function normalizeStoryCharacterVoiceHistory(list5 = []) {
         return;
       (map['add'](storyCharacterVoiceReferenceKey), list6['push'](storyCharacterVoiceReference2));
     }),
-    list6['slice'](0x0, STORY_CHARACTER_VOICE_HISTORY_LIMIT)
+    list6['slice'](0, STORY_CHARACTER_VOICE_HISTORY_LIMIT)
   );
 }
 export function replaceStoryCharacterVoiceReference(options4 = {}, value18 = {}) {
@@ -247,7 +247,7 @@ export function clearStoryCharacterVoiceReference(options5 = {}) {
     args4
   );
 }
-export function restoreStoryCharacterVoiceHistoryReference(options6 = {}, value20 = 0x0) {
+export function restoreStoryCharacterVoiceHistoryReference(options6 = {}, value20 = 0) {
   const args5 = normalizeStoryCharacterVoiceHistory(options6['voiceReferenceHistory']),
     value21 = Math['trunc'](Number(value20)),
     enabled = args5[value21];
@@ -278,7 +278,7 @@ export function getStoryCharacterVoiceWorkflow(value25 = '') {
     storyCharacterVoiceWorkflowItems['find'](
       (value27) => value27['key'] === STORY_CHARACTER_VOICE_DEFAULT_MODEL_ID,
     ) ||
-    storyCharacterVoiceWorkflowItems[0x0] ||
+    storyCharacterVoiceWorkflowItems[0] ||
     null
   );
 }
@@ -359,7 +359,7 @@ function buildVoicePrompt({
     '台词（只说引号内的内容）：“' + text5 + '”',
   ]
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function buildStoryCharacterVoicePayload({
   asset: asset = {},
@@ -372,16 +372,16 @@ export function buildStoryCharacterVoicePayload({
   if (!modelExecution?.['modelManifest'] || !modelExecution?.['executionManifest'])
     throw new Error('音频模型缺少执行清单：' + event['key']);
   const value30 = modelExecution['modelManifest']['inputSlots'] || {},
-    count = Number(value30?.['maxByKind']?.['audio'] || 0x0),
-    value31 = Number['isFinite'](count) && count > 0x0,
-    count2 = Number(value30?.['minByKind']?.['audio'] || 0x0),
-    value32 = Number['isFinite'](count2) && count2 > 0x0,
+    count = Number(value30?.['maxByKind']?.['audio'] || 0),
+    value31 = Number['isFinite'](count) && count > 0,
+    count2 = Number(value30?.['minByKind']?.['audio'] || 0),
+    value32 = Number['isFinite'](count2) && count2 > 0,
     storyCharacterVoiceReference4 = normalizeStoryCharacterVoiceReference(asset?.['voiceReference']),
     text7 = normalizeText(
       storyCharacterVoiceReference4?.['audioUrl'] ||
         localPathToUrl(storyCharacterVoiceReference4?.['localPath']),
     ),
-    audioWorkflowSlots = getAudioWorkflowSlots(event['key'])[0x0]?.['slot'] || 'audioRef',
+    audioWorkflowSlots = getAudioWorkflowSlots(event['key'])[0]?.['slot'] || 'audioRef',
     sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(
       event['key'],
       editor?.['nodeData']?.['generationParams'] || {},
@@ -465,13 +465,13 @@ export async function trimStoryCharacterVoiceAudio(
         electronPayload: {
           kind: 'audioCut',
           src: localPath4,
-          args: { start: 0x0, end: STORY_CHARACTER_VOICE_SAMPLE_MAX_SECONDS },
+          args: { start: 0, end: STORY_CHARACTER_VOICE_SAMPLE_MAX_SECONDS },
         },
       },
-      { timeout: 0x927c0 },
+      { timeout: 600000 },
     ),
     localPath5 = normalizeLocalPath(args14?.['localPath'] || args14?.['path'] || pickResultLocalPath(args14));
-  if (!localPath5) throw new Error('参考人声音频裁剪到\x205\x20秒失败。');
+  if (!localPath5) throw new Error('参考人声音频裁剪到 5 秒失败。');
   return {
     ...args13,
     ...(args14 && typeof args14 === 'object' ? args14 : {}),
@@ -544,7 +544,7 @@ export async function generateStoryCharacterVoice({
     fileName: value44['fileName'],
     modelId: workflow['key'],
     modelLabel: workflow['label'],
-    sampleText: payload2['textInputs'][0x0],
+    sampleText: payload2['textInputs'][0],
     voiceDescription: editor['voiceDescription'],
     generationParams: payload2['generationParams'],
     updatedAt: Date['now'](),
@@ -588,7 +588,7 @@ export async function resumeStoryCharacterVoice({
     fileName: trimStoryCharacterVoiceAudio2['fileName'],
     modelId: storyCharacterVoiceWorkflow3['key'],
     modelLabel: storyCharacterVoiceWorkflow3['label'],
-    sampleText: payload['textInputs']?.[0x0],
+    sampleText: payload['textInputs']?.[0],
     voiceDescription: asset['voiceDescription'] || asset['description'],
     generationParams: payload['generationParams'],
     updatedAt: Date['now'](),

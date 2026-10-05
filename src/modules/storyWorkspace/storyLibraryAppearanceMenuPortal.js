@@ -11,12 +11,12 @@ export function createStoryLibraryAssignmentMenuPortal({
     el4 = null,
     el5 = null,
     el6 = null,
-    item = 0x0;
+    item = 0;
   function run() {
     const el7 = storyRoot?.['ownerDocument']?.['documentElement'];
     return {
-      width: Number(windowObject?.['innerWidth']) || el7?.['clientWidth'] || 0x0,
-      height: Number(windowObject?.['innerHeight']) || el7?.['clientHeight'] || 0x0,
+      width: Number(windowObject?.['innerWidth']) || el7?.['clientWidth'] || 0,
+      height: Number(windowObject?.['innerHeight']) || el7?.['clientHeight'] || 0,
     };
   }
   function run2() {
@@ -46,14 +46,14 @@ export function createStoryLibraryAssignmentMenuPortal({
     const box = el2['getBoundingClientRect'](),
       box2 = el['getBoundingClientRect'](),
       box3 = run(),
-      key = box['bottom'] + 0xa,
-      index = box['top'] - box2['height'] - 0xa,
-      result = key + box2['height'] <= box3['height'] - 0x10 ? key : index,
+      key = box['bottom'] + 10,
+      index = box['top'] - box2['height'] - 10,
+      result = key + box2['height'] <= box3['height'] - 16 ? key : index,
       data = box['right'] - box2['width'],
-      options = box3['width'] - 0x10 - box2['width'],
-      target = box3['height'] - 0x10 - box2['height'];
-    ((el['style']['left'] = Math['max'](0x10, Math['min'](options, data)) + 'px'),
-      (el['style']['top'] = Math['max'](0x10, Math['min'](target, result)) + 'px'));
+      options = box3['width'] - 16 - box2['width'],
+      target = box3['height'] - 16 - box2['height'];
+    ((el['style']['left'] = Math['max'](16, Math['min'](options, data)) + 'px'),
+      (el['style']['top'] = Math['max'](16, Math['min'](target, result)) + 'px'));
   }
   function run5() {
     if (!el4?.['isConnected'] || !el5?.['isConnected'] || !el6?.['isConnected']) return;
@@ -61,13 +61,13 @@ export function createStoryLibraryAssignmentMenuPortal({
       box5 = el6['getBoundingClientRect'](),
       box6 = el4['getBoundingClientRect'](),
       box7 = run(),
-      source = box4['right'] + 0xa,
-      next = box4['left'] - box6['width'] - 0xa,
-      current = source + box6['width'] <= box7['width'] - 0x10 ? source : next,
-      entry = box7['width'] - 0x10 - box6['width'],
-      record = box7['height'] - 0x10 - box6['height'];
-    ((el4['style']['left'] = Math['max'](0x10, Math['min'](entry, current)) + 'px'),
-      (el4['style']['top'] = Math['max'](0x10, Math['min'](record, box5['top'])) + 'px'));
+      source = box4['right'] + 10,
+      next = box4['left'] - box6['width'] - 10,
+      current = source + box6['width'] <= box7['width'] - 16 ? source : next,
+      entry = box7['width'] - 16 - box6['width'],
+      record = box7['height'] - 16 - box6['height'];
+    ((el4['style']['left'] = Math['max'](16, Math['min'](entry, current)) + 'px'),
+      (el4['style']['top'] = Math['max'](16, Math['min'](record, box5['top'])) + 'px'));
   }
   function reposition() {
     (run4(), run5());
@@ -77,7 +77,7 @@ export function createStoryLibraryAssignmentMenuPortal({
     if (!windowObject?.['requestAnimationFrame']) return;
     if (item) windowObject['cancelAnimationFrame']?.(item);
     item = windowObject['requestAnimationFrame'](() => {
-      ((item = 0x0), reposition());
+      ((item = 0), reposition());
     });
   }
   function closeAppearance(el12 = storyRoot) {

@@ -24,14 +24,14 @@ function normalizeQuality(value, fallback = 'balanced') {
   return ['compact', 'balanced', 'high'].includes(normalized) ? normalized : fallback;
 }
 function getQualityMaxColors(quality) {
-  if (quality === 'compact') return 0x40;
-  if (quality === 'high') return 0x100;
-  return 0x80;
+  if (quality === 'compact') return 64;
+  if (quality === 'high') return 256;
+  return 128;
 }
 function getQualityBayerScale(quality) {
-  if (quality === 'compact') return 0x5;
-  if (quality === 'high') return 0x2;
-  return 0x3;
+  if (quality === 'compact') return 5;
+  if (quality === 'high') return 2;
+  return 3;
 }
 export function normalizeVideoToGifOptions(options = {}, meta = {}) {
   const preset = normalizePreset(options.preset),
@@ -49,19 +49,19 @@ export function normalizeVideoToGifOptions(options = {}, meta = {}) {
     ),
     sourceWidth = Math.max(0, Number(options.sourceWidth) || Number(meta.width) || 0),
     sourceHeight = Math.max(0, Number(options.sourceHeight) || Number(meta.height) || 0),
-    defaultSize = 0x2d0,
+    defaultSize = 720,
     sizeCandidate =
       Number(options.size) ||
       Math.max(Number(options.width) || 0, Number(options.height) || 0) ||
       defaultSize,
-    size = normalizeInteger(sizeCandidate, 0x40, 0x780, defaultSize);
-  let width = normalizeInteger(options.width, 0x1, 0x780, size),
-    height = normalizeInteger(options.height, 0x1, 0x780, size);
+    size = normalizeInteger(sizeCandidate, 64, 1920, defaultSize);
+  let width = normalizeInteger(options.width, 1, 1920, size),
+    height = normalizeInteger(options.height, 1, 1920, size);
   if (sourceWidth > 0 && sourceHeight > 0) {
     const aspectRatio = sourceWidth / sourceHeight;
-    aspectRatio >= 0x1
-      ? ((width = size), (height = Math.max(0x1, Math.round(size / aspectRatio))))
-      : ((width = Math.max(0x1, Math.round(size * aspectRatio))), (height = size));
+    aspectRatio >= 1
+      ? ((width = size), (height = Math.max(1, Math.round(size / aspectRatio))))
+      : ((width = Math.max(1, Math.round(size * aspectRatio))), (height = size));
   }
   const quality = normalizeQuality(options.quality, preset === PRESET_WECHAT ? 'high' : 'balanced');
   return {
@@ -70,16 +70,16 @@ export function normalizeVideoToGifOptions(options = {}, meta = {}) {
     start: start,
     end: end,
     duration: end - start,
-    fps: normalizeInteger(options.fps, 0x4, 0x1e, preset === PRESET_WECHAT ? 0xf : 0x14),
+    fps: normalizeInteger(options.fps, 4, 30, preset === PRESET_WECHAT ? 15 : 20),
     width: width,
     height: height,
-    maxColors: normalizeInteger(options.maxColors, 0x10, 0x100, getQualityMaxColors(quality)),
-    bayerScale: normalizeInteger(options.bayerScale, 0x0, 0x5, getQualityBayerScale(quality)),
+    maxColors: normalizeInteger(options.maxColors, 16, 256, getQualityMaxColors(quality)),
+    bayerScale: normalizeInteger(options.bayerScale, 0, 5, getQualityBayerScale(quality)),
     targetBytes: normalizeInteger(
       options.targetBytes,
-      0x0,
-      0x32 * 0x400 * 0x400,
-      preset === PRESET_WECHAT ? 0x400 * 0x400 : 0x0,
+      0,
+      50 * 1024 * 1024,
+      preset === PRESET_WECHAT ? 1024 * 1024 : 0,
     ),
   };
 }
@@ -121,19 +121,19 @@ export function buildVideoToGifFfmpegArgs({ sourceAbs: sourceAbs, outAbs: outAbs
 }
 export function resolveNextVideoGifAdaptiveProfile({
   profile: profile = {},
-  fileSize: fileSize = 0x0,
-  targetBytes: targetBytes = 0x0,
-  attempt: attempt = 0x0,
+  fileSize: fileSize = 0,
+  targetBytes: targetBytes = 0,
+  attempt: attempt = 0,
 } = {}) {
-  if (!(fileSize > targetBytes && targetBytes > 0x0)) return null;
-  const secondOptimizePass = attempt >= 0x2,
+  if (!(fileSize > targetBytes && targetBytes > 0)) return null;
+  const secondOptimizePass = attempt >= 2,
     nextProfile = {
       fps: secondOptimizePass
-        ? Math.max(0x6, Math.round((Number(profile.fps) || 0x6) * 0.85))
-        : Number(profile.fps) || 0x6,
-      maxColors: Math.max(0x20, Math.round((Number(profile.maxColors) || 0x20) * 0.75)),
-      width: Math.max(0x1, Math.round(Number(profile.width) || 0x1)),
-      height: Math.max(0x1, Math.round(Number(profile.height) || 0x1)),
+        ? Math.max(6, Math.round((Number(profile.fps) || 6) * 0.85))
+        : Number(profile.fps) || 6,
+      maxColors: Math.max(32, Math.round((Number(profile.maxColors) || 32) * 0.75)),
+      width: Math.max(1, Math.round(Number(profile.width) || 1)),
+      height: Math.max(1, Math.round(Number(profile.height) || 1)),
     };
   if (
     nextProfile.width === profile.width &&
@@ -171,21 +171,21 @@ export function createVideoToGifMediaTaskHandler({
           ? runFfmpegTask
           : (task, queue, args, options) =>
               queue.runProcess(task, getRuntimeToolOrFallback('ffmpeg'), args, options),
-      maxAttempts = gifOptions.targetBytes > 0x0 ? 0x6 : 0x1;
-    let fileSize = 0x0,
+      maxAttempts = gifOptions.targetBytes > 0 ? 6 : 1;
+    let fileSize = 0,
       activeProfile = {
         fps: gifOptions.fps,
         maxColors: gifOptions.maxColors,
         width: gifOptions.width,
         height: gifOptions.height,
       };
-    for (let attempt = 0x0; attempt < maxAttempts; attempt += 0x1) {
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       (queue.throwIfCancelled?.(task),
         queue.emitProgress?.(
           task,
           task.progress || 0.01,
-          attempt === 0x0 ? 'Encoding GIF' : 'Optimizing GIF (' + (attempt + 0x1) + '/' + maxAttempts + ')',
-          { stage: attempt === 0x0 ? 'encode' : 'optimize' },
+          attempt === 0 ? 'Encoding GIF' : 'Optimizing GIF (' + (attempt + 1) + '/' + maxAttempts + ')',
+          { stage: attempt === 0 ? 'encode' : 'optimize' },
         ));
       const ffmpegArgs = buildVideoToGifFfmpegArgs({
         sourceAbs: sourceAbs,
@@ -193,17 +193,17 @@ export function createVideoToGifMediaTaskHandler({
         options: { ...gifOptions, ...activeProfile },
       });
       (await runFfmpeg(task, queue, ffmpegArgs, {
-        durationSec: 0x0,
+        durationSec: 0,
         progressMessage: 'Encoding GIF',
       }),
-        (fileSize = Number(statFile(outAbs)?.size || 0x0)));
-      if (!(gifOptions.targetBytes > 0x0) || fileSize <= gifOptions.targetBytes) break;
-      if (attempt + 0x1 >= maxAttempts) break;
+        (fileSize = Number(statFile(outAbs)?.size || 0)));
+      if (!(gifOptions.targetBytes > 0) || fileSize <= gifOptions.targetBytes) break;
+      if (attempt + 1 >= maxAttempts) break;
       const nextProfile = resolveNextVideoGifAdaptiveProfile({
         profile: activeProfile,
         fileSize: fileSize,
         targetBytes: gifOptions.targetBytes,
-        attempt: attempt + 0x1,
+        attempt: attempt + 1,
       });
       if (!nextProfile) break;
       activeProfile = nextProfile;
@@ -222,7 +222,7 @@ export function createVideoToGifMediaTaskHandler({
       maxColors: activeProfile.maxColors,
       fileSize: fileSize,
       targetBytes: gifOptions.targetBytes,
-      targetExceeded: gifOptions.targetBytes > 0x0 && fileSize > gifOptions.targetBytes,
+      targetExceeded: gifOptions.targetBytes > 0 && fileSize > gifOptions.targetBytes,
       preset: gifOptions.preset,
     };
   };

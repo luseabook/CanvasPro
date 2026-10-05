@@ -1,8 +1,8 @@
 import { captureVideoFrameSnapshot, waitForVideoFrame } from '../../components/videoFrameCapture.js';
 import { localPathToUrl, normalizeLocalPath, pickResultLocalPath } from '../../utils/localMediaPath.js';
-const STORY_CLIP_VIDEO_LOCALIZE_MAX_BYTES = 0x200 * 0x400 * 0x400,
-  STORY_CLIP_FRAME_READY_TIMEOUT_MS = 0x2710,
-  STORY_CLIP_FRAME_SEEK_TIMEOUT_MS = 0x1f40;
+const STORY_CLIP_VIDEO_LOCALIZE_MAX_BYTES = 512 * 1024 * 1024,
+  STORY_CLIP_FRAME_READY_TIMEOUT_MS = 10000,
+  STORY_CLIP_FRAME_SEEK_TIMEOUT_MS = 8000;
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -40,10 +40,10 @@ function seekVideoToTime(el, item, key = STORY_CLIP_FRAME_SEEK_TIMEOUT_MS) {
   });
 }
 function resolveCaptureTime(target, source) {
-  const next = Math['max'](0x0, Number(source) || 0x0),
+  const next = Math['max'](0, Number(source) || 0),
     count = Number(target?.['duration']);
-  if (!Number['isFinite'](count) || count <= 0x0) return next;
-  return Math['min'](next, Math['max'](0x0, count - 0.001));
+  if (!Number['isFinite'](count) || count <= 0) return next;
+  return Math['min'](next, Math['max'](0, count - 0.001));
 }
 function inferVideoExtension(current, entry = {}) {
   const list = normalizeText(entry['mimeType'] || entry['contentType'])['toLowerCase']();
@@ -52,7 +52,7 @@ function inferVideoExtension(current, entry = {}) {
   if (list['includes']('mp4')) return 'mp4';
   try {
     const uRL = new URL(current, globalThis['location']?.['href'] || 'http://localhost/')['pathname'],
-      text = normalizeText(uRL['match'](/\.([a-z0-9]{2,5})$/i)?.[0x1])['toLowerCase']();
+      text = normalizeText(uRL['match'](/\.([a-z0-9]{2,5})$/i)?.[1])['toLowerCase']();
     if (['mp4', 'm4v', 'mov', 'webm']['includes'](text)) return text;
   } catch {}
   return 'mp4';
@@ -87,7 +87,7 @@ export function isStoryClipFrameCanvasSecurityError(error) {
 }
 export async function captureStoryClipFrameFromSource({
   sourceUrl: sourceUrl2,
-  currentTimeSec: currentTimeSec = 0x0,
+  currentTimeSec: currentTimeSec = 0,
   documentObject: documentObject = globalThis['document'],
   fileNamePrefix: fileNamePrefix = 'story_clip_frame',
   crop: crop,
@@ -131,7 +131,7 @@ export async function captureStoryClipFrameSnapshot({
   videoEl: videoEl,
   sourceResult: sourceResult = {},
   sourceUrl: sourceUrl = '',
-  currentTimeSec: currentTimeSec = 0x0,
+  currentTimeSec: currentTimeSec = 0,
   saveOutputFromUrl: saveOutputFromUrl,
   documentObject: documentObject = globalThis['document'],
   fileNamePrefix: fileNamePrefix = 'story_clip_frame',

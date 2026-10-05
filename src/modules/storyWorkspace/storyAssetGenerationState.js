@@ -144,7 +144,7 @@ export function buildStoryAssetBatchCancellationUpdate(options2 = {}, value14 = 
     canCancel = cancelledAppearanceKeys['length'] + cancelledVoiceAssetIds['length'],
     runningCount = pendingAppearanceKeys['length'] + pendingVoiceAssetIds['length'];
   return {
-    canCancel: canCancel > 0x0,
+    canCancel: canCancel > 0,
     cancelledCount: canCancel,
     runningCount: runningCount,
     cancelledAppearanceKeys: cancelledAppearanceKeys,
@@ -152,7 +152,7 @@ export function buildStoryAssetBatchCancellationUpdate(options2 = {}, value14 = 
     pendingAssetIds: pendingAssetIds,
     pendingAppearanceKeys: pendingAppearanceKeys,
     pendingVoiceAssetIds: pendingVoiceAssetIds,
-    label: runningCount ? '已取消后续生成 · 正在完成 ' + runningCount + '\x20项' : '已取消后续生成',
+    label: runningCount ? '已取消后续生成 · 正在完成 ' + runningCount + ' 项' : '已取消后续生成',
   };
 }
 export function buildStoryAssetBatchGenerationPlan(list6 = [], value18 = 'all') {

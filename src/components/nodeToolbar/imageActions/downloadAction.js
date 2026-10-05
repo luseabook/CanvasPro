@@ -87,7 +87,7 @@ export function bindImageDownloadAction(item) {
           const payload = await getImage(enabled.sourceId);
           if (payload) {
             const handle = window.URL.createObjectURL(payload);
-            (handler5(handle, record), setTimeout(() => window.URL.revokeObjectURL(handle), 0x3e8));
+            (handler5(handle, record), setTimeout(() => window.URL.revokeObjectURL(handle), 1000));
             return;
           }
         } catch {}
@@ -101,11 +101,11 @@ export function bindImageDownloadAction(item) {
       }
       try {
         const signal = new AbortController(),
-          setTimeout2 = setTimeout(() => signal.abort(), 0x3a98),
+          setTimeout2 = setTimeout(() => signal.abort(), 15000),
           state = await fetchRemoteBlob(enabled6, { signal: signal.signal });
         clearTimeout(setTimeout2);
         const config = window.URL.createObjectURL(state);
-        (handler5(config, record), setTimeout(() => window.URL.revokeObjectURL(config), 0x3e8));
+        (handler5(config, record), setTimeout(() => window.URL.revokeObjectURL(config), 1000));
       } catch {
         handler5(enabled6, record);
       }

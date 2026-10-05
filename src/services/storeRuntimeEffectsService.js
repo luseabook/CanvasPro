@@ -129,8 +129,8 @@ export function readUiPrefsFromStorage() {
           : 'click',
     record = Number(safeStorageGet22),
     alignDistributeGap = Number['isFinite'](record)
-      ? Math['max'](0x0, Math['min'](0xc8, Math['round'](record)))
-      : 0x28;
+      ? Math['max'](0, Math['min'](200, Math['round'](record)))
+      : 40;
   return {
     showVideoMeta: ![],
     showSelectionMediaProperties: String(safeStorageGet2) !== '0',
@@ -189,7 +189,7 @@ export function persistUiPrefsToStorage(payload) {
           : 'click',
     value8 = value7 !== 'off',
     value9 = Number(payload?.['alignDistributeGap']),
-    value10 = Number['isFinite'](value9) ? Math['max'](0x0, Math['min'](0xc8, Math['round'](value9))) : 0x28,
+    value10 = Number['isFinite'](value9) ? Math['max'](0, Math['min'](200, Math['round'](value9))) : 40,
     value11 = payload?.['snapGuidesEnabled'] !== ![],
     sanitizeFeatureSelectionsRecord2 = sanitizeFeatureSelectionsRecord(payload?.['featureSelections'] || {});
   (safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0'),
@@ -378,8 +378,8 @@ export function initStoreRuntimeEffects(value12) {
       (value78) => {
         const value79 = Number(value78['ui']?.['alignDistributeGap']);
         return Number['isFinite'](value79)
-          ? Math['max'](0x0, Math['min'](0xc8, Math['round'](value79)))
-          : 0x28;
+          ? Math['max'](0, Math['min'](200, Math['round'](value79)))
+          : 40;
       },
       (value80) => {
         safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(value80));

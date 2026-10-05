@@ -1,4 +1,4 @@
-const MAX_DRAFT_CHARS = 0xfa0,
+const MAX_DRAFT_CHARS = 4000,
   DIAGNOSTIC_COPY = Object['freeze']({
     'zh-CN': Object['freeze']({
       planning: '规划阶段',
@@ -33,12 +33,12 @@ const MAX_DRAFT_CHARS = 0xfa0,
         'The planning request did not finish in time. The task and completed steps were preserved.',
       ],
       PLANNER_NETWORK_ERROR: [
-        'Model\x20service\x20network\x20request\x20failed',
+        'Model service network request failed',
         'No executable plan was received. Resume from the current checkpoint.',
       ],
       PLANNER_NO_ACTION: [
-        'Planner\x20returned\x20no\x20canvas\x20action',
-        'The\x20request\x20required\x20a\x20canvas\x20change,\x20but\x20the\x20model\x20returned\x20no\x20executable\x20action.',
+        'Planner returned no canvas action',
+        'The request required a canvas change, but the model returned no executable action.',
       ],
       PLANNER_REPORTED_FAILURE: [
         'The model ended planning',
@@ -49,18 +49,18 @@ const MAX_DRAFT_CHARS = 0xfa0,
         'The returned action did not satisfy the canvas command contract.',
       ],
       PLANNER_UNSUPPORTED_ACTION: [
-        'Planner\x20action\x20is\x20unavailable',
+        'Planner action is unavailable',
         'The model selected an unsupported or undisclosed command for this turn.',
       ],
       PLANNER_REQUEST_ERROR: [
-        'Model\x20planning\x20request\x20failed',
+        'Model planning request failed',
         'The request returned no executable plan. The task and completed steps were preserved.',
       ],
       EXECUTION_ACTION_FAILED: [
         'Canvas action failed',
-        'Completed\x20preparation\x20was\x20preserved.\x20Retry\x20the\x20failed\x20action\x20or\x20revise\x20the\x20request.',
+        'Completed preparation was preserved. Retry the failed action or revise the request.',
       ],
-      retryPlanner: 'Repair\x20and\x20continue',
+      retryPlanner: 'Repair and continue',
       editRequest: 'Edit request',
       changeModel: 'Change model',
     }),
@@ -77,7 +77,7 @@ function normalizeErrorCode(item = '', key = '') {
     ['trim']()
     ['toUpperCase']()
     ['replace'](/[^A-Z0-9_.-]/g, '_')
-    ['slice'](0x0, 0x50);
+    ['slice'](0, 80);
   return index || key;
 }
 function classifyPlannerFailure({
@@ -118,7 +118,7 @@ export function buildAgentPlannerDiagnostic({
   const errorCode2 = classifyPlannerFailure({ validation: validation, cause: cause, reason: reason }),
     phaseLabel2 = getDiagnosticCopy(locale, 'planning', errorCode2),
     source = Array['isArray'](loopState['validationFeedback'])
-      ? loopState['validationFeedback']['at'](-0x1)
+      ? loopState['validationFeedback']['at'](-1)
       : null;
   return {
     phase: 'planning',
@@ -127,10 +127,10 @@ export function buildAgentPlannerDiagnostic({
     detail: phaseLabel2['detail'],
     errorCode: errorCode2,
     sourceErrorCode: normalizeErrorCode(validation?.['errorCode'] || source?.['errorCode']),
-    commandId: String(validation?.['plan']?.['actions']?.[0x0]?.['type'] || source?.['commandId'] || '')
+    commandId: String(validation?.['plan']?.['actions']?.[0]?.['type'] || source?.['commandId'] || '')
       ['trim']()
-      ['slice'](0x0, 0x78),
-    step: Math['max'](0x1, Math['trunc'](Number(loopState['step'] || 0x0)) + 0x1),
+      ['slice'](0, 120),
+    step: Math['max'](1, Math['trunc'](Number(loopState['step'] || 0)) + 1),
     completedSteps: countCompletedSteps(loopState['toolResults']),
     retryable: !![],
   };
@@ -138,7 +138,7 @@ export function buildAgentPlannerDiagnostic({
 export function buildAgentExecutionDiagnostic({
   execution: execution = {},
   recovery: recovery = null,
-  step: step = 0x0,
+  step: step = 0,
   completedSteps: completedSteps = null,
   locale: locale = 'zh-CN',
 } = {}) {
@@ -152,7 +152,7 @@ export function buildAgentExecutionDiagnostic({
     )['length'],
     completedSteps2 =
       completedSteps != null && Number['isFinite'](Number(completedSteps))
-        ? Math['max'](0x0, Math['trunc'](Number(completedSteps)))
+        ? Math['max'](0, Math['trunc'](Number(completedSteps)))
         : next;
   return {
     phase: 'execution',
@@ -163,8 +163,8 @@ export function buildAgentExecutionDiagnostic({
     sourceErrorCode: '',
     commandId: String(recovery?.['failedAction']?.['type'] || '')
       ['trim']()
-      ['slice'](0x0, 0x78),
-    step: Math['max'](0x1, Math['trunc'](Number(step || 0x0)) + 0x1),
+      ['slice'](0, 120),
+    step: Math['max'](1, Math['trunc'](Number(step || 0)) + 1),
     completedSteps: completedSteps2,
     retryable: Boolean(recovery),
   };
@@ -183,7 +183,7 @@ export function buildAgentPlannerRecovery({
         label: label['editRequest'],
         draft: String(originalMessage || '')
           ['trim']()
-          ['slice'](0x0, MAX_DRAFT_CHARS),
+          ['slice'](0, MAX_DRAFT_CHARS),
       },
       { id: 'changeModel', label: label['changeModel'] },
     ],

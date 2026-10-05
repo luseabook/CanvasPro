@@ -26,12 +26,12 @@ function trimString(data) {
 }
 function positiveNumber(options, target) {
   const count = Number(options);
-  return Number['isFinite'](count) && count >= 0x0 ? count : target;
+  return Number['isFinite'](count) && count >= 0 ? count : target;
 }
-function collectTaskIds(enabled, source, count2 = 0x0) {
-  if (!enabled || typeof enabled !== 'object' || count2 > 0x4) return;
+function collectTaskIds(enabled, source, count2 = 0) {
+  if (!enabled || typeof enabled !== 'object' || count2 > 4) return;
   if (Array['isArray'](enabled)) {
-    for (const next of enabled) collectTaskIds(next, source, count2 + 0x1);
+    for (const next of enabled) collectTaskIds(next, source, count2 + 1);
     return;
   }
   for (const [current, entry] of Object['entries'](enabled)) {
@@ -39,7 +39,7 @@ function collectTaskIds(enabled, source, count2 = 0x0) {
       const trimString2 = trimString(entry);
       if (trimString2) source['add'](trimString2);
     }
-    if (entry && typeof entry === 'object') collectTaskIds(entry, source, count2 + 0x1);
+    if (entry && typeof entry === 'object') collectTaskIds(entry, source, count2 + 1);
   }
 }
 function nodeHasTaskId(options2 = {}, record = '') {
@@ -56,7 +56,7 @@ function pushExistingNodeId(list2, map2, state, config) {
   const nodeId = trimString(config);
   if (!nodeId || map2['has'](nodeId)) return;
   if (!getNode(state, nodeId))
-    throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas\x20node\x20not\x20found:\x20' + nodeId, {
+    throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + nodeId, {
       nodeId: nodeId,
     });
   (list2['push'](nodeId), map2['add'](nodeId));
@@ -64,7 +64,7 @@ function pushExistingNodeId(list2, map2, state, config) {
 function resolveTaskTargetNodeIds(options3 = {}, scope = {}) {
   const list3 = [],
     input = new Set();
-  if (Array['isArray'](options3['ids']) && options3['ids']['length'] > 0x0) {
+  if (Array['isArray'](options3['ids']) && options3['ids']['length'] > 0) {
     for (const output of options3['ids']) pushExistingNodeId(list3, input, scope, output);
   }
   (pushExistingNodeId(list3, input, scope, options3['nodeId']),
@@ -75,11 +75,11 @@ function resolveTaskTargetNodeIds(options3 = {}, scope = {}) {
     for (const [value2, value3] of Object['entries'](getState(scope)['nodes'] || {})) {
       if (nodeHasTaskId(value3, taskId)) pushExistingNodeId(list3, input, scope, value2);
     }
-  if (list3['length'] === 0x0 && !taskId)
+  if (list3['length'] === 0 && !taskId)
     for (const value4 of getSelectedNodeIds(scope)) {
       pushExistingNodeId(list3, input, scope, value4);
     }
-  if (list3['length'] === 0x0)
+  if (list3['length'] === 0)
     throw createCanvasCommandError(
       'TASK_TARGET_NOT_FOUND',
       'Task target node was not found. Provide nodeId, ids, resultNodeId, or taskId.',
@@ -116,7 +116,7 @@ function pickTaskId(options4 = {}, value7 = {}, value8 = '') {
 export function registerTaskCommands(value9) {
   (value9['register']({
     id: 'task.focusResult',
-    description: 'Focus\x20the\x20canvas\x20viewport\x20on\x20a\x20task\x20result\x20node.',
+    description: 'Focus the canvas viewport on a task result node.',
     riskLevel: 'safe',
     argsSchema: {
       properties: {
@@ -129,7 +129,7 @@ export function registerTaskCommands(value9) {
         durationMs: { type: 'number' },
         options: { type: 'object' },
       },
-      defaults: { padding: 0x50, durationMs: 0x320 },
+      defaults: { padding: 80, durationMs: 800 },
       selectionFallback: !![],
     },
     capabilitySchema: {
@@ -152,8 +152,8 @@ export function registerTaskCommands(value9) {
             ...options5,
             nodeIds: resolveTaskTargetNodeIds(options5, value10),
             taskId: trimString(options5['taskId']),
-            padding: positiveNumber(options5['padding'], 0x50),
-            durationMs: positiveNumber(options5['durationMs'], 0x320),
+            padding: positiveNumber(options5['padding'], 80),
+            durationMs: positiveNumber(options5['durationMs'], 800),
             options:
               options5['options'] &&
               typeof options5['options'] === 'object' &&
@@ -204,7 +204,7 @@ export function registerTaskCommands(value9) {
       validate(options6 = {}, value12 = {}) {
         try {
           const nodeIds = resolveTaskTargetNodeIds(options6, value12);
-          if (nodeIds['length'] !== 0x1)
+          if (nodeIds['length'] !== 1)
             return {
               ok: ![],
               errorCode: 'AMBIGUOUS_TASK_TARGET',
@@ -214,7 +214,7 @@ export function registerTaskCommands(value9) {
           return {
             args: {
               ...options6,
-              nodeId: nodeIds[0x0],
+              nodeId: nodeIds[0],
               taskId: trimString(options6['taskId']),
               options:
                 options6['options'] &&

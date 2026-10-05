@@ -59,7 +59,7 @@ export function initCanvasControlSettings() {
   const buttons = Array['from'](
     document['querySelectorAll']('#canvasWheelBehaviorGroup [data-canvas-wheel-behavior]'),
   );
-  if (buttons['length'] === 0x0) return;
+  if (buttons['length'] === 0) return;
   (setCanvasWheelBehavior(readCanvasWheelBehavior()),
     buttons['forEach']((button) => {
       button['addEventListener']('click', () => {

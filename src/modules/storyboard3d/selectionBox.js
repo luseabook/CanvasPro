@@ -1,5 +1,5 @@
-export const STORYBOARD_3D_SELECTION_DRAG_THRESHOLD = 0x4;
-function finite(value, item = 0x0) {
+export const STORYBOARD_3D_SELECTION_DRAG_THRESHOLD = 4;
+function finite(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -22,7 +22,7 @@ export function createStoryboard3DSelectionRect(event = {}, event2 = {}) {
   };
 }
 export function hasStoryboard3DSelectionDragMoved(box) {
-  return Math['max'](box?.['width'] || 0x0, box?.['height'] || 0x0) >= STORYBOARD_3D_SELECTION_DRAG_THRESHOLD;
+  return Math['max'](box?.['width'] || 0, box?.['height'] || 0) >= STORYBOARD_3D_SELECTION_DRAG_THRESHOLD;
 }
 export function mergeStoryboard3DBoxSelection({
   initialObjectIds: initialObjectIds = [],

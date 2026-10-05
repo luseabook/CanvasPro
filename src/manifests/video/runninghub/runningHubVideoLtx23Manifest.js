@@ -47,7 +47,7 @@ export const rhVideoLtx23ModelManifest = createRunningHubVideoModelManifest({
       label: '秒数',
       defaultValue: 5,
       min: 1,
-      max: 0x258,
+      max: 600,
     }),
     RH_INSTANCE_FIELD,
   ],
@@ -66,7 +66,7 @@ export const rhVideoLtx23ExecutionManifest = createRunningHubVideoExecutionManif
         fieldName: 'value',
         source: 'param',
         field: 'rhVideoResolution',
-        defaultValue: 0x340,
+        defaultValue: 832,
         transform: 'normalizeRhVideoResolution',
       }),
       Object.freeze({

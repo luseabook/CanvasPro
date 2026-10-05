@@ -49,7 +49,7 @@ export function isModelApiVideoFamily(state, config = '', scope = '') {
 }
 export function getModelApiVideoMaxInputVideoSeconds(input, output = '', value2 = null) {
   const count = Number(getModelApiVideoExtension(input, output, 'maxInputVideoSeconds'));
-  return Number['isFinite'](count) && count > 0x0 ? Math['trunc'](count) : value2;
+  return Number['isFinite'](count) && count > 0 ? Math['trunc'](count) : value2;
 }
 export function isHappyHorseModelApiVideo(value3, value4 = '') {
   return isModelApiVideoFamily(value3, value4, 'happyHorse');

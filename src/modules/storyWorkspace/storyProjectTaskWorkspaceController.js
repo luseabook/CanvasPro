@@ -49,7 +49,7 @@ export function createStoryProjectTaskWorkspaceController({
     if (!enabled || typeof enabled !== 'object')
       throw new TypeError('Story project tasks require ' + key + '.');
   }
-  let index = 0x0;
+  let index = 0;
   const run = () => getWorkspaceDestroyed() === !![],
     resetTaskState = () => {
       (Object['assign'](state, deriveStoryProjectTaskState()), (state['exportingAssetAppearanceKey'] = ''));
@@ -150,7 +150,7 @@ export function createStoryProjectTaskWorkspaceController({
       return updateStoryBackgroundTask2;
     },
     updateBackgroundTaskBatch = (enabled5, value4, value5 = {}) => {
-      if (!enabled5?.['data']?.['project']) return 0x0;
+      if (!enabled5?.['data']?.['project']) return 0;
       const updateStoryBackgroundTaskBatch2 = updateStoryBackgroundTaskBatch(
         enabled5['data'],
         value4,
@@ -162,13 +162,13 @@ export function createStoryProjectTaskWorkspaceController({
     createTaskBatch = (value6, value7 = {}) => {
       const text4 = normalizeText(state['data']?.['project']?.['id']) || 'project';
       return (
-        (index += 0x1),
+        (index += 1),
         {
           ...cloneData(value7),
           id: (normalizeText(value6) || 'batch') + ':' + text4 + ':' + Date['now']() + ':' + index,
           type: normalizeText(value6) || 'batch',
-          total: Math['max'](0x0, Math['trunc'](Number(value7['total']) || 0x0)),
-          completed: Math['max'](0x0, Math['trunc'](Number(value7['completed']) || 0x0)),
+          total: Math['max'](0, Math['trunc'](Number(value7['total']) || 0)),
+          completed: Math['max'](0, Math['trunc'](Number(value7['completed']) || 0)),
           label: normalizeText(value7['label']),
         }
       );

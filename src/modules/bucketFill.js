@@ -94,7 +94,7 @@ const FILL_REGION_CACHE_LIMIT = 64,
 function cacheNumber(value20) {
   const value21 = Number(value20);
   if (!Number.isFinite(value21)) return 0;
-  return Math.round(value21 * 0x3e8) / 0x3e8;
+  return Math.round(value21 * 1000) / 1000;
 }
 function pointSignature(value22) {
   return (Array.isArray(value22) ? value22 : [])

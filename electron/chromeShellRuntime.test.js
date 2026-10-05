@@ -12,9 +12,9 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function flush(count = 0x8) {
+function flush(count = 8) {
   let chain = Promise.resolve();
-  for (let index = 0x0; index < count; index += 0x1)
+  for (let index = 0; index < count; index += 1)
     chain = chain.then(() => new Promise((resolve) => setImmediate(resolve)));
   return chain;
 }
@@ -37,18 +37,18 @@ function createLaunchDouble(overrides = {}) {
     browserPath: BROWSER_PATH,
     profileDir: PROFILE_DIR,
     process: {
-      pid: 0x10e1,
+      pid: 4321,
       exitCode: null,
       signalCode: null,
-      killCount: 0x0,
+      killCount: 0,
       kill() {
-        launch.process.killCount += 0x1;
+        launch.process.killCount += 1;
       },
     },
     startupDiagnostics: {
-      stopCount: 0x0,
+      stopCount: 0,
       stop() {
-        launch.startupDiagnostics.stopCount += 0x1;
+        launch.startupDiagnostics.stopCount += 1;
       },
       snapshot: () => ({ stderrTail: 'boom' }),
     },
@@ -73,9 +73,9 @@ function createBrowserWorkerDouble({ devToolsPipe = null } = {}) {
   const factory = (options = {}) => {
     const worker = {
       options,
-      disposeCount: 0x0,
+      disposeCount: 0,
       dispose() {
-        worker.disposeCount += 0x1;
+        worker.disposeCount += 1;
       },
     };
     if (devToolsPipe) worker.devToolsPipe = devToolsPipe;
@@ -103,7 +103,7 @@ function createWebPreviewManagerDouble() {
       syncViewsPayloads: [],
       controlViewPayloads: [],
       disposeViewsPayloads: [],
-      disposeCount: 0x0,
+      disposeCount: 0,
       entries: {},
       syncViews: async (payload) => {
         manager.syncViewsPayloads.push(payload);
@@ -120,7 +120,7 @@ function createWebPreviewManagerDouble() {
       consumeEvents: () => [{ type: 'consumed' }],
       waitForEvents: (payload) => Promise.resolve([{ type: 'waited', payload: payload }]),
       dispose: async () => {
-        manager.disposeCount += 0x1;
+        manager.disposeCount += 1;
       },
       _getEntry: (nodeId, tabId) => manager.entries[nodeId + ':' + tabId] || null,
     };
@@ -134,9 +134,9 @@ function createBridgeDouble(overrides = {}) {
   const bridge = {
     url: 'http://127.0.0.1:18999/bridge',
     token: 'bridge-token',
-    closeCount: 0x0,
+    closeCount: 0,
     close: async () => {
-      bridge.closeCount += 0x1;
+      bridge.closeCount += 1;
     },
   };
   return Object.assign(bridge, overrides);
@@ -191,7 +191,7 @@ test('resolveBrowserNodeMode falls back to lazy for unknown, blank and missing v
   assert.equal(resolveBrowserNodeMode({ [BROWSER_NODE_MODE_ENV]: '' }), 'lazy');
   assert.equal(resolveBrowserNodeMode({}), 'lazy');
   assert.equal(resolveBrowserNodeMode(null), 'lazy');
-  assert.equal(resolveBrowserNodeMode({ [BROWSER_NODE_MODE_ENV]: 0x7 }), 'lazy');
+  assert.equal(resolveBrowserNodeMode({ [BROWSER_NODE_MODE_ENV]: 7 }), 'lazy');
 });
 
 test('resolveBrowserNodeMode defaults to process.env', () => {
@@ -217,7 +217,7 @@ test('shouldKeepWebPreviewView rejects idle views and requires strict booleans',
   assert.equal(shouldKeepWebPreviewView({}), false);
   assert.equal(shouldKeepWebPreviewView(), false);
   assert.equal(shouldKeepWebPreviewView(null), false);
-  assert.equal(shouldKeepWebPreviewView({ visible: 0x1, selected: 'yes' }), false);
+  assert.equal(shouldKeepWebPreviewView({ visible: 1, selected: 'yes' }), false);
   assert.equal(shouldKeepWebPreviewView({ visible: false, fullscreen: false, pendingPopup: false }), false);
 });
 
@@ -243,14 +243,14 @@ test('startChromeShellRuntime creates the bridge through startHttpBridge and exp
     handlers: handlers,
   });
   const result = await startChromeShellRuntime(input);
-  assert.equal(calls.length, 0x1);
-  assert.equal(calls[0x0].token, 'session-token');
-  assert.equal(calls[0x0].handlers, handlers);
-  assert.equal(typeof calls[0x0].logEvent, 'function');
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].token, 'session-token');
+  assert.equal(calls[0].handlers, handlers);
+  assert.equal(typeof calls[0].logEvent, 'function');
   assert.equal(input.env['AIC_DESKTOP_BRIDGE_URL'], created.url);
   assert.equal(input.env['AIC_DESKTOP_BRIDGE_TOKEN'], created.token);
   assert.equal(result.desktopHttpBridge, created);
-  assert.equal(created.closeCount, 0x0);
+  assert.equal(created.closeCount, 0);
 });
 
 test('startChromeShellRuntime keeps a caller supplied bridge on startup failure', async () => {
@@ -262,7 +262,7 @@ test('startChromeShellRuntime keeps a caller supplied bridge on startup failure'
     },
   });
   await assert.rejects(startChromeShellRuntime(input), { message: 'launch exploded' });
-  assert.equal(bridge.closeCount, 0x0);
+  assert.equal(bridge.closeCount, 0);
 });
 
 test('startChromeShellRuntime closes a self created bridge on startup failure', async () => {
@@ -275,17 +275,17 @@ test('startChromeShellRuntime closes a self created bridge on startup failure', 
     },
   });
   await assert.rejects(startChromeShellRuntime(input), { message: 'launch exploded' });
-  assert.equal(bridge.closeCount, 0x1);
+  assert.equal(bridge.closeCount, 1);
   assert.equal(log.find('chrome_shell.startup_failed').level, 'error');
 });
 
 test('startChromeShellRuntime forwards the launch inputs and log sink to launchShell', async () => {
-  const displayWorkAreas = [{ x: 0x0, y: 0x0, width: 0x780, height: 0x438 }];
+  const displayWorkAreas = [{ x: 0, y: 0, width: 1920, height: 1080 }];
   const windowsTaskbarIdentity = { identity: 'canvaspro' };
   const { input, shell, log } = runtimeInput({ windowsTaskbarIdentity, displayWorkAreas });
   const result = await startChromeShellRuntime(input);
-  assert.equal(shell.calls.length, 0x1);
-  const options = shell.calls[0x0];
+  assert.equal(shell.calls.length, 1);
+  const options = shell.calls[0];
   assert.equal(options.app, input.app);
   assert.equal(options.appUrl, APP_URL);
   assert.equal(options.env, input.env);
@@ -304,13 +304,13 @@ test('startChromeShellRuntime lets prepare override the application url', async 
   const customUrl = 'http://127.0.0.1:9999/custom/';
   const { input, shell } = runtimeInput({ prepare: async () => ({ appUrl: customUrl }) });
   await startChromeShellRuntime(input);
-  assert.equal(shell.calls[0x0].appUrl, customUrl);
+  assert.equal(shell.calls[0].appUrl, customUrl);
 });
 
 test('startChromeShellRuntime keeps the default url when prepare returns nothing useful', async () => {
   const { input, shell } = runtimeInput({ prepare: async () => ({ appUrl: '   ' }) });
   await startChromeShellRuntime(input);
-  assert.equal(shell.calls[0x0].appUrl, APP_URL);
+  assert.equal(shell.calls[0].appUrl, APP_URL);
 });
 
 test('startChromeShellRuntime stops the startup diagnostics collector on success', async () => {
@@ -318,7 +318,7 @@ test('startChromeShellRuntime stops the startup diagnostics collector on success
   const shell = createLaunchShellDouble({ launch });
   const { input } = runtimeInput({ launchShell: shell.launchShell });
   const result = await startChromeShellRuntime(input);
-  assert.equal(launch.startupDiagnostics.stopCount, 0x1);
+  assert.equal(launch.startupDiagnostics.stopCount, 1);
   assert.equal(result.chromeShellLaunch, launch);
 });
 
@@ -386,7 +386,7 @@ test('startChromeShellRuntime aborts startup when the launch reports a spawn err
 });
 
 test('startChromeShellRuntime logs renderer readiness with the elapsed time', async () => {
-  const { input, log } = runtimeInput({ waitForRendererReady: async () => ({ elapsedMs: 0x2af8 }) });
+  const { input, log } = runtimeInput({ waitForRendererReady: async () => ({ elapsedMs: 11000 }) });
   await startChromeShellRuntime(input);
   const event = log.find('chrome_shell.renderer_ready');
   assert.equal(event.level, 'info');
@@ -394,32 +394,32 @@ test('startChromeShellRuntime logs renderer readiness with the elapsed time', as
   assert.equal(event.message, 'Chrome shell renderer completed startup');
   assert.equal(event.context.browserPath, BROWSER_PATH);
   assert.equal(event.context.profileDir, PROFILE_DIR);
-  assert.equal(event.context.elapsedMs, 0x2af8);
+  assert.equal(event.context.elapsedMs, 11000);
 });
 
 test('startChromeShellRuntime defaults the reported readiness time to zero', async () => {
   const { input, log } = runtimeInput({ waitForRendererReady: async () => undefined });
   await startChromeShellRuntime(input);
-  assert.equal(log.find('chrome_shell.renderer_ready').context.elapsedMs, 0x0);
+  assert.equal(log.find('chrome_shell.renderer_ready').context.elapsedMs, 0);
 });
 
 test('startChromeShellRuntime calls onClosed when the renderer already reported readiness', async () => {
-  const closeContext = { code: 0x0, signal: null };
+  const closeContext = { code: 0, signal: null };
   const { input, shell } = runtimeInput({ onClosed: () => 'user-result' });
   await startChromeShellRuntime(input);
-  assert.equal(shell.calls[0x0].onClosed(closeContext), 'user-result');
+  assert.equal(shell.calls[0].onClosed(closeContext), 'user-result');
 });
 
 test('startChromeShellRuntime vetoes the quit through onClosed when no renderer waiter exists', async () => {
   const { input, shell } = runtimeInput({ onClosed: () => false });
   await startChromeShellRuntime(input);
-  assert.equal(shell.calls[0x0].onClosed({ code: 0x3, signal: null }), false);
+  assert.equal(shell.calls[0].onClosed({ code: 3, signal: null }), false);
 });
 
 test('startChromeShellRuntime reports no quit request for a detached exit and marks the launch', async () => {
   const { input, shell } = runtimeInput({ onClosed: () => 'never called' });
   const result = await startChromeShellRuntime(input);
-  assert.equal(shell.calls[0x0].onClosed({ detached: true, code: 0x0 }), false);
+  assert.equal(shell.calls[0].onClosed({ detached: true, code: 0 }), false);
   assert.equal(result.chromeShellLaunch.detached, true);
 });
 
@@ -435,17 +435,17 @@ test('startChromeShellRuntime fails startup when the shell exits before the rend
   const promise = startChromeShellRuntime(input);
   await flush();
   assert.equal(typeof onClosed, 'function');
-  assert.equal(onClosed({ code: 0x2, signal: null }), false);
+  assert.equal(onClosed({ code: 2, signal: null }), false);
   await assert.rejects(promise, (error) => {
     assert.equal(error.message, 'Chrome shell exited before the renderer completed startup');
     assert.equal(error.code, 'CHROME_SHELL_EXITED_BEFORE_READY');
-    assert.equal(error.details.code, 0x2);
+    assert.equal(error.details.code, 2);
     return true;
   });
   const event = log.find('chrome_shell.exited_before_renderer_ready');
   assert.equal(event.level, 'error');
   assert.equal(event.source, 'main');
-  assert.equal(event.context.code, 0x2);
+  assert.equal(event.context.code, 2);
 });
 
 test('startChromeShellRuntime reports a pre-ready exit without signal as a cancelled startup', async () => {
@@ -459,7 +459,7 @@ test('startChromeShellRuntime reports a pre-ready exit without signal as a cance
   });
   const promise = startChromeShellRuntime(input);
   await flush();
-  onClosed({ code: 0x0, signal: null });
+  onClosed({ code: 0, signal: null });
   await assert.rejects(promise, (error) => {
     assert.equal(error.code, 'CHROME_SHELL_STARTUP_CANCELLED');
     return true;
@@ -481,9 +481,9 @@ test('startChromeShellRuntime keeps the browser node lazy by default', async () 
   const result = await startChromeShellRuntime(input);
   assert.equal(result.browserWorker, null);
   assert.equal(typeof result.webPreviewManager.syncViews, 'function');
-  assert.equal(browserWorker.launched.length, 0x0);
-  assert.equal(cdp.created.length, 0x0);
-  assert.equal(manager.created.length, 0x0);
+  assert.equal(browserWorker.launched.length, 0);
+  assert.equal(cdp.created.length, 0);
+  assert.equal(manager.created.length, 0);
 });
 
 test('startChromeShellRuntime prepares the browser node eagerly when asked', async () => {
@@ -498,14 +498,14 @@ test('startChromeShellRuntime prepares the browser node eagerly when asked', asy
     createWebPreviewManager: manager.factory,
   });
   const result = await startChromeShellRuntime(input);
-  assert.equal(browserWorker.launched.length, 0x1);
-  assert.equal(result.browserWorker, browserWorker.launched[0x0]);
-  assert.equal(cdp.created.length, 0x1);
-  assert.equal(cdp.created[0x0].options.write, pipe.write);
-  assert.equal(cdp.created[0x0].options.logEvent, log.logEvent);
-  assert.equal(manager.created.length, 0x1);
-  assert.equal(manager.created[0x0].options.client, cdp.created[0x0]);
-  assert.equal(browserWorker.launched[0x0].disposeCount, 0x0);
+  assert.equal(browserWorker.launched.length, 1);
+  assert.equal(result.browserWorker, browserWorker.launched[0]);
+  assert.equal(cdp.created.length, 1);
+  assert.equal(cdp.created[0].options.write, pipe.write);
+  assert.equal(cdp.created[0].options.logEvent, log.logEvent);
+  assert.equal(manager.created.length, 1);
+  assert.equal(manager.created[0].options.client, cdp.created[0]);
+  assert.equal(browserWorker.launched[0].disposeCount, 0);
 });
 
 test('startChromeShellRuntime disables the browser node when the mode is off', async () => {
@@ -523,7 +523,7 @@ test('startChromeShellRuntime disables the browser node when the mode is off', a
     ok: false,
     error: 'browser-node-disabled',
   });
-  assert.equal(browserWorker.launched.length, 0x0);
+  assert.equal(browserWorker.launched.length, 0);
 });
 
 test('startChromeShellRuntime returns an idle result for empty view sets without touching the worker', async () => {
@@ -532,15 +532,15 @@ test('startChromeShellRuntime returns an idle result for empty view sets without
   const result = await startChromeShellRuntime(input);
   assert.deepEqual(await result.webPreviewManager.syncViews({ views: [] }), {
     ok: true,
-    count: 0x0,
-    visibleCount: 0x0,
+    count: 0,
+    visibleCount: 0,
   });
   assert.deepEqual(await result.webPreviewManager.syncViews({ views: [{ id: 'a' }] }), {
     ok: true,
-    count: 0x0,
-    visibleCount: 0x0,
+    count: 0,
+    visibleCount: 0,
   });
-  assert.equal(browserWorker.launched.length, 0x0);
+  assert.equal(browserWorker.launched.length, 0);
 });
 
 test('startChromeShellRuntime starts the browser node on the first kept view and reuses it', async () => {
@@ -554,19 +554,19 @@ test('startChromeShellRuntime starts the browser node on the first kept view and
   const first = await result.webPreviewManager.syncViews({
     views: [{ id: 'a', visible: true }, { id: 'b' }, { id: 'c', selected: true }],
   });
-  assert.deepEqual(first, { ok: true, applied: 0x2 });
-  assert.equal(browserWorker.launched.length, 0x1);
-  assert.equal(browserWorker.launched[0x0].options.browserPath, BROWSER_PATH);
-  assert.equal(browserWorker.launched[0x0].options.mainProfileDir, PROFILE_DIR);
+  assert.deepEqual(first, { ok: true, applied: 2 });
+  assert.equal(browserWorker.launched.length, 1);
+  assert.equal(browserWorker.launched[0].options.browserPath, BROWSER_PATH);
+  assert.equal(browserWorker.launched[0].options.mainProfileDir, PROFILE_DIR);
   assert.deepEqual(
-    manager.created[0x0].syncViewsPayloads[0x0].views.map((view) => view.id),
+    manager.created[0].syncViewsPayloads[0].views.map((view) => view.id),
     ['a', 'c'],
   );
   const second = await result.webPreviewManager.syncViews({ views: [{ id: 'd', fullscreen: true }] });
-  assert.deepEqual(second, { ok: true, applied: 0x1 });
-  assert.equal(browserWorker.launched.length, 0x1);
+  assert.deepEqual(second, { ok: true, applied: 1 });
+  assert.equal(browserWorker.launched.length, 1);
   assert.deepEqual(
-    manager.created[0x0].syncViewsPayloads[0x1].views.map((view) => view.id),
+    manager.created[0].syncViewsPayloads[1].views.map((view) => view.id),
     ['d'],
   );
 });
@@ -621,10 +621,10 @@ test('startChromeShellRuntime delegates preview control to the manager once it e
   });
   assert.deepEqual(await result.webPreviewManager.disposeViews({ views: [{ id: 'a' }] }), {
     ok: true,
-    disposed: 0x1,
+    disposed: 1,
   });
-  assert.deepEqual(manager.created[0x0].controlViewPayloads, [{ nodeId: 'a', action: 'reload' }]);
-  assert.deepEqual(manager.created[0x0].disposeViewsPayloads, [{ views: [{ id: 'a' }] }]);
+  assert.deepEqual(manager.created[0].controlViewPayloads, [{ nodeId: 'a', action: 'reload' }]);
+  assert.deepEqual(manager.created[0].disposeViewsPayloads, [{ views: [{ id: 'a' }] }]);
 });
 
 test('startChromeShellRuntime reports no disposed views when the manager is absent', async () => {
@@ -632,7 +632,7 @@ test('startChromeShellRuntime reports no disposed views when the manager is abse
   const result = await startChromeShellRuntime(input);
   assert.deepEqual(await result.webPreviewManager.disposeViews({ views: [{ id: 'a' }] }), {
     ok: true,
-    disposed: 0x0,
+    disposed: 0,
   });
 });
 
@@ -641,7 +641,7 @@ test('startChromeShellRuntime reports no preview events before the manager exist
   const { input } = runtimeInput({ createWebPreviewManager: manager.factory });
   const result = await startChromeShellRuntime(input);
   assert.deepEqual(result.webPreviewManager.consumeEvents(), []);
-  assert.equal(manager.created.length, 0x0);
+  assert.equal(manager.created.length, 0);
 });
 
 test('startChromeShellRuntime delegates event consumption and waiting to the manager', async () => {
@@ -654,8 +654,8 @@ test('startChromeShellRuntime delegates event consumption and waiting to the man
   const result = await startChromeShellRuntime(input);
   await result.webPreviewManager.syncViews({ views: [{ id: 'a', visible: true }] });
   assert.deepEqual(result.webPreviewManager.consumeEvents(), [{ type: 'consumed' }]);
-  assert.deepEqual(await result.webPreviewManager.waitForEvents({ waitMs: 0x32 }), [
-    { type: 'waited', payload: { waitMs: 0x32 } },
+  assert.deepEqual(await result.webPreviewManager.waitForEvents({ waitMs: 50 }), [
+    { type: 'waited', payload: { waitMs: 50 } },
   ]);
 });
 
@@ -663,8 +663,8 @@ test('startChromeShellRuntime waits out the clamped fallback delay when the mana
   const { input } = runtimeInput();
   const result = await startChromeShellRuntime(input);
   const startedAt = Date.now();
-  assert.deepEqual(await result.webPreviewManager.waitForEvents({ waitMs: 0x1 }), []);
-  assert.ok(Date.now() - startedAt >= 0x28, 'clamped wait should not resolve before 50ms');
+  assert.deepEqual(await result.webPreviewManager.waitForEvents({ waitMs: 1 }), []);
+  assert.ok(Date.now() - startedAt >= 40, 'clamped wait should not resolve before 50ms');
 });
 
 test('startChromeShellRuntime ignores the requested wait time when it is not finite', async () => {
@@ -675,7 +675,7 @@ test('startChromeShellRuntime ignores the requested wait time when it is not fin
     settled = true;
     return value;
   });
-  await delay(0x14);
+  await delay(20);
   assert.equal(settled, false);
   assert.deepEqual(await promise, []);
   assert.equal(settled, true);
@@ -685,7 +685,7 @@ test('startChromeShellRuntime resolves pending waits once the runtime is dispose
   const { input } = runtimeInput();
   const result = await startChromeShellRuntime(input);
   await result.webPreviewManager.dispose();
-  assert.deepEqual(await result.webPreviewManager.waitForEvents({ waitMs: 0x1770 }), []);
+  assert.deepEqual(await result.webPreviewManager.waitForEvents({ waitMs: 6000 }), []);
 });
 
 test('startChromeShellRuntime looks entries up through the manager with both identifiers', async () => {
@@ -698,7 +698,7 @@ test('startChromeShellRuntime looks entries up through the manager with both ide
   const result = await startChromeShellRuntime(input);
   assert.equal(result.webPreviewManager._getEntry('node-1', 'tab-1'), null);
   await result.webPreviewManager.syncViews({ views: [{ id: 'a', visible: true }] });
-  manager.created[0x0].entries['node-1:tab-1'] = { nodeId: 'node-1', tabId: 'tab-1' };
+  manager.created[0].entries['node-1:tab-1'] = { nodeId: 'node-1', tabId: 'tab-1' };
   assert.deepEqual(result.webPreviewManager._getEntry('node-1', 'tab-1'), {
     nodeId: 'node-1',
     tabId: 'tab-1',
@@ -715,11 +715,11 @@ test('startChromeShellRuntime disposes the manager and worker exactly once', asy
   const result = await startChromeShellRuntime(input);
   await result.webPreviewManager.syncViews({ views: [{ id: 'a', visible: true }] });
   await result.webPreviewManager.dispose();
-  assert.equal(manager.created[0x0].disposeCount, 0x1);
-  assert.equal(browserWorker.launched[0x0].disposeCount, 0x1);
+  assert.equal(manager.created[0].disposeCount, 1);
+  assert.equal(browserWorker.launched[0].disposeCount, 1);
   await result.webPreviewManager.dispose();
-  assert.equal(manager.created[0x0].disposeCount, 0x1);
-  assert.equal(browserWorker.launched[0x0].disposeCount, 0x1);
+  assert.equal(manager.created[0].disposeCount, 1);
+  assert.equal(browserWorker.launched[0].disposeCount, 1);
 });
 
 test('startChromeShellRuntime refuses to start the browser node after disposal', async () => {
@@ -731,7 +731,7 @@ test('startChromeShellRuntime refuses to start the browser node after disposal',
     ok: false,
     error: 'browser-node-unavailable',
   });
-  assert.equal(browserWorker.launched.length, 0x0);
+  assert.equal(browserWorker.launched.length, 0);
 });
 
 test('startChromeShellRuntime logs the failed stage and launch snapshot when startup throws', async () => {
@@ -753,7 +753,7 @@ test('startChromeShellRuntime logs the failed stage and launch snapshot when sta
   assert.equal(event.context.profileDir, '');
   assert.equal(event.context.detached, false);
   assert.equal(event.context.stderrTail, undefined);
-  assert.equal(shell.calls.length, 0x0);
+  assert.equal(shell.calls.length, 0);
 });
 
 test('startChromeShellRuntime reports the launch stage before the launch object exists', async () => {
@@ -772,8 +772,8 @@ test('startChromeShellRuntime reports the launch stage before the launch object 
 
 test('startChromeShellRuntime reports the launch snapshot and process handles when a ready shell fails', async () => {
   const launch = createLaunchDouble();
-  launch.process.pid = 0xbeef;
-  launch.process.exitCode = 0x1;
+  launch.process.pid = 48879;
+  launch.process.exitCode = 1;
   launch.process.signalCode = 'SIGTERM';
   let onClosed = null;
   const { input, log } = runtimeInput({
@@ -785,18 +785,18 @@ test('startChromeShellRuntime reports the launch snapshot and process handles wh
   });
   const promise = startChromeShellRuntime(input);
   await flush();
-  onClosed({ code: 0x2, signal: null });
+  onClosed({ code: 2, signal: null });
   await assert.rejects(promise, { code: 'CHROME_SHELL_EXITED_BEFORE_READY' });
   const event = log.find('chrome_shell.startup_failed');
   assert.equal(event.context.stage, 'renderer-ready');
-  assert.equal(event.context.pid, 0xbeef);
-  assert.equal(event.context.exitCode, 0x1);
+  assert.equal(event.context.pid, 48879);
+  assert.equal(event.context.exitCode, 1);
   assert.equal(event.context.signalCode, 'SIGTERM');
   assert.equal(event.context.detached, false);
   assert.equal(event.context.browserPath, BROWSER_PATH);
   assert.equal(event.context.profileDir, PROFILE_DIR);
   assert.equal(event.context.stderrTail, 'boom');
-  assert.equal(launch.startupDiagnostics.stopCount, 0x1);
+  assert.equal(launch.startupDiagnostics.stopCount, 1);
 });
 
 test('startChromeShellRuntime reports the renderer stage when readiness fails', async () => {
@@ -836,7 +836,7 @@ async function failAfterLaunch({ launch = null, closeShellLaunch = null, control
   });
   const promise = startChromeShellRuntime(input);
   await flush();
-  onClosed({ code: 0x2, signal: null });
+  onClosed({ code: 2, signal: null });
   return { promise, input, log, launch: target };
 }
 
@@ -849,15 +849,15 @@ test('startChromeShellRuntime closes the shell launch after a startup failure', 
     },
   });
   await assert.rejects(promise, { code: 'CHROME_SHELL_EXITED_BEFORE_READY' });
-  assert.equal(closeCalls.length, 0x1);
-  assert.equal(closeCalls[0x0].launch, launch);
-  assert.equal(closeCalls[0x0].platform, 'linux');
+  assert.equal(closeCalls.length, 1);
+  assert.equal(closeCalls[0].launch, launch);
+  assert.equal(closeCalls[0].platform, 'linux');
   const event = log.find('chrome_shell.launch_close_after_startup_failure');
   assert.equal(event.level, 'info');
   assert.equal(event.source, 'main');
   assert.equal(event.message, 'Chrome shell close completed; profile release is not confirmed');
   assert.equal(event.context.closed, true);
-  assert.equal(launch.process.killCount, 0x0);
+  assert.equal(launch.process.killCount, 0);
 });
 
 test('startChromeShellRuntime warns when the launch close cannot be confirmed and kills the process', async () => {
@@ -867,10 +867,10 @@ test('startChromeShellRuntime warns when the launch close cannot be confirmed an
   assert.equal(event.level, 'warn');
   assert.equal(
     event.message,
-    'Chrome\x20shell\x20process\x20tree\x20could\x20not\x20be\x20confirmed\x20closed\x20after\x20startup\x20failure',
+    'Chrome shell process tree could not be confirmed closed after startup failure',
   );
   assert.equal(event.context.closed, false);
-  assert.equal(launch.process.killCount, 0x1);
+  assert.equal(launch.process.killCount, 1);
 });
 
 test('startChromeShellRuntime swallows a throwing launch close and falls back to killing the process', async () => {
@@ -881,7 +881,7 @@ test('startChromeShellRuntime swallows a throwing launch close and falls back to
   });
   await assert.rejects(promise, { code: 'CHROME_SHELL_EXITED_BEFORE_READY' });
   assert.equal(log.find('chrome_shell.launch_close_after_startup_failure').context.closed, false);
-  assert.equal(launch.process.killCount, 0x1);
+  assert.equal(launch.process.killCount, 1);
 });
 
 test('startChromeShellRuntime closes a detached window when the launch close is unconfirmed', async () => {
@@ -895,18 +895,18 @@ test('startChromeShellRuntime closes a detached window when the launch close is 
     },
   });
   await assert.rejects(promise, { code: 'CHROME_SHELL_EXITED_BEFORE_READY' });
-  assert.equal(controlCalls.length, 0x1);
-  assert.equal(controlCalls[0x0].action, 'close');
-  assert.equal(controlCalls[0x0].launch, launch);
-  assert.equal(controlCalls[0x0].platform, 'linux');
+  assert.equal(controlCalls.length, 1);
+  assert.equal(controlCalls[0].action, 'close');
+  assert.equal(controlCalls[0].launch, launch);
+  assert.equal(controlCalls[0].platform, 'linux');
   const event = log.find('chrome_shell.detached_window_close_after_startup_failure');
   assert.equal(event.level, 'info');
   assert.equal(
     event.message,
-    'Detached\x20Chrome\x20shell\x20window\x20closed\x20after\x20startup\x20failure',
+    'Detached Chrome shell window closed after startup failure',
   );
   assert.equal(event.context.closed, true);
-  assert.equal(launch.process.killCount, 0x0);
+  assert.equal(launch.process.killCount, 0);
 });
 
 test('startChromeShellRuntime warns when a detached window cannot be closed', async () => {
@@ -921,7 +921,7 @@ test('startChromeShellRuntime warns when a detached window cannot be closed', as
   const event = log.find('chrome_shell.detached_window_close_after_startup_failure');
   assert.equal(event.level, 'warn');
   assert.equal(event.context.closed, false);
-  assert.equal(launch.process.killCount, 0x0);
+  assert.equal(launch.process.killCount, 0);
 });
 
 test('startChromeShellRuntime disposes an eager browser node after a later startup failure', async () => {
@@ -936,8 +936,8 @@ test('startChromeShellRuntime disposes an eager browser node after a later start
     launchBrowserWorker: browserWorker.factory,
   });
   await assert.rejects(startChromeShellRuntime(input), pipeError);
-  assert.equal(browserWorker.launched.length, 0x1);
-  assert.equal(browserWorker.launched[0x0].disposeCount, 0x1);
+  assert.equal(browserWorker.launched.length, 1);
+  assert.equal(browserWorker.launched[0].disposeCount, 1);
 });
 
 test('startChromeShellRuntime rethrows the original startup failure after cleanup', async () => {

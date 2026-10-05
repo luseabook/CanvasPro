@@ -3,8 +3,8 @@ import { compileSourceDescriptions, usesSourceDescriptions } from './personRepla
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
-function normalizeStringList(item, key = 0x8) {
-  return (Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean)['slice'](0x0, key);
+function normalizeStringList(item, key = 8) {
+  return (Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean)['slice'](0, key);
 }
 export function extractJsonObject(response) {
   if (response && typeof response === 'object' && !Array['isArray'](response)) {
@@ -15,12 +15,12 @@ export function extractJsonObject(response) {
     response?.['text'] ?? response?.['outputText'] ?? response?.['content'] ?? response,
   );
   if (!text) return null;
-  const list = text['match'](/```(?:json)?\s*([\s\S]*?)```/iu)?.[0x1] || text,
+  const list = text['match'](/```(?:json)?\s*([\s\S]*?)```/iu)?.[1] || text,
     count = list['indexOf']('{'),
     result = list['lastIndexOf']('}');
-  if (count < 0x0 || result <= count) return null;
+  if (count < 0 || result <= count) return null;
   try {
-    return JSON['parse'](list['slice'](count, result + 0x1));
+    return JSON['parse'](list['slice'](count, result + 1));
   } catch {
     return null;
   }
@@ -39,8 +39,8 @@ export function resolvePersonReplacementPromptEnhancementModel(options = {}) {
       ? target['inputSlots']['allowedKinds']['map'](normalizeText)
       : [],
     maxImages = Math['max'](
-      0x0,
-      Math['trunc'](Number(target?.['inputSlots']?.['maxByKind']?.['image']) || 0x0),
+      0,
+      Math['trunc'](Number(target?.['inputSlots']?.['maxByKind']?.['image']) || 0),
     ),
     configured = Boolean(modelId && providerHint && target);
   return {
@@ -51,7 +51,7 @@ export function resolvePersonReplacementPromptEnhancementModel(options = {}) {
     provider: providerHint,
     providerProfileId: providerProfileId,
     supportsImage: Boolean(
-      configured && target?.['kind'] === 'text' && list2['includes']('image') && maxImages > 0x0,
+      configured && target?.['kind'] === 'text' && list2['includes']('image') && maxImages > 0,
     ),
   };
 }
@@ -68,7 +68,7 @@ export function buildPersonReplacementPromptEnhancementInputs({ promptPackage: p
         label: normalizeText(next['label']) || '图' + next['slot'],
         ref: normalizeText(next['ref']),
         role: normalizeText(next['role']),
-        slot: Math['max'](0x1, Math['trunc'](Number(next['slot']) || 0x1)),
+        slot: Math['max'](1, Math['trunc'](Number(next['slot']) || 1)),
         targetCharacterId: normalizeText(next['targetCharacterId']),
       }))
       ['filter']((current) => current['ref']),
@@ -83,10 +83,10 @@ export function buildPersonReplacementPromptEnhancementInputs({ promptPackage: p
         bbox:
           label['bbox'] && typeof label['bbox'] === 'object'
             ? {
-                x: Number(label['bbox']['x']) || 0x0,
-                y: Number(label['bbox']['y']) || 0x0,
-                width: Number(label['bbox']['width']) || 0x0,
-                height: Number(label['bbox']['height']) || 0x0,
+                x: Number(label['bbox']['x']) || 0,
+                y: Number(label['bbox']['y']) || 0,
+                width: Number(label['bbox']['width']) || 0,
+                height: Number(label['bbox']['height']) || 0,
               }
             : null,
       }))
@@ -131,7 +131,7 @@ export function createPersonReplacementPromptEnhancementStructuredOutput(list3 =
             properties: {
               label: minItems['length']
                 ? { type: 'string', enum: minItems }
-                : { type: 'string', maxLength: 0x0 },
+                : { type: 'string', maxLength: 0 },
               pose: { type: 'string' },
               gaze: { type: 'string' },
               expression: { type: 'string' },
@@ -141,7 +141,7 @@ export function createPersonReplacementPromptEnhancementStructuredOutput(list3 =
             },
           },
         },
-        integration: { type: 'array', minItems: 0x1, maxItems: 0x6, items: { type: 'string' } },
+        integration: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } },
       },
     },
   };
@@ -175,12 +175,12 @@ export function buildPersonReplacementPromptEnhancementPrompt({
         : '',
     '不要描述目标参考图自己的动作、背景、构图或身体裁切；不要要求把这些内容复制到结果中。',
     '不要在分析内容中书写人物到图片的对应箭头、图片编号绑定或新的修改范围。',
-    '图片角色：\x0a' + list4['map']((handle) => '-\x20' + handle)['join']('\x0a'),
+    '图片角色：\n' + list4['map']((handle) => '- ' + handle)['join']('\n'),
     '应用锁定的绑定事实：\n' + normalizeText(promptPackage['guidedBindingPrompt']),
     '按指定 JSON Schema 返回，不要附加解释。',
   ]
     ['filter'](Boolean)
-    ['join']('\x0a\x0a');
+    ['join']('\n\n');
 }
 export function parsePersonReplacementPromptEnhancementResult(
   state,
@@ -214,9 +214,9 @@ export function parsePersonReplacementPromptEnhancementResult(
       focus: normalizeText(extractJsonObject2['scene']?.['focus']),
       texture: normalizeText(extractJsonObject2['scene']?.['texture']),
     },
-    integration = normalizeStringList(extractJsonObject2['integration'], 0x6),
+    integration = normalizeStringList(extractJsonObject2['integration'], 6),
     list6 = Object['values'](scene)['filter'](Boolean),
-    list7 = people['flatMap']((output) => Object['values'](output)['slice'](0x1))['filter'](Boolean);
+    list7 = people['flatMap']((output) => Object['values'](output)['slice'](1))['filter'](Boolean);
   if (!list6['length'] && !list7['length'] && !integration['length'])
     throw new Error('AI 提示词增强返回了空分析');
   return { integration: integration, people: people, scene: scene };
@@ -244,19 +244,19 @@ export function compilePersonReplacementPromptEnhancement(options2 = {}) {
           ['map'](normalizeText)
           ['filter'](Boolean);
         return normalizeText(value2['label']) && list9['length']
-          ? '-\x20' + normalizeText(value2['label']) + '：' + list9['join']('；') + '。'
+          ? '- ' + normalizeText(value2['label']) + '：' + list9['join']('；') + '。'
           : '';
       })
       ['filter'](Boolean),
-    list10 = normalizeStringList(options2['integration'], 0x6);
+    list10 = normalizeStringList(options2['integration'], 6);
   return [
-    'AI\x20提示词增强（只补充视觉约束，不得改变既定人物绑定）：',
+    'AI 提示词增强（只补充视觉约束，不得改变既定人物绑定）：',
     list8['length'] ? '- 原图画面：' + list8['join']('；') + '。' : '',
     ...args,
     list10['length'] ? '- 融合要求：' + list10['join']('；') + '。' : '',
   ]
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export function applyPersonReplacementPromptEnhancement(args2 = {}, value3 = {}) {
   if (args2['promptMode'] === 'manual') return { ...args2 };
@@ -278,11 +278,11 @@ export function applyPersonReplacementPromptEnhancement(args2 = {}, value3 = {})
     bindingPrompt: [args2['bindingPrompt'], text2]
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x0a\x0a'),
+      ['join']('\n\n'),
     guidedBindingPrompt: [args2['guidedBindingPrompt'], text2]
       ['map'](normalizeText)
       ['filter'](Boolean)
-      ['join']('\x0a\x0a'),
-    prompt: [args2['prompt'], text2]['map'](normalizeText)['filter'](Boolean)['join']('\x0a\x0a'),
+      ['join']('\n\n'),
+    prompt: [args2['prompt'], text2]['map'](normalizeText)['filter'](Boolean)['join']('\n\n'),
   };
 }

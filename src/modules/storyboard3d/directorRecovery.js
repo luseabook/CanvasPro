@@ -27,19 +27,19 @@ export function recordDirectorDeletions(value, item, label = '删除内容') {
         deletedAt: Date['now'](),
         removed: removed,
       },
-    ]['slice'](-0x14);
+    ]['slice'](-20);
   return item;
 }
 export function normalizeDirectorRecycleBin(current, scene) {
   return (Array['isArray'](current) ? current : [])
-    ['slice'](-0x14)
+    ['slice'](-20)
     ['filter']((entry) => typeof entry?.['id'] === 'string')
     ['map']((id) => ({
       id: id['id'],
-      label: String(id['label'] || '删除内容')['slice'](0x0, 0x78),
-      deletedAt: Math['max'](0x0, Number(id['deletedAt']) || 0x0),
+      label: String(id['label'] || '删除内容')['slice'](0, 120),
+      deletedAt: Math['max'](0, Number(id['deletedAt']) || 0),
       removed: (Array['isArray'](id['removed']) ? id['removed'] : [])
-        ['slice'](0x0, 0x64)
+        ['slice'](0, 100)
         ['filter']((record) => record?.['scene'])
         ['map']((wholeScene, payload) => ({
           scene: scene(wholeScene['scene'], payload),
@@ -159,7 +159,7 @@ export function directorDeletionImpact(value25, list) {
         value30['animation']['objectTracks']['filter']((value31) => map3['has'](value31['objectId']))[
           'length'
         ],
-      0x0,
+      0,
     ),
     value32 = value25['shots']['reduce'](
       (value33, value34) =>
@@ -169,7 +169,7 @@ export function directorDeletionImpact(value25, list) {
         ]((value35) => map3['has'](value35['followObjectId']) || map3['has'](value35['lookAtObjectId']))[
           'length'
         ],
-      0x0,
+      0,
     );
   return (
     '已移入回收站：' +
@@ -178,7 +178,7 @@ export function directorDeletionImpact(value25, list) {
     value26 +
     ' 个镜头、' +
     value28 +
-    '\x20条运动轨道、' +
+    ' 条运动轨道、' +
     value32 +
     ' 项跟拍约束。可在导演编排中恢复。'
   );

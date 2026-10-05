@@ -67,8 +67,8 @@ function _persistLocalCache() {
 function _createResultNode(box, videoUrl) {
   const localPath = _getResultLocalPath(videoUrl);
   if (!localPath) throw new Error(videoReverseText('errors.incompleteResult'));
-  const handle = Number(box?.width) || Number(videoUrl?.videoWidth) || 0x200,
-    state = Number(box?.height) || Number(videoUrl?.videoHeight) || 0x120,
+  const handle = Number(box?.width) || Number(videoUrl?.videoWidth) || 512,
+    state = Number(box?.height) || Number(videoUrl?.videoHeight) || 288,
     { width: width, height: height } = getAutoMediaSizeByShortSide(handle, state),
     { x: x, y: y } = calcSafeSpawnPosNearNode(_getState().nodes || {}, box, width, height),
     name = String(box?.name || '').trim() || videoReverseText('fallback.video'),

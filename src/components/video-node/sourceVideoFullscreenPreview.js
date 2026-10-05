@@ -46,11 +46,11 @@ export function resolveSourceVideoFullscreenSources(options = {}, key = '') {
   return { previewUrl: previewUrl2, highResolutionUrl: highResolutionUrl };
 }
 function setPlaybackTime(data, target) {
-  const next = Math['max'](0x0, Number(target || 0x0));
+  const next = Math['max'](0, Number(target || 0));
   try {
-    const count = Number(data?.['duration'] || 0x0);
+    const count = Number(data?.['duration'] || 0);
     data['currentTime'] =
-      Number['isFinite'](count) && count > 0x0 ? Math['min'](next, Math['max'](0x0, count - 0.001)) : next;
+      Number['isFinite'](count) && count > 0 ? Math['min'](next, Math['max'](0, count - 0.001)) : next;
   } catch {}
 }
 function requestExclusivePlayback(el, label) {
@@ -59,9 +59,9 @@ function requestExclusivePlayback(el, label) {
     !claimVideoPlaybackOwnership(el, {
       label: label,
       minBufferAhead: 0.5,
-      readyTimeoutMs: 0x15e,
-      recoveryDebounceMs: 0x96,
-      recoveryCooldownMs: 0x1f4,
+      readyTimeoutMs: 350,
+      recoveryDebounceMs: 150,
+      recoveryCooldownMs: 500,
       shouldRecover: () => el['isConnected'] !== ![] && !el['paused'],
     })
   )
@@ -76,7 +76,7 @@ export function openSourceVideoFullscreenPreview({
   nodeData: nodeData = {},
   previewUrl: previewUrl = '',
   previewPlaybackUrl: previewPlaybackUrl = '',
-  currentTime: currentTime = 0x0,
+  currentTime: currentTime = 0,
   muted: muted = !![],
   loop: loop = ![],
   documentObject: documentObject = globalThis['document'],
@@ -209,8 +209,8 @@ export function openSourceVideoFullscreenPreview({
     let watchFrame2 = ![];
     const handle = () => {
         if (enabled2 || !hasPresentedFrame(el2, sources['highResolutionUrl'])) return;
-        const state = Number(previewVideo['currentTime'] || 0x0),
-          config = Number(el2['currentTime'] || 0x0);
+        const state = Number(previewVideo['currentTime'] || 0),
+          config = Number(el2['currentTime'] || 0);
         if (Math['abs'](state - config) > 0.25) {
           (resetFrame(el2), setPlaybackTime(el2, state), watchFrame(el2, handle));
           return;

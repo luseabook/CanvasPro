@@ -13,7 +13,7 @@ export function renderAgentConversationChoices(
 ) {
   el['replaceChildren']();
   const list = Array['isArray'](questionId?.['options']) ? questionId['options'] : [];
-  el['hidden'] = list['length'] === 0x0;
+  el['hidden'] = list['length'] === 0;
   let key = ![];
   for (const index of list) {
     const el2 = createAgentElement('button', 'agent-option-btn', index['label']);

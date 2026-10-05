@@ -66,12 +66,12 @@ function getLibraryAssetSourceKey(options = {}) {
   return (
     normalizeText(options['sourceAssetId']) +
     ':' +
-    Math['max'](0x0, Math['trunc'](Number(options['sourceItemIndex']) || 0x0))
+    Math['max'](0, Math['trunc'](Number(options['sourceItemIndex']) || 0))
   );
 }
 function getRenderableElementRect(el) {
   const box = el?.['getBoundingClientRect']?.();
-  return box?.['width'] > 0x0 && box?.['height'] > 0x0 ? box : null;
+  return box?.['width'] > 0 && box?.['height'] > 0 ? box : null;
 }
 function resolveLibraryAssetFlySource(el2, index, list2 = []) {
   const el3 = list2['find']((el4) => normalizeText(el4?.['dataset']?.['storyAssetId']) === index['id']),
@@ -102,18 +102,18 @@ export function getNewPersonReplacementLibraryAssets(options2 = {}, list3 = [], 
 export function playPersonReplacementLibraryAssetsIntoProjectTab(
   el7,
   list4 = [],
-  current = 0x0,
+  current = 0,
   entry = 'character',
   documentObject2 = globalThis['document'],
   windowObject2 = globalThis['window'],
 ) {
-  const enabled2 = Math['min'](list4['length'], Math['max'](0x0, Math['trunc'](Number(current) || 0x0)));
+  const enabled2 = Math['min'](list4['length'], Math['max'](0, Math['trunc'](Number(current) || 0)));
   if (!enabled2) return ![];
-  const toElement = el7?.['querySelector']?.('[data-asset-tab="' + entry + '\x22]');
+  const toElement = el7?.['querySelector']?.('[data-asset-tab="' + entry + '"]');
   if (!toElement) return ![];
   const record = Array['from'](el7?.['querySelectorAll']?.('[data-story-asset-id]') || []);
   return (
-    list4['slice'](0x0, enabled2)['forEach']((payload) => {
+    list4['slice'](0, enabled2)['forEach']((payload) => {
       const args = resolveLibraryAssetFlySource(el7, payload, record);
       if (!args) return;
       playAssetCreateFly({
@@ -147,7 +147,7 @@ export async function addPersonReplacementAppearanceToLibraryWithFly(
   return playAssetCreateFly({
     fromRect: fromRect3,
     contentElement: contentElement3,
-    toElement: toElement2?.['querySelector']?.('[data-asset-tab=\x22library\x22]'),
+    toElement: toElement2?.['querySelector']?.('[data-asset-tab="library"]'),
     documentObject: documentObject3,
     windowObject: windowObject3,
   });

@@ -42,7 +42,7 @@ export function bindStoryReplicationReview(
     storyVideoPlayback = null,
     value = 'story',
     enabled = ![],
-    item = 0x0,
+    item = 0,
     key = null,
     storyReplicationPortraitEditor = null,
     bindStoryReplicationSelects2 = null,
@@ -51,7 +51,7 @@ export function bindStoryReplicationReview(
     bindStoryReplicationReviewThumbnails2 = null,
     bindStoryReplicationReviewLayout2 = null,
     index = ![];
-  const result = { left: 0x14, right: 0x38 },
+  const result = { left: 20, right: 56 },
     handler = (data) =>
       isProjectTaskLive(data['token']) && data['episode']['replication']['sourceAnalysis'] === data['source'],
     handler2 = (options) => !enabled && !videoEl['hidden'] && busy === options && handler(options),
@@ -98,7 +98,7 @@ export function bindStoryReplicationReview(
     (bindStoryReplicationReviewLayout2?.['destroy'](),
       (bindStoryReplicationReviewLayout2 = null),
       bindStoryReplicationSelects2?.['close'](),
-      (item += 0x1),
+      (item += 1),
       key?.(),
       videoEl['querySelector']('video')?.['pause']());
     const el3 = videoEl['querySelector']('[data-replication-seeking]');
@@ -141,12 +141,12 @@ export function bindStoryReplicationReview(
         (el4['setAttribute']('aria-pressed', String(el4['dataset']['replicationTab'] === value)),
           el4['getAttribute']('role') === 'tab' &&
             (el4['setAttribute']('aria-selected', String(el4['dataset']['replicationTab'] === value)),
-            (el4['tabIndex'] = el4['dataset']['replicationTab'] === value ? 0x0 : -0x1)));
+            (el4['tabIndex'] = el4['dataset']['replicationTab'] === value ? 0 : -1)));
       }));
     const el5 = videoEl['querySelector']('.story-source-tabs');
     el5['style']['setProperty'](
       '--review-tab-index',
-      Math['max'](0x0, ['overview', 'story', 'dialogue', 'characters', 'shots']['indexOf'](value)),
+      Math['max'](0, ['overview', 'story', 'dialogue', 'characters', 'shots']['indexOf'](value)),
     );
     if (preserveScroll) videoEl['querySelector']('[data-replication-fields]')['scrollTop'] = current;
     else ctx['restore'](value);
@@ -158,7 +158,7 @@ export function bindStoryReplicationReview(
   }
   function run7(record, payload) {
     const handle = busy,
-      config = item + 0x1;
+      config = item + 1;
     void run8(record, payload)['catch'](() => {
       if (handler2(handle) && config === item) run('原视频定位或播放失败，请重试。');
     });
@@ -169,11 +169,11 @@ export function bindStoryReplicationReview(
     key?.();
     const el6 = videoEl['querySelector']('video'),
       el7 = videoEl['querySelector']('[data-replication-seeking]');
-    ((el7['hidden'] = el6['readyState'] >= 0x1), run());
+    ((el7['hidden'] = el6['readyState'] >= 1), run());
     try {
-      if (el6['readyState'] < 0x1 && !(await storyVideoPlayback['warm']())) return;
+      if (el6['readyState'] < 1 && !(await storyVideoPlayback['warm']())) return;
       if (!handler2(input) || output !== item) return;
-      el6['readyState'] < 0x1 &&
+      el6['readyState'] < 1 &&
         (await new Promise((handler4) => {
           const value2 = () => {
               (clearTimeout(setTimeout2),
@@ -182,17 +182,17 @@ export function bindStoryReplicationReview(
               if (key === value2) key = null;
               handler4();
             },
-            setTimeout2 = setTimeout(value2, 0x1f40);
+            setTimeout2 = setTimeout(value2, 8000);
           ((key = value2),
             el6['addEventListener']('loadedmetadata', value2, { once: !![] }),
             el6['addEventListener']('error', value2, { once: !![] }));
         }));
       if (!handler2(input) || output !== item) return;
-      if (el6['readyState'] < 0x1) {
+      if (el6['readyState'] < 1) {
         run('原视频加载失败，请检查源文件后重试。');
         return;
       }
-      const value3 = Math['min'](Math['max'](0x0, scope), Math['max'](0x0, el6['duration'] - 0.001));
+      const value3 = Math['min'](Math['max'](0, scope), Math['max'](0, el6['duration'] - 0.001));
       if (Math['abs'](el6['currentTime'] - value3) > 0.001) el6['currentTime'] = value3;
       if (play) await el6['play']();
       if (handler2(input) && output === item) run();
@@ -226,7 +226,7 @@ export function bindStoryReplicationReview(
     }
     if (card['hasAttribute']('data-replication-add-character')) {
       const timeSec = videoEl['querySelector']('video');
-      if (timeSec['readyState'] < 0x2 || timeSec['seeking']) {
+      if (timeSec['readyState'] < 2 || timeSec['seeking']) {
         showToast('请先定位并等待当前人物画面加载。', 'warn');
         return;
       }
@@ -335,7 +335,7 @@ export function bindStoryReplicationReview(
           ownerId: 'story-source:' + busy['token']['projectId'] + ':' + episode['id'],
         })),
         run(),
-        run7(ctx['selected']()?.['startSec'] || 0x0));
+        run7(ctx['selected']()?.['startSec'] || 0));
       return;
     }
     if (!busy || !videoEl['contains'](play2)) return;
@@ -354,7 +354,7 @@ export function bindStoryReplicationReview(
     ) {
       const value9 =
         play2['dataset']['replicationSegment'] ||
-        ctx['adjacent'](play2['hasAttribute']('data-replication-next') ? 0x1 : -0x1);
+        ctx['adjacent'](play2['hasAttribute']('data-replication-next') ? 1 : -1);
       ctx['save'](value);
       if (ctx['select'](value9)) {
         (run5(), run3());
@@ -392,7 +392,7 @@ export function bindStoryReplicationReview(
               (value11) => value11['id'] === play2['dataset']['replicationCapture'],
             ),
             value12 = videoEl['querySelector']('video');
-          if (value12['readyState'] < 0x2) throw new Error('请先等待原视频画面加载完成。');
+          if (value12['readyState'] < 2) throw new Error('请先等待原视频画面加载完成。');
           const timeSec2 = Number(value12['currentTime']);
           if (
             !videoRef2['source']['events']['some'](
@@ -483,12 +483,12 @@ export function bindStoryReplicationReview(
     return (
       !videoEl['contains'](el12) &&
       !el12['closest'](
-        'button,\x20a,\x20input,\x20textarea,\x20select,\x20[role=\x22button\x22],\x20[role=\x22separator\x22],\x20.story-page-footer',
+        'button, a, input, textarea, select, [role="button"], [role="separator"], .story-page-footer',
       )
     );
   }
   function run13(event3) {
-    index = Boolean(busy && !videoEl['hidden'] && event3['button'] === 0x0 && run11(event3['target']));
+    index = Boolean(busy && !videoEl['hidden'] && event3['button'] === 0 && run11(event3['target']));
   }
   function run14(event4) {
     if (
@@ -500,7 +500,7 @@ export function bindStoryReplicationReview(
       event4['metaKey'] ||
       event4['shiftKey'] ||
       event4['target']['closest'](
-        'input,\x20textarea,\x20select,\x20[contenteditable]:not([contenteditable=\x22false\x22]),\x20[role=\x22textbox\x22],\x20[role=\x22combobox\x22],\x20[role=\x22listbox\x22],\x20[role=\x22dialog\x22]',
+        'input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="combobox"], [role="listbox"], [role="dialog"]',
       )
     )
       return;

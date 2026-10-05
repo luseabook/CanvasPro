@@ -37,8 +37,8 @@ function normalizeExternalUrl(key) {
 }
 function extensionFromFile({ filename: filename, blob: blob, kind: kind }) {
   const trimText4 = trimText(filename)['match'](/\.([a-z0-9]{1,10})$/i);
-  if (trimText4?.[0x1]) return trimText4[0x1]['toLowerCase']();
-  const trimText5 = trimText(blob?.['type'])['split'](';', 0x1)[0x0]['toLowerCase']();
+  if (trimText4?.[1]) return trimText4[1]['toLowerCase']();
+  const trimText5 = trimText(blob?.['type'])['split'](';', 1)[0]['toLowerCase']();
   return MIME_EXTENSIONS[trimText5] || DEFAULT_MEDIA_EXTENSIONS[kind] || 'bin';
 }
 function getDependency(result, data, options) {
@@ -79,7 +79,7 @@ function triggerBlobDownload({
     triggerHrefDownload({ url: url2, filename: filename3, documentRef: documentRef });
   } finally {
     typeof schedule === 'function'
-      ? schedule(() => urlApi['revokeObjectURL']?.(url2), 0x0)
+      ? schedule(() => urlApi['revokeObjectURL']?.(url2), 0)
       : urlApi['revokeObjectURL']?.(url2);
   }
 }
@@ -98,7 +98,7 @@ async function cleanupStagedMedia(record, payload) {
   const localPaths = (Array['isArray'](record) ? record : [record])
     ['filter']((handle) => handle?.['staged'] === !![] && handle?.['localPath'])
     ['map']((state) => state['localPath']);
-  if (localPaths['length'] === 0x0) return;
+  if (localPaths['length'] === 0) return;
   const run2 = getDependency(payload, 'deleteOutputFilesFromServer', deleteOutputFilesFromServer);
   if (typeof run2 !== 'function') return;
   try {
@@ -191,7 +191,7 @@ export async function saveMediaDownload(blob6 = {}, output = {}) {
 }
 export async function saveMediaFilesDownload(options3 = {}, args = {}) {
   const count = Array['isArray'](options3?.['files']) ? options3['files'] : [];
-  if (count['length'] === 0x0) throw new Error('没有可保存的媒体文件');
+  if (count['length'] === 0) throw new Error('没有可保存的媒体文件');
   const dependency3 = getDependency(args, 'desktopBridge', desktopBridge);
   if (canUseCapability(dependency3, 'canSaveMediaFiles', 'saveMediaFiles')) {
     const files = [],

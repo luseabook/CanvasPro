@@ -18,7 +18,7 @@ export function createStoryAssetLayoutResizeController({
   ) {
     const el =
         layout ||
-        viewportElement?.['querySelector']?.('.story-page.is-current\x20.story-assets-layout') ||
+        viewportElement?.['querySelector']?.('.story-page.is-current .story-assets-layout') ||
         viewportElement?.['querySelector']?.('.story-assets-layout'),
       item = splitter || el?.['querySelector']?.('[data-story-assets-splitter]');
     state['assetSplitRatio'] = applyStoryAssetSplitRatioToLayout(el, item, value);
@@ -73,7 +73,7 @@ export function createStoryAssetLayoutResizeController({
       return (
         event3['preventDefault']?.(),
         event3['stopPropagation']?.(),
-        setAssetSplitRatio(state['assetSplitRatio'] + (event3['key'] === 'ArrowLeft' ? -0x2 : 0x2), {
+        setAssetSplitRatio(state['assetSplitRatio'] + (event3['key'] === 'ArrowLeft' ? -2 : 2), {
           shouldPersist: !![],
         }),
         !![]
@@ -83,7 +83,7 @@ export function createStoryAssetLayoutResizeController({
     return (
       event3['preventDefault']?.(),
       event3['stopPropagation']?.(),
-      setAssetDetailSplitRatio(state['assetDetailSplitRatio'] + (event3['key'] === 'ArrowUp' ? -0x2 : 0x2), {
+      setAssetDetailSplitRatio(state['assetDetailSplitRatio'] + (event3['key'] === 'ArrowUp' ? -2 : 2), {
         shouldPersist: !![],
       }),
       !![]

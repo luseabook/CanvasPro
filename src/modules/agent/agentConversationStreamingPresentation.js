@@ -25,7 +25,7 @@ export function createAgentConversationStreamingPresentation({
 }) {
   let content = null,
     requestAnimationFrame2 = null;
-  const run = () => messagesEl['scrollHeight'] - messagesEl['scrollTop'] - messagesEl['clientHeight'] < 0x40,
+  const run = () => messagesEl['scrollHeight'] - messagesEl['scrollTop'] - messagesEl['clientHeight'] < 64,
     handler = (handler2) => {
       const key = run(),
         index = messagesEl['scrollTop'];

@@ -1,8 +1,8 @@
 import { parseStrictJson } from '../utils/strictJson.js';
 import { getResultText } from './storyTextRequest.js';
-export const STORY_SUMMARY_SCHEMA_VERSION = 0x4;
-export const STORY_SUMMARY_MAX_CORE_CHARACTERS = 0x8;
-export const STORY_SUMMARY_MAX_PLOT_BEATS = 0x8;
+export const STORY_SUMMARY_SCHEMA_VERSION = 4;
+export const STORY_SUMMARY_MAX_CORE_CHARACTERS = 8;
+export const STORY_SUMMARY_MAX_PLOT_BEATS = 8;
 export const STORY_SUMMARY_SYSTEM_PROMPT = [
   '你是一名专业的短剧总编剧与故事策划。',
   '当前阶段只生成结构化故事蓝图和核心人物叙事设定，不生成分集大纲、分集正文、分镜、视觉资产提示词或声音设定。',
@@ -10,12 +10,12 @@ export const STORY_SUMMARY_SYSTEM_PROMPT = [
   '摘要必须完整交代主角目标、主要阻力、关键转折、高潮方向与最终结局，不能只留下悬念。',
   'storyContract 明确主角目标、核心冲突、失败代价、推进动力、约束条件、高潮与结局；任何题材都必须使用具体剧情事实表达。',
   'plotBeats 根据故事复杂度给出足够的因果节点，前一节点的结果必须能推动后一节点，不按字数凑内容。',
-  'continuityFacts\x20记录后续不能无理由改变的事实；战斗题材可记录武器和能力，言情题材可记录关系阶段、承诺、秘密与知情范围，悬疑或职场题材记录对应的线索、身份、职位和归属。',
+  'continuityFacts 记录后续不能无理由改变的事实；战斗题材可记录武器和能力，言情题材可记录关系阶段、承诺、秘密与知情范围，悬疑或职场题材记录对应的线索、身份、职位和归属。',
   '人物小传只描述核心人物的剧情身份、固定特征、核心标签、动机、关系、性格和成长弧；fixedTraits 只写影响剧情连续性的身份、年龄段、伤疤、身体限制或伪装等固定事实，不设计服装、发型、画面风格或声线。',
   '输入 scriptMode 只决定后续剧本的叙事载体：plot 以人物行动与对白推进，narration 以第三人称旁白推进；当前摘要仍使用客观梗概表达。',
   '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
   'JSON 必须且只能包含 title、storyType、targetAudience、storySummary、storyBackground、storySetting、coreHook、logline、storyContract、plotBeats、continuityFacts、characters 十二个字段。',
-]['join']('\x0a');
+]['join']('\n');
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
@@ -73,7 +73,7 @@ function createStorySummaryResponseSchema(maxItems) {
       },
       plotBeats: {
         type: 'array',
-        minItems: 0x4,
+        minItems: 4,
         maxItems: STORY_SUMMARY_MAX_PLOT_BEATS,
         items: {
           type: 'object',
@@ -86,10 +86,10 @@ function createStorySummaryResponseSchema(maxItems) {
           },
         },
       },
-      continuityFacts: { type: 'array', minItems: 0x1, maxItems: maxItems, items: { type: 'string' } },
+      continuityFacts: { type: 'array', minItems: 1, maxItems: maxItems, items: { type: 'string' } },
       characters: {
         type: 'array',
-        minItems: 0x1,
+        minItems: 1,
         maxItems: STORY_SUMMARY_MAX_CORE_CHARACTERS,
         items: {
           type: 'object',
@@ -111,7 +111,7 @@ function createStorySummaryResponseSchema(maxItems) {
             name: { type: 'string' },
             roleType: { type: 'string' },
             fixedTraits: { type: 'string' },
-            coreTags: { type: 'array', minItems: 0x1, maxItems: 0x5, items: { type: 'string' } },
+            coreTags: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } },
             profile: { type: 'string' },
             motivation: { type: 'string' },
             relationships: { type: 'string' },
@@ -126,17 +126,17 @@ function createStorySummaryResponseSchema(maxItems) {
 export function createStorySummaryBlueprint({
   normalizeStoryScriptMode: normalizeStoryScriptMode,
   validateStoryPlanningConstraints: validateStoryPlanningConstraints,
-  continuityMaxFacts: continuityMaxFacts = 0xc,
+  continuityMaxFacts: continuityMaxFacts = 12,
 } = {}) {
   if (typeof normalizeStoryScriptMode !== 'function')
     throw new TypeError('Story Summary Blueprint 需要剧本模式规范化函数。');
   if (typeof validateStoryPlanningConstraints !== 'function')
     throw new TypeError('Story Summary Blueprint 需要规划约束校验函数。');
-  function normalizeStorySummaryCharacter(error = {}, item = 0x0) {
+  function normalizeStorySummaryCharacter(error = {}, item = 0) {
     const name = normalizeText(error?.['name']);
     if (!name) return null;
     return {
-      ref: normalizeText(error?.['ref']) || 'character-' + (item + 0x1),
+      ref: normalizeText(error?.['ref']) || 'character-' + (item + 1),
       name: name,
       roleType: normalizeText(error?.['roleType'] || error?.['role']) || '其他角色',
       fixedTraits: normalizeText(error?.['fixedTraits']),
@@ -162,21 +162,21 @@ export function createStorySummaryBlueprint({
       ending: normalizeText(key['ending']),
     };
   }
-  function normalizeStoryPlotBeat(options2 = {}, index = 0x0) {
+  function normalizeStoryPlotBeat(options2 = {}, index = 0) {
     const result = options2 && typeof options2 === 'object' && !Array['isArray'](options2) ? options2 : {},
       stage = normalizeText(result['stage']),
       event = normalizeText(result['event']),
       consequence = normalizeText(result['consequence']);
     if (!stage && !event && !consequence) return null;
     return {
-      ref: normalizeText(result['ref']) || 'plot-beat-' + (index + 0x1),
+      ref: normalizeText(result['ref']) || 'plot-beat-' + (index + 1),
       stage: stage,
       event: event,
       consequence: consequence,
     };
   }
   function parseStorySummaryResult(data) {
-    const strictJson = parseStrictJson(getResultText(data), 'Agent\x20未返回剧本摘要。'),
+    const strictJson = parseStrictJson(getResultText(data), 'Agent 未返回剧本摘要。'),
       enabled = {
         schemaVersion: STORY_SUMMARY_SCHEMA_VERSION,
         title: normalizeText(strictJson['title']),
@@ -192,17 +192,17 @@ export function createStorySummaryBlueprint({
           ? strictJson['plotBeats']
               ['map'](normalizeStoryPlotBeat)
               ['filter'](Boolean)
-              ['slice'](0x0, STORY_SUMMARY_MAX_PLOT_BEATS)
+              ['slice'](0, STORY_SUMMARY_MAX_PLOT_BEATS)
           : [],
         continuityFacts: normalizeStringArray(strictJson['continuityFacts'])['slice'](
-          0x0,
+          0,
           continuityMaxFacts,
         ),
         characters: Array['isArray'](strictJson['characters'])
           ? strictJson['characters']
               ['map'](normalizeStorySummaryCharacter)
               ['filter'](Boolean)
-              ['slice'](0x0, STORY_SUMMARY_MAX_CORE_CHARACTERS)
+              ['slice'](0, STORY_SUMMARY_MAX_CORE_CHARACTERS)
           : [],
       },
       target = [
@@ -219,13 +219,13 @@ export function createStorySummaryBlueprint({
       if (!enabled[source]) throw new Error('Agent 返回结果缺少' + next + '。');
     }
     const current = Object['entries'](enabled['storyContract'])['find'](([, enabled2]) => !enabled2);
-    if (current) throw new Error('Agent\x20返回结果缺少故事契约字段：' + current[0x0] + '。');
-    if (enabled['plotBeats']['length'] < 0x4) throw new Error('Agent\x20返回结果缺少完整的因果剧情节点。');
+    if (current) throw new Error('Agent 返回结果缺少故事契约字段：' + current[0] + '。');
+    if (enabled['plotBeats']['length'] < 4) throw new Error('Agent 返回结果缺少完整的因果剧情节点。');
     const entry = enabled['plotBeats']['find'](
       (enabled3) => !enabled3['stage'] || !enabled3['event'] || !enabled3['consequence'],
     );
     if (entry) throw new Error('Agent 返回的剧情节点缺少阶段、事件或结果。');
-    if (!enabled['continuityFacts']['length']) throw new Error('Agent\x20返回结果缺少连续性事实。');
+    if (!enabled['continuityFacts']['length']) throw new Error('Agent 返回结果缺少连续性事实。');
     if (!enabled['characters']['length']) throw new Error('Agent 返回结果缺少人物小传。');
     const error2 = enabled['characters']['find'](
       (enabled4) => !enabled4['fixedTraits'] || !enabled4['coreTags']['length'],
@@ -287,21 +287,21 @@ export function createStorySummaryBlueprint({
         selectedStyle
           ? '围绕所选风格“' +
             selectedStyle +
-            '”设计故事本身；在\x20storyType、storySummary、storyBackground、storySetting、storyContract、plotBeats\x20和人物弧光中落实适用的叙事语义，不要只把风格词复制到输出文本。'
+            '”设计故事本身；在 storyType、storySummary、storyBackground、storySetting、storyContract、plotBeats 和人物弧光中落实适用的叙事语义，不要只把风格词复制到输出文本。'
           : '未指定额外风格时，不要自行套用固定的画面风格或类型模板。',
         'storySummary 按故事实际复杂度完整交代主线因果和主要结局；不设固定字数，不为篇幅重复或注水。',
-        'coreHook\x20用简洁短语概括最有传播力的题材组合、能力机制或冲突卖点。',
+        'coreHook 用简洁短语概括最有传播力的题材组合、能力机制或冲突卖点。',
         'storyContract 使用题材无关的剧情事实明确目标、冲突、代价、推进动力、约束、高潮和结局。',
         'plotBeats 根据故事复杂度输出 4 至 8 个因果节点；每个 consequence 必须成为下一节点的条件或压力。',
-        'continuityFacts\x20只登记后续不能无理由改变的事实，并覆盖原始创意中明确给出的身份、关系、承诺、秘密、知情范围、能力、物品归属或世界规则。',
+        'continuityFacts 只登记后续不能无理由改变的事实，并覆盖原始创意中明确给出的身份、关系、承诺、秘密、知情范围、能力、物品归属或世界规则。',
         'characters 只包含主角和推动主要冲突的核心人物，最多 ' +
           STORY_SUMMARY_MAX_CORE_CHARACTERS +
-          '\x20人；临时路人和单集功能角色留到分集阶段。',
-        '人物小传需写明角色类型、剧情固定特征、3\x20至\x205\x20个核心标签、身份、动机、关系、性格和成长弧。',
+          ' 人；临时路人和单集功能角色留到分集阶段。',
+        '人物小传需写明角色类型、剧情固定特征、3 至 5 个核心标签、身份、动机、关系、性格和成长弧。',
         '本阶段禁止生成服装、发型、图片提示词和声音设定；这些制作资料在分集正文确认后的资产提取阶段生成。',
         '后续最多规划 ' +
           episodeLimit['episodeCount'] +
-          '\x20集；摘要应完整承载故事，但不得为了凑满上限注水。本次禁止输出分集。',
+          ' 集；摘要应完整承载故事，但不得为了凑满上限注水。本次禁止输出分集。',
         scriptMode2 === 'narration'
           ? '后续采用解说模式：摘要要形成可由第三人称旁白串联的清晰因果链，避免让核心冲突只能依靠大段人物对白成立。'
           : '后续采用剧情模式：为人物行动、关系碰撞和关键对白保留充分的戏剧空间。',

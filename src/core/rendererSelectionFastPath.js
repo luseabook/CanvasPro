@@ -1,4 +1,4 @@
-function normalizeNumber(value, item = 0x0) {
+function normalizeNumber(value, item = 0) {
   return Number['isFinite'](value) ? value : item;
 }
 function hasNodeRevision(options = {}) {
@@ -37,13 +37,13 @@ export function createRendererSelectionFastPath({
           ? state['_nodesRev']
           : typeof state['_persistRev'] === 'number'
             ? state['_persistRev']
-            : 0x0,
-      renderRequestRev: typeof state['_renderRequestRev'] === 'number' ? state['_renderRequestRev'] : 0x0,
-      edgesRev: typeof state['_edgesRev'] === 'number' ? state['_edgesRev'] : 0x0,
+            : 0,
+      renderRequestRev: typeof state['_renderRequestRev'] === 'number' ? state['_renderRequestRev'] : 0,
+      edgesRev: typeof state['_edgesRev'] === 'number' ? state['_edgesRev'] : 0,
       viewport: {
         x: normalizeNumber(box['x']),
         y: normalizeNumber(box['y']),
-        zoom: normalizeNumber(box['zoom'], 0x1),
+        zoom: normalizeNumber(box['zoom'], 1),
       },
       connOverlay: {
         srcId: srcId['srcId'] || '',
@@ -78,7 +78,7 @@ export function createRendererSelectionFastPath({
         visible: visible2['visible'] === !![],
         x: normalizeNumber(visible2['x']),
         y: normalizeNumber(visible2['y']),
-        itemCount: Array['isArray'](visible2['items']) ? visible2['items']['length'] : 0x0,
+        itemCount: Array['isArray'](visible2['items']) ? visible2['items']['length'] : 0,
       },
       ui: {
         connectionLinesVisible: connectionLinesVisible['connectionLinesVisible'] !== ![],
@@ -106,7 +106,7 @@ export function createRendererSelectionFastPath({
         : [],
       index = new Set(selectedNodeIds),
       result = state2['edges'] || {},
-      data = typeof state2['_edgesRev'] === 'number' ? state2['_edgesRev'] : 0x0;
+      data = typeof state2['_edgesRev'] === 'number' ? state2['_edgesRev'] : 0;
     ensureEdgeIndex?.(result, data);
     const relatedNodeIds =
       state2['ui']?.['selectionRelatedHighlightEnabled'] === ![]

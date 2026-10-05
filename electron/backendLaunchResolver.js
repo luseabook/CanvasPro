@@ -21,7 +21,7 @@ export function resolveBackendLaunchSpec({
     throw new Error(
       'Packaged backend executable is missing: ' +
         executable +
-        '.\x20' +
+        '. ' +
         'Rebuild the native backend before packaging.',
     );
   return { kind: 'native-backend', command: executable, args: [], cwd: appRoot };

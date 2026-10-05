@@ -1,6 +1,6 @@
 import { getPerfProbeSnapshot, setPerfProbeEnabled } from '../modules/perf/perfProbe.js';
 import { t } from '../i18n/index.js';
-const MAX_CONTEXT_STRING_LENGTH = 0x4b0,
+const MAX_CONTEXT_STRING_LENGTH = 1200,
   MAX_CONTEXT_DEPTH = 5;
 function getDiagnosticsApi() {
   const enabled = globalThis.window?.electronAPI?.diagnostics;

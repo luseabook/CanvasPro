@@ -12,14 +12,14 @@ export function registerAgentDiscoveryCommands(commandRegistry) {
       commandRegistry['register']({
         id: 'agent.capabilities.search',
         description:
-          'Search\x20registered\x20Canvas\x20Commands\x20by\x20user\x20intent\x20without\x20executing\x20them.',
+          'Search registered Canvas Commands by user intent without executing them.',
         riskLevel: 'safe',
         argsSchema: {
           type: 'object',
           required: ['query'],
           properties: {
             query: { type: 'string' },
-            limit: { type: 'integer', minimum: 0x1, maximum: 0xc, default: 0x6 },
+            limit: { type: 'integer', minimum: 1, maximum: 12, default: 6 },
           },
         },
         capabilitySchema: SAFE_DISCOVERY_CAPABILITY,
@@ -70,7 +70,7 @@ export function registerAgentDiscoveryCommands(commandRegistry) {
               type: 'array',
               items: { type: 'string', enum: ['image', 'video', 'audio', 'text'] },
             },
-            limit: { type: 'integer', minimum: 0x1, maximum: 0xc, default: 0x6 },
+            limit: { type: 'integer', minimum: 1, maximum: 12, default: 6 },
           },
         },
         capabilitySchema: SAFE_DISCOVERY_CAPABILITY,

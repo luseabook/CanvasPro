@@ -71,7 +71,7 @@ function resolveDirectOriginalTimelineRef(options2 = {}, target = []) {
     return '';
   const list = Array['isArray'](options2['sources']) ? options2['sources'] : [],
     map2 = new Map(list['map']((next) => [normalizeText(next['id']), next])),
-    current = list['length'] === 0x1 ? normalizeLocalPath(list[0x0]?.['videoRef']) : '',
+    current = list['length'] === 1 ? normalizeLocalPath(list[0]?.['videoRef']) : '',
     list2 = (Array['isArray'](target) ? target : [])['map']((entry) =>
       normalizeLocalPath(
         entry?.['sourceVideoRef'] || map2['get'](normalizeText(entry?.['sourceId']))?.['videoRef'] || current,
@@ -79,7 +79,7 @@ function resolveDirectOriginalTimelineRef(options2 = {}, target = []) {
     );
   if (!list2['length'] || list2['some']((enabled) => !enabled)) return '';
   const list3 = [...new Set(list2)];
-  return list3['length'] === 0x1 ? list3[0x0] : '';
+  return list3['length'] === 1 ? list3[0] : '';
 }
 function createWorkspacePresentationAdapter(record) {
   const run = (payload, args3) => {
@@ -163,7 +163,7 @@ export function createPersonReplacementOutputCoordinator({
             clips: src['clips'],
           },
         },
-        { wait: !![], timeout: 0x927c0 },
+        { wait: !![], timeout: 600000 },
       ),
       localPath = resolveMediaRef(data2);
     if (!data2?.['success'] || !localPath)
@@ -175,10 +175,10 @@ export function createPersonReplacementOutputCoordinator({
     { sourceId: sourceId, onAudioPickStateChange: onAudioPickStateChange = null } = {},
   ) {
     const list4 = projectId['sources']['filter']((input) => input?.['videoRef']),
-      enabled2 = list4['find']((output) => output['id'] === sourceId) || list4[0x0];
+      enabled2 = list4['find']((output) => output['id'] === sourceId) || list4[0];
     if (!enabled2 || typeof createVoicePanel !== 'function')
       return (
-        (root['innerHTML'] = '<div\x20class=\x22person-replacement-inline-empty\x22>请先导入可用视频</div>'),
+        (root['innerHTML'] = '<div class="person-replacement-inline-empty">请先导入可用视频</div>'),
         null
       );
     const map3 = new Map(),
@@ -209,7 +209,7 @@ export function createPersonReplacementOutputCoordinator({
                 videoUrl: resolveMediaUrl(videoDuration['videoRef']),
                 imageUrl: resolveMediaUrl(value4),
                 thumbUrl: resolveMediaUrl(value4),
-                videoDuration: videoDuration['durationSec'] || 0x0,
+                videoDuration: videoDuration['durationSec'] || 0,
               },
             ]
           );
@@ -252,7 +252,7 @@ export function createPersonReplacementOutputCoordinator({
         showCompletionNotification: (args9) =>
           showCompletionNotification({
             ...args9,
-            navigation: { source: 'replacement-studio', projectId: projectId2, step: 0x4 },
+            navigation: { source: 'replacement-studio', projectId: projectId2, step: 4 },
           }),
         composeTimeline: composeTimeline,
         onAudioPickStateChange: onAudioPickStateChange,
@@ -357,8 +357,8 @@ export function createPersonReplacementOutputCoordinator({
       );
       if (list7['some']((enabled5) => !enabled5)) throw new Error('合成所需的替换视频片段不完整');
       const run3 = (path2, { includeAudio: includeAudio = !![] } = {}) =>
-          path2['length'] === 0x1 && includeAudio
-            ? Promise['resolve']({ success: !![], path: path2[0x0] })
+          path2['length'] === 1 && includeAudio
+            ? Promise['resolve']({ success: !![], path: path2[0] })
             : enqueueMediaTask(
                 {
                   kind: 'videoCompose',
@@ -366,7 +366,7 @@ export function createPersonReplacementOutputCoordinator({
                   srcs: path2,
                   args: { includeAudio: includeAudio },
                 },
-                { wait: !![], timeout: 0x927c0 },
+                { wait: !![], timeout: 600000 },
               ),
         [value23, value24] = await Promise['all']([
           run3(list7, { includeAudio: ![] }),
@@ -390,7 +390,7 @@ export function createPersonReplacementOutputCoordinator({
           Promise['resolve']()['then'](() =>
             showCompletionNotification?.({
               body: '人物替换视频合成完成。',
-              navigation: { source: 'replacement-studio', projectId: projectId['id'], step: 0x5 },
+              navigation: { source: 'replacement-studio', projectId: projectId['id'], step: 5 },
             }),
           ),
         ])['then']((list8) => {
@@ -485,7 +485,7 @@ export function createPersonReplacementOutputCoordinator({
               src: src2,
               args: { audioSrc: audioSrc },
             },
-            { wait: !![], timeout: 0x927c0 },
+            { wait: !![], timeout: 600000 },
           ),
           finalVideoRef = resolveMediaRef(error7);
         if (!error7?.['success'] || !finalVideoRef)
@@ -507,8 +507,8 @@ export function createPersonReplacementOutputCoordinator({
       if (error8?.['canceled']) return ![];
       if (error8?.['success'] === ![])
         throw new Error(error8?.['error'] || error8?.['message'] || '素材导出失败');
-      const value26 = Math['max'](0x0, Number(error8?.['exportedCount']) || 0x0),
-        value27 = Math['max'](0x0, Number(error8?.['skippedCount']) || 0x0);
+      const value26 = Math['max'](0, Number(error8?.['exportedCount']) || 0),
+        value27 = Math['max'](0, Number(error8?.['skippedCount']) || 0);
       return (
         showToast(
           mode === PERSON_REPLACEMENT_EXPORT_MODES['FINAL_VIDEO']
@@ -516,7 +516,7 @@ export function createPersonReplacementOutputCoordinator({
             : mode === PERSON_REPLACEMENT_EXPORT_MODES['CURRENT_CLIP']
               ? '当前片段已导出。'
               : value27
-                ? '已导出 ' + value26 + ' 个素材，跳过 ' + value27 + '\x20个缺失项。'
+                ? '已导出 ' + value26 + ' 个素材，跳过 ' + value27 + ' 个缺失项。'
                 : '已导出 ' + value26 + ' 个素材。',
           'success',
         ),
@@ -536,8 +536,8 @@ export function createPersonReplacementOutputCoordinator({
           ? PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT']
           : PERSON_REPLACEMENT_CANVAS_SCOPES['CLIPS'],
       value29 = Math['max'](
-        0x1,
-        Math['min'](0x5, Math['trunc'](Number(value28['workspace']?.['step']) || 0x1)),
+        1,
+        Math['min'](5, Math['trunc'](Number(value28['workspace']?.['step']) || 1)),
       ),
       value30 = ['', '素材设定', '图像替换', '视频替换', '声音克隆', '替换片段'][value29];
     if (typeof createOutputCanvas !== 'function') return (showToast('当前环境无法加入画布。', 'error'), ![]);
@@ -585,8 +585,8 @@ export function createPersonReplacementOutputCoordinator({
     } finally {
       (pending['delete'](scope2),
         workspacePresentationAdapter?.['setOutputCanvasSyncState']?.({
-          pending: pending['size'] > 0x0,
-          scope: [...pending][0x0] || '',
+          pending: pending['size'] > 0,
+          scope: [...pending][0] || '',
         }));
     }
   }

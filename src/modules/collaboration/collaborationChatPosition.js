@@ -1,5 +1,5 @@
-const MIN_WIDTH = 0x168,
-  MIN_HEIGHT = 0x1a4;
+const MIN_WIDTH = 360,
+  MIN_HEIGHT = 420;
 export function bindCollaborationChatPosition({
   root: root,
   handles: handles,
@@ -21,8 +21,8 @@ export function bindCollaborationChatPosition({
     if (
       Number['isFinite'](box4?.['width']) &&
       Number['isFinite'](box4?.['height']) &&
-      box4['width'] > 0x0 &&
-      box4['height'] > 0x0
+      box4['width'] > 0 &&
+      box4['height'] > 0
     )
       box2 = {
         width: Math['max'](MIN_WIDTH, box4['width']),
@@ -37,21 +37,21 @@ export function bindCollaborationChatPosition({
     if (!box) {
       const box5 = document['querySelector']('.sidebar-floating')?.['getBoundingClientRect']();
       box = {
-        x: (box5?.['right'] || 0x40) + 0xc,
-        y: Math['max'](0x48, box5?.['top'] || 0x78),
+        x: (box5?.['right'] || 64) + 12,
+        y: Math['max'](72, box5?.['top'] || 120),
       };
     }
     const box6 = root['getBoundingClientRect']();
     ((box = {
-      x: Math['max'](0x8, Math['min'](box['x'], windowObject['innerWidth'] - box6['width'] - 0x8)),
-      y: Math['max'](0x8, Math['min'](box['y'], windowObject['innerHeight'] - box6['height'] - 0x8)),
+      x: Math['max'](8, Math['min'](box['x'], windowObject['innerWidth'] - box6['width'] - 8)),
+      y: Math['max'](8, Math['min'](box['y'], windowObject['innerHeight'] - box6['height'] - 8)),
     }),
       root['style']['setProperty']('--chat-left', box['x'] + 'px'),
       root['style']['setProperty']('--chat-top', box['y'] + 'px'));
   }
   function run(id) {
     if (
-      id['button'] !== 0x0 ||
+      id['button'] !== 0 ||
       (id['target']['closest']('button') && id['currentTarget'] !== id['target']['closest']('button'))
     )
       return;
@@ -75,13 +75,13 @@ export function bindCollaborationChatPosition({
     if (!x || x['id'] !== event['pointerId']) return;
     const key = event['clientX'] - x['x'],
       index = event['clientY'] - x['y'];
-    enabled ||= Math['hypot'](key, index) > 0x4;
+    enabled ||= Math['hypot'](key, index) > 4;
     if (!enabled) return;
     if (x['resizing']) {
-      const result = Math['min'](MIN_WIDTH, windowObject['innerWidth'] - 0x10),
-        data = Math['min'](MIN_HEIGHT, windowObject['innerHeight'] - 0x10),
-        options = Math['max'](result, windowObject['innerWidth'] - x['origin']['x'] - 0x8),
-        target = Math['max'](data, windowObject['innerHeight'] - x['origin']['y'] - 0x8);
+      const result = Math['min'](MIN_WIDTH, windowObject['innerWidth'] - 16),
+        data = Math['min'](MIN_HEIGHT, windowObject['innerHeight'] - 16),
+        options = Math['max'](result, windowObject['innerWidth'] - x['origin']['x'] - 8),
+        target = Math['max'](data, windowObject['innerHeight'] - x['origin']['y'] - 8);
       box2 = {
         width: Math['min'](options, Math['max'](result, x['width'] + key)),
         height: Math['min'](target, Math['max'](data, x['height'] + index)),

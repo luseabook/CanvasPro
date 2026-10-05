@@ -29,14 +29,14 @@ function isPrivateIpv4(options) {
   const list = String(options || '')
     ['split']('.')
     ['map']((target) => Number(target));
-  if (list['length'] !== 0x4 || list['some']((source) => !Number['isInteger'](source))) return ![];
+  if (list['length'] !== 4 || list['some']((source) => !Number['isInteger'](source))) return ![];
   const [count, count2] = list;
   return (
-    count === 0xa ||
+    count === 10 ||
     count === 0x7f ||
-    (count === 0xac && count2 >= 0x10 && count2 <= 0x1f) ||
-    (count === 0xc0 && count2 === 0xa8) ||
-    (count === 0xa9 && count2 === 0xfe)
+    (count === 172 && count2 >= 16 && count2 <= 0x1f) ||
+    (count === 192 && count2 === 168) ||
+    (count === 169 && count2 === 254)
   );
 }
 export function shouldAllowCloudComfyUiBaseUrl(next) {
@@ -52,7 +52,7 @@ export function shouldAllowCloudComfyUiBaseUrl(next) {
   }
 }
 function createClientId() {
-  return 'aic_' + Date['now']() + '_' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa);
+  return 'aic_' + Date['now']() + '_' + Math['random']()['toString'](36)['slice'](2, 10);
 }
 function normalizeInteger(current) {
   const entry = String(current ?? '')['trim']();
@@ -68,11 +68,11 @@ function isComfyUiSeedInputName(payload) {
   return handle === 'seed' || handle['endsWith']('_seed');
 }
 function getComfyUiBatchSeedContext(options2 = {}) {
-  const count3 = Number['parseInt'](options2?.['__aicBatchSize'], 0xa),
-    batchIndex = Number['parseInt'](options2?.['__aicBatchIndex'], 0xa);
-  if (!Number['isFinite'](count3) || count3 <= 0x1) return null;
-  if (!Number['isFinite'](batchIndex) || batchIndex < 0x0) return null;
-  const nonce = normalizeInteger(options2?.['__aicBatchSeedNonce']) || 0x0;
+  const count3 = Number['parseInt'](options2?.['__aicBatchSize'], 10),
+    batchIndex = Number['parseInt'](options2?.['__aicBatchIndex'], 10);
+  if (!Number['isFinite'](count3) || count3 <= 1) return null;
+  if (!Number['isFinite'](batchIndex) || batchIndex < 0) return null;
+  const nonce = normalizeInteger(options2?.['__aicBatchSeedNonce']) || 0;
   return { batchIndex: batchIndex, nonce: nonce };
 }
 function buildComfyUiBatchSeedValue(state, config) {
@@ -254,7 +254,7 @@ function resolveComfyUiMediaValueFromRefs(options5 = {}, value37 = {}, value38 =
       if (comfyUiMediaRefUrl) return comfyUiMediaRefUrl;
     }
   }
-  const value45 = Math['max'](0x0, Number(value37?.['inputIndex']) || 0x0);
+  const value45 = Math['max'](0, Number(value37?.['inputIndex']) || 0);
   for (const value46 of value42) {
     const comfyUiMediaRefUrl2 = getComfyUiMediaRefUrl(value46[value45], value41);
     if (comfyUiMediaRefUrl2) return comfyUiMediaRefUrl2;
@@ -291,7 +291,7 @@ async function resolveComfyUiMediaInput(payload2, item2, kind, value49, baseUrl2
     Array['isArray'](payload2?.['inputUrls']) &&
     kind === 'image'
   ) {
-    const value52 = Math['max'](0x0, Number(item2?.['inputIndex']) || 0x0);
+    const value52 = Math['max'](0, Number(item2?.['inputIndex']) || 0);
     payloadValue = payload2['inputUrls'][value52];
   }
   (payloadValue === undefined || payloadValue === null || String(payloadValue)['trim']() === '') &&
@@ -343,25 +343,25 @@ function getComfyUiNodeErrors(enabled7) {
   if (
     enabled7['node_errors'] &&
     typeof enabled7['node_errors'] === 'object' &&
-    Object['keys'](enabled7['node_errors'])['length'] > 0x0
+    Object['keys'](enabled7['node_errors'])['length'] > 0
   )
     return enabled7['node_errors'];
   if (
     enabled7['nodeErrors'] &&
     typeof enabled7['nodeErrors'] === 'object' &&
-    Object['keys'](enabled7['nodeErrors'])['length'] > 0x0
+    Object['keys'](enabled7['nodeErrors'])['length'] > 0
   )
     return enabled7['nodeErrors'];
   if (
     enabled7['error']?.['node_errors'] &&
     typeof enabled7['error']['node_errors'] === 'object' &&
-    Object['keys'](enabled7['error']['node_errors'])['length'] > 0x0
+    Object['keys'](enabled7['error']['node_errors'])['length'] > 0
   )
     return enabled7['error']['node_errors'];
   if (
     enabled7['error']?.['nodeErrors'] &&
     typeof enabled7['error']['nodeErrors'] === 'object' &&
-    Object['keys'](enabled7['error']['nodeErrors'])['length'] > 0x0
+    Object['keys'](enabled7['error']['nodeErrors'])['length'] > 0
   )
     return enabled7['error']['nodeErrors'];
   return null;
@@ -434,7 +434,7 @@ export function collectComfyUiOutputFiles(value65, value66 = {}) {
     list7 = [];
   return (
     Object['entries'](enabled9)['forEach'](([value68, enabled10]) => {
-      if (map4['size'] > 0x0 && !map4['has'](String(value68))) return;
+      if (map4['size'] > 0 && !map4['has'](String(value68))) return;
       if (!enabled10 || typeof enabled10 !== 'object' || Array['isArray'](enabled10)) return;
       Object['entries'](enabled10)['forEach'](([value69, value70]) => {
         const list8 = Array['isArray'](value70) ? value70 : [];
@@ -456,7 +456,7 @@ export function normalizeComfyUiHistoryResult(
   } = {},
 ) {
   const list9 = collectComfyUiOutputFiles(value72, resultConfig);
-  if (list9['length'] === 0x0) {
+  if (list9['length'] === 0) {
     const error6 = getComfyUiHistoryErrorSnapshot(value72);
     if (error6) {
       const node_errors = getComfyUiNodeErrors(error6),
@@ -510,7 +510,7 @@ async function buildComfyUiWorkflowRequest({
   const modelExecution = resolveModelExecution(payload3?.['model'], { providerHint: 'comfyui' }),
     executionId = modelExecution?.['executionManifest'];
   if (!executionId || executionId['provider'] !== 'comfyui' || executionId['adapterType'] !== 'workflow')
-    throw new Error('ComfyUI\x20workflow\x20manifest\x20missing:\x20' + (payload3?.['model'] || ''));
+    throw new Error('ComfyUI workflow manifest missing: ' + (payload3?.['model'] || ''));
   if (expectedKind && executionId['kind'] !== expectedKind)
     throw new Error('ComfyUI ' + expectedKind + ' workflow manifest missing: ' + (payload3?.['model'] || ''));
   const baseUrl4 = resolveComfyUiBaseUrl(payload3, executionId, ctx),

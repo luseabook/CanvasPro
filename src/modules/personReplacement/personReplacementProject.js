@@ -17,7 +17,7 @@ import {
   formatPersonReplacementPersonLabel,
 } from './personReplacementPromptIdentity.js';
 export { formatPersonReplacementPersonLabel };
-export const PERSON_REPLACEMENT_SCHEMA_VERSION = 0x7;
+export const PERSON_REPLACEMENT_SCHEMA_VERSION = 7;
 export const PERSON_REPLACEMENT_DEFAULT_IMAGE_MODEL_ID = 'apimart/gpt-image-2';
 export const PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID = RH_VIDEO_SCAIL2_V1_MODEL_ID;
 export const PERSON_REPLACEMENT_DEFAULT_VIDEO_PROMPT =
@@ -134,7 +134,7 @@ export function resolvePersonReplacementVideoModelId(target) {
     : PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID;
 }
 export function resolvePersonReplacementVideoGenerationFps(options2 = {}) {
-  if (options2?.['processingMode'] === 'skip') return 0x18;
+  if (options2?.['processingMode'] === 'skip') return 24;
   return normalizeSmartClipFps(options2?.['smartClipFps']);
 }
 export function normalizePersonReplacementVideoInputMode(source) {
@@ -190,15 +190,15 @@ function toArray(config) {
   if (Array['isArray'](config)) return config;
   return config && typeof config === 'object' ? [config] : [];
 }
-function normalizeNonNegativeNumber(scope, input = 0x0) {
+function normalizeNonNegativeNumber(scope, input = 0) {
   const count = Number(scope);
-  return Number['isFinite'](count) && count >= 0x0 ? count : input;
+  return Number['isFinite'](count) && count >= 0 ? count : input;
 }
 function normalizeConfidence(output) {
   const count2 = Number(output);
-  if (!Number['isFinite'](count2)) return 0x0;
-  const value2 = count2 > 0x1 && count2 <= 0x64 ? count2 / 0x64 : count2;
-  return Math['max'](0x0, Math['min'](0x1, value2));
+  if (!Number['isFinite'](count2)) return 0;
+  const value2 = count2 > 1 && count2 <= 100 ? count2 / 100 : count2;
+  return Math['max'](0, Math['min'](1, value2));
 }
 function normalizeStringArray(value3) {
   const list2 = [],
@@ -246,14 +246,14 @@ function parseJsonLike(value6) {
     return JSON['parse'](list5);
   } catch {
     const count3 = Math['min'](
-        ...[list5['indexOf']('{'), list5['indexOf']('[')]['filter']((count4) => count4 >= 0x0),
+        ...[list5['indexOf']('{'), list5['indexOf']('[')]['filter']((count4) => count4 >= 0),
       ),
       value7 = list5['lastIndexOf']('}'),
       value8 = list5['lastIndexOf'](']'),
       value9 = Math['max'](value7, value8);
-    if (Number['isFinite'](count3) && count3 >= 0x0 && value9 > count3)
+    if (Number['isFinite'](count3) && count3 >= 0 && value9 > count3)
       try {
-        return JSON['parse'](list5['slice'](count3, value9 + 0x1));
+        return JSON['parse'](list5['slice'](count3, value9 + 1));
       } catch {
         return {};
       }
@@ -262,7 +262,7 @@ function parseJsonLike(value6) {
 }
 function unwrapAiAnalysis(value10) {
   let jsonLike = parseJsonLike(value10);
-  for (let count5 = 0x0; count5 < 0x5; count5 += 0x1) {
+  for (let count5 = 0; count5 < 5; count5 += 1) {
     if (!jsonLike || typeof jsonLike !== 'object' || Array['isArray'](jsonLike)) break;
     const defined = firstDefined(
       jsonLike['analysis'],
@@ -383,22 +383,22 @@ function normalizeBoundingBox(box, box2 = {}) {
   let [value16, value17, value18, value19] = list6;
   const count6 = Number(firstDefined(box2['width'], box2['frameWidth'], box2['imageWidth'])),
     count7 = Number(firstDefined(box2['height'], box2['frameHeight'], box2['imageHeight']));
-  if (count6 > 0x0 && count7 > 0x0 && list6['some']((count8) => count8 > 0x1))
+  if (count6 > 0 && count7 > 0 && list6['some']((count8) => count8 > 1))
     ((value16 /= count6), (value18 /= count6), (value17 /= count7), (value19 /= count7));
   else
-    list6['every']((count9) => count9 >= 0x0 && count9 <= 0x64) &&
-      list6['some']((count10) => count10 > 0x1) &&
-      ((value16 /= 0x64), (value17 /= 0x64), (value18 /= 0x64), (value19 /= 0x64));
+    list6['every']((count9) => count9 >= 0 && count9 <= 100) &&
+      list6['some']((count10) => count10 > 1) &&
+      ((value16 /= 100), (value17 /= 100), (value18 /= 100), (value19 /= 100));
   return {
-    x: Math['max'](0x0, Math['min'](0x1, value16)),
-    y: Math['max'](0x0, Math['min'](0x1, value17)),
-    width: Math['max'](0x0, Math['min'](0x1 - Math['max'](0x0, value16), value18)),
-    height: Math['max'](0x0, Math['min'](0x1 - Math['max'](0x0, value17), value19)),
+    x: Math['max'](0, Math['min'](1, value16)),
+    y: Math['max'](0, Math['min'](1, value17)),
+    width: Math['max'](0, Math['min'](1 - Math['max'](0, value16), value18)),
+    height: Math['max'](0, Math['min'](1 - Math['max'](0, value17), value19)),
   };
 }
 function inferHorizontal(box3) {
   if (!box3) return 'unknown';
-  const count11 = box3['x'] + box3['width'] / 0x2;
+  const count11 = box3['x'] + box3['width'] / 2;
   if (count11 < 0.4) return 'left';
   if (count11 > 0.6) return 'right';
   return 'center';
@@ -422,7 +422,7 @@ function normalizeMaterializationStatus(value23, value24 = ![]) {
 }
 export function normalizePersonReplacementPerson(
   promptMarkerIndex = {},
-  { shotId: shotId = 'shot-1', index: index = 0x0, frame: frame = {} } = {},
+  { shotId: shotId = 'shot-1', index: index = 0, frame: frame = {} } = {},
 ) {
   const bbox = normalizeBoundingBox(
       firstDefined(
@@ -460,9 +460,9 @@ export function normalizePersonReplacementPerson(
     id:
       normalizeText(
         firstDefined(promptMarkerIndex['id'], promptMarkerIndex['personId'], promptMarkerIndex['person_id']),
-      ) || shotId + '-person-' + (index + 0x1),
+      ) || shotId + '-person-' + (index + 1),
     ...(Number['isSafeInteger'](promptMarkerIndex['promptMarkerIndex']) &&
-    promptMarkerIndex['promptMarkerIndex'] >= 0x0
+    promptMarkerIndex['promptMarkerIndex'] >= 0
       ? { promptMarkerIndex: promptMarkerIndex['promptMarkerIndex'] }
       : {}),
     sourceCharacterId: sourceCharacterId,
@@ -702,9 +702,9 @@ export function getPersonReplacementActiveImageResultIndex(
   options4 = {},
   list8 = getPersonReplacementImageResults(options4),
 ) {
-  if (!list8['length']) return 0x0;
-  const value28 = Math['trunc'](Number(options4?.['replacementImage']?.['activeIndex']) || 0x0);
-  return Math['max'](0x0, Math['min'](list8['length'] - 0x1, value28));
+  if (!list8['length']) return 0;
+  const value28 = Math['trunc'](Number(options4?.['replacementImage']?.['activeIndex']) || 0);
+  return Math['max'](0, Math['min'](list8['length'] - 1, value28));
 }
 export function getPersonReplacementActiveImageResult(
   options5 = {},
@@ -740,12 +740,12 @@ function normalizePersonReplacementImage(options7 = {}) {
   const value29 = Number(replacementImage['activeIndex']),
     value30 = imageUrl2
       ? results['findIndex']((value31) => resolvePersonReplacementImageResultRef(value31) === imageUrl2)
-      : -0x1,
+      : -1,
     activeIndex = results['length']
       ? Number['isFinite'](value29)
-        ? Math['max'](0x0, Math['min'](results['length'] - 0x1, Math['trunc'](value29)))
-        : Math['max'](0x0, value30)
-      : 0x0;
+        ? Math['max'](0, Math['min'](results['length'] - 1, Math['trunc'](value29)))
+        : Math['max'](0, value30)
+      : 0;
   return { results: results, activeIndex: activeIndex };
 }
 export function resolvePersonReplacementVideoResultRef(response5 = {}) {
@@ -838,9 +838,9 @@ export function getPersonReplacementActiveVideoResultIndex(
   options9 = {},
   list10 = getPersonReplacementVideoResults(options9),
 ) {
-  if (!list10['length']) return 0x0;
-  const value34 = Math['trunc'](Number(options9?.['replacementVideo']?.['activeIndex']) || 0x0);
-  return Math['max'](0x0, Math['min'](list10['length'] - 0x1, value34));
+  if (!list10['length']) return 0;
+  const value34 = Math['trunc'](Number(options9?.['replacementVideo']?.['activeIndex']) || 0);
+  return Math['max'](0, Math['min'](list10['length'] - 1, value34));
 }
 export function getPersonReplacementActiveVideoResult(
   options10 = {},
@@ -875,15 +875,15 @@ function normalizePersonReplacementVideo(options12 = {}) {
   const value35 = Number(replacementVideo['activeIndex']),
     value36 = videoUrl2
       ? results2['findIndex']((value37) => resolvePersonReplacementVideoResultRef(value37) === videoUrl2)
-      : -0x1,
+      : -1,
     activeIndex2 = results2['length']
       ? Number['isFinite'](value35)
-        ? Math['max'](0x0, Math['min'](results2['length'] - 0x1, Math['trunc'](value35)))
-        : Math['max'](0x0, value36)
-      : 0x0;
+        ? Math['max'](0, Math['min'](results2['length'] - 1, Math['trunc'](value35)))
+        : Math['max'](0, value36)
+      : 0;
   return { results: results2, activeIndex: activeIndex2 };
 }
-export function normalizePersonReplacementShot(imagePromptReferences = {}, value38 = 0x0) {
+export function normalizePersonReplacementShot(imagePromptReferences = {}, value38 = 0) {
   const shotId2 =
       normalizeText(
         firstDefined(
@@ -893,7 +893,7 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
           imagePromptReferences['segmentId'],
           imagePromptReferences['clipId'],
         ),
-      ) || 'shot-' + (value38 + 0x1),
+      ) || 'shot-' + (value38 + 1),
     startTimeSec = normalizeNonNegativeNumber(
       firstDefined(
         imagePromptReferences['startTimeSec'],
@@ -1005,7 +1005,7 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
     },
     startTimeSec: startTimeSec,
     endTimeSec: endTimeSec,
-    durationSec: Math['max'](0x0, endTimeSec - startTimeSec),
+    durationSec: Math['max'](0, endTimeSec - startTimeSec),
     sourceVideoRef: normalizeText(
       firstDefined(
         imagePromptReferences['sourceVideoRef'],
@@ -1038,7 +1038,7 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
     keyframeRef: keyframeRef || text17,
     ...(imageIterationReferenceRef ? { imageIterationReferenceRef: imageIterationReferenceRef } : {}),
     keyframeIndex: Math['max'](
-      0x0,
+      0,
       Math['trunc'](
         normalizeNonNegativeNumber(
           firstDefined(imagePromptReferences['keyframeIndex'], imagePromptReferences['frameIndex']),
@@ -1065,8 +1065,8 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
       Boolean(videoRef),
     ),
     materializationProgress: Math['max'](
-      0x0,
-      Math['min'](0x64, normalizeNonNegativeNumber(imagePromptReferences['materializationProgress'])),
+      0,
+      Math['min'](100, normalizeNonNegativeNumber(imagePromptReferences['materializationProgress'])),
     ),
     replacementImage: replacementImage2,
     replacementImageRef: resolvePersonReplacementImageResultRef(personReplacementActiveImageResult),
@@ -1103,7 +1103,7 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
     ...(Array['isArray'](imagePromptReferences['imagePromptReferences'])
       ? {
           imagePromptReferences: imagePromptReferences['imagePromptReferences']
-            ['filter']((value43) => Number['isSafeInteger'](value43?.['slot']) && value43['slot'] > 0x0)
+            ['filter']((value43) => Number['isSafeInteger'](value43?.['slot']) && value43['slot'] > 0)
             ['map']((slot) => ({ slot: slot['slot'], key: normalizeText(slot['key']) })),
         }
       : {}),
@@ -1233,7 +1233,7 @@ function normalizeVoiceReference(value48, value49 = '') {
       ? {
           libraryAssetId: normalizeText(error2['libraryAssetId']),
           sourceAssetId: normalizeText(error2['sourceAssetId']),
-          sourceItemIndex: Math['max'](0x0, Math['trunc'](Number(error2['sourceItemIndex']) || 0x0)),
+          sourceItemIndex: Math['max'](0, Math['trunc'](Number(error2['sourceItemIndex']) || 0)),
         }
       : {}),
     updatedAt: normalizeNonNegativeNumber(error2['updatedAt'], Date['now']()),
@@ -1250,16 +1250,16 @@ function normalizeCharacterAppearances(options14 = {}) {
           options14['imageRef'],
         ),
       )['map']((imageUrl3, name2) => ({
-        id: (normalizeText(options14['id']) || 'target-character') + '-appearance-' + (name2 + 0x1),
-        name: name2 === 0x0 ? '基础形象' : '形象 ' + (name2 + 0x1),
+        id: (normalizeText(options14['id']) || 'target-character') + '-appearance-' + (name2 + 1),
+        name: name2 === 0 ? '基础形象' : '形象 ' + (name2 + 1),
         imageUrl: imageUrl3,
       }));
   return list13['map']((error3, count12) => ({
     ...(error3 && typeof error3 === 'object' ? error3 : {}),
     id:
       normalizeText(error3?.['id']) ||
-      (normalizeText(options14['id']) || 'target-character') + '-appearance-' + (count12 + 0x1),
-    name: normalizeText(error3?.['name']) || (count12 === 0x0 ? '基础形象' : '形象 ' + (count12 + 0x1)),
+      (normalizeText(options14['id']) || 'target-character') + '-appearance-' + (count12 + 1),
+    name: normalizeText(error3?.['name']) || (count12 === 0 ? '基础形象' : '形象 ' + (count12 + 1)),
     imageUrl: normalizeText(
       firstDefined(
         error3?.['imageUrl'],
@@ -1274,16 +1274,16 @@ function normalizeCharacterAppearances(options14 = {}) {
     error: normalizeText(error3?.['error']),
   }));
 }
-function normalizeTargetCharacter(error4 = {}, value50 = 0x0) {
+function normalizeTargetCharacter(error4 = {}, value50 = 0) {
   const id2 =
       normalizeText(firstDefined(error4['id'], error4['ref'], error4['characterId'])) ||
-      'target-character-' + (value50 + 0x1),
+      'target-character-' + (value50 + 1),
     appearances = normalizeCharacterAppearances({ ...error4, id: id2 }),
     baseAppearanceId = appearances['some'](
       (value51) => value51['id'] === normalizeText(error4['baseAppearanceId']),
     )
       ? normalizeText(error4['baseAppearanceId'])
-      : appearances[0x0]?.['id'] || '',
+      : appearances[0]?.['id'] || '',
     voiceReference = normalizeVoiceReference(
       error4['voiceReference'],
       firstDefined(error4['voiceRef'], error4['audioRef']),
@@ -1294,7 +1294,7 @@ function normalizeTargetCharacter(error4 = {}, value50 = 0x0) {
     kind: 'character',
     name:
       normalizeText(firstDefined(error4['name'], error4['label'], error4['title'])) ||
-      '目标角色' + (value50 + 0x1),
+      '目标角色' + (value50 + 1),
     role: normalizeText(error4['role']) || '人物',
     appearances: appearances,
     baseAppearanceId: baseAppearanceId,
@@ -1304,23 +1304,23 @@ function normalizeTargetCharacter(error4 = {}, value50 = 0x0) {
     description: normalizeText(firstDefined(error4['description'], error4['prompt'])),
   };
 }
-function normalizeTargetScene(error5 = {}, value53 = 0x0) {
+function normalizeTargetScene(error5 = {}, value53 = 0) {
   const id3 =
       normalizeText(firstDefined(error5['id'], error5['ref'], error5['sceneId'])) ||
-      'target-scene-' + (value53 + 0x1),
+      'target-scene-' + (value53 + 1),
     appearances2 = normalizeCharacterAppearances({ ...error5, id: id3 }),
     baseAppearanceId2 = appearances2['some'](
       (value54) => value54['id'] === normalizeText(error5['baseAppearanceId']),
     )
       ? normalizeText(error5['baseAppearanceId'])
-      : appearances2[0x0]?.['id'] || '';
+      : appearances2[0]?.['id'] || '';
   return {
     ...normalizePlainObject(error5),
     id: id3,
     kind: 'scene',
     name:
       normalizeText(firstDefined(error5['name'], error5['label'], error5['title'])) ||
-      '场景' + (value53 + 0x1),
+      '场景' + (value53 + 1),
     role: normalizeText(error5['role']) || '场景',
     appearances: appearances2,
     baseAppearanceId: baseAppearanceId2,
@@ -1328,27 +1328,27 @@ function normalizeTargetScene(error5 = {}, value53 = 0x0) {
     description: normalizeText(firstDefined(error5['description'], error5['prompt'])),
   };
 }
-function normalizeProjectAudioAsset(error6 = {}, value56 = 0x0) {
+function normalizeProjectAudioAsset(error6 = {}, value56 = 0) {
   const args4 = normalizePlainObject(error6),
     sourceAssetId = normalizeText(firstDefined(error6['sourceAssetId'], error6['assetId'])),
     sourceItemIndex = Math['max'](
-      0x0,
-      Math['trunc'](Number(firstDefined(error6['sourceItemIndex'], error6['itemIndex'], 0x0)) || 0x0),
+      0,
+      Math['trunc'](Number(firstDefined(error6['sourceItemIndex'], error6['itemIndex'], 0)) || 0),
     ),
     sourceUrl = normalizeText(
       firstDefined(error6['audioUrl'], error6['sourceUrl'], error6['url'], error6['localPath']),
     ),
     description = normalizeText(error6['description']),
-    text22 = normalizeText(description['match'](/^来自画布素材「(.+)」$/u)?.[0x1]),
+    text22 = normalizeText(description['match'](/^来自画布素材「(.+)」$/u)?.[1]),
     savedName = normalizeText(error6['savedName']) || text22,
     name3 =
       savedName ||
       normalizeText(firstDefined(error6['name'], error6['assetName'], error6['fileName'])) ||
-      '音频 ' + (value56 + 0x1);
+      '音频 ' + (value56 + 1);
   return {
     ...args4,
     id:
-      normalizeText(firstDefined(error6['id'], error6['audioAssetId'])) || 'project-audio-' + (value56 + 0x1),
+      normalizeText(firstDefined(error6['id'], error6['audioAssetId'])) || 'project-audio-' + (value56 + 1),
     kind: 'audio',
     mediaKind: 'audio',
     name: name3,
@@ -1368,7 +1368,7 @@ function normalizeProjectAudioAsset(error6 = {}, value56 = 0x0) {
 export function getPersonReplacementCharacterBaseImageRef(options15 = {}) {
   const list14 = normalizeCharacterAppearances(options15),
     text23 = normalizeText(options15['baseAppearanceId']),
-    value57 = list14['find']((value58) => value58['id'] === text23) || list14[0x0];
+    value57 = list14['find']((value58) => value58['id'] === text23) || list14[0];
   if (value57?.['imageUrl']) return value57['imageUrl'];
   return (
     normalizeImageRefs(
@@ -1378,7 +1378,7 @@ export function getPersonReplacementCharacterBaseImageRef(options15 = {}) {
         options15['images'],
         options15['imageRef'],
       ),
-    )[0x0] || ''
+    )[0] || ''
   );
 }
 export function getPersonReplacementShotCharacterReferences(options16 = {}, value59 = {}) {
@@ -1411,7 +1411,7 @@ export function getPersonReplacementShotCharacterReferences(options16 = {}, valu
           list16['find'](
             (value66) => normalizeText(value66?.['id']) === normalizeText(error7['baseAppearanceId']),
           ) ||
-          list16[0x0] ||
+          list16[0] ||
           null;
       return {
         personId: normalizeText(value64?.['id']),
@@ -1460,9 +1460,9 @@ export function resolvePersonReplacementVideoImageInput(
                 (value71) =>
                   resolvePersonReplacementImageResultRef(value71) === personReplacementImageResultRef4,
               )
-            : -0x1,
+            : -1,
         resultIndex =
-          count13 >= 0x0 ? count13 : getPersonReplacementActiveImageResultIndex(value70, resultCount),
+          count13 >= 0 ? count13 : getPersonReplacementActiveImageResultIndex(value70, resultCount),
         imageRef = list20['length']
           ? resolvePersonReplacementImageResultRef(resultCount[resultIndex])
           : imageUrl4;
@@ -1506,7 +1506,7 @@ export function resolvePersonReplacementVideoImageInput(
       message = Boolean(
         text29 === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE && text30 && !enabled3,
       ),
-      value79 = enabled3 || (!text30 ? list21[0x0] : null) || null,
+      value79 = enabled3 || (!text30 ? list21[0] : null) || null,
       referenceKind = message
         ? null
         : (text29 === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE ? value79 : value76) ||
@@ -1516,7 +1516,7 @@ export function resolvePersonReplacementVideoImageInput(
       activeReferenceIndex = referenceOptions['indexOf'](referenceKind),
       status = referenceKind?.['imageRef'] || '',
       value80 = referenceKind?.['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-      reference = message ? null : value79?.['reference'] || references[0x0] || null;
+      reference = message ? null : value79?.['reference'] || references[0] || null;
     return {
       mode: mode,
       status: status ? 'ready' : 'missing',
@@ -1532,7 +1532,7 @@ export function resolvePersonReplacementVideoImageInput(
         ? '原选中的人物参考图已失效，请重新选择'
         : value80
           ? (reference?.['characterName'] || '人物参考') +
-            '\x20·\x20' +
+            ' · ' +
             (reference?.['appearanceName'] || '基础形象')
           : status
             ? '替换首帧'
@@ -1557,10 +1557,10 @@ export function resolvePersonReplacementVideoImageInput(
     message: status2 ? '替换首帧' : '缺少替换首帧',
   };
 }
-function normalizeSource(error9 = {}, value81 = 0x0) {
+function normalizeSource(error9 = {}, value81 = 0) {
   const videoRef2 = normalizeText(firstDefined(error9['videoRef'], error9['ref'], error9['url']));
   return {
-    id: normalizeText(error9['id']) || 'source-' + (value81 + 0x1),
+    id: normalizeText(error9['id']) || 'source-' + (value81 + 1),
     assetId: normalizeText(error9['assetId']),
     videoRef: videoRef2,
     playbackVideoRef: normalizeText(
@@ -1580,9 +1580,9 @@ function normalizeSource(error9 = {}, value81 = 0x0) {
     processingStatus:
       normalizeText(firstDefined(error9['processingStatus'], error9['analysisStatus'])) || 'idle',
     processingProgress: Math['max'](
-      0x0,
+      0,
       Math['min'](
-        0x64,
+        100,
         normalizeNonNegativeNumber(firstDefined(error9['processingProgress'], error9['analysisProgress'])),
       ),
     ),
@@ -1590,14 +1590,14 @@ function normalizeSource(error9 = {}, value81 = 0x0) {
     error: normalizeText(error9['error']),
   };
 }
-function normalizeSourceCharacter(error10 = {}, value82 = 0x0) {
+function normalizeSourceCharacter(error10 = {}, value82 = 0) {
   return {
     id:
       normalizeText(firstDefined(error10['id'], error10['ref'], error10['sourceCharacterId'])) ||
-      'source-character-' + (value82 + 0x1),
+      'source-character-' + (value82 + 1),
     name:
       normalizeText(firstDefined(error10['name'], error10['label'], error10['title'])) ||
-      '原人物' + (value82 + 0x1),
+      '原人物' + (value82 + 1),
     imageRefs: normalizeImageRefs(
       firstDefined(error10['imageRefs'], error10['keyframeRefs'], error10['images']),
     ),
@@ -1608,7 +1608,7 @@ function normalizeSourceCharacter(error10 = {}, value82 = 0x0) {
       : firstDefined(error10['reviewRequired'], error10['needsReview'], ![])
         ? 'needs_review'
         : 'auto',
-    memberCount: Math['max'](0x0, Math['trunc'](normalizeNonNegativeNumber(error10['memberCount']))),
+    memberCount: Math['max'](0, Math['trunc'](normalizeNonNegativeNumber(error10['memberCount']))),
     exemplarShotId: normalizeText(error10['exemplarShotId']),
     exemplarPersonId: normalizeText(error10['exemplarPersonId']),
     ambiguousIdentityIds: toArray(error10['ambiguousIdentityIds'])['map'](normalizeText)['filter'](Boolean),
@@ -1688,7 +1688,7 @@ export function normalizePersonReplacementProject(providerProfileId = {}) {
     )
       ['map'](normalizeSource)
       ['sort']((value84, value85) => value84['order'] - value85['order']),
-    source4 = sources[0x0] || source3,
+    source4 = sources[0] || source3,
     model =
       normalizeText(providerProfileId['settings']?.['replacementImageModelId']) ||
       PERSON_REPLACEMENT_DEFAULT_IMAGE_MODEL_ID,
@@ -1831,7 +1831,7 @@ export function canTransitionPersonReplacementProject(value87, value88) {
   const value89 = STATUS_INDEX['get'](normalizeText(value87)),
     value90 = STATUS_INDEX['get'](normalizeText(value88));
   if (value89 === undefined || value90 === undefined) return ![];
-  return value90 === value89 || value90 === value89 + 0x1;
+  return value90 === value89 || value90 === value89 + 1;
 }
 export function transitionPersonReplacementProject(value91, value92) {
   const response7 = normalizePersonReplacementProject(value91);
@@ -1886,7 +1886,7 @@ export function getPersonReplacementCrossRoleSourceCharacterIds(options20 = {}) 
     }),
     new Set(
       [...map7['entries']()]
-        ['filter'](([, value102]) => value102['size'] > 0x1)
+        ['filter'](([, value102]) => value102['size'] > 1)
         ['map'](([value103]) => value103),
     )
   );
@@ -1937,16 +1937,16 @@ export function mergePersonReplacementSourceCharacters(
   { sourceCharacterIds: sourceCharacterIds = [], keepSourceCharacterId: keepSourceCharacterId = '' } = {},
 ) {
   const list24 = [...new Set(toArray(sourceCharacterIds)['map'](normalizeText)['filter'](Boolean))];
-  if (list24['length'] < 0x2) throw new Error('合并人物至少需要选择两个身份');
+  if (list24['length'] < 2) throw new Error('合并人物至少需要选择两个身份');
   const map8 = new Set(list24),
     id4 = map8['has'](normalizeText(keepSourceCharacterId))
       ? normalizeText(keepSourceCharacterId)
-      : list24[0x0];
+      : list24[0];
   for (const value113 of toArray(args6?.['shots'])) {
     const list25 = toArray(value113?.['people'])['filter']((value114) =>
       map8['has'](normalizeText(value114?.['sourceCharacterId'])),
     );
-    if (list25['length'] > 0x1) throw new Error('同一镜头中同时出现的人物不能合并为同一身份');
+    if (list25['length'] > 1) throw new Error('同一镜头中同时出现的人物不能合并为同一身份');
   }
   const args7 = new Set();
   (toArray(args6?.['mappings'])['forEach']((value115) => {
@@ -1961,24 +1961,24 @@ export function mergePersonReplacementSourceCharacters(
           args7['add'](normalizeText(value117['targetCharacterId']));
       }),
     ));
-  if (args7['size'] > 0x1) throw new Error('所选人物已经映射到不同目标人物，请先统一映射后再合并');
-  const targetCharacterId5 = [...args7][0x0] || '',
+  if (args7['size'] > 1) throw new Error('所选人物已经映射到不同目标人物，请先统一映射后再合并');
+  const targetCharacterId5 = [...args7][0] || '',
     list26 = toArray(args6?.['sourceCharacters']),
     confidence = list26['filter']((value118) => map8['has'](value118['id'])),
     label3 = confidence['find']((value119) => value119['id'] === id4) ||
-      confidence[0x0] || { id: id4, name: '原人物' },
+      confidence[0] || { id: id4, name: '原人物' },
     value120 = {
       ...label3,
       id: id4,
       imageRefs: [...new Set(confidence['flatMap']((value121) => toArray(value121['imageRefs'])))],
       confidence: confidence['length']
         ? Math['min'](...confidence['map']((value122) => normalizeConfidence(value122['confidence'])))
-        : 0x0,
+        : 0,
       reviewRequired: ![],
       identityReviewStatus: 'confirmed',
       memberCount: confidence['reduce'](
-        (value123, value124) => value123 + Math['max'](0x0, Number(value124['memberCount']) || 0x0),
-        0x0,
+        (value123, value124) => value123 + Math['max'](0, Number(value124['memberCount']) || 0),
+        0,
       ),
       ambiguousIdentityIds: [
         ...new Set(confidence['flatMap']((value125) => toArray(value125['ambiguousIdentityIds']))),
@@ -2036,11 +2036,11 @@ export function splitPersonReplacementSourceCharacter(
       map9['has'](shot2['id'] + ':' + person2['id']),
     );
   if (!memberCount['length']) throw new Error('没有找到要拆分的人物框');
-  if (memberCount['length'] >= list27['length'] && list27['length'] > 0x1)
+  if (memberCount['length'] >= list27['length'] && list27['length'] > 1)
     throw new Error('不能把该身份的全部人物框拆分出去');
-  if (list27['length'] === 0x1) {
-    const value132 = memberCount[0x0]['person'],
-      label4 = normalizeText(value132['label']) || formatPersonReplacementPersonLabel(0x0);
+  if (list27['length'] === 1) {
+    const value132 = memberCount[0]['person'],
+      label4 = normalizeText(value132['label']) || formatPersonReplacementPersonLabel(0);
     return {
       ...args10,
       shots: toArray(args10?.['shots'])['map']((args11) => ({
@@ -2073,10 +2073,10 @@ export function splitPersonReplacementSourceCharacter(
     };
   }
   const map10 = new Set(toArray(args10?.['sourceCharacters'])['map']((value133) => value133['id']));
-  let sourceCharacterId7 = normalizeText(newSourceCharacterId) || id5 + '-split-' + (map10['size'] + 0x1),
-    value134 = 0x2;
+  let sourceCharacterId7 = normalizeText(newSourceCharacterId) || id5 + '-split-' + (map10['size'] + 1),
+    value134 = 2;
   while (map10['has'](sourceCharacterId7)) {
-    ((sourceCharacterId7 = id5 + '-split-' + (map10['size'] + value134)), (value134 += 0x1));
+    ((sourceCharacterId7 = id5 + '-split-' + (map10['size'] + value134)), (value134 += 1));
   }
   const error11 = toArray(args10?.['sourceCharacters'])['find']((value135) => value135['id'] === id5) || {
       id: id5,
@@ -2086,9 +2086,9 @@ export function splitPersonReplacementSourceCharacter(
       ...new Set(memberCount['map'](({ shot: shot3 }) => shot3['keyframeRef'])['filter'](Boolean)),
     ],
     label5 =
-      normalizeText(memberCount[0x0]['person']['label']) ||
+      normalizeText(memberCount[0]['person']['label']) ||
       normalizeText(error11['name']) ||
-      formatPersonReplacementPersonLabel(0x0);
+      formatPersonReplacementPersonLabel(0);
   return {
     ...args10,
     shots: toArray(args10?.['shots'])['map']((args14) => ({
@@ -2115,7 +2115,7 @@ export function splitPersonReplacementSourceCharacter(
           ? {
               ...args16,
               memberCount: Math['max'](
-                0x0,
+                0,
                 (Number(args16['memberCount']) || list27['length']) - memberCount['length'],
               ),
             }
@@ -2131,8 +2131,8 @@ export function splitPersonReplacementSourceCharacter(
         reviewRequired: !![],
         identityReviewStatus: 'needs_review',
         memberCount: memberCount['length'],
-        exemplarShotId: memberCount[0x0]['shot']['id'],
-        exemplarPersonId: memberCount[0x0]['person']['id'],
+        exemplarShotId: memberCount[0]['shot']['id'],
+        exemplarPersonId: memberCount[0]['person']['id'],
         ambiguousIdentityIds: [],
         notes: '人工拆分人物身份',
       },
@@ -2234,7 +2234,7 @@ export function confirmPersonReplacementSourceCharacter(
               }
             : {}),
           orientation: orientation && enabled9 ? personReplacementOrientation : args19['orientation'],
-          orientationConfidence: orientation && enabled9 ? 0x1 : args19['orientationConfidence'],
+          orientationConfidence: orientation && enabled9 ? 1 : args19['orientationConfidence'],
           orientationModelId: orientation && enabled9 ? '' : args19['orientationModelId'],
           identityReviewStatus: 'confirmed',
           identityReviewRequired: ![],

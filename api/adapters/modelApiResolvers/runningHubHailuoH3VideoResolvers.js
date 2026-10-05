@@ -21,7 +21,7 @@ function getHailuoH3Mode(options = {}, key = {}) {
 }
 function normalizeHailuoH3Duration(index) {
   const count = Math['trunc'](Number(index));
-  return Number['isFinite'](count) && count >= 0x5 && count <= 0xf ? String(count) : '5';
+  return Number['isFinite'](count) && count >= 5 && count <= 15 ? String(count) : '5';
 }
 function normalizeHailuoH3Ratio(result, { allowAdaptive: allowAdaptive }) {
   const data = String(result || '')['trim'](),
@@ -59,8 +59,8 @@ function resolveHailuoH3FrameInputs({
   let firstFrameUrl = String(slotUrls2['firstFrame'] || '')['trim'](),
     lastFrameUrl = String(slotUrls2['lastFrame'] || '')['trim']();
   return (
-    !firstFrameUrl && list['length'] > 0x0 && (firstFrameUrl = list['shift']()),
-    !lastFrameUrl && list['length'] > 0x0 && (lastFrameUrl = list['shift']()),
+    !firstFrameUrl && list['length'] > 0 && (firstFrameUrl = list['shift']()),
+    !lastFrameUrl && list['length'] > 0 && (lastFrameUrl = list['shift']()),
     { count: images2['length'], firstFrameUrl: firstFrameUrl, lastFrameUrl: lastFrameUrl }
   );
 }
@@ -86,7 +86,7 @@ export function runninghubHailuoH3Video({
       handle['prompt'] || finalPrompt || payload?.['prompt'] || '',
     )['trim']();
   if (!translateMinimaxH3EditorAssetMentions2)
-    throw new Error('RunningHub\x20MiniMax-H3\x20prompt\x20is\x20required');
+    throw new Error('RunningHub MiniMax-H3 prompt is required');
   const hailuoH3Mode = getHailuoH3Mode(payload, handle),
     list2 = normalizeInputList(inputVideos),
     list3 = normalizeInputList(inputAudios);
@@ -100,34 +100,34 @@ export function runninghubHailuoH3Video({
       finalUrlsBySlot: finalUrlsBySlot,
       slotIds: ['referenceImage'],
     });
-    if (images3['length'] === 0x0 && list2['length'] === 0x0 && list3['length'] === 0x0)
-      throw new Error('MiniMax-H3\x20多参考模式至少需要一张图片、一个视频或一段音频');
-    if (images3['length'] > 0x9)
+    if (images3['length'] === 0 && list2['length'] === 0 && list3['length'] === 0)
+      throw new Error('MiniMax-H3 多参考模式至少需要一张图片、一个视频或一段音频');
+    if (images3['length'] > 9)
       throw new Error('RunningHub MiniMax-H3 reference mode supports at most 9 image inputs');
-    if (list2['length'] > 0x3)
+    if (list2['length'] > 3)
       throw new Error(
-        'RunningHub\x20MiniMax-H3\x20reference\x20mode\x20supports\x20at\x20most\x203\x20video\x20inputs',
+        'RunningHub MiniMax-H3 reference mode supports at most 3 video inputs',
       );
-    if (list3['length'] > 0x3)
+    if (list3['length'] > 3)
       throw new Error('RunningHub MiniMax-H3 reference mode supports at most 3 audio inputs');
-    if (images3['length'] > 0x0) handle['imageUrls'] = images3;
-    if (list2['length'] > 0x0) handle['videoUrls'] = list2;
-    if (list3['length'] > 0x0) handle['audioUrls'] = list3;
+    if (images3['length'] > 0) handle['imageUrls'] = images3;
+    if (list2['length'] > 0) handle['videoUrls'] = list2;
+    if (list3['length'] > 0) handle['audioUrls'] = list3;
     return ((handle['ratio'] = normalizeHailuoH3Ratio(handle['ratio'], { allowAdaptive: !![] })), handle);
   }
-  if (list2['length'] > 0x0 || list3['length'] > 0x0)
+  if (list2['length'] > 0 || list3['length'] > 0)
     throw new Error(
-      'RunningHub\x20MiniMax-H3\x20first-last-frame\x20mode\x20accepts\x20images\x20only;\x20use\x20reference\x20mode\x20for\x20video\x20or\x20audio\x20inputs',
+      'RunningHub MiniMax-H3 first-last-frame mode accepts images only; use reference mode for video or audio inputs',
     );
   const hailuoH3FrameInputs = resolveHailuoH3FrameInputs({
     inputImages: inputImages,
     finalUrlsBySlot: finalUrlsBySlot,
   });
-  if (hailuoH3FrameInputs['count'] > 0x2)
+  if (hailuoH3FrameInputs['count'] > 2)
     throw new Error(
-      'RunningHub\x20MiniMax-H3\x20first-last-frame\x20mode\x20supports\x20at\x20most\x202\x20image\x20inputs',
+      'RunningHub MiniMax-H3 first-last-frame mode supports at most 2 image inputs',
     );
-  if (hailuoH3FrameInputs['count'] === 0x0)
+  if (hailuoH3FrameInputs['count'] === 0)
     return ((handle['ratio'] = normalizeHailuoH3Ratio(handle['ratio'], { allowAdaptive: ![] })), handle);
   return (
     hailuoH3FrameInputs['firstFrameUrl'] && (handle['firstFrameUrl'] = hailuoH3FrameInputs['firstFrameUrl']),
@@ -140,7 +140,7 @@ export function runninghubHailuoH3VideoEndpoint(options2 = {}) {
   const hailuoH3Mode2 = getHailuoH3Mode(options2['payload'], options2['currentBody']);
   if (hailuoH3Mode2 === 'reference') return RUNNINGHUB_HAILUO_H3_ENDPOINTS['reference'];
   const hailuoH3FrameInputs2 = resolveHailuoH3FrameInputs(options2);
-  return hailuoH3FrameInputs2['count'] > 0x0
+  return hailuoH3FrameInputs2['count'] > 0
     ? RUNNINGHUB_HAILUO_H3_ENDPOINTS['image']
     : RUNNINGHUB_HAILUO_H3_ENDPOINTS['text'];
 }

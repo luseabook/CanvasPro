@@ -21,14 +21,14 @@ function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
 function comparePeopleByPosition(item, key) {
-  const index = { left: 0x0, center: 0x1, right: 0x2, unknown: 0x3 },
+  const index = { left: 0, center: 1, right: 2, unknown: 3 },
     box = item['locator']?.['bbox'],
     box2 = key['locator']?.['bbox'],
-    result = box ? box['x'] + box['width'] / 0x2 : Number['POSITIVE_INFINITY'],
-    data = box2 ? box2['x'] + box2['width'] / 0x2 : Number['POSITIVE_INFINITY'];
+    result = box ? box['x'] + box['width'] / 2 : Number['POSITIVE_INFINITY'],
+    data = box2 ? box2['x'] + box2['width'] / 2 : Number['POSITIVE_INFINITY'];
   if (result !== data) return result - data;
   const options =
-    (index[item['locator']?.['horizontal']] ?? 0x3) - (index[key['locator']?.['horizontal']] ?? 0x3);
+    (index[item['locator']?.['horizontal']] ?? 3) - (index[key['locator']?.['horizontal']] ?? 3);
   if (options) return options;
   return item['id']['localeCompare'](key['id'], 'zh-CN');
 }
@@ -39,7 +39,7 @@ function normalizeCompilerInput(characters2 = {}) {
         mappings: characters2['mappings'],
       },
     ),
-    shot = normalizePersonReplacementShot(characters2['shot'] || {}, 0x0);
+    shot = normalizePersonReplacementShot(characters2['shot'] || {}, 0);
   return { project: project, shot: shot };
 }
 function getTargetCharacterId(target, map) {
@@ -69,7 +69,7 @@ function getPersonBoundingBox(options2 = {}) {
   return options2['locator']?.['bbox'] || options2['bbox'] || null;
 }
 export function isPersonReplacementSceneOnlyPromptPackage(enabled = {}) {
-  return Number(enabled['sceneReferenceSlot']) > 0x0 && !enabled['mappedPersonIds']?.['length'];
+  return Number(enabled['sceneReferenceSlot']) > 0 && !enabled['mappedPersonIds']?.['length'];
 }
 export function buildPersonReplacementPromptPackage(options3 = {}) {
   const { project: project2, shot: shot2 } = normalizeCompilerInput(options3),
@@ -108,12 +108,12 @@ export function buildPersonReplacementPromptPackage(options3 = {}) {
           slot: ref['slot'],
           label: '图' + ref['slot'],
         };
-      const slot = referenceImages['length'] + 0x1,
+      const slot = referenceImages['length'] + 1,
         value8 = { ...label, slot: slot, label: label['label'] || '图' + slot };
       return (map3['set'](value7, value8), referenceImages['push'](value8), value8);
     },
     ref2 = resolvePersonReplacementImageSourceRef(shot2);
-  if (ref2) handler({ slot: 0x1, label: '图像1', ref: ref2, role: 'source-keyframe' });
+  if (ref2) handler({ slot: 1, label: '图像1', ref: ref2, role: 'source-keyframe' });
   const reference = new Map(),
     people = [],
     unmappedPersonIds = [],
@@ -140,7 +140,7 @@ export function buildPersonReplacementPromptPackage(options3 = {}) {
     }
     const value9 = targetCharacterId + ':' + normalizeText(person['targetAppearanceId']);
     if (!reference['has'](value9)) {
-      if (!activePersonIds && reference['size'] >= 0x8) {
+      if (!activePersonIds && reference['size'] >= 8) {
         overflowPersonIds['push'](person['id']);
         return;
       }
@@ -183,7 +183,7 @@ export function buildPersonReplacementPromptPackage(options3 = {}) {
             })),
           }
         : null,
-    slot2 = locationGuide ? referenceImages['length'] + 0x1 : 0x0;
+    slot2 = locationGuide ? referenceImages['length'] + 1 : 0;
   if (locationGuide)
     handler({
       slot: slot2,
@@ -192,7 +192,7 @@ export function buildPersonReplacementPromptPackage(options3 = {}) {
       ref: buildPersonReplacementLocationGuideSvg(locationGuide)['dataUrl'],
     });
   const ref4 = resolveSceneReference(project2, shot2);
-  let sceneReferenceSlot = 0x0;
+  let sceneReferenceSlot = 0;
   if (ref4?.['scene'] && ref4['imageRef'])
     sceneReferenceSlot = handler({
       ref: ref4['imageRef'],
@@ -238,7 +238,7 @@ export function buildPersonReplacementPromptPackage(options3 = {}) {
             sceneReferenceSlot ? '仅将背景替换为图' + sceneReferenceSlot + '中的场景，不引用其中人物。' : '',
           ]
             ['filter'](Boolean)
-            ['join']('\x0a');
+            ['join']('\n');
   return {
     promptMode: shot2['replacementPromptMode'],
     locationGuide: locationGuide,

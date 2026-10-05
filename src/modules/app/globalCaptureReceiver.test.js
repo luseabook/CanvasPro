@@ -401,11 +401,11 @@ test('dispose is idempotent and keeps blocking receives', async () => {
 test('capacity default (0x40 = 64) retains a settled record for replay', async () => {
   const { api, calls } = createApi();
   const receiver = createGlobalCaptureReceiver({ api, handle: async () => ({ ok: true }) });
-  for (let index = 0; index < 0x40; index += 1) await receiver.receive({ eventId: `evt-${index}` });
-  assert.equal(calls.claimEvent.length, 0x40);
+  for (let index = 0; index < 64; index += 1) await receiver.receive({ eventId: `evt-${index}` });
+  assert.equal(calls.claimEvent.length, 64);
   await receiver.receive({ eventId: 'evt-0' });
-  assert.equal(calls.claimEvent.length, 0x40);
-  assert.equal(calls.acknowledgeEvent.length, 0x41);
+  assert.equal(calls.claimEvent.length, 64);
+  assert.equal(calls.acknowledgeEvent.length, 65);
 });
 
 test('at capacity an acknowledged record is evicted to make room', async () => {
@@ -471,7 +471,7 @@ test('a numeric expiresAt is honoured and a falsey one falls back to now + 0x753
     });
     const receiver = createGlobalCaptureReceiver({ api, handle: async () => ({ ok: true }), capacity: 1 });
     await receiver.receive({ eventId: 'evt-default-expiry' });
-    frozen = 1000 + 0x7530;
+    frozen = 1000 + 30000;
     await receiver.receive({ eventId: 'evt-after-default-expiry' });
     assert.equal(calls.claimEvent.length, 2);
     assert.equal(calls.claimEvent[1].eventId, 'evt-after-default-expiry');
@@ -491,7 +491,7 @@ test('a falsey expiresAt does not expire before the 0x7530 window elapses', asyn
     });
     const receiver = createGlobalCaptureReceiver({ api, handle: async () => ({ ok: true }), capacity: 1 });
     await receiver.receive({ eventId: 'evt-window' });
-    frozen = 5000 + 0x752f;
+    frozen = 5000 + 29999;
     await receiver.receive({ eventId: 'evt-inside-window' });
     assert.equal(calls.claimEvent.length, 1);
   } finally {

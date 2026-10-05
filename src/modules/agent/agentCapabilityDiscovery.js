@@ -1,6 +1,6 @@
 import { listModelManifests } from '../../manifests/index.js';
-const DEFAULT_RESULT_LIMIT = 0x6,
-  MAX_RESULT_LIMIT = 0xc;
+const DEFAULT_RESULT_LIMIT = 6,
+  MAX_RESULT_LIMIT = 12;
 export function normalizeAgentSearchText(value) {
   return String(value || '')
     ['normalize']('NFKC')
@@ -18,38 +18,38 @@ function normalizeStringArray(list) {
 function normalizeLimit(index) {
   const result = Number(index);
   if (!Number['isFinite'](result)) return DEFAULT_RESULT_LIMIT;
-  return Math['max'](0x1, Math['min'](MAX_RESULT_LIMIT, Math['trunc'](result)));
+  return Math['max'](1, Math['min'](MAX_RESULT_LIMIT, Math['trunc'](result)));
 }
 function collectSearchTokens(data) {
   return normalizeAgentSearchText(data)
     ['split'](/[\s,，。:：/|]+/)
     ['map']((options) => options['trim']())
-    ['filter']((list2) => list2['length'] >= 0x2);
+    ['filter']((list2) => list2['length'] >= 2);
 }
 function scoreHaystack(target, source, list3 = []) {
   const list4 = normalizeAgentSearchText(target);
-  if (!list4) return 0x1;
+  if (!list4) return 1;
   const list5 = normalizeAgentSearchKey(list4);
-  let next = 0x0;
+  let next = 0;
   for (const list6 of list3['map'](normalizeAgentSearchText)['filter'](Boolean)) {
-    if (list6 === list4) next += 0x3e8;
+    if (list6 === list4) next += 1000;
     else {
-      if (list4['includes'](list6) || list6['includes'](list4)) next += 0xdc;
+      if (list4['includes'](list6) || list6['includes'](list4)) next += 220;
     }
     const list7 = normalizeAgentSearchKey(list6);
-    if (list5 && list7 === list5) next += 0x384;
+    if (list5 && list7 === list5) next += 900;
     else
-      list5['length'] >= 0x3 &&
+      list5['length'] >= 3 &&
         list7 &&
         (list5['includes'](list7) || list7['includes'](list5)) &&
-        (next += 0xc8);
+        (next += 200);
   }
   const list8 = normalizeAgentSearchText(source);
-  if (list8['includes'](list4)) next += 0xb4;
+  if (list8['includes'](list4)) next += 180;
   const list9 = normalizeAgentSearchKey(list8);
-  if (list5['length'] >= 0x3 && list9['includes'](list5)) next += 0xa0;
+  if (list5['length'] >= 3 && list9['includes'](list5)) next += 160;
   for (const current of collectSearchTokens(list4)) {
-    if (list8['includes'](current)) next += 0x1e;
+    if (list8['includes'](current)) next += 30;
   }
   return next;
 }
@@ -77,16 +77,16 @@ export function searchAgentCommands({
           ...summary['reads'],
           ...summary['writes'],
           ...summary['argNames'],
-        ]['join']('\x20');
+        ]['join'](' ');
       return {
         summary: summary,
         index: index2,
         score: scoreHaystack(query, record, [summary['commandId']]),
       };
     })
-      ['filter']((payload) => payload['score'] > 0x0)
+      ['filter']((payload) => payload['score'] > 0)
       ['sort']((handle, state) => state['score'] - handle['score'] || handle['index'] - state['index']),
-    commandIds = totalMatched['slice'](0x0, normalizeLimit(limit));
+    commandIds = totalMatched['slice'](0, normalizeLimit(limit));
   return {
     query: String(query || '')['trim'](),
     commandIds: commandIds['map']((config) => config['summary']['commandId']),
@@ -102,7 +102,7 @@ export function describeAgentCommand({ commandRegistry: commandRegistry2, comman
       found: ![],
       commandId: commandId2,
       errorCode: 'AGENT_COMMAND_NOT_FOUND',
-      message: 'Canvas\x20command\x20is\x20not\x20registered:\x20' + commandId2,
+      message: 'Canvas command is not registered: ' + commandId2,
     };
   return {
     found: !![],
@@ -126,7 +126,7 @@ function summarizeInputSlots(minItems = {}) {
     }))
     ['filter']((input) => input['id']);
   return {
-    ...(fixedSlots['length'] > 0x0 ? { fixedSlots: fixedSlots } : {}),
+    ...(fixedSlots['length'] > 0 ? { fixedSlots: fixedSlots } : {}),
     ...(Array['isArray'](minItems['allowedKinds'])
       ? { allowedKinds: normalizeStringArray(minItems['allowedKinds']) }
       : {}),
@@ -146,8 +146,8 @@ function modelAcceptsInputKind(options3 = {}, output = '') {
   if (!agentSearchText) return !![];
   const map = new Set(normalizeStringArray(options3['allowedKinds'])['map'](normalizeAgentSearchText));
   if (map['has'](agentSearchText)) return !![];
-  if (Number(options3['maxByKind']?.[agentSearchText]) > 0x0) return !![];
-  if (Number(options3['minByKind']?.[agentSearchText]) > 0x0) return !![];
+  if (Number(options3['maxByKind']?.[agentSearchText]) > 0) return !![];
+  if (Number(options3['minByKind']?.[agentSearchText]) > 0) return !![];
   return (options3['fixedSlots'] || [])['some'](
     (value2) => normalizeAgentSearchText(value2['kind']) === agentSearchText,
   );
@@ -163,7 +163,7 @@ function summarizeModelField(required2 = {}) {
   }
   return (
     Array['isArray'](required2['options']) &&
-      (value3['options'] = required2['options']['slice'](0x0, 0x3c)['map']((value5) => {
+      (value3['options'] = required2['options']['slice'](0, 60)['map']((value5) => {
         if (!value5 || typeof value5 !== 'object') return value5;
         return {
           value: value5['value'],
@@ -208,7 +208,7 @@ export function searchAgentModels({
           score =
             (!agentSearchText2 || normalizeAgentSearchText(summary2['kind']) === agentSearchText2) &&
             (!agentSearchText3 || normalizeAgentSearchText(summary2['provider']) === agentSearchText3) &&
-            (args['size'] === 0x0 || value8),
+            (args['size'] === 0 || value8),
           value10 = [
             summary2['modelId'],
             summary2['provider'],
@@ -216,18 +216,18 @@ export function searchAgentModels({
             summary2['displayName'],
             summary2['description'],
             ...summary2['uiSchema']['fields']['map']((value11) => value11['id']),
-          ]['join']('\x20');
+          ]['join'](' ');
         return {
           summary: summary2,
           index: index3,
-          score: score ? scoreHaystack(query, value10, [summary2['modelId'], summary2['displayName']]) : 0x0,
+          score: score ? scoreHaystack(query, value10, [summary2['modelId'], summary2['displayName']]) : 0,
         };
       })
-      ['filter']((value12) => value12['score'] > 0x0)
+      ['filter']((value12) => value12['score'] > 0)
       ['sort'](
         (value13, value14) => value14['score'] - value13['score'] || value13['index'] - value14['index'],
       ),
-    modelIds = totalMatched2['slice'](0x0, normalizeLimit(limit2));
+    modelIds = totalMatched2['slice'](0, normalizeLimit(limit2));
   return {
     query: String(query || '')['trim'](),
     modelIds: modelIds['map']((value15) => value15['summary']['modelId']),

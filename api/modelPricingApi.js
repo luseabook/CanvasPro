@@ -4,9 +4,9 @@ import { resolveExecutionModelToken } from './adapters/ModelApiManifestNormalize
 import { getProviderConfig } from './configApi.js';
 import { resolveRunningHubPricingContext, fetchRunningHubPricing } from './runningHubPricingApi.js';
 import { resolveBinghuoPricingContext, fetchBinghuoPricing } from './binghuoPricingApi.js';
-export const MODEL_PRICE_TTL = 0x1e * 0x3c * 0x3e8;
+export const MODEL_PRICE_TTL = 30 * 60 * 1000;
 const STORAGE_KEY = 'aicanvas.model-pricing.v1',
-  MAX_ENTRIES = 0xa0;
+  MAX_ENTRIES = 160;
 export function resolveModelPricingContext(args = {}) {
   const modelExecution = resolveModelExecution(args['audioWorkflowKey'] || args['model'] || args['modelId'], {
       provider: args['provider'],
@@ -44,7 +44,7 @@ export async function fetchModelPricing(index) {
     response = await request(
       '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(result),
       { method: 'GET' },
-      0x2ee0,
+      12000,
     );
   if (!response['success'] || response['data']?.['success'] !== !![] || !response['data']?.['data'])
     throw new Error('价格暂不可用');
@@ -70,7 +70,7 @@ export function createModelPricingCache({
             next?.['data'] &&
             Number['isFinite'](next['fetchedAt']) &&
             next['fetchedAt'] <= now() &&
-            now() - next['fetchedAt'] < 0x7 * 0x5265c00
+            now() - next['fetchedAt'] < 7 * 86400000
           )
             map['set'](source, next);
         }
@@ -82,15 +82,15 @@ export function createModelPricingCache({
     handler2 = (enabled2) =>
       !enabled2 ||
       now() - enabled2['fetchedAt'] >= MODEL_PRICE_TTL ||
-      (Number(enabled2['data']?.['pricing']?.['time_pricing']?.['next_switch_at']) * 0x3e8 >
+      (Number(enabled2['data']?.['pricing']?.['time_pricing']?.['next_switch_at']) * 1000 >
         enabled2['fetchedAt'] &&
-        now() >= Number(enabled2['data']['pricing']['time_pricing']['next_switch_at']) * 0x3e8),
+        now() >= Number(enabled2['data']['pricing']['time_pricing']['next_switch_at']) * 1000),
     entry = (event) => {
       const record = handler(event);
       if (!handler2(record)) return Promise['resolve'](record);
       if (map2['has'](event['key'])) return map2['get'](event['key']);
       const payload = data['get'](event['key']);
-      if (payload && now() - payload['at'] < 0xea60)
+      if (payload && now() - payload['at'] < 60000)
         return record ? Promise['resolve'](record) : Promise['reject'](payload['error']);
       const handle = Promise['resolve']()
         ['then'](() => fetchPrice(event))

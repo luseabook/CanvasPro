@@ -27,24 +27,24 @@ export function createMentionMenuItem({
   );
 }
 export function positionMentionMenu(el, box) {
-  const count = Number(globalThis['window']?.['innerWidth'] || 0x0),
-    count2 = Number(globalThis['window']?.['innerHeight'] || 0x0),
-    value = 0xc,
-    key = 0x5;
+  const count = Number(globalThis['window']?.['innerWidth'] || 0),
+    count2 = Number(globalThis['window']?.['innerHeight'] || 0),
+    value = 12,
+    key = 5;
   el['style']['maxHeight'] = '';
   const box2 = el['getBoundingClientRect']?.(),
-    count3 = Math['max'](0x0, Number(box2?.['width'] || el['offsetWidth'] || 0x0)),
-    index = Math['max'](0x1, Number(box2?.['height'] || el['offsetHeight'] || 0x0));
-  let result = Number(box['left'] || 0x0),
-    data = Number(box['top'] || 0x0);
-  if (count > 0x0 && count3 > 0x0)
+    count3 = Math['max'](0, Number(box2?.['width'] || el['offsetWidth'] || 0)),
+    index = Math['max'](1, Number(box2?.['height'] || el['offsetHeight'] || 0));
+  let result = Number(box['left'] || 0),
+    data = Number(box['top'] || 0);
+  if (count > 0 && count3 > 0)
     result = Math['min'](Math['max'](value, result), Math['max'](value, count - value - count3));
-  if (count2 > 0x0) {
-    const options = Math['max'](0x0, count2 - value - data),
+  if (count2 > 0) {
+    const options = Math['max'](0, count2 - value - data),
       target = Number['isFinite'](box['anchorTop']) ? Number(box['anchorTop']) : data - key,
-      source = Math['max'](0x0, target - value),
+      source = Math['max'](0, target - value),
       next = index > options && source > options,
-      current = Math['max'](0x1, Math['min'](index, next ? source : options));
+      current = Math['max'](1, Math['min'](index, next ? source : options));
     ((el['style']['maxHeight'] = current + 'px'),
       (data = next
         ? Math['max'](value, target - key - current)

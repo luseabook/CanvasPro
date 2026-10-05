@@ -8,10 +8,10 @@ export async function requestStoryReviewRepairs({
   systemPrompt: systemPrompt,
 }) {
   const map = new Map(),
-    value = 0x2;
-  for (let item = 0x0; item < failedClips['length']; item += value) {
+    value = 2;
+  for (let item = 0; item < failedClips['length']; item += value) {
     const list = failedClips['slice'](item, item + value),
-      key = failedClips['length'] > value ? stepId + ':chunk-' + (item / value + 0x1) : stepId,
+      key = failedClips['length'] > value ? stepId + ':chunk-' + (item / value + 1) : stepId,
       index = await invoke({ prompt: buildPrompt(list), systemPrompt: systemPrompt }, key);
     for (const [result, data] of parseResponse(
       index,

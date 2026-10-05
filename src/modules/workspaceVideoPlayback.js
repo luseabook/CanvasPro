@@ -13,7 +13,7 @@ function normalizeText(value) {
 function requestWorkspaceVideoProgressFrame(item) {
   const key = globalThis['window']?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
   if (typeof key === 'function') return key['call'](globalThis['window'] || globalThis, item);
-  return setTimeout(item, 0x10);
+  return setTimeout(item, 16);
 }
 function cancelWorkspaceVideoProgressFrame(index) {
   const result = globalThis['window']?.['cancelAnimationFrame'] || globalThis['cancelAnimationFrame'];
@@ -30,7 +30,7 @@ export function createWorkspaceVideoProgressLoop({
   cancelFrame: cancelFrame = cancelWorkspaceVideoProgressFrame,
 } = {}) {
   if (!videoEl || typeof onFrame !== 'function')
-    throw new Error('workspace\x20video\x20progress\x20loop\x20requires\x20videoEl\x20and\x20onFrame');
+    throw new Error('workspace video progress loop requires videoEl and onFrame');
   let data = ![],
     requestFrame2 = null;
   const stop = () => {

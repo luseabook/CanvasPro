@@ -5,23 +5,23 @@ function createSceneAssetGeometry(box) {
     return new threeRuntime['CylinderGeometry'](
       Number(box['radiusTop']) || 0.5,
       Number(box['radiusBottom']) || 0.5,
-      Number(box['height']) || 0x1,
-      0x12,
+      Number(box['height']) || 1,
+      18,
     );
   if (box?.['primitive'] === 'sphere')
-    return new threeRuntime['SphereGeometry'](Number(box['radius']) || 0.5, 0x12, 0xc);
+    return new threeRuntime['SphereGeometry'](Number(box['radius']) || 0.5, 18, 12);
   if (box?.['primitive'] === 'torus')
     return new threeRuntime['TorusGeometry'](
       Number(box['radius']) || 0.5,
       Number(box['tube']) || 0.08,
-      0xa,
-      0x18,
+      10,
+      24,
     );
   const box2 = box?.['size'] || {};
   return new threeRuntime['BoxGeometry'](
-    Number(box2['x']) || 0x1,
-    Number(box2['y']) || 0x1,
-    Number(box2['z']) || 0x1,
+    Number(box2['x']) || 1,
+    Number(box2['y']) || 1,
+    Number(box2['z']) || 1,
   );
 }
 export function createSceneAssetVisual(metalness, value, handler) {
@@ -46,7 +46,7 @@ export function createSceneAssetVisual(metalness, value, handler) {
           edgeMaterial['set'](
             index,
             new threeRuntime['LineBasicMaterial']({
-              color: new threeRuntime['Color'](color)['clone']()['offsetHSL'](0x0, 0x0, -0.18),
+              color: new threeRuntime['Color'](color)['clone']()['offsetHSL'](0, 0, -0.18),
               transparent: !![],
               opacity: 0.78,
             }),
@@ -55,14 +55,14 @@ export function createSceneAssetVisual(metalness, value, handler) {
       return { material: material['get'](index), edgeMaterial: edgeMaterial['get'](index) };
     },
     list =
-      Array['isArray'](metalness?.['parts']) && metalness['parts']['length'] > 0x0
+      Array['isArray'](metalness?.['parts']) && metalness['parts']['length'] > 0
         ? metalness['parts']
         : [
             {
               primitive: 'box',
-              size: { x: 0x1, y: 0x1, z: 0x1 },
-              position: { x: 0x0, y: 0.5, z: 0x0 },
-              rotation: { x: 0x0, y: 0x0, z: 0x0 },
+              size: { x: 1, y: 1, z: 1 },
+              position: { x: 0, y: 0.5, z: 0 },
+              rotation: { x: 0, y: 0, z: 0 },
             },
           ];
   list['forEach']((result) => {
@@ -70,14 +70,14 @@ export function createSceneAssetVisual(metalness, value, handler) {
       { material: material2, edgeMaterial: edgeMaterial2 } = handler2(result['colorKey']),
       data = new threeRuntime['Mesh'](sceneAssetGeometry, material2);
     (data['position']['set'](
-      Number(result?.['position']?.['x']) || 0x0,
-      Number(result?.['position']?.['y']) || 0x0,
-      Number(result?.['position']?.['z']) || 0x0,
+      Number(result?.['position']?.['x']) || 0,
+      Number(result?.['position']?.['y']) || 0,
+      Number(result?.['position']?.['z']) || 0,
     ),
       data['rotation']['set'](
-        Number(result?.['rotation']?.['x']) || 0x0,
-        Number(result?.['rotation']?.['y']) || 0x0,
-        Number(result?.['rotation']?.['z']) || 0x0,
+        Number(result?.['rotation']?.['x']) || 0,
+        Number(result?.['rotation']?.['y']) || 0,
+        Number(result?.['rotation']?.['z']) || 0,
       ),
       content['add'](data));
     const options = new threeRuntime['LineSegments'](
@@ -109,6 +109,6 @@ export function applySceneAssetColors(target, source, handler3) {
   }),
     target?.['edgeMaterialsByColorKey']?.['forEach']((entry, record) => {
       const payload = record === '__default' ? source : handler3(record);
-      entry['color']['copy'](new threeRuntime['Color'](payload)['offsetHSL'](0x0, 0x0, -0.18));
+      entry['color']['copy'](new threeRuntime['Color'](payload)['offsetHSL'](0, 0, -0.18));
     }));
 }

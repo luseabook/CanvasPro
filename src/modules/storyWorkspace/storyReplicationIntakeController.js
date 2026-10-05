@@ -43,7 +43,7 @@ export function bindStoryReplicationIntake(
     handler3 = () => documentObject['closest']('.story-page.is-current') || documentObject;
   let activeItemId = '';
   const commit = (list2) => {
-      state['replicationSelectionMode'] = list2['length'] > 0x0;
+      state['replicationSelectionMode'] = list2['length'] > 0;
       for (const source of selectedIds())
         source['replication']['selectedForAnalysis'] = list2['includes'](source['id']);
       (handler2(), sync(), persist());
@@ -127,7 +127,7 @@ export function bindStoryReplicationIntake(
         return;
       }
       const all = toggleKey['target']['closest'](
-        '[data-replication-analyze],\x20[data-story-action=\x27analyze-all-replication\x27]',
+        '[data-replication-analyze], [data-story-action=\'analyze-all-replication\']',
       );
       if (!all || all['disabled']) return;
       void analyze({

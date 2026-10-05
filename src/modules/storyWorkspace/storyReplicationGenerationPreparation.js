@@ -30,7 +30,7 @@ export async function prepareStoryReplicationGenerationEpisode({
     storyVideoClipDurationConstraints = resolveStoryVideoClipDurationConstraints(
       resolveStoryPromptModeDefaultVideoModelId(promptMode),
     ),
-    result = storyVideoClipDurationConstraints?.['maxSeconds'] || 0xf;
+    result = storyVideoClipDurationConstraints?.['maxSeconds'] || 15;
   return (
     (structuredClone2['replication']['segmentPlan'] = buildReplicationSegmentPlan(
       structuredClone2['replication']['sourceAnalysis'],
@@ -39,7 +39,7 @@ export async function prepareStoryReplicationGenerationEpisode({
         promptMode: promptMode,
         maxSeconds: Math['min'](
           result,
-          Number(index['sceneMaxSeconds']) > 0x0 ? Number(index['sceneMaxSeconds']) : result,
+          Number(index['sceneMaxSeconds']) > 0 ? Number(index['sceneMaxSeconds']) : result,
         ),
       },
     )),

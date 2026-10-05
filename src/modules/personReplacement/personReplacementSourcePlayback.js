@@ -15,7 +15,7 @@ export function getPersonReplacementSourceAssetId(options = {}) {
   const assetId = normalizeAssetId(options?.['assetId']);
   if (assetId) return assetId;
   return (
-    normalizeText(options?.['videoRef'])['match'](CANONICAL_ORIGINAL_REF_RE)?.[0x1]?.['toLowerCase']() || ''
+    normalizeText(options?.['videoRef'])['match'](CANONICAL_ORIGINAL_REF_RE)?.[1]?.['toLowerCase']() || ''
   );
 }
 export function buildPersonReplacementSourcePlaybackProxyRef(options2 = {}) {

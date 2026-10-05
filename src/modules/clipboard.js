@@ -1,32 +1,32 @@
 import { desktopBridge } from '../services/desktopBridge.js';
 import { buildClipboardMediaSignature, clipboardImageBlobFromBase64 } from './clipboardMediaSignature.js';
-const CLIPBOARD_GRAPH_SCHEMA_VERSION = 0x1;
+const CLIPBOARD_GRAPH_SCHEMA_VERSION = 1;
 let clipData = null,
-  clipMeta = { copiedAt: 0x0, systemSignatureAtCopy: '', systemCopiedAt: 0x0, systemSignature: '' };
+  clipMeta = { copiedAt: 0, systemSignatureAtCopy: '', systemCopiedAt: 0, systemSignature: '' };
 function buildClipboardSignatureFromReadResult({
   files: files = [],
   mediaType: mediaType = '',
-  mediaSize: mediaSize = 0x0,
+  mediaSize: mediaSize = 0,
   text: text = '',
 } = {}) {
-  if (Array['isArray'](files) && files['length'] > 0x0) {
+  if (Array['isArray'](files) && files['length'] > 0) {
     const value = files['map']((error) => String(error?.['path'] || error?.['name'] || ''))
       ['filter'](Boolean)
-      ['slice'](0x0, 0x8)
+      ['slice'](0, 8)
       ['join']('|');
     return 'files:' + value + '|len:' + files['length'];
   }
-  if (mediaType) return 'media:' + String(mediaType)['toLowerCase']() + '|' + (Number(mediaSize) || 0x0);
+  if (mediaType) return 'media:' + String(mediaType)['toLowerCase']() + '|' + (Number(mediaSize) || 0);
   const list = String(text || '');
   if (!list['trim']()) return '';
-  const item = list['slice'](0x0, 0x100);
+  const item = list['slice'](0, 256);
   return 'text:' + item + '|len:' + list['length'];
 }
 function cloneJson(key) {
   return JSON['parse'](JSON['stringify'](key));
 }
 function normalizeNodeClipboardPayload(list2, { edges: edges = [] } = {}) {
-  if (!Array['isArray'](list2) || list2['length'] === 0x0) return null;
+  if (!Array['isArray'](list2) || list2['length'] === 0) return null;
   return {
     schemaVersion: CLIPBOARD_GRAPH_SCHEMA_VERSION,
     nodes: cloneJson(list2),
@@ -39,7 +39,7 @@ async function captureElectronClipboardSignatureBestEffort() {
   try {
     if (typeof enabled['readFileReferences'] === 'function') {
       const files2 = await enabled['readFileReferences']();
-      if (files2?.['ok'] && Array['isArray'](files2['files']) && files2['files']['length'] > 0x0) {
+      if (files2?.['ok'] && Array['isArray'](files2['files']) && files2['files']['length'] > 0) {
         const clipboardSignatureFromReadResult = buildClipboardSignatureFromReadResult({ files: files2['files'] });
         if (clipboardSignatureFromReadResult) return clipboardSignatureFromReadResult;
       }
@@ -99,7 +99,7 @@ async function captureSystemClipboardSignatureBestEffort() {
 export function markSystemClipboardWrite({
   signature: signature = '',
   mediaType: mediaType = '',
-  mediaSize: mediaSize = 0x0,
+  mediaSize: mediaSize = 0,
   text: text = '',
 } = {}) {
   const systemSignature =
@@ -119,7 +119,7 @@ export function observeSystemClipboardSignature(payload) {
 export function setClipboard(handle, state = {}) {
   const nodeClipboardPayload = normalizeNodeClipboardPayload(handle, state);
   if (!nodeClipboardPayload) {
-    ((clipData = null), (clipMeta = { ...clipMeta, copiedAt: 0x0, systemSignatureAtCopy: '' }));
+    ((clipData = null), (clipMeta = { ...clipMeta, copiedAt: 0, systemSignatureAtCopy: '' }));
     return;
   }
   clipData = nodeClipboardPayload;

@@ -1,5 +1,5 @@
 const FLOAT_PATTERN = '[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?';
-function finiteNumber(value, item = 0x0) {
+function finiteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -41,10 +41,10 @@ function createMeshPayload({
   uvs: uvs,
   colors: colors,
 }) {
-  const attributes = { position: floatAttribute(positions, 0x3) },
-    floatAttribute2 = floatAttribute(normals, 0x3),
-    floatAttribute3 = floatAttribute(uvs, 0x2),
-    floatAttribute4 = floatAttribute(colors, 0x3);
+  const attributes = { position: floatAttribute(positions, 3) },
+    floatAttribute2 = floatAttribute(normals, 3),
+    floatAttribute3 = floatAttribute(uvs, 2),
+    floatAttribute4 = floatAttribute(colors, 3);
   if (floatAttribute2) attributes['normal'] = floatAttribute2;
   if (floatAttribute3) attributes['uv'] = floatAttribute3;
   if (floatAttribute4) attributes['color'] = floatAttribute4;
@@ -52,31 +52,31 @@ function createMeshPayload({
     name: String(name2 || 'Mesh'),
     materialName: String(materialName || ''),
     attributes: attributes,
-    triangleCount: Math['floor'](positions['length'] / 0x9),
+    triangleCount: Math['floor'](positions['length'] / 9),
   };
 }
 function resolveObjIndex(source, next) {
-  const count = Number['parseInt'](source, 0xa);
-  if (!Number['isInteger'](count) || count === 0x0) return -0x1;
-  const count2 = count > 0x0 ? count - 0x1 : next + count;
-  return count2 >= 0x0 && count2 < next ? count2 : -0x1;
+  const count = Number['parseInt'](source, 10);
+  if (!Number['isInteger'](count) || count === 0) return -1;
+  const count2 = count > 0 ? count - 1 : next + count;
+  return count2 >= 0 && count2 < next ? count2 : -1;
 }
 function objVertex(current, entry) {
   const [record, uv, normal] = String(current || '')['split']('/');
   return {
     position: resolveObjIndex(record, entry['positions']),
-    uv: uv ? resolveObjIndex(uv, entry['uvs']) : -0x1,
-    normal: normal ? resolveObjIndex(normal, entry['normals']) : -0x1,
+    uv: uv ? resolveObjIndex(uv, entry['uvs']) : -1,
+    normal: normal ? resolveObjIndex(normal, entry['normals']) : -1,
   };
 }
-function pushTuple(list3, payload, handle, state, config = 0x0) {
-  for (let scope = 0x0; scope < state; scope += 0x1) {
+function pushTuple(list3, payload, handle, state, config = 0) {
+  for (let scope = 0; scope < state; scope += 1) {
     list3['push'](finiteNumber(payload[handle * state + scope], config));
   }
 }
 export function parseStoryboard3DObjGeometry(
   input,
-  { name: name = 'OBJ\x20model', onProgress: onProgress } = {},
+  { name: name = 'OBJ model', onProgress: onProgress } = {},
 ) {
   const textDecoder = new TextDecoder()['decode'](input),
     list4 = textDecoder['split'](/\r?\n/),
@@ -119,23 +119,23 @@ export function parseStoryboard3DObjGeometry(
         (normals3 = null));
     };
   onProgress?.(0.08);
-  for (let count3 = 0x0; count3 < list4['length']; count3 += 0x1) {
+  for (let count3 = 0; count3 < list4['length']; count3 += 1) {
     const list5 = list4[count3]['trim']();
     if (!list5 || list5['startsWith']('#')) continue;
     const count4 = list5['search'](/\s/),
-      output = count4 < 0x0 ? list5 : list5['slice'](0x0, count4),
-      value2 = count4 < 0x0 ? '' : list5['slice'](count4)['trim']();
+      output = count4 < 0 ? list5 : list5['slice'](0, count4),
+      value2 = count4 < 0 ? '' : list5['slice'](count4)['trim']();
     if (output === 'v') {
-      const list6 = value2['split'](/\s+/)['slice'](0x0, 0x3)['map'](Number);
-      if (list6['length'] === 0x3 && list6['every'](Number['isFinite'])) positions2['push'](...list6);
+      const list6 = value2['split'](/\s+/)['slice'](0, 3)['map'](Number);
+      if (list6['length'] === 3 && list6['every'](Number['isFinite'])) positions2['push'](...list6);
     } else {
       if (output === 'vn') {
-        const list7 = value2['split'](/\s+/)['slice'](0x0, 0x3)['map'](Number);
-        if (list7['length'] === 0x3 && list7['every'](Number['isFinite'])) normals2['push'](...list7);
+        const list7 = value2['split'](/\s+/)['slice'](0, 3)['map'](Number);
+        if (list7['length'] === 3 && list7['every'](Number['isFinite'])) normals2['push'](...list7);
       } else {
         if (output === 'vt') {
-          const list8 = value2['split'](/\s+/)['slice'](0x0, 0x2)['map'](Number);
-          if (list8['length'] >= 0x2 && list8['every'](Number['isFinite'])) uvs2['push'](...list8);
+          const list8 = value2['split'](/\s+/)['slice'](0, 2)['map'](Number);
+          if (list8['length'] >= 2 && list8['every'](Number['isFinite'])) uvs2['push'](...list8);
         } else {
           if (output === 'o' || output === 'g') (handler(), (name3 = value2 || name3));
           else {
@@ -149,27 +149,27 @@ export function parseStoryboard3DObjGeometry(
                     ['filter'](Boolean)
                     ['map']((value3) =>
                       objVertex(value3, {
-                        positions: positions2['length'] / 0x3,
-                        normals: normals2['length'] / 0x3,
-                        uvs: uvs2['length'] / 0x2,
+                        positions: positions2['length'] / 3,
+                        normals: normals2['length'] / 3,
+                        uvs: uvs2['length'] / 2,
                       }),
                     );
-                  if (list9['length'] < 0x3 || list9['some']((value4) => value4['position'] < 0x0)) continue;
+                  if (list9['length'] < 3 || list9['some']((value4) => value4['position'] < 0)) continue;
                   const value5 = run();
-                  for (let value6 = 0x1; value6 < list9['length'] - 0x1; value6 += 0x1) {
-                    for (const value7 of [list9[0x0], list9[value6], list9[value6 + 0x1]]) {
-                      pushTuple(value5['positions'], positions2, value7['position'], 0x3);
-                      const value8 = value5['positions']['length'] - 0x3;
+                  for (let value6 = 1; value6 < list9['length'] - 1; value6 += 1) {
+                    for (const value7 of [list9[0], list9[value6], list9[value6 + 1]]) {
+                      pushTuple(value5['positions'], positions2, value7['position'], 3);
+                      const value8 = value5['positions']['length'] - 3;
                       expandBounds(
                         emptyBounds2,
                         value5['positions'][value8],
-                        value5['positions'][value8 + 0x1],
-                        value5['positions'][value8 + 0x2],
+                        value5['positions'][value8 + 1],
+                        value5['positions'][value8 + 2],
                       );
-                      if (value7['normal'] >= 0x0)
-                        pushTuple(value5['normals'], normals2, value7['normal'], 0x3);
+                      if (value7['normal'] >= 0)
+                        pushTuple(value5['normals'], normals2, value7['normal'], 3);
                       else value5['hasNormals'] = ![];
-                      if (value7['uv'] >= 0x0) pushTuple(value5['uvs'], uvs2, value7['uv'], 0x2);
+                      if (value7['uv'] >= 0) pushTuple(value5['uvs'], uvs2, value7['uv'], 2);
                       else value5['hasUvs'] = ![];
                     }
                   }
@@ -180,64 +180,64 @@ export function parseStoryboard3DObjGeometry(
         }
       }
     }
-    count3 > 0x0 &&
-      count3 % 0x1000 === 0x0 &&
-      onProgress?.(0.08 + (count3 / Math['max'](0x1, list4['length'])) * 0.82);
+    count3 > 0 &&
+      count3 % 4096 === 0 &&
+      onProgress?.(0.08 + (count3 / Math['max'](1, list4['length'])) * 0.82);
   }
   handler();
   if (!meshes['length']) throw new Error('OBJ did not contain any triangle faces.');
   return (
-    onProgress?.(0x1),
+    onProgress?.(1),
     {
       format: 'obj',
       name: String(name || 'OBJ model')['replace'](/\.obj$/i, ''),
       meshes: meshes,
       bounds: finalizeBounds(emptyBounds2),
-      triangleCount: meshes['reduce']((value9, value10) => value9 + value10['triangleCount'], 0x0),
+      triangleCount: meshes['reduce']((value9, value10) => value9 + value10['triangleCount'], 0),
       materialLibraries: materialLibraries,
     }
   );
 }
 function isBinaryStl(value11) {
-  if (value11['byteLength'] < 0x54) return ![];
+  if (value11['byteLength'] < 84) return ![];
   const dataView = new DataView(value11['buffer'], value11['byteOffset'], value11['byteLength'])['getUint32'](
-    0x50,
+    80,
     !![],
   );
-  return 0x54 + dataView * 0x32 <= value11['byteLength'];
+  return 84 + dataView * 50 <= value11['byteLength'];
 }
 function parseBinaryStl(value12, value13) {
   const dataView2 = new DataView(value12['buffer'], value12['byteOffset'], value12['byteLength']),
-    triangleCount = dataView2['getUint32'](0x50, !![]),
-    positions3 = new Float32Array(triangleCount * 0x9),
-    normals4 = new Float32Array(triangleCount * 0x9),
+    triangleCount = dataView2['getUint32'](80, !![]),
+    positions3 = new Float32Array(triangleCount * 9),
+    normals4 = new Float32Array(triangleCount * 9),
     emptyBounds3 = emptyBounds();
-  let value14 = 0x0,
-    value15 = 0x54;
+  let value14 = 0,
+    value15 = 84;
   value13?.(0.08);
-  for (let count5 = 0x0; count5 < triangleCount; count5 += 0x1) {
+  for (let count5 = 0; count5 < triangleCount; count5 += 1) {
     const value16 = dataView2['getFloat32'](value15, !![]),
-      value17 = dataView2['getFloat32'](value15 + 0x4, !![]),
-      value18 = dataView2['getFloat32'](value15 + 0x8, !![]);
-    value15 += 0xc;
-    for (let count6 = 0x0; count6 < 0x3; count6 += 0x1) {
+      value17 = dataView2['getFloat32'](value15 + 4, !![]),
+      value18 = dataView2['getFloat32'](value15 + 8, !![]);
+    value15 += 12;
+    for (let count6 = 0; count6 < 3; count6 += 1) {
       const value19 = dataView2['getFloat32'](value15, !![]),
-        value20 = dataView2['getFloat32'](value15 + 0x4, !![]),
-        value21 = dataView2['getFloat32'](value15 + 0x8, !![]);
+        value20 = dataView2['getFloat32'](value15 + 4, !![]),
+        value21 = dataView2['getFloat32'](value15 + 8, !![]);
       ((positions3[value14] = value19),
-        (positions3[value14 + 0x1] = value20),
-        (positions3[value14 + 0x2] = value21),
+        (positions3[value14 + 1] = value20),
+        (positions3[value14 + 2] = value21),
         (normals4[value14] = value16),
-        (normals4[value14 + 0x1] = value17),
-        (normals4[value14 + 0x2] = value18),
+        (normals4[value14 + 1] = value17),
+        (normals4[value14 + 2] = value18),
         expandBounds(emptyBounds3, value19, value20, value21),
-        (value14 += 0x3),
-        (value15 += 0xc));
+        (value14 += 3),
+        (value15 += 12));
     }
-    ((value15 += 0x2),
-      count5 > 0x0 &&
-        count5 % 0x2000 === 0x0 &&
-        value13?.(0.08 + (count5 / Math['max'](0x1, triangleCount)) * 0.82));
+    ((value15 += 2),
+      count5 > 0 &&
+        count5 % 8192 === 0 &&
+        value13?.(0.08 + (count5 / Math['max'](1, triangleCount)) * 0.82));
   }
   return {
     positions: positions3,
@@ -253,7 +253,7 @@ function parseAsciiStl(value22, value23) {
         FLOAT_PATTERN +
         ')\\s+(' +
         FLOAT_PATTERN +
-        ')\x5cs+(' +
+        ')\\s+(' +
         FLOAT_PATTERN +
         ')\\s+outer\\s+loop([\\s\\S]*?)endloop',
       'gi',
@@ -266,21 +266,21 @@ function parseAsciiStl(value22, value23) {
     list12 = [],
     emptyBounds4 = emptyBounds();
   let list13,
-    triangleCount2 = 0x0;
+    triangleCount2 = 0;
   value23?.(0.08);
   while ((list13 = regExp['exec'](list10))) {
-    const args = list13['slice'](0x1, 0x4)['map'](Number),
-      list14 = [...list13[0x4]['matchAll'](regExp2)]['slice'](0x0, 0x3);
-    if (list14['length'] !== 0x3) continue;
+    const args = list13['slice'](1, 4)['map'](Number),
+      list14 = [...list13[4]['matchAll'](regExp2)]['slice'](0, 3);
+    if (list14['length'] !== 3) continue;
     for (const list15 of list14) {
-      const args2 = list15['slice'](0x1, 0x4)['map'](Number);
+      const args2 = list15['slice'](1, 4)['map'](Number);
       (list11['push'](...args2),
         list12['push'](...args),
-        expandBounds(emptyBounds4, args2[0x0], args2[0x1], args2[0x2]));
+        expandBounds(emptyBounds4, args2[0], args2[1], args2[2]));
     }
-    triangleCount2 += 0x1;
-    if (triangleCount2 % 0x1000 === 0x0)
-      value23?.(Math['min'](0.9, regExp['lastIndex'] / Math['max'](0x1, list10['length'])));
+    triangleCount2 += 1;
+    if (triangleCount2 % 4096 === 0)
+      value23?.(Math['min'](0.9, regExp['lastIndex'] / Math['max'](1, list10['length'])));
   }
   if (!triangleCount2) throw new Error('STL did not contain any triangle facets.');
   return {
@@ -292,14 +292,14 @@ function parseAsciiStl(value22, value23) {
 }
 export function parseStoryboard3DStlGeometry(
   value24,
-  { name: name = 'STL\x20model', onProgress: onProgress2 } = {},
+  { name: name = 'STL model', onProgress: onProgress2 } = {},
 ) {
   const value25 = value24 instanceof Uint8Array ? value24 : new Uint8Array(value24),
     array2 = isBinaryStl(value25)
       ? parseBinaryStl(value25, onProgress2)
       : parseAsciiStl(value25, onProgress2);
   return (
-    onProgress2?.(0x1),
+    onProgress2?.(1),
     {
       format: 'stl',
       name: String(name || 'STL model')['replace'](/\.stl$/i, ''),
@@ -310,13 +310,13 @@ export function parseStoryboard3DStlGeometry(
           attributes: {
             position: {
               array: array2['positions']['buffer'],
-              itemSize: 0x3,
-              count: array2['positions']['length'] / 0x3,
+              itemSize: 3,
+              count: array2['positions']['length'] / 3,
             },
             normal: {
               array: array2['normals']['buffer'],
-              itemSize: 0x3,
-              count: array2['normals']['length'] / 0x3,
+              itemSize: 3,
+              count: array2['normals']['length'] / 3,
             },
           },
           triangleCount: array2['triangleCount'],
@@ -335,7 +335,7 @@ export function parseStoryboard3DWorkerGeometry({
   onProgress: onProgress3,
 } = {}) {
   if (!(buffer instanceof ArrayBuffer))
-    throw new TypeError('Worker\x20geometry\x20import\x20requires\x20an\x20ArrayBuffer.');
+    throw new TypeError('Worker geometry import requires an ArrayBuffer.');
   if (format === 'obj') return parseStoryboard3DObjGeometry(buffer, { name: name4, onProgress: onProgress3 });
   if (format === 'stl') return parseStoryboard3DStlGeometry(buffer, { name: name4, onProgress: onProgress3 });
   throw new Error(

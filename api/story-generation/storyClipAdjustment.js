@@ -13,7 +13,7 @@ import {
   normalizeStoryPromptMode,
 } from '../../src/domain/storyGeneration/promptModes.js';
 import { getStoryClipPromptModeRewriteRequirements } from '../../src/domain/storyGeneration/promptModeRules.js';
-export const STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION = 0x3;
+export const STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION = 3;
 export const STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT = [
   '你是一名专业的短剧分镜提示词编辑。',
   '你的任务是按照用户说明，只调整指定的视频提示词内容，不扩写整集、不创建新片段，也不生成视频。',
@@ -25,7 +25,7 @@ export const STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT = [
   'scope 为 selection 时，只返回选中文字的替换文本；scope 为 prompt 或 clip 时，返回完整的候选视频提示词。',
   '不要输出 HTML、Markdown、代码块、解释、修改说明或多个方案。MiniMax H3 官方格式要求的 <Subject N>、<Picture N>、<Video N>、<Audio N>、<d>、<scenetrans>、<cutoff> 是提示词文本标签，不是 HTML。',
   '除目标提示词模式必要的英文字段名和官方结构标签外，candidateText 的叙述、对白、画外音、歌词和画面文字全部直接输出简体中文。返回 JSON 前先自行检查并把草稿中的英文正文改写为中文，不要把英文正文交给客户端处理。只返回严格 JSON 对象，且只能包含 candidateText、candidateDurationSeconds 两个字段；无需调整总时长时 candidateDurationSeconds 可以省略。',
-]['join']('\x0a');
+]['join']('\n');
 export function createStoryClipAdjustmentApi({
   generateText: generateText,
   parseStrictJson: parseStrictJson,
@@ -43,7 +43,7 @@ export function createStoryClipAdjustmentApi({
   function run2(item) {
     return [...new Set((Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean))][
       'slice'
-    ](0x0, 0x32);
+    ](0, 50);
   }
   function run3(options = {}) {
     const args = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
@@ -58,7 +58,7 @@ export function createStoryClipAdjustmentApi({
           }
         : {}),
       storySummary: normalizeText(args['storySummary']),
-      episodeNumber: Math['max'](0x1, Math['trunc'](Number(args['episodeNumber']) || 0x1)),
+      episodeNumber: Math['max'](1, Math['trunc'](Number(args['episodeNumber']) || 1)),
       episodeTitle: normalizeText(args['episodeTitle']),
       episodeSynopsis: normalizeText(args['episodeSynopsis']),
       clipTitle: normalizeText(args['clipTitle']),
@@ -77,7 +77,7 @@ export function createStoryClipAdjustmentApi({
     lockedAssetTokens: lockedAssetTokens = [],
     lockedDurationTokens: lockedDurationTokens = [],
     duration: duration = '',
-    maxDurationSeconds: maxDurationSeconds = 0x0,
+    maxDurationSeconds: maxDurationSeconds = 0,
     context: context = {},
     sourcePromptMode: sourcePromptMode = '',
     targetPromptMode: targetPromptMode = '',
@@ -85,13 +85,13 @@ export function createStoryClipAdjustmentApi({
   } = {}) {
     const args2 = run(scope),
       count = normalizePositiveNumber(maxDurationSeconds),
-      key = preserveDuration !== !![] && args2 !== 'selection' && count > 0x0,
+      key = preserveDuration !== !![] && args2 !== 'selection' && count > 0,
       args3 = Boolean(normalizeText(targetPromptMode)),
       storyPromptMode = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: !![] }),
       storyPromptMode2 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: !![] }),
       args4 = args3
         ? getStoryClipPromptModeRewriteRequirements(storyPromptMode2, {
-            hasAssetRefs: run2(lockedAssetTokens)['length'] > 0x0,
+            hasAssetRefs: run2(lockedAssetTokens)['length'] > 0,
           })
         : [];
     return JSON['stringify']({
@@ -136,7 +136,7 @@ export function createStoryClipAdjustmentApi({
         args2 === 'selection'
           ? 'candidateText 只返回选中文字的替换内容，不要返回完整提示词。'
           : 'candidateText 返回调整后的完整视频提示词。',
-        '严格执行\x20instruction，不改变未要求修改的剧情事实。',
+        '严格执行 instruction，不改变未要求修改的剧情事实。',
         args2 === 'selection'
           ? '在 selectedText 范围内补充 instruction 要求的可观察表演，选区外内容保持原样。'
           : '当 instruction 要求增强画面、电影感或情绪表现时，把原叙述转译成摄像机实际拍到的连续画面，并根据当前镜头选择有表达价值的环境、人物位置、动作过程、表情视线、道具、光影以及镜头观察方式。',
@@ -150,34 +150,34 @@ export function createStoryClipAdjustmentApi({
           : '可以按用户说明调整资产引用。',
         ...args4,
         preserveDuration === !![]
-          ? '保持\x20clipDuration\x20和\x20durationTokens，不增加超过当前时长的动作、对白或镜头节拍。'
+          ? '保持 clipDuration 和 durationTokens，不增加超过当前时长的动作、对白或镜头节拍。'
           : key
             ? args3
               ? '根据 targetPromptMode 的时间语法重新组织完整提示词；候选总时长不得超过 ' +
                 count +
                 ' 秒，candidateDurationSeconds 必须与目标模式的时间结构一致。完整保留 currentPrompt 的人物、场景、道具、剧情事件、动作、对白与声音内容。'
-              : '根据\x20instruction\x20决定是否重新拆分镜头和分配时间；instruction\x20未要求改变节奏时，候选总时长应尽量接近\x20sourceDuration。完整保留\x20currentPrompt\x20的人物、场景、道具、剧情事件、动作、对白与声音内容。每个镜头使用“⏱\x20数字s”标记，单镜至少\x200.5\x20秒并按\x200.5\x20秒递增；总时长不得超过\x20' +
+              : '根据 instruction 决定是否重新拆分镜头和分配时间；instruction 未要求改变节奏时，候选总时长应尽量接近 sourceDuration。完整保留 currentPrompt 的人物、场景、道具、剧情事件、动作、对白与声音内容。每个镜头使用“⏱ 数字s”标记，单镜至少 0.5 秒并按 0.5 秒递增；总时长不得超过 ' +
                 count +
                 ' 秒。candidateDurationSeconds 必须等于所有镜头时间标记之和。'
             : '可以按用户说明调整时间表达，但不得删减当前卡片内容。',
         key
           ? '只返回 JSON：{"candidateText":"...","candidateDurationSeconds":15}。'
-          : '只返回\x20JSON：{\x22candidateText\x22:\x22...\x22}。',
+          : '只返回 JSON：{"candidateText":"..."}。',
       ],
     });
   }
   function run5(index) {
     const result = String(index ?? '')['match'](/\d+(?:\.\d+)?/),
-      count2 = Number(result?.[0x0]);
-    return Number['isFinite'](count2) && count2 > 0x0 ? Number(count2['toFixed'](0x1)) : 0x0;
+      count2 = Number(result?.[0]);
+    return Number['isFinite'](count2) && count2 > 0 ? Number(count2['toFixed'](1)) : 0;
   }
   function run6(data) {
     const target = [],
       source = /⏱\s*(\d+(?:\.\d+)?)\s*(?:s|秒)/gi;
     let next = null;
     while ((next = source['exec'](String(data || '')))) {
-      const count3 = Number(next[0x1]);
-      if (Number['isFinite'](count3) && count3 > 0x0) target['push'](count3);
+      const count3 = Number(next[1]);
+      if (Number['isFinite'](count3) && count3 > 0) target['push'](count3);
     }
     return target;
   }
@@ -212,15 +212,15 @@ export function createStoryClipAdjustmentApi({
   function run8(input, enabled, output, value2 = '') {
     const count4 = normalizePositiveNumber(output);
     if (!enabled) throw new Error('AI 没有返回候选片段总时长。');
-    if (count4 > 0x0 && enabled > count4 + 0.001)
+    if (count4 > 0 && enabled > count4 + 0.001)
       throw new Error('候选片段总时长不能超过 ' + count4 + ' 秒。');
     const storyPromptMode3 = normalizeStoryPromptMode(value2, { allowDeveloperModes: !![] });
     if (isStorySeedance25PromptMode(storyPromptMode3) || isStoryWan30PromptMode(storyPromptMode3)) {
       const enabled2 = [
         ...String(input || '')['matchAll'](/(?:\[)?(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)秒(?:\])?/gu),
-      ]['map']((value3) => ({ start: Number(value3[0x1]), end: Number(value3[0x2]) }));
+      ]['map']((value3) => ({ start: Number(value3[1]), end: Number(value3[2]) }));
       if (!enabled2['length']) throw new Error('候选提示词没有连续时间区间。');
-      let value4 = 0x0;
+      let value4 = 0;
       enabled2['forEach'](({ start: start, end: end }) => {
         if (start !== value4 || end <= start) throw new Error('候选提示词的时间区间不连续。');
         value4 = end;
@@ -230,18 +230,18 @@ export function createStoryClipAdjustmentApi({
       return;
     }
     if (isStoryMinimaxH3PromptMode(storyPromptMode3)) {
-      if (!Number['isInteger'](enabled) || enabled < 0x4 || enabled > 0xf)
+      if (!Number['isInteger'](enabled) || enabled < 4 || enabled > 15)
         throw new Error('MiniMax H3 候选片段总时长必须为 4 至 15 秒的整数。');
       if (!/(?:integrated_multimodal_description|detailed_description):/u['test'](input))
-        throw new Error('MiniMax\x20H3\x20候选提示词缺少官方镜头描述段落。');
+        throw new Error('MiniMax H3 候选提示词缺少官方镜头描述段落。');
       if (/⏱/u['test'](input)) throw new Error('MiniMax H3 候选提示词不能包含 ⏱ 时长标签。');
       const value5 = [
         ...String(input || '')['matchAll'](/\[Shot\s+\d+\]\s+At\s+(\d{2}):(\d{2}(?:\.\d{3})?)/gu),
-      ]['map']((value6) => Number(value6[0x1]) * 0x3c + Number(value6[0x2]));
+      ]['map']((value6) => Number(value6[1]) * 60 + Number(value6[2]));
       if (
         value5['some'](
           (count5, count6) =>
-            count5 <= 0x0 || count5 >= enabled || (count6 > 0x0 && count5 <= value5[count6 - 0x1]),
+            count5 <= 0 || count5 >= enabled || (count6 > 0 && count5 <= value5[count6 - 1]),
         )
       )
         throw new Error('MiniMax H3 候选提示词的切镜时间无效。');
@@ -250,10 +250,10 @@ export function createStoryClipAdjustmentApi({
     const list = run6(input);
     if (!list['length']) throw new Error('候选提示词没有为每个镜头分配时间标记。');
     const value7 = list['find'](
-      (count7) => count7 < 0.5 || Math['abs'](count7 * 0x2 - Math['round'](count7 * 0x2)) > 0.001,
+      (count7) => count7 < 0.5 || Math['abs'](count7 * 2 - Math['round'](count7 * 2)) > 0.001,
     );
     if (value7 !== undefined) throw new Error('候选镜头时长必须至少为 0.5 秒，并按 0.5 秒递增。');
-    const value8 = Number(list['reduce']((value9, value10) => value9 + value10, 0x0)['toFixed'](0x1));
+    const value8 = Number(list['reduce']((value9, value10) => value9 + value10, 0)['toFixed'](1));
     if (Math['abs'](value8 - enabled) > 0.001)
       throw new Error('candidateDurationSeconds 必须等于所有镜头时间标记之和。');
   }
@@ -261,7 +261,7 @@ export function createStoryClipAdjustmentApi({
     value11,
     {
       requireDuration: requireDuration = ![],
-      maxDurationSeconds: maxDurationSeconds = 0x0,
+      maxDurationSeconds: maxDurationSeconds = 0,
       promptMode: promptMode = '',
     } = {},
   ) {
@@ -272,7 +272,7 @@ export function createStoryClipAdjustmentApi({
       isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode4);
     isStoryMinimaxH3PromptMode2 && (enabled3 = normalizeStoryMinimaxH3OfficialTags(enabled3));
     enabled3 = run7(enabled3, { allowMinimaxH3Tags: isStoryMinimaxH3PromptMode2 });
-    if (!enabled3) throw new Error('AI\x20返回的候选提示词为空。');
+    if (!enabled3) throw new Error('AI 返回的候选提示词为空。');
     const value13 = run5(value12['candidateDurationSeconds']);
     return (
       requireDuration && run8(enabled3, value13, maxDurationSeconds, promptMode),
@@ -280,11 +280,11 @@ export function createStoryClipAdjustmentApi({
     );
   }
   function run10(value14, value15) {
-    return String(value14 || '')['split'](value15)['length'] - 0x1;
+    return String(value14 || '')['split'](value15)['length'] - 1;
   }
   function run11(value16, value17, value18, value19, { allowCountChange: allowCountChange = ![] } = {}) {
     const list2 = run2(value18)['filter']((value20) =>
-      allowCountChange ? run10(value16, value20) < 0x1 : run10(value16, value20) !== run10(value17, value20),
+      allowCountChange ? run10(value16, value20) < 1 : run10(value16, value20) !== run10(value17, value20),
     );
     if (list2['length'])
       throw new Error(
@@ -304,7 +304,7 @@ export function createStoryClipAdjustmentApi({
     lockedAssetTokens: lockedAssetTokens = [],
     lockedDurationTokens: lockedDurationTokens = [],
     duration: duration = '',
-    maxDurationSeconds: maxDurationSeconds = 0x0,
+    maxDurationSeconds: maxDurationSeconds = 0,
     context: context = {},
     sourcePromptMode: sourcePromptMode = '',
     targetPromptMode: targetPromptMode = '',
@@ -323,7 +323,7 @@ export function createStoryClipAdjustmentApi({
       storyPromptMode6 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: !![] }),
       list3 = normalizeText(currentPrompt),
       count8 = normalizePositiveNumber(maxDurationSeconds),
-      value22 = preserveDuration !== !![] && value21 !== 'selection' && count8 > 0x0,
+      value22 = preserveDuration !== !![] && value21 !== 'selection' && count8 > 0,
       value23 = run5(duration),
       storyPromptLanguage = normalizeStoryPromptLanguage(targetLanguage);
     if (targetLanguage && !storyPromptLanguage) throw new Error('请选择支持的转换语言。');
@@ -331,11 +331,11 @@ export function createStoryClipAdjustmentApi({
       throw new Error('请先填写希望 AI 如何调整，或选择提示词模式。');
     if (!list3) throw new Error('当前片段还没有可调整的视频提示词。');
     let enabled6 = '',
-      value24 = 0x0,
-      value25 = 0x0;
+      value24 = 0,
+      value25 = 0;
     if (value21 === 'selection') {
-      ((value24 = Math['max'](0x0, Math['trunc'](Number(selection?.['start']) || 0x0))),
-        (value25 = Math['max'](value24, Math['trunc'](Number(selection?.['end']) || 0x0))),
+      ((value24 = Math['max'](0, Math['trunc'](Number(selection?.['start']) || 0))),
+        (value25 = Math['max'](value24, Math['trunc'](Number(selection?.['end']) || 0))),
         (enabled6 = normalizeText(selection?.['text'] || list3['slice'](value24, value25))));
       if (!enabled6 || list3['slice'](value24, value25) !== enabled6)
         throw new Error('选中文字已经变化，请重新选择后再调整。');
@@ -357,7 +357,7 @@ export function createStoryClipAdjustmentApi({
       targetLanguage: storyPromptLanguage,
     });
     return (
-      onProgress?.({ stage: 'adjusting-story-clip', current: 0x1, total: 0x1, message: '正在生成候选版本' }),
+      onProgress?.({ stage: 'adjusting-story-clip', current: 1, total: 1, message: '正在生成候选版本' }),
       await requestStrictResult({
         request: request,
         requestPayload: {
@@ -372,7 +372,7 @@ export function createStoryClipAdjustmentApi({
             }) || run3(context)['audioLanguage'],
           ]
             ['filter'](Boolean)
-            ['join']('\x0a'),
+            ['join']('\n'),
           temperature: 0.45,
           timeoutMs: requestTimeoutMs,
         },
@@ -385,7 +385,7 @@ export function createStoryClipAdjustmentApi({
             value29 =
               value21 === 'selection'
                 ? normalizeText(
-                    '' + list3['slice'](0x0, value24) + value28['candidateText'] + list3['slice'](value25),
+                    '' + list3['slice'](0, value24) + value28['candidateText'] + list3['slice'](value25),
                   )
                 : value28['candidateText'];
           return (
@@ -410,9 +410,9 @@ export function createStoryClipAdjustmentApi({
           ? enabled5
             ? 'candidateText and candidateDurationSeconds; strictly use ' +
               storyPromptMode6 +
-              '\x20prompt\x20structure;\x20keep\x20all\x20source\x20content\x20and\x20asset\x20tokens;\x20timing\x20is\x20within\x20maxDurationSeconds'
+              ' prompt structure; keep all source content and asset tokens; timing is within maxDurationSeconds'
             : 'candidateText and candidateDurationSeconds; keep all source content and asset tokens; each shot uses a 0.5-second-step timing token; timing sum is within maxDurationSeconds'
-          : 'candidateText\x20string;\x20preserve\x20every\x20locked\x20asset\x20and\x20duration\x20token',
+          : 'candidateText string; preserve every locked asset and duration token',
         repairInstruction: value22
           ? enabled5
             ? '只修复候选提示词，使其严格符合 ' +

@@ -6,19 +6,19 @@ function asObject(value) {
 function normalizeText(item) {
   return String(item || '')['trim']();
 }
-function normalizePositiveInteger(key, index = 0x1) {
+function normalizePositiveInteger(key, index = 1) {
   const count = Number(key);
-  return Number['isFinite'](count) && count > 0x0 ? Math['trunc'](count) : index;
+  return Number['isFinite'](count) && count > 0 ? Math['trunc'](count) : index;
 }
 function formatSequence(result) {
-  return String(normalizePositiveInteger(result))['padStart'](0x2, '0');
+  return String(normalizePositiveInteger(result))['padStart'](2, '0');
 }
 function sanitizeFilenamePart(data, options = '剧本') {
   const text = normalizeText(data)
     ['replace'](/[\\/:*?"<>|\x00-\x1F]/g, '_')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['replace'](/[. ]+$/g, '')
-    ['slice'](0x0, 0x50)
+    ['slice'](0, 80)
     ['trim']();
   return text || options;
 }
@@ -30,8 +30,8 @@ function resolveActiveVideoResult(options2 = {}) {
   if (!list['length']) return null;
   const source = Number(asObject2['activeIndex']),
     next = Number['isFinite'](source)
-      ? Math['max'](0x0, Math['min'](list['length'] - 0x1, Math['trunc'](source)))
-      : 0x0,
+      ? Math['max'](0, Math['min'](list['length'] - 1, Math['trunc'](source)))
+      : 0,
     current = list[next];
   return normalizeText(current?.['error']) ? null : current;
 }
@@ -46,11 +46,11 @@ function resolveVideoExportSource(response = {}) {
   }
   return null;
 }
-function createMissingClipEntry(options3 = {}, payload = {}, handle = 0x0) {
+function createMissingClipEntry(options3 = {}, payload = {}, handle = 0) {
   return {
     nodeId: normalizeText(payload['id']),
     nodeName:
-      'E' + formatSequence(options3['number']) + '-C' + formatSequence(payload['number'] || handle + 0x1),
+      'E' + formatSequence(options3['number']) + '-C' + formatSequence(payload['number'] || handle + 1),
     nodeType: 'story-clip-video',
     kind: 'video',
     reason: 'NO_ACTIVE_VIDEO',
@@ -60,13 +60,13 @@ function createMissingClipEntry(options3 = {}, payload = {}, handle = 0x0) {
 export function buildStoryClipExportItem({
   episode: episode = {},
   clip: clip = {},
-  clipIndex: clipIndex = 0x0,
+  clipIndex: clipIndex = 0,
 } = {}) {
   const activeVideoResult = resolveActiveVideoResult(clip),
     localPath2 = activeVideoResult ? resolveVideoExportSource(activeVideoResult) : null;
   if (!localPath2) return null;
-  const positiveInteger = normalizePositiveInteger(episode['number'], 0x1),
-    positiveInteger2 = normalizePositiveInteger(clip['number'], clipIndex + 0x1),
+  const positiveInteger = normalizePositiveInteger(episode['number'], 1),
+    positiveInteger2 = normalizePositiveInteger(clip['number'], clipIndex + 1),
     nodeName = 'E' + formatSequence(positiveInteger) + '-C' + formatSequence(positiveInteger2);
   return {
     nodeId: normalizeText(clip['id']) || nodeName,
@@ -100,7 +100,7 @@ export function buildStoryClipExportPlan({
     if (storyClipExportItem) items['push'](storyClipExportItem);
     else skipped['push'](createMissingClipEntry(episode, clip2, clipIndex2));
   });
-  const positiveInteger3 = normalizePositiveInteger(episode['number'], 0x1),
+  const positiveInteger3 = normalizePositiveInteger(episode['number'], 1),
     filename = sanitizeFilenamePart(project['name'] || project['title'] || project['storyTitle']);
   return {
     mode: mode,

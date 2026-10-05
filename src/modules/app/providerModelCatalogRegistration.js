@@ -10,7 +10,7 @@ import { getProviderModelCatalogOwnerProviderId } from '../settings/providerMode
 export const PROVIDER_MODEL_CATALOG_BUNDLE_SOURCE_ID = 'provider-model-catalog';
 
 // 动态登记的模型排在厂商内置模型之后，避免打乱既有排序。
-const MENU_ORDER_BASE = 0x384;
+const MENU_ORDER_BASE = 900;
 
 const MENU_EXTENSION_BY_KIND = Object.freeze({
   text: 'textMenu',
@@ -37,10 +37,10 @@ export function findProviderModelTemplate(item, key) {
       index?.['kind'] === key &&
       Boolean(getExecutionManifest(index?.['executionId'])),
   );
-  if (list['length'] === 0x0) return null;
+  if (list['length'] === 0) return null;
   return [...list]['sort']((result, data) =>
     String(result?.['modelId'] || '')['localeCompare'](String(data?.['modelId'] || ''), 'en'),
-  )[list['length'] - 0x1];
+  )[list['length'] - 1];
 }
 
 function deepClone(options) {
@@ -54,9 +54,9 @@ export function buildProviderModelCatalogBundle(map) {
   const models = [],
     executions = [],
     skipped = [];
-  let target = 0x0;
+  let target = 0;
   for (const id of map?.['values']?.() || []) {
-    const ownerProviderId = getProviderModelCatalogOwnerProviderId(id?.['providerIds']?.[0x0]),
+    const ownerProviderId = getProviderModelCatalogOwnerProviderId(id?.['providerIds']?.[0]),
       source = ownerProviderId + '/' + id['id'];
     if (getModelManifest(source)) {
       skipped['push']({ id: id['id'], reason: 'already-integrated' });
@@ -73,7 +73,7 @@ export function buildProviderModelCatalogBundle(map) {
       skipped['push']({ id: id['id'], reason: 'duplicate-execution' });
       continue;
     }
-    target += 0x1;
+    target += 1;
     const deepClone2 = deepClone(providerModelTemplate),
       deepClone3 = deepClone(getExecutionManifest(providerModelTemplate['executionId']));
     ((deepClone2['modelId'] = source),
@@ -132,13 +132,13 @@ export function createProviderModelCatalogBundleRegistry({
     sync(record) {
       clear();
       const skipped2 = buildProviderModelCatalogBundle(record);
-      if (skipped2['models']['length'] === 0x0)
-        return { changed: false, registered: 0x0, skipped: skipped2['skipped'] };
+      if (skipped2['models']['length'] === 0)
+        return { changed: false, registered: 0, skipped: skipped2['skipped'] };
       try {
         register(skipped2);
       } catch (error) {
         console['warn']('[Provider Model Catalog] register failed:', error);
-        return { changed: false, registered: 0x0, skipped: skipped2['skipped'], error: error };
+        return { changed: false, registered: 0, skipped: skipped2['skipped'], error: error };
       }
       enabled = skipped2;
       return {

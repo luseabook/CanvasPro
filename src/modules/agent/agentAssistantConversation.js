@@ -3,21 +3,21 @@ function normalizeChoice(enabled) {
   if (!enabled || typeof enabled !== 'object') return null;
   const question = String(enabled['question'] || '')
       ['trim']()
-      ['slice'](0x0, 0x258),
+      ['slice'](0, 600),
     map = new Set(),
     options = (Array['isArray'](enabled['options']) ? enabled['options'] : [])
       ['flatMap']((value) => {
         const id = String(value?.['id'] || '')
             ['trim']()
-            ['slice'](0x0, 0x50),
+            ['slice'](0, 80),
           label = String(value?.['label'] || '')
             ['trim']()
-            ['slice'](0x0, 0xf0);
+            ['slice'](0, 240);
         if (!id || !label || map['has'](id)) return [];
         return (map['add'](id), [{ id: id, label: label }]);
       })
-      ['slice'](0x0, 0x3);
-  return question && options['length'] >= 0x2 ? { question: question, options: options } : null;
+      ['slice'](0, 3);
+  return question && options['length'] >= 2 ? { question: question, options: options } : null;
 }
 export function normalizeAgentAssistantContext(enabled2) {
   if (!enabled2 || typeof enabled2 !== 'object') return null;
@@ -27,7 +27,7 @@ export function normalizeAgentAssistantContext(enabled2) {
           (item) => typeof item === 'string' && /^[a-z0-9][a-z0-9-]{0,63}$/['test'](item),
         ),
       ),
-    ]['slice'](0x0, 0x2),
+    ]['slice'](0, 2),
     choice = normalizeChoice(enabled2['choice']);
   return { skillIds: skillIds, ...(choice ? { choice: choice } : {}) };
 }
@@ -39,14 +39,14 @@ export function normalizeAgentAssistantReply(error) {
   const key = /(?:^|\n)```agent-choice\s*\n([\s\S]*?)\n```\s*$/u['exec'](reply);
   if (key) {
     try {
-      choice2 = normalizeChoice(JSON['parse'](key[0x1]));
+      choice2 = normalizeChoice(JSON['parse'](key[1]));
     } catch {
       choice2 = null;
     }
-    reply = reply['slice'](0x0, key['index'])['trim']();
+    reply = reply['slice'](0, key['index'])['trim']();
   }
   if (choice2 && !reply['includes'](choice2['question']))
-    reply = [reply, choice2['question']]['filter'](Boolean)['join']('\x0a\x0a');
+    reply = [reply, choice2['question']]['filter'](Boolean)['join']('\n\n');
   return { status: 'chat', reply: reply, ...(choice2 || {}) };
 }
 function latestConversationMessage(list = []) {
@@ -64,7 +64,7 @@ export function getAgentPendingAssistantChoice(list2 = []) {
     questionId:
       (response['itemId'] || response['turnId'] || response['ts'] + ':' + list2['length']) +
       ':' +
-      (response['replyVersions']?.['activeIndex'] || 0x0),
+      (response['replyVersions']?.['activeIndex'] || 0),
     responseChannel: 'assistant.message',
   };
 }

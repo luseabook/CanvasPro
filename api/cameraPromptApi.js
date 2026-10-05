@@ -23,9 +23,9 @@ class CameraPromptMapper {
       ]));
   }
   ['normalizeAzimuth'](value) {
-    let count = value % 0x168;
-    if (count > 180) count -= 0x168;
-    if (count <= -180) count += 0x168;
+    let count = value % 360;
+    if (count > 180) count -= 360;
+    if (count <= -180) count += 360;
     return count;
   }
   ['findClosestAzimuth'](item) {

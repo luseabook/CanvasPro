@@ -43,7 +43,7 @@ export function createThreeStlStoryboard3DParser({
     const geometry = new STLLoader()['parse'](await error['arrayBuffer']());
     (geometry['computeBoundingBox'](), geometry['computeBoundingSphere']());
     const error2 = new threeRuntime['Mesh'](geometry, materialFactory(geometry));
-    error2['name'] = String(error['name'] || 'STL\x20model')['replace'](/\.stl$/i, '');
+    error2['name'] = String(error['name'] || 'STL model')['replace'](/\.stl$/i, '');
     const scene2 = new threeRuntime['Group']();
     return (
       (scene2['name'] = error2['name']),
@@ -67,7 +67,7 @@ export function createThreeFbxStoryboard3DParser({ urlApi: urlApi = globalThis['
       typeof urlApi?.['createObjectURL'] !== 'function' ||
       typeof urlApi?.['revokeObjectURL'] !== 'function'
     )
-      throw new Error('Browser\x20object\x20URL\x20support\x20is\x20unavailable.');
+      throw new Error('Browser object URL support is unavailable.');
     const result = new threeRuntime['LoadingManager'](),
       promise = createStoryboard3DResourceUrlScope(resources, urlApi);
     (result['setURLModifier']((data) => promise['resolve'](data)),

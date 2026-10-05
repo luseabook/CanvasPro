@@ -114,7 +114,7 @@ function normalizeRhV54SpecialMode(value6) {
 }
 function normalizeRhV54MaskExpand(value8) {
   const value9 = Number(value8);
-  return Number.isFinite(value9) ? Math.max(-0x270f, Math.min(0x270f, Math.trunc(value9))) : 25;
+  return Number.isFinite(value9) ? Math.max(-9999, Math.min(9999, Math.trunc(value9))) : 25;
 }
 function normalizeRhV54BreastJiggle(value10) {
   const value11 = Number(value10);
@@ -161,7 +161,7 @@ function getNormalizedDisplayFieldValue(value23, value24, value25, value26 = {})
     value28 = value25[value27],
     value29 = Number(value28);
   if (value27 === 'rhVideoResolution') {
-    const fieldMinOptionNumber = getFieldMinOptionNumber(value24, 0x340),
+    const fieldMinOptionNumber = getFieldMinOptionNumber(value24, 832),
       fieldDefaultNumber = getFieldDefaultNumber(value24, fieldMinOptionNumber);
     return Number.isFinite(value29)
       ? Math.max(fieldMinOptionNumber, Math.trunc(value29))
@@ -316,7 +316,7 @@ export function resolveBerniniFunctionForInputMode(value61, value62 = '') {
     },
     value64 = value63[value61] || [],
     value65 = String(value62 || '')['trim']();
-  return value64['includes'](value65) ? value65 : value64[0x0] || '';
+  return value64['includes'](value65) ? value65 : value64[0] || '';
 }
 
 export function buildVideoWorkflowReferenceSummaryParamsPatch(options2 = {}, value66 = '', value67 = {}) {
@@ -324,12 +324,12 @@ export function buildVideoWorkflowReferenceSummaryParamsPatch(options2 = {}, val
     value68 = runningHubVideoParameterPanelPolicy3?.['fixedSlotSummary'],
     enabled5 = String(value68?.['field'] || '')['trim']();
   if (!enabled5 || value68?.['resolver'] !== 'berniniVideoReplaceInputMode') return {};
-  const count = Math['max'](0x0, Number(value67?.['imageCount']) || 0x0),
-    count2 = Math['max'](0x0, Number(value67?.['videoCount']) || 0x0),
+  const count = Math['max'](0, Number(value67?.['imageCount']) || 0),
+    count2 = Math['max'](0, Number(value67?.['videoCount']) || 0),
     berniniVideoReplaceInputMode = resolveBerniniVideoReplaceInputMode({
-      hasSourceVideo: count2 > 0x0,
-      hasRefImage: count > 0x0,
-      hasReferenceVideo: count2 > 0x1,
+      hasSourceVideo: count2 > 0,
+      hasRefImage: count > 0,
+      hasReferenceVideo: count2 > 1,
     }),
     value69 = { [enabled5]: berniniVideoReplaceInputMode },
     berniniFunctionForInputMode = resolveBerniniFunctionForInputMode(

@@ -74,7 +74,7 @@ test('doubao refuses a recording above the 100 MB fast-recognition limit', () =>
   const { deps } = doubaoDeps();
   const provider = createRecordingAsrProvider('volcengine-speech', deps);
   assert.throws(
-    () => provider.run({ bytes: { length: 0x64 * 0x400 * 0x400 + 1 }, credentials: { apiKey: 'k' } }),
+    () => provider.run({ bytes: { length: 100 * 1024 * 1024 + 1 }, credentials: { apiKey: 'k' } }),
     /录音文件超过极速识别的 100MB 上限。/,
   );
 });

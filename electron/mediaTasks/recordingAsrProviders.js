@@ -11,7 +11,7 @@ export function createRecordingAsrProvider(providerId, deps) {
             throw new Error('请在火山语音设置中配置录音识别凭据。');
         },
         run: ({ bytes, ...rest }) => {
-          if (bytes.length > 0x64 * 0x400 * 0x400)
+          if (bytes.length > 100 * 1024 * 1024)
             throw new Error('录音文件超过极速识别的 100MB 上限。');
           return transcribeDoubaoRecording({ ...rest, audioBase64: bytes.toString('base64') });
         },
@@ -26,7 +26,7 @@ export function createRecordingAsrProvider(providerId, deps) {
               ...rest,
               audio: new Blob([bytes], { type: 'audio/mpeg' }),
               includeRaw: true,
-              timeoutMs: 0x2bf20,
+              timeoutMs: 180000,
             }),
             utterances = result.raw.transcripts.flatMap((transcript) =>
               (transcript.sentences || []).map((sentence) => ({

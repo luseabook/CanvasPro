@@ -84,8 +84,8 @@ export function showVolcengineSpeechApiKeyGuide() {
     el14 = createEl('img', 'audio-voice-api-key-guide-image');
   ((el14['src'] = VOLCENGINE_SPEECH_API_KEY_GUIDE_IMAGE),
     (el14['alt'] = guideText('guideAlt')),
-    (el14['width'] = 0x3c0),
-    (el14['height'] = 0x834),
+    (el14['width'] = 960),
+    (el14['height'] = 2100),
     (el14['decoding'] = 'async'),
     (el14['loading'] = 'eager'),
     (el14['fetchPriority'] = 'high'));
@@ -102,7 +102,7 @@ export function showVolcengineSpeechApiKeyGuide() {
       label: guideText('openSettings'),
     },
   ]['forEach'](({ action: action, className: className, label: label }) => {
-    const el16 = createEl('button', 'audio-voice-api-key-guide-image-link\x20' + className, label);
+    const el16 = createEl('button', 'audio-voice-api-key-guide-image-link ' + className, label);
     ((el16['type'] = 'button'),
       (el16['dataset']['volcengineSpeechApiKeyGuideAction'] = action),
       el16['setAttribute']('aria-label', label),

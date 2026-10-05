@@ -3,9 +3,9 @@ import { t } from '../../i18n/index.js';
 import { desktopBridge } from '../../services/desktopBridge.js';
 import { readViewportInteractionState } from '../../core/viewportInteractionState.js';
 import { RENDERER_VIRTUALIZATION_CONFIG } from '../../core/rendererVirtualization.js';
-const SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS = 0x78,
-  SOURCE_VIDEO_BUSY_RETRY_MS = 0x50,
-  SOURCE_VIDEO_MAX_BUSY_WAIT_MS = 0xe10;
+const SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS = 120,
+  SOURCE_VIDEO_BUSY_RETRY_MS = 80,
+  SOURCE_VIDEO_MAX_BUSY_WAIT_MS = 3600;
 export function sourceVideoText(value, item = {}) {
   return t('sourceVideoNode.' + value, item);
 }
@@ -13,12 +13,12 @@ export function isDesktopRenderer() {
   return desktopBridge['isElectron'] || desktopBridge['isChromeShell'];
 }
 export function shouldEagerLoadSourceVideoAtCurrentZoom() {
-  let key = 0x1;
+  let key = 1;
   try {
     const index =
         typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']?.(),
       count = Number(index?.['viewport']?.['zoom']);
-    if (Number['isFinite'](count) && count > 0x0) key = count;
+    if (Number['isFinite'](count) && count > 0) key = count;
   } catch {}
   return key > RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'];
 }
@@ -75,7 +75,7 @@ export function scheduleSourceVideoIdleTask(
     handler2 = () => {
       if (typeof handler4 === 'function') handler4(next);
     };
-  } else run(0x10);
+  } else run(16);
   return () => {
     ((data = !![]), handler2());
   };

@@ -6,7 +6,7 @@ function formatRelativeTimeUnit(value, count) {
 export function formatFileSize(enabled, key = 2) {
   if (enabled === 0) return '0 Bytes';
   if (!enabled || isNaN(enabled)) return 'Unknown';
-  const index = 0x400,
+  const index = 1024,
     result = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'],
     data = Math.floor(Math.log(enabled) / Math.log(index));
   return parseFloat((enabled / Math.pow(index, data)).toFixed(key)) + ' ' + result[data];
@@ -29,12 +29,12 @@ export function formatRelativeTime(entry) {
   const record = entry instanceof Date ? entry : new Date(entry),
     payload = new Date(),
     handle = payload.getTime() - record.getTime(),
-    state = 60 * 0x3e8,
+    state = 60 * 1000,
     config = 60 * state,
     scope = 24 * config,
     input = 7 * scope,
     output = 30 * scope,
-    value2 = 0x16d * scope;
+    value2 = 365 * scope;
   if (handle < state) return t('format.relativeTime.justNow');
   if (handle < config) return formatRelativeTimeUnit('minute', Math.floor(handle / state));
   if (handle < scope) return formatRelativeTimeUnit('hour', Math.floor(handle / config));
@@ -52,8 +52,8 @@ export function formatNumber(value3, minimumFractionDigits = 0) {
 }
 export function formatDuration(enabled2) {
   if (!enabled2 || enabled2 < 0) return '00:00';
-  const count2 = Math.floor(enabled2 / 0xe10),
-    value4 = Math.floor((enabled2 % 0xe10) / 60),
+  const count2 = Math.floor(enabled2 / 3600),
+    value4 = Math.floor((enabled2 % 3600) / 60),
     value5 = Math.floor(enabled2 % 60),
     handler = (value6) => String(value6).padStart(2, '0');
   if (count2 > 0) return handler(count2) + ':' + handler(value4) + ':' + handler(value5);

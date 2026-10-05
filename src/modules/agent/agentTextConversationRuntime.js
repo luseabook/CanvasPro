@@ -5,7 +5,7 @@ export function createAgentTextConversationRuntime({
   getContext: getContext = () => ({}),
 } = {}) {
   let abortController = null,
-    value = 0x0,
+    value = 0,
     id = '',
     enabled = ![];
   const createFailedReply = (item, args = {}) => ({

@@ -12,8 +12,8 @@ import {
   createWorkspaceVideoPlaybackControls,
 } from './workspaceVideoPlaybackControls.js';
 const PLAYBACK_SYNC_DRIFT_SECONDS = 0.12,
-  VIDEO_CURRENT_DATA_READY_STATE = 0x2,
-  VIDEO_PLAYBACK_READY_STATE = 0x3,
+  VIDEO_CURRENT_DATA_READY_STATE = 2,
+  VIDEO_PLAYBACK_READY_STATE = 3,
   LOOP_ICON =
     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>',
   PANEL_VOLUME_ICON =
@@ -26,10 +26,10 @@ function clamp(value, item, key) {
   return Math['min'](key, Math['max'](item, index));
 }
 function formatPlaybackTime(result) {
-  const data = Math['max'](0x0, Number(result) || 0x0),
-    options = Math['floor'](data / 0x3c),
-    target = Math['floor'](data % 0x3c);
-  return options + ':' + String(target)['padStart'](0x2, '0');
+  const data = Math['max'](0, Number(result) || 0),
+    options = Math['floor'](data / 60),
+    target = Math['floor'](data % 60);
+  return options + ':' + String(target)['padStart'](2, '0');
 }
 function setPanelError(source) {
   ((source['playbackReady'] = ![]),
@@ -50,7 +50,7 @@ function setPanelVideoPending(next, current) {
     next['panel']['setAttribute']('aria-busy', 'true'));
 }
 function revealPanelVideoFrame(entry) {
-  if (Number(entry?.['video']?.['readyState'] || 0x0) < VIDEO_CURRENT_DATA_READY_STATE) return ![];
+  if (Number(entry?.['video']?.['readyState'] || 0) < VIDEO_CURRENT_DATA_READY_STATE) return ![];
   return (
     entry['video']['removeAttribute']?.('poster'),
     (entry['video']['poster'] = ''),
@@ -100,7 +100,7 @@ function createPanelMuteButton(el6, input, output, value3) {
     (el7['className'] = 'v2-material-comparison-panel-mute'),
     (el7['innerHTML'] = '' + PANEL_VOLUME_ICON + PANEL_MUTED_ICON),
     (el7['hidden'] = !![]),
-    (el7['tabIndex'] = -0x1),
+    (el7['tabIndex'] = -1),
     el7['setAttribute']('tabindex', '-1'),
     el7['setAttribute']('aria-pressed', 'false'),
     el7['setAttribute']('data-material-comparison-panel-mute', output),
@@ -171,7 +171,7 @@ export function createMaterialComparisonPlaybackController({
     root = volumeSlider?.['root'] || null;
   root && ((root['hidden'] = !![]), root['setAttribute']('aria-hidden', 'true'));
   let enabled2 = ![],
-    value11 = 0x0,
+    value11 = 0,
     value12 = null,
     enabled3 = ![],
     enabled4 = ![],
@@ -187,19 +187,19 @@ export function createMaterialComparisonPlaybackController({
       list['every'](
         ([, value15]) =>
           value15['playbackReady'] === !![] &&
-          Number(value15['video']?.['readyState'] || 0x0) >= handler2(value15),
+          Number(value15['video']?.['readyState'] || 0) >= handler2(value15),
       ),
     handler5 = () => {
       const list2 = getMediaElements()
-        ['map']((value16) => Number(value16?.['duration'] || 0x0))
-        ['filter']((count) => Number['isFinite'](count) && count > 0x0);
-      return list2['length'] > 0x0 ? Math['min'](...list2) : 0x0;
+        ['map']((value16) => Number(value16?.['duration'] || 0))
+        ['filter']((count) => Number['isFinite'](count) && count > 0);
+      return list2['length'] > 0 ? Math['min'](...list2) : 0;
     },
     handler6 = (value17, value18) => {
       const el8 = value17?.['muteButton'];
       if (!el8) return;
       ((el8['hidden'] = value18 !== !![]),
-        (el8['tabIndex'] = value18 === !![] ? 0x0 : -0x1),
+        (el8['tabIndex'] = value18 === !![] ? 0 : -1),
         el8['setAttribute']('tabindex', value18 === !![] ? '0' : '-1'));
     },
     onChange = () => {
@@ -232,11 +232,11 @@ export function createMaterialComparisonPlaybackController({
       const [value22, value23] = getMediaElements(),
         count2 = handler5(),
         clamp2 = clamp(
-          Number(value22?.['currentTime'] || value23?.['currentTime'] || 0x0),
-          0x0,
+          Number(value22?.['currentTime'] || value23?.['currentTime'] || 0),
+          0,
           count2 || Number['MAX_SAFE_INTEGER'],
         ),
-        value24 = count2 > 0x0 ? clamp((clamp2 / count2) * 0x64, 0x0, 0x64) : 0x0,
+        value24 = count2 > 0 ? clamp((clamp2 / count2) * 100, 0, 100) : 0,
         value25 =
           handler3() &&
           getMediaElements()['some']((value26) => value26?.['paused'] === ![] && value26?.['ended'] !== !![]);
@@ -282,9 +282,9 @@ export function createMaterialComparisonPlaybackController({
     },
     handler12 = (value34, value35) => {
       if (enabled2 || !handler11(value34, value35)) return ![];
-      const count3 = Number(value35['video']?.['readyState'] || 0x0);
+      const count3 = Number(value35['video']?.['readyState'] || 0);
       return (
-        count3 >= 0x1 && onMediaAspect(value34, value35, value35['video']),
+        count3 >= 1 && onMediaAspect(value34, value35, value35['video']),
         count3 >= VIDEO_CURRENT_DATA_READY_STATE && revealPanelVideoFrame(value35),
         count3 >= handler2(value35)
           ? setPanelReady(value35)
@@ -295,7 +295,7 @@ export function createMaterialComparisonPlaybackController({
       );
     },
     pause = () => {
-      ((value11 += 0x1), (enabled4 = ![]));
+      ((value11 += 1), (enabled4 = ![]));
       for (const value36 of getMediaElements()) {
         try {
           value36?.['pause']?.();
@@ -366,7 +366,7 @@ export function createMaterialComparisonPlaybackController({
       ((video['controls'] = ![]),
         (video['loop'] = ![]),
         (video['muted'] = ![]),
-        (video['volume'] = 0x1),
+        (video['volume'] = 1),
         (video['hidden'] = ![]),
         (video['playsInline'] = !![]),
         video['removeAttribute']?.('style'),
@@ -438,7 +438,7 @@ export function createMaterialComparisonPlaybackController({
     },
     clearPanelSource = (value49) => {
       const value50 = value49 === leftPanel ? leftSlot : rightSlot;
-      ((value49['attachToken'] += 0x1),
+      ((value49['attachToken'] += 1),
         (value49['sourceUrl'] = ''),
         (value49['playbackReady'] = ![]),
         (value49['playbackFailed'] = ![]));
@@ -483,7 +483,7 @@ export function createMaterialComparisonPlaybackController({
       el13['hidden'] = ![];
       if (value54) {
         value52['sourceUrl'] = enabled8;
-        Number(el13['readyState'] || 0x0) < VIDEO_CURRENT_DATA_READY_STATE &&
+        Number(el13['readyState'] || 0) < VIDEO_CURRENT_DATA_READY_STATE &&
           setPanelVideoPending(value52, value53?.['thumbnailUrl']);
         handler12(value51, value52);
         return;
@@ -539,8 +539,8 @@ export function createMaterialComparisonPlaybackController({
     },
     handler18 = (value59) => {
       const count4 = handler5();
-      if (!(count4 > 0x0)) return ![];
-      const clamp3 = clamp(value59, 0x0, count4);
+      if (!(count4 > 0)) return ![];
+      const clamp3 = clamp(value59, 0, count4);
       for (const value60 of getMediaElements()) {
         try {
           value60['currentTime'] = clamp3;
@@ -551,12 +551,12 @@ export function createMaterialComparisonPlaybackController({
     handler19 = (event) => {
       if (!volumeSlider || !handler3()) return ![];
       const box = volumeSlider['progress']['getBoundingClientRect']?.(),
-        count5 = Number(box?.['width'] || 0x0);
-      if (!(count5 > 0x0)) return ![];
+        count5 = Number(box?.['width'] || 0);
+      if (!(count5 > 0)) return ![];
       const clamp4 = clamp(
-        (Number(event?.['clientX'] || 0x0) - Number(box?.['left'] || 0x0)) / count5,
-        0x0,
-        0x1,
+        (Number(event?.['clientX'] || 0) - Number(box?.['left'] || 0)) / count5,
+        0,
+        1,
       );
       return handler18(handler5() * clamp4);
     };
@@ -576,20 +576,20 @@ export function createMaterialComparisonPlaybackController({
     (event3['preventDefault']?.(), event3['stopPropagation']?.(), handler19(event3));
   }
   const value61 = (event4) => {
-      if (event4?.['button'] != null && event4['button'] !== 0x0) return;
+      if (event4?.['button'] != null && event4['button'] !== 0) return;
       if (!handler19(event4)) return;
       (event4['preventDefault']?.(),
         event4['stopPropagation']?.(),
         run2(),
-        (value12 = event4?.['pointerId'] ?? 0x0),
+        (value12 = event4?.['pointerId'] ?? 0),
         windowObject?.['addEventListener']?.('pointermove', run3, !![]),
         windowObject?.['addEventListener']?.('pointerup', run2, !![]),
         windowObject?.['addEventListener']?.('pointercancel', run2, !![]));
     },
     value62 = (event5) => {
       if (event5['key'] !== 'ArrowLeft' && event5['key'] !== 'ArrowRight') return;
-      const value63 = Number(leftPanel['video']['currentTime'] || 0x0);
-      if (!handler18(value63 + (event5['key'] === 'ArrowRight' ? 0x1 : -0x1))) return;
+      const value63 = Number(leftPanel['video']['currentTime'] || 0);
+      if (!handler18(value63 + (event5['key'] === 'ArrowRight' ? 1 : -1))) return;
       (event5['preventDefault']?.(), event5['stopPropagation']?.());
     },
     handler20 = async (value64, { busy: busy = ![] } = {}) => {
@@ -628,15 +628,15 @@ export function createMaterialComparisonPlaybackController({
         return;
       }
       const count6 = handler5();
-      let value69 = Math['max'](0x0, Number(leftPanel['video']['currentTime'] || 0x0));
-      if (count6 > 0x0 && value69 >= count6 - 0.05) value69 = 0x0;
+      let value69 = Math['max'](0, Number(leftPanel['video']['currentTime'] || 0));
+      if (count6 > 0 && value69 >= count6 - 0.05) value69 = 0;
       await handler20(value69, { busy: !![] });
     },
     handler21 = async () => {
       if (enabled2 || !enabled3 || enabled4 || !handler3()) return;
       enabled4 = !![];
       try {
-        await handler20(0x0);
+        await handler20(0);
       } finally {
         enabled4 = ![];
       }
@@ -650,8 +650,8 @@ export function createMaterialComparisonPlaybackController({
     },
     value71 = () => {
       if (!handler3()) return;
-      const value72 = Number(leftPanel['video']['currentTime'] || 0x0),
-        value73 = Number(rightPanel['video']['currentTime'] || 0x0);
+      const value72 = Number(leftPanel['video']['currentTime'] || 0),
+        value73 = Number(rightPanel['video']['currentTime'] || 0);
       if (
         Number['isFinite'](value72) &&
         Number['isFinite'](value73) &&
@@ -730,7 +730,7 @@ export function createMaterialComparisonPlaybackController({
   const dispose = () => {
     if (enabled2) return;
     ((enabled2 = !![]),
-      (value11 += 0x1),
+      (value11 += 1),
       run2(),
       pause(),
       clearPanelSource(leftPanel),

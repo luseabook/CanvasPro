@@ -50,8 +50,8 @@ export function getStoryAssetBreakdownEpisodes(options = {}) {
       ? options['assetBreakdownEpisodes']
       : options['data']?.['episodes'];
   return (Array['isArray'](key) ? key : [])['map']((index, result) => ({
-    id: normalizeText(index?.['id']) || 'episode-' + (result + 0x1),
-    number: Math['max'](0x1, Math['trunc'](Number(index?.['number']) || result + 0x1)),
+    id: normalizeText(index?.['id']) || 'episode-' + (result + 1),
+    number: Math['max'](1, Math['trunc'](Number(index?.['number']) || result + 1)),
     synopsis: normalizeText(index?.['synopsis'] || index?.['script']?.['fullText']),
   }));
 }
@@ -165,7 +165,7 @@ export function createStoryAssetExtractionWorkspaceController({
     confirmMissingImages: confirmMissingImages = state['data']?.['project']?.['sourceMode'] !==
       'video-replication',
   } = {}) {
-    if (!confirmMissingImages) return goToStep(0x3);
+    if (!confirmMissingImages) return goToStep(3);
     const next = state['data'],
       list = state['data']['episodes']['filter']((current) =>
         isStoryReplicationPromptStale(state['data'], current),
@@ -175,7 +175,7 @@ export function createStoryAssetExtractionWorkspaceController({
         record = await requestStoryWorkspaceChoice({
           title: '替换设置已变更，分段提示词待更新',
           message:
-            '有\x20' +
+            '有 ' +
             list['length'] +
             ' 条视频仍使用修改前的分段提示词。已有视频结果保留，更新提示词将调用文本模型。',
           choices: [
@@ -184,7 +184,7 @@ export function createStoryAssetExtractionWorkspaceController({
           ],
         });
       if (record !== 'update' || state['data'] !== entry) return ![];
-      return goToStep(0x3);
+      return goToStep(3);
     }
     const list2 = confirmMissingImages ? getMissingStoryAssetImages(state['data']['assets']) : [];
     if (list2['length']) {
@@ -198,11 +198,11 @@ export function createStoryAssetExtractionWorkspaceController({
       });
       if (payload !== 'skip' || state['data'] !== next) return ![];
     }
-    return goToStep(0x3);
+    return goToStep(3);
   }
   function stopStoryAssetBreakdownProgress({ clearState: clearState = ![] } = {}) {
     (value2 && (windowObject['clearTimeout'](value2), (value2 = null)),
-      clearState && ((state['assetBreakdownEpisodes'] = []), (state['assetBreakdownVisibleCount'] = 0x0)));
+      clearState && ((state['assetBreakdownEpisodes'] = []), (state['assetBreakdownVisibleCount'] = 0)));
   }
   function run2() {
     stopStoryAssetBreakdownProgress();
@@ -218,11 +218,11 @@ export function createStoryAssetExtractionWorkspaceController({
       if (!isStoryAssetExtractionOperation(state['storyPlanningOperation'])) return;
       ((state['assetBreakdownVisibleCount'] = Math['min'](
         storyAssetBreakdownEpisodes,
-        Math['max'](0x1, state['assetBreakdownVisibleCount'] + 0x1),
+        Math['max'](1, state['assetBreakdownVisibleCount'] + 1),
       )),
-        state['view'] === 'project' && state['step'] === 0x1 && render({ updateToolbar: ![] }),
+        state['view'] === 'project' && state['step'] === 1 && render({ updateToolbar: ![] }),
         run2());
-    }, 0x640);
+    }, 1600);
   }
   function restoreStoryAssetBreakdownProgress() {
     if (state['data']?.['project']?.['sourceMode'] === 'video-replication') return ![];
@@ -231,8 +231,8 @@ export function createStoryAssetExtractionWorkspaceController({
     const handle = state['assetBreakdownEpisodes']['length'];
     return (
       (state['assetBreakdownVisibleCount'] = handle
-        ? Math['min'](handle, Math['max'](0x1, Number(state['assetBreakdownVisibleCount']) || 0x1))
-        : 0x0),
+        ? Math['min'](handle, Math['max'](1, Number(state['assetBreakdownVisibleCount']) || 1))
+        : 0),
       run2(),
       !![]
     );
@@ -395,7 +395,7 @@ export function createStoryAssetExtractionWorkspaceController({
     stopStoryAssetBreakdownProgress({ clearState: !![] });
     !episodes &&
       ((state['assetBreakdownEpisodes'] = cloneData(state['data']['episodes'])),
-      (state['assetBreakdownVisibleCount'] = state['assetBreakdownEpisodes']['length'] ? 0x1 : 0x0));
+      (state['assetBreakdownVisibleCount'] = state['assetBreakdownEpisodes']['length'] ? 1 : 0));
     setStoryPlanningOperation(output, '正在' + label);
     if (!episodes) run2();
     const value6 = state['step'],
@@ -557,7 +557,7 @@ export function createStoryAssetExtractionWorkspaceController({
               ? '角色、场景、道具三类 API 开发测试'
               : value9?.['extractionMode'] === 'api-fallback'
                 ? 'API 分批降级开发测试'
-                : 'PP-UIE\x20+\x20API\x20混合开发测试',
+                : 'PP-UIE + API 混合开发测试',
         preserveMedia = enabled3 !== 'rebuild';
       assetId['assets'] = (episodes ? mergeStoryReplicationAssets : mergeStoryPlanningAssets)(
         episodes ? assetId : assetId['assets'],
@@ -567,10 +567,10 @@ export function createStoryAssetExtractionWorkspaceController({
       const value15 = value9?.['candidateLedger']?.['summary']?.['quarantinedCount']
         ? '，已隔离 ' +
           Math['max'](
-            0x0,
-            Math['trunc'](Number(value9['candidateLedger']['summary']['quarantinedCount']) || 0x0),
+            0,
+            Math['trunc'](Number(value9['candidateLedger']['summary']['quarantinedCount']) || 0),
           ) +
-          '\x20个未通过证据裁决的候选'
+          ' 个未通过证据裁决的候选'
         : '';
       (message2 || episodes || useParallelExtraction2 || useBatchedExtraction2 || useSingleRequest2) &&
         (assetId['episodes'] = attachUploadedStoryAssetsToEpisodes(assetId['episodes'], assetId['assets']));
@@ -586,16 +586,16 @@ export function createStoryAssetExtractionWorkspaceController({
         notifyNavigableTextTaskComplete(
           message7 + '已提取 ' + assetId['assets']['length'] + ' 个角色、场景与道具素材' + value15 + '。',
           projectId,
-          { step: 0x2, assetId: assetId['assets'][0x0]?.['id'] },
+          { step: 2, assetId: assetId['assets'][0]?.['id'] },
           { notificationMessage: message7 + '角色、场景与道具素材提取完成。' },
         ));
       if (isProjectTaskCurrent(projectId)) {
-        ((state['selectedAssetId'] = assetId['assets'][0x0]?.['id'] || ''),
-          (state['assetFilter'] = assetId['assets'][0x0]?.['kind'] || 'character'),
+        ((state['selectedAssetId'] = assetId['assets'][0]?.['id'] || ''),
+          (state['assetFilter'] = assetId['assets'][0]?.['kind'] || 'character'),
           stopStoryAssetBreakdownProgress({ clearState: !![] }),
           (state['storyPlanningOperation'] = ''),
           (state['storyPlanningStatus'] = ''));
-        if (advance && state['view'] === 'project' && state['step'] === value6) goToStep(0x2);
+        if (advance && state['view'] === 'project' && state['step'] === value6) goToStep(2);
         else render();
       }
       return !![];
@@ -637,7 +637,7 @@ export function createStoryAssetExtractionWorkspaceController({
   async function continueToProjectAssets() {
     if (state['storyPlanningOperation']) return ![];
     const allowIncompleteScripts2 =
-      state['data']['episodes']['length'] > 0x0 &&
+      state['data']['episodes']['length'] > 0 &&
       !compileStoryEpisodeScripts(state['data']['episodes'])['complete'];
     if (allowIncompleteScripts2) {
       const value16 = await run();
@@ -655,7 +655,7 @@ export function createStoryAssetExtractionWorkspaceController({
           useSingleRequest: useSingleRequest3,
           extractionAgent: extractionAgent3,
         } = run3({ projectData: projectData2 });
-      if (typeof extractionAgent3 !== 'function') throw new Error('素材提取\x20Agent\x20尚未初始化');
+      if (typeof extractionAgent3 !== 'function') throw new Error('素材提取 Agent 尚未初始化');
       const args = getStoryPlanningAgentContext(projectData2),
         project4 = projectData2['project']?.['sourceMode'] === 'video-replication';
       return extractionAgent3({

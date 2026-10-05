@@ -51,17 +51,17 @@ import {
   resolveImageFreeAngleSourceSize,
 } from './imageFreeAngleAspectRatio.js';
 const FREE_ANGLE_DISTANCE_MIN = 0.1,
-  FREE_ANGLE_DISTANCE_MAX = 0x2,
+  FREE_ANGLE_DISTANCE_MAX = 2,
   FREE_ANGLE_VISUAL_SCALE_MIN = 0.7,
   FREE_ANGLE_PREVIOUS_DISTANCE_ONE_VISUAL_SCALE =
     FREE_ANGLE_VISUAL_SCALE_MIN +
-    (0x1 - FREE_ANGLE_DISTANCE_MIN) * (2.65 / (FREE_ANGLE_DISTANCE_MAX - FREE_ANGLE_DISTANCE_MIN));
+    (1 - FREE_ANGLE_DISTANCE_MIN) * (2.65 / (FREE_ANGLE_DISTANCE_MAX - FREE_ANGLE_DISTANCE_MIN));
 function _computeGenerationDuration(enabled) {
-  if (!enabled) return 0x0;
+  if (!enabled) return 0;
   if (typeof enabled['generationDuration'] === 'number') return enabled['generationDuration'];
   const count = Number(enabled['generationStartTime']);
-  if (!Number['isFinite'](count) || count <= 0x0) return 0x0;
-  return Math['max'](0x0, Date['now']() - count);
+  if (!Number['isFinite'](count) || count <= 0) return 0;
+  return Math['max'](0, Date['now']() - count);
 }
 function _isRunningHubTaskModel(value, item) {
   return isRunningHubImageTaskModel(value, item);
@@ -89,7 +89,7 @@ function _resolveImageProvider(options, target = '') {
 function _buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
   useOpenapiQuery: useOpenapiQuery = ![],
 } = {}) {
@@ -106,7 +106,7 @@ function _buildDreaminaTaskPatch({
   status: status = 'pending',
   phase: phase = 'generating',
   label: label = freeAngleText('task.generating'),
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
 } = {}) {
   return buildDreaminaTaskPatch({
@@ -124,7 +124,7 @@ function _buildAsyncTaskPatch({
   kind: kind = 'image',
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
 } = {}) {
   return buildAsyncTaskPatch({
@@ -255,7 +255,7 @@ const ImageFreeAngleController = {
   active: ![],
   nodeId: null,
   nodeData: null,
-  state: { rotation: 0x23, pitch: 0x14, scale: 0.5, pan: { x: 0x0, y: 0x0 } },
+  state: { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } },
   containerEl: null,
   cubeEl: null,
   imageWrapEl: null,
@@ -285,7 +285,7 @@ const ImageFreeAngleController = {
       this['triggerBtn']['setAttribute']('aria-label', freeAngleText('actions.exitControl')),
       this['triggerBtn']['setAttribute']('title', freeAngleText('actions.exitControl')),
       this['triggerBtn']['classList']['add']('ftb-btn-exit'));
-    ((this['state'] = { rotation: 0x23, pitch: 0x14, scale: 0.5, pan: { x: 0x0, y: 0x0 } }),
+    ((this['state'] = { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } }),
       (this['_modelCatalog'] = buildImageFreeAngleModelCatalog()));
     const defaultImageFreeAngleModelState = getDefaultImageFreeAngleModelState(this['_modelCatalog']);
     ((this['_currentModel'] = defaultImageFreeAngleModelState['model'] || 'nano-banana-2-lite'),
@@ -317,7 +317,7 @@ const ImageFreeAngleController = {
       (el5['innerHTML'] =
         '\n      <div class="fa-header">\n        <span class="fa-title">' +
         freeAngleText('panel.title') +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22fa-close-btn\x22>×</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-preview-area\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22fa-reset-btn\x22>' +
+        '</span>\n        <button class="fa-close-btn">×</button>\n      </div>\n      <div class="fa-content">\n        <div class="fa-preview-area">\n          <button class="fa-reset-btn">' +
         freeAngleText('actions.reset') +
         '</button>\n          <div class="fa-cube-container">\n            <div class="fa-cube">\n              <div class="fa-cube-face face-front">\n                <img src="' +
         config +
@@ -335,7 +335,7 @@ const ImageFreeAngleController = {
         freeAngleText('controls.rotation') +
         '</span>\n              <span class="fa-value" id="val-rotation">35.0°</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-rotation" min="0" max="360" step="0.5" value="35">\n          </div>\n          <div class="fa-control-item">\n            <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-pitch">' +
         freeAngleText('controls.pitch') +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22fa-value\x22\x20id=\x22val-pitch\x22>20.0°</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22range\x22\x20class=\x22fa-slider\x22\x20id=\x22sld-pitch\x22\x20min=\x22-30\x22\x20max=\x2260\x22\x20step=\x220.5\x22\x20value=\x2220\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-control-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fa-control-label-row\x22\x20style=\x22display:flex;justify-content:space-between;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22fa-label\x20fa-label-distance\x22>' +
+        '</span>\n              <span class="fa-value" id="val-pitch">20.0°</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-pitch" min="-30" max="60" step="0.5" value="20">\n          </div>\n          <div class="fa-control-item">\n             <div class="fa-control-label-row" style="display:flex;justify-content:space-between;">\n              <span class="fa-label fa-label-distance">' +
         freeAngleText('controls.distance') +
         '</span>\n              <span class="fa-value" id="val-scale">0.50</span>\n            </div>\n            <input type="range" class="fa-slider" id="sld-scale" min="0.1" max="2" step="0.05" value="0.5">\n          </div>\n          <div class="fa-footer">\n            ' +
         renderImageFunctionControls(this['_functionSelection'], scope) +
@@ -410,15 +410,15 @@ const ImageFreeAngleController = {
   _updateView() {
     if (!this['active']) return;
     const { rotation: rotation2, pitch: pitch2, scale: scale2 } = this['state'],
-      value7 = ((rotation2 % 0x168) + 0x168) % 0x168;
-    ((this['wrapperEl']['querySelector']('#val-rotation')['textContent'] = value7['toFixed'](0x1) + '°'),
-      (this['wrapperEl']['querySelector']('#val-pitch')['textContent'] = pitch2['toFixed'](0x1) + '°'),
-      (this['wrapperEl']['querySelector']('#val-scale')['textContent'] = '' + scale2['toFixed'](0x2)),
+      value7 = ((rotation2 % 360) + 360) % 360;
+    ((this['wrapperEl']['querySelector']('#val-rotation')['textContent'] = value7['toFixed'](1) + '°'),
+      (this['wrapperEl']['querySelector']('#val-pitch')['textContent'] = pitch2['toFixed'](1) + '°'),
+      (this['wrapperEl']['querySelector']('#val-scale')['textContent'] = '' + scale2['toFixed'](2)),
       (this['wrapperEl']['querySelector']('#sld-rotation')['value'] = value7),
       (this['wrapperEl']['querySelector']('#sld-pitch')['value'] = pitch2),
       (this['wrapperEl']['querySelector']('#sld-scale')['value'] = scale2),
       (this['cubeEl']['style']['transform'] =
-        'rotateX(' + -pitch2 + 'deg) rotateY(' + (value7 - 0x168) + 'deg)'));
+        'rotateX(' + -pitch2 + 'deg) rotateY(' + (value7 - 360) + 'deg)'));
     const value8 =
       FREE_ANGLE_VISUAL_SCALE_MIN +
       (scale2 - FREE_ANGLE_DISTANCE_MIN) *
@@ -438,16 +438,16 @@ const ImageFreeAngleController = {
         ((this['state']['scale'] = parseFloat(event5['target']['value'])), this['_updateView']());
       }),
       (el7['querySelector']('.fa-reset-btn')['onclick'] = () => {
-        ((this['state'] = { rotation: 0x23, pitch: 0x14, scale: 0.5, pan: { x: 0x0, y: 0x0 } }),
+        ((this['state'] = { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } }),
           this['_updateView']());
       }));
     const value9 = el7['querySelector']('.fa-preview-area');
     let enabled5 = ![],
       enabled6 = ![],
-      box = { x: 0x0, y: 0x0 };
+      box = { x: 0, y: 0 };
     value9['onmousedown'] = (x) => {
       enabled5 = !![];
-      if (x['button'] === 0x2) enabled6 = !![];
+      if (x['button'] === 2) enabled6 = !![];
       ((box = { x: x['clientX'], y: x['clientY'] }),
         x['preventDefault'](),
         x['stopPropagation']());
@@ -461,7 +461,7 @@ const ImageFreeAngleController = {
           !enabled6 &&
             ((this['state']['rotation'] += value11 * 0.5),
             (this['state']['pitch'] += value12 * 0.5),
-            (this['state']['pitch'] = Math['max'](-0x1e, Math['min'](0x3c, this['state']['pitch'])))),
+            (this['state']['pitch'] = Math['max'](-30, Math['min'](60, this['state']['pitch'])))),
           this['_updateView']());
       },
       value13 = () => {
@@ -475,8 +475,8 @@ const ImageFreeAngleController = {
       }),
       (value9['onwheel'] = (event6) => {
         (event6['preventDefault'](), event6['stopPropagation']());
-        const value14 = event6['deltaY'] > 0x0 ? -0.05 : 0.05;
-        ((this['state']['scale'] = Math['max'](0.1, Math['min'](0x2, this['state']['scale'] + value14))),
+        const value14 = event6['deltaY'] > 0 ? -0.05 : 0.05;
+        ((this['state']['scale'] = Math['max'](0.1, Math['min'](2, this['state']['scale'] + value14))),
           this['_updateView']());
       }),
       (value9['oncontextmenu'] = (event7) => event7['preventDefault']()),
@@ -582,7 +582,7 @@ const ImageFreeAngleController = {
         aspectRatio: aspectRatio2,
         imageSize: imageSize['imageSize'] || '2K',
         ...imageSize2,
-        batchSize: 0x1,
+        batchSize: 1,
         inputUrls: inputUrls ? [inputUrls] : [],
         apiKey: apiKey3,
         provider: provider2,
@@ -596,14 +596,14 @@ const ImageFreeAngleController = {
         ['trim']()
         ['toLowerCase'](),
       useOpenapiQuery2 = shouldUseRunningHubOpenapiQuery(model3, provider2);
-    let width = 0x120,
-      height = 0x120;
+    let width = 288,
+      height = 288;
     const value18 = aspectRatio2['split'](':'),
       box2 =
         isAdaptiveRatioLabel2 && sourceSize
           ? sourceSize
-          : { width: parseFloat(value18[0x0]), height: parseFloat(value18[0x1]) };
-    if (box2['width'] > 0x0 && box2['height'] > 0x0) {
+          : { width: parseFloat(value18[0]), height: parseFloat(value18[1]) };
+    if (box2['width'] > 0 && box2['height'] > 0) {
       const box3 = getAutoMediaSizeByShortSide(box2['width'], box2['height']);
       ((width = box3['width']), (height = box3['height']));
     }
@@ -783,8 +783,8 @@ const ImageFreeAngleController = {
       });
       if (handler4()) return;
       const sourceUrl =
-        generateImage2 && generateImage2['isBatch'] && Array['isArray'](generateImage2['images']) && generateImage2['images'][0x0]
-          ? generateImage2['images'][0x0]
+        generateImage2 && generateImage2['isBatch'] && Array['isArray'](generateImage2['images']) && generateImage2['images'][0]
+          ? generateImage2['images'][0]
           : generateImage2;
       if (sourceUrl?.['error']) throw new Error(String(sourceUrl['error']));
       const localPath = pickResultLocalPath(sourceUrl),
@@ -803,7 +803,7 @@ const ImageFreeAngleController = {
         taskId5 = appStore['getState']()['nodes']?.[id],
         duration2 = taskId5?.['generationStartTime']
           ? Date['now']() - taskId5['generationStartTime']
-          : 0x0,
+          : 0,
         args = buildImageGenerationResultPatch(
           {
             ...sourceUrl,
@@ -857,7 +857,7 @@ const ImageFreeAngleController = {
       if (taskId6) {
         const duration3 = taskId6?.['generationStartTime']
             ? Date['now']() - taskId6['generationStartTime']
-            : 0x0,
+            : 0,
           error2 = error?.['message'] || freeAngleText('errors.unknown');
         (appStore['updateNodeData'](id, {
           ...buildImageGenerationFailurePatch({
@@ -948,7 +948,7 @@ const ImageFreeAngleController = {
       aspectRatio: aspectRatio4,
       imageSize: aspectRatio3['imageSize'] || '2K',
       ...imageSize3,
-      batchSize: 0x1,
+      batchSize: 1,
       inputUrls: inputUrls2 ? [inputUrls2] : [],
       apiKey: apiKey4,
       provider: provider5,

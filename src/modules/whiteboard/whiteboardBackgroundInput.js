@@ -13,19 +13,19 @@ function normalizeText(value) {
 function positiveNumber(...args) {
   for (const item of args) {
     const count = Number(item);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 function resolveAiImagePrimaryItem(key) {
   if (normalizeText(key?.['type']) !== 'ai-image') return null;
   const list = Array['isArray'](key?.['images']) ? key['images'] : [];
-  if (list['length'] === 0x0) return null;
+  if (list['length'] === 0) return null;
   const index = Number(key?.['mainImageIndex']),
     result = Number['isFinite'](index)
-      ? Math['max'](0x0, Math['min'](list['length'] - 0x1, Math['trunc'](index)))
-      : 0x0;
-  return list[result] || list[0x0] || null;
+      ? Math['max'](0, Math['min'](list['length'] - 1, Math['trunc'](index)))
+      : 0;
+  return list[result] || list[0] || null;
 }
 function uniqueUrls(data) {
   return Array['from'](new Set((data || [])['map'](normalizeText)['filter'](Boolean)));
@@ -119,22 +119,22 @@ function appendIdentityParts(list2, target, enabled) {
 }
 function hashIdentity(next) {
   const list3 = normalizeText(next);
-  let current = 0x1505;
-  for (let entry = 0x0; entry < list3['length']; entry += 0x1) {
-    ((current = ((current << 0x5) + current) ^ list3['charCodeAt'](entry)), (current >>>= 0x0));
+  let current = 5381;
+  for (let entry = 0; entry < list3['length']; entry += 1) {
+    ((current = ((current << 5) + current) ^ list3['charCodeAt'](entry)), (current >>>= 0));
   }
-  return current['toString'](0x24);
+  return current['toString'](36);
 }
 function versionLocalImageUrl(record, payload) {
   const text2 = normalizeText(record);
   if (!text2 || !text2['startsWith']('/')) return text2;
-  const [list4, handle = ''] = text2['split']('#', 0x2),
+  const [list4, handle = ''] = text2['split']('#', 2),
     state = list4['includes']('?') ? '&' : '?';
   return '' + list4 + state + 'aicv=' + hashIdentity(payload) + (handle ? '#' + handle : '');
 }
 function edgeCreatedAt(config) {
   const scope = Number(config?.['createdAt']);
-  return Number['isFinite'](scope) ? scope : 0x0;
+  return Number['isFinite'](scope) ? scope : 0;
 }
 function findLatestBackgroundEdge(input, output, value2) {
   const text3 = normalizeText(input);
@@ -148,10 +148,10 @@ function findLatestBackgroundEdge(input, output, value2) {
       })
       ['sort']((value5, value6) => {
         const edgeCreatedAt2 = edgeCreatedAt(value5) - edgeCreatedAt(value6);
-        if (edgeCreatedAt2 !== 0x0) return edgeCreatedAt2;
+        if (edgeCreatedAt2 !== 0) return edgeCreatedAt2;
         return normalizeText(value5?.['id'])['localeCompare'](normalizeText(value6?.['id']));
       })
-      ['at'](-0x1) || null
+      ['at'](-1) || null
   );
 }
 export function isWhiteboardBackgroundSourceType(value7) {
@@ -175,7 +175,7 @@ export function resolveWhiteboardBackgroundInput({
     list7 = uniqueUrls([...args2['compositionUrls'], ...args3['compositionUrls']]),
     thumbnailCacheRefs = uniqueUrls([...args2['thumbnailCacheRefs'], ...args3['thumbnailCacheRefs']]),
     uniqueUrls2 = uniqueUrls([...list6, ...list5]),
-    rawUrl = uniqueUrls2[0x0] || '',
+    rawUrl = uniqueUrls2[0] || '',
     list8 = [
       'edge=' + normalizeText(latestBackgroundEdge['id']),
       'edgeCreatedAt=' + edgeCreatedAt(latestBackgroundEdge),
@@ -213,7 +213,7 @@ export function resolveWhiteboardBackgroundInput({
     sourceId: normalizeText(enabled2['id']),
     sourceType: normalizeText(enabled2['type']),
     identity: identity,
-    url: url[0x0] || '',
+    url: url[0] || '',
     urls: url,
     previewUrls: previewUrls2,
     fullUrls: fullUrls,
@@ -258,8 +258,8 @@ export function getWhiteboardBackgroundWorldRect({
     width2 = positiveNumber4 * value12,
     height2 = positiveNumber5 * value12;
   return {
-    x: (positiveNumber2 - width2) / 0x2,
-    y: (positiveNumber3 - height2) / 0x2,
+    x: (positiveNumber2 - width2) / 2,
+    y: (positiveNumber3 - height2) / 2,
     width: width2,
     height: height2,
   };
@@ -275,18 +275,18 @@ export function drawWhiteboardBackgroundImage({
 } = {}) {
   if (!ctx || !image || !viewport) return ![];
   const count2 = Number(viewport['zoom']);
-  if (!Number['isFinite'](count2) || count2 <= 0x0) return ![];
+  if (!Number['isFinite'](count2) || count2 <= 0) return ![];
   const box2 = getWhiteboardBackgroundWorldRect({
       imageWidth: imageWidth2,
       imageHeight: imageHeight2,
       frameWidth: frameWidth2,
       frameHeight: frameHeight2,
     }),
-    value13 = (box2['x'] - Number(viewport['x'] || 0x0)) * count2,
-    value14 = (box2['y'] - Number(viewport['y'] || 0x0)) * count2;
+    value13 = (box2['x'] - Number(viewport['x'] || 0)) * count2,
+    value14 = (box2['y'] - Number(viewport['y'] || 0)) * count2;
   return (
     ctx['save'](),
-    (ctx['globalAlpha'] = 0x1),
+    (ctx['globalAlpha'] = 1),
     ctx['drawImage'](image, value13, value14, box2['width'] * count2, box2['height'] * count2),
     ctx['restore'](),
     !![]
@@ -297,24 +297,24 @@ export function getWhiteboardSizeForBackground({
   imageHeight: imageHeight3,
   currentWidth: currentWidth = WHITEBOARD_DEFAULT_SIZE['width'],
   currentHeight: currentHeight = WHITEBOARD_DEFAULT_SIZE['height'],
-  minWidth: minWidth = 0x1,
-  minHeight: minHeight = 0x1,
+  minWidth: minWidth = 1,
+  minHeight: minHeight = 1,
 } = {}) {
   const positiveNumber6 = positiveNumber(imageWidth3),
     positiveNumber7 = positiveNumber(imageHeight3);
   if (!positiveNumber6 || !positiveNumber7) return null;
   const positiveNumber8 = positiveNumber(currentWidth, WHITEBOARD_DEFAULT_SIZE['width']),
     positiveNumber9 = positiveNumber(currentHeight, WHITEBOARD_DEFAULT_SIZE['height']),
-    positiveNumber10 = positiveNumber(minWidth, 0x1),
-    positiveNumber11 = positiveNumber(minHeight, 0x1),
+    positiveNumber10 = positiveNumber(minWidth, 1),
+    positiveNumber11 = positiveNumber(minHeight, 1),
     value15 = Math['max'](positiveNumber8 * positiveNumber9, positiveNumber10 * positiveNumber11),
     value16 = positiveNumber6 / positiveNumber7;
   let value17 = Math['sqrt'](value15 * value16),
     value18 = value17 / value16;
-  const value19 = Math['max'](0x1, positiveNumber10 / value17, positiveNumber11 / value18);
+  const value19 = Math['max'](1, positiveNumber10 / value17, positiveNumber11 / value18);
   return (
     (value17 *= value19),
     (value18 *= value19),
-    { width: Math['max'](0x1, Math['round'](value17)), height: Math['max'](0x1, Math['round'](value18)) }
+    { width: Math['max'](1, Math['round'](value17)), height: Math['max'](1, Math['round'](value18)) }
   );
 }

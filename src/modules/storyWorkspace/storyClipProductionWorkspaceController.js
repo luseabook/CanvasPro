@@ -102,9 +102,9 @@ export function createStoryClipProductionWorkspaceController({
               providerId['succeeded'] +
               ' 个，失败 ' +
               providerId['failed'] +
-              '\x20个，停止\x20' +
+              ' 个，停止 ' +
               providerId['cancelled'] +
-              '\x20个。',
+              ' 个。',
             providerId['failed'] ? 'warn' : 'info',
             providerId['projectToken'],
             { episodeId: providerId['episodeId'], clipId: providerId['clipId'] },
@@ -120,7 +120,7 @@ export function createStoryClipProductionWorkspaceController({
       return (
         notifyNavigableGenerationComplete(
           providerId['failed']
-            ? '完成\x20' + providerId['succeeded'] + ' 个，失败 ' + providerId['failed'] + ' 个。' + item
+            ? '完成 ' + providerId['succeeded'] + ' 个，失败 ' + providerId['failed'] + ' 个。' + item
             : '已完成 ' + providerId['succeeded'] + ' 个片段视频。',
           providerId['projectToken'],
           { episodeId: providerId['episodeId'], clipId: providerId['clipId'] },
@@ -157,7 +157,7 @@ export function createStoryClipProductionWorkspaceController({
       promptTextWithTextRefs = resolvePromptTextWithTextRefs({
         promptEl: promptEl,
         assetInputRefs: assetInputRefs,
-        assetMediaCounts: { image: 0x0, video: 0x0, audio: 0x0 },
+        assetMediaCounts: { image: 0, video: 0, audio: 0 },
         allowedAssetTypes: ['text', 'image', 'video', 'audio'],
         resolveAssetMentionRef: (el) =>
           resolveStoryClipAssetMentionRefs(el, assets['assets'], {
@@ -177,8 +177,8 @@ export function createStoryClipProductionWorkspaceController({
       isStoryMinimaxH3PromptMode(result) &&
       !assetInputRefs['some']((data) => ['image', 'video']['includes'](data?.['type']))
     )
-      for (let count = assetInputRefs['length'] - 0x1; count >= 0x0; count -= 0x1) {
-        if (assetInputRefs[count]?.['type'] === 'audio') assetInputRefs['splice'](count, 0x1);
+      for (let count = assetInputRefs['length'] - 1; count >= 0; count -= 1) {
+        if (assetInputRefs[count]?.['type'] === 'audio') assetInputRefs['splice'](count, 1);
       }
     return {
       prompt: prependStoryDialogueLanguageConstraint(serializeStoryPromptForMode(index, result), {

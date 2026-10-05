@@ -24,7 +24,7 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
       generateImage: generateImage2 = generateImage,
     } = item,
     canvasImageSourceUrl = resolveCanvasImageSourceUrl(
-      sourceNodeId['images']?.[sourceNodeId['mainImageIndex'] || 0x0] || sourceNodeId,
+      sourceNodeId['images']?.[sourceNodeId['mainImageIndex'] || 0] || sourceNodeId,
     );
   if (!canvasImageSourceUrl) throw new Error(imageDepthText('missingImage'));
   const modelExecution = resolveModelExecution(RH_IMAGE_DEPTH_MODEL_ID);
@@ -42,7 +42,7 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
       }),
       null
     );
-  const box = calcDisplaySizeByMedia(sourceNodeId['width'] || 0x12c, sourceNodeId['height'] || 0x12c),
+  const box = calcDisplaySizeByMedia(sourceNodeId['width'] || 300, sourceNodeId['height'] || 300),
     args = calcSafeSpawnPosNearNode(
       (store['getStateRaw']?.() || store['getState']())['nodes'],
       sourceNodeId,

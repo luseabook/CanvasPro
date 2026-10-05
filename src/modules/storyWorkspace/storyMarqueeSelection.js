@@ -20,7 +20,7 @@ export function createStoryAssetMarqueeConfig(
   { getVisibleAssets: getVisibleAssets, beforeCommit: beforeCommit, render: render },
 ) {
   return {
-    enabled: enabled['view'] === 'project' && enabled['step'] === 0x2,
+    enabled: enabled['view'] === 'project' && enabled['step'] === 2,
     selectedIds: enabled['selectedAssetIds'],
     commit(list) {
       beforeCommit();
@@ -39,8 +39,8 @@ export function createStoryAssetMarqueeConfig(
           ['map']((item) => item['id']),
       );
       ((enabled['selectedAssetIds'] = list['filter']((key) => map['has'](key))),
-        (enabled['assetSelectionMode'] = enabled['selectedAssetIds']['length'] > 0x0),
-        (enabled['selectedAssetId'] = enabled['selectedAssetIds']['at'](-0x1) || enabled['selectedAssetId']),
+        (enabled['assetSelectionMode'] = enabled['selectedAssetIds']['length'] > 0),
+        (enabled['selectedAssetId'] = enabled['selectedAssetIds']['at'](-1) || enabled['selectedAssetId']),
         render());
     },
   };

@@ -29,18 +29,18 @@ export function createPersonReplacementShotCutPreviewController({
   if (!session?.['workspaceState'] || !session?.['playback'])
     throw new TypeError('Shot cut preview requires a playback session.');
   if (!mediaController || !viewportController)
-    throw new TypeError('Shot\x20cut\x20preview\x20requires\x20media\x20and\x20viewport\x20owners.');
+    throw new TypeError('Shot cut preview requires media and viewport owners.');
   const enabled = session['workspaceState'],
     target = session['playback'],
     stopPlayback = () => session['stopPlayback'](),
     isPlaybackActive = (source) => target['isReverseActive']() || source?.['paused'] === ![],
     cancelFrameWait = () => {
-      ((enabled['previewSeekToken'] += 0x1), session['cancelPreviewFrameWait']());
+      ((enabled['previewSeekToken'] += 1), session['cancelPreviewFrameWait']());
     },
     clearPreviewMetadata = () => session['clearPreviewMetadata'](),
     cancelHoverPreview = () => session['cancelHoverPreview'](),
     syncTimelinePosition = (options2 = {}) => {
-      ((enabled['playheadSec'] = Number(options2['timelineSec']) || 0x0),
+      ((enabled['playheadSec'] = Number(options2['timelineSec']) || 0),
         (enabled['previewShotId'] = normalizeText(options2['shotId'])),
         viewportController['syncPlayhead']());
     },
@@ -54,7 +54,7 @@ export function createPersonReplacementShotCutPreviewController({
         return ![];
       const entry = Number(enabled2['sourceSec']),
         record = Number(enabled2['presentedSourceSec']),
-        payload = Math['max'](0.04, Number(enabled2['toleranceSec']) || 0x0);
+        payload = Math['max'](0.04, Number(enabled2['toleranceSec']) || 0);
       if (
         enabled2['seeked'] !== !![] ||
         !Number['isFinite'](entry) ||
@@ -125,13 +125,13 @@ export function createPersonReplacementShotCutPreviewController({
       const rangeId = value2?.['shotId'] || enabled5['id'],
         value6 = Math['max'](
           PERSON_REPLACEMENT_CUT_MIN_SEC,
-          0x1 / Math['max'](0x1, Number(value2?.['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
+          1 / Math['max'](1, Number(value2?.['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
         );
       cancelFrameWait();
       const token = enabled['previewSeekToken'],
         value7 = timelineSec !== null && timelineSec !== undefined && Number['isFinite'](Number(timelineSec)),
         value8 = value7
-          ? clamp(Number(timelineSec), 0x0, getPersonReplacementShotCutTotalDuration(enabled['draft']), 0x0)
+          ? clamp(Number(timelineSec), 0, getPersonReplacementShotCutTotalDuration(enabled['draft']), 0)
           : getPersonReplacementShotCutTimelineSec(enabled['draft'], rangeId, output);
       !hover
         ? ((enabled['hoverPreviewActive'] = ![]),
@@ -139,10 +139,10 @@ export function createPersonReplacementShotCutPreviewController({
           (enabled['previewShotId'] = rangeId),
           (enabled['pendingPreviewSeek'] = {
             rangeId: rangeId,
-            sourceSec: Number(output) || 0x0,
+            sourceSec: Number(output) || 0,
             kind: preservePlayhead ? 'boundary-preview' : 'playhead',
             token: token,
-            toleranceSec: Math['max'](0.04, value6 * 0x2),
+            toleranceSec: Math['max'](0.04, value6 * 2),
             seeked: ![],
             presentedSourceSec: Number['NaN'],
           }),
@@ -156,10 +156,10 @@ export function createPersonReplacementShotCutPreviewController({
           }))
         : (enabled['pendingPreviewSeek'] = {
             rangeId: rangeId,
-            sourceSec: Number(output) || 0x0,
+            sourceSec: Number(output) || 0,
             kind: 'hover',
             token: token,
-            toleranceSec: Math['max'](0.04, value6 * 0x2),
+            toleranceSec: Math['max'](0.04, value6 * 2),
             seeked: ![],
             presentedSourceSec: Number['NaN'],
           });
@@ -188,7 +188,7 @@ export function createPersonReplacementShotCutPreviewController({
           const value13 = enabled['pendingPreviewSeek'];
           let enabled8 = ![];
           try {
-            const value14 = Math['max'](0x0, Number(output) || 0x0);
+            const value14 = Math['max'](0, Number(output) || 0);
             (!Number['isFinite'](Number(el2['currentTime'])) ||
               Math['abs'](Number(el2['currentTime']) - value14) > 0.02) &&
               ((el2['currentTime'] = value14), (enabled8 = !![]));
@@ -215,7 +215,7 @@ export function createPersonReplacementShotCutPreviewController({
             el2['removeEventListener']?.('loadedmetadata', handler);
           }));
       else
-        Number(el2['readyState']) >= 0x1
+        Number(el2['readyState']) >= 1
           ? handler()
           : (el2['addEventListener']?.('loadedmetadata', handler, { once: !![] }),
             (enabled['previewMetadataCleanup'] = () => {
@@ -227,7 +227,7 @@ export function createPersonReplacementShotCutPreviewController({
     seekTimeline = (value15, { autoplay: autoplay = ![] } = {}) => {
       if (!enabled['isOpen'] || viewportController['isBusy']() || enabled['isKeyframeCapturing']) return ![];
       const timelineSec2 = getPersonReplacementShotCutPositionAtTimelineSec(enabled['draft'], value15);
-      if (timelineSec2['shotIndex'] < 0x0) return ![];
+      if (timelineSec2['shotIndex'] < 0) return ![];
       return preview(timelineSec2['shotId'], timelineSec2['sourceTimeSec'], {
         timelineSec: timelineSec2['timelineSec'],
         autoplay: autoplay,
@@ -248,16 +248,16 @@ export function createPersonReplacementShotCutPreviewController({
         ),
         value16 = Math['max'](
           PERSON_REPLACEMENT_CUT_MIN_SEC,
-          0x1 /
+          1 /
             Math['max'](
-              0x1,
+              1,
               Number(
                 enabled['draft'][personReplacementShotCutPositionAtTimelineSec['shotIndex']]?.['outputFps'],
               ) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
             ),
         );
-      enabled['playheadSec'] >= personReplacementShotCutTotalDuration - value16 / 0x2 &&
-        (enabled['playheadSec'] = 0x0);
+      enabled['playheadSec'] >= personReplacementShotCutTotalDuration - value16 / 2 &&
+        (enabled['playheadSec'] = 0);
       ((enabled['hoverPreviewActive'] = ![]), (enabled['hoverPreviewTimeSec'] = null), cancelHoverPreview());
       const el5 = el4?.['querySelector']?.('[data-person-replacement-shot-cut-hover-playhead]');
       return (
@@ -265,20 +265,20 @@ export function createPersonReplacementShotCutPreviewController({
         seekTimeline(enabled['playheadSec'], { autoplay: !![] })
       );
     },
-    stepTimeline = (value17, value18 = 0x1) => {
+    stepTimeline = (value17, value18 = 1) => {
       const personReplacementShotCutPositionAtTimelineSec2 = getPersonReplacementShotCutPositionAtTimelineSec(
           enabled['draft'],
           enabled['playheadSec'],
         ),
         value19 = Math['max'](
-          0x1,
+          1,
           Number(
             enabled['draft'][personReplacementShotCutPositionAtTimelineSec2['shotIndex']]?.['outputFps'],
           ) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS,
         );
       return seekTimeline(
         enabled['playheadSec'] +
-          ((Number(value17) < 0x0 ? -0x1 : 0x1) * Math['max'](0x1, Number(value18) || 0x1)) / value19,
+          ((Number(value17) < 0 ? -1 : 1) * Math['max'](1, Number(value18) || 1)) / value19,
       );
     },
     syncPlaybackFromVideo = (enabled11) => {
@@ -298,15 +298,15 @@ export function createPersonReplacementShotCutPreviewController({
       }
       const value25 = Math['max'](
         PERSON_REPLACEMENT_CUT_MIN_SEC,
-        0x1 / Math['max'](0x1, Number(enabled12['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
+        1 / Math['max'](1, Number(enabled12['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
       );
       if (value20) {
         if (Number(value20['token']) !== enabled['previewSeekToken']) return;
         if (enabled['previewFrameReadyToken'] !== Number(value20['token'])) return;
       }
       if (enabled['hoverPreviewActive'] && enabled11['paused'] !== ![]) return;
-      if (value24 >= Number(enabled12['endSec']) - value25 / 0x2) {
-        const enabled13 = enabled['draft'][value22 + 0x1];
+      if (value24 >= Number(enabled12['endSec']) - value25 / 2) {
+        const enabled13 = enabled['draft'][value22 + 1];
         if (enabled11['paused'] === ![] && enabled13) {
           const timelineSec3 = getPersonReplacementShotCutTimelineSec(
             enabled['draft'],

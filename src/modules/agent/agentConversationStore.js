@@ -2,7 +2,7 @@ export const AGENT_CONVERSATION_STORAGE_KEY = 'aiCanvas.agentConversations.v1';
 const AGENT_CONVERSATION_SCHEMA_VERSION = 1,
   DEFAULT_PROJECT_ID = 'default_v2_project',
   DEFAULT_CONVERSATION_TITLE = '新对话',
-  MAX_MESSAGE_CONTENT_CHARS = 0x1f40,
+  MAX_MESSAGE_CONTENT_CHARS = 8000,
   MAX_TITLE_CHARS = 40,
   MAX_SUMMARY_CHARS = 240;
 function getWindowObject(value) {

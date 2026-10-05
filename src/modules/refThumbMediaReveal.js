@@ -1,7 +1,7 @@
 import { preloadCanvasImage, resetCanvasMediaSchedulerForTests } from './canvasMediaScheduler.js';
 let _decodePromiseMap = new Map(),
   _revealTokenMap = new WeakMap();
-const REVEAL_RETRY_DELAYS_MS = [120, 0x140, 0x2d0],
+const REVEAL_RETRY_DELAYS_MS = [120, 320, 720],
   ATTACH_RETRY_DELAYS_MS = [0, 16, 50, 120];
 function nextRevealToken(value) {
   const item = (_revealTokenMap.get(value) || 0) + 1;

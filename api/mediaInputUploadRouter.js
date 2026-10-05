@@ -22,15 +22,15 @@ function isPrivateIpv4Host(item) {
   const list = String(item || '')
     ['split']('.')
     ['map']((key) => Number(key));
-  if (list['length'] !== 0x4 || list['some']((index) => !Number['isInteger'](index))) return ![];
+  if (list['length'] !== 4 || list['some']((index) => !Number['isInteger'](index))) return ![];
   const [count, count2] = list;
   return (
-    count === 0xa ||
+    count === 10 ||
     count === 0x7f ||
-    (count === 0xac && count2 >= 0x10 && count2 <= 0x1f) ||
-    (count === 0xc0 && count2 === 0xa8) ||
-    (count === 0xa9 && count2 === 0xfe) ||
-    (count === 0x0 && count2 === 0x0)
+    (count === 172 && count2 >= 16 && count2 <= 0x1f) ||
+    (count === 192 && count2 === 168) ||
+    (count === 169 && count2 === 254) ||
+    (count === 0 && count2 === 0)
   );
 }
 export function isPublicHttpMediaUrl(result) {
@@ -145,7 +145,7 @@ export async function uploadModelApiMediaInputs(value7, list2, value8, value9 = 
   if (!['image', 'video', 'audio']['includes'](value10))
     throw new Error('Unsupported media upload kind: ' + (value10 || value7));
   const list3 = Array['isArray'](list2) ? list2['map'](normalizeMediaUrl)['filter'](Boolean) : [];
-  if (list3['length'] === 0x0) return [];
+  if (list3['length'] === 0) return [];
   const userMediaStorageUploadTarget = resolveUserMediaStorageUploadTarget(value8, value9, value10),
     list4 = new Array(list3['length'])['fill'](''),
     list5 = [],
@@ -157,7 +157,7 @@ export async function uploadModelApiMediaInputs(value7, list2, value8, value9 = 
     }
     (list6['push'](value12), list5['push'](value11));
   });
-  if (list5['length'] === 0x0) return list4['filter'](Boolean);
+  if (list5['length'] === 0) return list4['filter'](Boolean);
   const uploadViaTarget2 = await uploadViaTarget(
     value10,
     list5,
@@ -170,10 +170,10 @@ export async function uploadModelApiMediaInputs(value7, list2, value8, value9 = 
   });
   const list7 = list4['filter'](Boolean);
   if (value9['strictUpload'] !== ![] && list7['length'] !== list3['length']) {
-    const list8 = list4['flatMap']((value15, value16) => (value15 ? [] : [value16 + 0x1]));
+    const list8 = list4['flatMap']((value15, value16) => (value15 ? [] : [value16 + 1]));
     throw new Error(
       userMediaStorageUploadTarget['provider'] +
-        '\x20' +
+        ' ' +
         getMediaKindLabel(value10) +
         '上传失败：第 ' +
         list8['join']('、') +

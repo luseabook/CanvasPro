@@ -19,8 +19,8 @@ import {
   SEEDANCE_VIDEO_RATIO_POLICY,
 } from './vendorVideoModelApiShared.js';
 const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
-    -0x1,
-    ...Array['from']({ length: 0x1b }, (value, item) => item + 0x4),
+    -1,
+    ...Array['from']({ length: 27 }, (value, item) => item + 4),
   ]),
   RUNNINGHUB_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object['freeze']({
     id: 'outputFormat',
@@ -62,13 +62,13 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     ),
   ),
   RUNNINGHUB_SEEDANCE_2_5_INPUT_SLOTS = createVideoInputSlots({
-    image: 0x1e,
-    video: 0xa,
-    audio: 0xa,
+    image: 30,
+    video: 10,
+    audio: 10,
     fixedSlots: RUNNINGHUB_SEEDANCE_2_5_FIXED_INPUT_SLOTS,
     cycleFixedInputWhenFull: !![],
     preserveHiddenInputsByKind: !![],
-    maxTotalDurationSecondsByKind: Object['freeze']({ video: 0x1e, audio: 0x1e }),
+    maxTotalDurationSecondsByKind: Object['freeze']({ video: 30, audio: 30 }),
     mediaConstraintsByKind: Object['freeze']({
       image: Object['freeze']({
         allowedExtensions: Object['freeze']([
@@ -83,19 +83,19 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
           'heic',
           'heif',
         ]),
-        maxBytes: 0x1e * 0x400 * 0x400,
+        maxBytes: 30 * 1024 * 1024,
       }),
       video: Object['freeze']({
         allowedExtensions: Object['freeze'](['mp4', 'mov']),
-        minDurationSeconds: 0x2,
-        maxDurationSeconds: 0x1e,
-        maxBytes: 0xc8 * 0x400 * 0x400,
+        minDurationSeconds: 2,
+        maxDurationSeconds: 30,
+        maxBytes: 200 * 1024 * 1024,
       }),
       audio: Object['freeze']({
         allowedExtensions: Object['freeze'](['wav', 'mp3']),
-        minDurationSeconds: 0x2,
-        maxDurationSeconds: 0x1e,
-        maxBytes: 0xf * 0x400 * 0x400,
+        minDurationSeconds: 2,
+        maxDurationSeconds: 30,
+        maxBytes: 15 * 1024 * 1024,
       }),
     }),
   }),
@@ -118,7 +118,7 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
       path: 'duration',
       from: 'param',
       field: Object['freeze'](['generationParams.duration', 'duration']),
-      defaultValue: -0x1,
+      defaultValue: -1,
       transform: 'runninghubSeedance25Duration',
     }),
     Object['freeze']({
@@ -196,12 +196,12 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     '无媒体入参时自动按文生视频提交；全能参考只有接入图片、视频或音频后才会触发。',
     '全能参考最多支持 30 张图片、10 个视频和 10 个音频，也支持仅接音频。',
     '视频和音频素材单个时长为 2–30 秒，同类素材总时长不超过 30 秒。',
-  ]['join']('\x0a');
+  ]['join']('\n');
 export const RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL = Object['freeze']({
   provider: 'runninghub',
   modelId: 'runninghub-model/seedance-2.5',
   executionId: 'runninghub.model-api.video.seedance-2-5.v1',
-  displayName: 'Seedance\x202.5',
+  displayName: 'Seedance 2.5',
   aliases: Object['freeze'](['runninghub-model/seedance2.5']),
   icon: 'images/RH.png',
   description: 'RunningHub Seedance 2.5 model API',
@@ -215,7 +215,7 @@ export const RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL = Object['freeze']({
     VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
     createFooterDurationSliderOptionsField({
       values: RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES,
-      defaultValue: -0x1,
+      defaultValue: -1,
       optionOverridesByValue: Object['freeze']({
         '-1': Object['freeze']({ label: '自动', displayLabel: '自动' }),
       }),
@@ -266,12 +266,12 @@ export const RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL = Object['freeze']({
       supported: !![],
       parameterPolicy: Object['freeze']({
         mode: Object['freeze']({ fieldId: 'rh_seedance_2_mode', value: 'multimodal2video' }),
-        duration: Object['freeze']({ fieldId: 'duration', value: -0x1 }),
+        duration: Object['freeze']({ fieldId: 'duration', value: -1 }),
       }),
     }),
     videoMenu: Object['freeze']({
       role: 'runninghubModel',
-      order: 0x5,
+      order: 5,
       label: 'Seedance 2.5',
       subtitle: '最长 30 秒，文生 / 图生 / 首尾帧 / 全能参考',
     }),

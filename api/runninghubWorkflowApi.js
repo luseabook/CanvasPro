@@ -16,7 +16,7 @@ import {
   hasRunningHubWorkflowPollingTimedOut,
   resolveRunningHubWorkflowPollingPolicy,
 } from './runningHubWorkflowPollingPolicy.js';
-const RH_PENDING_CODES = new Set([0x324, 0x32d]);
+const RH_PENDING_CODES = new Set([804, 813]);
 function getRhErrorMessage(value, item) {
   return formatRunningHubFailureMessage(value, item);
 }
@@ -83,7 +83,7 @@ export async function runRunninghubAiApp(args3, concurrency2 = {}) {
   const enabled2 = String(args3?.['appId'] || args3?.['workflowId'] || '')['trim'](),
     apiKey = String(args3?.['apiKey'] || '')['trim']();
   if (!enabled2) throw new Error('缺少 RunningHub appId');
-  if (!apiKey) throw new Error('RunningHub\x20API\x20Key\x20未配置');
+  if (!apiKey) throw new Error('RunningHub API Key 未配置');
   const { appId: appId, workflowId: workflowId, installId: installId3, ...args4 } = args3 || {},
     args5 = resolveRunningHubWorkflowQueueConfig({
       payload: { ...args3, apiKey: apiKey },
@@ -110,7 +110,7 @@ export async function runRunninghubAiApp(args3, concurrency2 = {}) {
           provider: 'runninghubwf',
           signal: concurrency2?.['signal'],
           headers: buildInstallIdHeaders(args3),
-          timeout: 0xdbba0,
+          timeout: 900000,
         },
       ),
   );
@@ -164,10 +164,10 @@ async function resumeRunninghubWorkflowTaskOnce(providerProfileId2, signal2 = {}
       maxPolls: maxPolls,
     } = resolveRunningHubWorkflowPollingPolicy(signal2),
     record = Date['now']();
-  for (let handle = 0x0; handle < maxPolls; handle++) {
+  for (let handle = 0; handle < maxPolls; handle++) {
     if (hasRunningHubWorkflowPollingTimedOut(record, pollTimeoutMs)) break;
     if (signal2?.['signal']?.['aborted']) throw new Error('CANCELLED');
-    if (pollIntervalMs > 0x0) {
+    if (pollIntervalMs > 0) {
       await new Promise((state) => setTimeout(state, pollIntervalMs));
       if (signal2?.['signal']?.['aborted']) throw new Error('CANCELLED');
       if (hasRunningHubWorkflowPollingTimedOut(record, pollTimeoutMs)) break;
@@ -184,7 +184,7 @@ async function resumeRunninghubWorkflowTaskOnce(providerProfileId2, signal2 = {}
       ),
       count = typeof queryRunninghubWorkflow2?.['code'] === 'number' ? queryRunninghubWorkflow2['code'] : null;
     if (count !== null && RH_PENDING_CODES['has'](count)) continue;
-    if (count !== null && count !== 0x0)
+    if (count !== null && count !== 0)
       throw new Error(getRhErrorMessage(queryRunninghubWorkflow2, '任务轮询失败 (code: ' + count + ')'));
     const runningHubTaskLifecycleStatus = resolveRunningHubTaskLifecycleStatus(queryRunninghubWorkflow2);
     if (runningHubTaskLifecycleStatus === 'cancelled') throw new Error('CANCELLED');

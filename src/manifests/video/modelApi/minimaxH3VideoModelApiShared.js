@@ -16,8 +16,8 @@ export const MINIMAX_H3_RATIO_FIELD = createAspectRatioField({
   options: ['21:9', '16:9', '4:3', '1:1', '3:4', '9:16'],
 });
 export const MINIMAX_H3_DURATION_FIELD = createFooterDurationSliderOptionsField({
-  values: [0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf],
-  defaultValue: 0x5,
+  values: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+  defaultValue: 5,
 });
 export const MINIMAX_H3_WATERMARK_FIELD = VIDEO_WATERMARK_CN_FIELD;
 export const MINIMAX_H3_FRAMES_PROMPT_PLACEHOLDER =
@@ -31,19 +31,19 @@ export const MINIMAX_H3_HELP_TOOLTIP = Object['freeze']([
 ]);
 export const MINIMAX_H3_MEDIA_CONSTRAINTS = Object['freeze']({
   image: Object['freeze']({
-    maxBytes: 0x1e * 0x400 * 0x400,
+    maxBytes: 30 * 1024 * 1024,
     allowedExtensions: Object['freeze'](['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif']),
   }),
   video: Object['freeze']({
-    minDurationSeconds: 0x2,
-    maxDurationSeconds: 0xf,
-    maxBytes: 0x32 * 0x400 * 0x400,
+    minDurationSeconds: 2,
+    maxDurationSeconds: 15,
+    maxBytes: 50 * 1024 * 1024,
     allowedExtensions: Object['freeze'](['mp4', 'mov']),
   }),
   audio: Object['freeze']({
-    minDurationSeconds: 0x2,
-    maxDurationSeconds: 0xf,
-    maxBytes: 0xf * 0x400 * 0x400,
+    minDurationSeconds: 2,
+    maxDurationSeconds: 15,
+    maxBytes: 15 * 1024 * 1024,
     allowedExtensions: Object['freeze'](['mp3', 'wav']),
   }),
 });
@@ -90,7 +90,7 @@ export function createMinimaxH3InputSlots(key) {
         label: '首帧',
         mode: 'frames',
         description: '可选；不传图片时自动使用文生视频',
-        displayOrder: 0xa,
+        displayOrder: 10,
         modeFieldId: key,
       }),
       createMinimaxH3FixedSlot({
@@ -99,7 +99,7 @@ export function createMinimaxH3InputSlots(key) {
         label: '尾帧',
         mode: 'frames',
         description: '可选；与首帧配合生成首尾帧过渡',
-        displayOrder: 0x14,
+        displayOrder: 20,
         modeFieldId: key,
       }),
       createMinimaxH3FixedSlot({
@@ -108,7 +108,7 @@ export function createMinimaxH3InputSlots(key) {
         label: '参考图',
         mode: 'reference',
         description: '多参考模式最多支持 9 张图片',
-        displayOrder: 0x1e,
+        displayOrder: 30,
         modeFieldId: key,
       }),
       createMinimaxH3FixedSlot({
@@ -116,8 +116,8 @@ export function createMinimaxH3InputSlots(key) {
         kind: 'video',
         label: '参考视频',
         mode: 'reference',
-        description: '多参考模式最多支持\x203\x20个视频',
-        displayOrder: 0x28,
+        description: '多参考模式最多支持 3 个视频',
+        displayOrder: 40,
         modeFieldId: key,
       }),
       createMinimaxH3FixedSlot({
@@ -125,8 +125,8 @@ export function createMinimaxH3InputSlots(key) {
         kind: 'audio',
         label: '参考音频',
         mode: 'reference',
-        description: '多参考模式最多支持\x203\x20个音频',
-        displayOrder: 0x32,
+        description: '多参考模式最多支持 3 个音频',
+        displayOrder: 50,
         modeFieldId: key,
       }),
     ]),
@@ -134,18 +134,18 @@ export function createMinimaxH3InputSlots(key) {
       Object['freeze']({
         when: Object['freeze']({ field: key, value: 'frames' }),
         allowedKinds: Object['freeze'](['text', 'image']),
-        maxByKind: Object['freeze']({ image: 0x2, video: 0x0, audio: 0x0 }),
+        maxByKind: Object['freeze']({ image: 2, video: 0, audio: 0 }),
       }),
     ]);
   return createVideoInputSlots({
-    image: 0x9,
-    video: 0x3,
-    audio: 0x3,
+    image: 9,
+    video: 3,
+    audio: 3,
     fixedSlots: index,
     cycleFixedInputWhenFull: !![],
     preserveHiddenInputsByKind: !![],
     policyVariants: result,
-    maxTotalDurationSecondsByKind: Object['freeze']({ video: 0xf, audio: 0xf }),
+    maxTotalDurationSecondsByKind: Object['freeze']({ video: 15, audio: 15 }),
     mediaConstraintsByKind: MINIMAX_H3_MEDIA_CONSTRAINTS,
   });
 }

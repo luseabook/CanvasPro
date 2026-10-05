@@ -14,10 +14,10 @@ function getPersonReplacementBoundingBox(options = {}) {
 function comparePersonReplacementPeopleByPosition(item, key) {
   const box = getPersonReplacementBoundingBox(item),
     box2 = getPersonReplacementBoundingBox(key),
-    index = box ? Number(box['x']) + Number(box['width']) / 0x2 : Infinity,
-    result = box2 ? Number(box2['x']) + Number(box2['width']) / 0x2 : Infinity,
-    data = box ? Number(box['y']) + Number(box['height']) / 0x2 : Infinity,
-    target = box2 ? Number(box2['y']) + Number(box2['height']) / 0x2 : Infinity;
+    index = box ? Number(box['x']) + Number(box['width']) / 2 : Infinity,
+    result = box2 ? Number(box2['x']) + Number(box2['width']) / 2 : Infinity,
+    data = box ? Number(box['y']) + Number(box['height']) / 2 : Infinity,
+    target = box2 ? Number(box2['y']) + Number(box2['height']) / 2 : Infinity;
   return (
     index - result ||
     data - target ||
@@ -167,10 +167,10 @@ export function getPersonReplacementDuplicateRoleLabels(options6 = {}, value14 =
       );
       map6['set'](
         personReplacementDetectionLabel,
-        (map6['get'](personReplacementDetectionLabel) || 0x0) + 0x1,
+        (map6['get'](personReplacementDetectionLabel) || 0) + 1,
       );
     }),
-    [...map6['entries']()]['filter'](([, count]) => count > 0x1)['map'](([value17]) => value17)
+    [...map6['entries']()]['filter'](([, count]) => count > 1)['map'](([value17]) => value17)
   );
 }
 export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
@@ -191,12 +191,12 @@ export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
             name:
               normalizeText(error2['name']) ||
               normalizeText(value23['label']) ||
-              '原人物' + (map8['size'] + 0x1),
+              '原人物' + (map8['size'] + 1),
             imageRefs: [],
             confidenceValues: [],
             reviewRequired: ![],
             identityReviewStatus: 'auto',
-            memberCount: 0x0,
+            memberCount: 0,
             exemplarShotId: normalizeText(error2['exemplarShotId']) || value22['id'],
             exemplarPersonId: normalizeText(error2['exemplarPersonId']) || value23['id'],
             ambiguousIdentityIds: new Set(error2['ambiguousIdentityIds'] || []),
@@ -205,8 +205,8 @@ export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
         value22['keyframeRef'] &&
           !enabled2['imageRefs']['includes'](value22['keyframeRef']) &&
           enabled2['imageRefs']['push'](value22['keyframeRef']);
-        ((enabled2['memberCount'] += 0x1),
-          enabled2['confidenceValues']['push'](Number(value23['identityConfidence']) || 0x0),
+        ((enabled2['memberCount'] += 1),
+          enabled2['confidenceValues']['push'](Number(value23['identityConfidence']) || 0),
           (value23['ambiguousIdentityIds'] || [])['forEach']((value24) => {
             if (value24) enabled2['ambiguousIdentityIds']['add'](value24);
           }));
@@ -231,7 +231,7 @@ export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
       id: id3['id'],
       name: id3['name'],
       imageRefs: id3['imageRefs'],
-      confidence: id3['confidenceValues']['length'] ? Math['min'](...id3['confidenceValues']) : 0x0,
+      confidence: id3['confidenceValues']['length'] ? Math['min'](...id3['confidenceValues']) : 0,
       reviewRequired: id3['reviewRequired'],
       identityReviewStatus: id3['identityReviewStatus'],
       memberCount: id3['memberCount'],
@@ -243,13 +243,13 @@ export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
   );
 }
 export function normalizePersonReplacementBoundingBox(box3 = {}) {
-  const x = Math['max'](0x0, Math['min'](0x1, Number(box3['x']) || 0x0)),
-    y = Math['max'](0x0, Math['min'](0x1, Number(box3['y']) || 0x0));
+  const x = Math['max'](0, Math['min'](1, Number(box3['x']) || 0)),
+    y = Math['max'](0, Math['min'](1, Number(box3['y']) || 0));
   return {
     x: x,
     y: y,
-    width: Math['max'](0x0, Math['min'](0x1 - x, Number(box3['width']) || 0x0)),
-    height: Math['max'](0x0, Math['min'](0x1 - y, Number(box3['height']) || 0x0)),
+    width: Math['max'](0, Math['min'](1 - x, Number(box3['width']) || 0)),
+    height: Math['max'](0, Math['min'](1 - y, Number(box3['height']) || 0)),
   };
 }
 export function orderAndRelabelPersonReplacementPeople(list3 = []) {

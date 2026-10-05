@@ -82,7 +82,7 @@ function isDreaminaTaskModel(result, data) {
 function buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
   useOpenapiQuery: useOpenapiQuery = ![],
 } = {}) {
@@ -99,7 +99,7 @@ function buildDreaminaTaskPatch({
   status: status = 'pending',
   phase: phase = 'generating',
   label: label = imageExpandText('task.generating'),
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
 } = {}) {
   return buildDreaminaTaskPatch_2({
@@ -117,7 +117,7 @@ function buildAsyncTaskPatch({
   kind: kind = 'image',
   taskId: taskId = '',
   status: status = 'pending',
-  startedAt: startedAt = 0x0,
+  startedAt: startedAt = 0,
   recovering: recovering = ![],
 } = {}) {
   return buildAsyncTaskPatch_2({
@@ -207,18 +207,18 @@ const ImageExpandController = {
       (this['_unsubscribe'] = appStore['subscribeSelector'](
         (state2) => {
           const nx = state2['nodes']?.[payload],
-            vx = state2['viewport'] || { x: 0x0, y: 0x0, zoom: 0x1 };
+            vx = state2['viewport'] || { x: 0, y: 0, zoom: 1 };
           return {
             hasNode: !!nx,
             vx: vx['x'],
             vy: vx['y'],
-            vz: vx['zoom'] || 0x1,
-            vox: vx['_screenOriginX'] || 0x0,
-            voy: vx['_screenOriginY'] || 0x0,
-            nx: nx ? nx['x'] : 0x0,
-            ny: nx ? nx['y'] : 0x0,
-            nw: nx ? nx['width'] : 0x0,
-            nh: nx ? nx['height'] : 0x0,
+            vz: vx['zoom'] || 1,
+            vox: vx['_screenOriginX'] || 0,
+            voy: vx['_screenOriginY'] || 0,
+            nx: nx ? nx['x'] : 0,
+            ny: nx ? nx['y'] : 0,
+            nw: nx ? nx['width'] : 0,
+            nh: nx ? nx['height'] : 0,
           };
         },
         (x2) => {
@@ -292,10 +292,10 @@ const ImageExpandController = {
               value5 = image['naturalHeight'],
               box2 = value3,
               box3 = {
-                x: x3['x'] || 0x0,
-                y: x3['y'] || 0x0,
-                w: x3['width'] || 0x1,
-                h: x3['height'] || 0x1,
+                x: x3['x'] || 0,
+                y: x3['y'] || 0,
+                w: x3['width'] || 1,
+                h: x3['height'] || 1,
               },
               value6 = value4 / box3['w'],
               value7 = value5 / box3['h'],
@@ -304,7 +304,7 @@ const ImageExpandController = {
             ((box['width'] = width),
               (box['height'] = height),
               (ctx['fillStyle'] = '#00FF00'),
-              ctx['fillRect'](0x0, 0x0, width, height));
+              ctx['fillRect'](0, 0, width, height));
             const value8 = Math['round']((box3['x'] - box2['x']) * value6),
               value9 = Math['round']((box3['y'] - box2['y']) * value7);
             (ctx['drawImage'](image, value8, value9, value4, value5),
@@ -341,7 +341,7 @@ const ImageExpandController = {
       imageSize: this['imageSize'],
       ...args2,
       inputUrls: [value12],
-      batchSize: 0x1,
+      batchSize: 1,
     };
   },
   _formatDebugRequest(value14) {
@@ -377,7 +377,7 @@ const ImageExpandController = {
       (this['_showDebugWindow'](finalApiDebugPreview['outputText'], finalApiDebugPreview['images']),
         window['showToast']?.(imageExpandText('toasts.debugShown'), 'warn'));
     } catch (error2) {
-      (console['error']('[ImageExpandController]\x20调试请求构建失败:', error2),
+      (console['error']('[ImageExpandController] 调试请求构建失败:', error2),
         window['showToast']?.(
           imageExpandText('toasts.debugBuildFailed', {
             error: error2?.['message'] || imageExpandText('errors.unknown'),
@@ -390,18 +390,18 @@ const ImageExpandController = {
   },
   _parseRatio() {
     if (this['ratioStr'] === 'original')
-      return (this['nodeData']['width'] || 0x1) / (this['nodeData']['height'] || 0x1);
+      return (this['nodeData']['width'] || 1) / (this['nodeData']['height'] || 1);
     const list2 = this['ratioStr']['split'](':')['map']((value18) => Number(value18));
-    if (list2['length'] !== 0x2 || !list2[0x0] || !list2[0x1])
-      return (this['nodeData']['width'] || 0x1) / (this['nodeData']['height'] || 0x1);
-    return list2[0x0] / list2[0x1];
+    if (list2['length'] !== 2 || !list2[0] || !list2[1])
+      return (this['nodeData']['width'] || 1) / (this['nodeData']['height'] || 1);
+    return list2[0] / list2[1];
   },
   _calcFrameWorldRect() {
     const box4 = this['nodeData'],
-      value19 = box4['width'] || 0x1,
-      value20 = box4['height'] || 0x1,
-      x4 = box4['x'] + value19 / 0x2,
-      y2 = box4['y'] + value20 / 0x2,
+      value19 = box4['width'] || 1,
+      value20 = box4['height'] || 1,
+      x4 = box4['x'] + value19 / 2,
+      y2 = box4['y'] + value20 / 2,
       value21 = value19 / value20,
       value22 = this['_parseRatio']();
     let value23, value24;
@@ -411,32 +411,32 @@ const ImageExpandController = {
     const value25 = 1.35,
       w = Math['max'](value19, value23) * value25,
       h = Math['max'](value20, value24) * value25;
-    return { x: x4 - w / 0x2, y: y2 - h / 0x2, w: w, h: h };
+    return { x: x4 - w / 2, y: y2 - h / 2, w: w, h: h };
   },
   _getNodeWorldRect() {
     const x5 = this['nodeData'] || {},
-      w2 = x5['width'] || 0x1,
-      h2 = x5['height'] || 0x1;
-    return { x: x5['x'] || 0x0, y: x5['y'] || 0x0, w: w2, h: h2 };
+      w2 = x5['width'] || 1,
+      h2 = x5['height'] || 1;
+    return { x: x5['x'] || 0, y: x5['y'] || 0, w: w2, h: h2 };
   },
   _clampFrameRect(box5) {
     const box6 = this['_getNodeWorldRect'](),
       handler3 = (value26, value27, value28) =>
         Math['min'](value28, Math['max'](value27, value26)),
       box7 = {
-        x: Number(box5?.['x']) || 0x0,
-        y: Number(box5?.['y']) || 0x0,
-        w: Number(box5?.['w']) || 0x1,
-        h: Number(box5?.['h']) || 0x1,
+        x: Number(box5?.['x']) || 0,
+        y: Number(box5?.['y']) || 0,
+        w: Number(box5?.['w']) || 1,
+        h: Number(box5?.['h']) || 1,
       },
-      value29 = Math['max'](box6['w'], 0x18),
-      value30 = Math['max'](box6['h'], 0x18);
+      value29 = Math['max'](box6['w'], 24),
+      value30 = Math['max'](box6['h'], 24);
     ((box7['w'] = Math['max'](box7['w'], value29)),
       (box7['h'] = Math['max'](box7['h'], value30)));
     if (this['ratioStr'] !== 'original') {
       const value31 = this['_parseRatio'](),
-        value32 = box7['x'] + box7['w'] / 0x2,
-        value33 = box7['y'] + box7['h'] / 0x2;
+        value32 = box7['x'] + box7['w'] / 2,
+        value33 = box7['y'] + box7['h'] / 2;
       let value34 = box7['w'],
         value35 = box7['h'];
       (value34 / value35 > value31
@@ -446,8 +446,8 @@ const ImageExpandController = {
         value35 < value30 && ((value35 = value30), (value34 = value35 * value31)),
         (box7['w'] = value34),
         (box7['h'] = value35),
-        (box7['x'] = value32 - box7['w'] / 0x2),
-        (box7['y'] = value33 - box7['h'] / 0x2));
+        (box7['x'] = value32 - box7['w'] / 2),
+        (box7['y'] = value33 - box7['h'] / 2));
     }
     const value36 = box6['x'] + box6['w'] - box7['w'],
       value37 = box6['x'],
@@ -500,7 +500,7 @@ const ImageExpandController = {
       this['imageSize'],
     )),
       (el5['innerHTML'] =
-        '\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-expand-toolbar-btn\x20exit\x22\x20title=\x22' +
+        '\n      <button class="v2-expand-toolbar-btn exit" title="' +
         imageExpandText('actions.exit') +
         '">\n        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>\n      </button>\n      ' +
         renderImageFunctionControls(this['_functionSelection'], value44) +
@@ -514,13 +514,13 @@ const ImageExpandController = {
           menuClass: 'v2-expand-menu ratio-menu',
           itemClass: 'v2-expand-menu-item',
         }) +
-        '\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-expand-toolbar-btn\x20debug-wrench-btn\x22\x20type=\x22button\x22\x20title=\x22' +
+        '\n      <button class="v2-expand-toolbar-btn debug-wrench-btn" type="button" title="' +
         imageExpandText('actions.debugApiParams') +
-        '\x22\x20aria-label=\x22' +
+        '" aria-label="' +
         imageExpandText('actions.debugApiParams') +
         '">\n        ' +
         DEBUG_WRENCH_ICON_HTML +
-        '\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22v2-expand-toolbar-btn\x20go\x20img-gen-btn\x22\x20title=\x22' +
+        '\n      </button>\n      <button class="v2-expand-toolbar-btn go img-gen-btn" title="' +
         imageExpandText('actions.generate') +
         '">\n        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>\n      </button>\n    '));
     const value45 = el5['querySelector']('[data-toolbar-up-menu="ratio"]');
@@ -548,8 +548,8 @@ const ImageExpandController = {
       const map = new Map(
           list3['map']((el7) => [String(el7['value'] || ''), el7]),
         ),
-        el8 = this['toolbarEl']['querySelector']('[data-toolbar-up-menu="' + value48 + '\x22]'),
-        value50 = map['get'](String(value49 || '')) || list3[0x0],
+        el8 = this['toolbarEl']['querySelector']('[data-toolbar-up-menu="' + value48 + '"]'),
+        value50 = map['get'](String(value49 || '')) || list3[0],
         el9 = el8?.['querySelector']('[data-toolbar-up-menu-label]');
       (el9 &&
         value50 &&
@@ -589,8 +589,8 @@ const ImageExpandController = {
       (this['imgEl']['style']['height'] = value55 + 'px'),
       this['toolbarEl'] &&
         positionCanvasEditorToolbar(this['toolbarEl'], {
-          center: center['x'] + value54 / 0x2,
-          top: center['y'] + value55 + 0xe,
+          center: center['x'] + value54 / 2,
+          top: center['y'] + value55 + 14,
         }));
   },
   _bindEvents() {
@@ -855,7 +855,7 @@ const ImageExpandController = {
             const taskId5 = appStore['getState']()['nodes']?.[id],
               duration = taskId5?.['generationStartTime']
                 ? Date['now']() - taskId5['generationStartTime']
-                : 0x0;
+                : 0;
             appStore['updateNodeData'](id, {
               ...buildImageGenerationFailurePatch({
                 error: error3['error'],
@@ -902,7 +902,7 @@ const ImageExpandController = {
           const taskId6 = appStore['getState']()['nodes']?.[id],
             duration2 = taskId6?.['generationStartTime']
               ? Date['now']() - taskId6['generationStartTime']
-              : 0x0,
+              : 0,
             box13 = await resolveOutputMediaSize({
               localPath: error3['localPath'],
               imageUrl: error3['imageUrl'],
@@ -966,7 +966,7 @@ const ImageExpandController = {
             if (isTaskCancelled(taskId7)) return;
             const duration3 = taskId7?.['generationStartTime']
                 ? Date['now']() - taskId7['generationStartTime']
-                : 0x0,
+                : 0,
               error5 = error4['message'] || imageExpandText('errors.unknown');
             (appStore['updateNodeData'](id, {
               ...buildImageGenerationFailurePatch({
@@ -1040,7 +1040,7 @@ const ImageExpandController = {
         const event7 = this['_pointerState'];
         if (!event7 || event6['pointerId'] !== event7['pointerId']) return;
         event6['preventDefault']();
-        const value68 = event7['zoom'] || this['_view']?.['viewport']?.['zoom'] || 0x1,
+        const value68 = event7['zoom'] || this['_view']?.['viewport']?.['zoom'] || 1,
           value69 = (event6['clientX'] - event7['startX']) / value68,
           value70 = (event6['clientY'] - event7['startY']) / value68,
           box14 = this['_getNodeWorldRect'](),
@@ -1058,8 +1058,8 @@ const ImageExpandController = {
           return;
         }
         const value74 = event7['handle'],
-          value75 = Math['max'](box14['w'], 0x18),
-          value76 = Math['max'](box14['h'], 0x18),
+          value75 = Math['max'](box14['w'], 24),
+          value76 = Math['max'](box14['h'], 24),
           handler6 = (args4) => {
             const box15 = { ...args4 },
               value77 = box14['x'] + box14['w'] - box15['w'],
@@ -1173,8 +1173,8 @@ const ImageExpandController = {
           return;
         }
         const value82 = this['_parseRatio'](),
-          value83 = event7['startRect']['x'] + event7['startRect']['w'] / 0x2,
-          value84 = event7['startRect']['y'] + event7['startRect']['h'] / 0x2;
+          value83 = event7['startRect']['x'] + event7['startRect']['w'] / 2,
+          value84 = event7['startRect']['y'] + event7['startRect']['h'] / 2;
         let box18 = { ...event7['startRect'] };
         if (value74 === 'lm' || value74 === 'rm') {
           let value85 = event7['startRect']['w'] + (value74 === 'rm' ? value69 : -value69);
@@ -1187,7 +1187,7 @@ const ImageExpandController = {
               value74 === 'rm'
                 ? event7['startRect']['x']
                 : event7['startRect']['x'] + event7['startRect']['w'] - box18['w']),
-            (box18['y'] = value84 - box18['h'] / 0x2));
+            (box18['y'] = value84 - box18['h'] / 2));
         } else {
           if (value74 === 'tm' || value74 === 'bm') {
             let value87 = event7['startRect']['h'] + (value74 === 'bm' ? value70 : -value70);
@@ -1200,13 +1200,13 @@ const ImageExpandController = {
                 value74 === 'bm'
                   ? event7['startRect']['y']
                   : event7['startRect']['y'] + event7['startRect']['h'] - box18['h']),
-              (box18['x'] = value83 - box18['w'] / 0x2));
+              (box18['x'] = value83 - box18['w'] / 2));
           } else {
-            const value89 = value74 === 'tr' || value74 === 'br' ? 0x1 : -0x1,
-              value90 = value74 === 'bl' || value74 === 'br' ? 0x1 : -0x1;
+            const value89 = value74 === 'tr' || value74 === 'br' ? 1 : -1,
+              value90 = value74 === 'bl' || value74 === 'br' ? 1 : -1;
             let value91 = event7['startRect']['w'] + value69 * value89,
               value92 = event7['startRect']['h'] + value70 * value90;
-            ((value91 = Math['max'](value91, 0x1)), (value92 = Math['max'](value92, 0x1)));
+            ((value91 = Math['max'](value91, 1)), (value92 = Math['max'](value92, 1)));
             value91 / value92 > value82
               ? (value92 = value91 / value82)
               : (value91 = value92 * value82);
@@ -1241,7 +1241,7 @@ const ImageExpandController = {
         (event8['preventDefault'](), run4());
       },
       value93 = (pointerId) => {
-        if (pointerId['button'] !== 0x0) return;
+        if (pointerId['button'] !== 0) return;
         (pointerId['stopPropagation'](), pointerId['preventDefault']());
         if (!this['frameRect']) this['frameRect'] = this['_calcFrameWorldRect']();
         this['frameRect'] = this['_clampFrameRect'](this['frameRect']);
@@ -1255,7 +1255,7 @@ const ImageExpandController = {
           startX: pointerId['clientX'],
           startY: pointerId['clientY'],
           startRect: { ...this['frameRect'] },
-          zoom: this['_view']?.['viewport']?.['zoom'] || 0x1,
+          zoom: this['_view']?.['viewport']?.['zoom'] || 1,
         }),
           this['frameEl']['setPointerCapture']?.(pointerId['pointerId']),
           window['addEventListener']('pointermove', value66, !![]),
@@ -1300,7 +1300,7 @@ const ImageExpandController = {
       (this['sizeMenuEl'] = null),
       setTimeout(() => {
         (el13?.['remove'](), el14?.['remove']());
-      }, 0xc8));
+      }, 200));
   },
 };
 export default ImageExpandController;

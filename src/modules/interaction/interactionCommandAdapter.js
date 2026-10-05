@@ -104,7 +104,7 @@ export function createInteractionCommandAdapter({
           return !![];
         case 'select_all': {
           const ids2 = Object['keys'](ids['nodes'] || {});
-          if (ids2['length'] === 0x0) return ((graphStore || store)?.['setSelectedNodes']?.([]), !![]);
+          if (ids2['length'] === 0) return ((graphStore || store)?.['setSelectedNodes']?.([]), !![]);
           return (executeCanvasCommandSync('node.select', { ids: ids2 }, value), !![]);
         }
         case 'align_nodes': {
@@ -112,7 +112,7 @@ export function createInteractionCommandAdapter({
           const axis = String(edgeId['mode'] || '')['trim']();
           if (axis === 'arrange-grid') {
             const count = Number(ids['ui']?.['alignDistributeGap']),
-              gapX = Number['isFinite'](count) && count >= 0x0 ? count : 0x28;
+              gapX = Number['isFinite'](count) && count >= 0 ? count : 40;
             return (
               executeCanvasCommandSync(
                 'layout.arrangeGrid',

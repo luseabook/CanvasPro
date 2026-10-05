@@ -30,7 +30,7 @@ export function bindGenerationPriceControl(
     enabled2 = ![],
     enabled3 = ![],
     enabled4 = ![],
-    key = 0x0,
+    key = 0,
     enabled5 = ![],
     setTimeout2,
     bindModelPriceDetails2;
@@ -50,14 +50,14 @@ export function bindGenerationPriceControl(
           : '',
       ]
         ['filter'](Boolean)
-        ['join']('\x0a'),
+        ['join']('\n'),
     }),
     handler = () => {
       if (enabled3) return;
       ((el4['hidden'] = !title), el4['setAttribute']('aria-busy', String(enabled2)));
       const enabled6 = value ? run() : null;
       ((el5['textContent'] = enabled6?.['amountText']
-        ? enabled6['prefix'] + '\x20'
+        ? enabled6['prefix'] + ' '
         : enabled6?.['label'] || priceText(enabled ? 'unavailable' : 'price')),
         (el6['textContent'] = enabled6?.['amountText'] || ''),
         (el6['hidden'] = !enabled6?.['amountText']),
@@ -91,7 +91,7 @@ export function bindGenerationPriceControl(
       if (enabled3) return;
       const event = getContext();
       (event?.['key'] !== title?.['key'] &&
-        ((key += 0x1),
+        ((key += 1),
         (enabled2 = ![]),
         (enabled = ![]),
         (item = ''),
@@ -100,7 +100,7 @@ export function bindGenerationPriceControl(
         (title = event),
         handler(),
         clearTimeout(setTimeout2),
-        (setTimeout2 = setTimeout(handler2, title?.['debounceMs'] || 0x0)));
+        (setTimeout2 = setTimeout(handler2, title?.['debounceMs'] || 0)));
     },
     sync2 = () => {
       if (enabled5) return;
@@ -129,7 +129,7 @@ export function bindGenerationPriceControl(
       sync: sync2,
       destroy() {
         ((enabled3 = !![]),
-          (key += 0x1),
+          (key += 1),
           clearTimeout(setTimeout2),
           data?.['disconnect'](),
           target?.(),

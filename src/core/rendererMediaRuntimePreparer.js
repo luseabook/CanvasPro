@@ -1,9 +1,9 @@
-const DEFAULT_IDLE_TIMEOUT_MS = 0xf0,
-  DEFAULT_FALLBACK_DELAY_MS = 0x20,
-  DEFAULT_BUSY_RETRY_MS = 0x78,
-  DEFAULT_MIN_IDLE_BUDGET_MS = 0xc,
-  DEFAULT_MAX_QUEUED = 0x18,
-  DEFAULT_MAX_PREPARED = 0x4,
+const DEFAULT_IDLE_TIMEOUT_MS = 240,
+  DEFAULT_FALLBACK_DELAY_MS = 32,
+  DEFAULT_BUSY_RETRY_MS = 120,
+  DEFAULT_MIN_IDLE_BUDGET_MS = 12,
+  DEFAULT_MAX_QUEUED = 24,
+  DEFAULT_MAX_PREPARED = 4,
   PREBUILD_MEDIA_TYPES = new Set(['source-image', 'source-video']);
 function getWindowLike() {
   return typeof window !== 'undefined' ? window : globalThis;
@@ -15,7 +15,7 @@ function defaultSchedule(handler, { timeoutMs: timeoutMs, delayMs: delayMs } = {
   const handle = getWindowLike();
   if (typeof handle['requestIdleCallback'] === 'function')
     return { handle: handle['requestIdleCallback'](handler, { timeout: timeoutMs }), type: 'idle' };
-  return { handle: setTimeout(() => handler(null), Math['max'](0x0, delayMs || 0x0)), type: 'timeout' };
+  return { handle: setTimeout(() => handler(null), Math['max'](0, delayMs || 0)), type: 'timeout' };
 }
 function defaultCancel(value, item) {
   const windowLike = getWindowLike();
@@ -42,8 +42,8 @@ function isSameTaskVersion(key, index, result) {
 }
 export function shouldPrebuildRendererMediaRuntime({
   node: node,
-  nodeCount: nodeCount = 0x0,
-  veryDenseNodeCount: veryDenseNodeCount = 0x78,
+  nodeCount: nodeCount = 0,
+  veryDenseNodeCount: veryDenseNodeCount = 120,
   hasExactVisiblePreview: hasExactVisiblePreview = ![],
   interactionBusy: interactionBusy = ![],
   interactionPriority: interactionPriority = ![],
@@ -56,7 +56,7 @@ export function shouldPrebuildRendererMediaRuntime({
     ['toLowerCase']();
   return !!(
     PREBUILD_MEDIA_TYPES['has'](data) &&
-    Number(nodeCount || 0x0) >= Math['max'](0x1, Number(veryDenseNodeCount) || 0x1) &&
+    Number(nodeCount || 0) >= Math['max'](1, Number(veryDenseNodeCount) || 1) &&
     hasExactVisiblePreview &&
     !interactionBusy &&
     !interactionPriority &&
@@ -84,8 +84,8 @@ export function createRendererMediaRuntimePreparer({
   let value2 = null,
     options = '',
     paused = ![];
-  const target = Math['max'](0x1, Math['trunc'](Number(maxQueued) || 0x1)),
-    source = Math['max'](0x1, Math['trunc'](Number(maxPrepared) || 0x1));
+  const target = Math['max'](1, Math['trunc'](Number(maxQueued) || 1)),
+    source = Math['max'](1, Math['trunc'](Number(maxPrepared) || 1));
   function run(enabled) {
     if (!enabled) return;
     try {
@@ -97,7 +97,7 @@ export function createRendererMediaRuntimePreparer({
     (cancelTask(value2, options), (value2 = null), (options = ''));
   }
   function run3(delayMs2 = fallbackDelayMs) {
-    if (paused || value2 !== null || queued['size'] === 0x0) return;
+    if (paused || value2 !== null || queued['size'] === 0) return;
     const scheduleTask2 = scheduleTask(flush, { timeoutMs: idleTimeoutMs, delayMs: delayMs2 });
     ((value2 = scheduleTask2?.['handle'] ?? scheduleTask2), (options = scheduleTask2?.['type'] || 'timeout'));
   }
@@ -110,7 +110,7 @@ export function createRendererMediaRuntimePreparer({
     const enabled3 = String(current || '')['trim']();
     if (!enabled3) return;
     (queued['delete'](enabled3), run4(enabled3));
-    if (queued['size'] === 0x0) run2();
+    if (queued['size'] === 0) run2();
   }
   function run5() {
     while (prepared['size'] >= source) {
@@ -130,13 +130,13 @@ export function createRendererMediaRuntimePreparer({
       value3 &&
       value3['didTimeout'] !== !![] &&
       typeof value3['timeRemaining'] === 'function' &&
-      value3['timeRemaining']() < Math['max'](0x0, Number(minIdleBudgetMs) || 0x0)
+      value3['timeRemaining']() < Math['max'](0, Number(minIdleBudgetMs) || 0)
     ) {
       run3(fallbackDelayMs);
       return;
     }
     let nodeId2 = null;
-    while (queued['size'] > 0x0 && !nodeId2) {
+    while (queued['size'] > 0 && !nodeId2) {
       const enabled5 = queued['entries']()['next']()['value'];
       if (!enabled5) break;
       const [entry, record] = enabled5;
@@ -145,11 +145,11 @@ export function createRendererMediaRuntimePreparer({
       nodeId2 = record;
     }
     if (!nodeId2) {
-      if (queued['size'] > 0x0) run3();
+      if (queued['size'] > 0) run3();
       return;
     }
     let runtime = null;
-    const payload = Number(now()) || 0x0;
+    const payload = Number(now()) || 0;
     try {
       runtime = nodeId2['prepare']();
     } catch (error) {
@@ -163,10 +163,10 @@ export function createRendererMediaRuntimePreparer({
           prepared['set'](nodeId2['nodeId'], state),
           onPrepared?.({
             nodeId: nodeId2['nodeId'],
-            durationMs: Math['max'](0x0, (Number(now()) || 0x0) - payload),
+            durationMs: Math['max'](0, (Number(now()) || 0) - payload),
           }));
     }
-    if (queued['size'] > 0x0) run3();
+    if (queued['size'] > 0) run3();
   }
   function enqueue(config) {
     const task = normalizeTask(config);
@@ -207,7 +207,7 @@ export function createRendererMediaRuntimePreparer({
     for (const value13 of prepared['keys']()) {
       if (!map['has'](value13)) run4(value13);
     }
-    if (queued['size'] === 0x0) run2();
+    if (queued['size'] === 0) run2();
   }
   function pause() {
     ((paused = !![]), run2());

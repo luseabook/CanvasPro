@@ -4,7 +4,7 @@ import {
   createAudioVoicePayloadError,
   firstNonEmptyString,
 } from './audioVoicePanelSegmentState.js';
-export const AUDIO_VOICE_SOURCE_CLIP_MIN_MS = 0x64;
+export const AUDIO_VOICE_SOURCE_CLIP_MIN_MS = 100;
 function buildAudioVoiceSegmentFingerprint(options = {}) {
   return JSON['stringify'](cloneAudioVoiceSegment(options));
 }
@@ -12,17 +12,17 @@ export function buildAudioVoicePendingSegmentMerge(args = {}, value = {}) {
   const currentSegmentId = String(args['id'] || '')['trim'](),
     nextSegmentId = String(value['id'] || '')['trim']();
   if (!currentSegmentId || !nextSegmentId) return null;
-  const startMs = Math['max'](0x0, Math['round'](Number(args['startMs']) || 0x0)),
+  const startMs = Math['max'](0, Math['round'](Number(args['startMs']) || 0)),
     endMs = Math['max'](startMs, Math['round'](Number(value['endMs']) || startMs)),
     draftSegment = cloneAudioVoiceSegment({
       ...args,
       startMs: startMs,
       endMs: endMs,
-      sourceText: [args['sourceText'], value['sourceText']]['filter'](Boolean)['join']('\x20'),
-      targetText: [args['targetText'], value['targetText']]['filter'](Boolean)['join']('\x20'),
+      sourceText: [args['sourceText'], value['sourceText']]['filter'](Boolean)['join'](' '),
+      targetText: [args['targetText'], value['targetText']]['filter'](Boolean)['join'](' '),
       convertedAudioLocalPath: '',
       convertedAudioUrl: '',
-      convertedAudioDuration: 0x0,
+      convertedAudioDuration: 0,
       convertedAudioReady: ![],
       activeAudio: 'source',
       status: 'edited',
@@ -42,7 +42,7 @@ export function projectAudioVoicePendingSegmentMerges(list = [], item = []) {
     list3 = (Array['isArray'](item) ? item : [])['filter'](
       (key) => key?.['currentSegmentId'] && key?.['nextSegmentId'] && key?.['draftSegment'],
     );
-  if (list3['length'] <= 0x0) return [...list2];
+  if (list3['length'] <= 0) return [...list2];
   const map = new Map(list3['map']((index) => [String(index['currentSegmentId']), index['draftSegment']])),
     map2 = new Set(list3['map']((result) => String(result['nextSegmentId'])));
   return list2['filter']((data) => !map2['has'](String(data?.['id'] || '')))['map'](
@@ -56,9 +56,9 @@ export function isAudioVoicePendingSegmentMergeCurrent(options2 = {}, source = [
     count = list4['findIndex'](
       (next) => String(next?.['id'] || '') === String(options2['currentSegmentId'] || ''),
     );
-  if (count < 0x0) return ![];
+  if (count < 0) return ![];
   const current = list4[count],
-    enabled = list4[count + 0x1];
+    enabled = list4[count + 1];
   if (!enabled || String(enabled['id'] || '') !== String(options2['nextSegmentId'] || '')) return ![];
   return (
     buildAudioVoiceSegmentFingerprint(current) === String(options2['currentFingerprint'] || '') &&
@@ -73,12 +73,12 @@ export async function mergeAudioVoiceSourceSegments(options3 = {}, entry = {}, r
   if (!localPath || !localPath2) throw createAudioVoicePayloadError('audioMissing');
   const durationMs =
       Math['max'](
-        0x0,
-        Math['round'](Number(options3['endMs']) || 0x0) - Math['round'](Number(options3['startMs']) || 0x0),
+        0,
+        Math['round'](Number(options3['endMs']) || 0) - Math['round'](Number(options3['startMs']) || 0),
       ) +
       Math['max'](
-        0x0,
-        Math['round'](Number(entry['endMs']) || 0x0) - Math['round'](Number(entry['startMs']) || 0x0),
+        0,
+        Math['round'](Number(entry['endMs']) || 0) - Math['round'](Number(entry['startMs']) || 0),
       ),
     response2 = await run([localPath, localPath2], { durationMs: durationMs }),
     localPath3 = normalizeLocalPath(response2?.['localPath'] || response2?.['path'] || ''),
@@ -111,7 +111,7 @@ export function buildAudioVoiceTextEditPatch(options4 = {}, payload = '') {
     targetText: targetText ? state : '',
     convertedAudioLocalPath: '',
     convertedAudioUrl: '',
-    convertedAudioDuration: 0x0,
+    convertedAudioDuration: 0,
     convertedAudioReady: ![],
     activeAudio: 'source',
     status: targetText ? 'edited' : options4['sourceAudioReady'] ? 'detected' : 'edited',
@@ -147,7 +147,7 @@ export function applyAudioVoiceTranslationResults(list5 = [], config = []) {
   });
 }
 export function buildAudioVoiceApplySourceClipPatch(options5 = {}, value2 = {}) {
-  const startMs3 = Math['max'](0x0, Math['round'](Number(value2['startMs'] ?? options5['startMs']) || 0x0)),
+  const startMs3 = Math['max'](0, Math['round'](Number(value2['startMs'] ?? options5['startMs']) || 0)),
     endMs3 = Math['max'](startMs3, Math['round'](Number(value2['endMs'] ?? options5['endMs']) || startMs3)),
     sourceAudioLocalPath = normalizeLocalPath(value2['localPath'] || value2['sourceAudioLocalPath'] || ''),
     sourceAudioUrl = firstNonEmptyString(
@@ -159,8 +159,8 @@ export function buildAudioVoiceApplySourceClipPatch(options5 = {}, value2 = {}) 
     value3 = hasAudioVoiceSourceClipBase2 ? options5['sourceClipBaseStartMs'] : options5['startMs'],
     value4 = hasAudioVoiceSourceClipBase2 ? options5['sourceClipBaseEndMs'] : options5['endMs'],
     sourceClipBaseStartMs = Math['max'](
-      0x0,
-      Math['round'](Number(value2['sourceClipBaseStartMs'] ?? value3) || 0x0),
+      0,
+      Math['round'](Number(value2['sourceClipBaseStartMs'] ?? value3) || 0),
     ),
     sourceClipBaseEndMs = Math['max'](
       sourceClipBaseStartMs,
@@ -189,7 +189,7 @@ export function buildAudioVoiceApplySourceClipPatch(options5 = {}, value2 = {}) 
     sourceAudioReady: !!sourceAudioUrl,
     convertedAudioLocalPath: '',
     convertedAudioUrl: '',
-    convertedAudioDuration: 0x0,
+    convertedAudioDuration: 0,
     convertedAudioReady: ![],
     activeAudio: 'source',
     status: 'edited',
@@ -202,8 +202,8 @@ function hasAudioVoiceSourceClipBase(options6 = {}) {
   return (
     !!normalizeLocalPath(options6['sourceClipBaseAudioLocalPath'] || '') ||
     !!String(options6['sourceClipBaseAudioUrl'] || '')['trim']() ||
-    Math['round'](Number(options6['sourceClipBaseEndMs']) || 0x0) >
-      Math['round'](Number(options6['sourceClipBaseStartMs']) || 0x0)
+    Math['round'](Number(options6['sourceClipBaseEndMs']) || 0) >
+      Math['round'](Number(options6['sourceClipBaseStartMs']) || 0)
   );
 }
 export function resolveAudioVoiceSourceClipEditBase(options7 = {}, value5 = {}) {
@@ -219,11 +219,11 @@ export function resolveAudioVoiceSourceClipEditBase(options7 = {}, value5 = {}) 
       value5['audioUrl'],
       localPathToUrl(localPath7),
     ),
-    value6 = Math['max'](0x0, Math['round'](Number(options7['startMs']) || 0x0)),
+    value6 = Math['max'](0, Math['round'](Number(options7['startMs']) || 0)),
     value7 = Math['max'](value6, Math['round'](Number(options7['endMs']) || value6)),
     startMs4 = Math['max'](
-      0x0,
-      Math['round'](Number(hasAudioVoiceSourceClipBase3 ? options7['sourceClipBaseStartMs'] : value6) || 0x0),
+      0,
+      Math['round'](Number(hasAudioVoiceSourceClipBase3 ? options7['sourceClipBaseStartMs'] : value6) || 0),
     ),
     endMs4 = Math['max'](
       startMs4,
@@ -236,22 +236,22 @@ export function resolveAudioVoiceSourceClipEditBase(options7 = {}, value5 = {}) 
     audioUrl: audioUrl2,
     startMs: startMs4,
     endMs: endMs4,
-    durationMs: Math['max'](0x0, endMs4 - startMs4),
+    durationMs: Math['max'](0, endMs4 - startMs4),
   };
 }
 function splitAudioVoiceTextAtRatio(value8 = '', value9 = 0.5) {
   const enabled2 = String(value8 || '');
   if (!enabled2) return ['', ''];
   const list6 = Array['from'](enabled2);
-  if (list6['length'] <= 0x1) return [enabled2, ''];
-  const value10 = Math['max'](0x0, Math['min'](0x1, Number(value9) || 0x0)),
-    value11 = Math['max'](0x1, Math['min'](list6['length'] - 0x1, Math['round'](list6['length'] * value10)));
-  return [list6['slice'](0x0, value11)['join']('')['trim'](), list6['slice'](value11)['join']('')['trim']()];
+  if (list6['length'] <= 1) return [enabled2, ''];
+  const value10 = Math['max'](0, Math['min'](1, Number(value9) || 0)),
+    value11 = Math['max'](1, Math['min'](list6['length'] - 1, Math['round'](list6['length'] * value10)));
+  return [list6['slice'](0, value11)['join']('')['trim'](), list6['slice'](value11)['join']('')['trim']()];
 }
 export function buildAudioVoiceSplitSourceSegmentDraft(args4 = {}, value12 = {}) {
-  const startMs5 = Math['max'](0x0, Math['round'](Number(value12['selectionStartMs']) || 0x0)),
-    endMs5 = Math['max'](startMs5, Math['round'](Number(value12['selectionEndMs']) || 0x0)),
-    endMs6 = Math['round'](Number(value12['splitAtMs']) || 0x0);
+  const startMs5 = Math['max'](0, Math['round'](Number(value12['selectionStartMs']) || 0)),
+    endMs5 = Math['max'](startMs5, Math['round'](Number(value12['selectionEndMs']) || 0)),
+    endMs6 = Math['round'](Number(value12['splitAtMs']) || 0);
   if (endMs6 - startMs5 < AUDIO_VOICE_SOURCE_CLIP_MIN_MS || endMs5 - endMs6 < AUDIO_VOICE_SOURCE_CLIP_MIN_MS)
     return null;
   const args5 = {
@@ -260,7 +260,7 @@ export function buildAudioVoiceSplitSourceSegmentDraft(args4 = {}, value12 = {})
       sourceAudioReady: ![],
       convertedAudioLocalPath: '',
       convertedAudioUrl: '',
-      convertedAudioDuration: 0x0,
+      convertedAudioDuration: 0,
       convertedAudioReady: ![],
       activeAudio: 'source',
       status: 'edited',
@@ -291,21 +291,21 @@ export function buildAudioVoiceSplitSourceSegmentDraft(args4 = {}, value12 = {})
   return [cloneAudioVoiceSegment2, cloneAudioVoiceSegment3];
 }
 function normalizeAudioVoiceSourceClipRanges(list7 = []) {
-  if (!Array['isArray'](list7) || list7['length'] < 0x2) return null;
+  if (!Array['isArray'](list7) || list7['length'] < 2) return null;
   const list8 = list7['map']((value14, count2) => {
-    const startMs6 = Math['max'](0x0, Math['round'](Number(value14?.['startMs']) || 0x0)),
-      endMs7 = Math['max'](startMs6, Math['round'](Number(value14?.['endMs']) || 0x0));
+    const startMs6 = Math['max'](0, Math['round'](Number(value14?.['startMs']) || 0)),
+      endMs7 = Math['max'](startMs6, Math['round'](Number(value14?.['endMs']) || 0));
     return {
-      id: String(value14?.['id'] || (count2 === 0x0 ? 'left' : 'right')),
+      id: String(value14?.['id'] || (count2 === 0 ? 'left' : 'right')),
       startMs: startMs6,
       endMs: endMs7,
     };
   })
     ['filter']((value15) => value15['endMs'] - value15['startMs'] >= AUDIO_VOICE_SOURCE_CLIP_MIN_MS)
     ['sort']((value16, value17) => value16['startMs'] - value17['startMs'])
-    ['slice'](0x0, 0x2);
-  if (list8['length'] < 0x2) return null;
-  if (list8[0x0]['endMs'] > list8[0x1]['startMs']) return null;
+    ['slice'](0, 2);
+  if (list8['length'] < 2) return null;
+  if (list8[0]['endMs'] > list8[1]['startMs']) return null;
   return list8;
 }
 function buildAudioVoiceRangeSourceSegmentDraft(args6 = {}, value18 = {}) {
@@ -317,7 +317,7 @@ function buildAudioVoiceRangeSourceSegmentDraft(args6 = {}, value18 = {}) {
       sourceAudioReady: ![],
       convertedAudioLocalPath: '',
       convertedAudioUrl: '',
-      convertedAudioDuration: 0x0,
+      convertedAudioDuration: 0,
       convertedAudioReady: ![],
       activeAudio: 'source',
       status: 'edited',
@@ -326,10 +326,10 @@ function buildAudioVoiceRangeSourceSegmentDraft(args6 = {}, value18 = {}) {
       needsSourceAudioRecut: !![],
     },
     count3 = list9['reduce'](
-      (value19, value20) => value19 + Math['max'](0x0, value20['endMs'] - value20['startMs']),
-      0x0,
+      (value19, value20) => value19 + Math['max'](0, value20['endMs'] - value20['startMs']),
+      0,
     ),
-    value21 = count3 > 0x0 ? (list9[0x0]['endMs'] - list9[0x0]['startMs']) / count3 : 0.5,
+    value21 = count3 > 0 ? (list9[0]['endMs'] - list9[0]['startMs']) / count3 : 0.5,
     [value22, value23] = splitAudioVoiceTextAtRatio(args6['sourceText'], value21),
     [value24, value25] = splitAudioVoiceTextAtRatio(args6['targetText'], value21),
     sourceText3 = [
@@ -340,11 +340,11 @@ function buildAudioVoiceRangeSourceSegmentDraft(args6 = {}, value18 = {}) {
     cloneAudioVoiceSegment({
       ...args6,
       ...args7,
-      id: id === 0x0 ? args6['id'] : String(value18['newSegmentId'] || 'audio-voice-split-' + Date['now']()),
+      id: id === 0 ? args6['id'] : String(value18['newSegmentId'] || 'audio-voice-split-' + Date['now']()),
       startMs: startMs7['startMs'],
       endMs: startMs7['endMs'],
-      sourceText: sourceText3[id]?.[0x0] || '',
-      targetText: sourceText3[id]?.[0x1] || '',
+      sourceText: sourceText3[id]?.[0] || '',
+      targetText: sourceText3[id]?.[1] || '',
     }),
   );
 }
@@ -355,11 +355,11 @@ export async function commitAudioVoiceSourceClipEdit(args8 = {}, rangesMs = {}) 
       args8,
       rangesMs['editBase'] || {},
     ),
-    selectionStartMs = Math['max'](0x0, Math['round'](Number(rangesMs['selectionStartMs']) || 0x0)),
-    selectionEndMs = Math['max'](selectionStartMs, Math['round'](Number(rangesMs['selectionEndMs']) || 0x0));
+    selectionStartMs = Math['max'](0, Math['round'](Number(rangesMs['selectionStartMs']) || 0)),
+    selectionEndMs = Math['max'](selectionStartMs, Math['round'](Number(rangesMs['selectionEndMs']) || 0));
   if (selectionEndMs - selectionStartMs < AUDIO_VOICE_SOURCE_CLIP_MIN_MS)
     throw createAudioVoicePayloadError('sourceClipInvalidSelection');
-  const enabled3 = Array['isArray'](rangesMs['rangesMs']) && rangesMs['rangesMs']['length'] > 0x0,
+  const enabled3 = Array['isArray'](rangesMs['rangesMs']) && rangesMs['rangesMs']['length'] > 0,
     enabled4 = enabled3
       ? buildAudioVoiceRangeSourceSegmentDraft(args8, {
           rangesMs: rangesMs['rangesMs'],

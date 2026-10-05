@@ -12,13 +12,13 @@ export function bindStoryReplicationReviewThumbnails(el, src) {
     item = !![];
     try {
       while (map['size'] && !enabled2 && isCurrent()) {
-        const list = [...map]['slice'](0x0, 0x6);
+        const list = [...map]['slice'](0, 6);
         list['forEach']((key) => map['delete'](key));
         const sampleTimes = list['map']((el2) => {
           const index = value['events']['find'](
             (result) => result['id'] === el2['dataset']['replicationSegment'],
           );
-          return index['startSec'] + Math['min'](0.25, (index['endSec'] - index['startSec']) / 0x2);
+          return index['startSec'] + Math['min'](0.25, (index['endSec'] - index['startSec']) / 2);
         });
         try {
           const extractClientVideoTimelineFrameUrls2 = await extractClientVideoTimelineFrameUrls({

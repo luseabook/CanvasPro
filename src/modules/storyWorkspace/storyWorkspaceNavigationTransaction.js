@@ -1,6 +1,6 @@
 import { isStoryVideoReplicationAssetLocalizationComplete } from './storyVideoReplication.js';
 import { isStoryCollaborationProject } from './storyCollaborationPolicy.js';
-const STORY_WORKSPACE_STEP_COUNT = 0x3;
+const STORY_WORKSPACE_STEP_COUNT = 3;
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
@@ -13,9 +13,9 @@ function cloneNavigationValue(item, key) {
   }
 }
 export function normalizeStoryWorkspaceStep(count) {
-  if (count === 0x0 || count === '0') return 0x0;
-  const index = Math['trunc'](Number(count) || 0x1);
-  return Math['max'](0x1, Math['min'](STORY_WORKSPACE_STEP_COUNT, index));
+  if (count === 0 || count === '0') return 0;
+  const index = Math['trunc'](Number(count) || 1);
+  return Math['max'](1, Math['min'](STORY_WORKSPACE_STEP_COUNT, index));
 }
 export function canReuseStoryStepNavigation({
   view: view = '',
@@ -32,18 +32,18 @@ export function getStoryVideoEpisodes(list = []) {
 function normalizeStoryWorkspaceProjectData(data) {
   return data && typeof data === 'object' && !Array['isArray'](data) ? data : {};
 }
-export function getStoryWorkspaceStepBlockMessage(options = {}, target = 0x1) {
+export function getStoryWorkspaceStepBlockMessage(options = {}, target = 1) {
   const storyWorkspaceStep = normalizeStoryWorkspaceStep(target),
     storyWorkspaceProjectData = normalizeStoryWorkspaceProjectData(options);
-  if (storyWorkspaceStep === 0x0)
+  if (storyWorkspaceStep === 0)
     return isStoryCollaborationProject(storyWorkspaceProjectData) ? '' : '当前项目没有故事构思步骤。';
   if (storyWorkspaceProjectData['project']?.['collaboration']?.['stage'] === 'writing')
     return '请先确认故事构思中的正文。';
-  if (storyWorkspaceStep === 0x1) return '';
+  if (storyWorkspaceStep === 1) return '';
   if (!getStoryVideoEpisodes(storyWorkspaceProjectData['episodes'])['length'])
     return '请先至少完成一集分集剧本正文。';
   if (
-    storyWorkspaceStep === 0x3 &&
+    storyWorkspaceStep === 3 &&
     storyWorkspaceProjectData['project']?.['sourceMode'] === 'video-replication' &&
     getStoryVideoEpisodes(storyWorkspaceProjectData['episodes'])['some'](
       (source) =>
@@ -59,15 +59,15 @@ export function getStoryWorkspaceStepBlockMessage(options = {}, target = 0x1) {
     return '请先完成资产本地化。';
   return '';
 }
-export function canEnterStoryWorkspaceStep(options2 = {}, current = 0x1) {
+export function canEnterStoryWorkspaceStep(options2 = {}, current = 1) {
   return !getStoryWorkspaceStepBlockMessage(options2, current);
 }
-export function isStoryWorkspaceStepNavigationDisabled(options3 = {}, entry = 0x1) {
+export function isStoryWorkspaceStepNavigationDisabled(options3 = {}, entry = 1) {
   const storyWorkspaceStep2 = normalizeStoryWorkspaceStep(entry),
     storyWorkspaceProjectData2 = normalizeStoryWorkspaceProjectData(options3);
   return (
     !canEnterStoryWorkspaceStep(storyWorkspaceProjectData2, storyWorkspaceStep2) ||
-    (storyWorkspaceStep2 > 0x1 && storyWorkspaceProjectData2['project']?.['outlineStatus'] === 'stale')
+    (storyWorkspaceStep2 > 1 && storyWorkspaceProjectData2['project']?.['outlineStatus'] === 'stale')
   );
 }
 export function getStoryWorkspaceTransitionDirection(record, payload) {
@@ -137,7 +137,7 @@ export function createStoryWorkspaceNavigationTransaction({
   if (!state2 || typeof state2 !== 'object') throw new Error('[storyWorkspaceNavigation] state is required');
   if (typeof renderAdapter['render'] !== 'function')
     throw new Error('[storyWorkspaceNavigation] renderAdapter.render is required');
-  let value4 = 0x0,
+  let value4 = 0,
     value5 = ![],
     value6 = null;
   function run({ restore: restore = !![] } = {}) {
@@ -184,7 +184,7 @@ export function createStoryWorkspaceNavigationTransaction({
   function run6(value9) {
     const el4 = toolbarEl?.['querySelector']?.('.story-project-toolbar--episode'),
       el5 = el4?.['querySelector']('.story-episode-toolbar-current'),
-      el6 = el4?.['querySelector']('[data-story-step="' + normalizeStoryWorkspaceStep(value9) + '\x22]');
+      el6 = el4?.['querySelector']('[data-story-step="' + normalizeStoryWorkspaceStep(value9) + '"]');
     if (!el4 || !el5 || !el6) return ![];
     const box = el5['getBoundingClientRect']?.(),
       box2 = el6['getBoundingClientRect']?.();
@@ -201,7 +201,7 @@ export function createStoryWorkspaceNavigationTransaction({
     const el7 = toolbarEl?.['querySelector']?.('.story-project-toolbar:not(.story-project-toolbar--episode)'),
       el8 = el7?.['querySelector']('.story-episode-toolbar-current[data-story-episode-state="inactive"]'),
       el9 = el7?.['querySelector'](
-        '[data-story-step=\x22' + normalizeStoryWorkspaceStep(state2['step']) + '\x22]',
+        '[data-story-step="' + normalizeStoryWorkspaceStep(state2['step']) + '"]',
       );
     if (!el7 || !el8 || !el9) return ![];
     const box3 = el8['getBoundingClientRect']?.(),
@@ -245,8 +245,8 @@ export function createStoryWorkspaceNavigationTransaction({
         handler();
         return;
       }
-      let value11 = 0x0,
-        value12 = 0x0,
+      let value11 = 0,
+        value12 = 0,
         value13 = ![];
       const run9 = () => {
           if (value13) return;
@@ -263,9 +263,9 @@ export function createStoryWorkspaceNavigationTransaction({
         };
       ((enabled2['cancelWait'] = value14),
         (value11 = windowObject['requestAnimationFrame'](() => {
-          ((value11 = 0x0),
+          ((value11 = 0),
             (value12 = windowObject['requestAnimationFrame'](() => {
-              ((value12 = 0x0), run9());
+              ((value12 = 0), run9());
             })));
         })));
     });
@@ -280,7 +280,7 @@ export function createStoryWorkspaceNavigationTransaction({
     if (value5 || token2 !== value4) return ![];
     restoreNavigationSnapshot(state2, snapshot2);
     if (value6?.['token'] === token2) value6 = null;
-    (run2(), logger?.['error']?.('[storyWorkspace][' + operation + ']\x20导航失败', error));
+    (run2(), logger?.['error']?.('[storyWorkspace][' + operation + '] 导航失败', error));
     try {
       renderAdapter['renderToolbar']?.();
     } catch (value15) {
@@ -298,7 +298,7 @@ export function createStoryWorkspaceNavigationTransaction({
     try {
       renderAdapter['renderToolbar']?.();
     } catch (value19) {
-      (logger?.['error']?.('[storyWorkspace][' + value18 + ']\x20工具栏收尾失败', value19),
+      (logger?.['error']?.('[storyWorkspace][' + value18 + '] 工具栏收尾失败', value19),
         notify('工具栏更新失败，请重试。', 'error'));
       throw value19;
     } finally {
@@ -344,7 +344,7 @@ export function createStoryWorkspaceNavigationTransaction({
           [text3]: !![],
         };
       }
-      if (storyWorkspaceStep6 === 0x2) {
+      if (storyWorkspaceStep6 === 2) {
         const enabled3 = (state2['data']?.['assets'] || [])['some'](
           (value20) =>
             normalizeText(value20?.['id']) === normalizeText(state2['selectedAssetId']) &&
@@ -367,7 +367,7 @@ export function createStoryWorkspaceNavigationTransaction({
           }),
         );
       if (value5 || token3 !== value4) return ![];
-      if (value23 !== !![]) throw new Error('story\x20workspace\x20page\x20transition\x20was\x20interrupted');
+      if (value23 !== !![]) throw new Error('story workspace page transition was interrupted');
       return (onCommit(), run4(token3), !![]);
     } catch (error2) {
       return run10({
@@ -381,7 +381,7 @@ export function createStoryWorkspaceNavigationTransaction({
   }
   async function run13(value24, value25 = '') {
     if (value5) return ![];
-    const storyWorkspaceStepBlockMessage2 = getStoryWorkspaceStepBlockMessage(state2['data'], 0x3);
+    const storyWorkspaceStepBlockMessage2 = getStoryWorkspaceStepBlockMessage(state2['data'], 3);
     if (storyWorkspaceStepBlockMessage2) return (notify(storyWorkspaceStepBlockMessage2, 'warn'), ![]);
     const episode = (state2['data']?.['episodes'] || [])['find'](
       (value26) => normalizeText(value26?.['id']) === normalizeText(value24),
@@ -402,7 +402,7 @@ export function createStoryWorkspaceNavigationTransaction({
         (state2['selectedEpisodeId'] = episode['id']));
       const value27 =
         episode['clips']['find']((value28) => normalizeText(value28?.['id']) === normalizeText(value25)) ||
-        episode['clips'][0x0];
+        episode['clips'][0];
       ((state2['selectedClipId'] = value27?.['id'] || ''),
         (state2['pendingDeleteClipId'] = ''),
         (state2['clipSelectionMode'] = ![]),
@@ -416,7 +416,7 @@ export function createStoryWorkspaceNavigationTransaction({
         (renderAdapter['renderToolbar']?.(), await run8(token4));
         if (token4 !== value4) return ![];
         if (state2['view'] !== 'episode' || state2['selectedEpisodeId'] !== episode['id'])
-          throw new Error('story\x20episode\x20navigation\x20was\x20superseded');
+          throw new Error('story episode navigation was superseded');
       }
       let onTransitionComplete2 = ![];
       enteringEpisode && (renderAdapter['renderToolbar']?.(), (onTransitionComplete2 = run7()));
@@ -449,7 +449,7 @@ export function createStoryWorkspaceNavigationTransaction({
     return Promise['resolve'](![]);
   }
   function destroy() {
-    (run(), (value5 = !![]), (value4 += 0x1), run2());
+    (run(), (value5 = !![]), (value4 += 1), run2());
   }
   return { navigate: navigate, destroy: destroy };
 }

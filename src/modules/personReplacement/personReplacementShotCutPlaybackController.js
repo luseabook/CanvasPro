@@ -18,16 +18,16 @@ export function createPersonReplacementShotCutPlaybackController({
   syncTimelinePosition: syncTimelinePosition,
   previewShotCut: previewShotCut,
 } = {}) {
-  let options = 0x0,
+  let options = 0,
     enabled = ![],
     target = null,
-    source = 0x0,
-    next = 0x0,
+    source = 0,
+    next = 0,
     enabled2 = ![],
-    enabled3 = 0x0,
-    clamp2 = 0x0;
+    enabled3 = 0,
+    clamp2 = 0;
   const stop = () => {
-      ((next += 0x1), (enabled2 = ![]), (enabled3 = 0x0), (clamp2 = 0x0));
+      ((next += 1), (enabled2 = ![]), (enabled3 = 0), (clamp2 = 0));
       const current = target;
       target = null;
       if (options) {
@@ -36,14 +36,14 @@ export function createPersonReplacementShotCutPlaybackController({
             ? windowObject?.['clearTimeout']?.(options)
             : windowObject?.['cancelAnimationFrame']?.(options);
         } catch {}
-        options = 0x0;
+        options = 0;
       }
       enabled = ![];
       if (source && current?.['cancelVideoFrameCallback'])
         try {
           current['cancelVideoFrameCallback'](source);
         } catch {}
-      source = 0x0;
+      source = 0;
     },
     handler = (enabled4) => {
       if (
@@ -58,9 +58,9 @@ export function createPersonReplacementShotCutPlaybackController({
       const entry = next,
         record = () => {
           if (entry !== next || enabled4 !== target || !isEditorOpen()) return;
-          ((options = 0x0),
+          ((options = 0),
             (enabled = ![]),
-            (source = 0x0),
+            (source = 0),
             syncNativePlayback(enabled4),
             enabled4['paused'] === ![] && enabled4['ended'] !== !![] && handler(enabled4));
         };
@@ -72,7 +72,7 @@ export function createPersonReplacementShotCutPlaybackController({
       const run = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
       typeof run === 'function'
         ? ((enabled = ![]), (options = run(record)))
-        : ((enabled = !![]), (options = windowObject?.['setTimeout']?.(record, 0x10) || 0x0));
+        : ((enabled = !![]), (options = windowObject?.['setTimeout']?.(record, 16) || 0));
     },
     startNative = (enabled5) => {
       if (!enabled5) return;
@@ -84,9 +84,9 @@ export function createPersonReplacementShotCutPlaybackController({
       try {
         el['pause']?.();
       } catch {}
-      ((target = el), (enabled2 = !![]), (enabled3 = 0x0));
+      ((target = el), (enabled2 = !![]), (enabled3 = 0));
       const handle = getDraft();
-      ((clamp2 = clamp(payload, 0x0, getPersonReplacementShotCutTotalDuration(handle), 0x0)),
+      ((clamp2 = clamp(payload, 0, getPersonReplacementShotCutTotalDuration(handle), 0)),
         (el['muted'] = !![]));
       const state = next,
         handler2 = () => {
@@ -95,14 +95,14 @@ export function createPersonReplacementShotCutPlaybackController({
           typeof run2 === 'function'
             ? ((enabled = ![]), (options = run2(handler3)))
             : ((enabled = !![]),
-              (options = windowObject?.['setTimeout']?.(() => handler3(Date['now']()), 0x10) || 0x0));
+              (options = windowObject?.['setTimeout']?.(() => handler3(Date['now']()), 16) || 0));
         },
         handler3 = (config) => {
-          ((options = 0x0), (enabled = ![]));
+          ((options = 0), (enabled = ![]));
           if (state !== next || !enabled2 || el !== target || !isEditorOpen()) return;
           const scope = Number['isFinite'](Number(config)) ? Number(config) : Date['now']();
           if (!enabled3) enabled3 = scope;
-          const input = Math['max'](0x0, (scope - enabled3) / 0x3e8),
+          const input = Math['max'](0, (scope - enabled3) / 1000),
             output = getDraft(),
             personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(output),
             value2 = Math['min'](personReplacementShotCutTotalDuration, clamp2 + input),

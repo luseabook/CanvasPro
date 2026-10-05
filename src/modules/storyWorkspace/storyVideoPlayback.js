@@ -2,14 +2,14 @@ import { createWorkspaceVideoPlayback, createWorkspaceVideoProgressLoop } from '
 import { bindWorkspaceVideoVolumeControls } from '../workspaceVideoPlaybackControls.js';
 export const createStoryVideoProgressLoop = createWorkspaceVideoProgressLoop;
 const STORY_VIDEO_PLAYBACK_ACQUIRE_OPTIONS = Object['freeze']({
-  maxBytes: 0x40 * 0x400 * 0x400,
-  timeout: 0x1388,
+  maxBytes: 64 * 1024 * 1024,
+  timeout: 5000,
 });
-let storyVideoPlaybackLeaseSequence = 0x0;
+let storyVideoPlaybackLeaseSequence = 0;
 function createStoryVideoPlaybackLeaseOwnerId(value) {
   const enabled = String(value || '')['trim']();
   if (!enabled) return '';
-  return ((storyVideoPlaybackLeaseSequence += 0x1), enabled + ':lease:' + storyVideoPlaybackLeaseSequence);
+  return ((storyVideoPlaybackLeaseSequence += 1), enabled + ':lease:' + storyVideoPlaybackLeaseSequence);
 }
 export function createStoryVideoPlayback(args = {}) {
   const item = String(args?.['ownerId'] || '')['trim'](),
@@ -22,10 +22,10 @@ export function createStoryVideoPlayback(args = {}) {
   });
 }
 export function formatStoryVideoPlaybackTime(key) {
-  const index = Math['max'](0x0, Number(key) || 0x0),
-    result = Math['floor'](index / 0x3c),
-    data = Math['floor'](index % 0x3c);
-  return result + ':' + String(data)['padStart'](0x2, '0');
+  const index = Math['max'](0, Number(key) || 0),
+    result = Math['floor'](index / 60),
+    data = Math['floor'](index % 60);
+  return result + ':' + String(data)['padStart'](2, '0');
 }
 export function bindStoryVideoPreviewPlayer(
   el,
@@ -45,11 +45,11 @@ export function bindStoryVideoPreviewPlayer(
     target = ![],
     source = null;
   const next = Math['max'](
-      0x0,
+      0,
       Math['trunc'](
         Number(
           videoEl['closest']?.('[data-story-video-result-index]')?.['dataset']?.['storyVideoResultIndex'],
-        ) || 0x0,
+        ) || 0,
       ),
     ),
     storyVideoPlayback = createStoryVideoPlayback({
@@ -66,23 +66,23 @@ export function bindStoryVideoPreviewPlayer(
     handler = () => {
       const count = Number(videoEl['duration']),
         count2 = Number(videoEl['currentTime']),
-        duration = Number['isFinite'](count) && count > 0x0 ? count : 0x0,
+        duration = Number['isFinite'](count) && count > 0 ? count : 0,
         currentTime =
-          Number['isFinite'](count2) && count2 > 0x0 ? Math['min'](count2, duration || count2) : 0x0;
+          Number['isFinite'](count2) && count2 > 0 ? Math['min'](count2, duration || count2) : 0;
       return {
         duration: duration,
         currentTime: currentTime,
-        ratio: duration > 0x0 ? Math['max'](0x0, Math['min'](0x1, currentTime / duration)) : 0x0,
+        ratio: duration > 0 ? Math['max'](0, Math['min'](1, currentTime / duration)) : 0,
       };
     },
     handler2 = ({ duration: duration2, currentTime: currentTime2, ratio: ratio }) => {
       if (el6) el6['textContent'] = formatStoryVideoPlaybackTime(currentTime2);
       if (el7) el7['textContent'] = formatStoryVideoPlaybackTime(duration2);
-      if (el5) el5['style']['width'] = ratio * 0x64 + '%';
-      (el4?.['setAttribute']('aria-valuenow', String(Math['round'](ratio * 0x64))),
+      if (el5) el5['style']['width'] = ratio * 100 + '%';
+      (el4?.['setAttribute']('aria-valuenow', String(Math['round'](ratio * 100))),
         el4?.['setAttribute'](
           'aria-valuetext',
-          formatStoryVideoPlaybackTime(currentTime2) + '\x20/\x20' + formatStoryVideoPlaybackTime(duration2),
+          formatStoryVideoPlaybackTime(currentTime2) + ' / ' + formatStoryVideoPlaybackTime(duration2),
         ));
     },
     onFrame = () => {
@@ -111,14 +111,14 @@ export function bindStoryVideoPreviewPlayer(
         videoEl['pause']?.();
         return;
       }
-      if (videoEl['ended']) videoEl['currentTime'] = 0x0;
+      if (videoEl['ended']) videoEl['currentTime'] = 0;
       (await storyVideoPlayback['play'](), handler3());
     },
     handler5 = (record) => {
       const duration3 = Number(videoEl['duration']),
         box = el4?.['getBoundingClientRect']?.();
-      if (!(duration3 > 0x0) || !box?.['width']) return ![];
-      const currentTime3 = Math['max'](0x0, Math['min'](0x1, (Number(record) - box['left']) / box['width']));
+      if (!(duration3 > 0) || !box?.['width']) return ![];
+      const currentTime3 = Math['max'](0, Math['min'](1, (Number(record) - box['left']) / box['width']));
       return (
         (videoEl['currentTime'] = currentTime3 * duration3),
         handler2({ duration: duration3, currentTime: currentTime3 * duration3, ratio: currentTime3 }),
@@ -162,14 +162,14 @@ export function bindStoryVideoPreviewPlayer(
     input = (event6) => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](event6['key'])) return;
       const count3 = Number(videoEl['duration']);
-      if (!(count3 > 0x0)) return;
+      if (!(count3 > 0)) return;
       (event6['preventDefault'](), event6['stopPropagation']());
-      if (event6['key'] === 'Home') videoEl['currentTime'] = 0x0;
+      if (event6['key'] === 'Home') videoEl['currentTime'] = 0;
       else {
         if (event6['key'] === 'End') videoEl['currentTime'] = count3;
         else {
-          const output = event6['key'] === 'ArrowLeft' ? -0x5 : 0x5;
-          videoEl['currentTime'] = Math['max'](0x0, Math['min'](count3, videoEl['currentTime'] + output));
+          const output = event6['key'] === 'ArrowLeft' ? -5 : 5;
+          videoEl['currentTime'] = Math['max'](0, Math['min'](count3, videoEl['currentTime'] + output));
         }
       }
       handler3();

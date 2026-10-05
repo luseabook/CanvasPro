@@ -13,7 +13,7 @@ export function bindIconButtonMotion(
   {
     activeClass: activeClass = ICON_BUTTON_ACTIVATION_CLASS,
     animationName: animationName = ICON_BUTTON_ACTIVATION_ANIMATION,
-    durationMs: durationMs = 0x140,
+    durationMs: durationMs = 320,
     requestFrame: requestFrame = defaultRequestFrame,
     setTimer: setTimer = globalThis['setTimeout']?.['bind'](globalThis),
     clearTimer: clearTimer = globalThis['clearTimeout']?.['bind'](globalThis),
@@ -25,10 +25,10 @@ export function bindIconButtonMotion(
   for (const el of key) {
     if (!el?.['addEventListener'] || !el?.['classList']) continue;
     let index = ![],
-      result = 0x0,
+      result = 0,
       setTimer2 = null;
     const run = () => {
-        ((result += 0x1),
+        ((result += 1),
           setTimer2 !== null && (clearTimer?.(setTimer2), (setTimer2 = null)),
           el['classList']['remove'](activeClass));
       },
@@ -37,7 +37,7 @@ export function bindIconButtonMotion(
           run();
           return;
         }
-        result += 0x1;
+        result += 1;
         const options = result;
         (setTimer2 !== null && (clearTimer?.(setTimer2), (setTimer2 = null)),
           el['classList']['remove'](activeClass),

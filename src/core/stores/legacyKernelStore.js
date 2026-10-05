@@ -179,9 +179,9 @@ function cloneNodeSnapshot(
     }) &&
     finalizeHydratedGenerationSnapshot(
       data,
-      Math['max'](0x1, hydratedAt - data['generationStartTime']),
+      Math['max'](1, hydratedAt - data['generationStartTime']),
     );
-  if (typeof data['_bizRev'] !== 'number') data['_bizRev'] = 0x1;
+  if (typeof data['_bizRev'] !== 'number') data['_bizRev'] = 1;
   return featureSelections ? applyFeatureSelectionsToNodeData(data, featureSelections) : data;
 }
 function shallowEqual(options, target) {
@@ -221,14 +221,14 @@ function _isSameStoreValue(current, entry) {
 function _isPatchNoop(enabled4, enabled5) {
   if (!enabled4 || !enabled5 || typeof enabled5 !== 'object') return ![];
   const list5 = Object['keys'](enabled5);
-  if (list5['length'] === 0x0) return !![];
+  if (list5['length'] === 0) return !![];
   return list5['every']((record) => _isSameStoreValue(enabled4[record], enabled5[record]));
 }
 function _trimText(payload) {
   return typeof payload === 'string' ? payload['trim']() : '';
 }
 function _getStoryboardCellPosition(handle, col) {
-  const state = Math['max'](0x1, Math['round'](Number(handle?.['cols']) || 0x1));
+  const state = Math['max'](1, Math['round'](Number(handle?.['cols']) || 1));
   return { col: col % state, row: Math['floor'](col / state) };
 }
 function _placeStoryboardCellForSwap(config, scope, input, output, value2, value3) {
@@ -245,7 +245,7 @@ function _isValidStoryboardCellTarget(value4, count) {
     value4['type'] === 'storyboard' &&
     Array['isArray'](value4['cells']) &&
     Number['isInteger'](count) &&
-    count >= 0x0 &&
+    count >= 0 &&
     count < value4['cells']['length']
   );
 }
@@ -325,7 +325,7 @@ function isRunningHubTaskNodeSnapshot(enabled9) {
 function hasResolvedVideoResultSnapshot(enabled10) {
   if (!enabled10 || typeof enabled10 !== 'object') return ![];
   const list8 = Array['isArray'](enabled10['videos']) ? enabled10['videos'] : [];
-  if (list8['length'] > 0x0) return !![];
+  if (list8['length'] > 0) return !![];
   return !!String(enabled10['videoUrl'] || '')['trim']() || !!String(enabled10['localPath'] || '')['trim']();
 }
 const HYDRATE_ACTIVE_STATUS_FIELDS = Object['freeze']([
@@ -419,15 +419,15 @@ function createStore() {
     list9 = [],
     list10 = [],
     list11 = [];
-  let count2 = 0x0,
+  let count2 = 0,
     enabled16 = ![],
     handler = () => !![];
   function run(value29 = !![]) {
-    args6['_persistRev'] = (args6['_persistRev'] || 0x0) + 0x1;
-    if (value29) args6['_contentPersistRev'] = (args6['_contentPersistRev'] || 0x0) + 0x1;
+    args6['_persistRev'] = (args6['_persistRev'] || 0) + 1;
+    if (value29) args6['_contentPersistRev'] = (args6['_contentPersistRev'] || 0) + 1;
   }
   function run2() {
-    args6['_edgesRev'] = (args6['_edgesRev'] || 0x0) + 0x1;
+    args6['_edgesRev'] = (args6['_edgesRev'] || 0) + 1;
   }
   function setViewportPersistPolicy(value30) {
     handler = typeof value30 === 'function' ? value30 : () => !![];
@@ -545,10 +545,10 @@ function createStore() {
     if (value34['isGenerating'] === !![]) {
       if (!status('jobStatus')) value34['jobStatus'] = 'running';
       const count3 = Number(value34['generationStartTime']);
-      if (!Number['isFinite'](count3) || count3 <= 0x0) {
+      if (!Number['isFinite'](count3) || count3 <= 0) {
         const count4 = Number(value33?.['generationStartTime']);
         value34['generationStartTime'] =
-          Number['isFinite'](count4) && count4 > 0x0 ? count4 : Date['now']();
+          Number['isFinite'](count4) && count4 > 0 ? count4 : Date['now']();
       }
       return ((value34['generationDuration'] = null), value34);
     }
@@ -562,16 +562,16 @@ function createStore() {
         ? Number(value34['generationStartTime'])
         : Number(value33?.['generationStartTime']);
       value34['generationDuration'] =
-        Number['isFinite'](count5) && count5 > 0x0
-          ? Math['max'](0x0, Date['now']() - count5)
+        Number['isFinite'](count5) && count5 > 0
+          ? Math['max'](0, Date['now']() - count5)
           : value44
-            ? 0x0
+            ? 0
             : value34['generationDuration'];
     }
     return value34;
   }
   function run3() {
-    if (count2 > 0x0) {
+    if (count2 > 0) {
       enabled16 = !![];
       return;
     }
@@ -579,7 +579,7 @@ function createStore() {
     for (const run5 of list10) {
       run5(args6);
     }
-    if (list9['length'] > 0x0) {
+    if (list9['length'] > 0) {
       const deepClone3 = deepClone(args6);
       for (const run6 of list9) {
         run6(deepClone3);
@@ -602,7 +602,7 @@ function createStore() {
     try {
       return handler6();
     } finally {
-      (count2--, count2 === 0x0 && enabled16 && ((enabled16 = ![]), run3()));
+      (count2--, count2 === 0 && enabled16 && ((enabled16 = ![]), run3()));
     }
   }
   function requestRender() {
@@ -618,25 +618,25 @@ function createStore() {
       handler7(deepClone(args6)),
       function run7() {
         const value47 = list9['indexOf'](handler7);
-        value47 !== -0x1 && list9['splice'](value47, 0x1);
+        value47 !== -1 && list9['splice'](value47, 1);
       }
     );
   }
   function subscribeRaw(handler8) {
     if (typeof handler8 !== 'function')
-      throw new TypeError('[store]\x20subscribeRaw()\x20的参数必须是一个函数');
+      throw new TypeError('[store] subscribeRaw() 的参数必须是一个函数');
     return (
       list10['push'](handler8),
       handler8(args6),
       function run8() {
         const value48 = list10['indexOf'](handler8);
-        value48 !== -0x1 && list10['splice'](value48, 0x1);
+        value48 !== -1 && list10['splice'](value48, 1);
       }
     );
   }
   function subscribeSelector(selector2, callback2, value49 = {}) {
     if (typeof selector2 !== 'function')
-      throw new TypeError('[store]\x20subscribeSelector()\x20的\x20selector\x20必须是函数');
+      throw new TypeError('[store] subscribeSelector() 的 selector 必须是函数');
     if (typeof callback2 !== 'function')
       throw new TypeError('[store] subscribeSelector() 的 callback 必须是函数');
     const isEqual2 = value49['isEqual'] || shallowEqual,
@@ -652,7 +652,7 @@ function createStore() {
       callback2(value50),
       function run9() {
         const value52 = list11['indexOf'](value51);
-        value52 !== -0x1 && list11['splice'](value52, 0x1);
+        value52 !== -1 && list11['splice'](value52, 1);
       }
     );
   }
@@ -699,7 +699,7 @@ function createStore() {
       (sanitizeCanvasNodeMediaPatchForStore2['jumpShortcut'] = normalizeCommentNoteJumpShortcut(sanitizeCanvasNodeMediaPatchForStore2['jumpShortcut']));
     const { _bizRev: _bizRev, ...args9 } = sanitizeCanvasNodeMediaPatchForStore2,
       args10 = run4(null, args9),
-      value54 = { parentId: null, name: name, _bizRev: 0x1, ...args10 };
+      value54 = { parentId: null, name: name, _bizRev: 1, ...args10 };
     (captureFeatureSelectionsFromNodePatch(
       value54,
       value54,
@@ -708,7 +708,7 @@ function createStore() {
       el['add'](args6['nodes'][value54['id']], value54),
       (args6['nodes'][value54['id']] = value54),
       subscribeNodeField['touch'](value54['id']),
-      (args6['_nodeCount'] = (args6['_nodeCount'] || 0x0) + 0x1),
+      (args6['_nodeCount'] = (args6['_nodeCount'] || 0) + 1),
       run(),
       value54['parentId'] && run10(value54['id'], value54['parentId']),
       run3());
@@ -725,7 +725,7 @@ function createStore() {
       const map2 = args6['_parentToChildren'][value59];
       map2 &&
         (map2['delete'](value58),
-        map2['size'] === 0x0 && delete args6['_parentToChildren'][value59]);
+        map2['size'] === 0 && delete args6['_parentToChildren'][value59]);
     }
     args6['_parentToChildren'][value58] && delete args6['_parentToChildren'][value58];
   }
@@ -743,8 +743,8 @@ function createStore() {
     for (const [value68, value69] of Object['entries'](value67)) {
       const box = args6['nodes'][value68];
       if (!box) continue;
-      const x2 = (box['x'] || 0x0) + value69['dx'],
-        y2 = (box['y'] || 0x0) + value69['dy'];
+      const x2 = (box['x'] || 0) + value69['dx'],
+        y2 = (box['y'] || 0) + value69['dy'];
       if (x2 === box['x'] && y2 === box['y']) continue;
       ((box['x'] = x2),
         (box['y'] = y2),
@@ -756,7 +756,7 @@ function createStore() {
     (el['geometry'](), run(), run3());
   }
   function groupNodes(list13, value70) {
-    if (!Array['isArray'](list13) || list13['length'] === 0x0) return;
+    if (!Array['isArray'](list13) || list13['length'] === 0) return;
     const parentId = value70 || null;
     let enabled24 = ![];
     list13['forEach']((value71) => {
@@ -768,7 +768,7 @@ function createStore() {
           subscribeNodeField['touch'](value71),
           map['record'](value71, { parentId: parentId }),
           (value72['_bizRev'] =
-            (typeof value72['_bizRev'] === 'number' ? value72['_bizRev'] : 0x0) + 0x1),
+            (typeof value72['_bizRev'] === 'number' ? value72['_bizRev'] : 0) + 1),
           run10(value71, parentId, value73),
           (enabled24 = !![]));
       }
@@ -792,9 +792,9 @@ function createStore() {
     });
     const run14 = (value77, value78) => {
       const value79 = Number(targetInputPolicy?.['maxByKind']?.[value77]),
-        value80 = Number(value74[value77] || 0x0);
+        value80 = Number(value74[value77] || 0);
       if (!Number['isFinite'](value79) || value79 <= value78 || value80 >= value79) return ![];
-      return ((value74[value77] = value80 + 0x1), !![]);
+      return ((value74[value77] = value80 + 1), !![]);
     };
     return {
       reserveSlot(value81, value82 = null) {
@@ -804,7 +804,7 @@ function createStore() {
           list14 = (fixedInputSlotConfigFromManifest['slotOrderByType']?.[value83] || [])['filter']((value85) =>
             map3['has'](value85),
           );
-        if (list14['length'] === 0x0) return run14(value83, 0x0);
+        if (list14['length'] === 0) return run14(value83, 0);
         const enabled25 =
           value84 && list14['includes'](value84) && map3['has'](value84)
             ? value84
@@ -814,7 +814,7 @@ function createStore() {
         if (value87 && map5['has'](value87)) return run14(value83, list14['length']);
         map4['add'](enabled25);
         if (value87) map5['add'](value87);
-        return ((value74[value83] = Number(value74[value83] || 0x0) + 0x1), enabled25);
+        return ((value74[value83] = Number(value74[value83] || 0) + 1), enabled25);
       },
       reserve(value88, value89 = null) {
         return !!this['reserveSlot'](value88, value89);
@@ -829,7 +829,7 @@ function createStore() {
     const sharedGroupId = enabled26['parentId'],
       policy = getTargetInputPolicy(enabled26),
       reserveInputSlot = run13(enabled26),
-      counts = { text: 0x0, image: 0x0, video: 0x0, audio: 0x0 },
+      counts = { text: 0, image: 0, video: 0, audio: 0 },
       list15 = [],
       list16 = [],
       directSourceIds = new Set(),
@@ -854,7 +854,7 @@ function createStore() {
           ? list15['push']({ ...args11, refSlot: refSlot })
           : list15['push'](args11),
           directSourceIds['add'](args11['sourceId']),
-          (counts[enabled28] = (counts[enabled28] || 0x0) + 0x1));
+          (counts[enabled28] = (counts[enabled28] || 0) + 1));
       }),
       Object['values'](nodes['edges'] || {})['forEach']((edge2) => {
         if (!edge2 || edge2['targetId'] !== targetId) return;
@@ -920,7 +920,7 @@ function createStore() {
             sharedGroupId: sharedGroupId,
             effectiveTargetId: targetId,
           }),
-            (counts[enabled29] = (counts[enabled29] || 0x0) + 0x1));
+            (counts[enabled29] = (counts[enabled29] || 0) + 1));
         }),
       [...list15, ...list16]['map']((value95) => cloneEdgeSnapshot(value95))
     );
@@ -990,7 +990,7 @@ function createStore() {
   function updateNodeData(value104, value105, value106 = {}) {
     const id3 = args6['nodes'][value104];
     if (!id3)
-      throw new Error('[store]\x20updateNodeData()\x20找不到\x20id\x20为\x20\x22' + value104 + '" 的节点');
+      throw new Error('[store] updateNodeData() 找不到 id 为 "' + value104 + '" 的节点');
     const value107 = JSON['parse'](JSON['stringify'](value105)),
       { _bizRev: _bizRev2, ...args15 } = value107;
     args15['cells'] &&
@@ -1004,7 +1004,7 @@ function createStore() {
       ? args17['parentId']
       : id3['parentId'];
     captureFeatureSelectionsFromNodePatch(id3, args17, args6['ui']?.['featureSelections'] || {});
-    const _bizRev3 = (typeof id3['_bizRev'] === 'number' ? id3['_bizRev'] : 0x0) + 0x1;
+    const _bizRev3 = (typeof id3['_bizRev'] === 'number' ? id3['_bizRev'] : 0) + 1;
     ((args6['nodes'][value104] = {
       ...(value106['replace'] === !![] ? { id: id3['id'], type: id3['type'] } : id3),
       ...args17,
@@ -1039,7 +1039,7 @@ function createStore() {
           args21,
           args6['ui']?.['featureSelections'] || {},
         );
-        const _bizRev5 = (typeof args18['_bizRev'] === 'number' ? args18['_bizRev'] : 0x0) + 0x1;
+        const _bizRev5 = (typeof args18['_bizRev'] === 'number' ? args18['_bizRev'] : 0) + 1;
         ((args6['nodes'][value111] = { ...args18, ...args21, _bizRev: _bizRev5 }),
           store['patch'](args18, args6['nodes'][value111]),
           subscribeNodeField['touch'](value111),
@@ -1083,7 +1083,7 @@ function createStore() {
         (args6['nodes'][value115] = {
           ...args22,
           cells: cells,
-          _bizRev: (typeof args22['_bizRev'] === 'number' ? args22['_bizRev'] : 0x0) + 0x1,
+          _bizRev: (typeof args22['_bizRev'] === 'number' ? args22['_bizRev'] : 0) + 1,
         }));
     else {
       const cells2 = args23['cells']['slice']();
@@ -1102,12 +1102,12 @@ function createStore() {
         (args6['nodes'][value115] = {
           ...args22,
           cells: cells,
-          _bizRev: (typeof args22['_bizRev'] === 'number' ? args22['_bizRev'] : 0x0) + 0x1,
+          _bizRev: (typeof args22['_bizRev'] === 'number' ? args22['_bizRev'] : 0) + 1,
         }),
         (args6['nodes'][value117] = {
           ...args23,
           cells: cells2,
-          _bizRev: (typeof args23['_bizRev'] === 'number' ? args23['_bizRev'] : 0x0) + 0x1,
+          _bizRev: (typeof args23['_bizRev'] === 'number' ? args23['_bizRev'] : 0) + 1,
         }));
     }
     return (
@@ -1123,7 +1123,7 @@ function createStore() {
     const error2 = args6['nodes'][value123];
     if (!error2) return;
     if (error2['name'] === name2) return;
-    const _bizRev6 = (typeof error2['_bizRev'] === 'number' ? error2['_bizRev'] : 0x0) + 0x1;
+    const _bizRev6 = (typeof error2['_bizRev'] === 'number' ? error2['_bizRev'] : 0) + 1;
     ((args6['nodes'][value123] = { ...error2, name: name2, _bizRev: _bizRev6 }),
       subscribeNodeField['touch'](value123),
       el['content'](),
@@ -1167,12 +1167,12 @@ function createStore() {
     (normalizeNodesCollection(args6['nodes']),
       (args6['edges'] = deepClone(enabled30['edges'] ?? {})),
       (args6['viewport'] = viewport['attach'](
-        deepClone(enabled30['viewport'] ?? { x: 0x0, y: 0x0, zoom: 0x1 }),
+        deepClone(enabled30['viewport'] ?? { x: 0, y: 0, zoom: 1 }),
       )),
       (args6['_nodeCount'] = Object['keys'](args6['nodes'])['length']));
     for (const enabled31 of Object['values'](args6['nodes'])) {
       if (!enabled31 || typeof enabled31 !== 'object') continue;
-      if (typeof enabled31['_bizRev'] !== 'number') enabled31['_bizRev'] = 0x1;
+      if (typeof enabled31['_bizRev'] !== 'number') enabled31['_bizRev'] = 1;
     }
     args6['_parentToChildren'] = {};
     for (const [value127, value128] of Object['entries'](args6['nodes'])) {
@@ -1238,7 +1238,7 @@ function createStore() {
     if (list22 === list23) return !![];
     if (!Array['isArray'](list22) || !Array['isArray'](list23)) return ![];
     if (list22['length'] !== list23['length']) return ![];
-    for (let value144 = 0x0; value144 < list22['length']; value144 += 0x1) {
+    for (let value144 = 0; value144 < list22['length']; value144 += 1) {
       if (!Object['is'](list22[value144], list23[value144])) return ![];
     }
     return !![];
@@ -1287,7 +1287,7 @@ function createStore() {
   function clearSelection() {
     const enabled37 = args6['selectionBox']?.['active'] === !![],
       enabled38 = Array['isArray'](args6['selectedNodeIds'])
-        ? args6['selectedNodeIds']['length'] > 0x0
+        ? args6['selectedNodeIds']['length'] > 0
         : ![],
       enabled39 = args6['selectionMeta']?.['source'] != null;
     if (!enabled37 && !enabled38 && !enabled39) return;
@@ -1302,7 +1302,7 @@ function createStore() {
   }
   function hideContextMenu() {
     if (args6['contextMenu']?.['visible'] !== !![]) return;
-    ((args6['contextMenu'] = { visible: ![], x: 0x0, y: 0x0, items: [] }), run3());
+    ((args6['contextMenu'] = { visible: ![], x: 0, y: 0, items: [] }), run3());
   }
   function setConnOverlay({ srcId: srcId, invalidNodeIds: invalidNodeIds, hoverId: hoverId, side: side }) {
     const value151 = {
@@ -1356,7 +1356,7 @@ function createStore() {
     enabled40['viewport'] &&
       (args6['viewport'] = viewport['attach'](cloneViewportSnapshot(enabled40['viewport'])));
     ((args6['nodes'] = {}), (args6['_parentToChildren'] = {}));
-    let value159 = 0x0;
+    let value159 = 0;
     if (Array['isArray'](enabled40['nodes']))
       enabled40['nodes']['forEach']((enabled41) => {
         if (!enabled41 || typeof enabled41 !== 'object') return;
@@ -1366,7 +1366,7 @@ function createStore() {
           preserveLiveGeneration: preserveLiveGeneration,
         });
         ((args6['nodes'][cloneNodeSnapshot2['id']] = cloneNodeSnapshot2),
-          (value159 += 0x1),
+          (value159 += 1),
           cloneNodeSnapshot2['parentId'] && run10(cloneNodeSnapshot2['id'], cloneNodeSnapshot2['parentId']));
       });
     else {
@@ -1379,7 +1379,7 @@ function createStore() {
             preserveLiveGeneration: preserveLiveGeneration,
           });
           ((args6['nodes'][id4] = cloneNodeSnapshot3),
-            (value159 += 0x1),
+            (value159 += 1),
             cloneNodeSnapshot3['parentId'] && run10(id4, cloneNodeSnapshot3['parentId']));
         }
     }
@@ -1595,8 +1595,8 @@ function createStore() {
   function setAlignDistributeGap(value208) {
     const value209 = Number(value208),
       value210 = Number['isFinite'](value209)
-        ? Math['max'](0x0, Math['min'](0xc8, Math['round'](value209)))
-        : 0x28;
+        ? Math['max'](0, Math['min'](200, Math['round'](value209)))
+        : 40;
     if (args6['ui'] && args6['ui']['alignDistributeGap'] === value210) return;
     if (!args6['ui']) args6['ui'] = {};
     ((args6['ui']['alignDistributeGap'] = value210), run3());
@@ -1688,8 +1688,8 @@ function createStore() {
       value234 = options4?.['alignFeatureEnabled'] === ![] ? ![] : value233 !== 'off',
       value235 = Number(options4?.['alignDistributeGap']),
       value236 = Number['isFinite'](value235)
-        ? Math['max'](0x0, Math['min'](0xc8, Math['round'](value235)))
-        : 0x28,
+        ? Math['max'](0, Math['min'](200, Math['round'](value235)))
+        : 40,
       value237 = options4?.['snapGuidesEnabled'] !== ![];
     if (!args6['ui']) args6['ui'] = {};
     ((args6['ui']['showVideoMeta'] = ![]),
@@ -1759,7 +1759,7 @@ function createStore() {
   function updateAsset(value247, args38) {
     if (!args6['assets']) return;
     const value248 = args6['assets']['findIndex']((value249) => value249['id'] === value247);
-    if (value248 !== -0x1) {
+    if (value248 !== -1) {
       const args39 = args6['assets'][value248],
         value250 = { ...args39, ...args38 };
       if (shallowEqual(args39, value250)) return;
@@ -1768,7 +1768,7 @@ function createStore() {
   }
   function run23() {
     ((!args6['workflows'] || typeof args6['workflows'] !== 'object') &&
-      (args6['workflows'] = { items: [], loading: ![], error: null, loadedAt: 0x0 }),
+      (args6['workflows'] = { items: [], loading: ![], error: null, loadedAt: 0 }),
       !Array['isArray'](args6['workflows']['items']) && (args6['workflows']['items'] = []),
       (!args6['workflowUi'] || typeof args6['workflowUi'] !== 'object') &&
         (args6['workflowUi'] = createInitialWorkflowUiState()));
@@ -1802,7 +1802,7 @@ function createStore() {
       count6 = args6['workflows']['items']['findIndex'](
         (value252) => value252?.['id'] === args40['id'],
       );
-    (count6 >= 0x0
+    (count6 >= 0
       ? (args6['workflows']['items'][count6] = {
           ...args6['workflows']['items'][count6],
           ...args40,
@@ -1817,7 +1817,7 @@ function createStore() {
     const count7 = args6['workflows']['items']['findIndex'](
       (value254) => value254?.['id'] === enabled55,
     );
-    if (count7 < 0x0) return;
+    if (count7 < 0) return;
     ((args6['workflows']['items'][count7] = {
       ...args6['workflows']['items'][count7],
       ...cloneWorkflowSnapshot(enabled54),

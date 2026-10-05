@@ -92,7 +92,7 @@ class FakeToolbar {
             id: 'comment-1',
             type: 'comment-note',
             content: '## 标题',
-            width: 0x104,
+            width: 260,
             height: 120,
           },
         },
@@ -100,7 +100,7 @@ class FakeToolbar {
         viewport: { x: 0, y: 0, zoom: 1 },
       }));
     const toolbarEl = new FakeToolbar(),
-      state = { id: 'comment-1', type: 'comment-note', content: '## 标题', width: 0x104, height: 120 };
+      state = { id: 'comment-1', type: 'comment-note', content: '## 标题', width: 260, height: 120 };
     (bindCommentNoteToolbarEvents({
       toolbarEl: toolbarEl,
       nodeId: 'comment-1',

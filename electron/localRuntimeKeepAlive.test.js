@@ -9,7 +9,7 @@ function createWindowStub(args = {}) {
     list2 = [],
     localRuntimeKeepAliveController = createLocalRuntimeKeepAliveController({
       getWindow: () => createWindowStub(),
-      intervalMs: 0xea60,
+      intervalMs: 60000,
       requestLocalJson: async (pathname, timeoutMs) => {
         list.push({ pathname: pathname, timeoutMs: timeoutMs });
       },
@@ -17,7 +17,7 @@ function createWindowStub(args = {}) {
     });
   (await localRuntimeKeepAliveController.start('focus'),
     localRuntimeKeepAliveController.stop(),
-    assert.deepEqual(list, [{ pathname: '/api/v2/runtime/info', timeoutMs: 0x3e8 }]),
+    assert.deepEqual(list, [{ pathname: '/api/v2/runtime/info', timeoutMs: 1000 }]),
     assert.deepEqual(list2[0], ['local-runtime-keepalive', true, 'prevent-app-suspension']),
     assert.deepEqual(list2.at(-1), ['local-runtime-keepalive', false]));
 }),
@@ -38,7 +38,7 @@ function createWindowStub(args = {}) {
     const list5 = [],
       localRuntimeKeepAliveController3 = createLocalRuntimeKeepAliveController({
         getWindow: () => createWindowStub(),
-        intervalMs: 0xea60,
+        intervalMs: 60000,
         requestLocalJson: async () => {
           throw new Error('offline');
         },

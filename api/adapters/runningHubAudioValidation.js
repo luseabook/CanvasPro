@@ -5,8 +5,8 @@ export function validateRunningHubAudioParameters(key, index, args, result, list
   const enabled = index['rules'] || {},
     data = enabled['weightedChinesePrompt']
       ? [...args]['reduce'](
-          (options, target) => options + (/\p{Script=Han}/u['test'](target) ? 0x2 : 0x1),
-          0x0,
+          (options, target) => options + (/\p{Script=Han}/u['test'](target) ? 2 : 1),
+          0,
         )
       : [...args]['length'];
   if (index['promptMaxLength'] && data > index['promptMaxLength'])
@@ -33,7 +33,7 @@ export function validateRunningHubAudioParameters(key, index, args, result, list
         !Number['isFinite'](payload) ||
         payload < enabled2['min'] ||
         payload > enabled2['max'] ||
-        (enabled2['step'] === 0x1 && !Number['isInteger'](payload))
+        (enabled2['step'] === 1 && !Number['isInteger'](payload))
       )
         throw new Error(enabled2['label'] + '超出允许范围');
     }
@@ -72,7 +72,7 @@ export function validateRunningHubAudioParameters(key, index, args, result, list
         ['split'](/\r?\n/)
         ['filter']((value3) => value3['trim']())['length'] > value2
     )
-      throw new Error('发音词典最多 ' + value2 + '\x20条');
+      throw new Error('发音词典最多 ' + value2 + ' 条');
   if (
     enabled['customVoiceId'] &&
     !/^[A-Za-z](?=.*\d)[A-Za-z0-9_-]{7,}$/['test'](text(source['customVoiceId']))
@@ -80,9 +80,9 @@ export function validateRunningHubAudioParameters(key, index, args, result, list
     throw new Error('新音色 ID 至少 8 字符，以字母开头并包含数字');
   for (const value4 of ['audio', 'image']) {
     const list3 = value4 === 'audio' ? list : list2,
-      value5 = Number(key['inputSlots']?.['maxByKind']?.[value4] || 0x0);
+      value5 = Number(key['inputSlots']?.['maxByKind']?.[value4] || 0);
     if (list3['length'] > value5)
-      throw new Error('最多支持 ' + value5 + '\x20个' + (value4 === 'audio' ? '音频' : '图片') + '输入');
+      throw new Error('最多支持 ' + value5 + ' 个' + (value4 === 'audio' ? '音频' : '图片') + '输入');
     const value6 = (key['inputSlots']?.['fixedSlots'] || [])['filter']((value7) => value7['kind'] === value4);
     for (const value8 of value6)
       if (value8['required'] && !list3['some']((value9) => value9['refSlot'] === value8['id']))
@@ -95,19 +95,19 @@ export function validateRunningHubAudioParameters(key, index, args, result, list
     if (!response2['url']) throw new Error('参考音频地址为空');
     if (map['has'](response2['refSlot'])) throw new Error('同一个参考槽不能连接多个音频');
     map['add'](response2['refSlot']);
-    const value10 = response2['fileName'] || text(response2['url'])['split'](/[?#]/)[0x0],
-      value11 = value10['match'](/\.([a-z0-9]+)$/i)?.[0x1]?.['toLowerCase']();
+    const value10 = response2['fileName'] || text(response2['url'])['split'](/[?#]/)[0],
+      value11 = value10['match'](/\.([a-z0-9]+)$/i)?.[1]?.['toLowerCase']();
     if (enabled['audioExtensions'] && value11 && !enabled['audioExtensions']['includes'](value11))
       throw new Error('参考音频只支持 ' + enabled['audioExtensions']['join']('、'));
     if (
       enabled['maxAudioBytes'] &&
       Number(response2['size'] || response2['fileSize']) > enabled['maxAudioBytes']
     )
-      throw new Error('参考音频不能超过\x2010\x20MB');
+      throw new Error('参考音频不能超过 10 MB');
     const count = Number(response2['audioDuration'] || response2['duration']);
     if (
       enabled['audioDuration'] &&
-      count > 0x0 &&
+      count > 0 &&
       (count < enabled['audioDuration']['min'] || count > enabled['audioDuration']['max'])
     )
       throw new Error('原曲长度必须在 6 秒到 6 分钟之间');
@@ -119,8 +119,8 @@ export function validateRunningHubAudioParameters(key, index, args, result, list
   }
   if (
     enabled['exclusiveInputs'] &&
-    [present(source['speaker']), list['length'] > 0x0, list2['length'] > 0x0]['filter'](Boolean)['length'] >
-      0x1
+    [present(source['speaker']), list['length'] > 0, list2['length'] > 0]['filter'](Boolean)['length'] >
+      1
   )
     throw new Error('音色 ID、参考音频和参考图片只能选一种');
   if (enabled['controlMode'] === 'murekaBgm') {

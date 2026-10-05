@@ -5,15 +5,15 @@ import {
 } from './apimartPrivateAvatarAssetResolver.js';
 import { normalizeApimartBaseUrl } from '../apimartUploadApi.js';
 const APIMART_DIMENSION_TARGET_PIXELS = Object.freeze({
-    '1K': 0x400 * 0x400,
-    '2K': 0x800 * 0x800,
-    '3K': 0xa00 * 0xa00,
-    '4K': 0xb40 * 0xb40,
+    '1K': 1024 * 1024,
+    '2K': 2048 * 2048,
+    '3K': 2560 * 2560,
+    '4K': 2880 * 2880,
   }),
   APIMART_DIMENSION_DEFAULT_RESOLUTION = '2K',
   APIMART_DIMENSION_ALIGN = 8,
-  APIMART_DIMENSION_MIN = 0x200,
-  APIMART_DIMENSION_MAX = 0x2000;
+  APIMART_DIMENSION_MIN = 512,
+  APIMART_DIMENSION_MAX = 8192;
 function parseRatioLabel(value) {
   const [item, key] = String(value || '1:1').split(':'),
     w = Number.parseFloat(item),

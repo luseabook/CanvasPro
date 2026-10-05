@@ -17,7 +17,7 @@ export class TimelineKeyframeDrag {
   }
   ['start'](event) {
     const el2 = event['target']['closest']?.('[data-keyframe-id]');
-    if (!el2 || event['button'] !== 0x0) return;
+    if (!el2 || event['button'] !== 0) return;
     const { shot: shot } = this['timeline']['_context'](),
       box = el2['closest']('.storyboard-3d-timeline-lane')?.['getBoundingClientRect']();
     if (!shot || !box?.['width']) return;
@@ -45,7 +45,7 @@ export class TimelineKeyframeDrag {
       el2['setPointerCapture'](event['pointerId']));
     const result = (event2) => {
         if (event2['pointerId'] !== enabled['pointerId']) return;
-        enabled['moved'] ||= Math['abs'](event2['clientX'] - enabled['startX']) > 0x3;
+        enabled['moved'] ||= Math['abs'](event2['clientX'] - enabled['startX']) > 3;
         if (!enabled['moved']) return;
         event2['preventDefault']();
         const data =
@@ -55,7 +55,7 @@ export class TimelineKeyframeDrag {
             ['filter']((options) => enabled['selection']['has'](directorKeyIdentity(options)))
             ['map'](({ key: key2 }) => key2['id']);
         ((enabled['time'] = Math['max'](
-          0x0,
+          0,
           Math['min'](
             storyboard3DShotAnimation['duration'],
             this['timeline']['editing']['snapTime'](
@@ -69,7 +69,7 @@ export class TimelineKeyframeDrag {
         )),
           el2['style']['setProperty'](
             '--storyboard-3d-keyframe-position',
-            (enabled['time'] / storyboard3DShotAnimation['duration']) * 0x64 + '%',
+            (enabled['time'] / storyboard3DShotAnimation['duration']) * 100 + '%',
           ),
           this['timeline']['_sampleAt'](enabled['time']));
       },
@@ -79,7 +79,7 @@ export class TimelineKeyframeDrag {
         if (!enabled['moved'] || this['timeline']['_context']()['shot']?.['id'] !== enabled['shotId']) return;
         ((this['suppressClick'] = !![]),
           this['timeline']['_mutateAnimation']('move-keyframe', '拖动关键帧', (source) => {
-            if (enabled['selection']['size'] > 0x1)
+            if (enabled['selection']['size'] > 1)
               try {
                 return normalizeStoryboard3DShotAnimation(
                   shiftDirectorKeys(source, enabled['selection'], enabled['time'] - enabled['startTime']),
@@ -125,13 +125,13 @@ export class TimelineKeyframeDrag {
       abort['abort'](),
       key3['style']['setProperty'](
         '--storyboard-3d-keyframe-position',
-        (startTime / animation['duration']) * 0x64 + '%',
+        (startTime / animation['duration']) * 100 + '%',
       ));
     if (key3['hasPointerCapture'](pointerId)) key3['releasePointerCapture'](pointerId);
   }
   ['consumeClick'](payload) {
     const handle = this['suppressClick'];
-    return ((this['suppressClick'] = ![]), handle && payload?.['detail'] !== 0x0);
+    return ((this['suppressClick'] = ![]), handle && payload?.['detail'] !== 0);
   }
   ['destroy']() {
     (this['cancel'](),

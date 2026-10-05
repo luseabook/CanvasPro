@@ -332,7 +332,7 @@ export function buildImageSchemaAspectRatioDisplayPatch({
     minSide: minSide,
   });
 }
-export function armImageSchemaRatioResizeAnimation(enabled5, value32, value33 = 0x118) {
+export function armImageSchemaRatioResizeAnimation(enabled5, value32, value33 = 280) {
   const el = typeof document !== 'undefined' ? document.getElementById(value32) : null;
   if (!el || !enabled5) return;
   el.classList.add('is-ratio-animating');
@@ -344,7 +344,7 @@ export function armImageSchemaRatioResizeAnimation(enabled5, value32, value33 = 
 }
 export function animateImageSchemaRatioResizeFlip(
   enabled6,
-  { nodeId: nodeId4, previewEl: previewEl, nodeData: nodeData7, patch: patch, ms: ms = 0x118 } = {},
+  { nodeId: nodeId4, previewEl: previewEl, nodeData: nodeData7, patch: patch, ms: ms = 280 } = {},
 ) {
   if (!enabled6 || !previewEl || typeof previewEl.animate !== 'function') return;
   const value34 = Math.max(1, Number(nodeData7?.width) || Number(patch?.width) || 1),
@@ -383,7 +383,7 @@ export function animateImageSchemaRatioResizeFlip(
 }
 export function applyImageSchemaRatioResizeAnimation(
   value41,
-  { nodeId: nodeId5, previewEl: previewEl2, nodeData: nodeData8, patch: patch2, ms: ms = 0x118 } = {},
+  { nodeId: nodeId5, previewEl: previewEl2, nodeData: nodeData8, patch: patch2, ms: ms = 280 } = {},
 ) {
   if (!patch2 || Object.keys(patch2).length === 0) return;
   (armImageSchemaRatioResizeAnimation(value41, nodeId5, ms),
@@ -470,7 +470,7 @@ export function getPersonReplaceV21ResolutionOptions() {
 export function normalizePersonReplaceV21Resolution(value51) {
   const manifestUiField2 = getManifestUiField(PERSON_REPLACE_V21_MODEL_ID, 'rhResolution'),
     personReplaceV21ResolutionOptions = getPersonReplaceV21ResolutionOptions(),
-    value52 = Number(manifestUiField2?.defaultValue) || 0x500;
+    value52 = Number(manifestUiField2?.defaultValue) || 1280;
   return pickNearestNumber(value51, personReplaceV21ResolutionOptions, value52);
 }
 export function buildRunningHubGptImage2OfficialPatch({
@@ -1183,14 +1183,14 @@ function pickSupportedImageSize(value117, value118) {
   if (!list14['length'] || !imageSizeToken || list14['includes'](imageSizeToken)) return '';
   const count = IMAGE_SIZE_ORDER['indexOf'](imageSizeToken),
     value120 = list14['map']((value121) => ({ value: value121, rank: IMAGE_SIZE_ORDER['indexOf'](value121) }))
-      ['filter']((value122) => value122['rank'] >= 0x0)
+      ['filter']((value122) => value122['rank'] >= 0)
       ['sort']((value123, value124) => value123['rank'] - value124['rank']);
-  if (count >= 0x0 && value120['length'] > 0x0) {
-    const el12 = value120['filter']((value125) => value125['rank'] <= count)['at'](-0x1);
-    return el12?.['value'] || value120[0x0]['value'];
+  if (count >= 0 && value120['length'] > 0) {
+    const el12 = value120['filter']((value125) => value125['rank'] <= count)['at'](-1);
+    return el12?.['value'] || value120[0]['value'];
   }
   const imageSizeToken2 = normalizeImageSizeToken(value118?.['defaultValue']);
-  return list14['includes'](imageSizeToken2) ? imageSizeToken2 : list14[0x0];
+  return list14['includes'](imageSizeToken2) ? imageSizeToken2 : list14[0];
 }
 
 const BINGHUO_BADGE_ICON_HTML = '<div class="node-menu-icon node-menu-icon-badge">BH</div>';
@@ -1212,7 +1212,7 @@ function getCustomProviderBadgeText(value130, value131 = {}) {
   return (
     String(getCustomProviderMeta(value130)?.['badge'] || value131['badge'] || 'CP')
       ['trim']()
-      ['slice'](0x0, 0x2) || 'CP'
+      ['slice'](0, 2) || 'CP'
   );
 }
 
@@ -1250,8 +1250,8 @@ function getCustomProviderImageGroups(value132 = '') {
         itemsHtml: value134['items']
           ['sort'](
             (value136, value137) =>
-              Number(getImageMenuMeta(value136)?.['order'] || 0x0) -
-              Number(getImageMenuMeta(value137)?.['order'] || 0x0),
+              Number(getImageMenuMeta(value136)?.['order'] || 0) -
+              Number(getImageMenuMeta(value137)?.['order'] || 0),
           )
           ['map']((value138) => renderImageManifestMenuItemHTML(value138, value132))
           ['join'](''),
@@ -1271,7 +1271,7 @@ export function buildBinghuoImageMenuGroupHTML(value139) {
     submenuClass: 'binghuo-image-submenu',
     iconHtml: BINGHUO_BADGE_ICON_HTML,
     title: '便宜渠道bh',
-    subtitle: '炳火图片生成\x20API',
+    subtitle: '炳火图片生成 API',
     itemsHtml: imageModelMenuManifests,
   });
 }
@@ -1285,7 +1285,7 @@ function buildOfficialImageMenuGroupHTML(value141, value142, value143, value144,
     toggleAttr: 'data-' + value142 + '-toggle',
     submenuClass: value142 + '-submenu',
     iconHtml:
-      '<img src="' + value144 + '\x22\x20class=\x22node-menu-icon\x22\x20alt=\x22' + value142 + '\x22>',
+      '<img src="' + value144 + '" class="node-menu-icon" alt="' + value142 + '">',
     title: value143,
     subtitle: value145,
     itemsHtml: imageModelMenuManifests2,
@@ -1371,7 +1371,7 @@ export function buildComfyUiLocalWorkflowImageMenuGroupHTML(value153) {
     submenuClass: 'comfyui-local-workflow-submenu',
     iconHtml: COMFYUI_LOCAL_WORKFLOW_ICON_HTML,
     title: '本地工作流',
-    subtitle: '保存的\x20ComfyUI\x20本地工作流',
+    subtitle: '保存的 ComfyUI 本地工作流',
   });
 }
 

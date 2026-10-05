@@ -13,15 +13,15 @@ function normalizeTranslationSegment(options = {}) {
   const id = String(options?.['id'] || '')['trim'](),
     sourceText = String(options?.['sourceText'] || '')['trim']();
   if (!id || !sourceText) return null;
-  const value = Math['max'](0x0, Math['round'](Number(options?.['startMs']) || 0x0)),
+  const value = Math['max'](0, Math['round'](Number(options?.['startMs']) || 0)),
     item = Math['max'](value, Math['round'](Number(options?.['endMs']) || value)),
     key = Number(options?.['durationMs']);
   return {
     id: id,
     sourceText: sourceText,
     durationMs: Number['isFinite'](key)
-      ? Math['max'](0x0, Math['round'](key))
-      : Math['max'](0x0, item - value),
+      ? Math['max'](0, Math['round'](key))
+      : Math['max'](0, item - value),
   };
 }
 export function classifyAudioVoiceTranslationConfigFailure(error = {}) {
@@ -30,7 +30,7 @@ export function classifyAudioVoiceTranslationConfigFailure(error = {}) {
       ['toUpperCase'](),
     result = [typeof error === 'string' ? error : '', error?.['message'], error?.['error'], error?.['detail']]
       ['filter'](Boolean)
-      ['join']('\x20')
+      ['join'](' ')
       ['trim']();
   if (
     /(?:api\s*key|apikey).*(?:未配置|没填写|未填写|missing|not\s+configured)|(?:missing|configure).*(?:api\s*key|apikey)/i[
@@ -57,9 +57,9 @@ export function resolveAudioVoiceTranslationTargets(list = [], args = []) {
     ),
     map = new Set(args instanceof Set ? [...args] : Array['isArray'](args) ? args : []),
     list3 = list2['filter']((next) => map['has'](next?.['id'])),
-    list4 = list3['length'] > 0x0 ? list3 : list2,
+    list4 = list3['length'] > 0 ? list3 : list2,
     targets = list4['map'](normalizeTranslationSegment)['filter'](Boolean),
-    scope = list2['length'] > 0x0 && list4['length'] === list2['length'];
+    scope = list2['length'] > 0 && list4['length'] === list2['length'];
   return { scope: scope ? 'all' : 'selected', targets: targets };
 }
 export function buildAudioVoiceTranslationPrompt({ language: language, segments: segments = [] } = {}) {
@@ -75,14 +75,14 @@ export function buildAudioVoiceTranslationPrompt({ language: language, segments:
   };
   return [
     'Translate the following voice-studio dialogue into the target language.',
-    'Use\x20the\x20full\x20list\x20as\x20shared\x20context\x20so\x20names,\x20pronouns,\x20tone,\x20and\x20terminology\x20stay\x20consistent.',
+    'Use the full list as shared context so names, pronouns, tone, and terminology stay consistent.',
     'Write natural spoken dialogue suitable for dubbing.',
-    'Keep\x20each\x20translation\x20concise\x20enough\x20to\x20fit\x20its\x20durationMs\x20when\x20possible.',
+    'Keep each translation concise enough to fit its durationMs when possible.',
     'Preserve every segment id exactly. Do not merge, split, omit, reorder, or add segments.',
     'Return only the required JSON object.',
     '',
     JSON['stringify'](current),
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 export function createAudioVoiceTranslationStructuredOutput(list5 = []) {
   const minItems = (Array['isArray'](list5) ? list5 : [])
@@ -108,7 +108,7 @@ export function createAudioVoiceTranslationStructuredOutput(list5 = []) {
             required: ['id', 'targetText'],
             properties: {
               id: { type: 'string', enum: minItems },
-              targetText: { type: 'string', minLength: 0x1 },
+              targetText: { type: 'string', minLength: 1 },
             },
           },
         },
@@ -136,7 +136,7 @@ export function parseAudioVoiceTranslationResult(response2, record = []) {
       enabled = String(state?.['targetText'] || '')['trim']();
     if (!map2['has'](config)) throw new Error('翻译结果包含未知句子 ID：' + (config || '空 ID') + '。');
     if (targetText['has'](config)) throw new Error('翻译结果包含重复句子 ID：' + config + '。');
-    if (!enabled) throw new Error('句子\x20' + config + ' 的翻译结果为空。');
+    if (!enabled) throw new Error('句子 ' + config + ' 的翻译结果为空。');
     targetText['set'](config, enabled);
   });
   const input = list7['find']((output) => !targetText['has'](output));

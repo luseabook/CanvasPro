@@ -52,7 +52,7 @@ function isStoryClipVideoBackgroundTaskCurrent(options2 = {}, entry = {}) {
   );
 }
 export function reconcileStoryClipVideoBackgroundTasks(options3 = {}) {
-  let record = 0x0;
+  let record = 0;
   const storyBackgroundTaskSummary = getStoryBackgroundTaskSummary(options3)['activeTasks'];
   for (const payload of storyBackgroundTaskSummary) {
     if (payload['type'] !== 'clip-video') continue;
@@ -70,7 +70,7 @@ export function reconcileStoryClipVideoBackgroundTasks(options3 = {}) {
         : ['cancelled', 'canceled']['includes'](text5)
           ? { status: 'cancelled', message: '片段视频任务已取消' }
           : { status: 'interrupted', message: '片段视频任务状态已失效' };
-    if (finishStoryBackgroundTask(options3, payload['id'], handle)) record += 0x1;
+    if (finishStoryBackgroundTask(options3, payload['id'], handle)) record += 1;
   }
   return record;
 }
@@ -87,12 +87,12 @@ export function reconcilePersistedStoryProjectTasks(enabled = {}) {
     ((enabled['project']['summaryStatus'] = normalizeText(enabled['project']['summary'])
       ? 'completed'
       : 'error'),
-    (interruptStoryBackgroundTasks2 += 0x1));
+    (interruptStoryBackgroundTasks2 += 1));
   enabled['project']['outlineStatus'] === 'generating' &&
     !map['has']('episode-planning') &&
     ((enabled['project']['outlineStatus'] =
       Array['isArray'](enabled['episodes']) && enabled['episodes']['length'] ? 'completed' : 'error'),
-    (interruptStoryBackgroundTasks2 += 0x1));
+    (interruptStoryBackgroundTasks2 += 1));
   for (const episodeId of enabled['episodes'] || []) {
     for (const clipId of episodeId?.['clips'] || []) {
       const remoteTaskId = getRecoverableStoryClipVideoTask(clipId);
@@ -106,7 +106,7 @@ export function reconcilePersistedStoryProjectTasks(enabled = {}) {
             error:
               '上次视频任务已中断，未保存任务 ID，无法自动查询结果。请先到厂商任务记录核对，再决定是否重新生成。',
           }),
-          (interruptStoryBackgroundTasks2 += 0x1));
+          (interruptStoryBackgroundTasks2 += 1));
         continue;
       }
       const id = buildStoryBackgroundTaskId('clip-video', {
@@ -133,10 +133,10 @@ export function reconcilePersistedStoryProjectTasks(enabled = {}) {
         executionId: remoteTaskId['executionId'],
         startedAt: remoteTaskId['startedAt'],
       }),
-        (interruptStoryBackgroundTasks2 += 0x1));
+        (interruptStoryBackgroundTasks2 += 1));
     }
   }
-  return interruptStoryBackgroundTasks2 > 0x0;
+  return interruptStoryBackgroundTasks2 > 0;
 }
 export function deriveStoryProjectTaskState(options4 = {}) {
   const list3 = getStoryBackgroundTaskSummary(options4)['activeTasks'],
@@ -187,12 +187,12 @@ export function deriveStoryProjectTaskState(options4 = {}) {
     value8 = handler2('episode-scripts');
   list4['length'] &&
     ((value4['scriptGenerationFocusMode'] = !![]),
-    (value4['generatingEpisodeScriptId'] = normalizeText(list4[0x0]?.['scope']?.['episodeId'])),
-    (value4['isBatchGeneratingScripts'] = Boolean(value8) || list4['length'] > 0x1),
+    (value4['generatingEpisodeScriptId'] = normalizeText(list4[0]?.['scope']?.['episodeId'])),
+    (value4['isBatchGeneratingScripts'] = Boolean(value8) || list4['length'] > 1),
     (value4['episodeScriptBatchId'] = normalizeText(value8?.['id'])),
     (value4['episodeScriptBatchCancelRequested'] = value8?.['cancelRequested'] === !![]),
     (value4['episodeScriptGenerationStatus'] =
-      value8?.['label'] || list4[0x0]?.['message'] || '正在生成分集剧本'),
+      value8?.['label'] || list4[0]?.['message'] || '正在生成分集剧本'),
     (value4['storyPlanningOperation'] = value4['isBatchGeneratingScripts']
       ? 'writing-episode-scripts'
       : 'writing-episode-script'),
@@ -240,7 +240,7 @@ export function deriveStoryProjectTaskState(options4 = {}) {
   ((value4['generatingClipIds'] = normalizeStoryTaskBatchIds(
     list6['map']((value18) => value18['scope']?.['clipId']),
   )),
-    (value4['generatingClipId'] = value4['generatingClipIds'][0x0] || ''));
+    (value4['generatingClipId'] = value4['generatingClipIds'][0] || ''));
   const map2 = new Map();
   return (
     list6['forEach']((value19) => {

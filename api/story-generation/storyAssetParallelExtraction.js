@@ -45,7 +45,7 @@ function classifyStoryAssetDetailedExtractionError(error, handler) {
 }
 function isStoryAssetConfirmedUnchargedRejection(response) {
   const item = Number(response?.['status'] ?? response?.['statusCode']);
-  return [0x190, 0x191, 0x193, 0x194, 0x199, 0x1a6, 0x1ad]['includes'](item);
+  return [400, 401, 403, 404, 409, 422, 429]['includes'](item);
 }
 function isStoryAssetPaidRerunAuthorized(enabled2, key) {
   if (!enabled2 || typeof enabled2 !== 'object') return ![];
@@ -90,10 +90,10 @@ function clearStoryAssetPaidLane(data, options, target) {
 function makeUniqueStoryAssetExtractionRef(source, next, map, handler2) {
   const current = handler2(source, next);
   if (!map['has'](current)) return (map['add'](current), current);
-  let entry = 0x2,
+  let entry = 2,
     record = next + '-' + entry;
   while (map['has'](record)) {
-    ((entry += 0x1), (record = next + '-' + entry));
+    ((entry += 1), (record = next + '-' + entry));
   }
   return (map['add'](record), record);
 }
@@ -112,11 +112,11 @@ export function createParallelStoryAssetExtractor({
   function run(payload) {
     const list4 = JSON['stringify'](payload);
     let handle = 0x811c9dc5;
-    for (let state = 0x0; state < list4['length']; state += 0x1) {
+    for (let state = 0; state < list4['length']; state += 1) {
       ((handle ^= list4['charCodeAt'](state)), (handle = Math['imul'](handle, 0x1000193)));
     }
     return (
-      schemaVersion + '-' + (handle >>> 0x0)['toString'](0x10)['padStart'](0x8, '0') + '-' + list4['length']
+      schemaVersion + '-' + (handle >>> 0)['toString'](16)['padStart'](8, '0') + '-' + list4['length']
     );
   }
   function run2({
@@ -193,7 +193,7 @@ export function createParallelStoryAssetExtractor({
     return {
       kind: kind2,
       responseMode: responseMode,
-      responseSchemaVersion: responseMode === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 0x1,
+      responseSchemaVersion: responseMode === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 1,
       requiredAssets:
         cloneStoryAssetDetailedExtractionValue(storyAssetPromptContracts['requiredAssets'] || []) || [],
       candidateAssets:
@@ -320,12 +320,12 @@ export function createParallelStoryAssetExtractor({
             cloneStoryAssetDetailedExtractionValue2?.['paidResponseReceivedByKind']?.[value9] ||
             Object['hasOwn'](cloneStoryAssetDetailedExtractionValue2?.['rawResponsesByKind'] || {}, value9) ||
             Math['max'](
-              0x0,
+              0,
               Math['trunc'](
                 Number(cloneStoryAssetDetailedExtractionValue2?.['kindStates']?.[value9]?.['requestCount']) ||
-                  0x0,
+                  0,
               ),
-            ) > 0x0 ||
+            ) > 0 ||
             [
               'submitted',
               'ambiguous',
@@ -340,7 +340,7 @@ export function createParallelStoryAssetExtractor({
               ),
             ) ||
             (Array['isArray'](cloneStoryAssetDetailedExtractionValue2?.['assetsByKind']?.[value9]) &&
-              cloneStoryAssetDetailedExtractionValue2['assetsByKind'][value9]['length'] > 0x0),
+              cloneStoryAssetDetailedExtractionValue2['assetsByKind'][value9]['length'] > 0),
         ),
       ),
       value10 = Boolean(!enabled5 && value8),
@@ -351,14 +351,14 @@ export function createParallelStoryAssetExtractor({
           {
             kind: kind3,
             status: 'pending',
-            attempt: 0x0,
-            requestCount: 0x0,
-            repairCount: 0x0,
-            assetCount: 0x0,
+            attempt: 0,
+            requestCount: 0,
+            repairCount: 0,
+            assetCount: 0,
             errorType: '',
             errorMessage: '',
-            startedAt: 0x0,
-            finishedAt: 0x0,
+            startedAt: 0,
+            finishedAt: 0,
           },
         ]),
       );
@@ -384,7 +384,7 @@ export function createParallelStoryAssetExtractor({
             completedKinds: [],
             completedAssets: [],
             failures: [],
-            totalRequestCount: 0x0,
+            totalRequestCount: 0,
           };
     current2['strategy'] = STORY_ASSET_DETAILED_DRAFT_STRATEGY;
     !errorMessage &&
@@ -434,8 +434,8 @@ export function createParallelStoryAssetExtractor({
       (current2['requestedContractSnapshotByKind'] =
         cloneStoryAssetDetailedExtractionValue(contractSnapshotByKind)),
       (current2['responseMode'] =
-        new Set(Object['values'](responseMode3))['size'] === 0x1
-          ? Object['values'](responseMode3)[0x0]
+        new Set(Object['values'](responseMode3))['size'] === 1
+          ? Object['values'](responseMode3)[0]
             ? 'compact'
             : 'verbose'
           : 'mixed'),
@@ -465,7 +465,7 @@ export function createParallelStoryAssetExtractor({
             'blocked-incompatible',
             'validated',
           ]['includes'](normalizeText(current2['submissionStatesByKind'][kind4]?.['status'])) ||
-          Math['max'](0x0, Math['trunc'](Number(response2?.['requestCount']) || 0x0)) > 0x0 ||
+          Math['max'](0, Math['trunc'](Number(response2?.['requestCount']) || 0)) > 0 ||
           current2['assetsByKind'][kind4]['length'],
         ),
         isStoryAssetPaidRerunAuthorized2 = isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, kind4);
@@ -497,10 +497,10 @@ export function createParallelStoryAssetExtractor({
         (current2['kindStates'][kind4] = {
           ...response2,
           status: 'pending',
-          assetCount: 0x0,
+          assetCount: 0,
           errorType: '',
           errorMessage: '',
-          finishedAt: 0x0,
+          finishedAt: 0,
         }),
         (enabled7 = !![]));
       if ((enabled5 || value10) && value15 && !isStoryAssetPaidRerunAuthorized2) {
@@ -544,10 +544,10 @@ export function createParallelStoryAssetExtractor({
         (current2['kindStates'][kind4] = {
           ...response2,
           status: 'pending',
-          assetCount: 0x0,
+          assetCount: 0,
           errorType: '',
           errorMessage: '',
-          finishedAt: 0x0,
+          finishedAt: 0,
         }),
         (enabled7 = !![]));
       const value16 = normalizeText(current2['submissionStatesByKind'][kind4]?.['status']),
@@ -559,7 +559,7 @@ export function createParallelStoryAssetExtractor({
             value16 === 'ambiguous' ||
             response2?.['status'] === 'blocked-ambiguous-submission' ||
             (!current2['rawResponsesByKind'][kind4] &&
-              Math['max'](0x0, Math['trunc'](Number(response2?.['requestCount']) || 0x0)) > 0x0 &&
+              Math['max'](0, Math['trunc'](Number(response2?.['requestCount']) || 0)) > 0 &&
               (response2?.['status'] === 'running' ||
                 (response2?.['status'] === 'failed' &&
                   ['timeout', 'connection-reset']['includes'](value17)))),
@@ -583,10 +583,10 @@ export function createParallelStoryAssetExtractor({
         (current2['kindStates'][kind4] = {
           ...response2,
           status: 'pending',
-          assetCount: 0x0,
+          assetCount: 0,
           errorType: '',
           errorMessage: '',
-          finishedAt: 0x0,
+          finishedAt: 0,
         })),
         (current2['contractFingerprintsByKind'][kind4] = contractFingerprintsByKind[kind4]),
         (current2['contractSnapshotByKind'][kind4] = cloneStoryAssetDetailedExtractionValue(
@@ -699,7 +699,7 @@ export function createParallelStoryAssetExtractor({
           current2['kindStates'][value30] = {
             ...current2['kindStates'][value30],
             status: 'blocked-paid-response',
-            assetCount: 0x0,
+            assetCount: 0,
             errorType: 'paid-result-validation',
             errorMessage: '已付费请求返回空内容；已停止自动重新请求。',
             finishedAt: Date['now'](),
@@ -711,10 +711,10 @@ export function createParallelStoryAssetExtractor({
             (current2['kindStates'][value30] = {
               ...current2['kindStates'][value30],
               status: 'pending',
-              assetCount: 0x0,
+              assetCount: 0,
               errorType: '',
               errorMessage: '',
-              finishedAt: 0x0,
+              finishedAt: 0,
             }));
         continue;
       }
@@ -736,7 +736,7 @@ export function createParallelStoryAssetExtractor({
                   allowedKinds: [value30],
                   allowEmptyResult:
                     Array['isArray'](requiredAssetNamesByKind?.[value30]) &&
-                    requiredAssetNamesByKind[value30]['length'] === 0x0,
+                    requiredAssetNamesByKind[value30]['length'] === 0,
                 });
         ((current2['assetsByKind'][value30] = assetCount['assets']),
           Array['isArray'](assetCount?.['decisions']) &&
@@ -760,24 +760,24 @@ export function createParallelStoryAssetExtractor({
             status: 'validated',
             validatedAt: Date['now'](),
           }),
-          await run7(output[value30] + '已从上次付费结果恢复：' + assetCount['assets']['length'] + '\x20个'));
+          await run7(output[value30] + '已从上次付费结果恢复：' + assetCount['assets']['length'] + ' 个'));
       } catch (error4) {
         if (isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, value30)) {
           (clearStoryAssetPaidLane(current2, value30, 'authorized-invalid-paid-response-rerun'),
             (current2['kindStates'][value30] = {
               ...current2['kindStates'][value30],
               status: 'pending',
-              assetCount: 0x0,
+              assetCount: 0,
               errorType: '',
               errorMessage: '',
-              finishedAt: 0x0,
+              finishedAt: 0,
             }));
           continue;
         }
         current2['kindStates'][value30] = {
           ...current2['kindStates'][value30],
           status: 'blocked-paid-response',
-          assetCount: 0x0,
+          assetCount: 0,
           errorType: 'paid-result-validation',
           errorMessage: normalizeText(error4?.['message'] || error4),
           finishedAt: Date['now'](),
@@ -801,16 +801,16 @@ export function createParallelStoryAssetExtractor({
           const value36 =
             responseMode3[value35] &&
             Array['isArray'](requiredAssetNamesByKind?.[value35]) &&
-            requiredAssetNamesByKind[value35]['length'] === 0x0 &&
+            requiredAssetNamesByKind[value35]['length'] === 0 &&
             (!Array['isArray'](candidateAssetsByKind?.[value35]) ||
-              candidateAssetsByKind[value35]['length'] === 0x0);
+              candidateAssetsByKind[value35]['length'] === 0);
           if (value36)
             return (
               (current2['assetsByKind'][value35] = []),
               (current2['kindStates'][value35] = {
                 ...current2['kindStates'][value35],
                 status: 'succeeded',
-                assetCount: 0x0,
+                assetCount: 0,
                 errorType: '',
                 errorMessage: '',
                 finishedAt: Date['now'](),
@@ -824,13 +824,13 @@ export function createParallelStoryAssetExtractor({
             ...current2['kindStates'][value35],
             status: 'running',
             attempt:
-              Math['max'](0x0, Math['trunc'](Number(current2['kindStates'][value35]?.['attempt']) || 0x0)) +
-              0x1,
-            assetCount: 0x0,
+              Math['max'](0, Math['trunc'](Number(current2['kindStates'][value35]?.['attempt']) || 0)) +
+              1,
+            assetCount: 0,
             errorType: '',
             errorMessage: '',
             startedAt: startedAt,
-            finishedAt: 0x0,
+            finishedAt: 0,
           }),
             await run7(
               '正在提取' +
@@ -840,7 +840,7 @@ export function createParallelStoryAssetExtractor({
                 '/' +
                 total['length'],
             ));
-          let count = 0x0;
+          let count = 0;
           try {
             const assetCount2 = await extractStoryAssets({
               project: project,
@@ -867,20 +867,20 @@ export function createParallelStoryAssetExtractor({
                 });
               },
               request: async (value37) => {
-                ((count += 0x1),
+                ((count += 1),
                   (current2['totalRequestCount'] =
-                    Math['max'](0x0, Math['trunc'](Number(current2['totalRequestCount']) || 0x0)) + 0x1),
+                    Math['max'](0, Math['trunc'](Number(current2['totalRequestCount']) || 0)) + 1),
                   (current2['kindStates'][value35]['requestCount'] =
                     Math['max'](
-                      0x0,
-                      Math['trunc'](Number(current2['kindStates'][value35]?.['requestCount']) || 0x0),
-                    ) + 0x1));
-                count > 0x1 &&
+                      0,
+                      Math['trunc'](Number(current2['kindStates'][value35]?.['requestCount']) || 0),
+                    ) + 1));
+                count > 1 &&
                   (current2['kindStates'][value35]['repairCount'] =
                     Math['max'](
-                      0x0,
-                      Math['trunc'](Number(current2['kindStates'][value35]?.['repairCount']) || 0x0),
-                    ) + 0x1);
+                      0,
+                      Math['trunc'](Number(current2['kindStates'][value35]?.['repairCount']) || 0),
+                    ) + 1);
                 ((current2['submissionStatesByKind'][value35] = {
                   status: 'submitted',
                   submittedAt: Date['now'](),
@@ -889,7 +889,7 @@ export function createParallelStoryAssetExtractor({
                   contractSnapshot: cloneStoryAssetDetailedExtractionValue(contractSnapshotByKind[value35]),
                 }),
                   await run7(
-                    count > 0x1
+                    count > 1
                       ? '正在提交' + output[value35] + '自动纠错请求（1/1）'
                       : '正在提交' + output[value35] + '提取请求',
                   ));
@@ -909,7 +909,7 @@ export function createParallelStoryAssetExtractor({
                   ((current2['kindStates'][value35] = {
                     ...current2['kindStates'][value35],
                     status: 'blocked-paid-response',
-                    assetCount: 0x0,
+                    assetCount: 0,
                     errorType: 'empty-paid-response',
                     errorMessage: '已付费请求返回空内容；已停止自动重新请求。',
                     finishedAt: Date['now'](),
@@ -954,7 +954,7 @@ export function createParallelStoryAssetExtractor({
                 status: 'validated',
                 validatedAt: Date['now'](),
               }),
-              await run7(output[value35] + '完成：' + assetCount2['assets']['length'] + '\x20个'),
+              await run7(output[value35] + '完成：' + assetCount2['assets']['length'] + ' 个'),
               assetCount2
             );
           } catch (error6) {
@@ -965,10 +965,10 @@ export function createParallelStoryAssetExtractor({
               ),
               errorType2 = classifyStoryAssetDetailedExtractionError(error6, normalizeText),
               enabled11 = Boolean(
-                !status && !errorType && count > 0x0 && isStoryAssetConfirmedUnchargedRejection(error6),
+                !status && !errorType && count > 0 && isStoryAssetConfirmedUnchargedRejection(error6),
               ),
-              status2 = Boolean(!status && !errorType && count > 0x0 && !enabled11);
-            count > 0x0 &&
+              status2 = Boolean(!status && !errorType && count > 0 && !enabled11);
+            count > 0 &&
               !status &&
               !errorType &&
               (current2['submissionStatesByKind'][value35] = {
@@ -986,7 +986,7 @@ export function createParallelStoryAssetExtractor({
                   : status2
                     ? 'blocked-ambiguous-submission'
                     : 'failed',
-              assetCount: 0x0,
+              assetCount: 0,
               errorType: errorType
                 ? normalizeText(current2['kindStates'][value35]?.['errorType']) || 'paid-result-validation'
                 : status
@@ -1003,7 +1003,7 @@ export function createParallelStoryAssetExtractor({
         }),
       ),
       count2 = list11['findIndex']((response4) => response4['status'] === 'rejected');
-    if (count2 >= 0x0) {
+    if (count2 >= 0) {
       const list12 = total['filter'](
           (value39) => current2['kindStates'][value39]?.['status'] === 'blocked-paid-response',
         ),
@@ -1045,7 +1045,7 @@ export function createParallelStoryAssetExtractor({
         (current2['assetsByKind'][value45] || [])['map']((appearances, value46) => {
           const ref = makeUniqueStoryAssetExtractionRef(
             appearances['ref'],
-            value45 + '-' + (value46 + 0x1),
+            value45 + '-' + (value46 + 1),
             value43,
             normalizeAssetReference,
           );
@@ -1056,7 +1056,7 @@ export function createParallelStoryAssetExtractor({
               ...args3,
               ref: makeUniqueStoryAssetExtractionRef(
                 args3['ref'],
-                ref + '-appearance-' + (value47 + 0x1),
+                ref + '-appearance-' + (value47 + 1),
                 value44,
                 normalizeAssetReference,
               ),
@@ -1066,7 +1066,7 @@ export function createParallelStoryAssetExtractor({
       );
     return (
       (current2['status'] = 'completed'),
-      await run7('资产提取完成：' + assets['length'] + '\x20个'),
+      await run7('资产提取完成：' + assets['length'] + ' 个'),
       { schemaVersion: schemaVersion, extractionStrategy: 'kind-detailed-parallel', assets: assets }
     );
   };

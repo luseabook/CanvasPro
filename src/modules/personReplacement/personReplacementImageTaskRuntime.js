@@ -65,7 +65,7 @@ function resolveGeneratedImages(item) {
   if (!list['length'])
     throw new Error(
       normalizeText(
-        imageGenerationResult['items'][0x0]?.['localSaveError'] || imageGenerationResult?.['localSaveError'],
+        imageGenerationResult['items'][0]?.['localSaveError'] || imageGenerationResult?.['localSaveError'],
       ) ||
         getImageGenerationResultError(imageGenerationResult) ||
         '图像生成结果缺少可用图片',
@@ -236,7 +236,7 @@ export function createPersonReplacementImageTaskRuntime({
           ],
         });
       if (promptPackage3['annotatedSource'])
-        payload['inputUrls']['unshift'](promptPackage3['referenceImages'][0x0]['ref']);
+        payload['inputUrls']['unshift'](promptPackage3['referenceImages'][0]['ref']);
       return (
         (payload['adaptiveSource'] = provider['adaptiveSource']),
         (payload['resolvedRatioLabel'] = provider['resolvedAspectRatio']),
@@ -581,7 +581,7 @@ export function createPersonReplacementImageTaskRuntime({
           : await generateImage(payload3, value2);
         if (data) return null;
         const map3 = resolveGeneratedImages(value5),
-          replacementImageRef = map3[0x0]['localPath'],
+          replacementImageRef = map3[0]['localPath'],
           currentProject5 = currentProject(projectId5);
         if (currentProject5?.['id'] !== projectId5) return null;
         const currentShot3 = currentProject5['shots']?.['find']?.((value6) => value6['id'] === shotId5);
@@ -610,7 +610,7 @@ export function createPersonReplacementImageTaskRuntime({
           });
         let replacementImage2 = currentShot3['replacementImage'];
         const createdAt2 = now();
-        let value7 = 0x0;
+        let value7 = 0;
         for (const [count, imageUrl2] of map3['entries']()) {
           replacementImage2 = appendPersonReplacementImageResult(
             { replacementImage: replacementImage2 },
@@ -625,7 +625,7 @@ export function createPersonReplacementImageTaskRuntime({
               createdAt: createdAt2,
             },
           );
-          if (count === 0x0) value7 = replacementImage2['activeIndex'];
+          if (count === 0) value7 = replacementImage2['activeIndex'];
         }
         replacementImage2['activeIndex'] = value7;
         const imagePrompt = normalizeText(currentShot3['imagePrompt']) !== normalizeText(savedPrompt5),
@@ -834,7 +834,7 @@ export function createPersonReplacementImageTaskRuntime({
     generate: generate,
     resume: resume,
     resumeRecoverable: resumeRecoverable,
-    hasActiveTasks: () => map['size'] > 0x0,
+    hasActiveTasks: () => map['size'] > 0,
     hasActiveTasksForProject: (value19) => {
       const text7 = normalizeText(value19);
       return Boolean(text7) && [...map['values']()]['some']((value20) => value20['projectId'] === text7);

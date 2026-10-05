@@ -4,6 +4,12 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-05（158 批·版本重定基线 + 去混淆收尾）：应用已升 **0.8.0**；镜像重取（1952 件 / 0 失败），同法反混淆后比 0.7.16：**+184 新增、0 删除、455 件有变**；仓库对 0.7.16 已 0 缺失，0.8.0 的 184 新件一件没有，**156 批待裁决项作废**。同批清掉转义 24,625 处与十六进制 6,680 处（**1,162 件**），1,189/1,189 校验 PASS、全量 11185/11182/3。注：「7,102→422」是"≥2 位"口径，"原生受保护件计数全为 0"已被 159 批推翻。**基线裁决（160 批记录）：用户选择维持 0.4.12 基线继续接线，暂不切 0.8.0。**
+
+- 2026-10-04（157 批·脏件批）：27 件脏件全过机械工序，27 件全落地后 70 例失败 → 逐件归因＋补测，回滚 12 件（taskOrchestrationModule 与 AIGenAudioNode 各 12、SourceVideoNode 8、modelApiResolvers 7、projectLifecycle 6 等），**落地 15 件**。孤立 269→**201**（接通 80，含 renderer 12 个 renderer* 与 agent 15 件；另 12 件被 0.7.16 淘汰转孤立）。483 口径 403/1238。全量 11185/11182/3 零回归。
+
+- 2026-10-04（156 批·manifests 层侦察）：11 件纯新增候选全过机械工序，闭包对 modelRegistry + vendorVideoModelApiManifests 已在批内闭合、裸导入全通过。但 10/11 属规格变更型——接通 0.7.16 模型 manifest 后 api 域 67 例断言 0.4.12 旧规格失败（baseline 1000/1000 全绿）。最终只落 `api/errors/ErrorParser.js`（+3 解析器、0 失败），孤立 272→**269**（累计 99）；全量 11185/11182/3 零回归。余 10 件待裁决是否采纳 0.7.16 模型规格。〔2026-10-05 注：该裁决项已因安装版升级到 0.8.0 而**作废**，见 `docs/b158-version-rebaseline.md`。〕
+
 - 2026-10-04（154 批·接线第 5 小样）：升代授权目录 gain≥2 干净件 13 取 11（AssetManager、sceneNodeActions、shortcuts、ImageCrop/FreeAngle/Matting、agent 两件、imageAnnotate/rendering、SourceAudioNode、textGenerationResultRenderer，改名 3999、导出面 0 丢弃），孤立 313→**291**（累计 77；483 口径 445/1238，imageAnnotate 组清零）。resultRenderModule（7）与 previewControlsModule（1）回滚；desktopProjectFileStore 5 例 stash 复核为 HEAD 既有环境失败。全量 11185/11184/0 零失败。
 - 2026-10-04（155 批）：干净件 gain≥1 清尾 21 取 17（textToolbar、WebPreviewNode、CanvasTabManager、GenerationHistoryFileManager、canvasNodeFlows、canvasCommands 2 件、clipboard、imagePreview、EdgeController、nodeResizePreview、settings 2 件、textInputContextMenu、ui/rendererUiEvents、services 2 件），孤立 291→**272**（累计 96；483 口径 437）。SourceImageNode、mediaPlaybackRecovery、keying/removeAction 共 7 例回滚。全量 11185/11182/3 基线一致。
 - 2026-10-04（153 批·接线第 4 小样）：升代授权目录干净件 7 取 4（MediaClipNode、PanoramaSceneNode、SettingsManager、appPanels，改名 1759、导出面不变），孤立 341→**313**（累计 55；483 口径 461/1238，canvasShortcuts 与 tutorials 清零）。DragController（10 例）、videoToolbar（3）、nodePromptShared（1，aigenImage 连带）行为回归回滚。教训：目录测试须含全部下游子目录。全量 11185/11181/4，回滚后名单与基线一致。

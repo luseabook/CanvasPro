@@ -60,8 +60,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
   const index = String(item ?? '')['trim']();
@@ -76,16 +76,16 @@ function clamp(data, options, target, source = options) {
   return Number['isFinite'](next) ? Math['min'](target, Math['max'](options, next)) : source;
 }
 function formatClock(current) {
-  const entry = Math['max'](0x0, Number(current) || 0x0),
-    record = Math['floor'](entry / 0x3c),
-    payload = Math['floor'](entry % 0x3c);
-  return String(record)['padStart'](0x2, '0') + ':' + String(payload)['padStart'](0x2, '0');
+  const entry = Math['max'](0, Number(current) || 0),
+    record = Math['floor'](entry / 60),
+    payload = Math['floor'](entry % 60);
+  return String(record)['padStart'](2, '0') + ':' + String(payload)['padStart'](2, '0');
 }
 function formatPreciseClock(handle) {
-  const state = Math['max'](0x0, Number(handle) || 0x0),
-    config = Math['floor'](state / 0x3c),
-    scope = state - config * 0x3c;
-  return String(config)['padStart'](0x2, '0') + ':' + scope['toFixed'](0x2)['padStart'](0x5, '0');
+  const state = Math['max'](0, Number(handle) || 0),
+    config = Math['floor'](state / 60),
+    scope = state - config * 60;
+  return String(config)['padStart'](2, '0') + ':' + scope['toFixed'](2)['padStart'](5, '0');
 }
 function resolvePersonReplacementVideoResultPosterRef(enabled = {}) {
   if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return '';
@@ -122,14 +122,14 @@ function renderShotTimelineVideoMedia({
     output +
     '" src="' +
     escapeHtml(mediaUrl) +
-    '\x22' +
-    (mediaUrl2 ? ' poster="' + escapeHtml(mediaUrl2) + '\x22' : '') +
-    '\x20muted\x20playsinline\x20preload=\x22metadata\x22\x20aria-label=\x22' +
+    '"' +
+    (mediaUrl2 ? ' poster="' + escapeHtml(mediaUrl2) + '"' : '') +
+    ' muted playsinline preload="metadata" aria-label="' +
     escapeHtml(value3) +
     '" draggable="false"></video>'
   );
 }
-function renderReplacementResultReferenceButton(options2 = {}, value4 = 0x0, value5 = 'image') {
+function renderReplacementResultReferenceButton(options2 = {}, value4 = 0, value5 = 'image') {
   const value6 = value5 === 'video',
     value7 = value6 ? getPersonReplacementVideoResults(options2) : getPersonReplacementImageResults(options2),
     value8 = value7[value4],
@@ -144,8 +144,8 @@ function renderReplacementResultReferenceButton(options2 = {}, value4 = 0x0, val
       ),
     value10 = value6 ? '视频' : '图片',
     value11 = value9
-      ? '取消' + value10 + '\x20' + (value4 + 0x1) + ' 的参考'
-      : '将' + value10 + '\x20' + (value4 + 0x1) + ' 设为参考',
+      ? '取消' + value10 + ' ' + (value4 + 1) + ' 的参考'
+      : '将' + value10 + ' ' + (value4 + 1) + ' 设为参考',
     value12 = value9
       ? '再次点击取消下一轮参考'
       : value6
@@ -158,7 +158,7 @@ function renderReplacementResultReferenceButton(options2 = {}, value4 = 0x0, val
     value5 +
     '-reference" data-shot-id="' +
     escapeHtml(options2?.['id']) +
-    '\x22\x20data-replacement-' +
+    '" data-replacement-' +
     value5 +
     '-result-index="' +
     value4 +
@@ -166,9 +166,9 @@ function renderReplacementResultReferenceButton(options2 = {}, value4 = 0x0, val
     value9 +
     '" aria-label="' +
     escapeHtml(value11) +
-    '\x22\x20title=\x22' +
+    '" title="' +
     escapeHtml(value12) +
-    '\x22>' +
+    '">' +
     (value9 ? '参考中' : '设为参考') +
     '</button>'
   );
@@ -184,10 +184,10 @@ function renderReplacementImageHistoryMenu(
     title: title2,
     results: results,
     activeIndex: activeIndex,
-    minimumItemCount: allowSingleResult ? 0x1 : 0x2,
+    minimumItemCount: allowSingleResult ? 1 : 2,
     countLabel: results['length'] + ' 张图片',
     menuLabel: title2 + '替换图片',
-    getItemLabel: (value13, value14) => '图片 ' + (value14 + 0x1),
+    getItemLabel: (value13, value14) => '图片 ' + (value14 + 1),
     getItemStatus: (value15, value16) => (value16 === activeIndex ? '当前使用' : '点击切换'),
     renderMedia: (value17, value18) => {
       const personReplacementImageResultRef = resolvePersonReplacementImageResultRef(value17);
@@ -195,7 +195,7 @@ function renderReplacementImageHistoryMenu(
         ? '<img class="story-media-history-thumbnail story-clip-video-history-thumbnail" src="' +
             escapeHtml(normalizeMediaUrl(personReplacementImageResultRef)) +
             '" alt="' +
-            escapeHtml(title2 + ' · 图片 ' + (value18 + 0x1)) +
+            escapeHtml(title2 + ' · 图片 ' + (value18 + 1)) +
             '" loading="lazy" draggable="false">'
         : '';
     },
@@ -204,14 +204,14 @@ function renderReplacementImageHistoryMenu(
       escapeHtml(options3?.['id']) +
       '" data-replacement-image-result-index="' +
       value20 +
-      '\x22',
+      '"',
     renderItemAction: (value21, value22) =>
       '' +
       renderReplacementResultReferenceButton(options3, value22) +
-      (results['length'] > 0x1
+      (results['length'] > 1
         ? renderWorkspaceCardDeleteControl({
             className: 'story-media-history-delete',
-            ariaLabel: '删除图片\x20' + (value22 + 0x1),
+            ariaLabel: '删除图片 ' + (value22 + 1),
             actionAttributes: {
               'data-story-action': 'delete-replacement-image-result',
               'data-shot-id': options3?.['id'],
@@ -232,19 +232,19 @@ function renderReplacementVideoHistoryMenu(
     title: title3,
     results: results2,
     activeIndex: activeIndex2,
-    minimumItemCount: allowSingleResult ? 0x1 : 0x2,
+    minimumItemCount: allowSingleResult ? 1 : 2,
     countLabel: results2['length'] + ' 个视频',
     menuLabel: title3 + '替换结果视频',
-    getItemLabel: (value23, value24) => '视频 ' + (value24 + 0x1),
+    getItemLabel: (value23, value24) => '视频 ' + (value24 + 1),
     getItemStatus: (value25, value26) => (value26 === activeIndex2 ? '当前播放' : '点击切换'),
     renderMedia: (value27, value28) => {
       const personReplacementVideoResultPosterRef = resolvePersonReplacementVideoResultPosterRef(value27);
       if (personReplacementVideoResultPosterRef)
         return (
-          '<img\x20class=\x22story-media-history-thumbnail\x20story-clip-video-history-thumbnail\x22\x20src=\x22' +
+          '<img class="story-media-history-thumbnail story-clip-video-history-thumbnail" src="' +
           escapeHtml(normalizeMediaUrl(personReplacementVideoResultPosterRef)) +
           '" alt="' +
-          escapeHtml(title3 + ' · 视频 ' + (value28 + 0x1)) +
+          escapeHtml(title3 + ' · 视频 ' + (value28 + 1)) +
           '" loading="lazy" draggable="false">'
         );
       const personReplacementVideoResultRef = resolvePersonReplacementVideoResultRef(value27);
@@ -252,23 +252,23 @@ function renderReplacementVideoHistoryMenu(
         ? '<video class="story-media-history-thumbnail story-clip-video-history-thumbnail" src="' +
             escapeHtml(normalizeMediaUrl(personReplacementVideoResultRef)) +
             '" aria-label="' +
-            escapeHtml(title3 + ' · 视频 ' + (value28 + 0x1)) +
+            escapeHtml(title3 + ' · 视频 ' + (value28 + 1)) +
             '" muted playsinline preload="metadata"></video>'
         : '';
     },
     getItemAttributes: (value29, value30) =>
       'data-story-action="select-replacement-video-result" data-shot-id="' +
       escapeHtml(options4?.['id']) +
-      '\x22\x20data-replacement-video-result-index=\x22' +
+      '" data-replacement-video-result-index="' +
       value30 +
-      '\x22',
+      '"',
     renderItemAction: (value31, value32) =>
       '' +
       renderReplacementResultReferenceButton(options4, value32, 'video') +
-      (results2['length'] > 0x1
+      (results2['length'] > 1
         ? renderWorkspaceCardDeleteControl({
             className: 'story-media-history-delete',
-            ariaLabel: '删除视频 ' + (value32 + 0x1),
+            ariaLabel: '删除视频 ' + (value32 + 1),
             actionAttributes: {
               'data-story-action': 'delete-replacement-video-result',
               'data-shot-id': options4?.['id'],
@@ -292,17 +292,17 @@ function renderShotTimeline(
     list = Array['isArray'](selectedAssetId['shots']) ? selectedAssetId['shots'] : [],
     value33 = list['reduce'](
       (value34, value35) => value34 + getPersonReplacementShotDurationSec(value35),
-      0x0,
+      0,
     ),
     personReplacementShotCutDraft = createPersonReplacementShotCutDraft(selectedAssetId),
     countEditablePersonReplacementShotCuts2 = countEditablePersonReplacementShotCuts(
       personReplacementShotCutDraft,
     ),
     value36 =
-      countEditablePersonReplacementShotCuts2 > 0x0 ||
+      countEditablePersonReplacementShotCuts2 > 0 ||
       hasSplittablePersonReplacementShotCut(personReplacementShotCutDraft),
     selectedAssetIds = selectedAssetId['workspace']['selectedShotIds'],
-    value37 = list['length'] > 0x0 && list['every']((value38) => selectedAssetIds['includes'](value38['id'])),
+    value37 = list['length'] > 0 && list['every']((value38) => selectedAssetIds['includes'](value38['id'])),
     args = name
       ? list['filter']((value39) =>
           isPersonReplacementVideoGenerationActive(
@@ -323,10 +323,10 @@ function renderShotTimeline(
       ),
     ],
     batchGenerationActionLabel = name
-      ? selectedAssetIds['length'] > 0x1
+      ? selectedAssetIds['length'] > 1
         ? '批量生成视频'
         : '生成视频'
-      : selectedAssetIds['length'] > 0x1
+      : selectedAssetIds['length'] > 1
         ? '批量生成替换图'
         : '生成替换图',
     value43 = {
@@ -355,9 +355,9 @@ function renderShotTimeline(
           VIDEO_CLIP_ICON_SVG +
           '</button>'
         : '') +
-      '<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x22\x20data-story-action=\x22toggle-all-shots\x22\x20aria-pressed=\x22' +
+      '<button type="button" class="story-secondary-button" data-story-action="toggle-all-shots" aria-pressed="' +
       value37 +
-      '\x22\x20' +
+      '" ' +
       (list['length'] ? '' : 'disabled') +
       '>' +
       (value37 ? '取消全选' : '全选') +
@@ -366,14 +366,14 @@ function renderShotTimeline(
         ? renderPersonReplacementBatchGenerationControl(value43)
         : ''),
     value46 = list['map']((shot2, value47) => {
-      const title4 = '片段' + String(value47 + 0x1)['padStart'](0x2, '0'),
+      const title4 = '片段' + String(value47 + 1)['padStart'](2, '0'),
         list2 = getPersonReplacementImageResults(shot2),
         personReplacementActiveImageResultIndex = getPersonReplacementActiveImageResultIndex(shot2, list2),
         personReplacementImageResultRef2 = resolvePersonReplacementImageResultRef(
           list2[personReplacementActiveImageResultIndex],
         ),
         list3 = name ? getPersonReplacementVideoResults(shot2) : [],
-        value48 = name ? getPersonReplacementActiveVideoResultIndex(shot2, list3) : 0x0,
+        value48 = name ? getPersonReplacementActiveVideoResultIndex(shot2, list3) : 0,
         value49 = list3[value48] || null,
         resultRef2 =
           resolvePersonReplacementVideoResultRef(value49) || normalizeText(shot2['resultVideoRef']),
@@ -396,14 +396,14 @@ function renderShotTimeline(
         statusText = value50 ? formatClock2 + ' · 已生成' : formatClock2,
         count = (name ? list3 : list2)['length'],
         value51 = name
-          ? 'data-person-replacement-video-history="' + (list3['length'] > 0x1) + '\x22'
-          : 'data-person-replacement-image-history="' + (list2['length'] > 0x1) + '\x22',
+          ? 'data-person-replacement-video-history="' + (list3['length'] > 1) + '"'
+          : 'data-person-replacement-image-history="' + (list2['length'] > 1) + '"',
         accessoryHtml =
-          !selectedAssetId['workspace']['shotSelectionMode'] && (name ? list3 : list2)['length'] === 0x1
-            ? renderReplacementResultReferenceButton(shot2, 0x0, name ? 'video' : 'image')
+          !selectedAssetId['workspace']['shotSelectionMode'] && (name ? list3 : list2)['length'] === 1
+            ? renderReplacementResultReferenceButton(shot2, 0, name ? 'video' : 'image')
             : '',
         value52 =
-          count > 0x1
+          count > 1
             ? '<button type="button" class="person-replacement-shot-result-count" data-person-replacement-result-history-toggle data-shot-id="' +
               escapeHtml(shot2['id']) +
               '" data-result-count="' +
@@ -413,7 +413,7 @@ function renderShotTimeline(
               ' 个结果" title="查看 ' +
               count +
               ' 个生成结果"' +
-              (selectedAssetId['workspace']['shotSelectionMode'] ? '\x20disabled' : '') +
+              (selectedAssetId['workspace']['shotSelectionMode'] ? ' disabled' : '') +
               '>' +
               renderWorkspaceActionIcon('results') +
               '<span>' +
@@ -439,7 +439,7 @@ function renderShotTimeline(
           cardAttributes:
             'data-person-replacement-shot-card="true" data-shot-id="' +
             escapeHtml(shot2['id']) +
-            '\x22\x20' +
+            '" ' +
             value51 +
             ' aria-current="' +
             (shot2['id'] === selectedAssetId['workspace']['selectedShotId'] ? 'true' : 'false') +
@@ -452,26 +452,26 @@ function renderShotTimeline(
                 formatClock(shot2['endTimeSec']) +
                 (value50 ? (name ? '，替换视频已生成' : '，替换图已生成') : ''),
             ) +
-            '\x22',
+            '"',
           shellClassName: [
             accessoryHtml || value52 ? 'person-replacement-shot-card-shell' : '',
             accessoryHtml ? 'has-reference-control' : '',
             value52 ? 'has-result-count-control' : '',
           ]
             ['filter'](Boolean)
-            ['join']('\x20'),
+            ['join'](' '),
           accessoryHtml: accessoryHtml + value52,
           preserveShell: !![],
         },
       );
     })['join'](''),
     value53 = selectedAssetId['workspace']['shotSelectionMode']
-      ? '已选择 ' + selectedAssetIds['length'] + '\x20项'
+      ? '已选择 ' + selectedAssetIds['length'] + ' 项'
       : '',
     value54 = value53 ? '<small>' + value53 + '</small>' : '',
     value55 = 'data-story-marquee-surface="shots" tabindex="0"';
   return (
-    '<section\x20class=\x22person-replacement-shot-timeline\x22\x20aria-label=\x22镜头片段网格\x22>\x0a\x20\x20\x20\x20<section\x20class=\x22person-replacement-result-history-panel\x22\x20data-person-replacement-result-history-menu\x20aria-label=\x22片段生成结果\x22\x20aria-hidden=\x22true\x22\x20hidden></section>\x0a\x20\x20\x20\x20<header\x20class=\x22person-replacement-shot-timeline-header\x22><div><strong>镜头片段</strong><span>' +
+    '<section class="person-replacement-shot-timeline" aria-label="镜头片段网格">\n    <section class="person-replacement-result-history-panel" data-person-replacement-result-history-menu aria-label="片段生成结果" aria-hidden="true" hidden></section>\n    <header class="person-replacement-shot-timeline-header"><div><strong>镜头片段</strong><span>' +
     list['length'] +
     ' 个片段 · ' +
     formatClock(value33) +
@@ -480,10 +480,10 @@ function renderShotTimeline(
     value45 +
     '</div></header>\n    <div class="person-replacement-shot-timeline-scroll" data-person-replacement-shot-timeline-scroll ' +
     value55 +
-    '>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-shot-grid\x20story-asset-grid\x22>' +
+    '>\n      <div class="person-replacement-shot-grid story-asset-grid">' +
     (value46 ||
       '<div class="person-replacement-shot-timeline-empty-state">镜头切分完成后会显示在这里</div>') +
-    '</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</section>'
+    '</div>\n    </div>\n  </section>'
   );
 }
 function renderShotCutEditor(
@@ -493,9 +493,9 @@ function renderShotCutEditor(
     submitting: submitting = ![],
     keyframeCapturing: keyframeCapturing = ![],
     smartDetecting: smartDetecting = ![],
-    playheadSec: playheadSec = 0x0,
+    playheadSec: playheadSec = 0,
     previewShotId: previewShotId = '',
-    timelineZoom: timelineZoom = 0x1,
+    timelineZoom: timelineZoom = 1,
     soundEnabled: soundEnabled = ![],
     canUndo: canUndo = ![],
     selectedShotIds: selectedShotIds = [],
@@ -524,7 +524,7 @@ function renderShotCutEditor(
       viewportWidthPx: PERSON_REPLACEMENT_CUT_BASE_VIEWPORT_WIDTH_PX,
       zoom: timelineZoom,
     }),
-    clamp2 = clamp(playheadSec, 0x0, durationSec, 0x0),
+    clamp2 = clamp(playheadSec, 0, durationSec, 0),
     personReplacementShotCutPositionAtTimelineSec = getPersonReplacementShotCutPositionAtTimelineSec(
       list4,
       clamp2,
@@ -533,14 +533,14 @@ function renderShotCutEditor(
     map2 = new Set(
       (Array['isArray'](selectedShotIds) ? selectedShotIds : [])['map'](normalizeText)['filter'](Boolean),
     ),
-    value60 = map2['size'] === 0x2,
+    value60 = map2['size'] === 2,
     enabled4 = value60 && canMergePersonReplacementShotCutRanges(list4, [...map2]),
     enabled5 = Boolean(
       isReversed &&
       canSplitPersonReplacementShotCutRange(
         isReversed,
         personReplacementShotCutPositionAtTimelineSec['sourceTimeSec'] -
-          (Number(isReversed['startSec']) || 0x0),
+          (Number(isReversed['startSec']) || 0),
       ),
     ),
     renderPersonReplacementShotCutRulerTicks2 = renderPersonReplacementShotCutRulerTicks(
@@ -549,7 +549,7 @@ function renderShotCutEditor(
       personReplacementShotCutDisplayDuration,
       getPersonReplacementShotCutRulerFrameRate(list4),
     );
-  let endSec = 0x0;
+  let endSec = 0;
   const list5 = [],
     list6 = [],
     value61 = list4['map']((value62, count2) => {
@@ -562,16 +562,16 @@ function renderShotCutEditor(
           endSec: endSec,
           durationSec: durationSec,
           trackWidthPx: trackWidthPx,
-          minWidthPct: 0x0,
+          minWidthPct: 0,
         }),
-        value65 = '片段' + String(count2 + 0x1)['padStart'](0x2, '0');
+        value65 = '片段' + String(count2 + 1)['padStart'](2, '0');
       list5['push'](
         '<span class="person-replacement-shot-cut-segment-label" data-person-replacement-cut-segment-label="' +
           count2 +
-          '\x22\x20style=\x22left:' +
-          mediaClipTimelineRangeRect['leftPct']['toFixed'](0x5) +
+          '" style="left:' +
+          mediaClipTimelineRangeRect['leftPct']['toFixed'](5) +
           '%;width:' +
-          mediaClipTimelineRangeRect['widthPct']['toFixed'](0x5) +
+          mediaClipTimelineRangeRect['widthPct']['toFixed'](5) +
           '%" aria-hidden="true">' +
           value65 +
           '</span>',
@@ -583,20 +583,20 @@ function renderShotCutEditor(
             value62['keyframeTimeSec'],
           ),
           clamp3 = clamp(
-            (personReplacementShotCutTimelineSec / personReplacementShotCutDisplayDuration) * 0x64,
-            0x0,
-            0x64,
-            0x0,
+            (personReplacementShotCutTimelineSec / personReplacementShotCutDisplayDuration) * 100,
+            0,
+            100,
+            0,
           ),
-          value66 = clamp3 < 0x5 ? ' is-start' : clamp3 > 0x5f ? '\x20is-end' : '',
+          value66 = clamp3 < 5 ? ' is-start' : clamp3 > 95 ? ' is-end' : '',
           value67 = value65 + ' 关键帧';
         list6['push'](
-          '<div\x20class=\x22person-replacement-shot-cut-keyframe-marker' +
+          '<div class="person-replacement-shot-cut-keyframe-marker' +
             value66 +
             '" data-person-replacement-keyframe-marker="' +
             count2 +
             '" style="left:' +
-            clamp3['toFixed'](0x5) +
+            clamp3['toFixed'](5) +
             '%" role="note" aria-label="' +
             value67 +
             '"><span aria-hidden="true">' +
@@ -604,52 +604,52 @@ function renderShotCutEditor(
             '</span></div>',
         );
       }
-      const value68 = count2 > 0x0 && list4[count2 - 0x1]?.['sourceId'] !== value62['sourceId'],
+      const value68 = count2 > 0 && list4[count2 - 1]?.['sourceId'] !== value62['sourceId'],
         text3 = normalizeText(previewShotId) === normalizeText(value62['shotId']),
         value69 = map2['has'](normalizeText(value62['shotId'])),
-        value70 = list4[count2 - 0x1],
-        value71 = list4[count2 + 0x1],
+        value70 = list4[count2 - 1],
+        value71 = list4[count2 + 1],
         value72 = Boolean(value70 && value70['sourceId'] && value70['sourceId'] === value62['sourceId']),
         value73 = Boolean(value71 && value71['sourceId'] && value71['sourceId'] === value62['sourceId']),
         value74 = value72
-          ? '<button\x20type=\x22button\x22\x20class=\x22person-replacement-shot-cut-boundary\x20media-clip-trim\x20media-clip-trim-left\x22\x20data-person-replacement-cut-boundary-index=\x22' +
+          ? '<button type="button" class="person-replacement-shot-cut-boundary media-clip-trim media-clip-trim-left" data-person-replacement-cut-boundary-index="' +
             count2 +
-            '\x22\x20data-person-replacement-cut-boundary-side=\x22left\x22\x20role=\x22slider\x22\x20aria-label=\x22调整片段\x20' +
-            (count2 + 0x1) +
+            '" data-person-replacement-cut-boundary-side="left" role="slider" aria-label="调整片段 ' +
+            (count2 + 1) +
             ' 的左切口" aria-valuemin="' +
-            (value70['startSec'] + getPersonReplacementShotCutFrameSec(value70, value62))['toFixed'](0x4) +
+            (value70['startSec'] + getPersonReplacementShotCutFrameSec(value70, value62))['toFixed'](4) +
             '" aria-valuemax="' +
-            (value62['endSec'] - getPersonReplacementShotCutFrameSec(value70, value62))['toFixed'](0x4) +
+            (value62['endSec'] - getPersonReplacementShotCutFrameSec(value70, value62))['toFixed'](4) +
             '" aria-valuenow="' +
-            value62['startSec']['toFixed'](0x4) +
-            '\x22><span\x20class=\x22media-clip-trim-visual\x22\x20aria-hidden=\x22true\x22></span></button>'
+            value62['startSec']['toFixed'](4) +
+            '"><span class="media-clip-trim-visual" aria-hidden="true"></span></button>'
           : '',
         value75 = value73
           ? '<button type="button" class="person-replacement-shot-cut-boundary media-clip-trim media-clip-trim-right" data-person-replacement-cut-boundary-index="' +
-            (count2 + 0x1) +
+            (count2 + 1) +
             '" data-person-replacement-cut-boundary-side="right" role="slider" aria-label="调整片段 ' +
-            (count2 + 0x1) +
+            (count2 + 1) +
             ' 的右切口" aria-valuemin="' +
-            (value62['startSec'] + getPersonReplacementShotCutFrameSec(value62, value71))['toFixed'](0x4) +
+            (value62['startSec'] + getPersonReplacementShotCutFrameSec(value62, value71))['toFixed'](4) +
             '" aria-valuemax="' +
-            (value71['endSec'] - getPersonReplacementShotCutFrameSec(value62, value71))['toFixed'](0x4) +
+            (value71['endSec'] - getPersonReplacementShotCutFrameSec(value62, value71))['toFixed'](4) +
             '" aria-valuenow="' +
-            value62['endSec']['toFixed'](0x4) +
-            '\x22><span\x20class=\x22media-clip-trim-visual\x22\x20aria-hidden=\x22true\x22></span></button>'
+            value62['endSec']['toFixed'](4) +
+            '"><span class="media-clip-trim-visual" aria-hidden="true"></span></button>'
           : '';
       return (
         '<div class="person-replacement-shot-cut-segment media-clip-segment media-clip-material-strip media-clip-segment-video ' +
         (text3 ? 'is-previewing' : '') +
-        '\x20' +
+        ' ' +
         (value69 ? 'is-merge-selected' : '') +
-        '\x20' +
+        ' ' +
         (value68 ? 'is-source-start' : '') +
-        '\x20' +
+        ' ' +
         (value62['isReversed'] === !![] ? 'is-reversed' : '') +
         '" style="left:' +
-        mediaClipTimelineRangeRect['leftPct']['toFixed'](0x5) +
+        mediaClipTimelineRangeRect['leftPct']['toFixed'](5) +
         '%;width:' +
-        mediaClipTimelineRangeRect['widthPct']['toFixed'](0x5) +
+        mediaClipTimelineRangeRect['widthPct']['toFixed'](5) +
         '%" data-person-replacement-action="preview-shot-cut" data-person-replacement-shot-cut-selectable data-story-marquee-item data-story-marquee-id="' +
         escapeHtml(value62['shotId']) +
         '" data-person-replacement-cut-shot-index="' +
@@ -658,17 +658,17 @@ function renderShotCutEditor(
         count2 +
         '" data-media-kind="video" data-shot-id="' +
         escapeHtml(value62['shotId']) +
-        '\x22\x20' +
+        '" ' +
         (text3 ? 'data-selected-clip="true"' : '') +
-        '\x20' +
+        ' ' +
         (value69 ? 'data-person-replacement-cut-merge-selected="true"' : '') +
-        '\x20' +
+        ' ' +
         (value62['isReversed'] === !![] ? 'data-person-replacement-cut-reversed="true"' : '') +
         ' role="button" tabindex="0" aria-pressed="' +
         text3 +
         '" aria-label="' +
         escapeHtml(
-          (value63['title'] || '片段 ' + (count2 + 0x1)) +
+          (value63['title'] || '片段 ' + (count2 + 1)) +
             '，' +
             formatClock(value62['startSec']) +
             ' 到 ' +
@@ -680,7 +680,7 @@ function renderShotCutEditor(
         renderPersonReplacementShotCutFilmstrip(value63, trackWidthPx, value62['keyframeRef']) +
         '\n      <div class="media-clip-material-selection v2-video-clipselection person-replacement-shot-cut-selection" style="left:0%;width:100%" aria-hidden="true"><div class="media-clip-material-label v2-video-cliplabel" data-person-replacement-cut-duration="' +
         count2 +
-        '\x22>' +
+        '">' +
         formatDurationLabel(value64) +
         '</div></div>\n      ' +
         (value62['isReversed'] === !![]
@@ -702,7 +702,7 @@ function renderShotCutEditor(
     editorBusy +
     '">\n    <header class="person-replacement-shot-timeline-header">\n      <div><strong>调整全部切口</strong><span>' +
     list4['length'] +
-    '\x20个片段\x20·\x20' +
+    ' 个片段 · ' +
     countEditablePersonReplacementShotCuts3 +
     ' 个可调切口</span><span class="person-replacement-shot-cut-clock"><output data-person-replacement-shot-cut-current-time>' +
     formatPreciseClock(clamp2) +
@@ -716,7 +716,7 @@ function renderShotCutEditor(
     (soundEnabled ? '关闭声音' : '打开声音') +
     '" aria-pressed="' +
     soundEnabled +
-    '\x22\x20' +
+    '" ' +
     (editorBusy ? 'disabled' : '') +
     '>' +
     handler(soundEnabled ? 'soundOn' : 'soundOff') +
@@ -732,20 +732,20 @@ function renderShotCutEditor(
     (value58 ? 'disabled' : '') +
     '>' +
     handler('close') +
-    '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-shot-cut-action\x20is-primary\x20is-icon-only\x20' +
+    '</button>\n        <button type="button" class="person-replacement-shot-cut-action is-primary is-icon-only ' +
     (cutSubmitting ? 'is-loading' : '') +
-    '\x22\x20data-person-replacement-action=\x22confirm-shot-cuts\x22\x20data-tooltip=\x22' +
+    '" data-person-replacement-action="confirm-shot-cuts" data-tooltip="' +
     (cutSubmitting ? '正在应用切口' : '应用切口') +
     '" aria-label="' +
     (cutSubmitting ? '正在应用切口' : '应用切口') +
     '" aria-busy="' +
     cutSubmitting +
-    '\x22\x20' +
+    '" ' +
     (value58 || !hasPersonReplacementShotCutUpdateChanges2 ? 'disabled' : '') +
     '>' +
     renderWorkspaceConfirmIcon() +
     '</button>\n      </div>\n    </header>\n    <div class="person-replacement-shot-cut-shell media-clip-compact is-editing' +
-    (editorBusy ? '\x20img-preview-loading' : '') +
+    (editorBusy ? ' img-preview-loading' : '') +
     '" aria-busy="' +
     editorBusy +
     '">\n      <div class="media-clip-compact-body">\n        <div class="person-replacement-shot-cut-scroll media-clip-timeline-scroll" data-person-replacement-shot-timeline-scroll data-story-marquee-surface="shot-cuts" tabindex="0">\n          <div class="person-replacement-shot-cut-timeline media-clip-compact-timeline is-editing" data-person-replacement-shot-cut-timeline style="--media-clip-track-content-width:' +
@@ -753,28 +753,28 @@ function renderShotCutEditor(
     'px;--media-clip-timeline-content-width:' +
     trackWidthPx +
     'px;--media-clip-track-axis-width:0px;--cut-total-duration:' +
-    durationSec['toFixed'](0x5) +
+    durationSec['toFixed'](5) +
     '">\n            <div class="media-clip-ruler person-replacement-shot-cut-ruler" aria-hidden="true">' +
     renderPersonReplacementShotCutRulerTicks2 +
-    '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22media-clip-timeline-lane\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22media-clip-timeline-tracks\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-shot-cut-track\x20media-clip-track\x20media-clip-track-video\x20is-active\x22\x20data-person-replacement-shot-cut-track>' +
+    '</div>\n            <div class="media-clip-timeline-lane">\n              <div class="media-clip-timeline-tracks">\n                <div class="person-replacement-shot-cut-track media-clip-track media-clip-track-video is-active" data-person-replacement-shot-cut-track>' +
     (value61 || '<div class="person-replacement-shot-timeline-empty-state">暂无可调整的镜头切口</div>') +
     '</div>\n              </div>\n            </div>\n            <div class="person-replacement-shot-cut-annotations">' +
     list5['join']('') +
     list6['join']('') +
     '</div>\n            <div class="media-clip-timeline-cursors person-replacement-shot-cut-cursors" aria-hidden="true">\n              <div class="media-clip-playhead media-clip-timeline-cursor media-clip-timeline-cursor-fixed person-replacement-shot-cut-playhead" data-person-replacement-shot-cut-playhead style="left:' +
-    ((clamp2 / personReplacementShotCutDisplayDuration) * 0x64)['toFixed'](0x4) +
-    '%\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22media-clip-hover-playhead\x20media-clip-timeline-cursor\x20media-clip-timeline-cursor-hover\x20person-replacement-shot-cut-hover-playhead\x22\x20data-person-replacement-shot-cut-hover-playhead\x20hidden></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20' +
+    ((clamp2 / personReplacementShotCutDisplayDuration) * 100)['toFixed'](4) +
+    '%"></div>\n              <div class="media-clip-hover-playhead media-clip-timeline-cursor media-clip-timeline-cursor-hover person-replacement-shot-cut-hover-playhead" data-person-replacement-shot-cut-hover-playhead hidden></div>\n            </div>\n          </div>\n        </div>\n      </div>\n      ' +
     value59 +
     '\n    </div>\n    <div class="person-replacement-shot-cut-primary-actions" aria-label="片段编辑工具">\n      <button type="button" class="person-replacement-shot-cut-action is-icon-only ' +
     (keyframeCapturing ? 'is-loading' : '') +
     '" data-person-replacement-action="capture-shot-keyframe" data-tooltip="' +
     (keyframeCapturing ? '正在获取关键帧' : '获取关键帧') +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     (keyframeCapturing ? '正在获取关键帧' : '获取关键帧') +
-    '\x22\x20aria-busy=\x22' +
+    '" aria-busy="' +
     keyframeCapturing +
-    '\x22\x20' +
-    (editorBusy || keyframeCapturing || personReplacementShotCutPositionAtTimelineSec['shotIndex'] < 0x0
+    '" ' +
+    (editorBusy || keyframeCapturing || personReplacementShotCutPositionAtTimelineSec['shotIndex'] < 0
       ? 'disabled'
       : '') +
     '>' +
@@ -787,14 +787,14 @@ function renderShotCutEditor(
     (reversePending ? 'is-loading' : value76 ? 'is-active' : '') +
     '" data-person-replacement-action="toggle-shot-cut-reverse" data-tooltip="' +
     mediaClipReverseControlState['label'] +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     mediaClipReverseControlState['label'] +
-    '\x22\x20aria-busy=\x22' +
+    '" aria-busy="' +
     mediaClipReverseControlState['ariaBusy'] +
     '" aria-pressed="' +
     mediaClipReverseControlState['ariaPressed'] +
-    '\x22\x20' +
-    (value58 || personReplacementShotCutPositionAtTimelineSec['shotIndex'] < 0x0 ? 'disabled' : '') +
+    '" ' +
+    (value58 || personReplacementShotCutPositionAtTimelineSec['shotIndex'] < 0 ? 'disabled' : '') +
     '>' +
     handler('reverse') +
     '</button>\n      ' +
@@ -818,9 +818,9 @@ function renderShotTimelineStage(
     cutEditorSubmitting: cutEditorSubmitting = ![],
     cutEditorKeyframeCapturing: cutEditorKeyframeCapturing = ![],
     cutEditorSmartDetecting: cutEditorSmartDetecting = ![],
-    cutEditorPlayheadSec: cutEditorPlayheadSec = 0x0,
+    cutEditorPlayheadSec: cutEditorPlayheadSec = 0,
     cutEditorPreviewShotId: cutEditorPreviewShotId = '',
-    cutEditorTimelineZoom: cutEditorTimelineZoom = 0x1,
+    cutEditorTimelineZoom: cutEditorTimelineZoom = 1,
     cutEditorSoundEnabled: cutEditorSoundEnabled = ![],
     cutEditorSelectedShotIds: cutEditorSelectedShotIds = [],
     cutEditorCanUndo: cutEditorCanUndo = ![],
@@ -840,23 +840,23 @@ function renderShotTimelineStage(
           ? 'is-flipping-to-timeline'
           : '',
     value80 = Boolean(value79),
-    value81 = cutEditorOpening ? '\x20is-cut-editor-loading\x20img-preview-loading' : '',
+    value81 = cutEditorOpening ? ' is-cut-editor-loading img-preview-loading' : '',
     value82 = enabled6 || cutEditorOpening;
   return (
     '<div class="person-replacement-shot-timeline-stage ' +
     (enabled6 ? 'is-editor' : 'is-timeline') +
-    '\x20' +
+    ' ' +
     (value80 ? 'is-animating' : 'is-settled') +
     value81 +
     '" data-person-replacement-shot-timeline-stage aria-busy="' +
     cutEditorOpening +
-    '\x22' +
+    '"' +
     (cutEditorOpening ? ' aria-label="视频加载中，正在准备裁剪预览"' : '') +
     '>\n    <div class="person-replacement-shot-timeline-cube ' +
     value79 +
     '">\n      <div class="person-replacement-shot-timeline-face person-replacement-shot-timeline-face--timeline" aria-hidden="' +
     enabled6 +
-    '\x22\x20' +
+    '" ' +
     (value82 ? 'inert' : '') +
     '>' +
     renderShotTimeline(value77, {
@@ -868,7 +868,7 @@ function renderShotTimelineStage(
     }) +
     '</div>\n      <div class="person-replacement-shot-timeline-face person-replacement-shot-timeline-face--editor" aria-hidden="' +
     !enabled6 +
-    '\x22\x20' +
+    '" ' +
     (enabled6 ? '' : 'inert') +
     '>' +
     renderShotCutEditor(
@@ -887,7 +887,7 @@ function renderShotTimelineStage(
       },
       value78,
     ) +
-    '</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20' +
+    '</div>\n    </div>\n    ' +
     (cutEditorOpening
       ? renderWorkspaceAssetLoadingOverlay({
           title: '视频加载中',

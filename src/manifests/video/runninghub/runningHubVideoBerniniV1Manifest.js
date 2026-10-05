@@ -175,12 +175,12 @@ export const rhVideoBerniniV1ModelManifest = createRunningHubVideoModelManifest(
       placement: 'videoParams',
       displayRole: 'resolution',
       label: '分辨率',
-      defaultValue: 0x340,
+      defaultValue: 832,
       options: Object.freeze([
-        Object.freeze({ value: 0x340, label: '832' }),
-        Object.freeze({ value: 0x400, label: '1024' }),
-        Object.freeze({ value: 0x500, label: '1280' }),
-        Object.freeze({ value: 0x5a0, label: '1440' }),
+        Object.freeze({ value: 832, label: '832' }),
+        Object.freeze({ value: 1024, label: '1024' }),
+        Object.freeze({ value: 1280, label: '1280' }),
+        Object.freeze({ value: 1440, label: '1440' }),
       ]),
     }),
     Object.freeze({

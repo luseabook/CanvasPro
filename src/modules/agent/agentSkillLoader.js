@@ -6,7 +6,7 @@ export async function refreshInstalledAgentSkills({
   if (!registry || typeof registry['replaceInstalledPackages'] !== 'function')
     throw new TypeError('Agent Skill Registry is required.');
   if (bridge?.['agentSkills']?.['isAvailable']?.() !== !![])
-    return { available: ![], loaded: 0x0, rootPath: '', diagnostics: [] };
+    return { available: ![], loaded: 0, rootPath: '', diagnostics: [] };
   try {
     const value = await bridge['agentSkills']['list']();
     return registry['replaceInstalledPackages'](value?.['packages'] || [], value || {});
@@ -14,13 +14,13 @@ export async function refreshInstalledAgentSkills({
     const item = registry['getState']?.() || {};
     return {
       available: ![],
-      loaded: Number(item['installedCount'] || 0x0),
+      loaded: Number(item['installedCount'] || 0),
       rootPath: String(item['rootPath'] || ''),
       diagnostics: [
         {
           ok: ![],
           errorCode: 'SKILL_DISCOVERY_FAILED',
-          message: String(error?.['message'] || error || 'Skill discovery failed')['slice'](0x0, 0x12c),
+          message: String(error?.['message'] || error || 'Skill discovery failed')['slice'](0, 300),
         },
       ],
     };
@@ -52,7 +52,7 @@ export async function saveManagedAgentSkill({
   bridge: bridge = desktopBridge,
 } = {}) {
   if (!registry3 || typeof registry3['replaceInstalledPackages'] !== 'function')
-    throw new TypeError('Agent\x20Skill\x20Registry\x20is\x20required.');
+    throw new TypeError('Agent Skill Registry is required.');
   if (bridge?.['agentSkills']?.['isAvailable']?.() !== !![])
     return { success: ![], canceled: ![], errorCode: 'SKILL_SAVE_UNAVAILABLE' };
   const response2 = await bridge['agentSkills']['saveManaged'](definition || {});
@@ -68,7 +68,7 @@ export async function deleteInstalledAgentSkill({
   bridge: bridge = desktopBridge,
 } = {}) {
   if (!registry4 || typeof registry4['replaceInstalledPackages'] !== 'function')
-    throw new TypeError('Agent\x20Skill\x20Registry\x20is\x20required.');
+    throw new TypeError('Agent Skill Registry is required.');
   if (bridge?.['agentSkills']?.['isAvailable']?.() !== !![])
     return { success: ![], canceled: ![], errorCode: 'SKILL_DELETE_UNAVAILABLE' };
   const response3 = await bridge['agentSkills']['deleteInstalled'](request || {});

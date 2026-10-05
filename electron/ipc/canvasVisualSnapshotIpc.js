@@ -1,5 +1,5 @@
-const MAX_CAPTURE_WIDTH = 0x960,
-  MAX_CAPTURE_HEIGHT = 0x640,
+const MAX_CAPTURE_WIDTH = 2400,
+  MAX_CAPTURE_HEIGHT = 1600,
   MIN_CAPTURE_SIZE = 16;
 function toNumber(value, item = 0) {
   const key = Number(value);
@@ -28,11 +28,11 @@ async function captureSenderPage(enabled, data = {}) {
   const captureRect = normalizeCaptureRect(data.rect || {}),
     options = Math.min(
       MAX_CAPTURE_WIDTH,
-      Math.max(MIN_CAPTURE_SIZE, Math.round(toNumber(data.maxWidth, 0x640))),
+      Math.max(MIN_CAPTURE_SIZE, Math.round(toNumber(data.maxWidth, 1600))),
     ),
     target = Math.min(
       MAX_CAPTURE_HEIGHT,
-      Math.max(MIN_CAPTURE_SIZE, Math.round(toNumber(data.maxHeight, 0x3e8))),
+      Math.max(MIN_CAPTURE_SIZE, Math.round(toNumber(data.maxHeight, 1000))),
     ),
     enabled2 = await enabled.capturePage(captureRect);
   if (!enabled2 || enabled2.isEmpty?.()) return { ok: false, reason: 'empty' };

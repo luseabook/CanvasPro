@@ -1,7 +1,7 @@
 import { getSceneAssetCategories, listSceneAssets } from '../panoramaSceneNode/sceneAssetCatalog.js';
 import { STORYBOARD_3D_BODY_PRESETS } from './characterRig.js';
 import { resolveStoryboard3DAssetSpatialMetadata } from './spatialLayout.js';
-const DEFAULT_RECENT_LIMIT = 0x18;
+const DEFAULT_RECENT_LIMIT = 24;
 export const STORYBOARD_3D_CLAY_MODEL_TINT = '#e8edf5';
 const PROCEDURAL_SIZE_TAGS = new Set(['small', 'medium', 'large']),
   PROCEDURAL_COLOR_TAGS = new Set(['blue', 'red', 'green', 'yellow', 'purple']);
@@ -10,7 +10,7 @@ function normalizeText(value) {
 }
 function normalizeTags(list) {
   return Array['isArray'](list)
-    ? [...new Set(list['map'](normalizeText)['filter'](Boolean))]['slice'](0x0, 0x20)
+    ? [...new Set(list['map'](normalizeText)['filter'](Boolean))]['slice'](0, 32)
     : [];
 }
 function normalizeHexColor(item) {
@@ -82,7 +82,7 @@ export function normalizeStoryboard3DAssetDescriptor(options2 = {}) {
             kind: 'file',
             format: normalizeText(options2['source']?.['format'])['toLowerCase'](),
             fileName: normalizeText(options2['source']?.['fileName']),
-            byteLength: Math['max'](0x0, Number(options2['source']?.['byteLength']) || 0x0),
+            byteLength: Math['max'](0, Number(options2['source']?.['byteLength']) || 0),
             fingerprint: normalizeText(options2['source']?.['fingerprint']),
           }
         : data === 'pack'
@@ -107,7 +107,7 @@ export function normalizeStoryboard3DAssetDescriptor(options2 = {}) {
         ? structuredClone(options2['assetRecord'])
         : null,
     spatial: resolveStoryboard3DAssetSpatialMetadata(options2),
-    createdAt: Math['max'](0x0, Number(options2['createdAt']) || 0x0),
+    createdAt: Math['max'](0, Number(options2['createdAt']) || 0),
   };
 }
 export function listBuiltinStoryboard3DAssets() {
@@ -154,26 +154,26 @@ export function searchStoryboard3DAssets(
     query: query = '',
     category: category = 'all',
     recentAssetIds: recentAssetIds = [],
-    limit: limit = 0x50,
-    offset: offset = 0x0,
+    limit: limit = 80,
+    offset: offset = 0,
   } = {},
 ) {
   const text6 = normalizeText(query)['toLocaleLowerCase'](),
     text7 = normalizeText(category)['toLocaleLowerCase']() || 'all',
     map2 = new Map(recentAssetIds['map']((current, entry) => [normalizeText(current), entry])),
-    record = Math['max'](0x0, Math['floor'](Number(offset) || 0x0)),
-    payload = Math['max'](0x1, Math['min'](0x640, Math['floor'](Number(limit) || 0x50)));
+    record = Math['max'](0, Math['floor'](Number(offset) || 0)),
+    payload = Math['max'](1, Math['min'](1600, Math['floor'](Number(limit) || 80)));
   return list2['filter']((args2) => {
     if (text7 === 'recent' && !map2['has'](args2['id'])) return ![];
     if (text7 !== 'all' && text7 !== 'recent' && args2['category'] !== text7) return ![];
     if (!text6) return !![];
     return [args2['id'], args2['name'], args2['category'], ...args2['tags']]
-      ['join']('\x20')
+      ['join'](' ')
       ['toLocaleLowerCase']()
       ['includes'](text6);
   })
     ['sort']((handle, state) => {
-      if (text7 !== 'recent') return 0x0;
+      if (text7 !== 'recent') return 0;
       return map2['get'](handle['id']) - map2['get'](state['id']);
     })
     ['slice'](record, record + payload);
@@ -185,8 +185,8 @@ export function createStoryboard3DAssetLibrary({
   recentLimit: recentLimit = DEFAULT_RECENT_LIMIT,
 } = {}) {
   const map3 = new Map(),
-    config = Math['max'](0x1, Math['min'](0x64, Math['floor'](Number(recentLimit) || DEFAULT_RECENT_LIMIT)));
-  let args3 = recentAssetIds['map'](normalizeText)['filter'](Boolean)['slice'](0x0, config);
+    config = Math['max'](1, Math['min'](100, Math['floor'](Number(recentLimit) || DEFAULT_RECENT_LIMIT)));
+  let args3 = recentAssetIds['map'](normalizeText)['filter'](Boolean)['slice'](0, config);
   for (const scope of [...builtinAssets, ...importedAssets]) {
     const storyboard3DAssetDescriptor = normalizeStoryboard3DAssetDescriptor(scope);
     map3['set'](storyboard3DAssetDescriptor['id'], storyboard3DAssetDescriptor);
@@ -244,7 +244,7 @@ export function createStoryboard3DAssetLibrary({
         const text8 = normalizeText(value5);
         if (!map3['has'](text8)) return ![];
         return (
-          (args3 = [text8, ...args3['filter']((value6) => value6 !== text8)]['slice'](0x0, config)),
+          (args3 = [text8, ...args3['filter']((value6) => value6 !== text8)]['slice'](0, config)),
           !![]
         );
       },

@@ -31,7 +31,7 @@ function resolveImageMimeType(result, data) {
 function bytesToBase64(list) {
   if (typeof Buffer !== 'undefined') return Buffer.from(list).toString('base64');
   let options = '';
-  const target = 0x8000;
+  const target = 32768;
   for (let source = 0; source < list.length; source += target) {
     options += String.fromCharCode(...list.subarray(source, source + target));
   }

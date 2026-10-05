@@ -41,7 +41,7 @@ function parseFfmpegTimeSeconds(payload) {
     state = Number(enabled2[2]) || 0,
     config = Number(enabled2[3]) || 0,
     scope = Number('0.' + (enabled2[4] || '0')) || 0;
-  return handle * 0xe10 + state * 60 + config + scope;
+  return handle * 3600 + state * 60 + config + scope;
 }
 function getCommandLabel(command) {
   const text = String(command || '').trim();
@@ -200,7 +200,7 @@ export class MediaTaskQueue {
       const task = this.get(taskId.trim());
       return task ? [task] : [];
     }
-    const value10 = Math.max(1, Math.min(0x1f4, Math.trunc(Number(limit) || 100)));
+    const value10 = Math.max(1, Math.min(500, Math.trunc(Number(limit) || 100)));
     return [...this.tasks.values()]
       .sort((item3, value11) => Number(value11.createdAt || 0) - Number(item3.createdAt || 0))
       .slice(0, value10)

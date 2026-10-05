@@ -41,15 +41,15 @@ export async function runStoryReplicationFlow({
   onProgress: onProgress,
   signal: signal,
   isActive: isActive = () => !![],
-  totalMs: totalMs = 0x8 * 0xea60,
-  stageMs: stageMs = 0x2bf20,
-  reviewWindowSec: reviewWindowSec = 0x23,
+  totalMs: totalMs = 8 * 60000,
+  stageMs: stageMs = 180000,
+  reviewWindowSec: reviewWindowSec = 35,
 } = {}) {
   (requireFlow(
     typeof videoRef === 'string' &&
       videoRef['trim']() &&
       Number['isFinite'](durationSec) &&
-      durationSec > 0x0,
+      durationSec > 0,
     '原视频或时长无效',
   ),
     assertVideoAnalysisModel(model));
@@ -61,7 +61,7 @@ export async function runStoryReplicationFlow({
   let source = null,
     stage = 'observe',
     key,
-    transportRetries = 0x0,
+    transportRetries = 0,
     index = '';
   const run = () => {
       requireFlow(!signal?.['aborted'] && isActive(), '流程已取消或项目已失效');
@@ -82,13 +82,13 @@ export async function runStoryReplicationFlow({
         : {
             videoRef: videoRef,
             windows: [
-              { sourceStartSec: 0x0, sourceEndSec: durationSec, reelStartSec: 0x0, reelEndSec: durationSec },
+              { sourceStartSec: 0, sourceEndSec: durationSec, reelStartSec: 0, reelEndSec: durationSec },
             ],
           };
-  async function run2(stage3, args3, result, maxOutputTokens, attempt = 0x1) {
+  async function run2(stage3, args3, result, maxOutputTokens, attempt = 1) {
     (run(), (stage = stage3));
     const count = totalMs - (Date['now']() - item);
-    requireFlow(count > 0x3e8, '自动流程总时限已到');
+    requireFlow(count > 1000, '自动流程总时限已到');
     const signal2 = new AbortController(),
       data = () => signal2['abort'](signal['reason']);
     signal?.['addEventListener']('abort', data, { once: !![] });
@@ -114,7 +114,7 @@ export async function runStoryReplicationFlow({
           thinking: { type: 'disabled' },
           temperature: 0.2,
           maxOutputTokens: maxOutputTokens,
-          timeoutMs: Math['min'](0x15f90, options),
+          timeoutMs: Math['min'](90000, options),
           signal: signal2['signal'],
           onText: (next) => {
             if (String(next)['trim']()) enabled = !![];
@@ -154,7 +154,7 @@ export async function runStoryReplicationFlow({
         !enabled &&
         !error2['partialText'] &&
         error2['retryable'] === !![] &&
-        transportRetries === 0x0 &&
+        transportRetries === 0 &&
         !signal2['signal']['aborted']
       )
         return (
@@ -162,7 +162,7 @@ export async function runStoryReplicationFlow({
           clearTimeout(setTimeout2),
           signal?.['removeEventListener']('abort', data),
           await handler2(stage3 + '-transport-retry', { error: error2['message'] }),
-          run2(stage3, args3, result, maxOutputTokens, attempt + 0x1)
+          run2(stage3, args3, result, maxOutputTokens, attempt + 1)
         );
       throw Object['assign'](error2, { flowRequestFailed: !![] });
     } finally {
@@ -176,7 +176,7 @@ export async function runStoryReplicationFlow({
         'observe',
         flowObservationPrompt({ durationSec: durationSec, cutHints: cutHints }),
         videoRef,
-        0x4000,
+        16384,
       )),
         (source = validateFlowSource(observed, durationSec, notes)),
         handler(source));
@@ -196,7 +196,7 @@ export async function runStoryReplicationFlow({
             error: validationError['message'],
           }),
           videoRef,
-          0x4000,
+          16384,
         )),
         (source = validateFlowSource(observed, durationSec, notes)),
         handler(source));
@@ -209,7 +209,7 @@ export async function runStoryReplicationFlow({
             'speech-recovery',
             flowSpeechRecoveryPrompt(source, durationSec),
             videoRef,
-            0x2000,
+            8192,
           ),
           removedCaptionDuplicates = applyFlowSpeechRecovery(source, current, durationSec);
         (handler(removedCaptionDuplicates['source']),
@@ -235,7 +235,7 @@ export async function runStoryReplicationFlow({
       actionable = { actionable: [] };
     let enabled2 = ![];
     for (const [entry, enabled3] of id['entries']()) {
-      const stage4 = id['length'] === 0x1 ? 'review' : 'review-' + (entry + 0x1);
+      const stage4 = id['length'] === 1 ? 'review' : 'review-' + (entry + 1);
       let record;
       try {
         (run(), (stage = stage4), (record = await handler3(enabled3['windows'])));
@@ -257,7 +257,7 @@ export async function runStoryReplicationFlow({
               stage4,
               flowReviewPrompt(enabled3['scope'], record['windows'], payload),
               record['videoRef'],
-              0x1000,
+              4096,
             ),
             record['windows'],
             notes,
@@ -266,7 +266,7 @@ export async function runStoryReplicationFlow({
         (actionable['actionable']['push'](
           ...args4['actionable']['map']((args5) => ({
             ...args5,
-            id: id['length'] === 0x1 ? args5['id'] : 'w' + (entry + 0x1) + '-' + args5['id'],
+            id: id['length'] === 1 ? args5['id'] : 'w' + (entry + 1) + '-' + args5['id'],
           })),
         ),
           notes['push'](...args4['notes']),
@@ -301,7 +301,7 @@ export async function runStoryReplicationFlow({
         'repair',
         flowRepairPrompt(source, actionable['actionable'], input['windows']),
         input['videoRef'],
-        0x1800,
+        6144,
       );
       let candidate;
       try {
@@ -325,7 +325,7 @@ export async function runStoryReplicationFlow({
           'verify',
           flowVerifyPrompt(candidate, actionable['actionable'], input['windows']),
           input['videoRef'],
-          0x1000,
+          4096,
         );
         (requireFlow(
           verification?.['videoObserved'] === !![] &&
@@ -382,7 +382,7 @@ export async function runStoryReplicationFlow({
       stages: stages,
       promptBytes: promptBytes['clips']['reduce'](
         (value4, value5) => value4 + new TextEncoder()['encode'](value5['prompt'])['length'],
-        0x0,
+        0,
       ),
       initialObservationRerun: !![],
       importedFindings: ![],

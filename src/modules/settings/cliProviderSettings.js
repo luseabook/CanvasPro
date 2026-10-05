@@ -15,8 +15,8 @@ const PROVIDERS = Object['freeze']({
         '未登录。点击登录后，按终端提示在浏览器完成 ChatGPT 官方登录；不要选择 API Key 或 Access Token。',
     }),
   }),
-  LOGIN_STATUS_POLL_INTERVAL_MS = 0x7d0,
-  LOGIN_STATUS_POLL_MAX_ATTEMPTS = 0x2d;
+  LOGIN_STATUS_POLL_INTERVAL_MS = 2000,
+  LOGIN_STATUS_POLL_MAX_ATTEMPTS = 45;
 function pickStatusMessage(error, value) {
   return String(error?.['message'] || error?.['error'] || value)['trim']();
 }
@@ -65,7 +65,7 @@ export function formatCliProviderStatus(enabled) {
     const item = [enabled['account'], enabled['version']]['filter'](Boolean)['join'](' · ');
     return Object['freeze']({
       statusText: '已登录',
-      message: pickStatusMessage(enabled, item || '本地\x20CLI\x20已登录'),
+      message: pickStatusMessage(enabled, item || '本地 CLI 已登录'),
       installed: installed,
       loggedIn: loggedIn,
       busy: busy,
@@ -178,11 +178,11 @@ export async function initCliProviderSettings({
   }
   function run3(current) {
     run(current);
-    let entry = 0x0;
+    let entry = 0;
     const async2 = async () => {
         map['delete'](current);
         if (enabled3) return;
-        entry += 0x1;
+        entry += 1;
         try {
           const record = await refresh(),
             providerStatus = resolveProviderStatus(record, current);
@@ -217,7 +217,7 @@ export async function initCliProviderSettings({
           run3(state)),
         showToast?.(scope, 'success'));
     } catch (error5) {
-      showToast?.(error5?.['message'] || enabled4['config']['label'] + '\x20操作失败', 'error');
+      showToast?.(error5?.['message'] || enabled4['config']['label'] + ' 操作失败', 'error');
     } finally {
       !enabled3 &&
         !enabled5 &&
@@ -238,7 +238,7 @@ export async function initCliProviderSettings({
         }));
     }),
     await refresh()['catch']((error7) => {
-      showToast?.(error7?.['message'] || 'CLI\x20状态刷新失败', 'error');
+      showToast?.(error7?.['message'] || 'CLI 状态刷新失败', 'error');
     }),
     Object['freeze']({
       refresh: refresh,
@@ -246,7 +246,7 @@ export async function initCliProviderSettings({
         if (enabled3) return;
         ((enabled3 = !![]),
           [...map['keys']()]['forEach'](run),
-          list2['splice'](0x0)['forEach']((handler2) => handler2()));
+          list2['splice'](0)['forEach']((handler2) => handler2()));
       },
     })
   );

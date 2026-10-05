@@ -8,11 +8,11 @@ export function createTaskCenterMediaController(root) {
         value['image']['removeAttribute']('src'),
         (value['image']['hidden'] = !![]),
         (value['wrap']['dataset']['thumbSrc'] = ''),
-        (value['wrap']['tabIndex'] = -0x1));
+        (value['wrap']['tabIndex'] = -1));
     },
     handler = (enabled2) => {
       if (!enabled || !enabled2['inView'] || !enabled2['src'] || enabled2['failed']) return run(enabled2);
-      ((enabled2['wrap']['dataset']['thumbSrc'] = enabled2['src']), (enabled2['wrap']['tabIndex'] = 0x0));
+      ((enabled2['wrap']['dataset']['thumbSrc'] = enabled2['src']), (enabled2['wrap']['tabIndex'] = 0));
       if (enabled2['image']['getAttribute']('src') !== enabled2['src'])
         enabled2['image']['setAttribute']('src', enabled2['src']);
       enabled2['image']['hidden'] = ![];
@@ -27,7 +27,7 @@ export function createTaskCenterMediaController(root) {
                 ((enabled3['inView'] = event['isIntersecting']), handler(enabled3));
               }
             },
-            { root: root, threshold: 0x0 },
+            { root: root, threshold: 0 },
           )
         : null;
   return {

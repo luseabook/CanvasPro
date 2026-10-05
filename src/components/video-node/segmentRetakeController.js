@@ -45,21 +45,21 @@ function measureAnnotationProjection(el, el2) {
   const rect = el?.['getBoundingClientRect']?.(),
     rect2 = el2?.['getBoundingClientRect']?.();
   if (!rect || !rect2) return null;
-  const elementWidth = Math['max'](0x1, Number(el['offsetWidth']) || rect['width'] || 0x1),
-    elementHeight = Math['max'](0x1, Number(el['offsetHeight']) || rect['height'] || 0x1);
+  const elementWidth = Math['max'](1, Number(el['offsetWidth']) || rect['width'] || 1),
+    elementHeight = Math['max'](1, Number(el['offsetHeight']) || rect['height'] || 1);
   return createVideoKeyingProjection({
     video: {
       rect: rect,
       elementWidth: elementWidth,
       elementHeight: elementHeight,
-      mediaWidth: Math['max'](0x1, Number(el['videoWidth']) || elementWidth),
-      mediaHeight: Math['max'](0x1, Number(el['videoHeight']) || elementHeight),
+      mediaWidth: Math['max'](1, Number(el['videoWidth']) || elementWidth),
+      mediaHeight: Math['max'](1, Number(el['videoHeight']) || elementHeight),
       objectFit: getComputedStyle(el)['objectFit'],
     },
     layer: {
       rect: rect2,
-      width: Math['max'](0x1, Number(el2['offsetWidth']) || rect2['width'] || 0x1),
-      height: Math['max'](0x1, Number(el2['offsetHeight']) || rect2['height'] || 0x1),
+      width: Math['max'](1, Number(el2['offsetWidth']) || rect2['width'] || 1),
+      height: Math['max'](1, Number(el2['offsetHeight']) || rect2['height'] || 1),
     },
   });
 }
@@ -73,10 +73,10 @@ function clampClientPointToVideo(data, options, target) {
   return data['pickClientPoint'](clamp(Number(options), source, current), clamp(Number(target), next, entry));
 }
 function formatTime(record) {
-  const payload = Math['max'](0x0, Number(record) || 0x0),
-    handle = Math['floor'](payload / 0x3c),
-    state = payload - handle * 0x3c;
-  return String(handle)['padStart'](0x2, '0') + ':' + state['toFixed'](0x2)['padStart'](0x5, '0');
+  const payload = Math['max'](0, Number(record) || 0),
+    handle = Math['floor'](payload / 60),
+    state = payload - handle * 60;
+  return String(handle)['padStart'](2, '0') + ':' + state['toFixed'](2)['padStart'](5, '0');
 }
 function sameRange(config, scope) {
   return (
@@ -96,7 +96,7 @@ function comparableMediaUrl(input) {
 function resolveLiveSourcePlaybackUrl(output, value2) {
   const el3 = document['getElementById'](String(output?.['sourceNodeId'] || '')),
     list = Array['from'](el3?.['querySelectorAll']?.('video') || []);
-  if (list['length'] === 0x0) return '';
+  if (list['length'] === 0) return '';
   const comparableMediaUrl2 = comparableMediaUrl(value2),
     value3 = list['find']((el4) => {
       const value4 = String(el4['dataset']?.['desktopMediaSourceUrl'] || '')['trim'](),
@@ -111,7 +111,7 @@ function resolveLiveSourcePlaybackUrl(output, value2) {
       value3 ||
       list['find']((el5) => el5['classList']?.['contains']('video-player')) ||
       list['find']((value6) => value6['paused'] === ![]) ||
-      list[0x0];
+      list[0];
   return getMediaElementCurrentSource(value5);
 }
 export class SegmentRetakeController {
@@ -125,7 +125,7 @@ export class SegmentRetakeController {
       (this['rangeSyncing'] = ![]),
       (this['draft'] = null),
       (this['smartSegments'] = []),
-      (this['annotationSubmitEpoch'] = 0x0),
+      (this['annotationSubmitEpoch'] = 0),
       (this['markerRenderSignature'] = ''),
       (this['annotationReconcilePending'] = ![]),
       (this['unsubscribeAnnotationDependencies'] = null));
@@ -171,7 +171,7 @@ export class SegmentRetakeController {
       previewEl['classList']['add']('segment-retake-preview'),
       previewEl['querySelector']('.img-node-placeholder')?.['setAttribute']('hidden', ''),
       (this['videoEl'] = document['createElement']('video')),
-      (this['videoEl']['className'] = 'segment-retake-video\x20video-player'),
+      (this['videoEl']['className'] = 'segment-retake-video video-player'),
       (this['videoEl']['controls'] = ![]),
       (this['videoEl']['playsInline'] = !![]),
       (this['videoEl']['preload'] = 'auto'),
@@ -199,7 +199,7 @@ export class SegmentRetakeController {
       (this['timelineHost']['className'] = 'segment-retake-timeline-host'),
       (this['smartButton'] = document['createElement']('button')),
       (this['smartButton']['type'] = 'button'),
-      (this['smartButton']['className'] = 'segment-retake-smart-button\x20v2-video-clip-smartbtn'),
+      (this['smartButton']['className'] = 'segment-retake-smart-button v2-video-clip-smartbtn'),
       (this['smartButton']['textContent'] = text('smart.button')),
       this['timelineRow']['append'](this['timelineHost'], this['smartButton']),
       this['timelineShell']['appendChild'](this['timelineRow']),
@@ -281,12 +281,12 @@ export class SegmentRetakeController {
       this['owner']['_syncVideoControlsFromVideo']?.(this['videoEl']));
   }
   ['clearAnnotationDraft']() {
-    ((this['annotationSubmitEpoch'] += 0x1),
+    ((this['annotationSubmitEpoch'] += 1),
       (this['draft'] = null),
       this['annotationLayer']?.['replaceChildren']());
   }
   ['onAnnotationPointerDown'] = (event3) => {
-    if (!this['annotationMode'] || event3['button'] !== 0x0) return;
+    if (!this['annotationMode'] || event3['button'] !== 0) return;
     if (event3['target']?.['closest']?.('.segment-retake-annotation-composer')) {
       event3['stopPropagation']();
       return;
@@ -341,8 +341,8 @@ export class SegmentRetakeController {
         handler(event5['pointerId']);
         if (
           !this['draft']?.['normalizedRect'] ||
-          this['draft']['clientSize']?.['width'] < 0x8 ||
-          this['draft']['clientSize']?.['height'] < 0x8
+          this['draft']['clientSize']?.['width'] < 8 ||
+          this['draft']['clientSize']?.['height'] < 8
         ) {
           this['clearAnnotationDraft']();
           return;
@@ -362,7 +362,7 @@ export class SegmentRetakeController {
     const value17 = document['createElement']('div');
     value17['className'] = 'segment-retake-annotation-composer';
     const el6 = document['createElement']('input');
-    ((el6['type'] = 'text'), (el6['placeholder'] = text('annotate.placeholder')), (el6['maxLength'] = 0x1f4));
+    ((el6['type'] = 'text'), (el6['placeholder'] = text('annotate.placeholder')), (el6['maxLength'] = 500));
     const el7 = document['createElement']('button');
     ((el7['type'] = 'button'), (el7['textContent'] = text('annotate.cancel')));
     const el8 = document['createElement']('button');
@@ -390,7 +390,7 @@ export class SegmentRetakeController {
     const requirement = String(value18 || '')['trim']();
     if (!requirement || !this['draft'] || el9['disabled']) return;
     const value19 = this['draft'],
-      annotationTimeSec = Number(this['videoEl']['currentTime']) || 0x0,
+      annotationTimeSec = Number(this['videoEl']['currentTime']) || 0,
       value20 = ++this['annotationSubmitEpoch'];
     ((el9['disabled'] = !![]), el9['setAttribute']('aria-busy', 'true'));
     try {
@@ -533,7 +533,7 @@ export class SegmentRetakeController {
       (el11['dataset']['retakeAnnotationId'] = value22['id']),
       (el11['contentEditable'] = 'false'),
       (el11['textContent'] = buildSegmentRetakePromptText(value22['requirement'])));
-    const value23 = document['createTextNode']('\u00a0'),
+    const value23 = document['createTextNode']('\xa0'),
       value24 = el10['nextSibling'] || el10;
     return (
       value24['after'](el11, value23),
@@ -549,10 +549,10 @@ export class SegmentRetakeController {
         for (const value25 of this['session']?.['annotations'] || []) {
           const value26 = CSS['escape'](value25['id']),
             enabled3 = this['owner']['promptEl']['querySelector'](
-              '.ref-pill[data-retake-annotation-id="' + value26 + '\x22]',
+              '.ref-pill[data-retake-annotation-id="' + value26 + '"]',
             ),
             enabled4 = this['owner']['promptEl']['querySelector'](
-              '.segment-retake-prompt-instruction[data-retake-annotation-id=\x22' + value26 + '\x22]',
+              '.segment-retake-prompt-instruction[data-retake-annotation-id="' + value26 + '"]',
             );
           (!enabled3 || !enabled4) && this['deleteAnnotation'](value25['id'], { promptAlreadyRemoved: !![] });
         }
@@ -575,13 +575,13 @@ export class SegmentRetakeController {
       const value31 = CSS['escape'](value30['id']);
       this['owner']['promptEl']
         ?.['querySelectorAll'](
-          '.segment-retake-prompt-time[data-retake-annotation-id=\x22' + value31 + '\x22]',
+          '.segment-retake-prompt-time[data-retake-annotation-id="' + value31 + '"]',
         )
         ['forEach']((el12) => {
           (el12['remove'](), (value29 = !![]));
         });
       const el13 = this['owner']['promptEl']?.['querySelector'](
-          '.ref-pill[data-retake-annotation-id="' + value31 + '\x22]',
+          '.ref-pill[data-retake-annotation-id="' + value31 + '"]',
         ),
         el14 = el13?.['querySelector']?.('.ref-pill-label');
       if (el13 && (el13['dataset']['label'] !== name || el13['dataset']['refLabel'] !== name)) {
@@ -591,7 +591,7 @@ export class SegmentRetakeController {
         value29 = !![];
       }
     }
-    (Object['keys'](value28)['length'] > 0x0 && appStore['updateNodesData'](value28),
+    (Object['keys'](value28)['length'] > 0 && appStore['updateNodesData'](value28),
       value29 &&
         (this['owner']['promptEl']?.['dispatchEvent'](new Event('input', { bubbles: !![] })),
         window['_triggerLocalCacheSave']?.()));
@@ -622,7 +622,7 @@ export class SegmentRetakeController {
       nodes: nodes['nodes'],
       edges: nodes['edges'],
     });
-    if (list2['length'] === 0x0) return;
+    if (list2['length'] === 0) return;
     ((this['annotationReconcilePending'] = !![]),
       queueMicrotask(() => {
         try {
@@ -670,7 +670,7 @@ export class SegmentRetakeController {
       }),
       !promptAlreadyRemoved &&
         (this['owner']['promptEl']
-          ?.['querySelectorAll']('[data-retake-annotation-id="' + CSS['escape'](value35) + '\x22]')
+          ?.['querySelectorAll']('[data-retake-annotation-id="' + CSS['escape'](value35) + '"]')
           ['forEach']((el15) => el15['remove']()),
         this['owner']['promptEl']?.['dispatchEvent'](new Event('input', { bubbles: !![] }))),
       commit(),
@@ -702,14 +702,14 @@ export class SegmentRetakeController {
     const enabled5 = this['clipController']['getSourceTimelineElements']();
     if (!enabled5?.['trackEl']) return;
     const value41 = this['session'],
-      duration = Number(value41?.['sourceDurationSec']) || 0x0,
+      duration = Number(value41?.['sourceDurationSec']) || 0,
       value42 = value40 || value41?.['range'] || {},
       value43 = JSON['stringify']({
         duration: duration,
-        range: [Number(value42['startSec']) || 0x0, Number(value42['endSec']) || 0x0],
+        range: [Number(value42['startSec']) || 0, Number(value42['endSec']) || 0],
         annotations: (value41?.['annotations'] || [])['map']((value44) => [
           value44['id'],
-          Number(value44['timeSec']) || 0x0,
+          Number(value44['timeSec']) || 0,
           value44['requirement'],
           value44['thumbnailUrl'],
         ]),
@@ -722,10 +722,10 @@ export class SegmentRetakeController {
     for (const value45 of value41?.['annotations'] || []) {
       const el17 = document['createElement']('div');
       ((el17['className'] = 'segment-retake-marker'),
-        (el17['tabIndex'] = 0x0),
+        (el17['tabIndex'] = 0),
         el17['setAttribute']('role', 'button'));
       !isSegmentRetakeAnnotationInRange(value45, value42) && el17['classList']['add']('is-invalid');
-      ((el17['style']['left'] = clamp((Number(value45['timeSec']) / duration) * 0x64, 0x0, 0x64) + '%'),
+      ((el17['style']['left'] = clamp((Number(value45['timeSec']) / duration) * 100, 0, 100) + '%'),
         el17['setAttribute']('aria-label', text('marker.label', { time: formatTime(value45['timeSec']) })));
       const el18 = document['createElement']('span');
       el18['className'] = 'segment-retake-marker-popover';
@@ -744,17 +744,17 @@ export class SegmentRetakeController {
       const value47 = () => {
         const box3 = el17['getBoundingClientRect']();
         ((el18['style']['left'] =
-          clamp(box3['left'] - 0x2e, 0x8, Math['max'](0x8, window['innerWidth'] - 0x154)) + 'px'),
+          clamp(box3['left'] - 46, 8, Math['max'](8, window['innerWidth'] - 340)) + 'px'),
           (el18['style']['top'] =
-            clamp(box3['bottom'] + 0x8, 0x8, Math['max'](0x8, window['innerHeight'] - 0x96)) + 'px'));
+            clamp(box3['bottom'] + 8, 8, Math['max'](8, window['innerHeight'] - 150)) + 'px'));
       };
       (el17['addEventListener']('mouseenter', value47), el17['addEventListener']('focus', value47));
       const run = () => {
-        this['videoEl']['currentTime'] = Number(value45['timeSec']) || 0x0;
+        this['videoEl']['currentTime'] = Number(value45['timeSec']) || 0;
       };
       (el17['addEventListener']('click', run),
         el17['addEventListener']('keydown', (event9) => {
-          if (event9['key'] !== 'Enter' && event9['key'] !== '\x20') return;
+          if (event9['key'] !== 'Enter' && event9['key'] !== ' ') return;
           (event9['preventDefault'](), run());
         }),
         enabled5['trackEl']['appendChild'](el17));
@@ -767,7 +767,7 @@ export class SegmentRetakeController {
       return;
     }
     const value48 = this['session'];
-    if (Number(value48?.['sourceDurationSec']) < 0x4) {
+    if (Number(value48?.['sourceDurationSec']) < 4) {
       window['showToast']?.(text('errors.durationTooShort'), 'warn');
       return;
     }
@@ -783,7 +783,7 @@ export class SegmentRetakeController {
           mode: 'stable',
           unlimitedSegments: !![],
           outputMode: SMART_CLIP_OUTPUT_MODE_ANALYSIS,
-          maxSegmentDurationSec: 0x1e,
+          maxSegmentDurationSec: 30,
         },
       });
       if (this['disposed']) return;
@@ -804,12 +804,12 @@ export class SegmentRetakeController {
   };
   ['renderSmartSegments']() {
     (this['segmentList']['replaceChildren'](),
-      (this['segmentList']['hidden'] = this['smartSegments']['length'] === 0x0),
+      (this['segmentList']['hidden'] = this['smartSegments']['length'] === 0),
       this['smartSegments']['forEach']((value49, index3) => {
         const el21 = document['createElement']('button');
         ((el21['type'] = 'button'),
           (el21['textContent'] = text('smart.segment', {
-            index: index3 + 0x1,
+            index: index3 + 1,
             start: formatTime(value49['startSec']),
             end: formatTime(value49['endSec']),
           })),

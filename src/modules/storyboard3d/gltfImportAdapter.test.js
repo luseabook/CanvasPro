@@ -70,7 +70,7 @@ function binaryFile() {
   const jsonPad = (4 - (jsonBytes.length % 4)) % 4;
   const jsonChunk = new Uint8Array(jsonBytes.length + jsonPad);
   jsonChunk.set(jsonBytes);
-  jsonChunk.fill(0x20, jsonBytes.length);
+  jsonChunk.fill(32, jsonBytes.length);
   const binPad = (4 - (bin.length % 4)) % 4;
   const binChunk = new Uint8Array(bin.length + binPad);
   binChunk.set(bin);

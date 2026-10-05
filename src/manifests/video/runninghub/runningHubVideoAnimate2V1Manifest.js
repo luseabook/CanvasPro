@@ -8,10 +8,10 @@ import {
 export const RH_VIDEO_ANIMATE2_V1_MODEL_ID = 'runninghub/2086051371794657282';
 export const RH_VIDEO_ANIMATE2_V1_EXECUTION_ID = 'runninghub.workflow.video-animate2-v1.v1';
 export const RH_VIDEO_ANIMATE2_V1_HELP_TOOLTIP = [
-  '视频编辑Animate2\x20V1用法',
+  '视频编辑Animate2 V1用法',
   '必接 [[red:源视频]] + [[red:参考图]]',
   '提示词可以留空；可在高级设置中选择模式并描述原视频姿势',
-]['join']('\x0a');
+]['join']('\n');
 export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest({
   modelId: RH_VIDEO_ANIMATE2_V1_MODEL_ID,
   executionId: RH_VIDEO_ANIMATE2_V1_EXECUTION_ID,
@@ -25,7 +25,7 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
     videoParameterPanel: Object['freeze']({
       sourceFrameCountFps: 'v54',
       submitScopeTargetEdges: !![],
-      frameStateDefaults: Object['freeze']({ frameRate: 0x18, frameCount: 0x32 }),
+      frameStateDefaults: Object['freeze']({ frameRate: 24, frameCount: 50 }),
       adaptiveRatio: Object['freeze']({
         scopeTargetEdges: !![],
         preferSlot: 'sourceVideo',
@@ -36,8 +36,8 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
   fixedAssetSlots: ['sourceVideo', 'refImage'],
   inputSlots: {
     allowedKinds: ['text', 'image', 'video'],
-    minByKind: { image: 0x1, video: 0x1 },
-    maxByKind: { image: 0x1, video: 0x1, audio: 0x0 },
+    minByKind: { image: 1, video: 1 },
+    maxByKind: { image: 1, video: 1, audio: 0 },
     fixedSlots: Object['freeze']([
       Object['freeze']({ id: 'sourceVideo', kind: 'video', label: '源视频', required: !![] }),
       Object['freeze']({ id: 'refImage', kind: 'image', label: '参考图', required: !![] }),
@@ -51,10 +51,10 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
       type: 'stepper',
       placement: 'videoParams',
       label: '帧数',
-      defaultValue: 0x32,
-      min: 0x0,
+      defaultValue: 50,
+      min: 0,
       max: 0xf423f,
-      step: 0x1,
+      step: 1,
     }),
     Object['freeze']({
       id: 'rhAnimate2Mode',
@@ -96,7 +96,7 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
 });
 export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecutionManifest({
   id: RH_VIDEO_ANIMATE2_V1_EXECUTION_ID,
-  label: '视频编辑Animate2\x20V1',
+  label: '视频编辑Animate2 V1',
   workflowId: '2086051371794657282',
   submitMode: 'openapi-v2-ai-app',
   queryMode: 'openapi-v2-query',
@@ -120,7 +120,7 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         fieldName: 'force_rate',
         source: 'param',
         fields: Object['freeze'](['generationParams.rhVideoFps', 'rhVideoFps', 'frameRate']),
-        defaultValue: 0x18,
+        defaultValue: 24,
         transform: 'normalizeRhVideoFps',
         description: '帧率',
       }),
@@ -129,8 +129,8 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         fieldName: 'frame_load_cap',
         source: 'param',
         fields: Object['freeze'](['generationParams.rhVideoFrames', 'rhVideoFrames', 'frameCount']),
-        defaultValue: 0x32,
-        transform: Object['freeze']({ name: 'integer', min: 0x0 }),
+        defaultValue: 50,
+        transform: Object['freeze']({ name: 'integer', min: 0 }),
         description: '帧数',
       }),
       Object['freeze']({
@@ -160,7 +160,7 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         source: 'param',
         fields: Object['freeze'](['generationParams.rhAnimate2Mode', 'rhAnimate2Mode']),
         defaultValue: '1',
-        transform: Object['freeze']({ name: 'integer', min: 0x0, max: 0x2 }),
+        transform: Object['freeze']({ name: 'integer', min: 0, max: 2 }),
         description: '模式选择（0~2）',
       }),
       Object['freeze']({
@@ -168,7 +168,7 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         fieldName: 'value',
         source: 'param',
         fields: Object['freeze'](['generationParams.rhVideoResolution', 'rhVideoResolution']),
-        defaultValue: 0x340,
+        defaultValue: 832,
         transform: 'normalizeRhVideoResolution',
         description: '分辨率',
       }),

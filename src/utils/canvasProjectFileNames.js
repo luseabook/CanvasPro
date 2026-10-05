@@ -19,10 +19,10 @@ export function buildUniqueCanvasName(index, result = [], data = {}) {
     );
   if (!map['has'](target)) return target;
   const source =
-    Number['isInteger'](data?.['maxAttempts']) && data['maxAttempts'] > 0x0 ? data['maxAttempts'] : 0x3e8;
-  for (let next = 0x1; next < source; next += 0x1) {
+    Number['isInteger'](data?.['maxAttempts']) && data['maxAttempts'] > 0 ? data['maxAttempts'] : 1000;
+  for (let next = 1; next < source; next += 1) {
     const current = target + '(' + next + ')';
     if (!map['has'](current)) return current;
   }
-  return target + '\x20' + Date['now']();
+  return target + ' ' + Date['now']();
 }

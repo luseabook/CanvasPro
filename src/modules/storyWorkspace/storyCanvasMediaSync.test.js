@@ -301,7 +301,7 @@ test('storyCanvasMediaSync: 帧画布适配器建节点用默认尺寸、写回�
   const harness = createCanvasAdapterHarness();
   const node = await harness.adapter.createMediaNode({ type: 'source-image', name: '帧', imageUrl: 'http://x/a.png' }, { sequenceKey: 'seq' });
 
-  assert.deepEqual(harness.calls.createNodeAtCursor[0].slice(0, 4), ['source-image', 0x200, 0x120, '帧']);
+  assert.deepEqual(harness.calls.createNodeAtCursor[0].slice(0, 4), ['source-image', 512, 288, '帧']);
   assert.deepEqual(harness.calls.createNodeAtCursor[0][4], { placement: 'viewport-center-sequence', sequenceKey: 'seq' });
   assert.equal(Object.hasOwn(harness.calls.updateNodeData[0][1], 'type'), false);
   assert.equal(harness.calls.commit, 1);

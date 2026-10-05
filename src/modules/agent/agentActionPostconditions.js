@@ -115,9 +115,9 @@ function createVerificationFailure(commandId, reason, details = {}) {
 }
 function verifyNodeIds(source, enabled, next, args2 = {}) {
   const nodeIds = uniqueIds(next);
-  if (nodeIds['length'] === 0x0) return createVerificationFailure(source, 'missing_result_node_ids', args2);
+  if (nodeIds['length'] === 0) return createVerificationFailure(source, 'missing_result_node_ids', args2);
   const missingNodeIds = nodeIds['filter']((current) => !enabled[current]);
-  if (missingNodeIds['length'] > 0x0)
+  if (missingNodeIds['length'] > 0)
     return createVerificationFailure(source, 'nodes_not_committed', {
       ...args2,
       nodeIds: nodeIds,
@@ -160,9 +160,9 @@ function verifyNodeCreation(payload, handle, id3, state, config) {
         ...(Array['isArray'](handle['ids']) ? handle['ids'] : []),
         handle['nodeId'],
       ]),
-      copies = Math['max'](0x1, Math['trunc'](Number(id3['copies'] ?? handle['copies'] ?? 0x1))),
+      copies = Math['max'](1, Math['trunc'](Number(id3['copies'] ?? handle['copies'] ?? 1))),
       expectedCount = sourceIds['length'] * copies;
-    if (expectedCount > 0x0 && actualCount['length'] !== expectedCount)
+    if (expectedCount > 0 && actualCount['length'] !== expectedCount)
       return createVerificationFailure(payload, 'duplicate_count_mismatch', {
         sourceIds: sourceIds,
         copies: copies,
@@ -183,7 +183,7 @@ function verifyNodeCreation(payload, handle, id3, state, config) {
 }
 function verifySelection(input, output, value2) {
   const expectedIds = uniqueIds(output['ids'] || output['nodeIds'] || []);
-  if (expectedIds['length'] === 0x0 || !sameIds(expectedIds, value2))
+  if (expectedIds['length'] === 0 || !sameIds(expectedIds, value2))
     return createVerificationFailure(input, 'selection_state_mismatch', {
       expectedIds: expectedIds,
       actualIds: uniqueIds(value2 || []),
@@ -198,7 +198,7 @@ function verifyGroup(value3, value4, enabled2, value5) {
     childMismatch = childIds['find'](
       (value6) => !enabled2[value6] || normalizeId(enabled2[value6]['parentId']) !== groupId,
     );
-  if (String(enabled2[groupId]?.['type'] || '') !== 'group' || childIds['length'] === 0x0 || childMismatch)
+  if (String(enabled2[groupId]?.['type'] || '') !== 'group' || childIds['length'] === 0 || childMismatch)
     return createVerificationFailure(value3, 'group_state_mismatch', {
       groupId: groupId,
       childIds: childIds,
@@ -218,7 +218,7 @@ function verifyUngroup(value7, value8, enabled3) {
     attachedChildIds = childIds2['filter'](
       (value10) => !enabled3[value10] || groupIds['includes'](normalizeId(enabled3[value10]['parentId'])),
     );
-  if (groupIds['length'] === 0x0 || remainingGroupIds['length'] > 0x0 || attachedChildIds['length'] > 0x0)
+  if (groupIds['length'] === 0 || remainingGroupIds['length'] > 0 || attachedChildIds['length'] > 0)
     return createVerificationFailure(value7, 'ungroup_state_mismatch', {
       groupIds: groupIds,
       childIds: childIds2,
@@ -233,7 +233,7 @@ function verifyPastedGraph(value11, value12, value13, enabled4, value14) {
   if (!response4['ok']) return response4;
   const edgeIds = uniqueIds(value12['edgeIds'] || []),
     missingEdgeIds = edgeIds['filter']((value15) => !enabled4[value15]);
-  if (missingEdgeIds['length'] > 0x0)
+  if (missingEdgeIds['length'] > 0)
     return createVerificationFailure(value11, 'edges_not_committed', {
       edgeIds: edgeIds,
       missingEdgeIds: missingEdgeIds,
@@ -248,14 +248,14 @@ function verifyPastedGraph(value11, value12, value13, enabled4, value14) {
 function verifyResultContract(value16, response5) {
   if (['viewport.focusNodes', 'viewport.fitAll', 'task.focusResult']['includes'](value16)) {
     const nodeIds2 = uniqueIds(response5['ids'] || response5['nodeIds'] || []);
-    return response5['focused'] === !![] && nodeIds2['length'] > 0x0
+    return response5['focused'] === !![] && nodeIds2['length'] > 0
       ? { ok: !![], nodeIds: nodeIds2 }
       : createVerificationFailure(value16, 'viewport_effect_not_acknowledged', { ids: nodeIds2 });
   }
   if (value16 === 'clipboard.copy') {
     const nodeIds3 = uniqueIds(response5['ids'] || []),
-      nodeCount = Math['max'](0x0, Math['trunc'](Number(response5['nodeCount']) || 0x0));
-    return nodeIds3['length'] > 0x0 && nodeCount === nodeIds3['length']
+      nodeCount = Math['max'](0, Math['trunc'](Number(response5['nodeCount']) || 0));
+    return nodeIds3['length'] > 0 && nodeCount === nodeIds3['length']
       ? { ok: !![], nodeIds: nodeIds3 }
       : createVerificationFailure(value16, 'clipboard_result_mismatch', {
           ids: nodeIds3,
@@ -263,9 +263,9 @@ function verifyResultContract(value16, response5) {
         });
   }
   if (value16 === 'node.exportSelected') {
-    const exportedCount = Math['max'](0x0, Math['trunc'](Number(response5['exportedCount']) || 0x0)),
+    const exportedCount = Math['max'](0, Math['trunc'](Number(response5['exportedCount']) || 0)),
       path = normalizeId(response5['path'] || response5['outputPath']);
-    return response5['success'] === !![] && exportedCount > 0x0 && path
+    return response5['success'] === !![] && exportedCount > 0 && path
       ? { ok: !![], path: path, exportedCount: exportedCount }
       : createVerificationFailure(value16, 'export_result_unverified', {
           exportedCount: exportedCount,
@@ -305,7 +305,7 @@ function verifyParams(value24, value25, value26) {
   const value27 = value26[nodeId3]['generationParams'] || {},
     value28 = value25['params'] || {},
     list6 = Object['keys'](value28)['filter']((value29) => !valuesEqual(value27[value29], value28[value29]));
-  if (list6['length'] > 0x0)
+  if (list6['length'] > 0)
     return createVerificationFailure(value24, 'params_state_mismatch', { nodeId: nodeId3 });
   return { ok: !![], nodeIds: [nodeId3] };
 }
@@ -359,7 +359,7 @@ function verifyGeneration(value35, value36, value37) {
         ? value36['results']
         : []
       : [value36];
-  if (list7['length'] === 0x0) return createVerificationFailure(value35, 'generation_results_missing');
+  if (list7['length'] === 0) return createVerificationFailure(value35, 'generation_results_missing');
   for (const value38 of list7) {
     const response12 = verifyGenerationEntry(value35, value38 || {}, value37);
     if (!response12['ok']) return response12;
@@ -448,7 +448,7 @@ export function verifyAgentActionPostcondition({
                           const edgeIds2 = uniqueIds(id5['edgeIds'] || []),
                             remainingEdgeIds = edgeIds2['filter']((value42) => value40[value42]);
                           status2 =
-                            remainingEdgeIds['length'] === 0x0
+                            remainingEdgeIds['length'] === 0
                               ? { ok: !![], edgeIds: edgeIds2 }
                               : createVerificationFailure(commandId3, 'edges_not_removed', {
                                   remainingEdgeIds: remainingEdgeIds,
@@ -458,7 +458,7 @@ export function verifyAgentActionPostcondition({
                             const nodeIds5 = uniqueIds(id5['ids'] || []),
                               remainingNodeIds = nodeIds5['filter']((value43) => enabled6[value43]);
                             status2 =
-                              nodeIds5['length'] > 0x0 && remainingNodeIds['length'] === 0x0
+                              nodeIds5['length'] > 0 && remainingNodeIds['length'] === 0
                                 ? { ok: !![], nodeIds: nodeIds5 }
                                 : createVerificationFailure(commandId3, 'nodes_not_removed', {
                                     nodeIds: nodeIds5,
@@ -576,7 +576,7 @@ function buildPostconditionFailure(commandId4, reason2, repairAttempted = null) 
     },
     verification: {
       status: 'failed',
-      attempts: repairAttempted === null ? 0x0 : 0x1,
+      attempts: repairAttempted === null ? 0 : 1,
       reason: reason2['reason'] || 'postcondition_failed',
     },
   };
@@ -595,7 +595,7 @@ export function createAgentActionPostconditionHandler({
         response: response15,
         commandContext: commandContext2,
       });
-    if (status3['ok']) return { ...response15, verification: { status: status3['status'], attempts: 0x0 } };
+    if (status3['ok']) return { ...response15, verification: { status: status3['status'], attempts: 0 } };
     if (
       !AUTO_REPAIRABLE_COMMANDS['has'](commandId5) ||
       (typeof shouldContinue === 'function' &&
@@ -615,7 +615,7 @@ export function createAgentActionPostconditionHandler({
       ...response16,
       verification: {
         status: 'repaired',
-        attempts: 0x1,
+        attempts: 1,
         initialReason: status3['reason'] || 'postcondition_failed',
       },
     };

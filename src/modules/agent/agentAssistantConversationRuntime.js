@@ -65,7 +65,7 @@ export function createAgentAssistantConversationRuntime({
           const replyVersions = appendAgentReplyVersion(args2, content['message'], args);
           sessionStore['replaceConversationMessages'](
             [
-              ...list['slice'](0x0, -0x2),
+              ...list['slice'](0, -2),
               { ...args2['user'], content: content['message'] },
               { ...args2['assistant'], ...args, replyVersions: replyVersions },
             ],
@@ -113,7 +113,7 @@ export function createAgentAssistantConversationRuntime({
         return createFailedReply(agentConversationActionText('limit'));
       const content3 = String(message ?? revision['user']['content'])['trim']();
       if (!content3) return createFailedReply(text('emptyMessage'));
-      const history2 = [...run()['slice'](0x0, -0x2), { ...revision['user'], content: content3 }];
+      const history2 = [...run()['slice'](0, -2), { ...revision['user'], content: content3 }];
       return this['handle'](
         content3,
         {

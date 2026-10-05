@@ -1,5 +1,5 @@
-const DEFAULT_RECENT_CREATION_GROUP_LIMIT = 0x8,
-  DEFAULT_RECENT_CREATED_NODE_LIMIT = 0xc;
+const DEFAULT_RECENT_CREATION_GROUP_LIMIT = 8,
+  DEFAULT_RECENT_CREATED_NODE_LIMIT = 12;
 function normalizeId(value) {
   return String(value || '')['trim']();
 }
@@ -18,7 +18,7 @@ export function buildAgentReferenceContext({
     recentCreationGroups = [],
     map2 = new Set(),
     list = Array['isArray'](operationLedger) ? operationLedger : [];
-  for (let count = list['length'] - 0x1; count >= 0x0; count -= 0x1) {
+  for (let count = list['length'] - 1; count >= 0; count -= 1) {
     if (
       recentCreationGroups['length'] >= creationGroupLimit ||
       recentCreatedNodeIds['length'] >= createdNodeLimit
@@ -29,8 +29,8 @@ export function buildAgentReferenceContext({
     const nodeIds = (Array['isArray'](response['createdNodeIds']) ? response['createdNodeIds'] : [])
       ['map'](normalizeId)
       ['filter']((key) => key && map['has'](key) && !map2['has'](key))
-      ['slice'](0x0, Math['max'](0x0, createdNodeLimit - recentCreatedNodeIds['length']));
-    if (nodeIds['length'] === 0x0) continue;
+      ['slice'](0, Math['max'](0, createdNodeLimit - recentCreatedNodeIds['length']));
+    if (nodeIds['length'] === 0) continue;
     (nodeIds['forEach']((index) => map2['add'](index)),
       recentCreatedNodeIds['push'](...nodeIds),
       recentCreationGroups['push']({
@@ -38,7 +38,7 @@ export function buildAgentReferenceContext({
         runId: normalizeId(response['runId']),
         commandId: normalizeId(response['commandId']),
         nodeIds: nodeIds,
-        completedAt: Number(response['completedAt'] || response['startedAt'] || 0x0),
+        completedAt: Number(response['completedAt'] || response['startedAt'] || 0),
       }));
   }
   return { recentCreatedNodeIds: recentCreatedNodeIds, recentCreationGroups: recentCreationGroups };

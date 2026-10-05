@@ -20,16 +20,16 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function resolveMediaExtension(key, index) {
   const text = normalizeText(key),
-    result = text['match'](/^data:([^;,]+)/i)?.[0x1]?.['toLowerCase']();
+    result = text['match'](/^data:([^;,]+)/i)?.[1]?.['toLowerCase']();
   if (result && MEDIA_MIME_EXTENSIONS[result]) return MEDIA_MIME_EXTENSIONS[result];
   return (
-    text['split'](/[?#]/, 0x1)[0x0]
-      ['match'](/\.([a-z0-9]{2,5})$/i)?.[0x1]
+    text['split'](/[?#]/, 1)[0]
+      ['match'](/\.([a-z0-9]{2,5})$/i)?.[1]
       ?.['toLowerCase']() || DEFAULT_MEDIA_EXTENSIONS[index]
   );
 }
@@ -39,7 +39,7 @@ function sanitizeFilenameBase(data, options) {
       ['replace'](/[\\/:*?"<>|]+/g, '-')
       ['replace'](/-+/g, '-')
       ['replace'](/[.\s-]+$/g, '')
-      ['slice'](0x0, 0x60) || options
+      ['slice'](0, 96) || options
   );
 }
 export function buildWorkspaceMediaDownloadPayload({
@@ -96,12 +96,12 @@ export function renderWorkspaceMediaDownloadButton({
     text4 = normalizeText(label) || '下载媒体';
   return (
     '<button type="button" class="workspace-image-download-button' +
-    (text3 ? '\x20' + escapeHtml(text3) : '') +
-    '\x22\x20data-story-action=\x22' +
+    (text3 ? ' ' + escapeHtml(text3) : '') +
+    '" data-story-action="' +
     escapeHtml(action) +
     '" aria-label="' +
     escapeHtml(text4) +
-    '\x22\x20title=\x22' +
+    '" title="' +
     escapeHtml(text4) +
     '"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 15v4h14v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'
   );

@@ -1,8 +1,8 @@
 import { startNodeResizePreview } from '../../modules/interaction/nodeResizePreview.js';
 const MIN_NODE_WIDTH = 220,
-  MIN_NODE_HEIGHT = 0x104,
-  DEFAULT_NODE_WIDTH = 0x12c,
-  DEFAULT_NODE_HEIGHT = 0x12c;
+  MIN_NODE_HEIGHT = 260,
+  DEFAULT_NODE_WIDTH = 300,
+  DEFAULT_NODE_HEIGHT = 300;
 function normalizeMinDimension(value, item) {
   const count = Number(value);
   return Number.isFinite(count) && count > 0 ? count : item;

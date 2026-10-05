@@ -1,14 +1,14 @@
 import { isAdaptiveRatioLabel, pickClosestRatioForProviderModel } from '../../api/imageRatioPolicy.js';
 function toPositiveDimension(value) {
   const count = Number(value);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function pickPositiveDimension(...args) {
   for (const item of args) {
     const toPositiveDimension2 = toPositiveDimension(item);
-    if (toPositiveDimension2 > 0x0) return toPositiveDimension2;
+    if (toPositiveDimension2 > 0) return toPositiveDimension2;
   }
-  return 0x0;
+  return 0;
 }
 export function resolveImageFreeAngleSourceSize(options = {}, key = null) {
   const width = pickPositiveDimension(
@@ -25,7 +25,7 @@ export function resolveImageFreeAngleSourceSize(options = {}, key = null) {
       options?.['naturalHeight'],
       key?.['naturalHeight'],
     );
-  return width > 0x0 && height > 0x0 ? { width: width, height: height } : null;
+  return width > 0 && height > 0 ? { width: width, height: height } : null;
 }
 export function resolveImageFreeAngleAspectRatio({
   aspectRatio: aspectRatio = '',
@@ -40,7 +40,7 @@ export function resolveImageFreeAngleAspectRatio({
     provider: provider,
     model: model,
     imageSize: imageSize,
-    width: sourceSize?.['width'] || 0x0,
-    height: sourceSize?.['height'] || 0x0,
+    width: sourceSize?.['width'] || 0,
+    height: sourceSize?.['height'] || 0,
   });
 }

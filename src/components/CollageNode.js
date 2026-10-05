@@ -1406,7 +1406,7 @@ export class CollageNode {
           return;
         }
       } else count15 = 0;
-      if (handler5() - count14 > 0x4b0) {
+      if (handler5() - count14 > 1200) {
         run2();
         return;
       }
@@ -1859,7 +1859,7 @@ export class CollageNode {
     const value171 = this._setComposeButtonBusy(value170 || this.el.querySelector('.collage-compose-btn')),
       handler7 = (enabled22) => {
         if (!enabled22) return;
-        setTimeout(() => revokeBlobObjectUrl(enabled22), 0xfa0);
+        setTimeout(() => revokeBlobObjectUrl(enabled22), 4000);
       };
     try {
       const filename = await this._renderCollageOutput(value169),

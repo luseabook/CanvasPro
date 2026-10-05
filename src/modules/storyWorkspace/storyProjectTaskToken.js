@@ -18,8 +18,8 @@ export function createStoryProjectTaskToken(args2 = {}) {
     item = args2?.['storyProjectSessionById'],
     key =
       item && typeof item === 'object'
-        ? Math['max'](0x0, Math['trunc'](Number(item[text]) || 0x0))
-        : Math['max'](0x0, Math['trunc'](Number(args2?.['storyProjectSessionId']) || 0x0));
+        ? Math['max'](0, Math['trunc'](Number(item[text]) || 0))
+        : Math['max'](0, Math['trunc'](Number(args2?.['storyProjectSessionId']) || 0));
   return {
     projectId: text,
     sessionId: key,
@@ -50,8 +50,8 @@ export function isStoryProjectTaskTokenLive(options = {}, enabled = null) {
   const index = options?.['storyProjectSessionById'],
     result =
       index && typeof index === 'object'
-        ? Math['max'](0x0, Math['trunc'](Number(index[text2]) || 0x0))
-        : Math['max'](0x0, Math['trunc'](Number(options?.['storyProjectSessionId']) || 0x0));
+        ? Math['max'](0, Math['trunc'](Number(index[text2]) || 0))
+        : Math['max'](0, Math['trunc'](Number(options?.['storyProjectSessionId']) || 0));
   if (enabled['sessionId'] !== result) return ![];
   if (text2 === normalizeText(options?.['data']?.['project']?.['id'])) return !![];
   return (Array['isArray'](options?.['projects']) ? options['projects'] : [])['some'](
@@ -68,9 +68,9 @@ export function advanceStoryProjectSession(
   enabled2 = {},
   text3 = normalizeText(enabled2?.['data']?.['project']?.['id']),
 ) {
-  if (!enabled2 || typeof enabled2 !== 'object') return 0x0;
+  if (!enabled2 || typeof enabled2 !== 'object') return 0;
   const text4 = normalizeText(text3);
-  if (!text4) return 0x0;
+  if (!text4) return 0;
   (!enabled2['storyProjectSessionById'] || typeof enabled2['storyProjectSessionById'] !== 'object') &&
     (enabled2['storyProjectSessionById'] = {});
   const text5 = normalizeText(enabled2?.['data']?.['project']?.['id']),
@@ -78,8 +78,8 @@ export function advanceStoryProjectSession(
       ? enabled2['storyProjectSessionById'][text4]
       : text4 === text5
         ? enabled2['storyProjectSessionId']
-        : 0x0,
-    next = Math['max'](0x0, Math['trunc'](Number(source) || 0x0)) + 0x1;
+        : 0,
+    next = Math['max'](0, Math['trunc'](Number(source) || 0)) + 1;
   return (
     (enabled2['storyProjectSessionById'][text4] = next),
     text4 === text5 && (enabled2['storyProjectSessionId'] = next),

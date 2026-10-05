@@ -7,17 +7,17 @@ function escapeHtml(value) {
     ['replace'](/'/g, '&#39;');
 }
 function clampActiveIndex(item, enabled) {
-  if (!enabled) return 0x0;
-  return Math['max'](0x0, Math['min'](enabled - 0x1, Math['trunc'](Number(item) || 0x0)));
+  if (!enabled) return 0;
+  return Math['max'](0, Math['min'](enabled - 1, Math['trunc'](Number(item) || 0)));
 }
 export function renderWorkspaceMediaHistoryMenu({
   title: title = '媒体结果',
   results: results = [],
-  activeIndex: activeIndex = 0x0,
+  activeIndex: activeIndex = 0,
   countLabel: countLabel = '',
   menuLabel: menuLabel = '',
-  minimumItemCount: minimumItemCount = 0x2,
-  getItemLabel: getItemLabel = (key, index) => '版本\x20' + (index + 0x1),
+  minimumItemCount: minimumItemCount = 2,
+  getItemLabel: getItemLabel = (key, index) => '版本 ' + (index + 1),
   getItemStatus: getItemStatus = (result, data, options) => (data === options ? '当前使用' : '点击切换'),
   renderMedia: renderMedia = () => '',
   getItemAttributes: getItemAttributes = () => '',
@@ -26,27 +26,27 @@ export function renderWorkspaceMediaHistoryMenu({
   const list = Array['isArray'](results)
       ? results['filter']((target) => target && typeof target === 'object')
       : [],
-    source = Math['max'](0x1, Math['trunc'](Number(minimumItemCount) || 0x2));
+    source = Math['max'](1, Math['trunc'](Number(minimumItemCount) || 2));
   if (list['length'] < source) return '';
   const clampActiveIndex2 = clampActiveIndex(activeIndex, list['length']),
     next = String(title || '媒体结果')['trim'](),
     current = String(countLabel || list['length'] + ' 个版本')['trim'](),
     entry = String(menuLabel || next + '历史结果')['trim'](),
     record = list['map']((payload, handle) => {
-      const state = String(getItemLabel(payload, handle) || '版本 ' + (handle + 0x1))['trim'](),
+      const state = String(getItemLabel(payload, handle) || '版本 ' + (handle + 1))['trim'](),
         config = String(getItemStatus(payload, handle, clampActiveIndex2) || '点击切换')['trim'](),
         renderMedia2 = renderMedia(payload, handle) || '',
         scope = String(getItemAttributes(payload, handle) || '')['trim'](),
         input =
           '<button type="button" class="story-media-history-item story-clip-video-history-item' +
           (handle === clampActiveIndex2 ? ' is-current' : '') +
-          '\x22\x20' +
+          '" ' +
           scope +
           ' role="menuitem" aria-current="' +
           (handle === clampActiveIndex2 ? 'true' : 'false') +
           '">\n      <span class="story-media-history-media story-clip-video-history-media">' +
           renderMedia2 +
-          '</span>\x0a\x20\x20\x20\x20\x20\x20<span><strong>' +
+          '</span>\n      <span><strong>' +
           escapeHtml(state) +
           '</strong><small>' +
           escapeHtml(config) +
@@ -54,8 +54,8 @@ export function renderWorkspaceMediaHistoryMenu({
         output = String(renderItemAction(payload, handle, clampActiveIndex2) || '')['trim']();
       return output
         ? '<div class="story-media-history-entry' +
-            (handle === clampActiveIndex2 ? '\x20is-current' : '') +
-            '\x22>' +
+            (handle === clampActiveIndex2 ? ' is-current' : '') +
+            '">' +
             input +
             output +
             '</div>'
@@ -70,7 +70,7 @@ export function renderWorkspaceMediaHistoryMenu({
     escapeHtml(current) +
     '</span></div>\n    <div class="story-media-history-list story-clip-video-history-list" role="menu" aria-label="' +
     escapeHtml(entry) +
-    '\x22>' +
+    '">' +
     record +
     '</div>'
   );
@@ -79,25 +79,25 @@ export function createWorkspaceMediaHistoryMenuController({
   menuElement: menuElement,
   windowObject: windowObject = globalThis['window'] || globalThis,
   getMarkup: getMarkup = () => '',
-  hideDelayMs: hideDelayMs = 0x78,
+  hideDelayMs: hideDelayMs = 120,
 } = {}) {
   let value2 = null,
-    enabled2 = 0x0;
+    enabled2 = 0;
   const clearHideTimer = () => {
       if (!enabled2) return;
-      (windowObject?.['clearTimeout']?.(enabled2), (enabled2 = 0x0));
+      (windowObject?.['clearTimeout']?.(enabled2), (enabled2 = 0));
     },
     position = (el = value2) => {
       if (!el || !menuElement?.['classList']?.['contains']?.('is-visible')) return ![];
       const box = el['getBoundingClientRect']?.(),
         box2 = menuElement['getBoundingClientRect']?.();
       if (!box || !box2) return ![];
-      const value3 = windowObject?.['innerWidth'] || 0x400,
-        value4 = windowObject?.['innerHeight'] || 0x300,
-        value5 = 0xa,
-        value6 = 0xa,
+      const value3 = windowObject?.['innerWidth'] || 1024,
+        value4 = windowObject?.['innerHeight'] || 768,
+        value5 = 10,
+        value6 = 10,
         value7 = Math['max'](value5, value3 - box2['width'] - value5),
-        value8 = Math['min'](Math['max'](value5, box['left'] + (box['width'] - box2['width']) / 0x2), value7),
+        value8 = Math['min'](Math['max'](value5, box['left'] + (box['width'] - box2['width']) / 2), value7),
         value9 = box['top'] - box2['height'] - value6,
         value10 = box['bottom'] + value6,
         value11 =
@@ -117,10 +117,10 @@ export function createWorkspaceMediaHistoryMenuController({
         enabled2 =
           windowObject?.['setTimeout']?.(
             () => {
-              ((enabled2 = 0x0), hide());
+              ((enabled2 = 0), hide());
             },
-            Math['max'](0x0, Number(hideDelayMs) || 0x0),
-          ) || 0x0;
+            Math['max'](0, Number(hideDelayMs) || 0),
+          ) || 0;
         return;
       }
       ((value2 = null),
@@ -148,8 +148,8 @@ export function createWorkspaceMediaHistoryMenuController({
       fallbackFocus: fallbackFocus = null,
     } = {}) => {
       const value13 = menuElement?.['querySelector']?.('.story-media-history-list'),
-        value14 = Number(value13?.['scrollLeft']) || 0x0,
-        value15 = Number(value13?.['scrollTop']) || 0x0,
+        value14 = Number(value13?.['scrollLeft']) || 0,
+        value15 = Number(value13?.['scrollTop']) || 0,
         value16 = menuElement?.['ownerDocument']?.['activeElement'],
         value17 = Boolean(value16 && menuElement?.['contains']?.(value16));
       if (!show(anchor, context)) {
@@ -160,8 +160,8 @@ export function createWorkspaceMediaHistoryMenuController({
         if (value2 !== anchor || !menuElement?.['classList']?.['contains']?.('is-visible')) return;
         const value18 = menuElement?.['querySelector']?.('.story-media-history-list');
         (value18 &&
-          ((value18['scrollLeft'] = Math['max'](0x0, value14)),
-          (value18['scrollTop'] = Math['max'](0x0, value15))),
+          ((value18['scrollLeft'] = Math['max'](0, value14)),
+          (value18['scrollTop'] = Math['max'](0, value15))),
           value17 && focusSelector && menuElement?.['querySelector']?.(focusSelector)?.['focus']?.());
       };
       return (run(), windowObject?.['requestAnimationFrame']?.(run), !![]);
@@ -171,14 +171,14 @@ export function createWorkspaceMediaHistoryMenuController({
     value21 = (event) => {
       const el2 = event['target']?.['closest']?.('.story-media-history-list, .story-clip-video-history-list');
       if (!el2 || !menuElement?.['contains']?.(el2)) return ![];
-      const count = Math['max'](0x0, Number(el2['scrollWidth']) - Number(el2['clientWidth']));
-      if (!(count > 0x0)) return ![];
-      const value22 = Number(event['deltaX']) || 0x0,
-        value23 = Number(event['deltaY']) || 0x0,
+      const count = Math['max'](0, Number(el2['scrollWidth']) - Number(el2['clientWidth']));
+      if (!(count > 0)) return ![];
+      const value22 = Number(event['deltaX']) || 0,
+        value23 = Number(event['deltaY']) || 0,
         enabled4 = Math['abs'](value22) > Math['abs'](value23) ? value22 : value23;
       if (!enabled4) return ![];
-      const value24 = Math['max'](0x0, Number(el2['scrollLeft']) || 0x0),
-        value25 = Math['max'](0x0, Math['min'](count, value24 + enabled4));
+      const value24 = Math['max'](0, Number(el2['scrollLeft']) || 0),
+        value25 = Math['max'](0, Math['min'](count, value24 + enabled4));
       if (value25 === value24) return ![];
       return (event['preventDefault']?.(), event['stopPropagation']?.(), (el2['scrollLeft'] = value25), !![]);
     };

@@ -31,7 +31,7 @@ function failed(index, result) {
 }
 export function normalizeAgentSkillAuthoringResult(error = {}) {
   if (!error || typeof error !== 'object' || Array['isArray'](error))
-    return failed('SKILL_AUTHORING_INVALID', 'Skill\x20authoring\x20returned\x20an\x20invalid\x20result.');
+    return failed('SKILL_AUTHORING_INVALID', 'Skill authoring returned an invalid result.');
   const status = String(error['status'] || '')['trim']();
   if (status === 'need_clarification') {
     const question = String(error['question'] || error['reply'] || '')['trim']();
@@ -42,7 +42,7 @@ export function normalizeAgentSkillAuthoringResult(error = {}) {
       status: status,
       reply: String(error['reply'] || question)['trim'](),
       question: question,
-      options: Array['isArray'](error['options']) ? error['options']['slice'](0x0, 0x6) : [],
+      options: Array['isArray'](error['options']) ? error['options']['slice'](0, 6) : [],
     };
   }
   if (status === 'failed')
@@ -84,7 +84,7 @@ export async function requestNormalizedAgentSkillDraft({
   return (
     onTrace?.({ type: 'agent_skill_authoring_schema_retry', errorCode: errorCode['errorCode'] }),
     (errorCode = normalizeAgentSkillAuthoringResult(
-      await author({ ...payload, repairReason: errorCode['errorCode'] + ':\x20' + errorCode['message'] }),
+      await author({ ...payload, repairReason: errorCode['errorCode'] + ': ' + errorCode['message'] }),
     )),
     errorCode
   );
@@ -96,7 +96,7 @@ export function createAvailableAgentSkillId(data = 'skill', options = []) {
         ['toLowerCase']()
         ['replace'](/[^a-z0-9-]+/g, '-')
         ['replace'](/^-+|-+$/g, '')
-        ['slice'](0x0, 0x40) || 'skill',
+        ['slice'](0, 64) || 'skill',
     map = new Set(
       (Array['isArray'](options) ? options : [])
         ['map']((target) =>
@@ -108,12 +108,12 @@ export function createAvailableAgentSkillId(data = 'skill', options = []) {
     );
   if (!map['has'](list)) return list;
   const source = list['match'](/^(.*?)-(\d+)$/),
-    list2 = source?.[0x1] || list,
-    next = source ? Math['max'](0x2, Number(source[0x2]) + 0x1) : 0x2;
-  for (let count = next; count < 0x3e8; count += 0x1) {
+    list2 = source?.[1] || list,
+    next = source ? Math['max'](2, Number(source[2]) + 1) : 2;
+  for (let count = next; count < 1000; count += 1) {
     const list3 = '-' + count,
-      current = '' + list2['slice'](0x0, 0x40 - list3['length']) + list3;
+      current = '' + list2['slice'](0, 64 - list3['length']) + list3;
     if (!map['has'](current)) return current;
   }
-  return list['slice'](0x0, 0x37) + '-' + Date['now']()['toString'](0x24)['slice'](-0x8);
+  return list['slice'](0, 55) + '-' + Date['now']()['toString'](36)['slice'](-8);
 }

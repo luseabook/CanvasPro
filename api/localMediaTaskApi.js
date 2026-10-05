@@ -320,7 +320,7 @@ function buildBackendBodyFromElectronPayload(src = {}) {
 export async function runLocalMediaClipExport(options7 = {}, value12 = {}) {
   const value13 = options7?.electronPayload || options7,
     url = options7?.outputType === 'audio' || value13?.kind === 'audioCut' ? 'audio' : 'video',
-    timeout2 = Number(value12.timeout || 0) || 0x927c0;
+    timeout2 = Number(value12.timeout || 0) || 600000;
   if (value13.kind === 'storySequenceExport') {
     if (!canUseElectronMediaTask() || typeof getMediaTaskBridge()?.list !== 'function')
       throw new Error('镜头初剪渲染需要更新后的桌面媒体任务接口；不回退到浏览器后端');

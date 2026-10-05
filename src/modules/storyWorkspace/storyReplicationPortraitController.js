@@ -29,25 +29,25 @@ export function createStoryReplicationPortraitEditor({
             item +
             '%<input type="number" min="0" max="100" step="1" data-crop-value="' +
             value +
-            '\x22></label>',
+            '"></label>',
         )
         ['join']('') +
-      '</div>\x0a\x20\x20\x20\x20<div\x20class=\x22story-source-actions\x22><button\x20type=\x22button\x22\x20data-crop-save>保存人物图</button><button\x20type=\x22button\x22\x20data-crop-close>取消</button></div><span\x20role=\x22status\x22></span>'),
+      '</div>\n    <div class="story-source-actions"><button type="button" data-crop-save>保存人物图</button><button type="button" data-crop-close>取消</button></div><span role="status"></span>'),
     (el2['querySelector']('img')['src'] = timeSec['url']),
     card['append'](el2));
   const el3 = el2['querySelector']('.story-source-portrait-image'),
     el4 = el3['querySelector']('img'),
     el5 = el3['querySelector']('span');
-  let box = { x: 0x0, y: 0x0, width: 0x1, height: 0x1 },
+  let box = { x: 0, y: 0, width: 1, height: 1 },
     enabled = null,
     value2 = null,
     enabled2 = ![],
     enabled3 = ![];
   function run() {
     for (const [key, index] of Object['entries'](box)) {
-      (el5['style']['setProperty']('--crop-' + key, index * 0x64 + '%'),
-        (el2['querySelector']('[data-crop-value=\x22' + key + '\x22]')['value'] = String(
-          Math['round'](index * 0x64),
+      (el5['style']['setProperty']('--crop-' + key, index * 100 + '%'),
+        (el2['querySelector']('[data-crop-value="' + key + '"]')['value'] = String(
+          Math['round'](index * 100),
         )));
     }
   }
@@ -60,7 +60,7 @@ export function createStoryReplicationPortraitEditor({
     ((enabled2 = !![]), run2(), el2['remove']());
   }
   (el3['addEventListener']('pointerdown', (x) => {
-    if (enabled3 || x['button'] !== 0x0 || !el4['naturalWidth']) return;
+    if (enabled3 || x['button'] !== 0 || !el4['naturalWidth']) return;
     ((enabled = { x: x['clientX'], y: x['clientY'] }),
       (value2 = x['pointerId']),
       el3['setPointerCapture'](x['pointerId']),
@@ -79,7 +79,7 @@ export function createStoryReplicationPortraitEditor({
   return (
     el2['addEventListener']('input', (event) => {
       if (enabled3 || !event['target']['dataset']['cropValue']) return;
-      ((box[event['target']['dataset']['cropValue']] = Number(event['target']['value']) / 0x64), run());
+      ((box[event['target']['dataset']['cropValue']] = Number(event['target']['value']) / 100), run());
     }),
     el2['addEventListener']('click', async (event2) => {
       if (event2['target']['closest']('[data-crop-close]')) {
@@ -92,9 +92,9 @@ export function createStoryReplicationPortraitEditor({
         return;
       }
       if (
-        Object['values'](box)['some']((count) => !Number['isFinite'](count) || count < 0x0) ||
-        box['width'] <= 0x0 ||
-        box['height'] <= 0x0 ||
+        Object['values'](box)['some']((count) => !Number['isFinite'](count) || count < 0) ||
+        box['width'] <= 0 ||
+        box['height'] <= 0 ||
         box['x'] + box['width'] > 1.000001 ||
         box['y'] + box['height'] > 1.000001
       ) {

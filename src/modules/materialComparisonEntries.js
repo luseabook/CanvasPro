@@ -9,7 +9,7 @@ function getEntryLabel(error, value, index, handler) {
     value?.['label'] ||
       error?.['name'] ||
       error?.['fileName'] ||
-      handler('canvasInteraction.materialComparison.untitled', { index: index + 0x1 }),
+      handler('canvasInteraction.materialComparison.untitled', { index: index + 1 }),
   )['trim']();
 }
 function getEntryAspectRatio(item, box) {
@@ -23,7 +23,7 @@ function getEntryAspectRatio(item, box) {
         item?.['videoWidth'] ||
         item?.['imageWidth'] ||
         item?.['sourceWidth'] ||
-        0x0,
+        0,
     ),
     count2 = Number(
       box?.['originalHeight'] ||
@@ -35,9 +35,9 @@ function getEntryAspectRatio(item, box) {
         item?.['videoHeight'] ||
         item?.['imageHeight'] ||
         item?.['sourceHeight'] ||
-        0x0,
+        0,
     );
-  if (count <= 0x0 || count2 <= 0x0) return 0x0;
+  if (count <= 0 || count2 <= 0) return 0;
   return count / count2;
 }
 function resolveImageEntry(node, key, result) {
@@ -71,7 +71,7 @@ function resolveVideoEntry(node2, data, options) {
       'trim'
     ](),
     sourceUrl: String(canvasNodePlayableVideoEntry['source'] || '')['trim'](),
-    videoIndex: Number(canvasNodePlayableVideoEntry['videoIndex']) || 0x0,
+    videoIndex: Number(canvasNodePlayableVideoEntry['videoIndex']) || 0,
     aspectRatio: getEntryAspectRatio(node2, target),
     originalPromise: null,
     originalUrl: '',
@@ -91,19 +91,19 @@ export function getMaterialComparisonKindCounts(list2 = []) {
   for (const record of Array['isArray'](list2) ? list2 : []) {
     const enabled = String(record?.['kind'] || '')['trim']();
     if (!enabled) continue;
-    map['set'](enabled, (map['get'](enabled) || 0x0) + 0x1);
+    map['set'](enabled, (map['get'](enabled) || 0) + 1);
   }
   return map;
 }
 export function findInitialMaterialComparisonPair(list3 = []) {
   const list4 = Array['isArray'](list3) ? list3 : [],
     map2 = getMaterialComparisonKindCounts(list4),
-    leftIndex = list4['findIndex']((payload) => (map2['get'](payload?.['kind']) || 0x0) >= 0x2);
-  if (leftIndex < 0x0) return null;
+    leftIndex = list4['findIndex']((payload) => (map2['get'](payload?.['kind']) || 0) >= 2);
+  if (leftIndex < 0) return null;
   const rightIndex = list4['findIndex'](
     (handle, state) => state !== leftIndex && handle?.['kind'] === list4[leftIndex]?.['kind'],
   );
-  if (rightIndex < 0x0) return null;
+  if (rightIndex < 0) return null;
   return { leftIndex: leftIndex, rightIndex: rightIndex };
 }
 export function hasMaterialComparisonPair(list5 = []) {

@@ -41,10 +41,10 @@ export function createUiSchemaBindingSession(
     box2 = null,
     data = ![],
     box3 = null,
-    options = 0x0;
+    options = 0;
   const map = new Map(),
     invalidatePendingMenuRestore = () => {
-      options += 0x1;
+      options += 1;
     },
     handler = (el) => (el?.['classList']?.['contains']('ui-schema-duration-pop') ? 'flex' : 'block'),
     handler2 = (el2) => {
@@ -147,7 +147,7 @@ export function createUiSchemaBindingSession(
       handler8(config);
       const timer = setTimeout(() => {
         (map['delete'](config), commitValue(config, value2));
-      }, 0xb4);
+      }, 180);
       map['set'](config, { timer: timer, value: value2 });
     },
     handler11 = (el12) => {
@@ -175,7 +175,7 @@ export function createUiSchemaBindingSession(
             event['stopImmediatePropagation']?.(),
             run());
         };
-      return (el13['addEventListener']('click', value3, !![]), (setTimeout2 = setTimeout(run, 0x15e)), !![]);
+      return (el13['addEventListener']('click', value3, !![]), (setTimeout2 = setTimeout(run, 350)), !![]);
     },
     handler13 = (value4, value5) => {
       const value6 = Number(value4);
@@ -184,8 +184,8 @@ export function createUiSchemaBindingSession(
     handler14 = () => {
       const value7 = globalThis['crypto'] || globalThis['window']?.['crypto'];
       if (value7?.['getRandomValues']) {
-        const uint32Array = new Uint32Array(0x1);
-        return (value7['getRandomValues'](uint32Array), uint32Array[0x0] / 0x100000000);
+        const uint32Array = new Uint32Array(1);
+        return (value7['getRandomValues'](uint32Array), uint32Array[0] / 0x100000000);
       }
       return Math['random']();
     },
@@ -198,10 +198,10 @@ export function createUiSchemaBindingSession(
         ),
         value10 = Math['min'](value8, value9),
         value11 = Math['max'](value8, value9);
-      return String(value10 + Math['floor'](handler14() * (value11 - value10 + 0x1)));
+      return String(value10 + Math['floor'](handler14() * (value11 - value10 + 1)));
     },
     handler15 = (el15, value12) => {
-      const value13 = handler13(el15?.['dataset']?.['uiSchemaDefault'], 0x0),
+      const value13 = handler13(el15?.['dataset']?.['uiSchemaDefault'], 0),
         value14 = handler13(el15?.['dataset']?.['uiSchemaMin'], -Infinity),
         value15 = handler13(el15?.['dataset']?.['uiSchemaMax'], Infinity),
         value16 = evaluateUiSchemaNumberExpression(value12),
@@ -211,7 +211,7 @@ export function createUiSchemaBindingSession(
     },
     handler16 = (el16, value19) => {
       const value20 = String(el16?.['dataset']?.['uiSchemaField'] || '')['trim']();
-      return value20 === 'rhVideoFrames' && Number(value19) === 0x0
+      return value20 === 'rhVideoFrames' && Number(value19) === 0
         ? t('aigenImage.uiSchema.fullLength')
         : String(value19);
     },
@@ -229,7 +229,7 @@ export function createUiSchemaBindingSession(
       const value24 = Number(value23);
       if (!Number['isFinite'](value24)) return String(value23 ?? '');
       if (el19?.['dataset']?.['uiSchemaNumberMode'] === 'float')
-        return String(Number(value24['toFixed'](0xa)));
+        return String(Number(value24['toFixed'](10)));
       return String(Math['trunc'](value24));
     },
     handler18 = (el20, value25) => {
@@ -243,7 +243,7 @@ export function createUiSchemaBindingSession(
         value28 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
       return handler15(
         el22,
-        getNodeFieldValue(value28, value27, el22?.['dataset']?.['uiSchemaDefault'] ?? 0x0),
+        getNodeFieldValue(value28, value27, el22?.['dataset']?.['uiSchemaDefault'] ?? 0),
       );
     },
     handler20 = (event2, eventName) => {
@@ -270,7 +270,7 @@ export function createUiSchemaBindingSession(
         value31 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
       return handler15(
         el23,
-        getNodeFieldValue(value31, value30, el23?.['dataset']?.['uiSchemaDefault'] ?? 0x0),
+        getNodeFieldValue(value31, value30, el23?.['dataset']?.['uiSchemaDefault'] ?? 0),
       );
     },
     handler22 = (el24) => {
@@ -328,9 +328,9 @@ export function createUiSchemaBindingSession(
     value36 = (event6) => {
       if (!box2) return;
       const value38 = event6['clientX'] - box2['x'];
-      if (Math['abs'](value38) >= 0x2) box2['dragged'] = !![];
-      const value39 = Math['trunc'](value38 / 0x6),
-        value40 = handler13(box2['fieldEl']?.['dataset']?.['uiSchemaStep'], 0x1),
+      if (Math['abs'](value38) >= 2) box2['dragged'] = !![];
+      const value39 = Math['trunc'](value38 / 6),
+        value40 = handler13(box2['fieldEl']?.['dataset']?.['uiSchemaStep'], 1),
         value41 = handler15(box2['fieldEl'], box2['base'] + value39 * value40);
       value41 !== box2['last'] &&
         ((box2['moved'] = !![]),
@@ -355,9 +355,9 @@ export function createUiSchemaBindingSession(
       if (!box3) return;
       event7['preventDefault']?.();
       const value45 = event7['clientX'] - box3['x'];
-      if (Math['abs'](value45) >= 0x2) box3['dragged'] = !![];
-      const value46 = Math['trunc'](value45 / 0x6),
-        value47 = handler13(box3['fieldEl']?.['dataset']?.['uiSchemaStep'], 0x1),
+      if (Math['abs'](value45) >= 2) box3['dragged'] = !![];
+      const value46 = Math['trunc'](value45 / 6),
+        value47 = handler13(box3['fieldEl']?.['dataset']?.['uiSchemaStep'], 1),
         value48 = handler15(box3['fieldEl'], box3['base'] + value46 * value47);
       value48 !== box3['last'] &&
         ((box3['moved'] = !![]), (box3['last'] = value48), handler18(box3['fieldEl'], value48));
@@ -373,9 +373,9 @@ export function createUiSchemaBindingSession(
       !enabled5['dragged'] && (enabled5['input']?.['focus']?.(), enabled5['input']?.['select']?.());
     },
     handler25 = (el28, value49) => {
-      const value50 = handler13(el28?.['dataset']?.['uiSchemaDefault'], 0x19),
-        value51 = handler13(el28?.['dataset']?.['uiSchemaMin'], -0x270f),
-        value52 = handler13(el28?.['dataset']?.['uiSchemaMax'], 0x270f),
+      const value50 = handler13(el28?.['dataset']?.['uiSchemaDefault'], 25),
+        value51 = handler13(el28?.['dataset']?.['uiSchemaMin'], -9999),
+        value52 = handler13(el28?.['dataset']?.['uiSchemaMax'], 9999),
         value53 = normalizeRhV54MaskExpand(value49, value50);
       return Math['max'](value51, Math['min'](value52, value53));
     },
@@ -393,7 +393,7 @@ export function createUiSchemaBindingSession(
         value57 = typeof getNodeData === 'function' ? getNodeData() || {} : {};
       return handler25(
         el31,
-        getNodeFieldValue(value57, value56, el31?.['dataset']?.['uiSchemaDefault'] ?? 0x19),
+        getNodeFieldValue(value57, value56, el31?.['dataset']?.['uiSchemaDefault'] ?? 25),
       );
     },
     handler28 = (el32) => {
@@ -448,8 +448,8 @@ export function createUiSchemaBindingSession(
     value62 = (event11) => {
       if (!box) return;
       const value64 = event11['clientX'] - box['x'];
-      if (Math['abs'](value64) >= 0x2) box['dragged'] = !![];
-      const value65 = Math['trunc'](value64 / 0x6),
+      if (Math['abs'](value64) >= 2) box['dragged'] = !![];
+      const value65 = Math['trunc'](value64 / 6),
         value66 = handler25(box['fieldEl'], box['base'] + value65);
       value66 !== box['last'] &&
         ((box['moved'] = !![]), (box['last'] = value66), handler26(box['fieldEl'], value66));
@@ -465,7 +465,7 @@ export function createUiSchemaBindingSession(
       const input2 = x['target']?.['closest']?.(
         '.ui-schema-rh-aiapp-footer-param--input .ui-schema-rh-aiapp-footer-input',
       );
-      if (input2 && x['button'] === 0x0) {
+      if (input2 && x['button'] === 0) {
         const fieldEl2 = input2['closest']('.ui-schema-rh-aiapp-footer-param--input') || value68,
           fieldId2 = String(fieldEl2?.['dataset']?.['uiSchemaField'] || '')['trim']();
         if (
@@ -497,7 +497,7 @@ export function createUiSchemaBindingSession(
         return;
       }
       const el36 = x['target']?.['closest']?.('.ui-schema-rh-video-stepper .rh-stepper-value');
-      if (el36 && x['button'] === 0x0) {
+      if (el36 && x['button'] === 0) {
         const fieldEl3 = el36['closest']('.ui-schema-rh-video-stepper') || value68,
           fieldId3 = String(fieldEl3?.['dataset']?.['uiSchemaField'] || '')['trim']();
         if (!fieldEl3 || !fieldId3) return;
@@ -523,7 +523,7 @@ export function createUiSchemaBindingSession(
         return;
       }
       const el37 = x['target']?.['closest']?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
-      if (!el37 || x['button'] !== 0x0) return;
+      if (!el37 || x['button'] !== 0) return;
       const fieldEl4 = el37['closest']('.ui-schema-rh-v54-mask-expand') || value68,
         fieldId4 = String(fieldEl4?.['dataset']?.['uiSchemaField'] || '')['trim']();
       if (!fieldEl4 || !fieldId4 || fieldEl4['classList']?.['contains']('is-rh-disabled')) return;
@@ -567,7 +567,7 @@ export function createUiSchemaBindingSession(
         handler22(value71);
         return;
       }
-      const value72 = event12['target']?.['closest']?.('.ui-schema-rh-v54-mask-expand\x20.rh-stepper-value');
+      const value72 = event12['target']?.['closest']?.('.ui-schema-rh-v54-mask-expand .rh-stepper-value');
       if (value72) {
         event12['stopPropagation']();
         if (result) {
@@ -645,12 +645,12 @@ export function createUiSchemaBindingSession(
           handler2(handler6(value79));
         },
         handler31 = () => {
-          const value80 = options + 0x1;
+          const value80 = options + 1;
           ((options = value80), handler30());
           const run4 =
             typeof requestAnimationFrame === 'function'
               ? requestAnimationFrame
-              : (value81) => setTimeout(value81, 0x0);
+              : (value81) => setTimeout(value81, 0);
           run4(() => {
             if (value80 === options) handler30();
           });
@@ -698,7 +698,7 @@ export function createUiSchemaBindingSession(
         list = parseRangeValuesFromFieldEl(value89),
         value90 =
           el45['type'] === 'range' && list?.['length']
-            ? list[Math['max'](0x0, Math['min'](list['length'] - 0x1, Number(el45['value'])))]
+            ? list[Math['max'](0, Math['min'](list['length'] - 1, Number(el45['value'])))]
             : el45['type'] === 'range' || el45['type'] === 'number'
               ? el46?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param--input')
                 ? handler15(el46, el45['value'])
@@ -726,7 +726,7 @@ export function createUiSchemaBindingSession(
         const el55 = el53['querySelector']('.ui-schema-resolution-value');
         el55
           ? (el55['textContent'] = String(value90))
-          : (el53['textContent'] = (el54['textContent'] || 'Resolution') + '\x20' + value90);
+          : (el53['textContent'] = (el54['textContent'] || 'Resolution') + ' ' + value90);
       }
       if (handler11(el45)) {
         event13['type'] === 'input'

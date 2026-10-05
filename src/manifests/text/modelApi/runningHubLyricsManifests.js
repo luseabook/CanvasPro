@@ -2,17 +2,17 @@ import { getRunningHubModelApiProfileIds } from '../../../modules/runningHubProv
 const definitions = [
   {
     id: 'suno-lyrics',
-    name: 'Suno\x20歌词生成',
+    name: 'Suno 歌词生成',
     endpoint: '/openapi/v2/rhart-audio/suno/lyrics',
     docId: 0x1ac2ba4c,
-    maxLength: 0x1f4,
+    maxLength: 500,
   },
   {
     id: 'mureka-lyrics',
     name: 'Mureka 歌词生成',
     endpoint: '/openapi/v2/mureka-ai/generate-lyrics',
     docId: 0x1d7ef04a,
-    maxLength: 0x400,
+    maxLength: 1024,
   },
 ];
 export const runningHubLyricsModels = Object['freeze'](
@@ -29,8 +29,8 @@ export const runningHubLyricsModels = Object['freeze'](
       description: '描述主题、情绪和曲风，生成可连接到音乐节点的歌词。',
       inputSlots: {
         allowedKinds: ['text'],
-        minByKind: { text: 0x1 },
-        maxByKind: { image: 0x0, video: 0x0, audio: 0x0 },
+        minByKind: { text: 1 },
+        maxByKind: { image: 0, video: 0, audio: 0 },
         fixedSlots: [],
       },
       uiSchema: { fields: [] },
@@ -38,14 +38,14 @@ export const runningHubLyricsModels = Object['freeze'](
       prompt: {
         emptyPolicy: 'block',
         maxLength: displayName['maxLength'],
-        placeholder: '描述歌词主题，最多\x20' + displayName['maxLength'] + ' 字符',
+        placeholder: '描述歌词主题，最多 ' + displayName['maxLength'] + ' 字符',
       },
       extensions: {
         textMenu: {
           group: 'runninghub',
           title: displayName['name'],
           icon: 'runninghub',
-          subtitle: '音乐创作\x20·\x20歌词生成',
+          subtitle: '音乐创作 · 歌词生成',
         },
         providerProfiles: getRunningHubModelApiProfileIds('runninghub/' + displayName['id']),
       },

@@ -36,7 +36,7 @@ export function createGenerationTaskRecoveryOwner({
   const lane = new Map(Object['values'](GENERATION_TASK_PROTOCOLS)['map']((item) => [item, createLane()])),
     handler = (key) => {
       const adapter = getGenerationTaskProtocolAdapter(key);
-      if (!adapter) throw new Error('Unknown\x20generation\x20task\x20recovery\x20protocol:\x20' + key);
+      if (!adapter) throw new Error('Unknown generation task recovery protocol: ' + key);
       return { adapter: adapter, lane: lane['get'](adapter['id']) };
     },
     publishUiState = () => {

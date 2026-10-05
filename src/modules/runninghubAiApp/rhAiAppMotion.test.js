@@ -60,7 +60,7 @@ test('animatePreviewOrder animates an element that moved', () => {
       { transform: 'translate(30px, -15px)' },
       { transform: 'translate(0, 0)' },
     ]);
-    assert.equal(el.animations[0].options.duration, 0xd2);
+    assert.equal(el.animations[0].options.duration, 210);
     assert.equal(el.animations[0].options.easing, 'cubic-bezier(0.2, 0, 0.2, 1)');
   });
 });
@@ -160,7 +160,7 @@ test('showGroupPanel reveals immediately and stays revealed when the reveal fini
       { opacity: 0, transform: 'translateY(6px) scale(.98)' },
       { opacity: 1, transform: 'translateY(0) scale(1)' },
     ]);
-    assert.equal(panel.animations[0].options.duration, 0xb4);
+    assert.equal(panel.animations[0].options.duration, 180);
     assert.equal(panel.animations[0].options.easing, 'ease-out');
     panel.animations[0].onfinish();
     assert.equal(panel.hidden, false);
@@ -176,7 +176,7 @@ test('showGroupPanel reverses the keyframes with the shorter duration when hidin
       { opacity: 1, transform: 'translateY(0) scale(1)' },
       { opacity: 0, transform: 'translateY(6px) scale(.98)' },
     ]);
-    assert.equal(panel.animations[0].options.duration, 0x78);
+    assert.equal(panel.animations[0].options.duration, 120);
     panel.animations[0].onfinish();
     assert.equal(panel.hidden, true);
   });

@@ -4,7 +4,7 @@ import {
   normalizeProviderModelListPayload,
 } from '../src/modules/settings/providerModelCatalog.js';
 
-export const PROVIDER_MODEL_LIST_TIMEOUT_MS = 0x7530;
+export const PROVIDER_MODEL_LIST_TIMEOUT_MS = 30000;
 
 /**
  * 读取厂商的真实模型清单。

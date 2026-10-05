@@ -31,10 +31,10 @@ export function createPersonReplacementBatchGenerationController({
     typeof resolveCharacterImageBatchConcurrency !== 'function'
   )
     throw new TypeError(
-      'Person\x20replacement\x20batch\x20generation\x20requires\x20project\x20and\x20task\x20adapters.',
+      'Person replacement batch generation requires project and task adapters.',
     );
   const map2 = new Map();
-  let key = 0x0,
+  let key = 0,
     active = ![],
     label = '',
     map3 = new Set(),
@@ -54,7 +54,7 @@ export function createPersonReplacementBatchGenerationController({
     getMatchingShotSession = () => {
       const result = getProject(),
         text = normalizeText(result['id']),
-        data = result['workspace']['step'] === 0x3 ? 'video' : 'image',
+        data = result['workspace']['step'] === 3 ? 'video' : 'image',
         enabled = handler();
       if (!text || !enabled['size']) return null;
       return (
@@ -69,7 +69,7 @@ export function createPersonReplacementBatchGenerationController({
     generatingShotIds = () => {
       const target = getProject(),
         text2 = normalizeText(target['id']),
-        source = target['workspace']['step'] === 0x3 ? 'video' : 'image';
+        source = target['workspace']['step'] === 3 ? 'video' : 'image';
       return [
         ...new Set(
           [...map2['values']()]
@@ -121,12 +121,12 @@ export function createPersonReplacementBatchGenerationController({
               ...args2,
               workspace: { ...args2['workspace'], selectedShotId: normalizeText(enabled2['id']) },
             });
-            return !enabled3['gate']['sceneOnly'] && enabled3['gate']['duplicateRoleLabels']['length'] > 0x0;
+            return !enabled3['gate']['sceneOnly'] && enabled3['gate']['duplicateRoleLabels']['length'] > 0;
           });
       if (list3['length'])
         return (
           windowObject?.['showToast']?.(
-            '有\x20' + list3['length'] + '\x20个镜头存在重复角色名，请先修改红色框中的角色。',
+            '有 ' + list3['length'] + ' 个镜头存在重复角色名，请先修改红色框中的角色。',
             'warn',
           ),
           ![]
@@ -146,7 +146,7 @@ export function createPersonReplacementBatchGenerationController({
           label: label3 + ' 0/' + targetShotIds['length'],
         };
       (map2['set'](id, scope), run());
-      let input = 0x0;
+      let input = 0;
       return (
         void runTaskBatchQueue({
           targets: targetShotIds,
@@ -165,10 +165,10 @@ export function createPersonReplacementBatchGenerationController({
           onTargetSettled: ({ target: target3 }) => {
             (scope['activeShotIds']['delete'](target3),
               scope['generatingShotIds']['delete'](target3),
-              (input += 0x1),
+              (input += 1),
               (scope['label'] = cancellation['isRequested']()
                 ? '正在停止批量生成 · 已结束 ' + input + '/' + targetShotIds['length']
-                : label3 + '\x20' + input + '/' + targetShotIds['length']),
+                : label3 + ' ' + input + '/' + targetShotIds['length']),
               run());
           },
         })
@@ -247,7 +247,7 @@ export function createPersonReplacementBatchGenerationController({
         (map4 = new Set()),
         (label = '批量生成 0/' + targetCount['length']),
         requestRender());
-      let value4 = 0x0;
+      let value4 = 0;
       const concurrency = resolveCharacterImageBatchConcurrency({
         targetCount: targetCount['length'],
         modelId: modelId['settings']['characterImageModelId'],
@@ -280,9 +280,9 @@ export function createPersonReplacementBatchGenerationController({
           onTargetSettled: ({ target: target5 }) => {
             (map4['delete'](target5),
               map3['delete'](target5),
-              (value4 += 0x1),
+              (value4 += 1),
               (label = shouldStop['isRequested']()
-                ? '已取消后续生成 · 正在完成 ' + map4['size'] + '\x20项'
+                ? '已取消后续生成 · 正在完成 ' + map4['size'] + ' 项'
                 : '批量生成 ' + value4 + '/' + targetCount['length']),
               requestRender());
           },
@@ -326,7 +326,7 @@ export function createPersonReplacementBatchGenerationController({
       return (
         (map3 = new Set(map4)),
         (label = map4['size']
-          ? '已取消后续生成\x20·\x20正在完成\x20' + map4['size'] + '\x20项'
+          ? '已取消后续生成 · 正在完成 ' + map4['size'] + ' 项'
           : '已取消后续生成'),
         requestRender(),
         !![]

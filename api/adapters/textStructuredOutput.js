@@ -1,7 +1,7 @@
 function normalizeSchemaName(value) {
   const list = String(value || '')['trim']();
-  if (!list || list['length'] > 0x40 || !/^[A-Za-z0-9_-]+$/['test'](list))
-    throw new Error('结构化输出名称必须是\x201\x20至\x2064\x20位字母、数字、下划线或连字符。');
+  if (!list || list['length'] > 64 || !/^[A-Za-z0-9_-]+$/['test'](list))
+    throw new Error('结构化输出名称必须是 1 至 64 位字母、数字、下划线或连字符。');
   return list;
 }
 export function normalizeTextStructuredOutput(strict) {
@@ -31,7 +31,7 @@ export function buildChatCompletionsStructuredOutput(item, { mode: mode = 'json_
   };
 }
 export function buildTextStructuredOutputSystemPrompt(key, index, { mode: mode = 'json_schema' } = {}) {
-  const result = String(key || 'You\x20are\x20a\x20helpful\x20assistant.')['trim'](),
+  const result = String(key || 'You are a helpful assistant.')['trim'](),
     textStructuredOutput = normalizeTextStructuredOutput(index);
   if (!textStructuredOutput || mode === 'json_schema') return result;
   return [
@@ -41,7 +41,7 @@ export function buildTextStructuredOutputSystemPrompt(key, index, { mode: mode =
     'Return exactly one valid JSON object that satisfies the JSON Schema below.',
     'Do not explain, do not use Markdown or code fences, and do not add text before or after the JSON object.',
     'JSON Schema: ' + JSON['stringify'](textStructuredOutput['schema']),
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 export function buildResponsesStructuredOutput(data) {
   const name2 = normalizeTextStructuredOutput(data);
@@ -68,5 +68,5 @@ export function getTextStructuredOutputRequestMeta(options, { mode: mode = 'json
     : null;
 }
 export function shouldFallbackTextStructuredOutput(target, source) {
-  return target?.['fallback'] === 'prompt' && [0x190, 0x1a6]['includes'](Number(source));
+  return target?.['fallback'] === 'prompt' && [400, 422]['includes'](Number(source));
 }

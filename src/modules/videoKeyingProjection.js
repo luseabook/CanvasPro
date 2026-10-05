@@ -1,6 +1,6 @@
 function toPositiveFinite(value) {
   const count = Number(value);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function normalizeRect(box) {
   if (!box) return null;
@@ -24,11 +24,11 @@ function buildVideoProjection(item) {
     sy = rect['height'] / eh;
   if (
     !Number['isFinite'](scale) ||
-    scale <= 0x0 ||
+    scale <= 0 ||
     !Number['isFinite'](sx) ||
-    sx <= 0x0 ||
+    sx <= 0 ||
     !Number['isFinite'](sy) ||
-    sy <= 0x0
+    sy <= 0
   )
     return null;
   const dw = vw * scale,
@@ -43,8 +43,8 @@ function buildVideoProjection(item) {
     scale: scale,
     dw: dw,
     dh: dh,
-    ox: (ew - dw) / 0x2,
-    oy: (eh - dh) / 0x2,
+    ox: (ew - dw) / 2,
+    oy: (eh - dh) / 2,
     sx: sx,
     sy: sy,
   });
@@ -56,11 +56,11 @@ function buildLayerProjection(box2) {
   if (!rect2 || !lw || !lh) return null;
   const sx2 = rect2['width'] / lw,
     sy2 = rect2['height'] / lh;
-  if (!Number['isFinite'](sx2) || sx2 <= 0x0 || !Number['isFinite'](sy2) || sy2 <= 0x0) return null;
+  if (!Number['isFinite'](sx2) || sx2 <= 0 || !Number['isFinite'](sy2) || sy2 <= 0) return null;
   return Object['freeze']({ rect: rect2, lw: lw, lh: lh, sx: sx2, sy: sy2 });
 }
 function clampNormalized(key) {
-  return Math['max'](0x0, Math['min'](0x1, Number(key) || 0x0));
+  return Math['max'](0, Math['min'](1, Number(key) || 0));
 }
 export function createVideoKeyingProjection({ video: video, layer: layer = null } = {}) {
   const videoProjection = buildVideoProjection(video);
@@ -101,14 +101,14 @@ export function createVideoKeyingProjection({ video: video, layer: layer = null 
       return { x: x, y: y };
     },
     getVideoRectInLayer = () => {
-      const x2 = normalizedToLayerPoint(0x0, 0x0),
-        box3 = normalizedToLayerPoint(0x1, 0x1);
+      const x2 = normalizedToLayerPoint(0, 0),
+        box3 = normalizedToLayerPoint(1, 1);
       if (!x2 || !box3) return null;
       return {
         x: x2['x'],
         y: x2['y'],
-        width: Math['max'](0x1, box3['x'] - x2['x']),
-        height: Math['max'](0x1, box3['y'] - x2['y']),
+        width: Math['max'](1, box3['x'] - x2['x']),
+        height: Math['max'](1, box3['y'] - x2['y']),
       };
     };
   return Object['freeze']({

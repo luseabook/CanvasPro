@@ -12,9 +12,9 @@ export async function saveModelApiVideoContent(value, item, provider = {}) {
     headers: { Authorization: 'Bearer ' + item },
     provider: provider['providerId'] || 'custom-provider',
     responseType: 'blob',
-    timeout: 0x1d4c0,
+    timeout: 120000,
     signal: provider['signal'],
-    retries: 0x0,
+    retries: 0,
   });
   if (
     !requester2?.['size'] ||

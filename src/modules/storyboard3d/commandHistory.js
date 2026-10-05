@@ -51,9 +51,9 @@ function createCompositeCommand(options, args) {
   };
 }
 export class CommandHistory {
-  constructor({ context: context, limit: limit = 0x64, onChange: onChange } = {}) {
+  constructor({ context: context, limit: limit = 100, onChange: onChange } = {}) {
     ((this['context'] = context),
-      (this['limit'] = Math['max'](0x1, Math['round'](Number(limit) || 0x64))),
+      (this['limit'] = Math['max'](1, Math['round'](Number(limit) || 100))),
       (this['onChange'] = typeof onChange === 'function' ? onChange : null),
       (this['undoStack'] = []),
       (this['redoStack'] = []),
@@ -68,7 +68,7 @@ export class CommandHistory {
       (this['transaction']['commands']['push'](payload), this['_notify']('execute-in-transaction', payload));
       return;
     }
-    const handle = this['undoStack'][this['undoStack']['length'] - 0x1],
+    const handle = this['undoStack'][this['undoStack']['length'] - 1],
       enabled =
         handle &&
         handle['mergeKey'] &&
@@ -77,11 +77,11 @@ export class CommandHistory {
         handle['mergeWith'](payload) === !![];
     if (!enabled) this['undoStack']['push'](payload);
     if (this['undoStack']['length'] > this['limit'])
-      this['undoStack']['splice'](0x0, this['undoStack']['length'] - this['limit']);
+      this['undoStack']['splice'](0, this['undoStack']['length'] - this['limit']);
     ((this['redoStack'] = []), this['_notify'](enabled ? 'merge' : 'execute', enabled ? handle : payload));
   }
   ['_run'](state, config, scope, input) {
-    if (this['busy']) throw new Error('Command\x20history\x20is\x20busy');
+    if (this['busy']) throw new Error('Command history is busy');
     let invoke4;
     try {
       invoke4 = invoke(state, config, this['context']);
@@ -112,7 +112,7 @@ export class CommandHistory {
   }
   ['undo']() {
     if (this['transaction']) throw new Error('Cannot undo during a transaction');
-    if (this['busy'] || this['undoStack']['length'] === 0x0) return ![];
+    if (this['busy'] || this['undoStack']['length'] === 0) return ![];
     const value5 = this['undoStack']['pop']();
     return this['_run'](
       value5,
@@ -124,8 +124,8 @@ export class CommandHistory {
     );
   }
   ['redo']() {
-    if (this['transaction']) throw new Error('Cannot\x20redo\x20during\x20a\x20transaction');
-    if (this['busy'] || this['redoStack']['length'] === 0x0) return ![];
+    if (this['transaction']) throw new Error('Cannot redo during a transaction');
+    if (this['busy'] || this['redoStack']['length'] === 0) return ![];
     const value6 = this['redoStack']['pop']();
     return this['_run'](
       value6,
@@ -146,11 +146,11 @@ export class CommandHistory {
     if (!this['transaction']) return ![];
     const value8 = this['transaction'];
     this['transaction'] = null;
-    if (value8['commands']['length'] === 0x0) return (this['_notify']('empty-transaction'), ![]);
+    if (value8['commands']['length'] === 0) return (this['_notify']('empty-transaction'), ![]);
     const compositeCommand = createCompositeCommand(value8['label'], value8['commands']);
     this['undoStack']['push'](compositeCommand);
     if (this['undoStack']['length'] > this['limit'])
-      this['undoStack']['splice'](0x0, this['undoStack']['length'] - this['limit']);
+      this['undoStack']['splice'](0, this['undoStack']['length'] - this['limit']);
     return (
       (this['redoStack'] = []),
       this['_notify']('commit-transaction', compositeCommand),
@@ -162,7 +162,7 @@ export class CommandHistory {
     const value9 = this['transaction'];
     this['transaction'] = null;
     const compositeCommand2 = createCompositeCommand(value9['label'], value9['commands']);
-    if (value9['commands']['length'] === 0x0)
+    if (value9['commands']['length'] === 0)
       return (this['_notify']('cancel-transaction', compositeCommand2), !![]);
     return this['_run'](compositeCommand2, 'undo', () =>
       this['_notify']('cancel-transaction', compositeCommand2),
@@ -201,15 +201,15 @@ export class CommandHistory {
   }
   ['getSnapshot']() {
     return {
-      canUndo: !this['busy'] && !this['transaction'] && this['undoStack']['length'] > 0x0,
-      canRedo: !this['busy'] && !this['transaction'] && this['redoStack']['length'] > 0x0,
+      canUndo: !this['busy'] && !this['transaction'] && this['undoStack']['length'] > 0,
+      canRedo: !this['busy'] && !this['transaction'] && this['redoStack']['length'] > 0,
       undoCount: this['undoStack']['length'],
       redoCount: this['redoStack']['length'],
       busy: this['busy'],
       transactionActive: this['transaction'] !== null,
-      transactionSize: this['transaction']?.['commands']['length'] || 0x0,
-      nextUndoLabel: this['undoStack'][this['undoStack']['length'] - 0x1]?.['label'] || null,
-      nextRedoLabel: this['redoStack'][this['redoStack']['length'] - 0x1]?.['label'] || null,
+      transactionSize: this['transaction']?.['commands']['length'] || 0,
+      nextUndoLabel: this['undoStack'][this['undoStack']['length'] - 1]?.['label'] || null,
+      nextRedoLabel: this['redoStack'][this['redoStack']['length'] - 1]?.['label'] || null,
     };
   }
 }
@@ -254,7 +254,7 @@ export function applyStoryboard3DObjectTransforms(
         }),
       value29['push'](value30['id']));
   });
-  if (value29['length'] > 0x0) cloneStoryboard3DProject2['updatedAt'] = Date['now']();
+  if (value29['length'] > 0) cloneStoryboard3DProject2['updatedAt'] = Date['now']();
   return { project: cloneStoryboard3DProject2, changedObjectIds: value29 };
 }
 function readTransforms(value31, value32, value33) {
@@ -291,7 +291,7 @@ export function createStoryboard3DTransformCommand({
           sceneId: sceneId2,
           transforms: cloneStoryboard3DProject5,
         });
-        if (storyboard3DObjectTransforms['changedObjectIds']['length'] === 0x0) return ![];
+        if (storyboard3DObjectTransforms['changedObjectIds']['length'] === 0) return ![];
         return value40['replaceProject'](storyboard3DObjectTransforms['project'], {
           reason: 'transform-objects',
         });
@@ -329,11 +329,11 @@ export function createStoryboard3DTransformCommand({
 }
 export function createStoryboard3DProjectMutationCommand({
   type: type = 'update-project',
-  label: label = 'Update\x20project',
+  label: label = 'Update project',
   mutate: mutate,
 } = {}) {
   if (typeof mutate !== 'function')
-    throw new TypeError('A\x20project\x20mutation\x20function\x20is\x20required');
+    throw new TypeError('A project mutation function is required');
   let cloneStoryboard3DProject6 = null,
     recordDirectorDeletions2 = null;
   return {

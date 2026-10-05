@@ -20,7 +20,7 @@ export function bindCollaborationChatInput({
     value2 = null;
     if (
       !chat['isOpen']() ||
-      event['button'] !== 0x0 ||
+      event['button'] !== 0 ||
       isRecording() ||
       hasActiveModalInteraction() ||
       run(event['target'])

@@ -19,7 +19,7 @@ function isAudioGenerationResourceDenied(value) {
     /requested\s+resource\s+not\s+granted/i['test'](value)
   );
 }
-export function parseError(raw, status = 0x0) {
+export function parseError(raw, status = 0) {
   const errorText = getErrorText(raw)['trim']();
   if (isAudioGenerationResourceDenied(errorText))
     return new ApiError({

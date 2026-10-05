@@ -5,7 +5,7 @@ export function reviewElement(value, item = '', key = '') {
   return el;
 }
 export function reviewTime(index) {
-  return new Date(index * 0x3e8)['toLocaleString']([], {
+  return new Date(index * 1000)['toLocaleString']([], {
     month: 'numeric',
     day: 'numeric',
     hour: '2-digit',
@@ -26,13 +26,13 @@ export function appendMentionText(data, list, list2 = [], list3 = []) {
     (error2, error3) => error3['name']['length'] - error2['name']['length'],
   );
   let options = '';
-  for (let target = 0x0; target < list['length'];) {
+  for (let target = 0; target < list['length'];) {
     const error4 =
       list[target] === '@' &&
       list4['find'](
         (error5) =>
           list['startsWith']('@' + error5['name'], target) &&
-          !/[\p{L}\p{N}_]/u['test'](list[target + error5['name']['length'] + 0x1] || ''),
+          !/[\p{L}\p{N}_]/u['test'](list[target + error5['name']['length'] + 1] || ''),
       );
     if (!error4) {
       options += list[target++];
@@ -41,7 +41,7 @@ export function appendMentionText(data, list, list2 = [], list3 = []) {
     (data['append'](document['createTextNode'](options)),
       (options = ''),
       data['append'](colorMemberName(reviewElement('span', '', '@' + error4['name']), error4)),
-      (target += error4['name']['length'] + 0x1));
+      (target += error4['name']['length'] + 1));
   }
   data['append'](document['createTextNode'](options));
 }
@@ -49,7 +49,7 @@ export function reviewAvatar(error6) {
   const el3 = reviewElement(
     'span',
     'collaboration-message-avatar',
-    Array['from'](error6['name'] || '成员')[0x0],
+    Array['from'](error6['name'] || '成员')[0],
   );
   return (
     el3['style']['setProperty']('--member-color', collaborationMemberColor(error6)),

@@ -16,7 +16,7 @@ import { onLocaleChange, t } from '../i18n/index.js';
 import { desktopBridge } from '../services/desktopBridge.js';
 import { showContextMenu } from './interaction/contextMenuPresenter.js';
 import { createTaskStatusFeedback } from './taskStatusFeedback.js';
-const MAX_TASKS = 0x78;
+const MAX_TASKS = 120;
 function el(value, item = '', key = '') {
   const el2 = document['createElement'](value);
   if (item) el2['className'] = item;
@@ -48,7 +48,7 @@ function normalizeTask(navigation = {}) {
     progress:
       navigation['progress'] == null
         ? null
-        : Math['max'](0x0, Math['min'](0x1, Number(navigation['progress']) || 0x0)),
+        : Math['max'](0, Math['min'](1, Number(navigation['progress']) || 0)),
     message: String(navigation['message'] || '')['trim'](),
     error: String(navigation['error'] || '')['trim'](),
     remoteTaskId: String(navigation['remoteTaskId'] || '')['trim'](),
@@ -56,10 +56,10 @@ function normalizeTask(navigation = {}) {
     result: navigation['result'] && typeof navigation['result'] === 'object' ? navigation['result'] : null,
     thumbnail: navigation['thumbnail'] || null,
     createdAt:
-      Number(navigation['createdAt'] || 0x0) ||
-      (ACTIVE_TASK_STATUSES['has'](navigation['status']) ? Date['now']() : 0x0),
-    startedAt: Number(navigation['startedAt'] || 0x0) || 0x0,
-    finishedAt: Number(navigation['finishedAt'] || 0x0) || 0x0,
+      Number(navigation['createdAt'] || 0) ||
+      (ACTIVE_TASK_STATUSES['has'](navigation['status']) ? Date['now']() : 0),
+    startedAt: Number(navigation['startedAt'] || 0) || 0,
+    finishedAt: Number(navigation['finishedAt'] || 0) || 0,
     updatedAt: Date['now'](),
   };
 }
@@ -78,17 +78,17 @@ function getStatusLabel(target) {
   return t3 === source ? taskCenterText('statuses.fallback') : t3;
 }
 function formatDuration(next) {
-  const current = Math['max'](0x0, Math['floor'](Number(next || 0x0) / 0x3e8)),
-    count = Math['floor'](current / 0x3c),
-    entry = current % 0x3c;
-  if (count <= 0x0) return entry + 's';
-  return count + 'm\x20' + String(entry)['padStart'](0x2, '0') + 's';
+  const current = Math['max'](0, Math['floor'](Number(next || 0) / 1000)),
+    count = Math['floor'](current / 60),
+    entry = current % 60;
+  if (count <= 0) return entry + 's';
+  return count + 'm ' + String(entry)['padStart'](2, '0') + 's';
 }
 function getTaskDuration(response) {
-  const enabled3 = Number(response['startedAt'] || response['createdAt'] || 0x0) || 0x0,
+  const enabled3 = Number(response['startedAt'] || response['createdAt'] || 0) || 0,
     enabled4 =
-      Number(response['finishedAt'] || 0x0) ||
-      (ACTIVE_TASK_STATUSES['has'](response['status']) ? Date['now']() : 0x0);
+      Number(response['finishedAt'] || 0) ||
+      (ACTIVE_TASK_STATUSES['has'](response['status']) ? Date['now']() : 0);
   if (!enabled3 || !enabled4) return '';
   return formatDuration(enabled4 - enabled3);
 }
@@ -96,12 +96,12 @@ function getResultLocalPath(record) {
   return pickResultLocalPath(record);
 }
 function sortTasks(args) {
-  const payload = { processing: 0x0, waiting: 0x1, failed: 0x2, complete: 0x3, cancelled: 0x4 };
+  const payload = { processing: 0, waiting: 1, failed: 2, complete: 3, cancelled: 4 };
   return [...args]['sort']((response2, response3) => {
-    const handle = payload[response2['status']] ?? 0x9,
-      state = payload[response3['status']] ?? 0x9;
+    const handle = payload[response2['status']] ?? 9,
+      state = payload[response3['status']] ?? 9;
     if (handle !== state) return handle - state;
-    return Number(response3['createdAt'] || 0x0) - Number(response2['createdAt'] || 0x0);
+    return Number(response3['createdAt'] || 0) - Number(response2['createdAt'] || 0);
   });
 }
 function getElectronMediaTaskApi() {
@@ -128,8 +128,8 @@ export class TaskCenterManager {
       (this['cardViews'] = new Map()),
       (this['sectionViews'] = new Map()),
       (this['pendingActions'] = new Set()),
-      (this['renderTimer'] = 0x0),
-      (this['clockTimer'] = 0x0),
+      (this['renderTimer'] = 0),
+      (this['clockTimer'] = 0),
       (this['unsubscribe'] = null),
       (this['unsubscribeGenerationTasks'] = null),
       (this['unsubscribeLocale'] = null),
@@ -174,15 +174,15 @@ export class TaskCenterManager {
   ['handleWheel'](event) {
     (event['stopPropagation'](), event['stopImmediatePropagation']?.());
     if (!this['listEl'] || this['listEl']['contains'](event['target'])) return;
-    const enabled5 = Number(event['deltaY'] || 0x0);
+    const enabled5 = Number(event['deltaY'] || 0);
     if (!enabled5) return;
     const enabled6 =
-      Number(this['listEl']['scrollHeight'] || 0x0) > Number(this['listEl']['clientHeight'] || 0x0);
+      Number(this['listEl']['scrollHeight'] || 0) > Number(this['listEl']['clientHeight'] || 0);
     if (!enabled6) return;
     (event['preventDefault']?.(),
       (this['listEl']['scrollTop'] = Math['max'](
-        0x0,
-        Number(this['listEl']['scrollTop'] || 0x0) + enabled5,
+        0,
+        Number(this['listEl']['scrollTop'] || 0) + enabled5,
       )));
   }
   ['bindLocaleChange']() {
@@ -248,7 +248,7 @@ export class TaskCenterManager {
       document['getElementById']('btnTasks')?.['classList']['remove']('active'),
       this['stopClock']());
     if (this['renderTimer']) window['cancelAnimationFrame']?.(this['renderTimer']);
-    this['renderTimer'] = 0x0;
+    this['renderTimer'] = 0;
   }
   ['startClock']() {
     if (this['clockTimer']) return;
@@ -258,11 +258,11 @@ export class TaskCenterManager {
         return;
       }
       this['render']();
-    }, 0x3e8);
+    }, 1000);
   }
   ['stopClock']() {
     if (!this['clockTimer']) return;
-    (window['clearInterval'](this['clockTimer']), (this['clockTimer'] = 0x0));
+    (window['clearInterval'](this['clockTimer']), (this['clockTimer'] = 0));
   }
   ['closeContextMenu']() {
     (this['contextMenuSession']?.['close']?.(),
@@ -293,7 +293,7 @@ export class TaskCenterManager {
         (this['tasks']['set'](value5, {
           ...message,
           status: 'complete',
-          progress: 0x1,
+          progress: 1,
           message: message['message'] || 'Replaced by latest task',
           finishedAt: message['finishedAt'] || Date['now'](),
           updatedAt: Date['now'](),
@@ -311,7 +311,7 @@ export class TaskCenterManager {
       });
     if (!response7) return;
     if (ACTIVE_TASK_STATUSES['has'](response7['status'])) {
-      response7['finishedAt'] = 0x0;
+      response7['finishedAt'] = 0;
       if (response6 && TERMINAL_TASK_STATUSES['has'](response6['status']) && !createdAt['createdAt'])
         response7['createdAt'] = Date['now']();
     }
@@ -348,7 +348,7 @@ export class TaskCenterManager {
     }
     if (this['renderTimer']) return;
     this['renderTimer'] = window['requestAnimationFrame'](() => {
-      ((this['renderTimer'] = 0x0), this['render']());
+      ((this['renderTimer'] = 0), this['render']());
     });
   }
   ['getTaskGroups']() {
@@ -368,8 +368,8 @@ export class TaskCenterManager {
           ACTIVE_TASK_STATUSES['has'](response12['status']),
         )['length'];
     if (!this['badgeEl']) return;
-    if (this['badgeEl']['hidden'] !== count2 <= 0x0) this['badgeEl']['hidden'] = count2 <= 0x0;
-    const value8 = count2 > 0x63 ? '99+' : String(count2);
+    if (this['badgeEl']['hidden'] !== count2 <= 0) this['badgeEl']['hidden'] = count2 <= 0;
+    const value8 = count2 > 99 ? '99+' : String(count2);
     if (this['badgeEl']['textContent'] !== value8) this['badgeEl']['textContent'] = value8;
   }
   ['render']() {
@@ -390,12 +390,12 @@ export class TaskCenterManager {
       failed: failed,
       done: done,
     });
-    if (this['clearBtn']) this['clearBtn']['hidden'] = done + failed <= 0x0;
+    if (this['clearBtn']) this['clearBtn']['hidden'] = done + failed <= 0;
     const list3 = [];
     for (const [value9, list4] of Object['entries'](active2)) {
       if (!list4['length']) {
         const el5 = this['sectionViews']['get'](value9);
-        if (el5) syncTaskElements(el5, [el5['children'][0x0]]);
+        if (el5) syncTaskElements(el5, [el5['children'][0]]);
         continue;
       }
       let el6 = this['sectionViews']['get'](value9);
@@ -403,9 +403,9 @@ export class TaskCenterManager {
         ((el6 = el('section', 'v2-task-center-section')),
         el6['appendChild'](el('div', 'v2-task-center-section-title')),
         this['sectionViews']['set'](value9, el6)),
-        (el6['children'][0x0]['textContent'] = taskCenterText('sections.' + value9)),
+        (el6['children'][0]['textContent'] = taskCenterText('sections.' + value9)),
         syncTaskElements(el6, [
-          el6['children'][0x0],
+          el6['children'][0],
           ...list4['map']((value10) => this['renderTaskCard'](value10)),
         ]),
         list3['push'](el6));
@@ -453,7 +453,7 @@ export class TaskCenterManager {
         title: title['title'] || getTaskLabel(title['kind']),
         context: [title['projectTitle'], title['provider'], title['modelId']]
           ['filter'](Boolean)
-          ['join']('\x20·\x20'),
+          ['join'](' · '),
         meta: [
           title['message'] || getStatusLabel(title['status']),
           duration ? taskCenterText('duration', { duration: duration }) : '',

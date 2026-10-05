@@ -1,4 +1,4 @@
-const DEFAULT_CELL_SIZE = 0x400,
+const DEFAULT_CELL_SIZE = 1024,
   DEFAULT_NODE_WIDTH = 160,
   DEFAULT_NODE_HEIGHT = 120;
 let cachedSpatialIndexSignature = '',

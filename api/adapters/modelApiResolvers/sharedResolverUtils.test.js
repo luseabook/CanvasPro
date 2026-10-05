@@ -46,8 +46,8 @@ test('sharedResolverUtils: normalizes Kling booleans and image references', () =
   assert.equal(normalizeKlingKeepOriginalSound(undefined), false);
 
   assert.equal(
-    replaceKlingO1PromptImageReferences('\u56fe\u72471 and @\u56fe\u72472, \u56fe\u72473, \u56fe4', 3),
-    '<<<image_1>>> and <<<image_2>>>, <<<image_3>>>, \u56fe4',
+    replaceKlingO1PromptImageReferences('图片1 and @图片2, 图片3, 图4', 3),
+    '<<<image_1>>> and <<<image_2>>>, <<<image_3>>>, 图4',
   );
-  assert.equal(replaceKlingO1PromptImageReferences('\u56fe1', 0), '\u56fe1');
+  assert.equal(replaceKlingO1PromptImageReferences('图1', 0), '图1');
 });

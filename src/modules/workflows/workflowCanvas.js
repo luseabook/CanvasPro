@@ -1,6 +1,6 @@
 import { generateId } from '../../core/math.js';
 import { t } from '../../i18n/index.js';
-export const WORKFLOW_LIMITS = { nameMax: 50, tagMax: 5, tagLengthMax: 12, noteMax: 0x12c };
+export const WORKFLOW_LIMITS = { nameMax: 50, tagMax: 5, tagLengthMax: 12, noteMax: 300 };
 function deepClone(value) {
   if (typeof structuredClone === 'function')
     try {

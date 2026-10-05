@@ -32,8 +32,8 @@ export function prepareShortcutGraph(graph, x) {
     ),
     prepareClipboardGraphPaste2 = prepareClipboardGraphPaste({
       graph: graph,
-      x: x['x'] - box['width'] / 0x2,
-      y: x['y'] - box['height'] / 0x2,
+      x: x['x'] - box['width'] / 2,
+      y: x['y'] - box['height'] / 2,
       generateNodeId: () => generateId('node'),
       generateEdgeId: () => generateId('edge'),
       sanitizeNode: stripImageGenerationRuntimeState,

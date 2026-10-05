@@ -9,7 +9,7 @@ function normalizeText(value) {
 }
 export function getFirstSuccessfulImageRef(item) {
   const imageGenerationResult = normalizeImageGenerationResult(item),
-    response = getSuccessfulImageGenerationItems(imageGenerationResult)[0x0],
+    response = getSuccessfulImageGenerationItems(imageGenerationResult)[0],
     enabled =
       [
         response?.['localPath'],

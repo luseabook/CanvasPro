@@ -16,17 +16,17 @@ const SCALE_FILTER =
   "scale=w='min(iw\\,1280)':h='min(ih\\,1280)':force_original_aspect_ratio=decrease:force_divisible_by=2";
 
 test('constants match the 0.7.16 build', () => {
-  assert.equal(VIDEO_PLAYBACK_PROXY_MAX_LONG_EDGE, 0x500);
+  assert.equal(VIDEO_PLAYBACK_PROXY_MAX_LONG_EDGE, 1280);
   assert.equal(VIDEO_PLAYBACK_PROXY_MAX_LONG_EDGE, 1280);
   assert.equal(VIDEO_PLAYBACK_PROXY_VERSION, 'v2-1280');
 });
 
 test('resolveVideoPlaybackProxyTimeoutMs clamps between 5 minutes and 6 hours', () => {
-  assert.equal(resolveVideoPlaybackProxyTimeoutMs(0), 0x5 * 0x3c * 0x3e8);
-  assert.equal(resolveVideoPlaybackProxyTimeoutMs(10), 0x5 * 0x3c * 0x3e8);
-  assert.equal(resolveVideoPlaybackProxyTimeoutMs(30), 30 * 0x3e8 * 0xc);
-  assert.equal(resolveVideoPlaybackProxyTimeoutMs(10000), 0x6 * 0x3c * 0x3c * 0x3e8);
-  assert.equal(resolveVideoPlaybackProxyTimeoutMs(-5), 0x5 * 0x3c * 0x3e8);
+  assert.equal(resolveVideoPlaybackProxyTimeoutMs(0), 5 * 60 * 1000);
+  assert.equal(resolveVideoPlaybackProxyTimeoutMs(10), 5 * 60 * 1000);
+  assert.equal(resolveVideoPlaybackProxyTimeoutMs(30), 30 * 1000 * 12);
+  assert.equal(resolveVideoPlaybackProxyTimeoutMs(10000), 6 * 60 * 60 * 1000);
+  assert.equal(resolveVideoPlaybackProxyTimeoutMs(-5), 5 * 60 * 1000);
   assert.ok(Number.isNaN(resolveVideoPlaybackProxyTimeoutMs('abc')));
 });
 
@@ -183,7 +183,7 @@ test('buildVideoPlaybackProxyFfmpegArgs emits the exact expect table', () => {
       inputPath: 'in.mp4',
       outputPath: 'out.mp4',
       preset: 'medium',
-      crf: 0x1c,
+      crf: 28,
     }),
     [
       '-y',
@@ -206,7 +206,7 @@ test('buildVideoPlaybackProxyFfmpegArgs emits the exact expect table', () => {
       '-preset',
       'medium',
       '-crf',
-      0x1c,
+      28,
       '-c:a',
       'aac',
       '-b:a',

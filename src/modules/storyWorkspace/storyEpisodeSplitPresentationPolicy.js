@@ -2,7 +2,7 @@ const normalizeText = (value) => String(value ?? '')['trim']();
 export function getStoryEpisodeSplitPaidRetryChoice(item) {
   return {
     overlayId: 'story-episode-split-paid-retry-' + item['id'],
-    title: '第\x20' + (item['number'] || '') + ' 集上次请求尚未安全提交',
+    title: '第 ' + (item['number'] || '') + ' 集上次请求尚未安全提交',
     message: '上次请求可能已经计费，或原始响应尚未完成本地提交。确认后才会再次调用模型。',
     fallbackValue: null,
     choices: [

@@ -30,7 +30,7 @@ export function applyReplicationAsrDelivery(clips, episode, project = {}, assets
         ['flatMap']((result) => getReplicationEventSpeech(result) || [])
         ['sort']((data, options) => data['startSec'] - options['startSec']);
       if (list2['some']((target) => target['timingSource'] !== 'asr')) return args;
-      let endSec = 0x0;
+      let endSec = 0;
       const list3 = projectReplicationObservedShots(args, enabled2, {
           episode: episode,
           project: project,
@@ -57,7 +57,7 @@ export function applyReplicationAsrDelivery(clips, episode, project = {}, assets
         ),
         next = isStorySeedance25PromptMode2 ? Math['round'] : (current) => current,
         list4 = list2['map']((endSec2) => {
-          const startSec2 = Math['max'](0x0, endSec2['startSec'] - enabled2['sourceStartSec']),
+          const startSec2 = Math['max'](0, endSec2['startSec'] - enabled2['sourceStartSec']),
             error = list['find']((entry) => entry['id'] === endSec2['speakerId']),
             enabled3 =
               project['replication']?.['characterBindings']?.[episode['id'] + ':' + endSec2['speakerId']],
@@ -81,7 +81,7 @@ export function applyReplicationAsrDelivery(clips, episode, project = {}, assets
               shots,
               startSec2,
               next,
-              0x0,
+              0,
               endSec2['endSec'] - enabled2['sourceStartSec'],
             ),
             parts: [
@@ -108,7 +108,7 @@ export function applyReplicationAsrDelivery(clips, episode, project = {}, assets
               response2['speakerLabel'] + '：' + response2['text'],
             ]
               ['filter'](Boolean)
-              ['join']('\x0a');
+              ['join']('\n');
           }
       }
       return { ...args, durationSec: endSec, shots: shots };

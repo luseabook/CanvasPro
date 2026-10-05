@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { resolveModelExecution } from '../src/manifests/index.js';
 function makeJsonResponse(value, ok = 200) {
   return {
-    ok: ok >= 200 && ok < 0x12c,
+    ok: ok >= 200 && ok < 300,
     status: ok,
     headers: {
       get(item) {
@@ -43,7 +43,7 @@ function buildPayload() {
       if (data.startsWith('/api/v2/proxy/upload?')) {
         assert.equal(dom.headers?.Authorization, 'Bearer k_rh');
         const uploadedAudioMarker = await readUploadedAudioMarker(dom.body);
-        if (uploadedAudioMarker === 'ref') return makeJsonResponse({ code: 0x1f4, message: 'upload failed' });
+        if (uploadedAudioMarker === 'ref') return makeJsonResponse({ code: 500, message: 'upload failed' });
         return makeJsonResponse({
           code: 0,
           data: { download_url: 'https://www.runninghub.cn/' + uploadedAudioMarker + '.mp3' },
@@ -355,7 +355,7 @@ function buildPayload() {
       list = [];
     try {
       ((globalThis.setTimeout = (value13, value14, ...args) =>
-        handler(value13, Number(value14) > 0x1388 ? Number(value14) : 0, ...args)),
+        handler(value13, Number(value14) > 5000 ? Number(value14) : 0, ...args)),
         (globalThis.fetch = async (value15, dom10 = {}) => {
           const value16 = String(value15);
           if (value16 === '/api/config')
@@ -393,7 +393,7 @@ function buildPayload() {
       list3 = [];
     try {
       ((globalThis.setTimeout = (value21, value22, ...args2) =>
-        handler2(value21, Number(value22) > 0x1388 ? Number(value22) : 0, ...args2)),
+        handler2(value21, Number(value22) > 5000 ? Number(value22) : 0, ...args2)),
         (globalThis.fetch = async (value23, dom11 = {}) => {
           const value24 = String(value23);
           if (value24 === '/api/config')
@@ -482,7 +482,7 @@ function buildPayload() {
       handler3 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value34, value35, ...args3) =>
-        handler3(value34, Number(value35) > 0x1388 ? Number(value35) : 0, ...args3)),
+        handler3(value34, Number(value35) > 5000 ? Number(value35) : 0, ...args3)),
         (globalThis.fetch = async (value36, dom13 = {}) => {
           const value37 = String(value36);
           if (value37 === '/api/config')
@@ -512,7 +512,7 @@ function buildPayload() {
       handler4 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value41, value42, ...args4) =>
-        handler4(value41, Number(value42) > 0x1388 ? Number(value42) : 0, ...args4)),
+        handler4(value41, Number(value42) > 5000 ? Number(value42) : 0, ...args4)),
         (globalThis.fetch = async (value43, dom14 = {}) => {
           const value44 = String(value43);
           if (value44 === '/api/config')
@@ -635,7 +635,7 @@ function buildPayload() {
       handler5 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value54, value55, ...args5) =>
-        handler5(value54, Number(value55) > 0x1388 ? Number(value55) : 0, ...args5)),
+        handler5(value54, Number(value55) > 5000 ? Number(value55) : 0, ...args5)),
         (globalThis.fetch = async (value56, dom19 = {}) => {
           const value57 = String(value56);
           if (value57 === '/api/config')
@@ -689,7 +689,7 @@ function buildPayload() {
       handler6 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value61, value62, ...args6) =>
-        handler6(value61, Number(value62) > 0x1388 ? Number(value62) : 0, ...args6)),
+        handler6(value61, Number(value62) > 5000 ? Number(value62) : 0, ...args6)),
         (globalThis.fetch = async (value63, dom20 = {}) => {
           const value64 = String(value63);
           if (value64 === '/api/config')
@@ -729,7 +729,7 @@ function buildPayload() {
       handler7 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value68, value69, ...args7) =>
-        handler7(value68, Number(value69) > 0x1388 ? Number(value69) : 0, ...args7)),
+        handler7(value68, Number(value69) > 5000 ? Number(value69) : 0, ...args7)),
         (globalThis.fetch = async (value70, dom21 = {}) => {
           const value71 = String(value70);
           if (value71 === '/api/config')
@@ -786,7 +786,7 @@ function buildPayload() {
       handler8 = globalThis.setTimeout;
     try {
       ((globalThis.setTimeout = (value78, value79, ...args8) =>
-        handler8(value78, Number(value79) > 0x1388 ? Number(value79) : 0, ...args8)),
+        handler8(value78, Number(value79) > 5000 ? Number(value79) : 0, ...args8)),
         (globalThis.fetch = async (value80, dom23 = {}) => {
           const value81 = String(value80);
           if (value81 === '/api/config')

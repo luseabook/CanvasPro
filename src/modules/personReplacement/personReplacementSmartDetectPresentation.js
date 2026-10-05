@@ -4,8 +4,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&apos;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&apos;');
 }
 function panelText(item, key = {}) {
   return t('videoClip.smartPanel.' + item, key);
@@ -35,9 +35,9 @@ function renderModeOptions(data, options = 'set-smart-clip-mode') {
         escapeHtml(options) +
         '" data-smart-clip-mode="' +
         target +
-        '\x22\x20aria-pressed=\x22' +
+        '" aria-pressed="' +
         (data === target) +
-        '\x22>' +
+        '">' +
         escapeHtml(source) +
         '</button>',
     )
@@ -51,11 +51,11 @@ export function createPersonReplacementSmartDetectPresentation({ renderIcon: ren
       escapeHtml(panelText('mode')) +
       '">\n          ' +
       renderModeOptions(next['settings']['smartClipMode'], 'set-shot-cut-smart-detect-mode') +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22person-replacement-shot-cut-smart-detect-footer\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20person-replacement-shot-cut-smart-detect-confirm\x20' +
+      '\n        </div>\n      </div>\n      <div class="person-replacement-shot-cut-smart-detect-footer">\n        <button type="button" class="story-primary-button person-replacement-shot-cut-smart-detect-confirm ' +
       (smartDetecting ? 'is-loading' : '') +
-      '\x22\x20data-person-replacement-action=\x22confirm-shot-cut-smart-detect\x22\x20aria-busy=\x22' +
+      '" data-person-replacement-action="confirm-shot-cut-smart-detect" aria-busy="' +
       smartDetecting +
-      '\x22\x20' +
+      '" ' +
       (smartDetecting ? 'disabled' : '') +
       '>' +
       (smartDetecting ? '检测中…' : '确定') +
@@ -67,15 +67,15 @@ export function createPersonReplacementSmartDetectPresentation({ renderIcon: ren
     } = {}) => {
       const current = smartDetecting ? '智能检测中' : '智能检测';
       return (
-        '<span\x20class=\x22person-replacement-shot-cut-smart-detect\x20' +
+        '<span class="person-replacement-shot-cut-smart-detect ' +
         (smartDetectOpen ? 'is-open' : '') +
-        '\x22\x20data-person-replacement-shot-cut-smart-detect>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22person-replacement-secondary-button\x20person-replacement-keyframe-smart-detect' +
+        '" data-person-replacement-shot-cut-smart-detect>\n      <button type="button" class="person-replacement-secondary-button person-replacement-keyframe-smart-detect' +
         (smartDetecting ? ' is-loading' : '') +
         '" data-person-replacement-action="toggle-shot-cut-smart-detect" aria-label="' +
         current +
-        '\x22\x20aria-haspopup=\x22dialog\x22\x20aria-controls=\x22person-replacement-shot-cut-smart-detect-panel\x22\x20aria-expanded=\x22' +
+        '" aria-haspopup="dialog" aria-controls="person-replacement-shot-cut-smart-detect-panel" aria-expanded="' +
         smartDetectOpen +
-        '\x22' +
+        '"' +
         (disabled ? ' disabled' : '') +
         '>' +
         renderIcon('smartDetect') +

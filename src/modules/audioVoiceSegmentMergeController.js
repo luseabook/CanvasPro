@@ -29,7 +29,7 @@ export function createAudioVoiceSegmentMergeController({
   showError: showError = noop,
   showStale: showStale = noop,
 } = {}) {
-  if (!session) throw new TypeError('session\x20is\x20required');
+  if (!session) throw new TypeError('session is required');
   if (typeof composeAudio !== 'function') throw new TypeError('composeAudio is required');
   function getOperations() {
     return session['listActive']({ kind: 'merge', sourceNodeId: getSourceNodeId() });
@@ -43,7 +43,7 @@ export function createAudioVoiceSegmentMergeController({
     return projectAudioVoicePendingSegmentMerges(getVisibleAudioVoiceSegments(getSegments()), run());
   }
   function hasPending() {
-    return getOperations()['length'] > 0x0;
+    return getOperations()['length'] > 0;
   }
   function isMerging(options = {}) {
     const enabled = String(options?.['id'] || options || '')['trim']();
@@ -62,7 +62,7 @@ export function createAudioVoiceSegmentMergeController({
       list = getVisibleAudioVoiceSegments(segments),
       key = list['findIndex']((index) => index['id'] === segmentId),
       enabled2 = list[key],
-      enabled3 = list[key + 0x1];
+      enabled3 = list[key + 1];
     if (!enabled2 || !enabled3) return { status: 'missing' };
     const payload = buildAudioVoicePendingSegmentMerge(enabled2, enabled3);
     if (!payload) return { status: 'missing' };
@@ -81,7 +81,7 @@ export function createAudioVoiceSegmentMergeController({
           composeAudio({
             sourceNodeId: sourceNodeId,
             srcs: srcs,
-            durationMs: Number(result['durationMs'] || 0x0),
+            durationMs: Number(result['durationMs'] || 0),
           }),
       });
       if (!session['isCurrent'](enabled4, getSourceNodeId())) return { status: 'stale' };

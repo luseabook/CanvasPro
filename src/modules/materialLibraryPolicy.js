@@ -1,5 +1,5 @@
 const DEFAULT_MEDIA_EXTENSIONS = Object['freeze']({ image: 'png', video: 'mp4', audio: 'mp3' });
-export const MATERIAL_LIBRARY_CATEGORY_LIMIT = 0x63;
+export const MATERIAL_LIBRARY_CATEGORY_LIMIT = 99;
 export const DEFAULT_MATERIAL_LIBRARY_CATEGORIES = Object['freeze']([
   '人物',
   '场景',
@@ -39,18 +39,18 @@ function getMaterialNodeSource(response = {}) {
 function sanitizeFilenamePart(index, result = 'material') {
   const trimText3 = trimText(index)
     ['replace'](/[<>:"/\\|?*\u0000-\u001F]/g, '-')
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['replace'](/[.\s]+$/g, '')
-    ['slice'](0x0, 0x50);
+    ['slice'](0, 80);
   return trimText3 || result;
 }
 function resolveExtension(response2, data) {
-  const trimText4 = trimText(response2['localPath'] || response2['url'])['split'](/[?#]/, 0x1)[0x0],
+  const trimText4 = trimText(response2['localPath'] || response2['url'])['split'](/[?#]/, 1)[0],
     options = trimText4['match'](/\.([a-z0-9]{1,10})$/i);
-  return options?.[0x1]?.['toLocaleLowerCase']() || DEFAULT_MEDIA_EXTENSIONS[data] || 'bin';
+  return options?.[1]?.['toLocaleLowerCase']() || DEFAULT_MEDIA_EXTENSIONS[data] || 'bin';
 }
 export function getMaterialAssetItems(state = {}) {
-  if (Array['isArray'](state['items']) && state['items']['length'] > 0x0)
+  if (Array['isArray'](state['items']) && state['items']['length'] > 0)
     return state['items']['map']((nodeData, target) => ({
       ...nodeData,
       nodeData: nodeData?.['nodeData'] || state['nodes']?.[target] || null,
@@ -93,7 +93,7 @@ export function getMaterialLibraryGroups({
           error['name'],
           error['category'],
           ...list2['map']((error2) => error2?.['name'] || error2?.['nodeData']?.['name']),
-        ]['join']('\x20'),
+        ]['join'](' '),
       );
     if (searchText && !list3['includes'](searchText)) continue;
     const categoryKey2 = categoryKey(error['category']),
@@ -101,7 +101,7 @@ export function getMaterialLibraryGroups({
     if (entry) entry['assets']['push'](error);
   }
   if (!searchText && !favoritesOnly) return list;
-  return list['filter']((record) => record['assets']['length'] > 0x0);
+  return list['filter']((record) => record['assets']['length'] > 0);
 }
 export function getMaterialFolderAssetCounts({
   groups: groups = [],
@@ -113,7 +113,7 @@ export function getMaterialFolderAssetCounts({
   for (const handle of Array['isArray'](groups) ? groups : []) {
     const categoryKey3 = categoryKey(handle?.['category']);
     if (!categoryKey3) continue;
-    map2['set'](categoryKey3, Array['isArray'](handle?.['assets']) ? handle['assets']['length'] : 0x0);
+    map2['set'](categoryKey3, Array['isArray'](handle?.['assets']) ? handle['assets']['length'] : 0);
   }
   for (const [config, scope] of Object['entries'](parents || {})) {
     const categoryKey4 = categoryKey(config),
@@ -130,13 +130,13 @@ export function getMaterialFolderAssetCounts({
   }
   for (const input of Array['isArray'](groups) ? groups : []) {
     const categoryKey6 = categoryKey(input?.['category']),
-      count = Array['isArray'](input?.['assets']) ? input['assets']['length'] : 0x0;
-    if (!categoryKey6 || count <= 0x0) continue;
+      count = Array['isArray'](input?.['assets']) ? input['assets']['length'] : 0;
+    if (!categoryKey6 || count <= 0) continue;
     const map4 = new Set([categoryKey6]);
     let output = map3['get'](categoryKey6);
     while (output && !map4['has'](output)) {
       (map4['add'](output),
-        map2['set'](output, (map2['get'](output) || 0x0) + count),
+        map2['set'](output, (map2['get'](output) || 0) + count),
         (output = map3['get'](output)));
     }
   }
@@ -157,7 +157,7 @@ export function buildMaterialCategoryRenamePlan({
     nextKey = trimText(categoryKey(category3)),
     list4 = Array['isArray'](userCategories) ? userCategories : [],
     count2 = list4['findIndex']((value2) => trimText(categoryKey(value2)) === currentKey);
-  if (!currentKey || !nextKey || count2 < 0x0) return { status: 'invalid' };
+  if (!currentKey || !nextKey || count2 < 0) return { status: 'invalid' };
   if (currentCategory2 === category3) return { status: 'unchanged' };
   if (
     nextKey !== currentKey &&
@@ -255,7 +255,7 @@ export function deleteMaterialFolderParent({
   const trimText12 = trimText(categoryKey(category));
   if (!trimText12) return { ...(parents || {}) };
   const list5 = Object['entries'](parents && typeof parents === 'object' ? parents : {}),
-    value17 = list5['find'](([value18]) => trimText(categoryKey(value18)) === trimText12)?.[0x1] || '',
+    value17 = list5['find'](([value18]) => trimText(categoryKey(value18)) === trimText12)?.[1] || '',
     value19 = {};
   for (const [value20, value21] of list5) {
     if (trimText(categoryKey(value20)) === trimText12) continue;
@@ -307,7 +307,7 @@ export function buildMaterialDownloadFiles(error5 = {}) {
         sanitizeFilenamePart3 = sanitizeFilenamePart(error6?.['name'] || error7?.['name'], ''),
         value23 =
           sanitizeFilenamePart3 ||
-          (getMaterialAssetItems(error5)['length'] > 0x1 ? '' + (value22 + 0x1) : '');
+          (getMaterialAssetItems(error5)['length'] > 1 ? '' + (value22 + 1) : '');
       list6['push']({
         kind: kind,
         localPath: localPath2['localPath'],

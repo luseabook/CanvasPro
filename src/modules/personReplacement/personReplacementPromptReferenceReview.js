@@ -1,7 +1,7 @@
 import { buildPersonReplacementPromptPackage } from './personReplacementPromptCompiler.js';
 import { localPathToUrl } from '../../utils/localMediaPath.js';
 function plainReferenceSlots(value = '') {
-  let enabled = 0x0,
+  let enabled = 0,
     args = '';
   for (const [enabled2] of String(value)['matchAll'](/<[^>]*>|[^<]+/g)) {
     if (/^<span\b/i['test'](enabled2)) {
@@ -13,7 +13,7 @@ function plainReferenceSlots(value = '') {
       }
     }
   }
-  return [...new Set([...args['matchAll'](/图(?:片|像)?\s*(\d+)/gu)]['map']((item) => Number(item[0x1])))];
+  return [...new Set([...args['matchAll'](/图(?:片|像)?\s*(\d+)/gu)]['map']((item) => Number(item[1])))];
 }
 function referenceKey(enabled3) {
   if (!enabled3) return '';

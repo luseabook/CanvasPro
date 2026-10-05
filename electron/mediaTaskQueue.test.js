@@ -350,7 +350,7 @@ test('list clamps the limit and supports an exact task lookup', async () => {
   assert.deepEqual(queue.list({ taskId: 'missing' }), []);
   assert.throws(() => queue.list({ taskId: '   ' }), { message: 'Invalid media task ID' });
   assert.throws(() => queue.list({ taskId: 7 }), { message: 'Invalid media task ID' });
-  assert.throws(() => queue.list({ taskId: 'bad\u0001id' }), { message: 'Invalid media task ID' });
+  assert.throws(() => queue.list({ taskId: 'bad\x01id' }), { message: 'Invalid media task ID' });
   assert.throws(() => queue.list({ taskId: 'x'.repeat(257) }), { message: 'Invalid media task ID' });
 });
 

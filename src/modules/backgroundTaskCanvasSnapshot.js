@@ -5,12 +5,12 @@ export function captureBackgroundTaskCanvas(store, nodes, value) {
     count =
       value && canvas?.['canvas'] === nodes
         ? nodes['nodes']?.['findIndex']((item) => item['id'] === value)
-        : -0x1,
+        : -1,
     key =
-      count >= 0x0 &&
+      count >= 0 &&
       typeof store['serializeNode'] === 'function' &&
-      persistRev['_persistRev'] === canvas['persistRev'] + 0x1 &&
-      persistRev['_contentPersistRev'] === canvas['contentRev'] + 0x1 &&
+      persistRev['_persistRev'] === canvas['persistRev'] + 1 &&
+      persistRev['_contentPersistRev'] === canvas['contentRev'] + 1 &&
       persistRev['_nodeMembershipRev'] === canvas['membershipRev'] &&
       persistRev['_edgesRev'] === canvas['edgesRev'],
     index = key ? store['serializeNode'](value) : null,

@@ -42,7 +42,7 @@ function showRunningHubGuideDialog({
   steps: steps,
   footerTitle: footerTitle = '说明',
   footerText: footerText,
-  settingsButtonLabel: settingsButtonLabel = '打开\x20API\x20Key\x20设置',
+  settingsButtonLabel: settingsButtonLabel = '打开 API Key 设置',
   settingsButtonPrimary: settingsButtonPrimary = ![],
 } = {}) {
   closeRunningHubMediaUploadGuide();
@@ -54,7 +54,7 @@ function showRunningHubGuideDialog({
     el5['setAttribute']('aria-modal', 'true'),
     el5['setAttribute']('aria-label', ariaLabel || 'RunningHub 配置'));
   const el6 = createEl('div', 'update-banner-header'),
-    el7 = createEl('span', 'update-banner-icon\x20runninghub-media-upload-guide-icon', 'RH');
+    el7 = createEl('span', 'update-banner-icon runninghub-media-upload-guide-icon', 'RH');
   el7['setAttribute']('aria-hidden', 'true');
   const el8 = createEl('div', 'update-banner-header-title');
   el8['textContent'] = headerTitle || '配置 RunningHub';
@@ -69,7 +69,7 @@ function showRunningHubGuideDialog({
     el12 = createEl(
       'div',
       'update-banner-sub',
-      subtitle || '当前模型需要\x20RunningHub\x20模型\x20API\x20Key\x20才能提交生成。',
+      subtitle || '当前模型需要 RunningHub 模型 API Key 才能提交生成。',
     ),
     el13 = createEl('div', 'update-banner-notes'),
     el14 = createEl('div', 'update-banner-section-title', sectionTitle || '按这几步完成设置'),
@@ -122,11 +122,11 @@ export function showRunningHubMediaUploadGuide() {
     ariaLabel: 'RunningHub 上传配置',
     headerTitle: '配置 RunningHub 上传',
     title: RUNNINGHUB_MEDIA_UPLOAD_API_KEY_MISSING_MESSAGE,
-    subtitle: '当前模型需要先把本地视频/音频上传为公网\x20URL，然后再提交给模型\x20API。',
+    subtitle: '当前模型需要先把本地视频/音频上传为公网 URL，然后再提交给模型 API。',
     sectionTitle: '按这几步连接 RunningHub',
     steps: [
       '点击下方按钮打开 RunningHub，并使用推广连接进入。',
-      '登录后进入\x20API\x20Key\x20页面，复制可用于上传的\x20API\x20Key。',
+      '登录后进入 API Key 页面，复制可用于上传的 API Key。',
       '回到本应用的设置 > API Key > RunningHub。',
       '优先粘贴到“模型 API 密钥”，保存后重新生成。',
     ],

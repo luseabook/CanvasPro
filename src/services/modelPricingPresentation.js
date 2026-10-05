@@ -5,11 +5,11 @@ export function buildModelPriceView(currency, value) {
   if (value['provider'] === 'binghuo') return buildBinghuoPriceView(currency, value);
   if (value['provider'] !== 'runninghub')
     return { ...buildApimartPriceView(currency, value), currency: 'USD' };
-  const estimate = currency['isFreeThisCall'] ? 0x0 : currency['estimatedPrice'],
+  const estimate = currency['isFreeThisCall'] ? 0 : currency['estimatedPrice'],
     label = priceText('reference'),
     amountText = formatPrice(estimate, currency['currency']);
   return {
-    label: label + '\x20' + amountText,
+    label: label + ' ' + amountText,
     prefix: label,
     amountText: amountText,
     estimate: estimate,

@@ -72,7 +72,7 @@ test('collection appends without overwriting source; character notes round trip'
 test('CSV mitigates spreadsheet formula injection and quotes multiline cells', () => {
   const value = sample(); value.episodes[0].shots[0].description = '=HYPERLINK("x")\n第二行';
   const csv = storyEpisodeCsv(value, value.episodes[0]);
-  assert.ok(csv.startsWith('\uFEFF')); assert.ok(csv.includes("'=HYPERLINK")); assert.ok(csv.includes('""x""'));
+  assert.ok(csv.startsWith('\ufeff')); assert.ok(csv.includes("'=HYPERLINK")); assert.ok(csv.includes('""x""'));
 });
 test('Markdown includes script, assets and shots without executing markup', () => {
   const value = sample(); value.episodes[0].script = '<script>test</script>';

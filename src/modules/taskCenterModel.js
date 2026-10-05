@@ -26,12 +26,12 @@ export function normalizeTaskCenterStatus(value) {
   if (['cancelled', 'canceled']['includes'](item)) return 'cancelled';
   return '';
 }
-export function pruneTaskCenterRecords(list, key = 0x78) {
+export function pruneTaskCenterRecords(list, key = 120) {
   const args = list['filter']((response) => ACTIVE_TASK_STATUSES['has'](response['status'])),
     list2 = list['filter']((response2) => !ACTIVE_TASK_STATUSES['has'](response2['status']))['sort'](
       (index, result) =>
-        Number(result['finishedAt'] || result['createdAt'] || 0x0) -
-        Number(index['finishedAt'] || index['createdAt'] || 0x0),
+        Number(result['finishedAt'] || result['createdAt'] || 0) -
+        Number(index['finishedAt'] || index['createdAt'] || 0),
     );
-  return [...args, ...list2['slice'](0x0, key)];
+  return [...args, ...list2['slice'](0, key)];
 }

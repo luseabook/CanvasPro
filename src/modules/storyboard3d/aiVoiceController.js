@@ -24,7 +24,7 @@ function createId(index, handler) {
   const result = typeof handler === 'function' ? handler(index) : globalThis['crypto']?.['randomUUID']?.();
   return (
     normalizedText(result) ||
-    index + '_' + Date['now']() + '_' + Math['random']()['toString'](0x24)['slice'](0x2, 0xa)
+    index + '_' + Date['now']() + '_' + Math['random']()['toString'](36)['slice'](2, 10)
   );
 }
 function requireScene(data, options) {
@@ -34,7 +34,7 @@ function requireScene(data, options) {
 }
 function requireObject(source, next) {
   const enabled2 = source['objects']['find']((current) => current['id'] === next);
-  if (!enabled2) throw new Error('Object\x20does\x20not\x20exist:\x20' + next);
+  if (!enabled2) throw new Error('Object does not exist: ' + next);
   return enabled2;
 }
 function requireShot(entry, record) {
@@ -44,7 +44,7 @@ function requireShot(entry, record) {
 }
 function activeShot(handle) {
   return (
-    handle['shots']['find']((state) => state['id'] === handle['activeShotId']) || handle['shots'][0x0] || null
+    handle['shots']['find']((state) => state['id'] === handle['activeShotId']) || handle['shots'][0] || null
   );
 }
 function mergeTransform(box, box2) {
@@ -161,7 +161,7 @@ function executeSafeTool(value4, value5, value6) {
     const value11 = {
       id: createId('light', value6['idFactory']),
       type: 'light',
-      name: args['lightType'] + '\x20light',
+      name: args['lightType'] + ' light',
       lightType: args['lightType'],
       color: args['color'] || '#ffffff',
       intensity: args['intensity'],
@@ -206,7 +206,7 @@ function executeSafeTool(value4, value5, value6) {
       throw new Error('Character action does not exist: ' + args['actionId']);
     return (
       (requireObject4['actionId'] = args['actionId']),
-      (requireObject4['actionTime'] = 0x0),
+      (requireObject4['actionTime'] = 0),
       { changed: !![], result: { objectId: requireObject4['id'], actionId: requireObject4['actionId'] } }
     );
   }
@@ -235,7 +235,7 @@ function executeSafeTool(value4, value5, value6) {
         focalLength: args['focalLength'],
       }),
       (args2['animation'] = upsertStoryboard3DCameraKeyframe(args2['animation'], {
-        time: 0x0,
+        time: 0,
         camera: args2['camera'],
       })),
       (args2['updatedAt'] = value6['now']),
@@ -267,7 +267,7 @@ function executeSafeTool(value4, value5, value6) {
       args['focalLength'] != null &&
         ((requireShot2['camera']['focalLength'] = args['focalLength']),
         (requireShot2['animation'] = upsertStoryboard3DCameraKeyframe(requireShot2['animation'], {
-          time: 0x0,
+          time: 0,
           camera: requireShot2['camera'],
         }))),
       (requireShot2['updatedAt'] = value6['now']),
@@ -325,7 +325,7 @@ export function createStoryboard3DSafeToolExecutor({
           }));
       } catch (value22) {
         throw new Storyboard3DToolExecutionError(
-          '3D command failed: ' + value21['tool'] + ':\x20' + (value22?.['message'] || String(value22)),
+          '3D command failed: ' + value21['tool'] + ': ' + (value22?.['message'] || String(value22)),
           { command: value21, cause: value22 },
         );
       }
@@ -405,7 +405,7 @@ export class Storyboard3DAIVoiceController {
         execution: null,
         error: null,
       }),
-      (this['runToken'] = 0x0),
+      (this['runToken'] = 0),
       (this['voiceService'] = voiceServiceFactory({
         windowObject: windowObject,
         onStateChange: (value24) => this['_handleVoiceState'](value24),
@@ -521,7 +521,7 @@ export class Storyboard3DAIVoiceController {
   }
   ['cancel']() {
     return (
-      (this['runToken'] += 0x1),
+      (this['runToken'] += 1),
       this['abortVoice'](),
       this['_setState']({ status: 'idle', error: null }, 'cancel')
     );
@@ -535,7 +535,7 @@ export class Storyboard3DAIVoiceController {
     };
   }
   ['destroy']() {
-    ((this['runToken'] += 0x1),
+    ((this['runToken'] += 1),
       this['voiceService']['destroy']?.(),
       this['_setState']({ status: 'idle' }, 'destroy'));
   }

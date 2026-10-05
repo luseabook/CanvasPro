@@ -75,7 +75,7 @@ export function schedulePanoramaFullLoad(enabled3, enabled4, token2) {
   const run =
     typeof globalThis['requestAnimationFrame'] === 'function'
       ? globalThis['requestAnimationFrame']['bind'](globalThis)
-      : (data) => setTimeout(data, 0x0);
+      : (data) => setTimeout(data, 0);
   enabled3['_panoramaFullLoadFrame'] = run(() => {
     enabled3['_panoramaFullLoadFrame'] = null;
     if (token2 !== enabled3['_panoramaLoadToken']) return;

@@ -32,7 +32,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
   const el7 = reviewElement('button', 'collaboration-button', '重新加载'),
     el8 = reviewElement('div', 'collaboration-chat-messages');
   (el8['setAttribute']('aria-label', '聊天记录'),
-    (el8['tabIndex'] = 0x0),
+    (el8['tabIndex'] = 0),
     (el8['dataset']['readonlyTextSelectionRoot'] = 'true'));
   const el9 = reviewElement('button', 'collaboration-button', '加载更早消息');
   el8['append'](el9);
@@ -41,8 +41,8 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
   const el11 = reviewElement('form', 'collaboration-chat-composer'),
     el12 = reviewElement('div', 'collaboration-chat-refs'),
     input = reviewElement('textarea', 'collaboration-input');
-  ((input['maxLength'] = 0x7d0),
-    (input['rows'] = 0x3),
+  ((input['maxLength'] = 2000),
+    (input['rows'] = 3),
     (input['placeholder'] = '发送消息，@ 节点或成员'),
     input['setAttribute']('aria-label', '聊天消息'));
   const menu = reviewElement('div', 'collaboration-chat-picker');
@@ -50,7 +50,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
   const reviewElement3 = reviewElement('div', 'collaboration-actions'),
     trigger = reviewElement('button', 'collaboration-button', '@ 引用'),
     el13 = reviewElement('button', 'collaboration-button', '加入所选节点'),
-    el14 = reviewElement('button', 'collaboration-button\x20collaboration-primary', '发送');
+    el14 = reviewElement('button', 'collaboration-button collaboration-primary', '发送');
   ((el14['type'] = 'submit'),
     reviewElement3['append'](trigger, el13, el14),
     el11['append'](el12, input, menu, reviewElement3));
@@ -74,7 +74,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
       onChange: onChange,
       onMention(error) {
         const key = getSession();
-        showToast(error['name'] + ' 在协作聊天中提到了你', 'ok', 0x1770, {
+        showToast(error['name'] + ' 在协作聊天中提到了你', 'ok', 6000, {
           onClick() {
             if (item || getSession() !== key) return;
             run();
@@ -85,7 +85,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
                 el8['scrollTop'] +=
                   el15['getBoundingClientRect']()['top'] -
                   el8['getBoundingClientRect']()['top'] -
-                  (el8['clientHeight'] - el15['offsetHeight']) / 0x2;
+                  (el8['clientHeight'] - el15['offsetHeight']) / 2;
             };
             (run2(),
               Promise['allSettled'](root['getAnimations']()['map']((index) => index['finished']))['then'](
@@ -131,9 +131,9 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
                 : [options['id']]),
             ]),
           ];
-        if (list['length'] > 0x14) return showToast('每条消息最多引用 20 个节点或提及 20 位成员', 'warn');
+        if (list['length'] > 20) return showToast('每条消息最多引用 20 个节点或提及 20 位成员', 'warn');
         const body = target['typed']
-          ? dom['body']['slice'](0x0, target['start']) + dom['body']['slice'](target['end'])
+          ? dom['body']['slice'](0, target['start']) + dom['body']['slice'](target['end'])
           : dom['body'];
         (mentions['edit']({ [options['kind']]: list, body: body }),
           input['setSelectionRange'](target['start'], target['start']));
@@ -162,14 +162,14 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
       (el3['hidden'] = !enabled),
       (el['hidden'] = enabled),
       (el2['hidden'] = !dom2['unread']),
-      (el2['textContent'] = dom2['mentioned'] ? '@' : String(Math['min'](dom2['unread'], 0x63))),
+      (el2['textContent'] = dom2['mentioned'] ? '@' : String(Math['min'](dom2['unread'], 99))),
       el['setAttribute'](
         'aria-label',
         dom2['unread']
           ? '展开协作聊天，' + dom2['unread'] + ' 条未读' + (dom2['mentioned'] ? '，有人提及你' : '')
           : '展开协作聊天',
       ),
-      (el4['textContent'] = (enabled2['state']['members']?.['length'] || 0x0) + '\x20位成员'),
+      (el4['textContent'] = (enabled2['state']['members']?.['length'] || 0) + ' 位成员'),
       (el6['textContent'] =
         dom2['error'] ||
         (dom2['sending']
@@ -187,11 +187,11 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
       reviewSendButton(el14, dom2['sending']));
     for (const el16 of [input, trigger, el13]) el16['disabled'] = dom2['sending'];
     if (input['value'] !== dom2['body']) input['value'] = dom2['body'];
-    const entry = el8['scrollHeight'] - el8['scrollTop'] - el8['clientHeight'] < 0x28,
+    const entry = el8['scrollHeight'] - el8['scrollTop'] - el8['clientHeight'] < 40,
       record = el8['scrollHeight'],
       payload = el8['scrollTop'],
       handle = el10['nextSibling']?.['dataset']['messageId'],
-      state = handle && dom2['messages'][0x0]?.['id'] !== handle;
+      state = handle && dom2['messages'][0]?.['id'] !== handle;
     let config = el10['nextSibling'];
     for (const id4 of dom2['messages']) {
       let el17 = map['get'](id4['id']);
@@ -236,7 +236,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
               if (!enabled2?.['state']['members']?.['some']((value3) => value3['id'] === output))
                 return showToast('该成员已离开房间', 'ok');
               const mentions2 = [...new Set([...args['mentions'], output])];
-              if (mentions2['length'] > 0x14) return showToast('每条消息最多提及 20 位成员', 'warn');
+              if (mentions2['length'] > 20) return showToast('每条消息最多提及 20 位成员', 'warn');
               (mentions['edit']({ mentions: mentions2 }), input['focus']({ preventScroll: !![] }));
             }),
             reviewElement4['append'](el19));
@@ -301,7 +301,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
             const el22 = reviewElement('span');
             ((el22['dataset']['nodeId'] = id6), el12['append'](el22));
           } else {
-            const el23 = reviewElement('button', 'collaboration-button', value9 + '\x20×');
+            const el23 = reviewElement('button', 'collaboration-button', value9 + ' ×');
             ((el23['disabled'] = dom2['sending']),
               el23['setAttribute']('aria-label', '移除引用 ' + value9),
               colorMemberName(
@@ -356,7 +356,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
             borderRadius: borderRadius ? '16px' : '24px',
           },
         ],
-        { duration: 0xdc, easing: 'cubic-bezier(.2,.8,.2,1)' },
+        { duration: 220, easing: 'cubic-bezier(.2,.8,.2,1)' },
       );
   }
   function run() {
@@ -373,7 +373,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
         ...list2['filter']((value16) => !!store['getStateRaw']()['nodes'][value16]),
       ]),
     ];
-    if (nodeIds['length'] > 0x14) return (showToast('每条消息最多引用 20 个节点，请分批发送', 'warn'), ![]);
+    if (nodeIds['length'] > 20) return (showToast('每条消息最多引用 20 个节点，请分批发送', 'warn'), ![]);
     return (mentions['edit']({ nodeIds: nodeIds }), run(), !![]);
   }
   (input['addEventListener']('input', () => mentions['edit']({ body: input['value'] })),

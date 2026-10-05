@@ -61,7 +61,7 @@ export function createStoryCollaboration({
         state['view'] !== 'home',
       projectId: state['hasCreatedProject'] ? projectId() : '',
       enabled: isStoryCollaborationProject(state['data']),
-      editing: state['step'] === 0x0 && state['view'] === 'project',
+      editing: state['step'] === 0 && state['view'] === 'project',
       root: root,
       host: host,
       trigger: trigger,
@@ -73,12 +73,12 @@ export function createStoryCollaboration({
   }
   function sync() {
     if (destroyed) return;
-    if (!isStoryCollaborationProject(state['data']) && state['step'] === 0x0) state['step'] = 0x1;
+    if (!isStoryCollaborationProject(state['data']) && state['step'] === 0) state['step'] = 1;
     if (state['developerModeAvailable'] !== !![]) {
       if (state['homeTab'] === 'collaborate') state['homeTab'] = 'generate';
-      if (state['view'] === 'project' && state['step'] === 0x0) {
+      if (state['view'] === 'project' && state['step'] === 0) {
         if (state['data']['project']['collaboration']?.['stage'] === 'writing') state['view'] = 'home';
-        else state['step'] = 0x1;
+        else state['step'] = 1;
       }
     }
     const target = snapshot();
@@ -128,7 +128,7 @@ export function createStoryCollaboration({
     const generatedStoryProjectData = createGeneratedStoryProjectData(
       {},
       {
-        projectId: 'story-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x7),
+        projectId: 'story-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 7),
         request: request,
       },
     );
@@ -145,7 +145,7 @@ export function createStoryCollaboration({
       (state['hasCreatedProject'] = !![]),
       (state['projectTitleEdited'] = ![]),
       (state['view'] = 'project'),
-      (state['step'] = 0x0),
+      (state['step'] = 0),
       (value2 = { projectId: projectId(), text: idea, settings: settings }),
       run4(),
       render(),
@@ -167,7 +167,7 @@ export function createStoryCollaboration({
       )
         throw new Error('请先在正文中选择要替换的文字');
       list =
-        record['draft']['slice'](0x0, selection['start']) +
+        record['draft']['slice'](0, selection['start']) +
         enabled +
         record['draft']['slice'](selection['end']);
     }
@@ -176,8 +176,8 @@ export function createStoryCollaboration({
       (record['draft'] = list),
       (selection = null),
       run4(),
-      (state['step'] !== 0x0 || state['view'] !== 'project') &&
-        ((state['step'] = 0x0), (state['view'] = 'project'), render()),
+      (state['step'] !== 0 || state['view'] !== 'project') &&
+        ((state['step'] = 0), (state['view'] = 'project'), render()),
       sync(),
       handler(selectedOnly ? '已替换选中文字' : '已采用，可继续编辑'));
   }
@@ -189,7 +189,7 @@ export function createStoryCollaboration({
       uploadedStoryProjectData = createUploadedStoryProjectData({
         projectId: projectId3
           ? projectId()
-          : 'story-' + Date['now']() + '-' + Math['random']()['toString'](0x24)['slice'](0x2, 0x7),
+          : 'story-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 7),
         request: {
           mode: 'upload',
           sourceText: sourceText['draft'],
@@ -212,7 +212,7 @@ export function createStoryCollaboration({
       projectData['replaceCurrent'](uploadedStoryProjectData),
       (state['hasCreatedProject'] = !![]),
       (state['view'] = 'project'),
-      (state['step'] = 0x1),
+      (state['step'] = 1),
       run4(),
       render(),
       sync(),
@@ -309,7 +309,7 @@ export function createStoryCollaboration({
             '。剧本模式：' +
             title['project']['scriptMode'] +
             '。目标集数：' +
-            (title['project']['planning']?.['episodeCount'] || 0x1) +
+            (title['project']['planning']?.['episodeCount'] || 1) +
             '。故事想法：' +
             (document2['idea'] || ''),
         },

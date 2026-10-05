@@ -22,22 +22,22 @@ import { recordDiagnosticsLaunchVersion } from './diagnosticsLaunchVersion.js';
 const DESKTOP_LOG_NAME = 'desktop.log.jsonl',
   ROTATED_DESKTOP_LOG_NAME = DESKTOP_LOG_NAME + '.1',
   INCIDENT_LOG_NAME = 'incidents.log.jsonl',
-  INCIDENT_LOG_BYTES = 0x2 * 0x400 * 0x400,
+  INCIDENT_LOG_BYTES = 2 * 1024 * 1024,
   DIAGNOSTIC_README_NAME = 'README.txt',
   DIAGNOSTIC_METADATA_NAME = 'metadata.json',
   AI_DIAGNOSTICS_REPORT_NAME = 'ai-diagnostics-report.json',
   DIAGNOSTIC_PACKAGE_MANIFEST_NAME = 'package-manifest.json',
   DIAGNOSTIC_ERROR_SUMMARY_NAME = 'error-summary.json',
-  DEFAULT_MAX_LOG_BYTES = 0x5 * 0x400 * 0x400,
-  DEFAULT_SERVER_TAIL_BYTES = 0x400 * 0x400,
-  DEFAULT_DESKTOP_TAIL_BYTES = 0x2 * 0x400 * 0x400,
-  DEFAULT_ROTATED_DESKTOP_TAIL_BYTES = 0x2 * 0x400 * 0x400,
-  MAX_RECENT_PROBLEMS = 0x1e,
-  MAX_STRING_LENGTH = 0x7d0,
-  MAX_STACK_LENGTH = 0x2710,
-  MAX_ARRAY_ITEMS = 0x1e,
-  MAX_OBJECT_KEYS = 0x50,
-  MAX_DEPTH = 0x5,
+  DEFAULT_MAX_LOG_BYTES = 5 * 1024 * 1024,
+  DEFAULT_SERVER_TAIL_BYTES = 1024 * 1024,
+  DEFAULT_DESKTOP_TAIL_BYTES = 2 * 1024 * 1024,
+  DEFAULT_ROTATED_DESKTOP_TAIL_BYTES = 2 * 1024 * 1024,
+  MAX_RECENT_PROBLEMS = 30,
+  MAX_STRING_LENGTH = 2000,
+  MAX_STACK_LENGTH = 10000,
+  MAX_ARRAY_ITEMS = 30,
+  MAX_OBJECT_KEYS = 80,
+  MAX_DEPTH = 5,
   REDACTED = '[REDACTED]',
   SENSITIVE_KEY_RE =
     /(?:api[-_ ]?key|token|authorization|password|passwd|pwd|cdkey|secret|cookie|session|bearer|access[-_ ]?key|refresh[-_ ]?key)/i,
@@ -70,13 +70,13 @@ const DESKTOP_LOG_NAME = 'desktop.log.jsonl',
   COMMON_SECRET_VALUE_RE = /\b(?:sk|rk|pk)-[A-Za-z0-9_-]{8,}\b/gi;
 function normalizeOneLine(value, item = '') {
   return String(value ?? item)
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']();
 }
 function truncateString(key, index = MAX_STRING_LENGTH) {
   const list = String(key ?? '');
   if (list['length'] <= index) return list;
-  return list['slice'](0x0, index) + '... [truncated ' + (list['length'] - index) + ' chars]';
+  return list['slice'](0, index) + '... [truncated ' + (list['length'] - index) + ' chars]';
 }
 function escapeRegExp(result) {
   return String(result || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -107,8 +107,8 @@ function isSensitiveDiagnosticKey(entry) {
   return SENSITIVE_KEY_RE['test'](record) || PRIVATE_CONTENT_KEY_RE['test'](record);
 }
 export function sanitizeDiagnosticValue(list2, event = {}) {
-  const depth = Number(event['depth'] || 0x0) || 0x0,
-    maxDepth = Math['min'](0xc, Math['max'](MAX_DEPTH, Number(event['maxDepth']) || MAX_DEPTH)),
+  const depth = Number(event['depth'] || 0) || 0,
+    maxDepth = Math['min'](12, Math['max'](MAX_DEPTH, Number(event['maxDepth']) || MAX_DEPTH)),
     payload = String(event['key'] || '');
   if (isSensitiveDiagnosticKey(payload)) return REDACTED;
   if (list2 == null) return list2;
@@ -126,26 +126,26 @@ export function sanitizeDiagnosticValue(list2, event = {}) {
       maxDepth: maxDepth,
     });
   if (Array['isArray'](list2)) {
-    const list3 = list2['slice'](0x0, MAX_ARRAY_ITEMS)['map']((state) =>
-      sanitizeDiagnosticValue(state, { depth: depth + 0x1, maxDepth: maxDepth }),
+    const list3 = list2['slice'](0, MAX_ARRAY_ITEMS)['map']((state) =>
+      sanitizeDiagnosticValue(state, { depth: depth + 1, maxDepth: maxDepth }),
     );
     return (
       list2['length'] > MAX_ARRAY_ITEMS &&
-        list3['push']('[truncated\x20' + (list2['length'] - MAX_ARRAY_ITEMS) + ' items]'),
+        list3['push']('[truncated ' + (list2['length'] - MAX_ARRAY_ITEMS) + ' items]'),
       list3
     );
   }
   const config = {},
-    list4 = Object['entries'](list2)['slice'](0x0, MAX_OBJECT_KEYS);
+    list4 = Object['entries'](list2)['slice'](0, MAX_OBJECT_KEYS);
   for (const [key2, scope] of list4) {
     config[key2] = sanitizeDiagnosticValue(scope, {
       key: key2,
-      depth: depth + 0x1,
+      depth: depth + 1,
       maxDepth: maxDepth,
     });
   }
   const count = Object['keys'](list2)['length'] - list4['length'];
-  if (count > 0x0) config['__truncatedKeys'] = count;
+  if (count > 0) config['__truncatedKeys'] = count;
   return config;
 }
 export function buildDiagnosticLogEntry(error = {}, ts = new Date(), input = {}) {
@@ -158,14 +158,14 @@ export function buildDiagnosticLogEntry(error = {}, ts = new Date(), input = {})
     output =
       error2 && typeof args === 'object' && !Array['isArray'](args) ? { ...args, error: error2 } : args,
     oneLine4 = normalizeOneLine(input['launchSessionId'] || error['launchSessionId']),
-    eventSeq = Number(input['eventSeq'] || error['eventSeq'] || 0x0) || 0x0;
+    eventSeq = Number(input['eventSeq'] || error['eventSeq'] || 0) || 0;
   return {
     ts: ts['toISOString'](),
-    ...(oneLine4 ? { launchSessionId: truncateString(oneLine4, 0x78) } : {}),
-    ...(eventSeq > 0x0 ? { eventSeq: eventSeq } : {}),
-    type: truncateString(oneLine2, 0x78),
+    ...(oneLine4 ? { launchSessionId: truncateString(oneLine4, 120) } : {}),
+    ...(eventSeq > 0 ? { eventSeq: eventSeq } : {}),
+    type: truncateString(oneLine2, 120),
     level: level,
-    source: truncateString(oneLine, 0x78),
+    source: truncateString(oneLine, 120),
     message: sanitizeDiagnosticText(
       error['message'] || error2?.['message'] || error['error'] || oneLine2,
       MAX_STRING_LENGTH,
@@ -195,27 +195,27 @@ function readTailSnapshot(enabled2, value7) {
   try {
     if (!enabled2 || !existsSync(enabled2))
       return {
-        buffer: Buffer['alloc'](0x0),
+        buffer: Buffer['alloc'](0),
         exists: ![],
-        sourceBytes: 0x0,
-        includedBytes: 0x0,
+        sourceBytes: 0,
+        includedBytes: 0,
         truncated: ![],
       };
     const exists = statSync(enabled2);
-    if (!exists['isFile']() || exists['size'] <= 0x0)
+    if (!exists['isFile']() || exists['size'] <= 0)
       return {
-        buffer: Buffer['alloc'](0x0),
+        buffer: Buffer['alloc'](0),
         exists: exists['isFile'](),
-        sourceBytes: Math['max'](0x0, Number(exists['size'] || 0x0)),
-        includedBytes: 0x0,
+        sourceBytes: Math['max'](0, Number(exists['size'] || 0)),
+        includedBytes: 0,
         truncated: ![],
       };
     const value8 = Math['min'](exists['size'], value7),
-      value9 = Math['max'](0x0, exists['size'] - value8),
+      value9 = Math['max'](0, exists['size'] - value8),
       buffer = Buffer['alloc'](value8),
       openSync2 = openSync(enabled2, 'r');
     try {
-      readSync(openSync2, buffer, 0x0, value8, value9);
+      readSync(openSync2, buffer, 0, value8, value9);
     } finally {
       closeSync(openSync2);
     }
@@ -228,10 +228,10 @@ function readTailSnapshot(enabled2, value7) {
     };
   } catch {
     return {
-      buffer: Buffer['alloc'](0x0),
+      buffer: Buffer['alloc'](0),
       exists: ![],
-      sourceBytes: 0x0,
-      includedBytes: 0x0,
+      sourceBytes: 0,
+      includedBytes: 0,
       truncated: ![],
       readFailed: !![],
     };
@@ -254,28 +254,28 @@ function parseJsonlEntries(list5 = []) {
   );
 }
 function sanitizeStructuredLogBuffer(list7) {
-  if (!Buffer['isBuffer'](list7) || list7['length'] === 0x0) return Buffer['alloc'](0x0);
+  if (!Buffer['isBuffer'](list7) || list7['length'] === 0) return Buffer['alloc'](0);
   const list8 = [];
   for (const enabled4 of list7['toString']('utf8')['split'](/\r?\n/)) {
     if (!enabled4['trim']()) continue;
     try {
       const value15 = JSON['parse'](enabled4);
-      list8['push'](JSON['stringify'](sanitizeDiagnosticValue(value15, { maxDepth: 0xc })));
+      list8['push'](JSON['stringify'](sanitizeDiagnosticValue(value15, { maxDepth: 12 })));
     } catch {}
   }
-  return Buffer['from'](list8['length'] ? list8['join']('\x0a') + '\x0a' : '', 'utf8');
+  return Buffer['from'](list8['length'] ? list8['join']('\n') + '\n' : '', 'utf8');
 }
 function incrementCounter(value16, value17) {
   const oneLine5 = normalizeOneLine(value17, 'unknown') || 'unknown';
-  value16[oneLine5] = (value16[oneLine5] || 0x0) + 0x1;
+  value16[oneLine5] = (value16[oneLine5] || 0) + 1;
 }
-function sortCounter(value18, value19 = 0x32) {
+function sortCounter(value18, value19 = 50) {
   return Object['fromEntries'](
     Object['entries'](value18)
       ['sort'](
-        (value20, value21) => value21[0x1] - value20[0x1] || value20[0x0]['localeCompare'](value21[0x0]),
+        (value20, value21) => value21[1] - value20[1] || value20[0]['localeCompare'](value21[0]),
       )
-      ['slice'](0x0, value19),
+      ['slice'](0, value19),
   );
 }
 function buildErrorSummary(eventCount2 = [], generatedAt = {}) {
@@ -295,15 +295,15 @@ function buildErrorSummary(eventCount2 = [], generatedAt = {}) {
         launchSessionId: launchSessionId2,
         firstEventAt: firstEventAt2?.['ts'] || '',
         lastEventAt: firstEventAt2?.['ts'] || '',
-        eventCount: 0x0,
-        problemCount: 0x0,
+        eventCount: 0,
+        problemCount: 0,
         startedAt: '',
         endedAt: '',
       };
       ((value26['lastEventAt'] = firstEventAt2?.['ts'] || value26['lastEventAt']),
-        (value26['eventCount'] += 0x1));
+        (value26['eventCount'] += 1));
       if (firstEventAt2?.['level'] === 'error' || firstEventAt2?.['level'] === 'warn')
-        value26['problemCount'] += 0x1;
+        value26['problemCount'] += 1;
       if (firstEventAt2?.['type'] === 'app.session_started')
         value26['startedAt'] = firstEventAt2?.['ts'] || '';
       if (firstEventAt2?.['type'] === 'app.session_ended') value26['endedAt'] = firstEventAt2?.['ts'] || '';
@@ -314,26 +314,26 @@ function buildErrorSummary(eventCount2 = [], generatedAt = {}) {
       problemCount2['push']({
         ts: firstEventAt2?.['ts'] || '',
         launchSessionId: firstEventAt2?.['launchSessionId'] || '',
-        eventSeq: Number(firstEventAt2?.['eventSeq'] || 0x0) || 0x0,
+        eventSeq: Number(firstEventAt2?.['eventSeq'] || 0) || 0,
         type: firstEventAt2?.['type'] || 'unknown',
         level: firstEventAt2?.['level'] || 'warn',
         source: firstEventAt2?.['source'] || 'unknown',
         message: firstEventAt2?.['message'] || '',
         context: firstEventAt2?.['context'] || {},
-        stack: sanitizeDiagnosticText(firstEventAt2?.['stack'] || '', 0xfa0),
+        stack: sanitizeDiagnosticText(firstEventAt2?.['stack'] || '', 4000),
       }));
   }
   return sanitizeDiagnosticValue(
     {
-      schemaVersion: 0x2,
+      schemaVersion: 2,
       generatedAt: generatedAt['generatedAt'] || new Date()['toISOString'](),
       launchSessionId: generatedAt['launchSessionId'] || '',
       eventCount: eventCount2['length'],
       problemCount: problemCount2['length'],
-      timeRange: { first: eventCount2[0x0]?.['ts'] || '', last: eventCount2['at'](-0x1)?.['ts'] || '' },
-      launchSessionIds: Array['from'](value25)['slice'](-0x14),
+      timeRange: { first: eventCount2[0]?.['ts'] || '', last: eventCount2['at'](-1)?.['ts'] || '' },
+      launchSessionIds: Array['from'](value25)['slice'](-20),
       launches: Array['from'](map['values']())
-        ['slice'](-0x14)
+        ['slice'](-20)
         ['map']((args2) => ({ ...args2, normalEndRecorded: Boolean(args2['endedAt']) })),
       levelCounts: sortCounter(value22),
       sourceCounts: sortCounter(value23),
@@ -347,11 +347,11 @@ function buildErrorSummary(eventCount2 = [], generatedAt = {}) {
         'A missing normal end is not proof of a crash: the launch may still be running or logs may be truncated.',
       ],
     },
-    { maxDepth: 0xc },
+    { maxDepth: 12 },
   );
 }
 function sanitizeServerLogBuffer(list9) {
-  if (!Buffer['isBuffer'](list9) || list9['length'] === 0x0) return Buffer['alloc'](0x0);
+  if (!Buffer['isBuffer'](list9) || list9['length'] === 0) return Buffer['alloc'](0);
   return Buffer['from'](redactSensitiveText(list9['toString']('utf8')), 'utf8');
 }
 function describePackageFile(name, truncated, kind = {}) {
@@ -359,8 +359,8 @@ function describePackageFile(name, truncated, kind = {}) {
     name: name,
     kind: kind['kind'] || 'log',
     included: kind['included'] !== ![],
-    sourceBytes: Number(truncated?.['sourceBytes'] || 0x0),
-    includedBytes: Number(kind['includedBytes'] ?? truncated?.['includedBytes'] ?? 0x0),
+    sourceBytes: Number(truncated?.['sourceBytes'] || 0),
+    includedBytes: Number(kind['includedBytes'] ?? truncated?.['includedBytes'] ?? 0),
     truncated: truncated?.['truncated'] === !![],
     readFailed: truncated?.['readFailed'] === !![],
     redacted: kind['redacted'] === !![],
@@ -384,10 +384,10 @@ function resolveDownloadsDir(value31, value32) {
   return ensureDir(value32);
 }
 function timestampForFilename(value34 = new Date()) {
-  const run = (value35) => String(value35)['padStart'](0x2, '0');
+  const run = (value35) => String(value35)['padStart'](2, '0');
   return [
     value34['getFullYear'](),
-    run(value34['getMonth']() + 0x1),
+    run(value34['getMonth']() + 1),
     run(value34['getDate']()),
     '-',
     run(value34['getHours']()),
@@ -397,14 +397,14 @@ function timestampForFilename(value34 = new Date()) {
 }
 function buildReadme() {
   return [
-    'SHUO\x20Canvas\x20诊断包',
+    'SHUO Canvas 诊断包',
     '',
     '请将整个 ZIP 文件发送给开发者用于排查问题。',
     '本诊断包包含运行日志、错误摘要、环境摘要和生成瞬间的脱敏状态快照。',
     '不包含项目文件、画布正文、素材、提示词、API Key 或授权码。',
     'package-manifest.json 会说明日志时间范围、截断和脱敏状态。',
     '',
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
 export function createDiagnosticsManager(options2 = {}) {
   const logDir = ensureDir(options2['logDir']),
@@ -416,14 +416,14 @@ export function createDiagnosticsManager(options2 = {}) {
     launchSessionId3 = normalizeOneLine(options2['launchSessionId'] || randomUUID()),
     app = options2['app'] || null,
     handler = typeof options2['getMetadata'] === 'function' ? options2['getMetadata'] : () => ({});
-  let eventSeq2 = 0x0,
+  let eventSeq2 = 0,
     enabled5 = ![],
     value38 = ![],
     launchVersion = null;
   const precedingEvents = [];
   function logEvent(options3 = {}) {
     try {
-      (ensureDir(logDir), rotateLogIfNeeded(desktopLogPath, value37), (eventSeq2 += 0x1));
+      (ensureDir(logDir), rotateLogIfNeeded(desktopLogPath, value37), (eventSeq2 += 1));
       const event2 = buildDiagnosticLogEntry(options3, new Date(), {
         launchSessionId: launchSessionId3,
         eventSeq: eventSeq2,
@@ -433,18 +433,18 @@ export function createDiagnosticsManager(options2 = {}) {
           'includes'
         ](event2['type']) &&
         (event2['context'] = { ...event2['context'], launchVersion: launchVersion });
-      appendFileSync(desktopLogPath, JSON['stringify'](event2) + '\x0a', 'utf8');
+      appendFileSync(desktopLogPath, JSON['stringify'](event2) + '\n', 'utf8');
       if (event2['level'] === 'warn' || event2['level'] === 'error')
         try {
           (rotateLogIfNeeded(value36, INCIDENT_LOG_BYTES),
             appendFileSync(
               value36,
-              JSON['stringify']({ event: event2, precedingEvents: precedingEvents }) + '\x0a',
+              JSON['stringify']({ event: event2, precedingEvents: precedingEvents }) + '\n',
               'utf8',
             ));
         } catch {}
       precedingEvents['push'](event2);
-      if (precedingEvents['length'] > 0x8) precedingEvents['shift']();
+      if (precedingEvents['length'] > 8) precedingEvents['shift']();
       return { ok: !![] };
     } catch (error3) {
       return { ok: ![], error: String(error3?.['message'] || error3) };
@@ -472,7 +472,7 @@ export function createDiagnosticsManager(options2 = {}) {
       sanitizeDiagnosticValue2 = sanitizeDiagnosticValue({
         generatedAt: generatedAt2['toISOString'](),
         host: { platform: process['platform'], arch: process['arch'], osRelease: os['release']() },
-        diagnostics: { schemaVersion: 0x2, launchSessionId: launchSessionId3, launchVersion: launchVersion },
+        diagnostics: { schemaVersion: 2, launchSessionId: launchSessionId3, launchVersion: launchVersion },
         ...(value41 || {}),
       }),
       value42 = desktopLogPath + '.1',
@@ -501,15 +501,15 @@ export function createDiagnosticsManager(options2 = {}) {
       }),
       value44 =
         options4?.['aiAnalysisReport'] && typeof options4['aiAnalysisReport'] === 'object'
-          ? sanitizeDiagnosticValue(options4['aiAnalysisReport'], { maxDepth: 0xc })
+          ? sanitizeDiagnosticValue(options4['aiAnalysisReport'], { maxDepth: 12 })
           : null,
       includedBytes3 = Buffer['from'](
-        JSON['stringify'](sanitizeDiagnosticValue2, null, 0x2) + '\x0a',
+        JSON['stringify'](sanitizeDiagnosticValue2, null, 2) + '\n',
         'utf8',
       ),
-      includedBytes4 = Buffer['from'](JSON['stringify'](structuredLogRange, null, 0x2) + '\x0a', 'utf8'),
+      includedBytes4 = Buffer['from'](JSON['stringify'](structuredLogRange, null, 2) + '\n', 'utf8'),
       includedBytes5 = value44
-        ? Buffer['from'](JSON['stringify'](value44, null, 0x2) + '\x0a', 'utf8')
+        ? Buffer['from'](JSON['stringify'](value44, null, 2) + '\n', 'utf8')
         : null,
       includedBytes6 = Buffer['from'](buildReadme(), 'utf8'),
       files = [
@@ -554,15 +554,15 @@ export function createDiagnosticsManager(options2 = {}) {
     }
     includedBytes5 &&
       files['splice'](
-        0x1,
-        0x0,
+        1,
+        0,
         describePackageFile(AI_DIAGNOSTICS_REPORT_NAME, null, {
           kind: 'runtime-snapshot',
           includedBytes: includedBytes5['length'],
         }),
       );
     const sanitizeDiagnosticValue3 = sanitizeDiagnosticValue({
-        schemaVersion: 0x1,
+        schemaVersion: 1,
         generatedAt: generatedAt2['toISOString'](),
         launchSessionId: launchSessionId3,
         limits: {
@@ -571,7 +571,7 @@ export function createDiagnosticsManager(options2 = {}) {
           serverTailBytes: DEFAULT_SERVER_TAIL_BYTES,
           recentProblems: MAX_RECENT_PROBLEMS,
           incidentTailBytesPerFile: INCIDENT_LOG_BYTES,
-          precedingEventsPerIncident: 0x8,
+          precedingEventsPerIncident: 8,
         },
         structuredLogRange: structuredLogRange['timeRange'],
         files: files,
@@ -586,7 +586,7 @@ export function createDiagnosticsManager(options2 = {}) {
       value45 = new yazl['ZipFile']();
     (value45['addBuffer'](includedBytes3, DIAGNOSTIC_METADATA_NAME),
       value45['addBuffer'](
-        Buffer['from'](JSON['stringify'](sanitizeDiagnosticValue3, null, 0x2) + '\x0a', 'utf8'),
+        Buffer['from'](JSON['stringify'](sanitizeDiagnosticValue3, null, 2) + '\n', 'utf8'),
         DIAGNOSTIC_PACKAGE_MANIFEST_NAME,
       ),
       value45['addBuffer'](includedBytes4, DIAGNOSTIC_ERROR_SUMMARY_NAME));

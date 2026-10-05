@@ -2,10 +2,10 @@ import { removeContextMenus, showContextMenu } from './interaction/contextMenuPr
 import { TEXT_CONTEXT_MENU_TARGET_SELECTOR } from './textInputContextMenu.js';
 const EDITABLE_SELECTOR = 'select, ' + TEXT_CONTEXT_MENU_TARGET_SELECTOR,
   FOLDER_ACTION_SELECTOR = [
-    '[data-ui-action=\x22material-folder-toggle\x22]',
-    '[data-ui-action=\x22material-folder-rename\x22]',
-    '[data-ui-action=\x22material-folder-delete-request\x22]',
-  ]['join'](',\x20'),
+    '[data-ui-action="material-folder-toggle"]',
+    '[data-ui-action="material-folder-rename"]',
+    '[data-ui-action="material-folder-delete-request"]',
+  ]['join'](', '),
   MATERIAL_CONTEXT_MENU_ICONS = Object['freeze']({
     'material-folder-toggle': 'folder-open',
     'material-folder-rename': 'edit',
@@ -74,7 +74,7 @@ export function createMaterialLibraryContextMenuController({
           handler(event, list2)
         );
       }
-      const el4 = event['target']?.['closest']?.('.v2-material-asset-row,\x20.v2-material-project-row');
+      const el4 = event['target']?.['closest']?.('.v2-material-asset-row, .v2-material-project-row');
       if (el4 && enabled?.['contains']?.(el4)) {
         const enabled3 = String(
           el4['dataset']['assetId'] ||

@@ -31,7 +31,7 @@ export const DEFAULT_AIGEN_TEXT_MODEL_ID = 'apimart/kimi-k2-instruct';
 const CARET_HTML =
     '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="node-menu-caret"><polyline points="6 9 12 15 18 9"></polyline></svg>',
   FALLBACK_ICON_HTML =
-    '<svg\x20width=\x2212\x22\x20height=\x2212\x22\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x222\x22><polygon\x20points=\x2213\x202\x203\x2014\x2012\x2014\x2011\x2022\x2021\x2010\x2012\x2010\x2013\x202\x22/></svg>';
+    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
 function resolveModelLabel(value, item) {
   return item?.(value) || findTextModelMenuItem(value)?.['title'] || value || '选择模型';
 }
@@ -51,12 +51,12 @@ export function buildAIGenTextModelMenuMarkup({
       ? ''
       : '<div class="custom-group-header floating-menu-item node-menu-group-header" data-custom-toggle data-node-menu-submenu=".custom-submenu" data-credential-provider="openai">\n          <div class="text-model-icon text-model-icon-badge">OA</div>\n          <div class="fmi-content">\n            <div class="fmi-title" data-aigen-text-locale="customModelTitle">' +
         t('aigenText.customModelTitle') +
-        '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22fmi-sub\x22\x20data-aigen-text-locale=\x22customModelSubtitle\x22>' +
+        '</div>\n            <div class="fmi-sub" data-aigen-text-locale="customModelSubtitle">' +
         t('aigenText.customModelSubtitle') +
         '</div>\n          </div>\n          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="node-menu-caret"><polyline points="9 18 15 12 9 6"></polyline></svg>\n        </div>\n        <div class="custom-submenu node-model-submenu node-menu-submenu"></div>';
   return (
     data +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n        ' +
     buildTextProviderMenuGroupsHTML(activeModel, { allowedModelIds: allowedModelIds })
   );
 }
@@ -76,35 +76,35 @@ export function renderAIGenTextModelSelectorMarkup({
     }),
     options = includeRunningHubInternational
       ? '<button type="button" class="model-provider-profile-selector-toggle' +
-        (getModelProviderProfileIds(model)['length'] > 0x1 ? '' : ' is-hidden') +
-        '\x22\x20data-provider-profile-id=\x22' +
+        (getModelProviderProfileIds(model)['length'] > 1 ? '' : ' is-hidden') +
+        '" data-provider-profile-id="' +
         escapeNodeMenuHtml(getModelProviderProfileStyleId(modelProviderProfileId)) +
         '" data-provider-profile-value="' +
         escapeNodeMenuHtml(modelProviderProfileId) +
-        '\x22>' +
+        '">' +
         escapeNodeMenuHtml(getModelProviderProfileShortLabel(modelProviderProfileId)) +
         '</button>'
       : '',
-    target = ['img-model-pills', 'aigen-text-model-selector', className]['filter'](Boolean)['join']('\x20');
+    target = ['img-model-pills', 'aigen-text-model-selector', className]['filter'](Boolean)['join'](' ');
   return (
-    '<div\x20class=\x22' +
+    '<div class="' +
     escapeNodeMenuHtml(target) +
     '" data-aigen-text-model-selector>\n    <div class="img-model-wrap">\n      <button type="button" class="img-pill-btn img-model-btn-trigger">\n        ' +
     resolveTriggerIcon(model, provider) +
     '\n        <span class="img-model-label">' +
     escapeNodeMenuHtml(resolveModelLabel(model, getDisplayModelName)) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</span>\n        ' +
     CARET_HTML +
     '\n      </button>\n      <div class="floating-menu img-model-menu node-model-menu">\n        ' +
     buildAIGenTextModelMenuMarkup({ activeModel: model, allowedModelIds: allowedModelIds2 }) +
     '\n      </div>\n    </div>\n    ' +
     options +
-    '\x0a\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-mode-slot\x22\x20data-aigen-text-ui-schema-mode-slot\x20hidden></div>\x0a\x20\x20</div>'
+    '\n    <div class="ui-schema-placement ui-schema-mode-slot" data-aigen-text-ui-schema-mode-slot hidden></div>\n  </div>'
   );
 }
 function createCustomModelItem(el, source, next) {
   const item2 = el['createElement']('div');
-  ((item2['className'] = 'floating-menu-item\x20custom-model-item' + (next === source ? ' active' : '')),
+  ((item2['className'] = 'floating-menu-item custom-model-item' + (next === source ? ' active' : '')),
     (item2['dataset']['value'] = source),
     (item2['dataset']['provider'] = 'custom'));
   const el2 = el['createElement']('div');
@@ -174,7 +174,7 @@ export function bindAIGenTextModelSelector(
     handler = () => {
       if (!el7) return;
       const list2 = getModelProviderProfileIds(model2),
-        enabled = list2['length'] > 0x1;
+        enabled = list2['length'] > 1;
       el7['classList']['toggle']('is-hidden', !enabled);
       if (!enabled) return;
       const args = {
@@ -349,7 +349,7 @@ export function bindAIGenTextModelSelector(
       }),
     ));
   const onLocaleChange2 = onLocaleChange(() => {
-    (root['querySelector']('[data-aigen-text-locale=\x22customModelTitle\x22]')?.['replaceChildren'](
+    (root['querySelector']('[data-aigen-text-locale="customModelTitle"]')?.['replaceChildren'](
       documentObject['createTextNode'](t('aigenText.customModelTitle')),
     ),
       root['querySelector']('[data-aigen-text-locale="customModelSubtitle"]')?.['replaceChildren'](

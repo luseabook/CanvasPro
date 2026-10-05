@@ -64,7 +64,7 @@ test('runningHubAudioValidation: enforces prompt limits and weighted Chinese cou
           promptMaxLength: 4,
           rules: { weightedChinesePrompt: true },
         },
-        '\u4f60\u597da',
+        '你好a',
         {},
         [],
         [],

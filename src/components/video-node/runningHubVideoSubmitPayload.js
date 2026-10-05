@@ -23,7 +23,7 @@ function runningHubVideoSubmitText(value, item = {}) {
 }
 const RH_STANDARD_FPS_OPTIONS = Object.freeze([16, 24]),
   RH_V54_FPS_OPTIONS = Object.freeze([16, 24, 30]),
-  RH_MIN_VIDEO_RESOLUTION = 0x340,
+  RH_MIN_VIDEO_RESOLUTION = 832,
   RH_VIDEO_V54_PAYLOAD_RESOLVER = 'runninghubVideoV54';
 function normalizeRhStandardFps(key) {
   const index = Number(key);
@@ -517,11 +517,11 @@ export async function buildRunningHubVideoWorkflowSubmitPatch(nodeData8 = {}) {
   return { payloadPatch: payloadPatch6, updateData: updateData5?.updateData || {} };
 }
 
-const RH_LTX23_RESOLUTION_OPTIONS = Object['freeze']([0x400, 0x500, 0x5a0, 0x640, 0x780]);
+const RH_LTX23_RESOLUTION_OPTIONS = Object['freeze']([1024, 1280, 1440, 1600, 1920]);
 
 function normalizeRhLtx23Resolution(value55) {
   const value56 = Number(value55);
-  return RH_LTX23_RESOLUTION_OPTIONS['includes'](value56) ? value56 : 0x500;
+  return RH_LTX23_RESOLUTION_OPTIONS['includes'](value56) ? value56 : 1280;
 }
 
 export function buildRunningHubVideoFixedSlotPayloadPatch({

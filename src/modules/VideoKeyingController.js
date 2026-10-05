@@ -62,8 +62,8 @@ import {
   videoKeyingText,
 } from './videoKeyingTextHelpers.js';
 import { videoKeyingLifecycleMethods } from './videoKeyingLifecycleMethods.js';
-const REMOVE_POS_POINT_LIMIT = 0xbb8,
-  REMOVE_MASK_MAX_SIDE = 0x200,
+const REMOVE_POS_POINT_LIMIT = 3000,
+  REMOVE_MASK_MAX_SIDE = 512,
   VIDEO_KEYING_TASK_CHANGE_EVENT = 'aicanvas:video-keying-task-change',
   VideoKeyingController = {
     active: false,
@@ -453,7 +453,7 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
         handler = (value26, value27) => {
           const x3 = count2 > 1 ? value26 / (count2 - 1) : 0,
             y3 = count3 > 1 ? value27 / (count3 - 1) : 0,
-            value28 = Math.round(x3 * 0xfa0) + ':' + Math.round(y3 * 0xfa0);
+            value28 = Math.round(x3 * 4000) + ':' + Math.round(y3 * 4000);
           if (map.has(value28)) return;
           (map.add(value28), list8.push({ x: x3, y: y3 }));
         },
@@ -561,11 +561,11 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
       const videoEl = this.videoEl || this._getVideoEl(),
         sourceW = Math.max(
           1,
-          Number(videoEl?.videoWidth) || Number(videoEl?.offsetWidth) || Number(value52) || 0x400,
+          Number(videoEl?.videoWidth) || Number(videoEl?.offsetWidth) || Number(value52) || 1024,
         ),
         sourceH = Math.max(
           1,
-          Number(videoEl?.videoHeight) || Number(videoEl?.offsetHeight) || Number(value52) || 0x400,
+          Number(videoEl?.videoHeight) || Number(videoEl?.offsetHeight) || Number(value52) || 1024,
         ),
         { w: w3, h: h3 } = this._calcKeyingFrameSize(sourceW, sourceH, value52);
       return {
@@ -1362,10 +1362,10 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
           el32.appendChild(el34));
         const el35 = document.createElement('div');
         ((el35.className = 'img-rp-quality-segmented'),
-          [0x340, 0x400, 0x500, 0x5a0, 0x640, 0x6e0, 0x780].forEach((item17) => {
+          [832, 1024, 1280, 1440, 1600, 1760, 1920].forEach((item17) => {
             const el36 = document.createElement('button');
             el36.type = 'button';
-            const value131 = Number(item17) > 0x5a0;
+            const value131 = Number(item17) > 1440;
             ((el36.className = (
               'img-rp-quality-item ' +
               (value131 ? 'dev-mode-only' : '') +
@@ -1724,8 +1724,8 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
             }
             const box10 = value152,
               { width: width2, height: height2 } = getAutoMediaSizeByShortSide(
-                box10.width || 0x200,
-                box10.height || 0x120,
+                box10.width || 512,
+                box10.height || 288,
               ),
               x6 = calcSafeSpawnPosNearNode(appStore.getState().nodes, box10, width2, height2),
               id = generateId('source-video-erase'),
@@ -1841,8 +1841,8 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
           }
           const name = value152,
             { width: width3, height: height3 } = getAutoMediaSizeByShortSide(
-              name.width || 0x200,
-              name.height || 0x120,
+              name.width || 512,
+              name.height || 288,
             ),
             x7 = calcSafeSpawnPosNearNode(appStore.getState().nodes, name, width3, height3),
             id3 = generateId('source-video-matting'),
@@ -2056,9 +2056,9 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
             el77.addEventListener('click', (event22) => {
               (event22.preventDefault(), event22.stopPropagation());
               const value174 = Math.trunc(Number(el77.dataset.value)),
-                rhVideoResolution = [0x340, 0x400, 0x500, 0x5a0, 0x640, 0x6e0, 0x780].includes(value174)
+                rhVideoResolution = [832, 1024, 1280, 1440, 1600, 1760, 1920].includes(value174)
                   ? value174
-                  : 0x400;
+                  : 1024;
               try {
                 appStore.updateNodeData(this.nodeId, { rhVideoResolution: rhVideoResolution });
               } catch {}
@@ -2159,7 +2159,7 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
               outputText5 = formatFinalApiDebugRequest(generateVideoRequest),
               value183 = appStore.getState(),
               box12 = value183.nodes?.[this.nodeId] || {},
-              x8 = (box12.x || 0) + (box12.width || 0x17c) + 50,
+              x8 = (box12.x || 0) + (box12.width || 380) + 50,
               y6 = box12.y || 0;
             let enabled34 = Object.values(value183.nodes || {}).find(
               (item22) => item22 && item22.type === 'debug',
@@ -2170,8 +2170,8 @@ const REMOVE_POS_POINT_LIMIT = 0xbb8,
                   type: 'debug',
                   x: x8,
                   y: y6,
-                  width: 0x1a4,
-                  height: 0x168,
+                  width: 420,
+                  height: 360,
                   name: videoKeyingText('debug.nodeName'),
                   outputText: outputText5,
                 })

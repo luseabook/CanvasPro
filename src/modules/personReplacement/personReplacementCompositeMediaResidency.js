@@ -18,7 +18,7 @@ function adoptCompositeMediaElement(el, item, { role: role, sourceUrl: sourceUrl
   if (!enabled && typeof item['replaceWith'] !== 'function')
     throw new Error('composite media placeholder cannot be replaced');
   try {
-    (el['pause']?.(), (el['currentTime'] = 0x0));
+    (el['pause']?.(), (el['currentTime'] = 0));
   } catch {}
   ((el['className'] = item['className'] || ''),
     (el['dataset']['personReplacementCompareVideo'] = role),
@@ -123,7 +123,7 @@ export function createPersonReplacementCompositeMediaResidency({
     },
     nextSequence(payload) {
       const text5 = normalizeText(payload),
-        handle = (map2['get'](text5) || 0x0) + 0x1;
+        handle = (map2['get'](text5) || 0) + 1;
       return (map2['set'](text5, handle), handle);
     },
     adopt({

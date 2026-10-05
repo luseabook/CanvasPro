@@ -7,14 +7,14 @@ function readImageSource(value) {
   return String(value?.['getAttribute']?.('src') || value?.['currentSrc'] || value?.['src'] || '')['trim']();
 }
 function isImagePaintReady(item) {
-  return !!(item?.['complete'] === !![] && Number(item?.['naturalWidth'] || 0x0) > 0x0);
+  return !!(item?.['complete'] === !![] && Number(item?.['naturalWidth'] || 0) > 0);
 }
 function hasPaintedImageSource(el, key) {
   return !!(
     key &&
     el?.['style']?.['display'] !== 'none' &&
     el?.['complete'] !== ![] &&
-    (el?.['naturalWidth'] === undefined || Number(el['naturalWidth'] || 0x0) > 0x0)
+    (el?.['naturalWidth'] === undefined || Number(el['naturalWidth'] || 0) > 0)
   );
 }
 function readFallbackLayout(el2) {

@@ -80,7 +80,7 @@ export function parseError(options, target, source) {
   if (parser?.['parseError']) {
     const next = parser['parseError'](target, source);
     if (next) return preserveRawErrorContext(next, target, source);
-    if (Number(source) < 0x190) return null;
+    if (Number(source) < 400) return null;
   }
   return preserveRawErrorContext(parseGenericError(options, target, source), target, source);
 }
@@ -115,7 +115,7 @@ export function parseNetworkError(provider, raw, record) {
         provider: provider,
         message:
           '本地服务响应超时（' +
-          (record ? Math['round'](record / 0x3e8) + '秒' : '未知') +
+          (record ? Math['round'](record / 1000) + '秒' : '未知') +
           '），请稍后重试；若持续超时，请重启应用后再试',
         raw: raw,
         retryable: !![],
@@ -153,7 +153,7 @@ export function parseNetworkError(provider, raw, record) {
   return ApiError['networkError'](provider, raw);
 }
 export function applyManifestErrorRules(code, list2, payload = {}) {
-  if (!code || !Array['isArray'](list2) || list2['length'] === 0x0) return code;
+  if (!code || !Array['isArray'](list2) || list2['length'] === 0) return code;
   const handle = String(payload['phase'] || 'any')
       ['trim']()
       ['toLowerCase'](),
@@ -177,7 +177,7 @@ export function applyManifestErrorRules(code, list2, payload = {}) {
     const list4 = Array['isArray'](retryable['httpStatuses'])
       ? retryable['httpStatuses']['map'](Number)['filter'](Number['isInteger'])
       : [];
-    if (list4['length'] > 0x0 && (status === null || !list4['includes'](status))) continue;
+    if (list4['length'] > 0 && (status === null || !list4['includes'](status))) continue;
     const list5 = Array['isArray'](retryable['messageIncludesAny'])
       ? retryable['messageIncludesAny']
           ['map']((scope) =>
@@ -187,9 +187,9 @@ export function applyManifestErrorRules(code, list2, payload = {}) {
           )
           ['filter'](Boolean)
       : [];
-    if (list5['length'] > 0x0 && !list5['some']((input) => list3['includes'](input)))
+    if (list5['length'] > 0 && !list5['some']((input) => list3['includes'](input)))
       continue;
-    if (list4['length'] === 0x0 && list5['length'] === 0x0) continue;
+    if (list4['length'] === 0 && list5['length'] === 0) continue;
     const output = String(retryable['userMessage'] || '')['trim'](),
       value2 = String(retryable['hint'] || '')['trim'](),
       list6 = output || errorText2 || code['message'] || '请求失败',
@@ -211,7 +211,7 @@ export function applyManifestErrorRules(code, list2, payload = {}) {
 }
 function parseGenericError(provider3, error3, status2) {
   let message2 = '',
-    code2 = status2 >= 0x190 ? status2 : undefined;
+    code2 = status2 >= 400 ? status2 : undefined;
   if (typeof error3 === 'string') message2 = error3;
   else
     error3 &&
@@ -238,17 +238,17 @@ function parseGenericError(provider3, error3, status2) {
   if (list7['includes']('BALANCE') || list7['includes']('余额') || list7['includes']('QUOTA'))
     return ApiError['insufficientBalance'](provider3, code2);
   if (
-    status2 === 0x1ad ||
+    status2 === 429 ||
     /\b(?:RATE[\s_-]*(?:LIMIT\w*|EXCEEDED)|TOO[\s_-]+MANY[\s_-]+REQUESTS|THROTTL(?:E|ED|ING))\b|请求过于频繁|限流/i[
       'test'
     ](message2)
   )
     return ApiError['rateLimit'](provider3, code2);
-  if (list7['includes']('AUTH') || list7['includes']('KEY') || status2 === 0x191)
+  if (list7['includes']('AUTH') || list7['includes']('KEY') || status2 === 401)
     return ApiError['authError'](provider3, code2, message2);
   if (list7['includes']('CONTENT') || list7['includes']('FILTER') || list7['includes']('SAFETY'))
     return ApiError['contentFiltered'](provider3, message2);
-  if (status2 >= 0x190) return ApiError['fromHttpStatus'](status2, provider3, message2);
+  if (status2 >= 400) return ApiError['fromHttpStatus'](status2, provider3, message2);
   return new ApiError({
     type: ErrorType['UNKNOWN'],
     provider: provider3,

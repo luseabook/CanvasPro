@@ -15,7 +15,7 @@ export function selectTextMediaExecution(manifest, payload, ctx) {
     throw new Error('视频理解暂不能同时使用联网或搜图，请关闭联网和搜图后重试');
   const manifestMaxTokens = Number(manifest['extensions']['maxOutputTokens']);
   if (Number(payload['maxOutputTokens']) > manifestMaxTokens)
-    throw new Error('输出上限不能超过 ' + manifestMaxTokens + '\x20tokens');
+    throw new Error('输出上限不能超过 ' + manifestMaxTokens + ' tokens');
   return {
     ...manifest,
     endpoint: videoChatCompletion['endpoint'],
@@ -47,7 +47,7 @@ export async function buildTextResponsesBody({
       ? ctx['buildChatCompletionUserContent']
       : ctx['buildVolcengineResponsesUserContent'];
   if (typeof buildUserContent !== 'function')
-    throw new Error('responses\x20text\x20manifest\x20requires\x20user\x20content\x20resolver');
+    throw new Error('responses text manifest requires user content resolver');
   const inputUrls =
       typeof ctx['resolveChatCompletionInputUrls'] === 'function'
         ? ctx['resolveChatCompletionInputUrls']({
@@ -82,7 +82,7 @@ export async function buildTextResponsesBody({
       : userContent,
     manifestMaxTokens = Number(extensions['maxOutputTokens']);
   if (maxOutputTokens && Number['isFinite'](manifestMaxTokens) && maxOutputTokens > manifestMaxTokens)
-    throw new Error('输出上限不能超过\x20' + manifestMaxTokens + ' tokens');
+    throw new Error('输出上限不能超过 ' + manifestMaxTokens + ' tokens');
   const tools =
       payload['webSearch'] === !![]
         ? (extensions['webSearchTools'] || [{ type: 'web_search' }])['map']((tool) => ({ ...tool }))
@@ -97,7 +97,7 @@ export async function buildTextResponsesBody({
   }
   const instructions = [payload['systemPrompt'], imageSearchTool && extensions['imageSearchInstructions']]
     ['filter'](Boolean)
-    ['join']('\x0a\x0a');
+    ['join']('\n\n');
   return {
     apiKey: apiKey,
     model: modelToken,

@@ -15,7 +15,7 @@ export async function materializePersonReplacementGuide({
   const name = entry['data'],
     args = name['personReplacementBinding'],
     args2 = args['annotatedSource'] || args['locationGuide'],
-    locationGuideSignature = JSON['stringify']({ version: 0x1, ...args2 }),
+    locationGuideSignature = JSON['stringify']({ version: 1, ...args2 }),
     value = previousNodes[entry['key']];
   let imageRef = '',
     args3 = {};
@@ -31,8 +31,8 @@ export async function materializePersonReplacementGuide({
     )(args2);
     if (!await2?.['dataUrl']?.['startsWith']('data:image/png;base64,'))
       throw new Error('人物定位图 PNG 导出失败');
-    const key = Uint8Array['from'](atob(await2['dataUrl']['split'](',')[0x1]), (index) =>
-        index['charCodeAt'](0x0),
+    const key = Uint8Array['from'](atob(await2['dataUrl']['split'](',')[1]), (index) =>
+        index['charCodeAt'](0),
       ),
       response = await saveOutputBlob(new Blob([key], { type: 'image/png' }), {
         ext: 'png',

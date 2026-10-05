@@ -22,7 +22,7 @@ export function createAudioModelApiManifest({
   const item = {};
   extensions && Object['assign'](item, extensions);
   modelType && (item['modelType'] = String(modelType));
-  const key = Object['keys'](item)['length'] > 0x0;
+  const key = Object['keys'](item)['length'] > 0;
   return Object['freeze']({
     schemaVersion: '1.0',
     modelId: modelId,
@@ -49,11 +49,11 @@ export function createAudioModelApiManifest({
     inputSlots: inputSlots
       ? Object['freeze']({
           allowedKinds: Object['freeze']([...(inputSlots['allowedKinds'] || [])]),
-          minByKind: Object['freeze']({ ...(inputSlots['minByKind'] || { text: 0x1 }) }),
+          minByKind: Object['freeze']({ ...(inputSlots['minByKind'] || { text: 1 }) }),
           maxByKind: Object['freeze']({
-            image: 0x0,
-            video: 0x0,
-            audio: 0x1,
+            image: 0,
+            video: 0,
+            audio: 1,
             ...(inputSlots['maxByKind'] || {}),
           }),
           ...(inputSlots['fixedSlots']
@@ -66,8 +66,8 @@ export function createAudioModelApiManifest({
         })
       : Object['freeze']({
           allowedKinds: Object['freeze'](['text']),
-          minByKind: Object['freeze']({ text: 0x1 }),
-          maxByKind: Object['freeze']({ image: 0x0, video: 0x0, audio: 0x0 }),
+          minByKind: Object['freeze']({ text: 1 }),
+          maxByKind: Object['freeze']({ image: 0, video: 0, audio: 0 }),
         }),
     uiSchema: Object['freeze']({ fields: Object['freeze'](fields || []) }),
     async: async,
@@ -101,7 +101,7 @@ export function createAudioModelApiExecutionManifest({
     responseMapping: Object['freeze']({
       taskIdPath: '',
       statusPath: 'code',
-      statusSuccessValue: 0x0,
+      statusSuccessValue: 0,
       errorPath: Object['freeze'](['message', 'msg', 'error']),
       base64AudioField: 'data',
       ...(responseMapping || {}),
@@ -151,7 +151,7 @@ export const VOLCENGINE_SPEAKER_ID_FIELD = Object['freeze']({
   customModeValue: 'custom',
   placeholder: '留空使用预设音色',
   description:
-    '填写后覆盖预设音色，默认音色将不可选。_uranus_bigtts\x20走\x20TTS\x202.0，_mars_bigtts\x20走\x20TTS\x201.0，其它火山自定义/音色设计音色\x20ID\x20走\x20ICL\x202.0。',
+    '填写后覆盖预设音色，默认音色将不可选。_uranus_bigtts 走 TTS 2.0，_mars_bigtts 走 TTS 1.0，其它火山自定义/音色设计音色 ID 走 ICL 2.0。',
   helpUrl: 'https://console.volcengine.com/speech/new/voices',
   showInfoTip: !![],
 });
@@ -160,10 +160,10 @@ export const VOLCENGINE_SPEED_FIELD = Object['freeze']({
   type: 'slider',
   placement: 'advanced',
   label: '语速',
-  defaultValue: 0x0,
-  min: -0x32,
-  max: 0x64,
-  step: 0xa,
+  defaultValue: 0,
+  min: -50,
+  max: 100,
+  step: 10,
   displayValueTemplate: '{value}',
 });
 export const VOLCENGINE_VOLUME_FIELD = Object['freeze']({
@@ -171,10 +171,10 @@ export const VOLCENGINE_VOLUME_FIELD = Object['freeze']({
   type: 'slider',
   placement: 'advanced',
   label: '音量',
-  defaultValue: 0x0,
-  min: -0x32,
-  max: 0x64,
-  step: 0xa,
+  defaultValue: 0,
+  min: -50,
+  max: 100,
+  step: 10,
   displayValueTemplate: '{value}',
 });
 export const VOLCENGINE_PITCH_FIELD = Object['freeze']({
@@ -182,10 +182,10 @@ export const VOLCENGINE_PITCH_FIELD = Object['freeze']({
   type: 'slider',
   placement: 'advanced',
   label: '音调',
-  defaultValue: 0x0,
-  min: -0xc,
-  max: 0xc,
-  step: 0x1,
+  defaultValue: 0,
+  min: -12,
+  max: 12,
+  step: 1,
   displayValueTemplate: '{value}',
 });
 export const VOLCENGINE_FORMAT_FIELD = Object['freeze']({
@@ -206,11 +206,11 @@ export const VOLCENGINE_SAMPLE_RATE_FIELD = Object['freeze']({
   type: 'segmented',
   placement: 'advanced',
   label: '采样率',
-  defaultValue: 0x5dc0,
+  defaultValue: 24000,
   options: Object['freeze']([
-    Object['freeze']({ value: 0x1f40, label: '8k', selectedLabel: '8k' }),
-    Object['freeze']({ value: 0x3e80, label: '16k', selectedLabel: '16k' }),
-    Object['freeze']({ value: 0x5dc0, label: '24k', selectedLabel: '24k' }),
-    Object['freeze']({ value: 0xac44, label: '44k', selectedLabel: '44k' }),
+    Object['freeze']({ value: 8000, label: '8k', selectedLabel: '8k' }),
+    Object['freeze']({ value: 16000, label: '16k', selectedLabel: '16k' }),
+    Object['freeze']({ value: 24000, label: '24k', selectedLabel: '24k' }),
+    Object['freeze']({ value: 44100, label: '44k', selectedLabel: '44k' }),
   ]),
 });

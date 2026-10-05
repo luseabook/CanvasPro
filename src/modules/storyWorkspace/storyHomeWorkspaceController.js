@@ -117,9 +117,9 @@ export function createStoryHomeWorkspaceController({
       ),
       key = 'story-' + Date['now']() + '-copy';
     let index = key,
-      result = 0x2;
+      result = 2;
     while (map['has'](index)) {
-      ((index = key + '-' + result), (result += 0x1));
+      ((index = key + '-' + result), (result += 1));
     }
     return index;
   }
@@ -159,7 +159,7 @@ export function createStoryHomeWorkspaceController({
       enabled = projectData['getEntry'](text3);
     if (!enabled) return (showToast('项目状态更新失败，请刷新后重试。', 'error'), ![]);
     return (
-      (enabled['archivedAt'] = next ? Date['now']() : 0x0),
+      (enabled['archivedAt'] = next ? Date['now']() : 0),
       (enabled['updatedAt'] = Date['now']()),
       (state['openProjectMenuId'] = ''),
       (state['pendingDeleteProjectId'] = ''),
@@ -225,7 +225,7 @@ export function createStoryHomeWorkspaceController({
     if (el10) el10['hidden'] = !['generate', 'collaborate']['includes'](state['homeTab']);
     const el11 = el3?.['querySelector']('[data-story-planning-picker="promptMode"]');
     if (el11) el11['hidden'] = ![];
-    const el12 = el3?.['querySelector']('[data-story-planning-picker=\x22targetLocale\x22]');
+    const el12 = el3?.['querySelector']('[data-story-planning-picker="targetLocale"]');
     if (el12) el12['hidden'] = state['homeTab'] !== 'replication';
     const el13 = el3?.['querySelector']('.story-home-composer');
     (el13?.['classList']['toggle']('is-generating', state['isGeneratingStory']),
@@ -237,7 +237,7 @@ export function createStoryHomeWorkspaceController({
     const el16 = el3?.['querySelector']('[data-story-idea-count]');
     el16 && (el16['textContent'] = state['idea']['length'] + ' / ' + STORY_IDEA_MAX_CHARACTERS);
     const el17 = el3?.['querySelector']('[data-story-paste-count]');
-    el17 && (el17['textContent'] = state['scriptText']['length'] + '\x20/\x20' + STORY_SCRIPT_MAX_CHARACTERS);
+    el17 && (el17['textContent'] = state['scriptText']['length'] + ' / ' + STORY_SCRIPT_MAX_CHARACTERS);
   }
   function switchTab(payload) {
     if (payload === 'collaborate' && state['developerModeAvailable'] !== !![]) return ![];
@@ -260,7 +260,7 @@ export function createStoryHomeWorkspaceController({
       const handle = el22['dataset']['storyHomeTab'] === storyVideoReplicationHomeTab;
       (el22['classList']['toggle']('is-active', handle),
         el22['setAttribute']('aria-selected', String(handle)),
-        (el22['tabIndex'] = handle ? 0x0 : -0x1));
+        (el22['tabIndex'] = handle ? 0 : -1));
     });
     if (storyVideoReplicationHomeTab === 'replication') {
       const storyVideoInputTextModelId = resolveStoryVideoInputTextModelId(state['models']['text']);
@@ -315,7 +315,7 @@ export function createStoryHomeWorkspaceController({
       // The parser used to slice the document to the limit without saying anything, so an
       // oversized novel silently lost everything past the cut. Report the loss explicitly.
       const list2 = String(response?.['text'] || ''),
-        text5 = list2['slice'](0x0, STORY_SCRIPT_MAX_CHARACTERS),
+        text5 = list2['slice'](0, STORY_SCRIPT_MAX_CHARACTERS),
         count = list2['length'] - text5['length'];
       if (!normalizeText(text5)) throw new Error('文档解析结果没有可用文本。');
       return (
@@ -332,7 +332,7 @@ export function createStoryHomeWorkspaceController({
             characterCount: state['scriptCharacterCount'],
           }),
         schedulePersistence({ immediate: !![] }),
-        count > 0x0 &&
+        count > 0 &&
           showTaskResultToast(
             '文档共 ' +
               list2['length'] +
@@ -352,10 +352,10 @@ export function createStoryHomeWorkspaceController({
               (schedulePersistence({ immediate: !![] }),
                 render(),
                 showTaskResultToast(
-                  count2 > 0x1
+                  count2 > 1
                     ? '已解析 ' + count2 + ' 章，请勾选本次要改编的章节。'
                     : '未能识别章节标题，全文作为一章，请确认是否继续。',
-                  count2 > 0x1 ? 'success' : 'warn',
+                  count2 > 1 ? 'success' : 'warn',
                 ));
             })()
           : showTaskResultToast('剧本文档解析完成。', 'success'),

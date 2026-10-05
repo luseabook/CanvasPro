@@ -4,8 +4,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeText(item) {
   return String(item ?? '')['trim']();
@@ -26,7 +26,7 @@ function defaultRenderImageOrEmpty({
         escapeHtml(className) +
         '" src="' +
         escapeHtml(imageUrl) +
-        '\x22\x20alt=\x22' +
+        '" alt="' +
         escapeHtml(alt) +
         '" loading="lazy" decoding="async" draggable="false">'
     : '<div class="' +
@@ -63,8 +63,8 @@ export function createStoryClipProductionPresentation({
       : [];
     if (!list2['length']) return [];
     const target = Math['max'](
-      0x0,
-      Math['min'](list2['length'] - 0x1, Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0x0)),
+      0,
+      Math['min'](list2['length'] - 1, Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0)),
     );
     return [list2[target], ...list2['filter']((next, current) => current !== target)]['filter'](
       (entry) => !normalizeText(entry['error']),
@@ -84,7 +84,7 @@ export function createStoryClipProductionPresentation({
   }
   function run3(options4 = {}) {
     const response = options4['media'] || { kind: 'empty', url: '', source: 'empty' },
-      alt2 = normalizeText(options4['title']) || '第\x20' + (options4['number'] || '') + '\x20集';
+      alt2 = normalizeText(options4['title']) || '第 ' + (options4['number'] || '') + ' 集';
     if (response['kind'] === 'image')
       return (
         '<img class="story-episode-cover" src="' +
@@ -101,13 +101,13 @@ export function createStoryClipProductionPresentation({
     const {
         id: id = '',
         number: number = '',
-        sequenceLabel: sequenceLabel = '第\x20' + number + '\x20集',
+        sequenceLabel: sequenceLabel = '第 ' + number + ' 集',
         title: title = '',
         status: status = '',
-        characterCount: characterCount = 0x0,
-        sceneCount: sceneCount = 0x0,
-        propCount: propCount = 0x0,
-        clipCount: clipCount = 0x0,
+        characterCount: characterCount = 0,
+        sceneCount: sceneCount = 0,
+        propCount: propCount = 0,
+        clipCount: clipCount = 0,
         isChecked: isChecked = ![],
         isSelectionMode: isSelectionMode = ![],
         isSplitting: isSplitting = ![],
@@ -131,26 +131,26 @@ export function createStoryClipProductionPresentation({
         : actionKind === 'generate'
           ? '<span class="story-episode-primary-actions"><button type="button" class="story-episode-enter story-episode-enter--' +
             escapeHtml(actionKind) +
-            '\x22\x20data-story-action=\x22split-episode\x22\x20data-story-episode-id=\x22' +
+            '" data-story-action="split-episode" data-story-episode-id="' +
             escapeHtml(id) +
             '" aria-label="' +
             escapeHtml(state) +
-            '\x22\x20' +
+            '" ' +
             (disabled ? 'disabled' : '') +
             ' aria-busy="' +
             isSplitting +
-            '\x22>' +
+            '">' +
             (isSplitting
               ? renderStoryGenerationSpinner({ button: !![] })
               : renderEpisodeCardActionIcon(actionKind)) +
-            '<span\x20class=\x22story-episode-enter-label\x22>' +
+            '<span class="story-episode-enter-label">' +
             escapeHtml(isSplitting ? '生成中' : actionLabel) +
             '</span></button></span>'
           : '<span class="story-episode-enter story-episode-enter--' +
             escapeHtml(actionKind) +
             '" aria-hidden="true">' +
             renderEpisodeCardActionIcon(actionKind) +
-            '<span\x20class=\x22story-episode-enter-label\x22>' +
+            '<span class="story-episode-enter-label">' +
             escapeHtml(actionLabel) +
             '</span></span>',
       enabled = actionKind === 'edit',
@@ -161,15 +161,15 @@ export function createStoryClipProductionPresentation({
             escapeHtml(id) +
             '" aria-label="重新生成' +
             escapeHtml(sequenceLabel) +
-            '\x22\x20' +
+            '" ' +
             (disabled ? 'disabled' : '') +
             ' aria-busy="' +
             isSplitting +
-            '\x22>' +
+            '">' +
             (isSplitting
               ? renderStoryGenerationSpinner({ button: !![] })
               : renderEpisodeCardActionIcon('regenerate')) +
-            '<span\x20class=\x22story-episode-enter-label\x22>' +
+            '<span class="story-episode-enter-label">' +
             (isSplitting ? '重新生成中' : '重新生成') +
             '</span></button>',
       input = !isSelectionMode && Boolean(experimentalActionMarkup || requestDebugMarkup),
@@ -195,7 +195,7 @@ export function createStoryClipProductionPresentation({
         sceneCount +
         ' · 道具 ' +
         propCount +
-        '\x20·\x20片段\x20' +
+        ' · 片段 ' +
         (clipCount || '待拆分') +
         '</span>\n        ' +
         config +
@@ -206,11 +206,11 @@ export function createStoryClipProductionPresentation({
           escapeHtml(id) +
           '" data-story-open-episode="' +
           escapeHtml(id) +
-          '\x22\x20aria-label=\x22' +
+          '" aria-label="' +
           escapeHtml(state) +
           '" aria-pressed="' +
           (isSelectionMode ? String(isChecked) : 'false') +
-          '\x22\x20' +
+          '" ' +
           (disabled ? 'disabled aria-disabled="true"' : '') +
           '>' +
           value2 +
@@ -219,33 +219,33 @@ export function createStoryClipProductionPresentation({
           escapeHtml(id) +
           '" aria-label="' +
           escapeHtml(state) +
-          '\x22>' +
+          '">' +
           value2 +
           '\n    </div>';
     return (
       '<article class="story-episode-card has-inline-actions ' +
       (options5['posterLayout'] ? 'story-episode-card--poster' : '') +
-      '\x20' +
+      ' ' +
       (input ? 'has-developer-actions' : '') +
-      '\x20' +
+      ' ' +
       (isSelectionMode ? 'is-selection-mode' : '') +
-      '\x20' +
+      ' ' +
       (isChecked ? 'is-checked' : '') +
-      '\x20' +
+      ' ' +
       (isSplitting ? 'is-splitting' : '') +
       '" data-story-marquee-item data-story-marquee-id="' +
       escapeHtml(id) +
-      '\x22\x20aria-busy=\x22' +
+      '" aria-busy="' +
       isSplitting +
-      '\x22>\x0a\x20\x20\x20\x20' +
+      '">\n    ' +
       value4 +
-      '\x0a\x20\x20\x20\x20' +
+      '\n    ' +
       output +
       '\n    ' +
       (isSelectionMode ? '' : splitDraftMarkup) +
       '\n    ' +
       (isSplitting
-        ? '<div\x20class=\x22story-episode-loading\x20storyboard-script-loading-overlay\x22\x20role=\x22status\x22\x20aria-live=\x22polite\x22>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-script-loading-spinner\x22></div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22storyboard-script-loading-label\x22>正在拆分' +
+        ? '<div class="story-episode-loading storyboard-script-loading-overlay" role="status" aria-live="polite">\n      <div class="storyboard-script-loading-spinner"></div>\n      <div class="storyboard-script-loading-label">正在拆分' +
           escapeHtml(sequenceLabel) +
           '</div>\n      <div class="storyboard-script-loading-bar"><div class="storyboard-script-loading-bar-fill"></div></div>\n    </div>'
         : '') +
@@ -256,7 +256,7 @@ export function createStoryClipProductionPresentation({
     if (options6['kind'] === 'card') return run4(options6['card']);
     const list3 = Array['isArray'](options6['cards']) ? options6['cards'] : [],
       el = options6['batchControl'] || {},
-      value5 = Math['max'](0x0, Math['trunc'](Number(options6['selectedCount']) || 0x0)),
+      value5 = Math['max'](0, Math['trunc'](Number(options6['selectedCount']) || 0)),
       value6 = el['operation'] === 'splitting-selected',
       value7 = el['operation'] === 'splitting-all',
       value8 = value6 || value7,
@@ -277,11 +277,11 @@ export function createStoryClipProductionPresentation({
       escapeHtml(options6['eyebrow'] || '剧本拆分结果') +
       '</span>\n        <h2>' +
       escapeHtml(options6['title'] || '分集视频') +
-      '</h2>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-heading-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '</h2>\n      </div>\n      <div class="story-heading-actions">\n        ' +
       (options6['experimentalModeToggleMarkup'] || '') +
       '\n        <button type="button" class="story-secondary-button" data-story-action="toggle-all-episodes" aria-pressed="' +
       Boolean(options6['allEpisodesSelected']) +
-      '\x22\x20' +
+      '" ' +
       (el['disabled'] || !list3['length'] ? 'disabled' : '') +
       '>' +
       (options6['allEpisodesSelected'] ? '取消全选' : '全选') +
@@ -290,20 +290,20 @@ export function createStoryClipProductionPresentation({
         ? value9
         : '<button type="button" class="story-primary-button story-main-action-button" data-story-action="' +
           (options6['selectionMode'] ? 'split-selected-episodes' : 'split-all-episodes') +
-          '\x22\x20' +
+          '" ' +
           (el['disabled'] || !list3['length'] ? 'disabled' : '') +
           ' aria-busy="false">' +
           (options6['selectionMode'] ? '拆分选中 (' + value5 + ')' : '批量拆分') +
           '</button>') +
-      '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</header>\x0a\x20\x20\x20\x20' +
+      '\n      </div>\n    </header>\n    ' +
       (options6['description'] === ''
         ? ''
-        : '<p\x20class=\x22story-page-description\x22>' +
+        : '<p class="story-page-description">' +
           escapeHtml(options6['description'] ?? '每一集会形成一套片段脚本；确认后可创建为新的画布页面。') +
           '</p>') +
       '\n    <div class="story-episode-grid">\n      ' +
       list3['map'](run4)['join']('') +
-      '\x0a\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20' +
+      '\n    </div>\n    ' +
       (options6['footerMarkup'] || '') +
       '\n  </div>'
     );
@@ -330,7 +330,7 @@ export function createStoryClipProductionPresentation({
   function run6(count = []) {
     if (!count['length'])
       return {
-        count: 0x0,
+        count: 0,
         markup:
           '<div class="story-episode-asset-empty">\n        <strong>画布素材库暂无可引用素材</strong>\n        <span>在画布中把节点加入素材库后，可在这里直接拖入片段提示词。</span>\n      </div>',
       };
@@ -360,19 +360,19 @@ export function createStoryClipProductionPresentation({
               error2['assets']
                 ['map'](
                   (error3) =>
-                    '<button\x20type=\x22button\x22\x20draggable=\x22true\x22\x20data-story-reference-asset=\x22' +
+                    '<button type="button" draggable="true" data-story-reference-asset="' +
                     escapeHtml(error3['sourceAssetId']) +
                     '" data-story-reference-asset-index="' +
-                    Math['max'](0x0, Math['trunc'](Number(error3['sourceItemIndex']) || 0x0)) +
+                    Math['max'](0, Math['trunc'](Number(error3['sourceItemIndex']) || 0)) +
                     '" data-story-reference-source="library" data-story-reference-media-type="' +
                     escapeHtml(error3['mediaKind']) +
                     '" aria-label="引用总素材 ' +
                     escapeHtml(error3['name']) +
                     '，仅可拖入提示词">\n          ' +
                     run5(error3) +
-                    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
+                    '\n          <span>' +
                     escapeHtml(error3['name']) +
-                    '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>' +
+                    '</span>\n          <small>' +
                     escapeHtml(error3['role']) +
                     '</small>\n        </button>',
                 )
@@ -389,11 +389,11 @@ export function createStoryClipProductionPresentation({
         ? '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="m7 15 3.5-3.5 2.5 2.5 2-2 2 3"/><circle cx="15.5" cy="9" r="1.25"/>'
         : value12 === 'library'
           ? '<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'
-          : '<path\x20d=\x22M4\x206.5h6l1.7\x202H20v9.5a2\x202\x200\x200\x201-2\x202H6a2\x202\x200\x200\x201-2-2z\x22/><path\x20d=\x22M4\x209h16\x22/>';
+          : '<path d="M4 6.5h6l1.7 2H20v9.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 9h16"/>';
     return (
       '<span class="story-episode-asset-tab-icon" data-icon="' +
       value12 +
-      '\x22\x20aria-hidden=\x22true\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22>' +
+      '" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">' +
       value13 +
       '</svg></span>'
     );
@@ -411,11 +411,11 @@ export function createStoryClipProductionPresentation({
           (value17) =>
             '<section>\n      <h3>' +
             escapeHtml(options7['assetKindLabels']?.[value17] || value17) +
-            '</h3>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-episode-asset-grid\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+            '</h3>\n      <div class="story-episode-asset-grid">\n        ' +
             list4['filter']((value18) => value18['kind'] === value17)
               ['map'](
                 (imageUrl2) =>
-                  '<button\x20type=\x22button\x22\x20draggable=\x22true\x22\x20data-story-reference-asset=\x22' +
+                  '<button type="button" draggable="true" data-story-reference-asset="' +
                   escapeHtml(imageUrl2['id']) +
                   '" aria-label="引用素材 ' +
                   escapeHtml(imageUrl2['name']) +
@@ -443,16 +443,16 @@ export function createStoryClipProductionPresentation({
         const clipId = normalizeText(value20?.['id']);
         return {
           clipId: clipId,
-          label: normalizeText(value20?.['title']) || '片段 ' + (value21 + 0x1),
+          label: normalizeText(value20?.['title']) || '片段 ' + (value21 + 1),
           frames: frames['get'](clipId) || [],
         };
-      })['filter']((value22) => value22['frames']['length'] > 0x0),
+      })['filter']((value22) => value22['frames']['length'] > 0),
       map2 = new Set(list7['map']((value23) => value23['clipId']));
     frames['forEach']((frames2, clipId2) => {
       if (map2['has'](clipId2)) return;
       list7['push']({
         clipId: clipId2,
-        label: normalizeText(frames2[0x0]?.['clipTitle']) || '其他片段',
+        label: normalizeText(frames2[0]?.['clipTitle']) || '其他片段',
         frames: frames2,
       });
     });
@@ -469,13 +469,13 @@ export function createStoryClipProductionPresentation({
             value25['frames']
               ['map']((imageUrl3) => {
                 const value26 = imageUrl3['mediaType'] === 'video',
-                  value27 = '删除' + (value26 ? '视频片段' : '片段帧') + '\x20' + imageUrl3['name'],
+                  value27 = '删除' + (value26 ? '视频片段' : '片段帧') + ' ' + imageUrl3['name'],
                   value28 = value26
                     ? '<div class="story-episode-frame-video-wrap">\n                  <video class="story-episode-asset-image story-episode-frame-video" src="' +
                       escapeHtml(imageUrl3['mediaUrl']) +
-                      '\x22' +
+                      '"' +
                       (imageUrl3['imageUrl']
-                        ? ' poster="' + escapeHtml(imageUrl3['imageUrl']) + '\x22'
+                        ? ' poster="' + escapeHtml(imageUrl3['imageUrl']) + '"'
                         : '') +
                       ' muted playsinline preload="metadata" aria-label="' +
                       escapeHtml(imageUrl3['name']) +
@@ -494,9 +494,9 @@ export function createStoryClipProductionPresentation({
                   escapeHtml(imageUrl3['mediaType']) +
                   '" aria-label="引用' +
                   (value26 ? '裁剪视频' : '片段帧') +
-                  '\x20' +
+                  ' ' +
                   escapeHtml(imageUrl3['name']) +
-                  '，仅可拖入提示词\x22\x20aria-busy=\x22' +
+                  '，仅可拖入提示词" aria-busy="' +
                   (imageUrl3['captureSavePending'] === !![]) +
                   '">\n                ' +
                   value28 +
@@ -506,7 +506,7 @@ export function createStoryClipProductionPresentation({
                   escapeHtml(imageUrl3['id']) +
                   '" aria-label="' +
                   escapeHtml(value27) +
-                  '\x22\x20' +
+                  '" ' +
                   (imageUrl3['captureSavePending'] === !![] ? 'disabled' : '') +
                   '>' +
                   renderDeleteIcon() +
@@ -524,9 +524,9 @@ export function createStoryClipProductionPresentation({
       (value14 === 'assets' ? 'is-active' : '') +
       '" data-story-episode-asset-tab="assets" role="tab" aria-selected="' +
       (value14 === 'assets') +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '">\n          ' +
       run7('assets') +
-      '<span\x20class=\x22story-episode-asset-tab-label\x22>本集素材</span><span\x20class=\x22story-episode-asset-count\x22\x20data-story-episode-asset-count=\x22assets\x22>' +
+      '<span class="story-episode-asset-tab-label">本集素材</span><span class="story-episode-asset-count" data-story-episode-asset-count="assets">' +
       list4['length'] +
       '</span>\n        </button>\n        <button type="button" class="' +
       (value14 === 'frames' ? 'is-active' : '') +
@@ -548,9 +548,9 @@ export function createStoryClipProductionPresentation({
       escapeHtml(options7['helpText']) +
       '</small>\n    </header>\n    <div class="story-episode-asset-rail-viewport">\n      <div class="story-episode-asset-rail-track" data-story-episode-asset-rail-track>\n        <div class="story-episode-asset-rail-page ' +
       (value14 === 'assets' ? 'is-active' : '') +
-      '\x22\x20data-story-episode-asset-panel=\x22assets\x22\x20role=\x22tabpanel\x22\x20aria-hidden=\x22' +
+      '" data-story-episode-asset-panel="assets" role="tabpanel" aria-hidden="' +
       (value14 !== 'assets') +
-      '\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '">\n          ' +
       value16 +
       '\n        </div>\n        <div class="story-episode-asset-rail-page ' +
       (value14 === 'frames' ? 'is-active' : '') +
@@ -560,7 +560,7 @@ export function createStoryClipProductionPresentation({
       value24 +
       '\n        </div>\n        <div class="story-episode-asset-rail-page ' +
       (value14 === 'library' ? 'is-active' : '') +
-      '\x22\x20data-story-episode-asset-panel=\x22library\x22\x20role=\x22tabpanel\x22\x20aria-hidden=\x22' +
+      '" data-story-episode-asset-panel="library" role="tabpanel" aria-hidden="' +
       (value14 !== 'library') +
       '">\n          ' +
       value15['markup'] +
@@ -568,15 +568,15 @@ export function createStoryClipProductionPresentation({
     );
   }
   function renderDetail(options8 = {}) {
-    const box = options8['ratios'] || { left: 0x18, center: 0x2c },
+    const box = options8['ratios'] || { left: 24, center: 44 },
       value29 =
-        '<div\x20class=\x22story-episode-detail-page\x22>\x0a\x20\x20\x20\x20' +
+        '<div class="story-episode-detail-page">\n    ' +
         (options8['assetRailMarkup'] || '') +
         '\n    <div class="story-episode-splitter story-episode-splitter--assets panel-resize-handle panel-resize-handle--transient" data-story-episode-splitter="assets" role="separator" aria-orientation="vertical" aria-label="调整本集素材区域宽度" aria-valuemin="14" aria-valuemax="34" aria-valuenow="' +
-        Math['round'](Number(box['left']) || 0x0) +
+        Math['round'](Number(box['left']) || 0) +
         '" tabindex="0"></div>\n    <section class="story-clip-editor">\n      <header>\n        <h2>' +
         escapeHtml(options8['title'] || '片段脚本') +
-        '</h2>\x0a\x20\x20\x20\x20\x20\x20</header>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-clip-context-row\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-clip-meta\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+        '</h2>\n      </header>\n      <div class="story-clip-context-row">\n        <div class="story-clip-meta">\n          ' +
         (Array['isArray'](options8['clipMeta']) ? options8['clipMeta'] : [])
           ['map']((value30) => '<span>' + escapeHtml(value30) + '</span>')
           ['join']('') +
@@ -585,12 +585,12 @@ export function createStoryClipProductionPresentation({
         '\n      </div>\n      ' +
         (options8['promptSurface'] || '') +
         '\n    </section>\n    <div class="story-episode-splitter story-episode-splitter--preview panel-resize-handle panel-resize-handle--transient" data-story-episode-splitter="preview" role="separator" aria-orientation="vertical" aria-label="调整脚本与视频结果区域宽度" aria-valuemin="38" aria-valuemax="76" aria-valuenow="' +
-        Math['round']((Number(box['left']) || 0x0) + (Number(box['center']) || 0x0)) +
+        Math['round']((Number(box['left']) || 0) + (Number(box['center']) || 0)) +
         '" tabindex="0"></div>\n    <section class="story-video-preview" data-story-clip-navigation="' +
         Boolean(options8['hasMultipleClips']) +
-        '\x22\x20' +
+        '" ' +
         (options8['hasMultipleClips']
-          ? 'tabindex=\x220\x22\x20aria-label=\x22滚动鼠标滚轮或按左右方向键切换上一幕、下一幕\x22'
+          ? 'tabindex="0" aria-label="滚动鼠标滚轮或按左右方向键切换上一幕、下一幕"'
           : '') +
         '>\n      ' +
         (options8['navigationMarkup'] || '') +
@@ -600,7 +600,7 @@ export function createStoryClipProductionPresentation({
         (options8['timeline'] || '') +
         '\n  </div>';
     return options8['episodeRailMarkup']
-      ? '<div\x20class=\x22workspace-episode-production\x20story-replication-episode-production\x22\x20data-story-replication-episode-production>' +
+      ? '<div class="workspace-episode-production story-replication-episode-production" data-story-replication-episode-production>' +
           options8['episodeRailMarkup'] +
           value29 +
           '</div>'

@@ -3,9 +3,9 @@ export function planNodeMovement(state, value, item) {
     key = state['_parentToChildren'] || {},
     index = {};
   if (value !== 'moveNodesByOffsets') {
-    const list = value === 'updateNodePosition' ? [item[0x0]] : item[0x0],
-      dx = Number(item[0x1]),
-      dy = Number(item[0x2]);
+    const list = value === 'updateNodePosition' ? [item[0]] : item[0],
+      dx = Number(item[1]),
+      dy = Number(item[2]);
     if (!list?.['length'] || !Number['isFinite'](dx) || !Number['isFinite'](dy) || (!dx && !dy)) return index;
     const map = new Set(),
       list2 = [...list];
@@ -19,7 +19,7 @@ export function planNodeMovement(state, value, item) {
     return index;
   }
   const options = {};
-  for (const [target, enabled2] of Object['entries'](item[0x0] || {})) {
+  for (const [target, enabled2] of Object['entries'](item[0] || {})) {
     if (!enabled[target] || !enabled2) continue;
     const dx2 = Number(enabled2['dx']),
       dy2 = Number(enabled2['dy']);
@@ -54,7 +54,7 @@ export function describeGraphMutation(name, args, state2) {
     payload['nodeIds'] = Object['keys'](planNodeMovement(state2, name, args));
   else {
     if (name === 'deleteNodes') {
-      payload['removedNodeIds'] = [...new Set(args[0x0] || [])];
+      payload['removedNodeIds'] = [...new Set(args[0] || [])];
       const map4 = new Set(payload['removedNodeIds']);
       payload['nodeIds'] = [
         ...new Set([
@@ -68,30 +68,30 @@ export function describeGraphMutation(name, args, state2) {
       ];
     } else {
       if (name === 'groupNodes')
-        payload['nodeIds'] = (args[0x0] || [])['filter'](
-          (scope) => entry[scope] && (entry[scope]['parentId'] || null) !== (args[0x1] || null),
+        payload['nodeIds'] = (args[0] || [])['filter'](
+          (scope) => entry[scope] && (entry[scope]['parentId'] || null) !== (args[1] || null),
         );
       else {
-        if (name === 'addEdge') payload['nodeIds'] = handler([record[args[0x0]?.['id']], args[0x0]]);
+        if (name === 'addEdge') payload['nodeIds'] = handler([record[args[0]?.['id']], args[0]]);
         else {
-          if (name === 'removeEdge') payload['nodeIds'] = handler([record[args[0x0]]]);
+          if (name === 'removeEdge') payload['nodeIds'] = handler([record[args[0]]]);
           else {
             if (name === 'updateEdgesBatch') {
-              const list5 = (args[0x1] || [])['filter']((input) => input?.['id']);
+              const list5 = (args[1] || [])['filter']((input) => input?.['id']);
               payload['nodeIds'] = handler([
-                ...(args[0x0] || [])['map']((output) => record[output]),
+                ...(args[0] || [])['map']((output) => record[output]),
                 ...list5['map']((value2) => record[value2['id']]),
                 ...list5,
               ]);
             } else {
-              if (name === 'updateNodesData') payload['nodeIds'] = Object['keys'](args[0x0] || {});
+              if (name === 'updateNodesData') payload['nodeIds'] = Object['keys'](args[0] || {});
               else {
                 if (name === 'swapStoryboardCells')
-                  payload['nodeIds'] = [args[0x0], args[0x2]]['filter'](Boolean);
+                  payload['nodeIds'] = [args[0], args[2]]['filter'](Boolean);
                 else {
-                  if (name === 'addNode') payload['nodeIds'] = [args[0x0]?.['id']]['filter'](Boolean);
+                  if (name === 'addNode') payload['nodeIds'] = [args[0]?.['id']]['filter'](Boolean);
                   else {
-                    if (['updateNodeData', 'renameNode']['includes'](name)) payload['nodeIds'] = [args[0x0]];
+                    if (['updateNodeData', 'renameNode']['includes'](name)) payload['nodeIds'] = [args[0]];
                     else throw new Error('Unknown graph mutation: ' + name);
                   }
                 }

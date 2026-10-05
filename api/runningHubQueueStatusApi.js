@@ -1,6 +1,6 @@
 import { request } from './apiBase.js';
 const DEFAULT_RUNNINGHUB_BASE_URL = 'https://www.runninghub.cn',
-  DEFAULT_QUEUE_STATUS_TIMEOUT_MS = 0x7530;
+  DEFAULT_QUEUE_STATUS_TIMEOUT_MS = 30000;
 function isPlainObject(enabled) {
   return !!enabled && typeof enabled === 'object' && !Array['isArray'](enabled);
 }
@@ -31,7 +31,7 @@ export function normalizeRunningHubQueueStatusPayload(options = {}) {
     isPlainObject(options?.['data']) && !Array['isArray'](options['data']) ? options['data'] : options;
   if (!isPlainObject(response)) return null;
   if (response['success'] === ![]) return null;
-  if (response['code'] !== undefined && Number(response['code']) !== 0x0) return null;
+  if (response['code'] !== undefined && Number(response['code']) !== 0) return null;
   const isPlainObject2 =
       isPlainObject(response['data']) && !Array['isArray'](response['data']) ? response['data'] : response,
     concurrentLimit = toFiniteNumber(isPlainObject2['concurrentLimit'] ?? isPlainObject2['concurrent_limit']);
@@ -53,10 +53,10 @@ export async function fetchRunningHubWorkflowQueueStatus(options2 = {}, target =
     response2 = await request(
       '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(runningHubQueueStatusProbeUrl),
       { method: 'GET', headers: { Authorization: 'Bearer ' + enabled3 } },
-      Math['max'](0x1, Number(target?.['timeoutMs']) || DEFAULT_QUEUE_STATUS_TIMEOUT_MS),
+      Math['max'](1, Number(target?.['timeoutMs']) || DEFAULT_QUEUE_STATUS_TIMEOUT_MS),
     );
   if (!response2['success']) return null;
-  const count = Number(response2['status'] || 0x0);
-  if (count && (count < 0xc8 || count >= 0x12c)) return null;
+  const count = Number(response2['status'] || 0);
+  if (count && (count < 200 || count >= 300)) return null;
   return normalizeRunningHubQueueStatusPayload(response2['data']);
 }

@@ -8,11 +8,11 @@ const WASM_ROOT_URL = new URL('../../../vendor/mediapipe/tasks-vision/wasm', imp
 let poseLandmarkerPromise = null;
 function serializeLandmark(box = {}) {
   return {
-    x: Number(box['x']) || 0x0,
-    y: Number(box['y']) || 0x0,
-    z: Number(box['z']) || 0x0,
-    visibility: Number['isFinite'](Number(box['visibility'])) ? Number(box['visibility']) : 0x1,
-    presence: Number['isFinite'](Number(box['presence'])) ? Number(box['presence']) : 0x1,
+    x: Number(box['x']) || 0,
+    y: Number(box['y']) || 0,
+    z: Number(box['z']) || 0,
+    visibility: Number['isFinite'](Number(box['visibility'])) ? Number(box['visibility']) : 1,
+    presence: Number['isFinite'](Number(box['presence'])) ? Number(box['presence']) : 1,
   };
 }
 async function getPoseLandmarker() {
@@ -44,8 +44,8 @@ async function estimatePose(key) {
   try {
     const poseLandmarker = await getPoseLandmarker();
     index = poseLandmarker['detect'](imageBitmap);
-    const imageLandmarks = index?.['landmarks']?.[0x0],
-      worldLandmarks = index?.['worldLandmarks']?.[0x0];
+    const imageLandmarks = index?.['landmarks']?.[0],
+      worldLandmarks = index?.['worldLandmarks']?.[0];
     if (!Array['isArray'](imageLandmarks) || !Array['isArray'](worldLandmarks)) {
       const error2 = new Error('没有在图片中识别到完整人物姿势。');
       error2['code'] = 'POSE_NOT_FOUND';

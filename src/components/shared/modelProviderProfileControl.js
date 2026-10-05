@@ -42,9 +42,9 @@ export function buildModelProviderProfileBadgesHtml(result, { vip: vip = ![] } =
           ? 'model-provider-profile-badge--international'
           : 'model-provider-profile-badge--domestic';
       return (
-        '<span\x20class=\x22floating-menu-badge\x20floating-menu-badge-inline\x20model-provider-profile-badge\x20' +
+        '<span class="floating-menu-badge floating-menu-badge-inline model-provider-profile-badge ' +
         source +
-        '\x22>' +
+        '">' +
         escapeNodeMenuHtml(getModelProviderProfileShortLabel(options)) +
         '</span>'
       );
@@ -93,7 +93,7 @@ export function getProfileSwitchConfigurationMessage(record, payload = '') {
       getProviderProfileAdapterType(payload) === 'workflow'
         ? '工作流 API Key'
         : String(modelProviderProfile4?.['credentialLabel'] || '模型 API Key')['trim'](),
-    state = /^[A-Za-z]/['test'](providerProfileAdapterType) ? '\x20' : '';
+    state = /^[A-Za-z]/['test'](providerProfileAdapterType) ? ' ' : '';
   return '切换到 ' + handle + '需配置' + state + providerProfileAdapterType;
 }
 function showProfileConfigurationRequired(fieldIds, providerId, model) {
@@ -171,7 +171,7 @@ export function createModelProviderProfileControl({
       if (!panel) return;
       const args = getNodeData?.() || {},
         list2 = getModelProviderProfileIds(args?.['model']),
-        enabled3 = list2['length'] > 0x1;
+        enabled3 = list2['length'] > 1;
       panel['classList']?.['toggle']('has-model-provider-profile-toggle', enabled3);
       if (!enabled3) {
         el?.['classList']?.['add']('is-hidden');

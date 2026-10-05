@@ -1,7 +1,7 @@
-export const DEFAULT_NODE_SIZE = { width: 0x118, height: 200 };
+export const DEFAULT_NODE_SIZE = { width: 280, height: 200 };
 export const ZOOM_LIMITS = { min: 0.1, max: 3, default: 1 };
 export const GRID = { size: 20, snapThreshold: 10 };
-export const MINIMAP = { size: 200, padding: 0x258 };
+export const MINIMAP = { size: 200, padding: 600 };
 export const NODE_TYPES = {
   SOURCE_IMAGE: 'sourceImage',
   SOURCE_TEXT: 'sourceText',
@@ -30,10 +30,10 @@ export const NODE_TYPE_LABELS = {
   [NODE_TYPES.DEBUG]: '调试',
   [NODE_TYPES.STORYBOARD]: '故事板',
 };
-export const THUMBNAIL = { maxWidth: 0x320, maxHeight: 0x320, quality: 0.8, format: 'image/jpeg' };
-export const IMAGE_COMPRESSION = { maxDimension: 0x320, quality: 0.6, format: 'image/jpeg' };
+export const THUMBNAIL = { maxWidth: 800, maxHeight: 800, quality: 0.8, format: 'image/jpeg' };
+export const IMAGE_COMPRESSION = { maxDimension: 800, quality: 0.6, format: 'image/jpeg' };
 export const SUPPORTED_IMAGE_FORMATS = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp', '.avif'];
-export const MAX_FILE_SIZE = 10 * 0x400 * 0x400;
+export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 export const DB_CONFIG = {
   name: 'TapNowCanvasDB',
   version: 2,
@@ -45,7 +45,7 @@ export const STORAGE_KEYS = {
   RECENT_FILES: 'tapnow_recent_files',
   USER_PREFERENCES: 'tapnow_user_preferences',
 };
-export const ANIMATION_DURATION = { fast: 150, normal: 0x12c, slow: 0x1f4 };
+export const ANIMATION_DURATION = { fast: 150, normal: 300, slow: 500 };
 export const DRAG = { threshold: 5, edgeHandleSize: 12 };
 export const EDGE = {
   strokeWidth: 2,
@@ -59,7 +59,7 @@ export const API_ENDPOINTS = {
   PROJECTS: '/api/v2/projects',
   IMAGES: '/api/v2/images',
 };
-export const REQUEST_TIMEOUT = 0x7530;
+export const REQUEST_TIMEOUT = 30000;
 export const MAX_RETRY_COUNT = 3;
 export const MODIFIER_KEYS = { CTRL: 'Ctrl', SHIFT: 'Shift', ALT: 'Alt', META: 'Meta' };
 export const COMMON_SHORTCUTS = {

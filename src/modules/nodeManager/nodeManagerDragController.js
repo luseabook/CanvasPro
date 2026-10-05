@@ -20,8 +20,8 @@ export function resolveNodeManagerDuplicateOffset({
   viewport: viewport,
 } = {}) {
   const dx = screenToWorld(clientX, clientY, viewport || {}),
-    key = (Number(source?.['x']) || 0x0) + (Number(source?.['width']) || 0x0) / 0x2,
-    index = (Number(source?.['y']) || 0x0) + (Number(source?.['height']) || 0x0) / 0x2;
+    key = (Number(source?.['x']) || 0) + (Number(source?.['width']) || 0) / 2,
+    index = (Number(source?.['y']) || 0) + (Number(source?.['height']) || 0) / 2;
   return { dx: dx['x'] - key, dy: dx['y'] - index };
 }
 export function createNodeManagerDragController({
@@ -69,7 +69,7 @@ export function createNodeManagerDragController({
         onDuplicateFailed?.(response);
         return;
       }
-      const next = response?.['result']?.['ids']?.[0x0];
+      const next = response?.['result']?.['ids']?.[0];
       if (next) onDuplicated?.(next);
     };
   return (

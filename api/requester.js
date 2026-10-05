@@ -2,7 +2,7 @@ import { buildApiUrl } from './apiUrl.js';
 import { ApiError } from './errors/ApiError.js';
 import { parseError, parseNetworkError } from './errors/ErrorParser.js';
 import { logDiagnosticEvent } from '../src/services/diagnosticsService.js';
-const DEFAULT_TIMEOUT = 0x7530;
+const DEFAULT_TIMEOUT = 30000;
 function isAbsoluteUrl(value) {
   return /^https?:\/\//i.test(value);
 }
@@ -131,7 +131,7 @@ export async function requester(value7) {
     timeout: timeout = DEFAULT_TIMEOUT,
     signal: signal3,
     retries: retries = 0,
-    retryDelay: retryDelay = 0x258,
+    retryDelay: retryDelay = 600,
     responseType: responseType = 'auto',
     allow404Null: allow404Null = false,
     provider: provider = 'unknown',
@@ -152,8 +152,8 @@ export async function requester(value7) {
         timeout,
         signal3,
       );
-      if (headers3.status === 0x194 && allow404Null)
-        return returnMeta ? { data: null, status: 0x194, headers: headers3.headers } : null;
+      if (headers3.status === 404 && allow404Null)
+        return returnMeta ? { data: null, status: 404, headers: headers3.headers } : null;
       if (!headers3.ok) {
         const errorBody = await parseErrorBody(headers3),
           apiErr2 =

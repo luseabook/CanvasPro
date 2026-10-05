@@ -16,7 +16,7 @@ export function createDesktopStartupLifecycle({
   }
   function assertStarting() {
     if (!quitting) return;
-    throw Object['assign'](new Error('Desktop\x20startup\x20cancelled\x20during\x20shutdown'), {
+    throw Object['assign'](new Error('Desktop startup cancelled during shutdown'), {
       code: 'AIC_DESKTOP_STARTUP_CANCELLED',
     });
   }
@@ -39,7 +39,7 @@ export function createDesktopStartupLifecycle({
       const quitTimer = setTimer(() => {
         if (pendingQuitTimer !== quitTimer) return;
         ((pendingQuitTimer = null), app['quit']());
-      }, 0x4b0);
+      }, 1200);
       return ((pendingQuitTimer = quitTimer), ![]);
     },
     beginQuit() {

@@ -182,7 +182,7 @@ async function writeVerifiedPart({ partPath: partPath, source: source, expectedS
   const hash = createHash('sha256');
   let total = 0;
   try {
-    handle = await open(partPath, 'wx', 0x180);
+    handle = await open(partPath, 'wx', 384);
     const hasher = new Transform({
         transform(chunk, encoding, callback) {
           try {

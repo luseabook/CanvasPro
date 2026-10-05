@@ -8,7 +8,7 @@ import {
 } from './windowsSystemTools.js';
 
 const { resolveWindowsRoot } = __windowsSystemToolsForTest;
-const MAX_FAILURE_TEXT_LENGTH = 0x7d0;
+const MAX_FAILURE_TEXT_LENGTH = 2000;
 
 test('resolveWindowsRoot prefers SystemRoot and returns the first win32 absolute value', () => {
   assert.equal(resolveWindowsRoot({ SystemRoot: 'C:\\Windows' }), 'C:\\Windows');

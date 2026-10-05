@@ -135,10 +135,10 @@ function normalizeIdentity(value) {
 function normalizeExpirySeconds(item) {
   if (item === null || item === undefined || item === '') return null;
   const count = Number(item);
-  if (Number['isFinite'](count) && count > 0x0)
-    return count > 0x174876e800 ? Math['floor'](count / 0x3e8) : Math['floor'](count);
+  if (Number['isFinite'](count) && count > 0)
+    return count > 100000000000 ? Math['floor'](count / 1000) : Math['floor'](count);
   const count2 = Date['parse'](String(item));
-  return Number['isFinite'](count2) && count2 > 0x0 ? Math['floor'](count2 / 0x3e8) : null;
+  return Number['isFinite'](count2) && count2 > 0 ? Math['floor'](count2 / 1000) : null;
 }
 function isActiveSubscription(response, key) {
   if (
@@ -148,7 +148,7 @@ function isActiveSubscription(response, key) {
   )
     return ![];
   const expirySeconds = normalizeExpirySeconds(response?.['expiresAt']);
-  return expirySeconds === null || expirySeconds > Math['floor'](key / 0x3e8);
+  return expirySeconds === null || expirySeconds > Math['floor'](key / 1000);
 }
 function assertExactValue(index, result, data) {
   if (index !== result) throw new Error('[modelCatalog] invalid ' + data);
@@ -158,7 +158,7 @@ function assertObjectKeysAllowed(enabled, map, options) {
     throw new Error('[modelCatalog] invalid ' + options);
   for (const target of Object['keys'](enabled)) {
     if (!map['has'](target))
-      throw new Error('[modelCatalog] ' + options + '.' + target + '\x20is\x20not\x20allowed');
+      throw new Error('[modelCatalog] ' + options + '.' + target + ' is not allowed');
   }
 }
 function assertBinghuoModelCatalogMetadata(source, next) {
@@ -166,18 +166,18 @@ function assertBinghuoModelCatalogMetadata(source, next) {
   assertObjectKeysAllowed(source, BINGHUO_MODEL_CATALOG_EXTENSION_KEYS, next);
   for (const current of BINGHUO_MODEL_CATALOG_EXTENSION_KEYS) {
     if (!Object['hasOwn'](source, current))
-      throw new Error('[modelCatalog] ' + next + '.' + current + '\x20is\x20required');
+      throw new Error('[modelCatalog] ' + next + '.' + current + ' is required');
   }
   if (
     typeof source['templateFamilyId'] !== 'string' ||
     !/^[a-z0-9][a-z0-9._-]{0,127}$/['test'](source['templateFamilyId'])
   )
-    throw new Error('[modelCatalog]\x20invalid\x20' + next + '.templateFamilyId');
+    throw new Error('[modelCatalog] invalid ' + next + '.templateFamilyId');
   if (
     typeof source['templateFamilyLabel'] !== 'string' ||
     source['templateFamilyLabel'] !== source['templateFamilyLabel']['trim']() ||
-    source['templateFamilyLabel']['length'] === 0x0 ||
-    source['templateFamilyLabel']['length'] > 0x80 ||
+    source['templateFamilyLabel']['length'] === 0 ||
+    source['templateFamilyLabel']['length'] > 128 ||
     /[\u0000-\u001f]/['test'](source['templateFamilyLabel'])
   )
     throw new Error('[modelCatalog] invalid ' + next + '.templateFamilyLabel');
@@ -201,10 +201,10 @@ function assertBinghuoBodyMapping(list2, payload) {
     );
     const scope = String(handle['path'] || '')['trim']();
     if (!BINGHUO_BODY_MAPPING_PATHS['has'](scope))
-      throw new Error('[modelCatalog]\x20invalid\x20' + config + '.path');
+      throw new Error('[modelCatalog] invalid ' + config + '.path');
     const input = String(handle['from'] || '')['trim']();
     if (!BINGHUO_BODY_MAPPING_SOURCES['has'](input))
-      throw new Error('[modelCatalog]\x20invalid\x20' + config + '.from');
+      throw new Error('[modelCatalog] invalid ' + config + '.from');
     for (const output of normalizeMappingTransformNames(handle['transform'])) {
       if (!BINGHUO_BODY_MAPPING_TRANSFORMS['has'](output))
         throw new Error('[modelCatalog] invalid ' + config + '.transform');
@@ -231,15 +231,15 @@ function assertBinghuoAssetUploadPolicy(value2, value3, value4) {
     value2['responsePath'] !== 'url' ||
     value2['strictUpload'] !== !![] ||
     !Array['isArray'](value2['inputKinds']) ||
-    value2['inputKinds']['length'] !== 0x1 ||
-    value2['inputKinds'][0x0] !== value4
+    value2['inputKinds']['length'] !== 1 ||
+    value2['inputKinds'][0] !== value4
   )
-    throw new Error('[modelCatalog]\x20invalid\x20' + value3 + ' contract');
+    throw new Error('[modelCatalog] invalid ' + value3 + ' contract');
 }
 function assertStatusList(list3, value5) {
   if (
     !Array['isArray'](list3) ||
-    list3['length'] === 0x0 ||
+    list3['length'] === 0 ||
     list3['some']((value6) => !/^[a-z][a-z0-9_-]{0,63}$/['test'](String(value6 || '')))
   )
     throw new Error('[modelCatalog] invalid ' + value5);
@@ -247,7 +247,7 @@ function assertStatusList(list3, value5) {
 function assertHttpStatusList(list4, value7) {
   if (
     !Array['isArray'](list4) ||
-    list4['some']((count3) => !Number['isInteger'](count3) || count3 < 0x190 || count3 > 0x257)
+    list4['some']((count3) => !Number['isInteger'](count3) || count3 < 400 || count3 > 599)
   )
     throw new Error('[modelCatalog] invalid ' + value7);
 }
@@ -260,7 +260,7 @@ function assertBinghuoTaskPolling(value8, enabled2) {
   (assertObjectKeysAllowed(value8, BINGHUO_TASK_POLLING_KEYS, 'execution extensions.taskPolling'),
     assertExactValue(value8['mode'], 'task-proxy', 'task polling mode'),
     assertExactValue(value8['method'], 'GET', 'task polling method'),
-    assertExactValue(value8['headersMode'], 'bearer', 'task\x20polling\x20headersMode'),
+    assertExactValue(value8['headersMode'], 'bearer', 'task polling headersMode'),
     assertExactValue(
       value8['urlTemplate'],
       enabled2['pollingUrlTemplate'],
@@ -270,14 +270,14 @@ function assertBinghuoTaskPolling(value8, enabled2) {
     count5 = Number(value8['maxWaitMs']);
   if (
     !Number['isFinite'](count4) ||
-    count4 < 0x3e8 ||
-    count4 > 0x7530 ||
+    count4 < 1000 ||
+    count4 > 30000 ||
     !Number['isFinite'](count5) ||
-    count5 < 0xea60 ||
-    count5 > 0x6ddd00
+    count5 < 60000 ||
+    count5 > 7200000
   )
     throw new Error('[modelCatalog] invalid task polling timing');
-  (assertStatusList(value8['successStatuses'], 'task\x20polling\x20successStatuses'),
+  (assertStatusList(value8['successStatuses'], 'task polling successStatuses'),
     assertStatusList(value8['failedStatuses'], 'task polling failedStatuses'));
   const value9 = value8['transportErrorPolicy'];
   assertObjectKeysAllowed(
@@ -287,8 +287,8 @@ function assertBinghuoTaskPolling(value8, enabled2) {
   );
   if (
     !Number['isInteger'](value9['maxConsecutiveErrors']) ||
-    value9['maxConsecutiveErrors'] < 0x1 ||
-    value9['maxConsecutiveErrors'] > 0xa ||
+    value9['maxConsecutiveErrors'] < 1 ||
+    value9['maxConsecutiveErrors'] > 10 ||
     value9['surfaceLastError'] !== !![]
   )
     throw new Error('[modelCatalog] invalid task polling transport policy');
@@ -302,7 +302,7 @@ function assertBinghuoExecutionPolicy(response2) {
       ['toLowerCase'](),
     enabled3 = BINGHUO_EXECUTION_POLICY[value10];
   if (!enabled3)
-    throw new Error('[modelCatalog]\x20catalog\x20contains\x20an\x20unsupported\x20execution\x20kind');
+    throw new Error('[modelCatalog] catalog contains an unsupported execution kind');
   (assertExactValue(String(response2?.['adapterType'] || '')['trim'](), 'modelApi', 'execution adapterType'),
     assertExactValue(
       String(response2?.['method'] || '')
@@ -339,22 +339,22 @@ function assertBinghuoExecutionPolicy(response2) {
   ]) {
     assertBinghuoAssetUploadPolicy(
       response2?.['extensions']?.[value12],
-      'execution\x20extensions.' + value12,
+      'execution extensions.' + value12,
       value13,
     );
   }
 }
 function assertBinghuoBundle(enabled4) {
   if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4))
-    throw new TypeError('[modelCatalog]\x20catalog\x20bundle\x20must\x20be\x20an\x20object');
+    throw new TypeError('[modelCatalog] catalog bundle must be an object');
   if (enabled4['schemaVersion'] !== '1.0')
     throw new Error('[modelCatalog] unsupported catalog schemaVersion');
   if (enabled4['sourceId'] !== BINGHUO_MODEL_CATALOG_SOURCE_ID)
     throw new Error('[modelCatalog] invalid catalog sourceId');
-  if (!Number['isInteger'](enabled4['version']) || enabled4['version'] < 0x1)
+  if (!Number['isInteger'](enabled4['version']) || enabled4['version'] < 1)
     throw new Error('[modelCatalog] catalog version must be a positive integer');
   if (!Array['isArray'](enabled4['models']) || !Array['isArray'](enabled4['executions']))
-    throw new Error('[modelCatalog]\x20catalog\x20models/executions\x20must\x20be\x20arrays');
+    throw new Error('[modelCatalog] catalog models/executions must be arrays');
   const enabled5 = new Set(),
     enabled6 = new Set();
   (enabled4['models']['forEach']((value14) => {
@@ -373,7 +373,7 @@ function assertBinghuoBundle(enabled4) {
       ),
       assertBinghuoModelCatalogMetadata(
         value14?.['extensions']?.['modelCatalog'],
-        'model\x20extensions.modelCatalog',
+        'model extensions.modelCatalog',
       ));
     if (
       value15 !== 'binghuo' ||
@@ -400,7 +400,7 @@ function assertBinghuoBundle(enabled4) {
     }));
   if (!enabled5['size'] || !enabled6['size'])
     throw new Error(
-      '[modelCatalog]\x20catalog\x20must\x20include\x20at\x20least\x20one\x20executable\x20model',
+      '[modelCatalog] catalog must include at least one executable model',
     );
   return enabled4;
 }
@@ -435,7 +435,7 @@ function isCacheEligible(value23, { installId: installId, deviceId: deviceId, no
     normalizeIdentity(value23?.['subject']?.['installId']) === normalizeIdentity(installId) &&
     normalizeIdentity(value23?.['subject']?.['deviceId']) === normalizeIdentity(deviceId) &&
     expirySeconds2 !== null &&
-    expirySeconds2 > Math['floor'](nowMs / 0x3e8) &&
+    expirySeconds2 > Math['floor'](nowMs / 1000) &&
     value23?.['bundle']?.['sourceId'] === BINGHUO_MODEL_CATALOG_SOURCE_ID
   );
 }
@@ -450,10 +450,10 @@ function createCatalogState(args = {}) {
     sourceId: '',
     version: null,
     etag: '',
-    modelCount: 0x0,
-    executionCount: 0x0,
-    lastLoadedAt: 0x0,
-    lastSyncAt: 0x0,
+    modelCount: 0,
+    executionCount: 0,
+    lastLoadedAt: 0,
+    lastSyncAt: 0,
     error: null,
     ...args,
   };
@@ -468,7 +468,7 @@ export function createModelCatalogService({
   now: now = () => Date['now'](),
 } = {}) {
   let status2 = null,
-    value25 = 0x0;
+    value25 = 0;
   function run(args2) {
     const args3 = store?.['getStateRaw']?.()?.['modelCatalog'] || {};
     store?.['setModelCatalogState']?.({ ...args3, ...createCatalogState(), ...args2 });
@@ -498,7 +498,7 @@ export function createModelCatalogService({
       modelCount: sourceId['models']['length'],
       executionCount: sourceId['executions']['length'],
       lastLoadedAt: lastLoadedAt,
-      lastSyncAt: synced ? lastLoadedAt : 0x0,
+      lastSyncAt: synced ? lastLoadedAt : 0,
       error: null,
     });
   }
@@ -512,9 +512,9 @@ export function createModelCatalogService({
       sourceId: '',
       version: null,
       etag: '',
-      modelCount: 0x0,
-      executionCount: 0x0,
-      lastLoadedAt: 0x0,
+      modelCount: 0,
+      executionCount: 0,
+      lastLoadedAt: 0,
       lastSyncAt: now(),
       error: error,
     });
@@ -544,7 +544,7 @@ export function createModelCatalogService({
     deviceId: deviceId3,
     error: error4,
   } = {}) {
-    value25 += 0x1;
+    value25 += 1;
     const bundle2 = readCache(storage);
     if (!isCacheEligible(bundle2, { installId: installId3, deviceId: deviceId3, nowMs: now() })) {
       if (bundle2) removeCache(storage);
@@ -628,7 +628,7 @@ export function createModelCatalogService({
       run2(version);
       const expiresAt = normalizeExpirySeconds(subscriptionState?.['expiresAt']);
       return (
-        expiresAt !== null && expiresAt > Math['floor'](now() / 0x3e8)
+        expiresAt !== null && expiresAt > Math['floor'](now() / 1000)
           ? writeCache(storage, {
               schemaVersion: '1.0',
               provider: 'binghuo',
@@ -645,7 +645,7 @@ export function createModelCatalogService({
       );
     } catch (error6) {
       if (value28 !== value25) return { status: 'superseded', error: error6 };
-      if (error6?.['status'] === 0x191 || error6?.['status'] === 0x193)
+      if (error6?.['status'] === 401 || error6?.['status'] === 403)
         return (run4({ clearCache: !![], status: 'unavailable' }), { status: 'unauthorized', error: error6 });
       if (bundle3)
         return (
@@ -660,7 +660,7 @@ export function createModelCatalogService({
     }
   }
   function clear() {
-    ((value25 += 0x1), run4({ clearCache: !![], status: 'unavailable' }));
+    ((value25 += 1), run4({ clearCache: !![], status: 'unavailable' }));
   }
   return {
     loadCachedCatalog: loadCachedCatalog,

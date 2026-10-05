@@ -69,11 +69,11 @@ export function createScene3DGizmoVisual({
         new threeRuntime['MeshBasicMaterial']({
           color: 0xffffff,
           transparent: !![],
-          opacity: 0x0,
+          opacity: 0,
           side: threeRuntime['DoubleSide'],
           depthWrite: ![],
         }),
-        { transparent: !![], opacity: 0x0 },
+        { transparent: !![], opacity: 0 },
       ),
       pickMesh = new threeRuntime['Mesh'](createPlaneCornerPickGeometry(GIZMO_BASE_PLANE_SIZE), value);
     (group3['position']['copy'](offset),
@@ -104,7 +104,7 @@ export function createScene3DGizmoVisual({
     group: group,
     handleStore: handleStore,
     normalAxis: 'z',
-    offset: new threeRuntime['Vector3'](0.38, 0.38, 0x0),
+    offset: new threeRuntime['Vector3'](0.38, 0.38, 0),
     horizontalColor: horizontalColor3,
     verticalColor: horizontalColor3,
     linkedAxes: ['x', 'y'],
@@ -115,22 +115,22 @@ export function createScene3DGizmoVisual({
       group: group,
       handleStore: handleStore,
       normalAxis: 'y',
-      offset: new threeRuntime['Vector3'](0.38, 0x0, 0.38),
+      offset: new threeRuntime['Vector3'](0.38, 0, 0.38),
       horizontalColor: horizontalColor2,
       verticalColor: horizontalColor2,
       linkedAxes: ['x', 'z'],
-      rotation: { x: -Math['PI'] / 0x2, z: -Math['PI'] / 0x2 },
+      rotation: { x: -Math['PI'] / 2, z: -Math['PI'] / 2 },
     }),
     run({
       key: 'plane-yz',
       group: group,
       handleStore: handleStore,
       normalAxis: 'x',
-      offset: new threeRuntime['Vector3'](0x0, 0.38, 0.38),
+      offset: new threeRuntime['Vector3'](0, 0.38, 0.38),
       horizontalColor: horizontalColor,
       verticalColor: horizontalColor,
       linkedAxes: ['y', 'z'],
-      rotation: { y: Math['PI'] / 0x2, z: Math['PI'] / 0x2 },
+      rotation: { y: Math['PI'] / 2, z: Math['PI'] / 2 },
     }),
     root['add'](group));
   const rotateGroup = new threeRuntime['Group'](),
@@ -208,10 +208,10 @@ export function createScene3DGizmoVisual({
   const index = new threeRuntime['Mesh'](
     new threeRuntime['BoxGeometry'](0.34, 0.34, 0.34),
     configureGizmoMaterial(
-      new threeRuntime['MeshBasicMaterial']({ color: 0xffffff, transparent: !![], opacity: 0x0 }),
+      new threeRuntime['MeshBasicMaterial']({ color: 0xffffff, transparent: !![], opacity: 0 }),
       {
         transparent: !![],
-        opacity: 0x0,
+        opacity: 0,
       },
     ),
   );
@@ -226,22 +226,22 @@ export function createScene3DGizmoVisual({
     }),
     pickMeshes['push'](index));
   for (const [key2, normalAxis2, offset2, horizontalColor5, linkedAxes2, rotation2] of [
-    ['scale-plane-xy', 'z', new threeRuntime['Vector3'](0.38, 0.38, 0x0), horizontalColor3, ['x', 'y'], null],
+    ['scale-plane-xy', 'z', new threeRuntime['Vector3'](0.38, 0.38, 0), horizontalColor3, ['x', 'y'], null],
     [
       'scale-plane-xz',
       'y',
-      new threeRuntime['Vector3'](0.38, 0x0, 0.38),
+      new threeRuntime['Vector3'](0.38, 0, 0.38),
       horizontalColor2,
       ['x', 'z'],
-      { x: -Math['PI'] / 0x2, z: -Math['PI'] / 0x2 },
+      { x: -Math['PI'] / 2, z: -Math['PI'] / 2 },
     ],
     [
       'scale-plane-yz',
       'x',
-      new threeRuntime['Vector3'](0x0, 0.38, 0.38),
+      new threeRuntime['Vector3'](0, 0.38, 0.38),
       horizontalColor,
       ['y', 'z'],
-      { y: Math['PI'] / 0x2, z: Math['PI'] / 0x2 },
+      { y: Math['PI'] / 2, z: Math['PI'] / 2 },
     ],
   ]) {
     run({

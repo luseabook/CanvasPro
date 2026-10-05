@@ -281,7 +281,7 @@ test('ffprobeVideoMeta reads duration, fps and dimensions through the queue', as
   const harness = createHarness();
   harness.queueDouble.runProcess = async (task, command, args, options) => {
     assert.equal(command, '/tools/ffprobe');
-    assert.equal(options.timeoutMs, 0x7530);
+    assert.equal(options.timeoutMs, 30000);
     assert.ok(args.some((value) => String(value).includes('nb_frames')));
     return {
       stdout: Buffer.from(
@@ -412,7 +412,7 @@ test('long media task notifications are skipped below the duration floor', () =>
     taskId: 'short',
     kind: 'videoCut',
     startedAt: 1000,
-    finishedAt: 1000 + 0x4e20 - 1,
+    finishedAt: 1000 + 20000 - 1,
   });
   assert.equal(harness.state.notifications.length, 0);
 });
@@ -425,7 +425,7 @@ test('long media task notifications fire once and honour the silent flag', () =>
     taskId: 'long-1',
     kind: 'audioVoiceCompose',
     startedAt: 1000,
-    finishedAt: 1000 + 0x4e20,
+    finishedAt: 1000 + 20000,
   };
   harness.state.queueOptions.onUpdate(update);
   harness.state.queueOptions.onUpdate(update);
@@ -450,7 +450,7 @@ test('long media task notifications describe failures with the mapped display na
     kind: 'videoAudioMux',
     error: 'encoder died',
     startedAt: 1000,
-    finishedAt: 1000 + 0x4e20 + 1,
+    finishedAt: 1000 + 20000 + 1,
   });
   assert.deepEqual(harness.state.notifications[0].options, {
     title: '完整视频封装失败',
@@ -467,7 +467,7 @@ test('long media task notifications fall back to a generic kind label', () => {
     taskId: 'long-unknown',
     kind: 'mystery',
     startedAt: 1000,
-    finishedAt: 1000 + 0x4e20,
+    finishedAt: 1000 + 20000,
   });
   assert.equal(harness.state.notifications[0].options.title, '媒体任务完成');
 });
@@ -481,7 +481,7 @@ test('long media task notifications skip person-replacement compose tasks', () =
     kind: 'videoCompose',
     purpose: ' person-replacement-compose ',
     startedAt: 1000,
-    finishedAt: 1000 + 0x4e20,
+    finishedAt: 1000 + 20000,
   });
   assert.equal(harness.state.notifications.length, 0);
 });
@@ -496,7 +496,7 @@ test('long media task notifications respect Notification.isSupported', () => {
     taskId: 'unsupported-1',
     kind: 'videoCut',
     startedAt: 1000,
-    finishedAt: 1000 + 0x4e20,
+    finishedAt: 1000 + 20000,
   });
   assert.equal(harness.state.notifications.length, 0);
 });
@@ -510,7 +510,7 @@ test('long media task notifications cap the dedupe set at 500 entries', () => {
       taskId: id,
       kind: 'videoCut',
       startedAt: 1000,
-      finishedAt: 1000 + 0x4e20,
+      finishedAt: 1000 + 20000,
     });
   for (let index = 0; index <= 500; index += 1) fire('capped-' + index);
   assert.equal(harness.state.notifications.length, 501);
@@ -539,7 +539,7 @@ test('notification failures are logged without escaping', () => {
       taskId: 'boom-1',
       kind: 'videoCut',
       startedAt: 1000,
-      finishedAt: 1000 + 0x4e20,
+      finishedAt: 1000 + 20000,
     });
   } finally {
     console.warn = originalWarn;
@@ -574,7 +574,7 @@ test('probeVideoPlaybackInfoForImport reads the import probe through runCapture'
       'json',
       '/video.mp4',
     ],
-    options: { cwd: path.resolve('/app-root'), timeoutMs: 0x7530 },
+    options: { cwd: path.resolve('/app-root'), timeoutMs: 30000 },
   });
   assert.deepEqual(info, {
     codecName: 'hevc',
@@ -653,7 +653,7 @@ test('ensureAssetVideoPlaybackProxy transcodes, renames and reuses the cached pr
   });
   assert.equal(harness.state.ffmpegCalls.length, 1);
   assert.equal(harness.state.ffmpegCalls[0].options.progressMessage, 'Transcoding video');
-  assert.equal(harness.state.ffmpegCalls[0].options.timeoutMs, 600 * 0x3e8 * 0xc);
+  assert.equal(harness.state.ffmpegCalls[0].options.timeoutMs, 600 * 1000 * 12);
   assert.ok(harness.state.ffmpegCalls[0].args.includes('veryfast'));
   assert.ok(harness.state.ffmpegCalls[0].args.includes('23'));
   const proxyPath = path.join(harness.assetsDir, 'derived', 'video', 'asset-hevc.proxy-v2-1280.mp4');

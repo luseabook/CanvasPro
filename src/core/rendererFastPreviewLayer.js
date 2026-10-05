@@ -31,35 +31,35 @@ import {
   isRendererRuntimeDiagnosticsEnabled,
   recordRendererRuntimeDiagnostic,
 } from './rendererRuntimeDiagnostics.js';
-const FAST_PREVIEW_NODE_COUNT_THRESHOLD = 0x30,
-  FAST_PREVIEW_CANDIDATE_THRESHOLD = 0x10,
-  FAST_PREVIEW_MEDIA_SRC_BATCH_SIZE = 0xc,
-  FAST_PREVIEW_FALLBACK_NODE_CREATE_BATCH_SIZE = 0x50,
-  FAST_PREVIEW_LARGE_CANDIDATE_COUNT = 0xb4,
-  FAST_PREVIEW_HUGE_CANDIDATE_COUNT = 0x168,
-  FAST_PREVIEW_LARGE_MEDIA_SRC_BATCH_SIZE = 0xa,
-  FAST_PREVIEW_HUGE_MEDIA_SRC_BATCH_SIZE = 0x8,
-  FAST_PREVIEW_BUSY_MEDIA_SRC_BATCH_SIZE = 0x8,
-  FAST_PREVIEW_VIDEO_MEDIA_SRC_BATCH_SIZE = 0x8,
-  FAST_PREVIEW_LARGE_VIDEO_MEDIA_SRC_BATCH_SIZE = 0x6,
-  FAST_PREVIEW_HUGE_VIDEO_MEDIA_SRC_BATCH_SIZE = 0x4,
-  FAST_PREVIEW_BUSY_VIDEO_MEDIA_SRC_BATCH_SIZE = 0x2,
-  FAST_PREVIEW_BUSY_HINT_TTL_MS = 0xb4,
-  FAST_PREVIEW_BUSY_MEDIA_SRC_RETRY_MS = 0x40,
-  FAST_PREVIEW_MEDIA_PRELOAD_PRIORITY = 0x2d,
-  FAST_PREVIEW_LOW_PRIORITY_MEDIA_PRELOAD_PRIORITY = 0x19,
-  FAST_PREVIEW_BUSY_MEDIA_PRELOAD_PRIORITY = 0x14,
-  FAST_PREVIEW_VIEWPORT_BUSY_PRELOAD_CANCEL_PRIORITY_LIMIT = 0x50,
-  FAST_PREVIEW_NODE_POOL_LIMIT = 0x140,
-  FAST_PREVIEW_DETACHED_NODE_CACHE_LIMIT = 0xf0,
-  FAST_PREVIEW_DETACHED_IN_FLIGHT_CACHE_LIMIT = 0x208,
-  FAST_PREVIEW_LAYER_PADDING = 0x60,
+const FAST_PREVIEW_NODE_COUNT_THRESHOLD = 48,
+  FAST_PREVIEW_CANDIDATE_THRESHOLD = 16,
+  FAST_PREVIEW_MEDIA_SRC_BATCH_SIZE = 12,
+  FAST_PREVIEW_FALLBACK_NODE_CREATE_BATCH_SIZE = 80,
+  FAST_PREVIEW_LARGE_CANDIDATE_COUNT = 180,
+  FAST_PREVIEW_HUGE_CANDIDATE_COUNT = 360,
+  FAST_PREVIEW_LARGE_MEDIA_SRC_BATCH_SIZE = 10,
+  FAST_PREVIEW_HUGE_MEDIA_SRC_BATCH_SIZE = 8,
+  FAST_PREVIEW_BUSY_MEDIA_SRC_BATCH_SIZE = 8,
+  FAST_PREVIEW_VIDEO_MEDIA_SRC_BATCH_SIZE = 8,
+  FAST_PREVIEW_LARGE_VIDEO_MEDIA_SRC_BATCH_SIZE = 6,
+  FAST_PREVIEW_HUGE_VIDEO_MEDIA_SRC_BATCH_SIZE = 4,
+  FAST_PREVIEW_BUSY_VIDEO_MEDIA_SRC_BATCH_SIZE = 2,
+  FAST_PREVIEW_BUSY_HINT_TTL_MS = 180,
+  FAST_PREVIEW_BUSY_MEDIA_SRC_RETRY_MS = 64,
+  FAST_PREVIEW_MEDIA_PRELOAD_PRIORITY = 45,
+  FAST_PREVIEW_LOW_PRIORITY_MEDIA_PRELOAD_PRIORITY = 25,
+  FAST_PREVIEW_BUSY_MEDIA_PRELOAD_PRIORITY = 20,
+  FAST_PREVIEW_VIEWPORT_BUSY_PRELOAD_CANCEL_PRIORITY_LIMIT = 80,
+  FAST_PREVIEW_NODE_POOL_LIMIT = 320,
+  FAST_PREVIEW_DETACHED_NODE_CACHE_LIMIT = 240,
+  FAST_PREVIEW_DETACHED_IN_FLIGHT_CACHE_LIMIT = 520,
+  FAST_PREVIEW_LAYER_PADDING = 96,
   FAST_PREVIEW_MEDIA_PRELOAD_SCOPE = 'renderer-fast-preview-media',
-  FAST_PREVIEW_MOTION_MIN_DISTANCE_SQ = 0x4,
+  FAST_PREVIEW_MOTION_MIN_DISTANCE_SQ = 4,
   FAST_PREVIEW_MINIMAL_INTERACTION_DETAIL_MAX_ZOOM = 0.08,
   FAST_PREVIEW_AUDIO_WAVE_PATH =
     'M10,40 L10,40 M15,30 L15,50 M20,20 L20,60 M25,35 L25,45 M30,25 L30,55 M35,15 L35,65 M40,30 L40,50 M45,38 L45,42 M50,22 L50,58 M55,18 L55,62 M60,28 L60,52 M65,32 L65,48 M70,24 L70,56 M75,36 L75,44 M80,20 L80,60 M85,16 L85,64 M90,26 L90,54 M95,34 L95,46 M100,22 L100,58 M105,18 L105,62 M110,30 L110,50 M115,38 L115,42 M120,15 L120,65 M125,25 L125,55 M130,35 L130,45 M135,20 L135,60 M140,30 L140,50 M145,40 L145,40 M150,25 L150,55 M155,15 L155,65 M160,30 L160,50 M165,38 L165,42 M170,22 L170,58 M175,18 L175,62 M180,28 L180,52 M185,32 L185,48 M190,24 L190,56';
-function toNumber(value, item = 0x0) {
+function toNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
@@ -92,7 +92,7 @@ function isMountedImageReady(options) {
   )['trim']();
   if (!enabled || !isElementVisible(options)) return ![];
   if (options['complete'] === ![]) return ![];
-  return Number(options['naturalWidth'] || 0x0) > 0x0 || options['complete'] === undefined;
+  return Number(options['naturalWidth'] || 0) > 0 || options['complete'] === undefined;
 }
 function isMountedVideoReady(target) {
   const enabled2 = String(
@@ -101,7 +101,7 @@ function isMountedVideoReady(target) {
   return (
     !!enabled2 &&
     isElementVisible(target) &&
-    (Number(target['readyState'] || 0x0) >= 0x2 || hasPresentedVideoFrame(target))
+    (Number(target['readyState'] || 0) >= 2 || hasPresentedVideoFrame(target))
   );
 }
 function hasActiveMountedVideoPlayback(el2) {
@@ -139,7 +139,7 @@ function isMountedMediaReady(el5) {
     list2 = Array['from'](el5?.['querySelectorAll']?.('video') || [])['filter'](
       isMountedPresentationMediaElement,
     );
-  if (list['length'] === 0x0 && list2['length'] === 0x0) return ![];
+  if (list['length'] === 0 && list2['length'] === 0) return ![];
   for (const entry of list) {
     if (isMountedImageReady(entry)) return !![];
   }
@@ -179,18 +179,18 @@ function getPreviewText(error = {}, payload = 'node') {
             ? 'Text'
             : 'Node';
   return String(error['name'] || error['title'] || error['prompt'] || error['text'] || handle)
-    ['replace'](/\s+/g, '\x20')
+    ['replace'](/\s+/g, ' ')
     ['trim']()
-    ['slice'](0x0, payload === 'text' ? 0xa0 : 0x30);
+    ['slice'](0, payload === 'text' ? 160 : 48);
 }
-function getPrimaryListItem(list4, state = 0x0) {
-  if (!Array['isArray'](list4) || list4['length'] === 0x0) return null;
-  const config = Math['max'](0x0, Math['trunc'](Number(state) || 0x0));
-  return list4[config] || list4[0x0] || null;
+function getPrimaryListItem(list4, state = 0) {
+  if (!Array['isArray'](list4) || list4['length'] === 0) return null;
+  const config = Math['max'](0, Math['trunc'](Number(state) || 0));
+  return list4[config] || list4[0] || null;
 }
-function getPrimaryListItemIndex(list5, scope = 0x0) {
-  if (!Array['isArray'](list5) || list5['length'] === 0x0) return 0x0;
-  return Math['max'](0x0, Math['min'](list5['length'] - 0x1, Math['trunc'](Number(scope) || 0x0)));
+function getPrimaryListItemIndex(list5, scope = 0) {
+  if (!Array['isArray'](list5) || list5['length'] === 0) return 0;
+  return Math['max'](0, Math['min'](list5['length'] - 1, Math['trunc'](Number(scope) || 0)));
 }
 function firstLocalPreviewUrl(list6 = []) {
   for (const input of list6) {
@@ -218,24 +218,24 @@ function isLikelyImagePreviewUrl(value2) {
 function normalizeViewport(box = {}) {
   const count = Number(box?.['zoom']);
   return {
-    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0x0,
-    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0x0,
-    zoom: Number['isFinite'](count) && count > 0x0 ? count : 0x1,
+    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0,
+    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0,
+    zoom: Number['isFinite'](count) && count > 0 ? count : 1,
   };
 }
 function getViewportContainerSize(options4 = {}) {
   return {
     width: Math['max'](
-      0x1,
+      1,
       Number(options4['containerWidth'] ?? options4['containerW']) ||
-        (typeof window !== 'undefined' ? Number(window['innerWidth']) : 0x0) ||
-        0x640,
+        (typeof window !== 'undefined' ? Number(window['innerWidth']) : 0) ||
+        1600,
     ),
     height: Math['max'](
-      0x1,
+      1,
       Number(options4['containerHeight'] ?? options4['containerH']) ||
-        (typeof window !== 'undefined' ? Number(window['innerHeight']) : 0x0) ||
-        0x384,
+        (typeof window !== 'undefined' ? Number(window['innerHeight']) : 0) ||
+        900,
     ),
   };
 }
@@ -243,13 +243,13 @@ function getViewportWorldCenter(options5 = {}) {
   const box2 = normalizeViewport(options5['viewport']),
     { width: width, height: height } = getViewportContainerSize(options5);
   return {
-    x: ((0x0 - box2['x']) / box2['zoom'] + (width - box2['x']) / box2['zoom']) / 0x2,
-    y: ((0x0 - box2['y']) / box2['zoom'] + (height - box2['y']) / box2['zoom']) / 0x2,
+    x: ((0 - box2['x']) / box2['zoom'] + (width - box2['x']) / box2['zoom']) / 2,
+    y: ((0 - box2['y']) / box2['zoom'] + (height - box2['y']) / box2['zoom']) / 2,
   };
 }
 function resolveMediaSrcBatchSize(value3, value4 = {}) {
   const count2 = Number(value4['batchLimit']);
-  if (Number['isFinite'](count2) && count2 >= 0x0) return Math['max'](0x0, Math['trunc'](count2));
+  if (Number['isFinite'](count2) && count2 >= 0) return Math['max'](0, Math['trunc'](count2));
   if (value4['viewportBusy'] === !![]) return FAST_PREVIEW_BUSY_MEDIA_SRC_BATCH_SIZE;
   if (value3 >= FAST_PREVIEW_HUGE_CANDIDATE_COUNT) return FAST_PREVIEW_HUGE_MEDIA_SRC_BATCH_SIZE;
   if (value3 >= FAST_PREVIEW_LARGE_CANDIDATE_COUNT) return FAST_PREVIEW_LARGE_MEDIA_SRC_BATCH_SIZE;
@@ -257,7 +257,7 @@ function resolveMediaSrcBatchSize(value3, value4 = {}) {
 }
 function resolveVideoMediaSrcBatchSize(value5, value6 = {}) {
   const count3 = Number(value6['batchLimit']);
-  if (Number['isFinite'](count3) && count3 >= 0x0) return Math['max'](0x0, Math['trunc'](count3));
+  if (Number['isFinite'](count3) && count3 >= 0) return Math['max'](0, Math['trunc'](count3));
   if (value6['viewportBusy'] === !![]) return FAST_PREVIEW_BUSY_VIDEO_MEDIA_SRC_BATCH_SIZE;
   if (value5 >= FAST_PREVIEW_HUGE_CANDIDATE_COUNT) return FAST_PREVIEW_HUGE_VIDEO_MEDIA_SRC_BATCH_SIZE;
   if (value5 >= FAST_PREVIEW_LARGE_CANDIDATE_COUNT) return FAST_PREVIEW_LARGE_VIDEO_MEDIA_SRC_BATCH_SIZE;
@@ -336,7 +336,7 @@ function hasPreviewMediaHint(options8 = {}, value9 = 'node') {
       return ![];
     const list10 = [primaryListItem2];
     return (
-      (!primaryListItem2 || !Array['isArray'](options8['videos']) || options8['videos']['length'] <= 0x1) &&
+      (!primaryListItem2 || !Array['isArray'](options8['videos']) || options8['videos']['length'] <= 1) &&
         list10['push'](options8),
       list10['some']((value11) =>
         hasExplicitPreviewValue(value11, [
@@ -379,7 +379,7 @@ function getPreviewMediaUrls(options9 = {}, value12 = 'node', { displayFirst: di
   }
   if (value12 === 'video') {
     const primaryListItem4 = getPrimaryListItem(options9['videos'], options9['mainVideoIndex']),
-      count4 = Array['isArray'](options9['videos']) ? options9['videos']['length'] : 0x0,
+      count4 = Array['isArray'](options9['videos']) ? options9['videos']['length'] : 0,
       value13 =
         String(options9['type'] || '')
           ['trim']()
@@ -393,7 +393,7 @@ function getPreviewMediaUrls(options9 = {}, value12 = 'node', { displayFirst: di
       return [];
     return uniquePreviewUrls([
       ...getExplicitVideoPreviewUrls(primaryListItem4),
-      ...(count4 <= 0x1 ? getExplicitVideoPreviewUrls(options9) : []),
+      ...(count4 <= 1 ? getExplicitVideoPreviewUrls(options9) : []),
     ]);
   }
   return [];
@@ -417,7 +417,7 @@ function getNodePresentationMediaUrls(options10 = {}) {
     if (canvasVideoDisplayUrl) list11['push'](canvasVideoDisplayUrl);
     if (
       !primaryListItem6 ||
-      (Array['isArray'](options10['videos']) && options10['videos']['length'] <= 0x1)
+      (Array['isArray'](options10['videos']) && options10['videos']['length'] <= 1)
     ) {
       const canvasVideoDisplayUrl2 = resolveCanvasVideoDisplayUrl(options10);
       if (canvasVideoDisplayUrl2) list11['push'](canvasVideoDisplayUrl2);
@@ -478,18 +478,18 @@ function shouldUseFastPreviewLayer(value19, value20, value21 = {}) {
   const value22 = Number['isFinite'](value21['nodeCount'])
       ? value21['nodeCount']
       : Object['keys'](value19 || {})['length'],
-    count5 = value20 instanceof Set ? value20['size'] : 0x0;
-  if (value21['previewOnly'] === !![]) return count5 > 0x0;
+    count5 = value20 instanceof Set ? value20['size'] : 0;
+  if (value21['previewOnly'] === !![]) return count5 > 0;
   return value22 >= FAST_PREVIEW_NODE_COUNT_THRESHOLD || count5 >= FAST_PREVIEW_CANDIDATE_THRESHOLD;
 }
 function createEmptyStats() {
   return {
-    fastPreviewCount: 0x0,
-    visibleFastPreviewCount: 0x0,
-    previewWithMediaCount: 0x0,
-    deferredMountedWithPreviewCount: 0x0,
-    stagedPreviewCount: 0x0,
-    connectedStagedPreviewCount: 0x0,
+    fastPreviewCount: 0,
+    visibleFastPreviewCount: 0,
+    previewWithMediaCount: 0,
+    deferredMountedWithPreviewCount: 0,
+    stagedPreviewCount: 0,
+    connectedStagedPreviewCount: 0,
   };
 }
 function createPreviewEl(value23) {
@@ -511,7 +511,7 @@ function setPreviewSvgAttributes(el9, value26) {
 }
 function createAudioPreviewWaveform(value29) {
   const el10 = document['createElement']('div');
-  el10['className'] = 'waveform\x20' + value29;
+  el10['className'] = 'waveform ' + value29;
   const el11 = setPreviewSvgAttributes(createPreviewSvgElement('svg'), {
     width: '100%',
     height: '80',
@@ -551,17 +551,17 @@ function getAudioPreviewDuration(options12 = {}) {
     options12['duration'],
   ]) {
     const count6 = Number(value30);
-    if (Number['isFinite'](count6) && count6 > 0x0) return count6;
+    if (Number['isFinite'](count6) && count6 > 0) return count6;
   }
-  return 0x0;
+  return 0;
 }
 function formatAudioPreviewTime(value31) {
-  const value32 = Math['max'](0x0, Math['floor'](Number(value31) || 0x0)),
-    count7 = Math['floor'](value32 / 0xe10),
-    value33 = Math['floor']((value32 % 0xe10) / 0x3c),
-    value34 = String(value32 % 0x3c)['padStart'](0x2, '0');
-  return count7 > 0x0
-    ? count7 + ':' + String(value33)['padStart'](0x2, '0') + ':' + value34
+  const value32 = Math['max'](0, Math['floor'](Number(value31) || 0)),
+    count7 = Math['floor'](value32 / 3600),
+    value33 = Math['floor']((value32 % 3600) / 60),
+    value34 = String(value32 % 60)['padStart'](2, '0');
+  return count7 > 0
+    ? count7 + ':' + String(value33)['padStart'](2, '0') + ':' + value34
     : value33 + ':' + value34;
 }
 function getAudioPreviewTimeText(options13 = {}) {
@@ -589,7 +589,7 @@ function ensureAudioPreviewContent(el12, value35, value36) {
     });
     (el16['appendChild'](
       setPreviewSvgAttributes(createPreviewSvgElement('polygon'), {
-        points: '5\x203\x2019\x2012\x205\x2021\x205\x203',
+        points: '5 3 19 12 5 21 5 3',
       }),
     ),
       el15['appendChild'](el16),
@@ -639,10 +639,10 @@ function syncPreviewStaticContent(value40, value41, value42, value43) {
   else resetAudioPreviewContent(value40, value43);
 }
 function getPreviewGeometry(box3 = {}) {
-  const x = toNumber(box3['x'], 0x0),
-    y = toNumber(box3['y'], 0x0),
-    width2 = Math['max'](0x1, toNumber(box3['width'], 0xa0)),
-    height2 = Math['max'](0x1, toNumber(box3['height'], 0x78));
+  const x = toNumber(box3['x'], 0),
+    y = toNumber(box3['y'], 0),
+    width2 = Math['max'](1, toNumber(box3['width'], 160)),
+    height2 = Math['max'](1, toNumber(box3['height'], 120));
   return { x: x, y: y, width: width2, height: height2 };
 }
 function setPreviewMediaSrc(el26, value44, value45) {
@@ -688,8 +688,8 @@ function isPreviewMediaLoaded(el28) {
   return (
     el28?.['dataset']?.['previewLoaded'] === '1' ||
     el28?.['complete'] === !![] ||
-    Number(el28?.['naturalWidth'] || 0x0) > 0x0 ||
-    Number(el28?.['naturalHeight'] || 0x0) > 0x0
+    Number(el28?.['naturalWidth'] || 0) > 0 ||
+    Number(el28?.['naturalHeight'] || 0) > 0
   );
 }
 function getPreviewRasterFrameEl(el29) {
@@ -748,7 +748,7 @@ function isPreviewRasterFrameCompatible(value49, value50) {
     return ![];
   const list13 = uniquePreviewUrls(box4['sources'] || []),
     list14 = uniquePreviewUrls(value50?.['sources'] || []);
-  if (list13['length'] === 0x0 || list14['length'] === 0x0) return !![];
+  if (list13['length'] === 0 || list14['length'] === 0) return !![];
   const map2 = new Set(list14);
   return list13['some']((value51) => map2['has'](value51));
 }
@@ -757,8 +757,8 @@ function isPreviewMediaRequestInFlight(el37) {
     !!getPreviewMediaCurrentSrc(el37) &&
     el37?.['dataset']?.['previewLoaded'] !== '1' &&
     el37?.['complete'] !== !![] &&
-    Number(el37?.['naturalWidth'] || 0x0) <= 0x0 &&
-    Number(el37?.['naturalHeight'] || 0x0) <= 0x0
+    Number(el37?.['naturalWidth'] || 0) <= 0 &&
+    Number(el37?.['naturalHeight'] || 0) <= 0
   );
 }
 function isPreviewMediaResourceProtected(value52) {
@@ -796,8 +796,8 @@ function restorePaintedPreviewMedia(el42) {
   delete el43['dataset']['previewResourceOnly'];
   if (el43['style']) el43['style']['visibility'] = '';
   el42['dataset']['hasMedia'] = '1';
-  const count8 = Array['isArray'](el43['_previewSources']) ? el43['_previewSources']['length'] : 0x0;
-  if (count8 > 0x0) el42['dataset']['previewSrcCount'] = String(count8);
+  const count8 = Array['isArray'](el43['_previewSources']) ? el43['_previewSources']['length'] : 0;
+  if (count8 > 0) el42['dataset']['previewSrcCount'] = String(count8);
   return !![];
 }
 function getReusableCurrentPreviewMediaSource(el44, value58) {
@@ -809,11 +809,11 @@ function getReusableCurrentPreviewMediaSource(el44, value58) {
   return list16['includes'](previewMediaCurrentSrc2) ? previewMediaCurrentSrc2 : '';
 }
 function nextPreviewMediaPreloadToken(enabled9) {
-  if (!enabled9) return 0x0;
-  const value60 = (Number(enabled9['_previewSrcPreloadToken']) || 0x0) + 0x1;
+  if (!enabled9) return 0;
+  const value60 = (Number(enabled9['_previewSrcPreloadToken']) || 0) + 1;
   return ((enabled9['_previewSrcPreloadToken'] = value60), value60);
 }
-function isPreviewMediaPreloadCurrent(el45, value61, value62, value63 = 0x0) {
+function isPreviewMediaPreloadCurrent(el45, value61, value62, value63 = 0) {
   if (!el45 || el45['isConnected'] === ![]) return ![];
   if (el45['_previewSrcPreloadToken'] !== value62) return ![];
   const value64 = el45['_previewSources'] || [];
@@ -824,7 +824,7 @@ function resolvePreviewMediaPreloadPriority(value65, { viewportBusy: viewportBus
   if (value65?.['loading'] === 'lazy') return FAST_PREVIEW_LOW_PRIORITY_MEDIA_PRELOAD_PRIORITY;
   return FAST_PREVIEW_MEDIA_PRELOAD_PRIORITY;
 }
-function applyPreviewMediaSrcAfterPreload(fetchPriority, value66, value67 = 0x0, decode = {}) {
+function applyPreviewMediaSrcAfterPreload(fetchPriority, value66, value67 = 0, decode = {}) {
   const enabled10 = value66[value67] || '';
   if (!enabled10) return ![];
   const enabled11 = fetchPriority['getAttribute']?.('src') || fetchPriority['src'] || '';
@@ -865,7 +865,7 @@ function applyPreviewMediaSrcAfterPreload(fetchPriority, value66, value67 = 0x0,
     !![]
   );
 }
-function setPreviewMediaSrcJoiningSharedAcquisition(value69, value70, value71 = 0x0, args = {}) {
+function setPreviewMediaSrcJoiningSharedAcquisition(value69, value70, value71 = 0, args = {}) {
   const enabled12 = value70[value71] || '';
   if (!enabled12) return ![];
   if (
@@ -893,7 +893,7 @@ export function cancelRendererFastPreviewMediaPreloads({
   });
 }
 function previewMediaNeedsSrc(el46, value72) {
-  const uniquePreviewUrls2 = uniquePreviewUrls(Array['isArray'](value72) ? value72 : [value72])[0x0] || '';
+  const uniquePreviewUrls2 = uniquePreviewUrls(Array['isArray'](value72) ? value72 : [value72])[0] || '';
   if (!uniquePreviewUrls2) return ![];
   const enabled13 = el46?.['querySelector']?.('.v2-fast-preview-media');
   if (!enabled13) return !![];
@@ -903,12 +903,12 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
   let image = el47['querySelector']('.v2-fast-preview-media');
   const list17 = uniquePreviewUrls(Array['isArray'](value73) ? value73 : [value73]),
     previewMediaCurrentSrc3 = getPreviewMediaCurrentSrc(image);
-  list17['length'] > 0x0 &&
+  list17['length'] > 0 &&
     previewMediaCurrentSrc3 &&
     !list17['includes'](previewMediaCurrentSrc3) &&
     isCanvasImagePreloadSharedImage(image) &&
     ((image['onload'] = null), (image['onerror'] = null), image['remove']?.(), (image = null));
-  if (list17['length'] === 0x0) {
+  if (list17['length'] === 0) {
     if (image) viewportBusy2['cancelPendingMediaSrc']?.(image);
     const value75 =
       viewportBusy2['preserveInFlightResource'] !== ![] &&
@@ -924,7 +924,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
       viewportBusy2['placeholderReady'] === !![]
         ? (el47['dataset']['placeholderReady'] = '1')
         : delete el47['dataset']['placeholderReady'],
-      { imageCount: 0x0, srcAssignedCount: 0x0 }
+      { imageCount: 0, srcAssignedCount: 0 }
     );
   }
   delete el47['dataset']['placeholderReady'];
@@ -950,12 +950,12 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     (image['_previewMediaSrcBatchLimit'] =
       viewportBusy2['mediaSrcBatchLimit'] != null &&
       Number['isFinite'](Number(viewportBusy2['mediaSrcBatchLimit']))
-        ? Math['max'](0x0, Math['trunc'](Number(viewportBusy2['mediaSrcBatchLimit'])))
+        ? Math['max'](0, Math['trunc'](Number(viewportBusy2['mediaSrcBatchLimit'])))
         : null),
     (image['_previewVideoMediaSrcBatchLimit'] =
       viewportBusy2['videoMediaSrcBatchLimit'] != null &&
       Number['isFinite'](Number(viewportBusy2['videoMediaSrcBatchLimit']))
-        ? Math['max'](0x0, Math['trunc'](Number(viewportBusy2['videoMediaSrcBatchLimit'])))
+        ? Math['max'](0, Math['trunc'](Number(viewportBusy2['videoMediaSrcBatchLimit'])))
         : null),
     (image['_previewDirectWhenBlank'] = viewportBusy2['directWhenBlank'] === !![]),
     delete image['dataset']['previewResourceOnly']);
@@ -965,7 +965,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     if (!enabled14 || !isPreviewMediaLoaded(image)) return;
     if (
       String(image['tagName'] || '')['toLowerCase']() === 'img' &&
-      (image['complete'] === ![] || Number(image['naturalWidth'] || 0x0) <= 0x0)
+      (image['complete'] === ![] || Number(image['naturalWidth'] || 0) <= 0)
     )
       return;
     const value78 = String(viewportBusy2['nodeId'] || '') + '\x00' + enabled14;
@@ -984,8 +984,8 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
         enabled15,
         {
           image: image,
-          naturalWidth: image['naturalWidth'] || image['width'] || 0x0,
-          naturalHeight: image['naturalHeight'] || image['height'] || 0x0,
+          naturalWidth: image['naturalWidth'] || image['width'] || 0,
+          naturalHeight: image['naturalHeight'] || image['height'] || 0,
         },
         { retainImage: !![] },
       ),
@@ -993,8 +993,8 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
   }),
     (image['onerror'] = () => {
       (forgetCanvasImageDisplayLoad(image), delete image['dataset']['previewLoaded']);
-      const value79 = Math['max'](0x0, Number(image['dataset']?.['srcIndex']) || 0x0),
-        value80 = value79 + 0x1;
+      const value79 = Math['max'](0, Number(image['dataset']?.['srcIndex']) || 0),
+        value80 = value79 + 1;
       !applyPreviewMediaSrcAfterPreload(image, image['_previewSources'] || [], value80) &&
         (image['onerror'] = null);
     }));
@@ -1004,20 +1004,20 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     let srcAssignedCount = ![];
     if (viewportBusy2['fallbackWhileDecoding'] === !![]) {
       const previewMediaCurrentSrc4 = getPreviewMediaCurrentSrc(image),
-        enabled16 = !previewMediaCurrentSrc4 && list17['length'] > 0x1;
+        enabled16 = !previewMediaCurrentSrc4 && list17['length'] > 1;
       (enabled16 &&
-        (srcAssignedCount = setPreviewMediaSrcJoiningSharedAcquisition(image, list17, 0x1, {
+        (srcAssignedCount = setPreviewMediaSrcJoiningSharedAcquisition(image, list17, 1, {
           decode: ![],
           viewportBusy: viewportBusy2['viewportBusy'] === !![],
         })),
         viewportBusy2['holdFallbackWhileBusy'] !== !![] &&
-          (srcAssignedCount = applyPreviewMediaSrcAfterPreload(image, list17, 0x0, {
+          (srcAssignedCount = applyPreviewMediaSrcAfterPreload(image, list17, 0, {
             decode: !![],
             directWhenBlank: viewportBusy2['directWhenBlank'] === !![] && !enabled16,
             viewportBusy: viewportBusy2['viewportBusy'] === !![],
           })));
     } else
-      srcAssignedCount = setPreviewMediaSrcJoiningSharedAcquisition(image, list17, 0x0, {
+      srcAssignedCount = setPreviewMediaSrcJoiningSharedAcquisition(image, list17, 0, {
         decode: viewportBusy2['kind'] === 'image',
         directWhenBlank: viewportBusy2['directWhenBlank'] === !![],
         viewportBusy: viewportBusy2['viewportBusy'] === !![],
@@ -1027,7 +1027,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
       (el47['dataset']['hasMedia'] = '1'),
       (el47['dataset']['previewSrcCount'] = String(list17['length'])),
       run(),
-      { imageCount: 0x1, srcAssignedCount: srcAssignedCount ? 0x1 : 0x0 }
+      { imageCount: 1, srcAssignedCount: srcAssignedCount ? 1 : 0 }
     );
   }
   return (
@@ -1035,7 +1035,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     (el47['dataset']['hasMedia'] = '1'),
     (el47['dataset']['previewSrcCount'] = String(list17['length'])),
     run(),
-    { imageCount: 0x1, srcAssignedCount: 0x0 }
+    { imageCount: 1, srcAssignedCount: 0 }
   );
 }
 function syncPreviewEl(
@@ -1046,8 +1046,8 @@ function syncPreviewEl(
     text: text,
     sources: sources2,
     geometry: geometry2,
-    offsetX: offsetX = 0x0,
-    offsetY: offsetY = 0x0,
+    offsetX: offsetX = 0,
+    offsetY: offsetY = 0,
     mediaLoading: mediaLoading = 'eager',
     mediaFetchPriority: mediaFetchPriority = 'high',
     mediaCritical: mediaCritical = ![],
@@ -1072,12 +1072,12 @@ function syncPreviewEl(
     value83 = Array['isArray'](sources2) ? sources2['join']('>') : String(sources2 || ''),
     value84 = value81 + ',' + value82 + ',' + width3 + ',' + height3,
     value85 = kind3 === 'audio' ? getAudioPreviewTimeText(nodeId) : '',
-    value86 = kind3 + '|' + text + '|' + value83 + '|' + (placeholderReady ? 0x1 : 0x0) + '|' + value85,
+    value86 = kind3 + '|' + text + '|' + value83 + '|' + (placeholderReady ? 1 : 0) + '|' + value85,
     enabled17 = el48['_previewGeometrySig'] !== value84,
     enabled18 = el48['_previewContentSig'] !== value86;
   if (!enabled18) {
     const enabled19 = el48['querySelector']('.v2-fast-preview-media'),
-      value87 = (!Array['isArray'](sources2) || sources2['length'] === 0x0) && !!enabled19,
+      value87 = (!Array['isArray'](sources2) || sources2['length'] === 0) && !!enabled19,
       enabled20 =
         value87 ||
         previewMediaNeedsSrc(el48, sources2) ||
@@ -1103,7 +1103,7 @@ function syncPreviewEl(
   }
   if (enabled17 || value90) applyPreviewDragTransform(el48);
   const enabled21 = el48['querySelector']('.v2-fast-preview-media'),
-    value92 = (!Array['isArray'](sources2) || sources2['length'] === 0x0) && !!enabled21,
+    value92 = (!Array['isArray'](sources2) || sources2['length'] === 0) && !!enabled21,
     enabled22 =
       enabled18 ||
       value92 ||
@@ -1134,11 +1134,11 @@ function syncPreviewEl(
 }
 function applyPreviewDragTransform(el49) {
   if (!el49) return ![];
-  const toNumber2 = toNumber(el49['_previewBaseX'], 0x0),
-    toNumber3 = toNumber(el49['_previewBaseY'], 0x0),
+  const toNumber2 = toNumber(el49['_previewBaseX'], 0),
+    toNumber3 = toNumber(el49['_previewBaseY'], 0),
     value93 = el49['_previewDragActive'] === !![],
-    value94 = value93 ? toNumber(el49['_previewDragDx'], 0x0) : 0x0,
-    value95 = value93 ? toNumber(el49['_previewDragDy'], 0x0) : 0x0;
+    value94 = value93 ? toNumber(el49['_previewDragDx'], 0) : 0,
+    value95 = value93 ? toNumber(el49['_previewDragDy'], 0) : 0;
   ((el49['style']['transform'] =
     'translate(' + (toNumber2 + value94) + 'px, ' + (toNumber3 + value95) + 'px)'),
     el49['classList']?.['toggle']?.('is-dragging-proxy', value93));
@@ -1149,20 +1149,20 @@ function applyPreviewDragTransform(el49) {
 function resetPreviewDragState(el50) {
   if (!el50) return;
   ((el50['_previewDragActive'] = ![]),
-    (el50['_previewDragDx'] = 0x0),
-    (el50['_previewDragDy'] = 0x0),
+    (el50['_previewDragDx'] = 0),
+    (el50['_previewDragDy'] = 0),
     applyPreviewDragTransform(el50),
     el50['classList']?.['remove']?.('is-dragging-proxy'),
     delete el50['dataset']['dragProxy']);
 }
-function settlePreviewDragState(enabled23, value96 = 0x0, value97 = 0x0) {
+function settlePreviewDragState(enabled23, value96 = 0, value97 = 0) {
   if (!enabled23) return ![];
   return (
-    (enabled23['_previewBaseX'] = toNumber(enabled23['_previewBaseX'], 0x0) + toNumber(value96, 0x0)),
-    (enabled23['_previewBaseY'] = toNumber(enabled23['_previewBaseY'], 0x0) + toNumber(value97, 0x0)),
+    (enabled23['_previewBaseX'] = toNumber(enabled23['_previewBaseX'], 0) + toNumber(value96, 0)),
+    (enabled23['_previewBaseY'] = toNumber(enabled23['_previewBaseY'], 0) + toNumber(value97, 0)),
     (enabled23['_previewDragActive'] = ![]),
-    (enabled23['_previewDragDx'] = 0x0),
-    (enabled23['_previewDragDy'] = 0x0),
+    (enabled23['_previewDragDx'] = 0),
+    (enabled23['_previewDragDy'] = 0),
     applyPreviewDragTransform(enabled23)
   );
 }
@@ -1215,14 +1215,14 @@ function buildPreviewCandidateSyncSignature(response, value104, el52 = null) {
     map4 = value104?.['requiredImmediateMediaSourceOwnerIds'],
     list19 = Array['isArray'](value106['invalidNodeIds']) ? value106['invalidNodeIds'] : [],
     el53 = el52?.['querySelector']?.('.v2-fast-preview-media') || null,
-    value108 = String(sources[0x0] || '')['trim'](),
+    value108 = String(sources[0] || '')['trim'](),
     value109 =
       (response?.['fullEligibleVisible'] === !![] || response?.['visible'] === !![]) &&
       (kind4 === 'video' ||
-        toNumber(value104?.['visibleMediaCandidateCount'], 0x0) <=
-          toNumber(value104?.['immediateMediaSrcLimit'], 0x0)),
-    toNumber4 = toNumber(geometry['x'], 0x0) - toNumber(value104?.['layerBounds']?.['offsetX'], 0x0),
-    toNumber5 = toNumber(geometry['y'], 0x0) - toNumber(value104?.['layerBounds']?.['offsetY'], 0x0);
+        toNumber(value104?.['visibleMediaCandidateCount'], 0) <=
+          toNumber(value104?.['immediateMediaSrcLimit'], 0)),
+    toNumber4 = toNumber(geometry['x'], 0) - toNumber(value104?.['layerBounds']?.['offsetX'], 0),
+    toNumber5 = toNumber(geometry['y'], 0) - toNumber(value104?.['layerBounds']?.['offsetY'], 0);
   return [
     nodeId2,
     kind4,
@@ -1230,39 +1230,39 @@ function buildPreviewCandidateSyncSignature(response, value104, el52 = null) {
     sources['join']('>'),
     toNumber4,
     toNumber5,
-    toNumber(geometry['width'], 0x0),
-    toNumber(geometry['height'], 0x0),
-    response?.['nearViewport'] === !![] ? 0x1 : 0x0,
-    response?.['visible'] === !![] ? 0x1 : 0x0,
-    response?.['fullEligibleVisible'] === !![] ? 0x1 : 0x0,
-    response?.['fullEligiblePreview'] === !![] ? 0x1 : 0x0,
-    response?.['fullEligibleMotionAhead'] === !![] ? 0x1 : 0x0,
-    response?.['motionFront'] === !![] ? 0x1 : 0x0,
-    response?.['motionAhead'] === !![] ? 0x1 : 0x0,
-    response?.['selected'] === !![] ? 0x1 : 0x0,
-    response?.['retained'] === !![] ? 0x1 : 0x0,
-    response?.['mounted'] === !![] ? 0x1 : 0x0,
-    value104?.['mediaPlan']?.['nodeIdsWithMedia']?.['has']?.(nodeId2) === !![] ? 0x1 : 0x0,
-    map3 === null ? 'legacy' : map3?.['has']?.(nodeId2) === !![] ? 0x1 : 0x0,
-    map4 === null ? 'legacy' : map4?.['has']?.(nodeId2) === !![] ? 0x1 : 0x0,
-    value104?.['mediaPlan']?.['lowPriority'] === !![] ? 0x1 : 0x0,
-    value104?.['mediaPlan']?.['prefetchAhead'] === !![] ? 0x1 : 0x0,
+    toNumber(geometry['width'], 0),
+    toNumber(geometry['height'], 0),
+    response?.['nearViewport'] === !![] ? 1 : 0,
+    response?.['visible'] === !![] ? 1 : 0,
+    response?.['fullEligibleVisible'] === !![] ? 1 : 0,
+    response?.['fullEligiblePreview'] === !![] ? 1 : 0,
+    response?.['fullEligibleMotionAhead'] === !![] ? 1 : 0,
+    response?.['motionFront'] === !![] ? 1 : 0,
+    response?.['motionAhead'] === !![] ? 1 : 0,
+    response?.['selected'] === !![] ? 1 : 0,
+    response?.['retained'] === !![] ? 1 : 0,
+    response?.['mounted'] === !![] ? 1 : 0,
+    value104?.['mediaPlan']?.['nodeIdsWithMedia']?.['has']?.(nodeId2) === !![] ? 1 : 0,
+    map3 === null ? 'legacy' : map3?.['has']?.(nodeId2) === !![] ? 1 : 0,
+    map4 === null ? 'legacy' : map4?.['has']?.(nodeId2) === !![] ? 1 : 0,
+    value104?.['mediaPlan']?.['lowPriority'] === !![] ? 1 : 0,
+    value104?.['mediaPlan']?.['prefetchAhead'] === !![] ? 1 : 0,
     value104?.['mediaLoading'] || '',
     value104?.['mediaFetchPriority'] || '',
-    value109 ? 0x1 : 0x0,
-    value104?.['viewportBusy'] === !![] ? 0x1 : 0x0,
-    value105['suppressNewMedia'] === !![] ? 0x1 : 0x0,
-    value105['suspendNewMediaSrc'] === !![] ? 0x1 : 0x0,
-    value105['previewMotion']?.['zoomChanged'] === !![] ? 0x1 : 0x0,
+    value109 ? 1 : 0,
+    value104?.['viewportBusy'] === !![] ? 1 : 0,
+    value105['suppressNewMedia'] === !![] ? 1 : 0,
+    value105['suspendNewMediaSrc'] === !![] ? 1 : 0,
+    value105['previewMotion']?.['zoomChanged'] === !![] ? 1 : 0,
     String(value106['srcId'] || ''),
     String(value106['hoverId'] || ''),
     String(value106['side'] || ''),
-    list19['includes'](nodeId2) ? 0x1 : 0x0,
-    value107['active'] === !![] ? 0x1 : 0x0,
+    list19['includes'](nodeId2) ? 1 : 0,
+    value107['active'] === !![] ? 1 : 0,
     String(value107['sourceNodeId'] || ''),
     String(value107['hoverNodeId'] || ''),
     String(value107['handleDirection'] || ''),
-    isStoryboardEditingNode(node) ? 0x1 : 0x0,
+    isStoryboardEditingNode(node) ? 1 : 0,
     el52?.['dataset']?.['mediaSourceOwner'] || '',
     el52?.['dataset']?.['hasMedia'] || '',
     el52?.['dataset']?.['placeholderReady'] || '',
@@ -1272,11 +1272,11 @@ function buildPreviewCandidateSyncSignature(response, value104, el52 = null) {
     el53?.['style']?.['visibility'] || '',
     el53?.['loading'] || '',
     el53?.['fetchPriority'] || '',
-    value108 && kind4 !== 'video' && isCanvasImagePreloadCoolingDown(value108) ? 0x1 : 0x0,
+    value108 && kind4 !== 'video' && isCanvasImagePreloadCoolingDown(value108) ? 1 : 0,
   ]['join']('\x1f');
 }
 function syncLayerBounds(offsetX2, list20, { preserveAnchor: preserveAnchor = ![] } = {}) {
-  if (!offsetX2 || !Array['isArray'](list20) || list20['length'] === 0x0) return null;
+  if (!offsetX2 || !Array['isArray'](list20) || list20['length'] === 0) return null;
   if (
     preserveAnchor &&
     Number['isFinite'](offsetX2['_previewOffsetX']) &&
@@ -1298,8 +1298,8 @@ function syncLayerBounds(offsetX2, list20, { preserveAnchor: preserveAnchor = ![
   if (![value110, value111, value112, value113]['every'](Number['isFinite'])) return null;
   const left = value110 - FAST_PREVIEW_LAYER_PADDING,
     top = value111 - FAST_PREVIEW_LAYER_PADDING,
-    width4 = 0x1,
-    height4 = 0x1,
+    width4 = 1,
+    height4 = 1,
     value115 = left + ',' + top + ',' + width4 + ',' + height4;
   return (
     offsetX2['_previewBoundsSig'] !== value115 &&
@@ -1335,13 +1335,13 @@ export function createRendererFastPreviewLayer({
     setTimeout2 = null,
     value117 = Number['POSITIVE_INFINITY'],
     value118 = Number['POSITIVE_INFINITY'],
-    nowPerf2 = 0x0,
+    nowPerf2 = 0,
     enabled30 = ![],
     value119 = null,
     value120 = null,
     args2 = null,
     value121 = null,
-    generation = 0x0,
+    generation = 0,
     el54 = null,
     value122 = null,
     value123 = null,
@@ -1423,7 +1423,7 @@ export function createRendererFastPreviewLayer({
       nowPerf2 = nowPerf() + FAST_PREVIEW_BUSY_HINT_TTL_MS;
       return;
     }
-    if (value135 === ![]) nowPerf2 = 0x0;
+    if (value135 === ![]) nowPerf2 = 0;
   }
   function run9() {
     return nowPerf2 > nowPerf();
@@ -1448,7 +1448,7 @@ export function createRendererFastPreviewLayer({
       viewport = normalizeViewport(options15?.['viewport'])['zoom'],
       value137 = value120;
     ((value119 = center), (value120 = viewport));
-    if (!box6) return { center: center, dx: 0x0, dy: 0x0, active: ![], zoomChanged: ![] };
+    if (!box6) return { center: center, dx: 0, dy: 0, active: ![], zoomChanged: ![] };
     const dx2 = center['x'] - box6['x'],
       dy2 = center['y'] - box6['y'];
     return {
@@ -1462,8 +1462,8 @@ export function createRendererFastPreviewLayer({
   function run12(value138, value139) {
     const value140 = value138?.['_previewMediaQueuePriority'] || {},
       value141 = value139?.['_previewMediaQueuePriority'] || {},
-      value142 = Number['isFinite'](Number(value140['userRank'])) ? Number(value140['userRank']) : 0x3,
-      value143 = Number['isFinite'](Number(value141['userRank'])) ? Number(value141['userRank']) : 0x3;
+      value142 = Number['isFinite'](Number(value140['userRank'])) ? Number(value140['userRank']) : 3,
+      value143 = Number['isFinite'](Number(value141['userRank'])) ? Number(value141['userRank']) : 3;
     if (value142 !== value143) return value142 - value143;
     const value144 = Number['isFinite'](Number(value140['distanceSq']))
         ? Number(value140['distanceSq'])
@@ -1472,19 +1472,19 @@ export function createRendererFastPreviewLayer({
         ? Number(value141['distanceSq'])
         : Number['POSITIVE_INFINITY'];
     if (value144 !== value145) return value144 - value145;
-    const value146 = Number['isFinite'](Number(value140['order'])) ? Number(value140['order']) : 0x0,
-      value147 = Number['isFinite'](Number(value141['order'])) ? Number(value141['order']) : 0x0;
+    const value146 = Number['isFinite'](Number(value140['order'])) ? Number(value140['order']) : 0,
+      value147 = Number['isFinite'](Number(value141['order'])) ? Number(value141['order']) : 0;
     return value146 - value147;
   }
   function run13(value148) {
     let value149 = pendingMediaSrcCount['length'];
-    for (let value150 = 0x0; value150 < pendingMediaSrcCount['length']; value150 += 0x1) {
-      if (run12(value148, pendingMediaSrcCount[value150]) < 0x0) {
+    for (let value150 = 0; value150 < pendingMediaSrcCount['length']; value150 += 1) {
+      if (run12(value148, pendingMediaSrcCount[value150]) < 0) {
         value149 = value150;
         break;
       }
     }
-    pendingMediaSrcCount['splice'](value149, 0x0, value148);
+    pendingMediaSrcCount['splice'](value149, 0, value148);
   }
   function run14() {
     pendingMediaSrcCount['sort'](run12);
@@ -1501,7 +1501,7 @@ export function createRendererFastPreviewLayer({
   }
   function run16() {
     const isPerfProbeEnabled2 = isPerfProbeEnabled(),
-      startPerf = isPerfProbeEnabled2 ? nowPerf() : 0x0;
+      startPerf = isPerfProbeEnabled2 ? nowPerf() : 0;
     ((value116 = null), run7());
     const viewportBusy3 = run9() || isViewportInteractionBusyForPreview(),
       batchLimit = pendingMediaSrcCount['reduce'](
@@ -1510,7 +1510,7 @@ export function createRendererFastPreviewLayer({
             value151,
             value152?.['_previewMediaSrcBatchLimit'] != null &&
               Number['isFinite'](Number(value152['_previewMediaSrcBatchLimit']))
-              ? Math['max'](0x0, Math['trunc'](Number(value152['_previewMediaSrcBatchLimit'])))
+              ? Math['max'](0, Math['trunc'](Number(value152['_previewMediaSrcBatchLimit'])))
               : Number['POSITIVE_INFINITY'],
           ),
         Number['POSITIVE_INFINITY'],
@@ -1521,7 +1521,7 @@ export function createRendererFastPreviewLayer({
             value153,
             value154?.['_previewVideoMediaSrcBatchLimit'] != null &&
               Number['isFinite'](Number(value154['_previewVideoMediaSrcBatchLimit']))
-              ? Math['max'](0x0, Math['trunc'](Number(value154['_previewVideoMediaSrcBatchLimit'])))
+              ? Math['max'](0, Math['trunc'](Number(value154['_previewVideoMediaSrcBatchLimit'])))
               : Number['POSITIVE_INFINITY'],
           ),
         Number['POSITIVE_INFINITY'],
@@ -1534,15 +1534,15 @@ export function createRendererFastPreviewLayer({
         viewportBusy: viewportBusy3,
         batchLimit: batchLimit2,
       }),
-      srcAssignedCount2 = 0x0,
-      videoSrcAssignedCount = 0x0,
-      videoDeferredCount = 0x0;
+      srcAssignedCount2 = 0,
+      videoSrcAssignedCount = 0,
+      videoDeferredCount = 0;
     const list22 = [],
       value155 = pendingMediaSrcCount['length'];
-    let value156 = 0x0;
-    while (mediaSrcBatchSize > 0x0 && pendingMediaSrcCount['length'] > 0x0 && value156 < value155) {
+    let value156 = 0;
+    while (mediaSrcBatchSize > 0 && pendingMediaSrcCount['length'] > 0 && value156 < value155) {
       const el58 = pendingMediaSrcCount['shift']();
-      value156 += 0x1;
+      value156 += 1;
       if (!el58) continue;
       if (el58['isConnected'] === ![]) {
         map9['delete'](el58);
@@ -1550,25 +1550,25 @@ export function createRendererFastPreviewLayer({
       }
       const isPreviewVideoMedia2 = isPreviewVideoMedia(el58),
         decode2 = isPreviewCriticalMedia(el58);
-      if (isPreviewVideoMedia2 && !decode2 && videoMediaSrcBatchSize <= 0x0) {
-        (list22['push'](el58), (videoDeferredCount += 0x1));
+      if (isPreviewVideoMedia2 && !decode2 && videoMediaSrcBatchSize <= 0) {
+        (list22['push'](el58), (videoDeferredCount += 1));
         continue;
       }
       map9['delete'](el58);
       if (
-        applyPreviewMediaSrcAfterPreload(el58, el58['_previewSources'] || [], 0x0, {
+        applyPreviewMediaSrcAfterPreload(el58, el58['_previewSources'] || [], 0, {
           decode: decode2 !== !![],
           directWhenBlank: decode2 === !![] || el58['_previewDirectWhenBlank'] === !![],
           viewportBusy: viewportBusy3,
         })
       ) {
-        srcAssignedCount2 += 0x1;
-        if (isPreviewVideoMedia2) videoSrcAssignedCount += 0x1;
+        srcAssignedCount2 += 1;
+        if (isPreviewVideoMedia2) videoSrcAssignedCount += 1;
       }
-      if (isPreviewVideoMedia2 && !decode2) videoMediaSrcBatchSize -= 0x1;
-      mediaSrcBatchSize -= 0x1;
+      if (isPreviewVideoMedia2 && !decode2) videoMediaSrcBatchSize -= 1;
+      mediaSrcBatchSize -= 1;
     }
-    list22['length'] > 0x0 && (pendingMediaSrcCount['push'](...list22), run14());
+    list22['length'] > 0 && (pendingMediaSrcCount['push'](...list22), run14());
     if (isPerfProbeEnabled2) {
       const endPerf = nowPerf();
       recordFastPreviewSample('media-src-batch', endPerf - startPerf, {
@@ -1580,11 +1580,11 @@ export function createRendererFastPreviewLayer({
         videoSrcAssignedCount: videoSrcAssignedCount,
       });
     }
-    if (pendingMediaSrcCount['length'] > 0x0) run15({ retryWhenBusy: viewportBusy3 });
+    if (pendingMediaSrcCount['length'] > 0) run15({ retryWhenBusy: viewportBusy3 });
   }
   function scheduleMediaSrc2(enabled35) {
     if (!enabled35) return;
-    const enabled36 = enabled35['_previewSources']?.[0x0] || '';
+    const enabled36 = enabled35['_previewSources']?.[0] || '';
     if (!enabled36) return;
     const value157 = enabled35['getAttribute']?.('src') || enabled35['src'] || '';
     if (value157 === enabled36) return;
@@ -1649,7 +1649,7 @@ export function createRendererFastPreviewLayer({
       preservePaintedVideoOwners: preservePaintedVideoOwners = ![],
     } = {},
   ) {
-    if (value161 == null || typeof value161?.[Symbol['iterator']] !== 'function') return 0x0;
+    if (value161 == null || typeof value161?.[Symbol['iterator']] !== 'function') return 0;
     const mediaSourceOwnerIds = new Set(
       Array['from'](value161, (value162) => String(value162 || ''))['filter'](Boolean),
     );
@@ -1661,7 +1661,7 @@ export function createRendererFastPreviewLayer({
         ),
       )),
       (args2['options'] = { ...args2['options'], mediaSourceOwnerIds: mediaSourceOwnerIds }));
-    let count9 = 0x0;
+    let count9 = 0;
     for (const [value164, el62] of existingPreviewNodeIds) {
       if (mediaSourceOwnerIds['has'](value164))
         ((el62['dataset']['mediaSourceOwner'] = '1'), restorePaintedPreviewMedia(el62));
@@ -1673,7 +1673,7 @@ export function createRendererFastPreviewLayer({
           ((el62['dataset']['mediaSourceOwner'] = '1'), restorePaintedPreviewMedia(el62));
         else {
           delete el62['dataset']['mediaSourceOwner'];
-          if (run20(el62)) count9 += 0x1;
+          if (run20(el62)) count9 += 1;
         }
       }
     }
@@ -1689,14 +1689,14 @@ export function createRendererFastPreviewLayer({
           restorePaintedPreviewMedia(el63);
         else {
           delete el63['dataset']['mediaSourceOwner'];
-          if (run20(el63)) count9 += 0x1;
+          if (run20(el63)) count9 += 1;
         }
       }
     }
     for (const value166 of map7['values']()) {
-      !mediaSourceOwnerIds['has'](value166['nodeId']) && run20(value166['el']) && (count9 += 0x1);
+      !mediaSourceOwnerIds['has'](value166['nodeId']) && run20(value166['el']) && (count9 += 1);
     }
-    if (count9 > 0x0) run21();
+    if (count9 > 0) run21();
     return count9;
   }
   function run22(el64) {
@@ -1741,7 +1741,7 @@ export function createRendererFastPreviewLayer({
           const value171 = el66?.['querySelector']?.('.v2-fast-preview-media');
           return !isPreviewMediaResourceProtected(value171);
         }),
-        enabled39 = value169?.[0x0];
+        enabled39 = value169?.[0];
       if (!enabled39) {
         if (map6['size'] <= FAST_PREVIEW_DETACHED_IN_FLIGHT_CACHE_LIMIT) break;
       }
@@ -1756,7 +1756,7 @@ export function createRendererFastPreviewLayer({
         const value176 = el67?.['querySelector']?.('.v2-fast-preview-media');
         return !isPreviewMediaResourceProtected(value176);
       }),
-      enabled40 = value174?.[0x0];
+      enabled40 = value174?.[0];
     if (!enabled40) return null;
     const value177 = map6['get'](enabled40);
     return (map6['delete'](enabled40), run22(value177), value177 || null);
@@ -1808,7 +1808,7 @@ export function createRendererFastPreviewLayer({
         ((response2['sourcesDisplayFirst'] = previewMediaUrls),
         (response2['sourcesThumbnailFirst'] = previewMediaUrls2)),
         (text2['sources'] = text2['fullEligiblePreview'] ? previewMediaUrls : previewMediaUrls2),
-        (text2['hasMediaHint'] = text2['sources']['length'] > 0x0),
+        (text2['hasMediaHint'] = text2['sources']['length'] > 0),
         response2 &&
           response2['text'] == null &&
           (response2['text'] = getPreviewText(text2['node'], text2['kind'])),
@@ -1831,14 +1831,14 @@ export function createRendererFastPreviewLayer({
       const value181 = Array['from'](map7['values']())['find']((value182) => value182['nodeId'] === nodeId4);
       value181 && (run29(value181), (el69 = existingPreviewNodeIds['get'](nodeId4)));
     }
-    let createdCount = 0x0,
-      reusedCount = 0x0;
+    let createdCount = 0,
+      reusedCount = 0;
     if (!el69) {
       ((el69 = run26(nodeId4)),
         existingPreviewNodeIds['set'](nodeId4, el69),
         (offsetX3['mountFragment'] || offsetX3['layer'])['appendChild'](el69));
-      if (el69['_fastPreviewReused'] === !![]) reusedCount = 0x1;
-      else createdCount = 0x1;
+      if (el69['_fastPreviewReused'] === !![]) reusedCount = 1;
+      else createdCount = 1;
       delete el69['_fastPreviewReused'];
     } else el69['parentNode'] !== offsetX3['layer'] && offsetX3['layer']['appendChild'](el69);
     run2(nodeId4, !![]);
@@ -1866,7 +1866,7 @@ export function createRendererFastPreviewLayer({
             offsetX3['options'],
           )),
           (offsetX3['pendingMediaPriorityChanged'] = !![])),
-        { createdCount: 0x0, imageCount: 0x0, reusedCount: 0x0, srcAssignedCount: 0x0 }
+        { createdCount: 0, imageCount: 0, reusedCount: 0, srcAssignedCount: 0 }
       );
     }
     const enabled46 = offsetX3['mediaPlan']['nodeIdsWithMedia']['has'](nodeId4),
@@ -1887,7 +1887,7 @@ export function createRendererFastPreviewLayer({
       value188 =
         enabled46 &&
         kind5 === 'video' &&
-        sources3['length'] > 0x0 &&
+        sources3['length'] > 0 &&
         (text2['motionFront'] ||
           (visible &&
             (text2['mounted'] ||
@@ -1896,7 +1896,7 @@ export function createRendererFastPreviewLayer({
       value189 =
         enabled46 &&
         kind5 === 'image' &&
-        sources3['length'] > 0x0 &&
+        sources3['length'] > 0 &&
         (text2['fullEligibleVisible'] ||
           (isRendererFastPreviewMediaReadable(geometry3, offsetX3['options']) &&
             (text2['motionFront'] || visible)) ||
@@ -1923,7 +1923,7 @@ export function createRendererFastPreviewLayer({
         else value190 && (sources4 = [value190]);
       }
     }
-    const value191 = sources4['length'] > 0x0,
+    const value191 = sources4['length'] > 0,
       value192 = enabled46 && value191 && (text2['selected'] || text2['retained'] || text2['mounted']),
       value193 = value191 && previewMediaNeedsSrc(el69, sources4),
       value194 = kind5 === 'video' && value191,
@@ -1951,11 +1951,11 @@ export function createRendererFastPreviewLayer({
       deferMediaSrc2 =
         value193 &&
         !mediaCritical2 &&
-        (offsetX3['immediateMediaSrcSlotsRef']['value'] <= 0x0 ||
-          (value194 && offsetX3['immediateVideoMediaSrcSlotsRef']['value'] <= 0x0));
+        (offsetX3['immediateMediaSrcSlotsRef']['value'] <= 0 ||
+          (value194 && offsetX3['immediateVideoMediaSrcSlotsRef']['value'] <= 0));
     if (value193 && !deferMediaSrc2) {
-      if (!mediaCritical2) offsetX3['immediateMediaSrcSlotsRef']['value'] -= 0x1;
-      value194 && !mediaCritical2 && (offsetX3['immediateVideoMediaSrcSlotsRef']['value'] -= 0x1);
+      if (!mediaCritical2) offsetX3['immediateMediaSrcSlotsRef']['value'] -= 1;
+      value194 && !mediaCritical2 && (offsetX3['immediateVideoMediaSrcSlotsRef']['value'] -= 1);
     }
     const value198 = (enabled46 && value191 && offsetX3['mediaPlan']['prefetchAhead'] === !![]) || value197,
       syncPreviewEl2 = syncPreviewEl(el69, node2, {
@@ -1979,7 +1979,7 @@ export function createRendererFastPreviewLayer({
         mediaHoldFallbackWhileBusy:
           offsetX3['viewportBusy'] && offsetX3['options']?.['suspendNewMediaSrc'] === !![],
         viewportBusy: offsetX3['viewportBusy'],
-        placeholderReady: sources3['length'] === 0x0,
+        placeholderReady: sources3['length'] === 0,
         preserveInFlightResource: offsetX3['options']?.['suspendNewMediaSrc'] !== !![],
         queuePriority: resolveRendererFastPreviewMediaQueuePriority(text2, offsetX3['options']),
         mediaSrcBatchLimit: offsetX3['mediaSrcBatchLimit'],
@@ -1996,15 +1996,15 @@ export function createRendererFastPreviewLayer({
       (el69['_previewCandidateSyncSig'] = buildPreviewCandidateSyncSignature(text2, offsetX3, el69)),
       {
         createdCount: createdCount,
-        imageCount: Number(syncPreviewEl2?.['imageCount'] || 0x0),
+        imageCount: Number(syncPreviewEl2?.['imageCount'] || 0),
         reusedCount: reusedCount,
-        srcAssignedCount: Number(syncPreviewEl2?.['srcAssignedCount'] || 0x0),
+        srcAssignedCount: Number(syncPreviewEl2?.['srcAssignedCount'] || 0),
       }
     );
   }
   function run30() {
     const isPerfProbeEnabled3 = isPerfProbeEnabled(),
-      startPerf2 = isPerfProbeEnabled3 ? nowPerf() : 0x0;
+      startPerf2 = isPerfProbeEnabled3 ? nowPerf() : 0;
     value121 = null;
     const pendingCreateCount = args2;
     if (
@@ -2017,17 +2017,17 @@ export function createRendererFastPreviewLayer({
     }
     let count10 =
         Number(pendingCreateCount['createBatchSize']) || FAST_PREVIEW_FALLBACK_NODE_CREATE_BATCH_SIZE,
-      createdCount2 = 0x0,
-      imageCount = 0x0,
-      reusedCount2 = 0x0,
-      srcAssignedCount3 = 0x0;
-    while (count10 > 0x0 && pendingCreateCount['candidates']['length'] > 0x0) {
+      createdCount2 = 0,
+      imageCount = 0,
+      reusedCount2 = 0,
+      srcAssignedCount3 = 0;
+    while (count10 > 0 && pendingCreateCount['candidates']['length'] > 0) {
       const value199 = run28(pendingCreateCount['candidates']['shift'](), pendingCreateCount);
-      ((createdCount2 += Number(value199?.['createdCount'] || 0x0)),
-        (imageCount += Number(value199?.['imageCount'] || 0x0)),
-        (reusedCount2 += Number(value199?.['reusedCount'] || 0x0)),
-        (srcAssignedCount3 += Number(value199?.['srcAssignedCount'] || 0x0)),
-        (count10 -= 0x1));
+      ((createdCount2 += Number(value199?.['createdCount'] || 0)),
+        (imageCount += Number(value199?.['imageCount'] || 0)),
+        (reusedCount2 += Number(value199?.['reusedCount'] || 0)),
+        (srcAssignedCount3 += Number(value199?.['srcAssignedCount'] || 0)),
+        (count10 -= 1));
     }
     run27(pendingCreateCount);
     pendingCreateCount['pendingMediaPriorityChanged'] &&
@@ -2035,11 +2035,11 @@ export function createRendererFastPreviewLayer({
     pendingCreateCount['viewportBusy'] === !![] &&
       ((value117 = Math['min'](
         value117,
-        Math['max'](0x0, pendingCreateCount['immediateMediaSrcSlotsRef']['value']),
+        Math['max'](0, pendingCreateCount['immediateMediaSrcSlotsRef']['value']),
       )),
       (value118 = Math['min'](
         value118,
-        Math['max'](0x0, pendingCreateCount['immediateVideoMediaSrcSlotsRef']['value']),
+        Math['max'](0, pendingCreateCount['immediateVideoMediaSrcSlotsRef']['value']),
       )));
     if (isPerfProbeEnabled3) {
       const endPerf2 = nowPerf();
@@ -2056,7 +2056,7 @@ export function createRendererFastPreviewLayer({
         zoom: pendingCreateCount['options']?.['viewport']?.['zoom'],
       });
     }
-    pendingCreateCount['candidates']['length'] > 0x0 ? (value121 = run5(run30)) : ((args2 = null), run21());
+    pendingCreateCount['candidates']['length'] > 0 ? (value121 = run5(run30)) : ((args2 = null), run21());
   }
   function run31(el70) {
     if (!el70) return null;
@@ -2077,7 +2077,7 @@ export function createRendererFastPreviewLayer({
     el54['classList']['toggle'](
       'is-minimal-interaction-detail',
       Number['isFinite'](count11) &&
-        count11 > 0x0 &&
+        count11 > 0 &&
         count11 <= FAST_PREVIEW_MINIMAL_INTERACTION_DETAIL_MAX_ZOOM,
     );
   }
@@ -2099,7 +2099,7 @@ export function createRendererFastPreviewLayer({
     }),
       existingPreviewNodeIds['clear'](),
       poolSize['forEach']((value203) => run22(value203)),
-      (poolSize['length'] = 0x0),
+      (poolSize['length'] = 0),
       map6['forEach']((value204) => run22(value204)),
       map6['clear'](),
       map8['clear'](),
@@ -2107,31 +2107,31 @@ export function createRendererFastPreviewLayer({
       retained['clear'](),
       (value122 = null));
     if (!preserveDragPreviewScene) value123 = null;
-    ((nowPerf2 = 0x0),
+    ((nowPerf2 = 0),
       (enabled30 = ![]),
       (value119 = null),
-      (!preserveStagedReleases || map7['size'] === 0x0) && (el54?.['remove']?.(), (el54 = null)),
+      (!preserveStagedReleases || map7['size'] === 0) && (el54?.['remove']?.(), (el54 = null)),
       (args3 = createEmptyStats()));
   }
   function run21() {
     const emptyStats = createEmptyStats();
     for (const [value205, el71] of existingPreviewNodeIds['entries']()) {
-      (run2(value205, !![]), (emptyStats['fastPreviewCount'] += 0x1));
-      if (isElementVisible(el71)) emptyStats['visibleFastPreviewCount'] += 0x1;
-      if (el71?.['dataset']?.['hasMedia'] === '1') emptyStats['previewWithMediaCount'] += 0x1;
+      (run2(value205, !![]), (emptyStats['fastPreviewCount'] += 1));
+      if (isElementVisible(el71)) emptyStats['visibleFastPreviewCount'] += 1;
+      if (el71?.['dataset']?.['hasMedia'] === '1') emptyStats['previewWithMediaCount'] += 1;
       const el72 = getWrapper?.(value205);
       isMounted?.(value205) &&
         el72?.['isConnected'] !== ![] &&
         (el72?.['classList']?.['contains']?.('v2-node-detail-deferred') ||
           el72?.['dataset']?.['detailStage'] === 'deferred') &&
-        (emptyStats['deferredMountedWithPreviewCount'] += 0x1);
+        (emptyStats['deferredMountedWithPreviewCount'] += 1);
     }
     for (const { el: el73 } of map7['values']()) {
-      emptyStats['stagedPreviewCount'] += 0x1;
+      emptyStats['stagedPreviewCount'] += 1;
       if (el73?.['isConnected'] === ![]) continue;
-      ((emptyStats['connectedStagedPreviewCount'] += 0x1), (emptyStats['fastPreviewCount'] += 0x1));
-      if (isElementVisible(el73)) emptyStats['visibleFastPreviewCount'] += 0x1;
-      if (el73?.['dataset']?.['hasMedia'] === '1') emptyStats['previewWithMediaCount'] += 0x1;
+      ((emptyStats['connectedStagedPreviewCount'] += 1), (emptyStats['fastPreviewCount'] += 1));
+      if (isElementVisible(el73)) emptyStats['visibleFastPreviewCount'] += 1;
+      if (el73?.['dataset']?.['hasMedia'] === '1') emptyStats['previewWithMediaCount'] += 1;
     }
     return ((args3 = emptyStats), emptyStats);
   }
@@ -2162,7 +2162,7 @@ export function createRendererFastPreviewLayer({
       ...(el74['querySelectorAll']?.('img') || []),
       ...(el74['querySelectorAll']?.('video') || []),
     ];
-    if (list23['length'] === 0x0) return;
+    if (list23['length'] === 0) return;
     const value210 = () => {
       const value211 = getWrapper?.(enabled49);
       if (!run4(enabled49, value211) || !run3(enabled49, value211)) return;
@@ -2285,10 +2285,10 @@ export function createRendererFastPreviewLayer({
       value231 && typeof value231[Symbol['iterator']] === 'function'
         ? new Set(Array['from'](value231, (value232) => String(value232 || '')))
         : new Set();
-    let count12 = 0x0;
+    let count12 = 0;
     for (const value233 of Array['from'](existingPreviewNodeIds['keys']())) {
       if (map11['has'](value233)) continue;
-      (removeNode(value233, { collect: ![] }), (count12 += 0x1));
+      (removeNode(value233, { collect: ![] }), (count12 += 1));
     }
     for (const value234 of Array['from'](map7['values']())) {
       if (map11['has'](value234['nodeId'])) continue;
@@ -2297,7 +2297,7 @@ export function createRendererFastPreviewLayer({
     for (const value235 of map8['keys']()) {
       if (!map11['has'](value235)) map8['delete'](value235);
     }
-    if (count12 > 0x0) run21();
+    if (count12 > 0) run21();
     return count12;
   }
   function run40(el81) {
@@ -2313,9 +2313,9 @@ export function createRendererFastPreviewLayer({
     if (!map12?.['has']?.(enabled55)) return ![];
     const value238 = value237?.['dragContext'] || {};
     if (value238['isDragging'] !== !![] || value238['isCommittingDrag'] === !![]) return ![];
-    const toNumber6 = toNumber(value238['pendingDx'], 0x0),
-      toNumber7 = toNumber(value238['pendingDy'], 0x0);
-    return value238['hasMoved'] === !![] || Math['hypot'](toNumber6, toNumber7) > 0x0;
+    const toNumber6 = toNumber(value238['pendingDx'], 0),
+      toNumber7 = toNumber(value238['pendingDy'], 0);
+    return value238['hasMoved'] === !![] || Math['hypot'](toNumber6, toNumber7) > 0;
   }
   function run42(
     value239,
@@ -2389,7 +2389,7 @@ export function createRendererFastPreviewLayer({
     if (
       String(value249?.['tagName'] || '')['toLowerCase']() === 'img' &&
       typeof value249?.['complete'] === 'boolean' &&
-      (value249['complete'] !== !![] || Number(value249['naturalWidth'] || 0x0) <= 0x0)
+      (value249['complete'] !== !![] || Number(value249['naturalWidth'] || 0) <= 0)
     )
       return ![];
     for (const value250 of [el54, el83, value249]) {
@@ -2415,8 +2415,8 @@ export function createRendererFastPreviewLayer({
   function syncNodeDragPreview(
     value257,
     {
-      dx: dx = 0x0,
-      dy: dy = 0x0,
+      dx: dx = 0,
+      dy: dy = 0,
       active: active = ![],
       settle: settle = ![],
       remove: remove = ![],
@@ -2442,7 +2442,7 @@ export function createRendererFastPreviewLayer({
           geometry4 = resolveRendererPreviewNodePresentation(value259),
           offsetX4 = syncLayerBounds(el85, [{ geometry: geometry4['geometry'] }], {
             preserveAnchor: !![],
-          }) || { offsetX: 0x0, offsetY: 0x0 };
+          }) || { offsetX: 0, offsetY: 0 };
         (run32(value123?.['options']?.['viewport']),
           (el84 = run26(enabled61)),
           (value258 = !![]),
@@ -2460,7 +2460,7 @@ export function createRendererFastPreviewLayer({
             mediaDirectWhenBlank: !![],
             mediaFallbackWhileDecoding: !![],
             placeholderReady:
-              geometry4['sources']['length'] === 0x0 &&
+              geometry4['sources']['length'] === 0 &&
               geometry4['kind'] !== 'image' &&
               geometry4['kind'] !== 'video',
             preserveInFlightResource: !![],
@@ -2474,8 +2474,8 @@ export function createRendererFastPreviewLayer({
       }
     }
     if (!el84) return ![];
-    if (Number['isFinite'](width5) && width5 > 0x0) el84['style']['width'] = width5 + 'px';
-    if (Number['isFinite'](height5) && height5 > 0x0) el84['style']['height'] = height5 + 'px';
+    if (Number['isFinite'](width5) && width5 > 0) el84['style']['width'] = width5 + 'px';
+    if (Number['isFinite'](height5) && height5 > 0) el84['style']['height'] = height5 + 'px';
     if (active !== !![] && settle === !![]) {
       const value261 = getWrapper?.(enabled61),
         value262 = value123?.['nodes']?.[enabled61],
@@ -2487,8 +2487,8 @@ export function createRendererFastPreviewLayer({
       return settlePreviewDragState(el84, dx, dy);
     }
     ((el84['_previewDragActive'] = active === !![]),
-      (el84['_previewDragDx'] = toNumber(dx, 0x0)),
-      (el84['_previewDragDy'] = toNumber(dy, 0x0)));
+      (el84['_previewDragDx'] = toNumber(dx, 0)),
+      (el84['_previewDragDy'] = toNumber(dy, 0)));
     const previewDragTransform = applyPreviewDragTransform(el84);
     if (active !== !![]) return previewDragTransform;
     const enabled63 = isNodePreviewReady(enabled61) || el84['dataset']?.['placeholderReady'] === '1';
@@ -2499,7 +2499,7 @@ export function createRendererFastPreviewLayer({
   }
   function sync(canvasEl, enabled64, value264, selected, options16 = {}) {
     const isRendererRuntimeDiagnosticsEnabled2 = isRendererRuntimeDiagnosticsEnabled(),
-      value265 = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0x0,
+      value265 = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0,
       nodes = enabled64 && typeof enabled64 === 'object' ? enabled64 : null,
       value266 = value122 !== nodes;
     ((value122 = nodes),
@@ -2508,7 +2508,7 @@ export function createRendererFastPreviewLayer({
         nodes: nodes,
         options: options16 && typeof options16 === 'object' ? options16 : {},
       }));
-    if (value266 && map5['size'] > 0x0)
+    if (value266 && map5['size'] > 0)
       for (const value267 of map5['keys']()) {
         if (!enabled64?.[value267]) map5['delete'](value267);
       }
@@ -2538,17 +2538,17 @@ export function createRendererFastPreviewLayer({
       removeNode(value268, { cache: ![], collect: ![] });
     }
     const isPerfProbeEnabled4 = isPerfProbeEnabled(),
-      startPerf3 = isPerfProbeEnabled4 ? nowPerf() : 0x0,
+      startPerf3 = isPerfProbeEnabled4 ? nowPerf() : 0,
       continuationPending = new Set(
         Array['from'](args2?.['candidates'] || [], (value271) => String(value271?.['nodeId'] || ''))[
           'filter'
         ](Boolean),
       ),
-      preambleMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0x0,
+      preambleMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0,
       candidateSeeds = [],
       map14 =
         value264 instanceof Set
-          ? existingPreviewNodeIds['size'] === 0x0
+          ? existingPreviewNodeIds['size'] === 0
             ? value264
             : new Set(value264)
           : value264 && typeof value264[Symbol['iterator']] === 'function'
@@ -2609,7 +2609,7 @@ export function createRendererFastPreviewLayer({
         value277 = fullEligiblePreview ? text3['sourcesDisplayFirst'] : text3['sourcesThumbnailFirst'],
         deferredDescriptorSources = !Array['isArray'](value277),
         sources5 = deferredDescriptorSources ? [] : value277,
-        hasMedia2 = deferredDescriptorSources ? text3['hasMediaHint'] === !![] : sources5['length'] > 0x0;
+        hasMedia2 = deferredDescriptorSources ? text3['hasMediaHint'] === !![] : sources5['length'] > 0;
       if (
         !run42(nodeId7, selected, {
           kind: kind7,
@@ -2639,15 +2639,15 @@ export function createRendererFastPreviewLayer({
         mounted: mounted,
       });
     }
-    const candidateSeedMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0x0,
+    const candidateSeedMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0,
       mediaSrcBatchLimit2 = planRendererFastPreviewAdmission({
         candidateSeeds: candidateSeeds,
         existingPreviewNodeIds: existingPreviewNodeIds,
         options: dragTargets2,
       }),
-      admissionMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0x0,
+      admissionMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0,
       list24 = mediaSrcBatchLimit2['candidates'];
-    if (list24['length'] === 0x0) {
+    if (list24['length'] === 0) {
       let value278 = ![];
       for (const value279 of Array['from'](existingPreviewNodeIds['keys']())) {
         const value280 = enabled64?.[value279];
@@ -2670,17 +2670,17 @@ export function createRendererFastPreviewLayer({
       }
       run21();
       if (value278) return;
-      if (map7['size'] > 0x0) return;
+      if (map7['size'] > 0) return;
       return clear({ preserveStagedReleases: !![], preserveDragPreviewScene: !![] });
     }
     const layer = run31(canvasEl);
     if (!layer) return;
     run32(dragTargets2['viewport']);
     const layerBounds = syncLayerBounds(layer, list24, { preserveAnchor: viewportBusy4 }) || {
-      offsetX: 0x0,
-      offsetY: 0x0,
+      offsetX: 0,
+      offsetY: 0,
     };
-    (run18(), (generation += 0x1));
+    (run18(), (generation += 1));
     const map15 = mediaSrcBatchLimit2['liveIds'],
       candidateCount = mediaSrcBatchLimit2['candidates'],
       mediaPlan = mediaSrcBatchLimit2['mediaPlan'];
@@ -2714,7 +2714,7 @@ export function createRendererFastPreviewLayer({
           : null;
     if (!viewportBusy4) {
       ((value117 = Number['POSITIVE_INFINITY']), (value118 = Number['POSITIVE_INFINITY']));
-      if (pendingMediaSrcCount['length'] > 0x0) run15();
+      if (pendingMediaSrcCount['length'] > 0) run15();
     }
     const args5 = {
         candidates: [],
@@ -2745,30 +2745,30 @@ export function createRendererFastPreviewLayer({
         mountFragment: mountFragment(),
       },
       candidates = mediaSrcBatchLimit2['deferredCandidates'],
-      commitSetupMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0x0;
-    let createdCount3 = 0x0,
-      imageCount2 = 0x0,
-      reusedCount3 = 0x0,
-      srcAssignedCount4 = 0x0;
+      commitSetupMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0;
+    let createdCount3 = 0,
+      imageCount2 = 0,
+      reusedCount3 = 0,
+      srcAssignedCount4 = 0;
     for (const value286 of mediaSrcBatchLimit2['immediateCandidates']) {
       const value287 = run28(value286, args5);
-      ((createdCount3 += Number(value287?.['createdCount'] || 0x0)),
-        (imageCount2 += Number(value287?.['imageCount'] || 0x0)),
-        (reusedCount3 += Number(value287?.['reusedCount'] || 0x0)),
-        (srcAssignedCount4 += Number(value287?.['srcAssignedCount'] || 0x0)));
+      ((createdCount3 += Number(value287?.['createdCount'] || 0)),
+        (imageCount2 += Number(value287?.['imageCount'] || 0)),
+        (reusedCount3 += Number(value287?.['reusedCount'] || 0)),
+        (srcAssignedCount4 += Number(value287?.['srcAssignedCount'] || 0)));
     }
     run27(args5);
-    const immediateSyncMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0x0;
+    const immediateSyncMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0;
     args5['pendingMediaPriorityChanged'] && (run14(), (args5['pendingMediaPriorityChanged'] = ![]));
     viewportBusy4 &&
-      ((value117 = Math['min'](value117, Math['max'](0x0, args5['immediateMediaSrcSlotsRef']['value']))),
-      (value118 = Math['min'](value118, Math['max'](0x0, args5['immediateVideoMediaSrcSlotsRef']['value']))));
-    let removedCount = 0x0;
+      ((value117 = Math['min'](value117, Math['max'](0, args5['immediateMediaSrcSlotsRef']['value']))),
+      (value118 = Math['min'](value118, Math['max'](0, args5['immediateVideoMediaSrcSlotsRef']['value']))));
+    let removedCount = 0;
     for (const value288 of Array['from'](existingPreviewNodeIds['keys']())) {
       if (!map15['has'](value288)) {
         const value289 = enabled64?.[value288];
         if (run43(value288, value289, dragTargets2)) {
-          (removeNode(value288, { cache: ![], collect: ![] }), (removedCount += 0x1));
+          (removeNode(value288, { cache: ![], collect: ![] }), (removedCount += 1));
           continue;
         }
         const value290 = getWrapper?.(value288),
@@ -2783,10 +2783,10 @@ export function createRendererFastPreviewLayer({
         }
         const enabled68 = enabled67 && run37(value288, { collect: ![] });
         if (!enabled68) removeNode(value288, { collect: ![] });
-        removedCount += 0x1;
+        removedCount += 1;
       }
     }
-    candidates['length'] > 0x0 && ((args2 = { ...args5, candidates: candidates }), (value121 = run5(run30)));
+    candidates['length'] > 0 && ((args2 = { ...args5, candidates: candidates }), (value121 = run5(run30)));
     run21();
     if (isRendererRuntimeDiagnosticsEnabled2) {
       const cleanupMs = nowPerf();

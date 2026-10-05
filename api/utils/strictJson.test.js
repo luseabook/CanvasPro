@@ -9,7 +9,7 @@ test('parseStrictJson returns plain objects unchanged (same reference)', () => {
 
 test('parseStrictJson parses plain JSON text, trimming whitespace and BOM', () => {
   assert.deepEqual(parseStrictJson('{"a":1}'), { a: 1 });
-  assert.deepEqual(parseStrictJson('\uFEFF  {"a":1}  '), { a: 1 });
+  assert.deepEqual(parseStrictJson('\ufeff  {"a":1}  '), { a: 1 });
   assert.deepEqual(parseStrictJson('[1,2]'), [1, 2]);
 });
 

@@ -30,8 +30,8 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&apos;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&apos;');
 }
 export function buildPersonReplacementAssetViewState(selectedAssetIds) {
   const assetFilter = ['character', 'scene', 'audio', 'library']['includes'](
@@ -56,7 +56,7 @@ export function buildPersonReplacementAssetViewState(selectedAssetIds) {
         : enabled2
           ? selectedAssetIds['workspace']['selectedSceneId']
           : selectedAssetIds['workspace']['selectedCharacterId'],
-    selectedAssetId = assets['find']((index) => index['id'] === key) || assets[0x0] || null;
+    selectedAssetId = assets['find']((index) => index['id'] === key) || assets[0] || null;
   return {
     data: { assets: assets, project: {} },
     assetFilter: assetFilter,
@@ -108,41 +108,41 @@ export function readPersonReplacementAssetPromptText(enabled4 = null) {
     },
     handler2 = (el, { root: root = ![] } = {}) => {
       const count = Number(el?.['nodeType']);
-      if (count === 0x3) {
+      if (count === 3) {
         handler(el['textContent'] || '');
         return;
       }
-      if (count !== 0x1 && !root) return;
+      if (count !== 1 && !root) return;
       const options = String(el?.['tagName'] || '')['toUpperCase']();
       if (options === 'BR') {
-        handler('\x0a');
+        handler('\n');
         return;
       }
       const target = !root && ['DIV', 'P']['includes'](options);
-      if (target && list['length'] && !list['at'](-0x1)['endsWith']('\x0a')) handler('\x0a');
+      if (target && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
       Array['from'](el?.['childNodes'] || [])['forEach']((source) => handler2(source));
-      if (target && list['length'] && !list['at'](-0x1)['endsWith']('\x0a')) handler('\x0a');
+      if (target && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
     };
   return (
     handler2(enabled4, { root: !![] }),
     list['join']('')
-      ['replace'](/\u00a0/g, '\x20')
-      ['replace'](/\n{3,}/g, '\x0a\x0a')
+      ['replace'](/\u00a0/g, ' ')
+      ['replace'](/\n{3,}/g, '\n\n')
       ['replace'](/\n$/g, '')
   );
 }
 function getSelectedAppearanceIndex(options2 = {}, next = {}) {
   const list2 = getWorkspaceAssetAppearances(next);
-  if (!list2['length']) return 0x0;
-  const current = Math['trunc'](Number(options2?.['assetAppearanceIndexes']?.[next['id']]) || 0x0);
-  return Math['max'](0x0, Math['min'](list2['length'] - 0x1, current));
+  if (!list2['length']) return 0;
+  const current = Math['trunc'](Number(options2?.['assetAppearanceIndexes']?.[next['id']]) || 0);
+  return Math['max'](0, Math['min'](list2['length'] - 1, current));
 }
 function getSelectedAppearance(options3 = {}, entry = {}) {
   const workspaceAssetAppearances = getWorkspaceAssetAppearances(entry);
   return (
     workspaceAssetAppearances[getSelectedAppearanceIndex(options3, entry)] ||
     getWorkspaceAssetBaseAppearance(entry) ||
-    workspaceAssetAppearances[0x0] ||
+    workspaceAssetAppearances[0] ||
     null
   );
 }
@@ -172,7 +172,7 @@ function isAssetGenerating(options5 = {}, handle = {}) {
   )['some']((scope) => {
     const list4 = normalizeText(scope);
     if (!list4['startsWith'](list3 + ':')) return ![];
-    const input = map['get'](list4['slice'](list3['length'] + 0x1));
+    const input = map['get'](list4['slice'](list3['length'] + 1));
     return input && !normalizeText(input['error']);
   });
 }
@@ -193,7 +193,7 @@ export function renderPersonReplacementVoicePreviewPlayer(
   const text2 = normalizeText(className);
   return (
     '<span class="story-character-voice-name-player' +
-    (text2 ? '\x20' + escapeHtml(text2) : '') +
+    (text2 ? ' ' + escapeHtml(text2) : '') +
     '" data-story-character-voice-player="' +
     escapeHtml(error['id']) +
     '">\n    <button type="button" class="story-character-voice-name-play" data-story-action="play-character-voice" data-story-voice-asset-id="' +
@@ -203,10 +203,10 @@ export function renderPersonReplacementVoicePreviewPlayer(
     ' 的声音参考">\n      <svg class="story-character-voice-name-play-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5.4v9.2l7.2-4.6L7 5.4Z"/></svg>\n      <svg class="story-character-voice-name-pause-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 5.5h2.3v9H6.5zM11.2 5.5h2.3v9h-2.3z"/></svg>\n    </button>\n    ' +
     (showWaveform
       ? '<span class="story-character-voice-waveform" data-story-character-voice-waveform hidden aria-hidden="true">' +
-        Array['from']({ length: 0xc }, () => '<i></i>')['join']('') +
+        Array['from']({ length: 12 }, () => '<i></i>')['join']('') +
         '</span>'
       : '') +
-    '\x0a\x20\x20</span>'
+    '\n  </span>'
   );
 }
 function renderVoiceCapsule(options7 = {}, output = '添加声音') {
@@ -217,38 +217,38 @@ function renderVoiceCapsule(options7 = {}, output = '添加声音') {
     (hasVoiceReference2 ? 'has-reference' : 'is-missing') +
     '" data-story-character-voice-capsule data-story-action="toggle-character-voice-menu" aria-label="' +
     escapeHtml(output) +
-    '\x22\x20aria-haspopup=\x22menu\x22\x20aria-expanded=\x22false\x22>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-character-voice-icon\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M12\x204v16M8.5\x207.5v9M15.5\x208.5v7M5\x2010v4M19\x2010v4\x22/></svg></span>\x0a\x20\x20\x20\x20\x20\x20<span>' +
+    '" aria-haspopup="menu" aria-expanded="false">\n      <span class="story-character-voice-icon"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v16M8.5 7.5v9M15.5 8.5v7M5 10v4M19 10v4"/></svg></span>\n      <span>' +
     escapeHtml(output) +
-    '</span>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<span\x20class=\x22person-replacement-add-voice-menu\x22\x20role=\x22menu\x22\x20aria-label=\x22添加人物声音\x22\x20aria-hidden=\x22true\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20role=\x22menuitem\x22\x20data-story-action=\x22upload-character-voice\x22>上传声音</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20role=\x22menuitem\x22\x20data-story-action=\x22choose-character-voice-from-library\x22>从项目音频添加</button>\x0a\x20\x20\x20\x20\x20\x20' +
+    '</span>\n    </button>\n    <span class="person-replacement-add-voice-menu" role="menu" aria-label="添加人物声音" aria-hidden="true">\n      <button type="button" role="menuitem" data-story-action="upload-character-voice">上传声音</button>\n      <button type="button" role="menuitem" data-story-action="choose-character-voice-from-library">从项目音频添加</button>\n      ' +
     (hasVoiceReference2
       ? '<button type="button" role="menuitem" data-story-action="remove-character-voice">删除音频参考</button>'
       : '') +
-    '\x0a\x20\x20\x20\x20</span>\x0a\x20\x20</span>'
+    '\n    </span>\n  </span>'
   );
 }
 function renderPromptPresetPicker(options8 = {}, value2 = '') {
   if (value2 !== 'character') return '';
   const list5 = Array['isArray'](options8['assetPromptPresets']) ? options8['assetPromptPresets'] : [];
   if (!list5['length']) return '';
-  const value3 = list5['find']((value4) => value4['id'] === options8['assetPromptPresetId']) || list5[0x0],
+  const value3 = list5['find']((value4) => value4['id'] === options8['assetPromptPresetId']) || list5[0],
     text3 = normalizeText(options8['assetPromptPresetLabel']) || '生成参考';
   return (
-    '<div\x20class=\x22story-home-param-picker\x20story-asset-preset-picker\x22\x20data-story-asset-preset-picker>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-home-param-trigger\x20story-menu-trigger\x20story-asset-preset-trigger\x22\x20data-story-home-param-trigger=\x22asset-preset\x22\x20aria-haspopup=\x22listbox\x22\x20aria-expanded=\x22false\x22>\x0a\x20\x20\x20\x20\x20\x20<span>' +
+    '<div class="story-home-param-picker story-asset-preset-picker" data-story-asset-preset-picker>\n    <button type="button" class="story-home-param-trigger story-menu-trigger story-asset-preset-trigger" data-story-home-param-trigger="asset-preset" aria-haspopup="listbox" aria-expanded="false">\n      <span>' +
     escapeHtml(text3) +
     '</span><strong>' +
     escapeHtml(value3?.['label'] || '选择预设') +
-    '</strong>\x0a\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20<div\x20class=\x22story-home-param-popover\x20story-asset-preset-popover\x22\x20role=\x22listbox\x22\x20aria-label=\x22' +
+    '</strong>\n    </button>\n    <div class="story-home-param-popover story-asset-preset-popover" role="listbox" aria-label="' +
     escapeHtml(text3) +
     '">\n      <strong>' +
     escapeHtml(text3) +
-    '</strong>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-asset-preset-options\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</strong>\n      <div class="story-asset-preset-options">\n        ' +
     list5['map'](
       (value5) =>
         '<button type="button" class="story-asset-preset-option floating-menu-item has-subtitle ' +
         (value5['id'] === value3?.['id'] ? 'active is-selected' : '') +
         '" data-story-asset-preset-option="' +
         escapeHtml(value5['id']) +
-        '\x22\x20data-story-asset-preset-kind=\x22character\x22\x20role=\x22option\x22\x20aria-selected=\x22' +
+        '" data-story-asset-preset-kind="character" role="option" aria-selected="' +
         (value5['id'] === value3?.['id']) +
         '"><span class="fmi-content"><span class="fmi-title">' +
         escapeHtml(value5['label']) +
@@ -256,7 +256,7 @@ function renderPromptPresetPicker(options8 = {}, value2 = '') {
         escapeHtml(value5['description']) +
         '</small></span></button>',
     )['join']('') +
-    '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</div>'
+    '\n      </div>\n    </div>\n  </div>'
   );
 }
 function renderPreviewActions({
@@ -289,7 +289,7 @@ function renderPreviewActions({
     value7 +
     '" title="' +
     value7 +
-    '\x22\x20' +
+    '" ' +
     (generating || value6 ? 'disabled' : '') +
     '>' +
     renderWorkspaceActionIcon('addToLibrary') +
@@ -331,26 +331,26 @@ export function renderPersonReplacementAssetCard(
   const appearances = generated['isLibraryAsset'] ? [generated] : getWorkspaceAssetAppearances(generated),
     stats = generated['isLibraryAsset']
       ? {
-          total: 0x1,
-          generated: generated['imageUrl'] ? 0x1 : 0x0,
-          failed: 0x0,
-          pending: generated['imageUrl'] ? 0x0 : 0x1,
+          total: 1,
+          generated: generated['imageUrl'] ? 1 : 0,
+          failed: 0,
+          pending: generated['imageUrl'] ? 0 : 1,
         }
       : getWorkspaceAssetAppearanceStats(generated),
     previewAppearance2 =
       previewAppearance ||
       getWorkspaceAssetBaseAppearance(generated) ||
       appearances['find']((value8) => normalizeText(value8?.['imageUrl'])) ||
-      appearances[0x0] ||
+      appearances[0] ||
       generated,
     disabled = isAssetGenerating(selected, generated),
     value9 = selected?.['allowAssetRename'] === !![] && !generated['isLibraryAsset'],
     nameAttributes = value9
-      ? 'data-story-asset-name-id=\x22' +
+      ? 'data-story-asset-name-id="' +
         escapeHtml(generated['id']) +
         '" aria-label="重命名' +
         escapeHtml(generated['name'] || '未命名素材') +
-        '\x22'
+        '"'
       : '',
     roleHtml =
       selected?.['hideAssetRoleTag'] !== !![] &&
@@ -362,10 +362,10 @@ export function renderPersonReplacementAssetCard(
     deleteControlHtml =
       selected?.['allowDeleteAssetCard'] &&
       !generated['isLibraryAsset'] &&
-      !(selected['assetSelectionMode'] && selected['selectedAssetIds']?.['length'] > 0x1)
+      !(selected['assetSelectionMode'] && selected['selectedAssetIds']?.['length'] > 1)
         ? renderWorkspaceCardDeleteControl({
             className: 'story-asset-card-delete-trigger',
-            ariaLabel: '删除' + value10 + '\x20' + generated['name'],
+            ariaLabel: '删除' + value10 + ' ' + generated['name'],
             actionAttributes: {
               'data-story-action': 'delete-asset-card',
               'data-story-asset-delete-id': generated['id'],
@@ -435,9 +435,9 @@ function renderAudioArtwork({ compact: compact = ![] } = {}) {
     (compact ? 'story-asset-card-image ' : '') +
     'person-replacement-audio-artwork' +
     (compact ? ' is-compact' : '') +
-    '\x22\x20role=\x22img\x22\x20aria-label=\x22音频素材\x22>\x0a\x20\x20\x20\x20<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M5\x2010v4M8.5\x207.5v9M12\x204v16M15.5\x208.5v7M19\x2010v4\x22/></svg>\x0a\x20\x20\x20\x20<span>' +
+    '" role="img" aria-label="音频素材">\n    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 10v4M8.5 7.5v9M12 4v16M15.5 8.5v7M19 10v4"/></svg>\n    <span>' +
     (compact ? '音频' : '声音素材') +
-    '</span>\x0a\x20\x20</span>'
+    '</span>\n  </span>'
   );
 }
 function getCharacterPreview(error2 = {}) {
@@ -457,14 +457,14 @@ export function renderPersonReplacementAudioAssetCard(
   args,
   { boundCharacters: boundCharacters = [], showVoiceLibraryConfirm: showVoiceLibraryConfirm = ![] } = {},
 ) {
-  const value13 = Array['isArray'](boundCharacters) ? boundCharacters['length'] : 0x0,
+  const value13 = Array['isArray'](boundCharacters) ? boundCharacters['length'] : 0,
     name = getAudioAssetDisplayName(args),
     accessoryHtml2 = showVoiceLibraryConfirm
       ? '<button type="button" class="story-primary-button person-replacement-audio-card-add-voice" data-person-replacement-action="confirm-character-voice-library" data-person-replacement-audio-asset-id="' +
         escapeHtml(args['id']) +
         '" aria-label="添加声音：' +
         escapeHtml(name) +
-        '\x22>添加声音</button>'
+        '">添加声音</button>'
       : '';
   return renderPersonReplacementAssetCard(
     value12,
@@ -475,7 +475,7 @@ export function renderPersonReplacementAudioAssetCard(
       shellClassName: showVoiceLibraryConfirm ? 'person-replacement-audio-asset-shell' : '',
       accessoryHtml: accessoryHtml2,
       cardMediaHtml: renderAudioArtwork({ compact: !![] }),
-      cardStatusHtml: '<span>' + (value13 ? '已绑定\x20' + value13 + ' 个人设' : '未绑定人设') + '</span>',
+      cardStatusHtml: '<span>' + (value13 ? '已绑定 ' + value13 + ' 个人设' : '未绑定人设') + '</span>',
     },
   );
 }
@@ -499,14 +499,14 @@ export function renderPersonReplacementAudioAssetDetail(
     boundNames: boundCharacters['map']((error3) => error3['name']),
     isLibrary: isLibrary,
     className: 'person-replacement-audio-detail',
-    detailAttributes: 'data-workspace-audio-asset-id="' + escapeHtml(waveformUrl['id']) + '\x22',
+    detailAttributes: 'data-workspace-audio-asset-id="' + escapeHtml(waveformUrl['id']) + '"',
     playerClassName: 'person-replacement-audio-playback',
     selectAttributes: 'data-person-replacement-audio-character',
     bindAttributes: 'data-person-replacement-action="bind-project-audio"',
     membershipAttributes:
       'data-person-replacement-action="' +
       (isLibrary ? 'add-project-audio' : 'remove-project-audio') +
-      '\x22',
+      '"',
   });
 }
 export function renderPersonReplacementAssetDetail(
@@ -516,7 +516,7 @@ export function renderPersonReplacementAssetDetail(
     showEmptyDescription: showEmptyDescription = !![],
     readOnly: readOnly = ![],
     voiceLibrarySelection: voiceLibrarySelection = null,
-    detailSplitRatio: detailSplitRatio = 0x32,
+    detailSplitRatio: detailSplitRatio = 50,
     detailSplitterHtml: detailSplitterHtml = '',
   } = {},
 ) {
@@ -525,19 +525,19 @@ export function renderPersonReplacementAssetDetail(
     return (
       '<aside class="story-asset-detail story-empty-panel">\n      <strong>暂无可用素材</strong>\n      ' +
       (showEmptyDescription && value14 ? '<p>' + value14 + '</p>' : '') +
-      '\x0a\x20\x20\x20\x20</aside>'
+      '\n    </aside>'
     );
   }
   const list6 = asset2['isLibraryAsset'] ? [asset2] : getWorkspaceAssetAppearances(asset2),
     selectedAppearanceIndex = getSelectedAppearanceIndex(modelId, asset2),
     appearance2 = getSelectedAppearance(modelId, asset2) || asset2,
-    enabled5 = !asset2['isLibraryAsset'] && !readOnly && list6['length'] > 0x1,
+    enabled5 = !asset2['isLibraryAsset'] && !readOnly && list6['length'] > 1,
     value15 = asset2['kind'] === 'character' && !asset2['isLibraryAsset'] && !readOnly,
     workspaceAssetBaseAppearance2 = getWorkspaceAssetBaseAppearance(asset2),
     enabled6 =
       value15 &&
-      (list6['length'] === 0x1
-        ? list6[0x0]?.['id'] === appearance2?.['id']
+      (list6['length'] === 1
+        ? list6[0]?.['id'] === appearance2?.['id']
         : workspaceAssetBaseAppearance2?.['id'] === appearance2?.['id']),
     generating2 = isAppearanceGenerating(modelId, asset2, appearance2),
     canDeleteAppearance2 = Boolean(modelId?.['allowDeleteAssetAppearance'] && enabled5 && !enabled6),
@@ -548,23 +548,23 @@ export function renderPersonReplacementAssetDetail(
         '" alt="' +
         escapeHtml(asset2['name'] + ' · ' + (appearance2['name'] || '形象')) +
         '" loading="lazy" decoding="async">'
-      : '<div\x20class=\x22story-asset-preview\x20story-media-empty\x22\x20role=\x22img\x22\x20aria-label=\x22' +
+      : '<div class="story-asset-preview story-media-empty" role="img" aria-label="' +
         escapeHtml(asset2['name'] + '待生成') +
         '"><span>待生成</span></div>',
     value17 =
       modelId?.['allowAssetRename'] === !![] && !asset2['isLibraryAsset']
-        ? '\x20data-story-asset-name-id=\x22' +
+        ? ' data-story-asset-name-id="' +
           escapeHtml(asset2['id']) +
           '" aria-label="重命名' +
           escapeHtml(asset2['name']) +
-          '\x22'
+          '"'
         : '',
     text6 = normalizeText(appearance2?.['occurrences'] || asset2?.['occurrences']) || '当前项目',
     waveformUrl2 = voiceLibrarySelection?.['audioAsset'] || null,
     audioUrl = waveformUrl2 ? getPersonReplacementLibraryAudioRef(waveformUrl2) : '',
     value18 = Boolean(voiceLibrarySelection),
     value19 = value18
-      ? '<div\x20class=\x22story-asset-prompt-field\x20person-replacement-voice-library-playback-field\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      ? '<div class="story-asset-prompt-field person-replacement-voice-library-playback-field">\n        ' +
         (audioUrl
           ? renderAudioPlaybackSurface({
               audioUrl: audioUrl,
@@ -573,11 +573,11 @@ export function renderPersonReplacementAssetDetail(
               playLabel: '播放' + (waveformUrl2?.['name'] || '所选声音'),
               pauseLabel: '暂停' + (waveformUrl2?.['name'] || '所选声音'),
             })
-          : '<div\x20class=\x22person-replacement-voice-library-playback-empty\x22>请从左侧选择声音</div>') +
+          : '<div class="person-replacement-voice-library-playback-empty">请从左侧选择声音</div>') +
         '\n      </div>'
       : '<div class="story-asset-prompt-field">\n        <div class="story-asset-prompt-editor" data-story-asset-prompt data-story-asset-prompt-asset-id="' +
         escapeHtml(asset2['id']) +
-        '\x22\x20data-story-asset-prompt-appearance-id=\x22' +
+        '" data-story-asset-prompt-appearance-id="' +
         escapeHtml(appearance2['id']) +
         '" contenteditable="' +
         (asset2['isLibraryAsset'] || readOnly ? 'false' : 'true') +
@@ -587,7 +587,7 @@ export function renderPersonReplacementAssetDetail(
             ? asset2['description'] || appearance2['prompt'] || ''
             : appearance2['prompt'] || '',
         ) +
-        '</div>\x0a\x20\x20\x20\x20\x20\x20</div>',
+        '</div>\n      </div>',
     value20 =
       asset2['isLibraryAsset'] || readOnly
         ? ''
@@ -607,9 +607,9 @@ export function renderPersonReplacementAssetDetail(
             }) +
             '\n          <div class="story-asset-generation-actions">\n            ' +
             renderPromptPresetPicker(modelId, asset2['kind']) +
-            '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+            '\n            ' +
             renderRequestDebugButton('data-story-action="debug-generation-asset"') +
-            '<button\x20type=\x22button\x22\x20class=\x22story-asset-generate-button\x20story-primary-button\x22\x20data-story-action=\x22generate-asset\x22\x20' +
+            '<button type="button" class="story-asset-generate-button story-primary-button" data-story-action="generate-asset" ' +
             (generating2 ? 'disabled' : '') +
             '><span>' +
             (generating2 ? '生成中' : escapeHtml(modelId?.['assetGenerateLabel'] || '生成素材图')) +
@@ -621,15 +621,15 @@ export function renderPersonReplacementAssetDetail(
       escapeHtml(asset2['name'] || '未命名素材') +
       '</strong>' +
       renderPersonReplacementVoicePreviewPlayer(asset2) +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22story-asset-caption-tags\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '</span>\n      <span class="story-asset-caption-tags">\n        ' +
       (value15
         ? '<button type="button" class="story-base-appearance-button ' +
           (enabled6 ? 'is-active' : '') +
-          '\x22\x20' +
+          '" ' +
           (enabled5 ? 'data-story-action="set-base-appearance"' : 'disabled') +
           ' aria-pressed="' +
           enabled6 +
-          '\x22\x20aria-disabled=\x22' +
+          '" aria-disabled="' +
           !enabled5 +
           '" title="会以基础形象作为参考，生成角色的其他形象">' +
           (enabled6 ? '基础形象' : '设为基础形象') +
@@ -639,11 +639,11 @@ export function renderPersonReplacementAssetDetail(
       renderVoiceCapsule(asset2, modelId?.['assetVoiceUploadLabel'] || '添加声音') +
       '\n      </span>\n    </div>\n    <span data-story-asset-caption-meta>' +
       escapeHtml(appearance2['name'] || asset2['role'] || '素材') +
-      '\x20·\x20' +
+      ' · ' +
       escapeHtml(text6) +
-      (enabled5 ? '\x20·\x20' + (selectedAppearanceIndex + 0x1) + '/' + list6['length'] : '') +
+      (enabled5 ? ' · ' + (selectedAppearanceIndex + 1) + '/' + list6['length'] : '') +
       '</span>\n  </div>',
-    value22 = Math['min'](0x44, Math['max'](0x20, Number(detailSplitRatio) || 0x32));
+    value22 = Math['min'](0x44, Math['max'](32, Number(detailSplitRatio) || 50));
   return (
     '<aside class="story-asset-detail person-replacement-asset-detail-layout' +
     (value18 ? ' person-replacement-voice-library-character-detail' : '') +
@@ -653,11 +653,11 @@ export function renderPersonReplacementAssetDetail(
     (value18 ? ' data-person-replacement-voice-library-character-detail' : '') +
     '>\n    <div class="story-asset-preview-wrap" data-story-appearance-wheel="' +
     enabled5 +
-    '\x22\x20' +
-    (enabled5 ? 'tabindex=\x220\x22\x20aria-label=\x22滚动鼠标滚轮或按左右方向键切换形象\x22' : '') +
+    '" ' +
+    (enabled5 ? 'tabindex="0" aria-label="滚动鼠标滚轮或按左右方向键切换形象"' : '') +
     '>\n      <div class="story-asset-preview-slide ' +
     (generating2 ? 'img-preview-loading' : '') +
-    '\x22\x20aria-busy=\x22' +
+    '" aria-busy="' +
     generating2 +
     '">\n        ' +
     value16 +
@@ -700,11 +700,11 @@ export function renderPersonReplacementAssetDetail(
 export function renderPersonReplacementBatchGenerationControl(options10 = {}) {
   const enabled7 = Array['isArray'](options10?.['selectedAssetIds'])
       ? options10['selectedAssetIds']['length']
-      : 0x0,
+      : 0,
     value23 = options10?.['isBatchGenerating'] === !![],
     value24 = options10?.['batchCancelRequested'] === !![],
     value25 = value23 ? value24 : !enabled7,
-    value26 = enabled7 ? '\x20(' + enabled7 + ')' : '',
+    value26 = enabled7 ? ' (' + enabled7 + ')' : '',
     text7 = normalizeText(options10?.['batchGenerationActionLabel']) || '批量生成',
     value27 = value23 ? '' + (value24 ? '正在停止' : '取消运行') + value26 : '' + text7 + value26,
     value28 = ['scene', 'prop']['includes'](normalizeText(options10?.['assetFilter'])) ? 'image' : '',
@@ -712,13 +712,13 @@ export function renderPersonReplacementBatchGenerationControl(options10 = {}) {
       ? normalizeText(options10['batchCancelAction']) || 'cancel-asset-batch-generation'
       : 'batch-generate-assets';
   return (
-    '<button\x20type=\x22button\x22\x20class=\x22story-primary-button\x20story-asset-batch-trigger\x22\x20data-story-action=\x22' +
+    '<button type="button" class="story-primary-button story-asset-batch-trigger" data-story-action="' +
     escapeHtml(value29) +
-    '\x22' +
-    (value28 ? ' data-story-asset-batch-direct-mode="' + value28 + '\x22' : '') +
+    '"' +
+    (value28 ? ' data-story-asset-batch-direct-mode="' + value28 + '"' : '') +
     ' aria-busy="' +
     value23 +
-    '\x22\x20' +
+    '" ' +
     (value25 ? 'disabled' : '') +
     '><span class="story-asset-batch-trigger-label">' +
     escapeHtml(value27) +
@@ -738,7 +738,7 @@ export function syncPersonReplacementVoicePreviewUi(
   const count2 = Number(audioEl?.['duration']),
     value31 = Number(audioEl?.['currentTime']),
     value32 =
-      Number['isFinite'](count2) && count2 > 0x0 ? Math['max'](0x0, Math['min'](0x1, value31 / count2)) : 0x0,
+      Number['isFinite'](count2) && count2 > 0 ? Math['max'](0, Math['min'](1, value31 / count2)) : 0,
     value33 = Boolean(audioEl && audioEl['paused'] === ![] && audioEl['ended'] !== !![]);
   return (
     el2?.['querySelectorAll']?.('[data-story-character-voice-player]')?.['forEach']?.((el3) => {
@@ -754,7 +754,7 @@ export function syncPersonReplacementVoicePreviewUi(
           el5['style']?.['setProperty']?.('--story-character-voice-progress', '' + value32));
         const list7 = el5['querySelectorAll']?.('i') || [];
         list7['forEach']?.((el6, value34) => {
-          el6['classList']?.['toggle']?.('is-played', text8 && value32 >= (value34 + 0x1) / list7['length']);
+          el6['classList']?.['toggle']?.('is-played', text8 && value32 >= (value34 + 1) / list7['length']);
         });
       }
     }),

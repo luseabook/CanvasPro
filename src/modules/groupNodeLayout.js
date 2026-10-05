@@ -1,31 +1,31 @@
 export const GROUP_NODE_CONTENT_INSETS = Object['freeze']({
-  top: 0x50,
-  right: 0x20,
-  bottom: 0x20,
-  left: 0x20,
+  top: 80,
+  right: 32,
+  bottom: 32,
+  left: 32,
 });
-function toFiniteNumber(value, item = 0x0) {
+function toFiniteNumber(value, item = 0) {
   const key = Number(value);
   return Number['isFinite'](key) ? key : item;
 }
 export function createGroupNodeLayout({
-  x: x = 0x0,
-  y: y = 0x0,
-  contentWidth: contentWidth = 0x0,
-  contentHeight: contentHeight = 0x0,
-  minWidth: minWidth = 0x0,
-  minHeight: minHeight = 0x0,
+  x: x = 0,
+  y: y = 0,
+  contentWidth: contentWidth = 0,
+  contentHeight: contentHeight = 0,
+  minWidth: minWidth = 0,
+  minHeight: minHeight = 0,
 } = {}) {
   const x2 = toFiniteNumber(x),
     y2 = toFiniteNumber(y),
-    index = Math['max'](0x0, toFiniteNumber(contentWidth)),
-    result = Math['max'](0x0, toFiniteNumber(contentHeight)),
+    index = Math['max'](0, toFiniteNumber(contentWidth)),
+    result = Math['max'](0, toFiniteNumber(contentHeight)),
     width = Math['max'](
-      Math['max'](0x0, toFiniteNumber(minWidth)),
+      Math['max'](0, toFiniteNumber(minWidth)),
       GROUP_NODE_CONTENT_INSETS['left'] + index + GROUP_NODE_CONTENT_INSETS['right'],
     ),
     height = Math['max'](
-      Math['max'](0x0, toFiniteNumber(minHeight)),
+      Math['max'](0, toFiniteNumber(minHeight)),
       GROUP_NODE_CONTENT_INSETS['top'] + result + GROUP_NODE_CONTENT_INSETS['bottom'],
     );
   return {
@@ -40,16 +40,16 @@ export function createGroupNodeLayout({
 export function calculateGroupNodeBounds(
   list,
   {
-    defaultNodeWidth: defaultNodeWidth = 0x104,
-    defaultNodeHeight: defaultNodeHeight = 0x64,
-    minWidth: minWidth = 0x0,
-    minHeight: minHeight = 0x0,
+    defaultNodeWidth: defaultNodeWidth = 260,
+    defaultNodeHeight: defaultNodeHeight = 100,
+    minWidth: minWidth = 0,
+    minHeight: minHeight = 0,
   } = {},
 ) {
   const list2 = Array['isArray'](list) ? list['filter'](Boolean) : [];
-  if (!list2['length']) throw new Error('calculateGroupNodeBounds\x20requires\x20at\x20least\x20one\x20node');
-  const data = Math['max'](0x0, toFiniteNumber(defaultNodeWidth, 0x104)),
-    options = Math['max'](0x0, toFiniteNumber(defaultNodeHeight, 0x64)),
+  if (!list2['length']) throw new Error('calculateGroupNodeBounds requires at least one node');
+  const data = Math['max'](0, toFiniteNumber(defaultNodeWidth, 260)),
+    options = Math['max'](0, toFiniteNumber(defaultNodeHeight, 100)),
     x3 = Math['min'](...list2['map']((box) => toFiniteNumber(box['x']))),
     y3 = Math['min'](...list2['map']((box2) => toFiniteNumber(box2['y']))),
     contentWidth2 = Math['max'](

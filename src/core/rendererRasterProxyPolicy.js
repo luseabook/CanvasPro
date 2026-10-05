@@ -30,22 +30,22 @@ function createNodeAccessor(map) {
 }
 function clampUnit(options) {
   const target = Number(options);
-  if (!Number['isFinite'](target)) return 0x0;
-  return Math['max'](0x0, Math['min'](0x1, target));
+  if (!Number['isFinite'](target)) return 0;
+  return Math['max'](0, Math['min'](1, target));
 }
 function smoothstep(source, next, current) {
-  if (current <= source) return 0x0;
-  if (current >= next) return 0x1;
+  if (current <= source) return 0;
+  if (current >= next) return 1;
   const entry = (current - source) / (next - source);
-  return entry * entry * (0x3 - 0x2 * entry);
+  return entry * entry * (3 - 2 * entry);
 }
 const DENSE_RASTER_FULL_STRENGTH_ZOOM = 0.4,
   DENSE_RASTER_EXIT_ZOOM = 0.55;
 export function calculateDenseLowZoomRasterStrength(record, box) {
   const clampUnit2 = clampUnit(record),
     count = Number(box?.['zoom']),
-    payload = Number['isFinite'](count) && count > 0x0 ? count : 0x1,
-    handle = 0x1 - smoothstep(DENSE_RASTER_FULL_STRENGTH_ZOOM, DENSE_RASTER_EXIT_ZOOM, payload);
+    payload = Number['isFinite'](count) && count > 0 ? count : 1,
+    handle = 1 - smoothstep(DENSE_RASTER_FULL_STRENGTH_ZOOM, DENSE_RASTER_EXIT_ZOOM, payload);
   return clampUnit2 * handle;
 }
 function addId(state, config) {
@@ -102,12 +102,12 @@ function isRasterSupported(value4, value5, map3, map4) {
   return !!enabled2 && map4['has'](enabled2);
 }
 function getProjectedMetrics(box2, value6, value7) {
-  const value8 = Math['max'](0x1, Number(box2?.['width']) || 0xa0) * value6,
-    value9 = Math['max'](0x1, Number(box2?.['height']) || 0x78) * value6,
+  const value8 = Math['max'](1, Number(box2?.['width']) || 160) * value6,
+    value9 = Math['max'](1, Number(box2?.['height']) || 120) * value6,
     area = value8 * value9,
-    value10 = 0xbb8 + (0x1f40 - 0xbb8) * value7,
-    value11 = 0x36b0 + (0x9c40 - 0x36b0) * value7;
-  return { area: area, compactness: 0x1 - smoothstep(value10, value11, area) };
+    value10 = 3000 + (8000 - 3000) * value7,
+    value11 = 14000 + (40000 - 14000) * value7;
+  return { area: area, compactness: 1 - smoothstep(value10, value11, area) };
 }
 function buildCoverageSignature(value12, value13, value14) {
   const run = (args) => [...args]['map'](String)['sort']();
@@ -122,7 +122,7 @@ export function planRendererRasterProxies({
   rasterSupportedNodeTypes: rasterSupportedNodeTypes,
   previousRasterIds: previousRasterIds,
   viewport: viewport,
-  scenePressure: scenePressure = 0x0,
+  scenePressure: scenePressure = 0,
   ...args2
 } = {}) {
   const run2 = createNodeAccessor(nodes),
@@ -142,26 +142,26 @@ export function planRendererRasterProxies({
     active = new Set(),
     domProxyIds = new Set(),
     rasterCandidateCount = [];
-  let interactiveDomCount = 0x0,
-    unsupportedDomCount = 0x0,
-    projectedDomCount = 0x0;
+  let interactiveDomCount = 0,
+    unsupportedDomCount = 0,
+    projectedDomCount = 0;
   const count2 = Number(viewport?.['zoom']),
-    value18 = Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x1,
+    value18 = Number['isFinite'](count2) && count2 > 0 ? count2 : 1,
     scenePressure2 = clampUnit(scenePressure),
     denseRasterStrength = calculateDenseLowZoomRasterStrength(scenePressure2, viewport);
   for (const id of proxyCount) {
     if (map6['has'](id)) {
-      (domProxyIds['add'](id), (interactiveDomCount += 0x1));
+      (domProxyIds['add'](id), (interactiveDomCount += 1));
       continue;
     }
     const value19 = run2(id);
     if (!isRasterSupported(id, value19, toIdSet2, value16)) {
-      (domProxyIds['add'](id), (unsupportedDomCount += 0x1));
+      (domProxyIds['add'](id), (unsupportedDomCount += 1));
       continue;
     }
     const args3 = getProjectedMetrics(value19, value18, denseRasterStrength);
     if (args3['compactness'] < 0.2) {
-      (domProxyIds['add'](id), (projectedDomCount += 0x1));
+      (domProxyIds['add'](id), (projectedDomCount += 1));
       continue;
     }
     rasterCandidateCount['push']({
@@ -171,52 +171,52 @@ export function planRendererRasterProxies({
       retained: retained['has'](id),
     });
   }
-  const proxyPressure = smoothstep(0xc, 0x48, proxyCount['size']),
-    value20 = 0x1 - (0x1 - scenePressure2) * (0x1 - proxyPressure),
+  const proxyPressure = smoothstep(12, 72, proxyCount['size']),
+    value20 = 1 - (1 - scenePressure2) * (1 - proxyPressure),
     value21 =
-      rasterCandidateCount['length'] > 0x0
-        ? rasterCandidateCount['reduce']((value22, value23) => value22 + value23['compactness'], 0x0) /
+      rasterCandidateCount['length'] > 0
+        ? rasterCandidateCount['reduce']((value22, value23) => value22 + value23['compactness'], 0) /
           rasterCandidateCount['length']
-        : 0x0,
+        : 0,
     activationSignal = value20 * value21,
     rasterShare = smoothstep(0.32, 0.78, activationSignal),
-    activationFloor = retained['size'] > 0x0 ? 0.24 : 0.32,
+    activationFloor = retained['size'] > 0 ? 0.24 : 0.32,
     value24 = Math['min'](
       rasterCandidateCount['length'],
-      activationSignal >= activationFloor ? rasterCandidateCount['length'] : 0x0,
+      activationSignal >= activationFloor ? rasterCandidateCount['length'] : 0,
     );
   rasterCandidateCount['sort']((enabled3, enabled4) => {
     const count3 = Number(!enabled3['exactVisible']) - Number(!enabled4['exactVisible']);
-    if (count3 !== 0x0) return count3;
-    const value25 = enabled3['compactness'] + (enabled3['retained'] ? 0.08 : 0x0),
-      value26 = enabled4['compactness'] + (enabled4['retained'] ? 0.08 : 0x0);
+    if (count3 !== 0) return count3;
+    const value25 = enabled3['compactness'] + (enabled3['retained'] ? 0.08 : 0),
+      value26 = enabled4['compactness'] + (enabled4['retained'] ? 0.08 : 0);
     if (value25 !== value26) return value26 - value25;
     if (enabled3['area'] !== enabled4['area']) return enabled3['area'] - enabled4['area'];
     return String(enabled3['id'])['localeCompare'](String(enabled4['id']));
   });
-  for (const value27 of rasterCandidateCount['slice'](0x0, value24)) {
+  for (const value27 of rasterCandidateCount['slice'](0, value24)) {
     active['add'](value27['id']);
   }
   for (const value28 of rasterCandidateCount['slice'](value24)) {
     domProxyIds['add'](value28['id']);
   }
   let reason = 'mixed-raster-dom';
-  if (proxyCount['size'] === 0x0) reason = 'no-proxy-candidates';
+  if (proxyCount['size'] === 0) reason = 'no-proxy-candidates';
   else {
-    if (rasterCandidateCount['length'] === 0x0) reason = 'dom-required-only';
+    if (rasterCandidateCount['length'] === 0) reason = 'dom-required-only';
     else {
-      if (active['size'] === 0x0) reason = 'below-raster-load';
-      else domProxyIds['size'] === 0x0 && (reason = 'rasterized-all-proxies');
+      if (active['size'] === 0) reason = 'below-raster-load';
+      else domProxyIds['size'] === 0 && (reason = 'rasterized-all-proxies');
     }
   }
-  let exactVisibleCoveredCount = 0x0;
+  let exactVisibleCoveredCount = 0;
   for (const value29 of exactVisible) {
     (map5['has'](value29) || active['has'](value29) || domProxyIds['has'](value29)) &&
-      (exactVisibleCoveredCount += 0x1);
+      (exactVisibleCoveredCount += 1);
   }
   const signature = buildCoverageSignature(map5, active, domProxyIds);
   return {
-    active: active['size'] > 0x0,
+    active: active['size'] > 0,
     rasterIds: active,
     domProxyIds: domProxyIds,
     reason: reason,

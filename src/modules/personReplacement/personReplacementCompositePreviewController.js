@@ -203,9 +203,9 @@ export function createPersonReplacementCompositePreviewController({
       stop();
       if (result) return ![];
       const project = getProject();
-      if (project?.['workspace']?.['view'] !== 'project' || project['workspace']['step'] !== 0x5) return ![];
+      if (project?.['workspace']?.['view'] !== 'project' || project['workspace']['step'] !== 5) return ![];
       const root = getRoot(),
-        source = root?.['querySelector']?.('[data-person-replacement-compare-video=\x22original\x22]'),
+        source = root?.['querySelector']?.('[data-person-replacement-compare-video="original"]'),
         adoptedOriginalPlayback = handler(source),
         originalVideo = adoptedOriginalPlayback?.['videoEl'] || source,
         next = root?.['querySelector']?.('[data-person-replacement-compare-video="replacement"]'),

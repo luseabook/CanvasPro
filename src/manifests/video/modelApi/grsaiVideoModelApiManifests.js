@@ -7,7 +7,7 @@ import {
   freezeBodyMapping,
   freezeOption,
 } from './vendorVideoModelApiShared.js';
-const DURATION_VALUES = Array['from']({ length: 0xf }, (value, item) => item + 0x1),
+const DURATION_VALUES = Array['from']({ length: 15 }, (value, item) => item + 1),
   GRSAI_H3_FIELDS = Object['freeze']([
     createResolutionField({ defaultValue: '768p', options: ['480p', '768p', '1080p'] }),
     Object['freeze']({
@@ -17,9 +17,9 @@ const DURATION_VALUES = Array['from']({ length: 0xf }, (value, item) => item + 0
     }),
     createFooterDurationSliderOptionsField({
       values: DURATION_VALUES,
-      defaultValue: 0xa,
+      defaultValue: 10,
       optionOverridesByValue: Object['fromEntries'](
-        DURATION_VALUES['filter']((count) => count > 0xa)['map']((key) => [
+        DURATION_VALUES['filter']((count) => count > 10)['map']((key) => [
           key,
           Object['freeze']({
             disableWhen: Object['freeze']({ field: 'resolution', value: '1080p' }),
@@ -59,9 +59,9 @@ export const GRSAI_VIDEO_MODELS = Object['freeze']([
     icon: 'images/grsai.png',
     model: 'minimax-h3',
     endpoint: '/v1/api/generate',
-    description: '480p\x20/\x20768p\x20/\x201080p\x20·\x20文生视频\x20/\x20图片与音频参考',
+    description: '480p / 768p / 1080p · 文生视频 / 图片与音频参考',
     fields: GRSAI_H3_FIELDS,
-    inputSlots: createVideoInputSlots({ image: 0x9, video: 0x0, audio: 0x3 }),
+    inputSlots: createVideoInputSlots({ image: 9, video: 0, audio: 3 }),
     bodyMapping: GRSAI_H3_BODY_MAPPING,
     responseMapping: Object['freeze']({
       taskIdPath: 'id',
@@ -83,7 +83,7 @@ export const GRSAI_VIDEO_MODELS = Object['freeze']([
     }),
     help: Object['freeze']({
       tooltip: Object['freeze']([
-        '支持文生视频，最多\x209\x20张参考图和\x203\x20段参考音频。',
+        '支持文生视频，最多 9 张参考图和 3 段参考音频。',
         '480p / 768p 支持 1–15 秒；1080p 最多 10 秒。',
         '建议明确描述分段时序、镜头运动、对白和声音要求。',
       ]),

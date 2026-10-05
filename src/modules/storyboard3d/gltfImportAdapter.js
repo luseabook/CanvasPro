@@ -36,9 +36,9 @@ export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
     inspection: !![],
     parsing: 'available',
     parserId: 'obj',
-    reason: '使用官方\x20Three\x20r180\x20OBJLoader。',
+    reason: '使用官方 Three r180 OBJLoader。',
     limitations: Object['freeze']([
-      '当前\x20adapter\x20不解析独立\x20MTL\x20文件，OBJ\x20会使用\x20loader\x20默认材质。',
+      '当前 adapter 不解析独立 MTL 文件，OBJ 会使用 loader 默认材质。',
     ]),
   }),
   stl: Object['freeze']({
@@ -47,7 +47,7 @@ export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
     parsing: 'available',
     parserId: 'stl',
     reason: '使用官方 Three r180 STLLoader。',
-    limitations: Object['freeze'](['STL\x20不携带完整材质，adapter\x20会创建默认标准材质。']),
+    limitations: Object['freeze'](['STL 不携带完整材质，adapter 会创建默认标准材质。']),
   }),
 });
 export function getStoryboard3DModelImportCapability(value) {
@@ -66,11 +66,11 @@ function normalizeResourceKey(item) {
   try {
     list = decodeURIComponent(list);
   } catch {}
-  return list['replaceAll']('\x5c', '/')['split'](/[?#]/, 0x1)[0x0]['replace'](/^\.\//, '');
+  return list['replaceAll']('\\', '/')['split'](/[?#]/, 1)[0]['replace'](/^\.\//, '');
 }
 function findResource(map, key) {
   const resourceKey = normalizeResourceKey(key);
-  return map?.['get']?.(resourceKey) || map?.['get']?.(resourceKey['split']('/')['at'](-0x1)) || null;
+  return map?.['get']?.(resourceKey) || map?.['get']?.(resourceKey['split']('/')['at'](-1)) || null;
 }
 export function createStoryboard3DResourceUrlScope(index, result) {
   const map2 = new Map();
@@ -100,22 +100,22 @@ export function measureStoryboard3DImportedSceneBounds(enabled) {
   };
 }
 export function countStoryboard3DSceneTriangles(target) {
-  let source = 0x0;
+  let source = 0;
   return (
     target?.['traverse']?.((enabled2) => {
       if (!enabled2?.['isMesh'] || !enabled2['geometry']) return;
       const next = enabled2['geometry'],
         current = Math['max'](
-          0x0,
-          Number(next['index']?.['count'] ?? next['getAttribute']?.('position')?.['count']) || 0x0,
+          0,
+          Number(next['index']?.['count'] ?? next['getAttribute']?.('position')?.['count']) || 0,
         ),
-        entry = Math['max'](0x0, Math['min'](current, Number(next['drawRange']?.['start']) || 0x0)),
+        entry = Math['max'](0, Math['min'](current, Number(next['drawRange']?.['start']) || 0)),
         record = Number(next['drawRange']?.['count']),
         payload = Number['isFinite'](record)
-          ? Math['max'](0x0, Math['min'](current - entry, record))
+          ? Math['max'](0, Math['min'](current - entry, record))
           : current - entry,
-        handle = enabled2['isInstancedMesh'] ? Math['max'](0x0, Number(enabled2['count']) || 0x0) : 0x1;
-      source += Math['floor'](payload / 0x3) * handle;
+        handle = enabled2['isInstancedMesh'] ? Math['max'](0, Number(enabled2['count']) || 0) : 1;
+      source += Math['floor'](payload / 3) * handle;
     }),
     source
   );
@@ -143,7 +143,7 @@ export function createThreeGltfStoryboard3DParser({
           ['endsWith']('.gltf'),
         output = input ? new TextDecoder()['decode'](scope) : scope,
         scene = await gLTFLoader['parseAsync'](output, STORYBOARD_3D_RESOURCE_BASE_URL);
-      if (!scene?.['scene']) throw new Error('GLB/glTF\x20did\x20not\x20contain\x20a\x20default\x20scene.');
+      if (!scene?.['scene']) throw new Error('GLB/glTF did not contain a default scene.');
       return {
         scene: scene['scene'],
         scenes: scene['scenes'] || [scene['scene']],

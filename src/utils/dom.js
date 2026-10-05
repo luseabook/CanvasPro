@@ -435,7 +435,7 @@ export function nextFrame(handler) {
     });
   });
 }
-export function debounce(value50, value51 = 0x12c) {
+export function debounce(value50, value51 = 300) {
   let setTimeout2 = null;
   return function (...args) {
     (clearTimeout(setTimeout2), (setTimeout2 = setTimeout(() => value50.apply(this, args), value51)));
@@ -472,7 +472,7 @@ export function rafSampleLatest(value54) {
     run2
   );
 }
-export function waitForElement(value58, value59 = 0x1388) {
+export function waitForElement(value58, value59 = 5000) {
   return new Promise((handler3, handler4) => {
     const value60 = document.querySelector(value58);
     if (value60) {
@@ -526,7 +526,7 @@ export function getDisplayedMediaSizeFromNode(value63, value64) {
     value67 = Array.from(el24.querySelectorAll(value66));
   let w2 = 0,
     h = 0,
-    value68 = -0x3b9aca00;
+    value68 = -1000000000;
   for (const value69 of value67) {
     const enabled13 = window.getComputedStyle(value69);
     if (!enabled13) continue;
@@ -555,7 +555,7 @@ export function getDisplayedVideoMetaFromNode(value72) {
   let src2 = '',
     w3 = 0,
     h2 = 0,
-    value74 = -0x3b9aca00;
+    value74 = -1000000000;
   for (const value75 of value73) {
     const enabled17 = window.getComputedStyle(value75);
     if (!enabled17) continue;

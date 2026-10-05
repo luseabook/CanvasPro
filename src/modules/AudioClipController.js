@@ -251,8 +251,8 @@ const AudioClipController = {
           el26 &&
             el26.classList.contains('hide-up') &&
             (el26.classList.remove('hide-up'), el26.classList.add('hide-down'));
-        }, 0x12c));
-    }, 0xfa0);
+        }, 300));
+    }, 4000);
     const config = document.createElement('div');
     ((config.className = 'v2-video-clip-smartwrap'),
       el23.appendChild(el24),
@@ -901,7 +901,7 @@ const AudioClipController = {
             src: src,
             args: { start: start, end: end },
           },
-          { wait: true, timeout: 0x493e0 },
+          { wait: true, timeout: 300000 },
         );
       else {
         const response = await requester({
@@ -913,7 +913,7 @@ const AudioClipController = {
           allow404Null: true,
           returnMeta: true,
         });
-        if (response?.status === 0x194 || response?.data == null)
+        if (response?.status === 404 || response?.data == null)
           throw new Error(audioClipText('errors.cutApiMissing'));
         error = response.data || {};
       }
@@ -923,7 +923,7 @@ const AudioClipController = {
         throw new Error(
           fileName?.error || error?.error || error?.message || audioClipText('errors.cutFailed'),
         );
-      const width = name.width || 0x168,
+      const width = name.width || 360,
         height = name.height || 150,
         x = calcSafeSpawnPosNearNode(appStore.getState().nodes, name, width, height),
         id = generateId('source-audio-cut');

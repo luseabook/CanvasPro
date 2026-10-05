@@ -15,12 +15,12 @@ export function createCanvasMcpSession({
 }) {
   let value = null,
     value2 = null,
-    item = 0x0,
+    item = 0,
     enabled = ![],
     promise = Promise['resolve']();
   const run = (key) => !enabled && value === key && key['binding'] === getBinding();
   async function disable(reason = '') {
-    item += 0x1;
+    item += 1;
     const sessionId = value;
     ((value = null),
       (value2 = null),
@@ -45,7 +45,7 @@ export function createCanvasMcpSession({
         result = await execute(index, requestId['arguments']);
       }
       result = sanitizeMcpResult(result);
-      if (JSON['stringify'](result)['length'] > 0x3d090)
+      if (JSON['stringify'](result)['length'] > 250000)
         result = {
           ok: ![],
           errorCode: 'RESULT_TOO_LARGE',
@@ -59,7 +59,7 @@ export function createCanvasMcpSession({
       };
     }
     if (!run(sessionId2)) return;
-    for (let count = 0x0; count < 0x2; count += 0x1) {
+    for (let count = 0; count < 2; count += 1) {
       try {
         await request(
           {
@@ -74,7 +74,7 @@ export function createCanvasMcpSession({
         return;
       } catch (error) {
         if (!run(sessionId2)) return;
-        if (count === 0x1) await disable(error['message']);
+        if (count === 1) await disable(error['message']);
       }
     }
   }
@@ -131,7 +131,7 @@ export function createCanvasMcpSession({
           url: sessionId4['url'],
           token: sessionId4['token'],
           binding: binding,
-          toolCount: tools['tools']['length'] + 0x1,
+          toolCount: tools['tools']['length'] + 1,
         }),
         void run3(value),
         sessionId4

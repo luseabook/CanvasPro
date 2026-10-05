@@ -20,8 +20,8 @@ const BOOT_PERF_MEASURE_NAMES = [
   LEGACY_WORKSPACE_KEY = 'current_state',
   WORKSPACE_CANVAS_KEY_PREFIX = 'workspace_canvas::',
   DREAMINA_RESUME_BACKUP_KEY = 'tapnow_v2_dreamina_resume_backup',
-  PAGE_LIFECYCLE_FLUSH_DEDUPE_MS = 0x7d0,
-  RECOVERY_SNAPSHOT_DEDUPE_MS = 0x1388,
+  PAGE_LIFECYCLE_FLUSH_DEDUPE_MS = 2000,
+  RECOVERY_SNAPSHOT_DEDUPE_MS = 5000,
   DREAMINA_RESUME_BACKUP_FIELDS = [
     'canvasId',
     'nodeId',
@@ -940,7 +940,7 @@ export function createProjectLifecycle({
           void run12(value75).catch((value77) => {
             console.warn('[projectLifecycle] 写入恢复快照失败:', value77);
           }));
-      }, 0x4b0)));
+      }, 1200)));
   }
   function run14() {
     if (setTimeout2 === null) return;
@@ -1030,7 +1030,7 @@ export function createProjectLifecycle({
   function run21(value82) {
     return sanitizeMultiCanvasDataForPersistence(value82 || {});
   }
-  function run22(handler13, { timeout: timeout = 0x5dc } = {}) {
+  function run22(handler13, { timeout: timeout = 1500 } = {}) {
     if (typeof handler13 !== 'function') return;
     if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
       window.requestIdleCallback(
@@ -1060,7 +1060,7 @@ export function createProjectLifecycle({
         ((wrapEl.style.transition = animate ? 'opacity 0.2s ease-in-out' : ''), (wrapEl.style.opacity = '1'));
       const el = document.getElementById('v2-initial-loader');
       el &&
-        ((el.style.opacity = '0'), (el.style.visibility = 'hidden'), setTimeout(() => el.remove(), 0x190));
+        ((el.style.opacity = '0'), (el.style.visibility = 'hidden'), setTimeout(() => el.remove(), 400));
       if (window.hideGlobalLoading) window.hideGlobalLoading();
       (run3('loader hidden:end'), run4('loader hidden', 'initApp:start', 'loader hidden:end'));
       if (typeof afterHidden === 'function') afterHidden();
@@ -1073,7 +1073,7 @@ export function createProjectLifecycle({
     run25();
   }
   function run26(value84) {
-    run22(value84, { timeout: 0x5dc });
+    run22(value84, { timeout: 1500 });
   }
   function run27({ projectId: projectId10, projectName: projectName7, multiData: multiData6 }) {
     if (!multiData6?.canvases?.length) return;
@@ -1352,11 +1352,11 @@ export function createProjectLifecycle({
     if (!enabled35) return;
     (run3('historicalAiLocalization queued:end'),
       run4('historicalAiLocalization queued', 'initApp:start', 'historicalAiLocalization queued:end'),
-      run22(() => run39(enabled35, value124), { timeout: 0x9c4 }));
+      run22(() => run39(enabled35, value124), { timeout: 2500 }));
   }
   function run42(enabled36, value125 = 10) {
     if (!enabled36) return;
-    run22(() => run40(enabled36, value125), { timeout: 0xc80 });
+    run22(() => run40(enabled36, value125), { timeout: 3200 });
   }
   window._queueLegacyThumbnailMigration = run27;
   function triggerLocalCacheSave() {
@@ -1410,7 +1410,7 @@ export function createProjectLifecycle({
         (setTimeout3 !== null && clearTimeout(setTimeout3),
           (setTimeout3 = setTimeout(() => {
             ((setTimeout3 = null), triggerLocalCacheSave());
-          }, 0x3e8)),
+          }, 1000)),
           run15({ writeRecovery: true, reason: 'persist-rev' }));
       },
     );

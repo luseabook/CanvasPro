@@ -1,32 +1,32 @@
 import { queryRendererSpatialIndexIds, screenViewportToWorldBounds } from './rendererSpatialIndex.js';
 export const RENDERER_VIRTUALIZATION_CONFIG = Object['freeze']({
-  mountPadding: 0x258,
-  parkPadding: 0x384,
-  denseLowZoomMountPadding: 0x1a4,
-  denseLowZoomParkPadding: 0x28a,
-  denseLowZoomPreviewPadding: 0x4b0,
-  veryDenseLowZoomMountPadding: 0x140,
-  veryDenseLowZoomParkPadding: 0x208,
-  veryDenseLowZoomPreviewPadding: 0x640,
+  mountPadding: 600,
+  parkPadding: 900,
+  denseLowZoomMountPadding: 420,
+  denseLowZoomParkPadding: 650,
+  denseLowZoomPreviewPadding: 1200,
+  veryDenseLowZoomMountPadding: 320,
+  veryDenseLowZoomParkPadding: 520,
+  veryDenseLowZoomPreviewPadding: 1600,
   denseLowZoomThreshold: 0.45,
   veryDenseLowZoomThreshold: 0.33,
-  denseLowZoomMaxMountCandidates: 0x24,
-  veryDenseLowZoomMaxMountCandidates: 0x18,
-  denseNodeCount: 0x50,
-  veryDenseNodeCount: 0x78,
-  settleDelayMs: 0x78,
-  parkAfterInteractionDelayMs: 0x140,
-  batchSize: 0xc,
-  structuralFrameBudgetMs: 0x8,
-  denseStructuralReconcileDelayMs: 0x2d0,
-  veryDenseStructuralReconcileDelayMs: 0x640,
-  lowZoomViewportCommitReconcileDelayMs: 0x2d0,
-  dragCommitReconcileDelayMs: 0x1e0,
-  recentPinMs: 0x7d0,
+  denseLowZoomMaxMountCandidates: 36,
+  veryDenseLowZoomMaxMountCandidates: 24,
+  denseNodeCount: 80,
+  veryDenseNodeCount: 120,
+  settleDelayMs: 120,
+  parkAfterInteractionDelayMs: 320,
+  batchSize: 12,
+  structuralFrameBudgetMs: 8,
+  denseStructuralReconcileDelayMs: 720,
+  veryDenseStructuralReconcileDelayMs: 1600,
+  lowZoomViewportCommitReconcileDelayMs: 720,
+  dragCommitReconcileDelayMs: 480,
+  recentPinMs: 2000,
 });
-export function resolveRendererVirtualizationTier({ viewport: viewport, nodeCount: nodeCount = 0x0 } = {}) {
-  const value = Number['isFinite'](Number(viewport?.['zoom'])) ? Number(viewport['zoom']) : 0x1,
-    item = Number['isFinite'](Number(nodeCount)) ? Number(nodeCount) : 0x0;
+export function resolveRendererVirtualizationTier({ viewport: viewport, nodeCount: nodeCount = 0 } = {}) {
+  const value = Number['isFinite'](Number(viewport?.['zoom'])) ? Number(viewport['zoom']) : 1,
+    item = Number['isFinite'](Number(nodeCount)) ? Number(nodeCount) : 0;
   if (
     value <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
     item >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
@@ -45,33 +45,33 @@ export function createRendererStructuralBudget({
   now: now = () =>
     typeof performance !== 'undefined' && typeof performance['now'] === 'function'
       ? performance['now']()
-      : 0x0,
+      : 0,
 } = {}) {
   let count = batchSize,
-    count2 = 0x0;
+    count2 = 0;
   const now2 = now();
   return {
     hasBudget() {
-      return count > 0x0 && (count2 <= 0x0 || !now2 || now() - now2 < frameBudgetMs);
+      return count > 0 && (count2 <= 0 || !now2 || now() - now2 < frameBudgetMs);
     },
     consume() {
-      ((count -= 0x1), (count2 += 0x1));
+      ((count -= 1), (count2 += 1));
     },
   };
 }
 export function getRendererStructuralReconcileDelayMs(key) {
   const index = Number(key);
-  if (!Number['isFinite'](index)) return 0x0;
+  if (!Number['isFinite'](index)) return 0;
   if (index >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'])
     return RENDERER_VIRTUALIZATION_CONFIG['veryDenseStructuralReconcileDelayMs'];
   if (index >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'])
     return RENDERER_VIRTUALIZATION_CONFIG['denseStructuralReconcileDelayMs'];
-  return 0x0;
+  return 0;
 }
 function addNodeAndChildren(map, enabled, result) {
   if (!enabled || map['has'](enabled)) return;
   const list = [enabled];
-  for (let data = 0x0; data < list['length']; data += 0x1) {
+  for (let data = 0; data < list['length']; data += 1) {
     const enabled2 = list[data];
     if (!enabled2 || map['has'](enabled2)) continue;
     map['add'](enabled2);
@@ -123,20 +123,20 @@ function getViewportWorldCenter(viewport2, containerWidth, containerHeight) {
     viewport: viewport2,
     containerWidth: containerWidth,
     containerHeight: containerHeight,
-    padding: 0x0,
+    padding: 0,
   });
   return {
-    x: (worldBounds['minX'] + worldBounds['maxX']) / 0x2,
-    y: (worldBounds['minY'] + worldBounds['maxY']) / 0x2,
+    x: (worldBounds['minX'] + worldBounds['maxX']) / 2,
+    y: (worldBounds['minY'] + worldBounds['maxY']) / 2,
   };
 }
 function getNodeCenterDistanceSq(box = {}, box2 = {}) {
-  const current = Number['isFinite'](Number(box['x'])) ? Number(box['x']) : 0x0,
-    entry = Number['isFinite'](Number(box['y'])) ? Number(box['y']) : 0x0,
-    record = Math['max'](0x1, Number(box['width']) || 0xa0),
-    payload = Math['max'](0x1, Number(box['height']) || 0x78),
-    handle = current + record / 0x2 - box2['x'],
-    state = entry + payload / 0x2 - box2['y'];
+  const current = Number['isFinite'](Number(box['x'])) ? Number(box['x']) : 0,
+    entry = Number['isFinite'](Number(box['y'])) ? Number(box['y']) : 0,
+    record = Math['max'](1, Number(box['width']) || 160),
+    payload = Math['max'](1, Number(box['height']) || 120),
+    handle = current + record / 2 - box2['x'],
+    state = entry + payload / 2 - box2['y'];
   return handle * handle + state * state;
 }
 function collectViewportWebPreviewNodeIds({
@@ -173,20 +173,20 @@ export function isNodeInsideViewportPadding(
   box4,
   input,
   output,
-  value2 = 0x0,
-  value3 = 0x0,
-  value4 = 0x0,
+  value2 = 0,
+  value3 = 0,
+  value4 = 0,
 ) {
   if (!box3 || !box4) return ![];
-  const value5 = Number['isFinite'](box4['zoom']) ? box4['zoom'] : 0x1,
-    value6 = Number['isFinite'](box3['x']) ? box3['x'] : 0x0,
-    value7 = Number['isFinite'](box3['y']) ? box3['y'] : 0x0,
-    value8 = Number['isFinite'](box3['width']) ? box3['width'] : 0x0,
-    value9 = Number['isFinite'](box3['height']) ? box3['height'] : 0x0,
-    value10 = Number['isFinite'](value3) ? value3 : 0x0,
-    value11 = Number['isFinite'](value4) ? value4 : 0x0,
-    value12 = (value6 + value10) * value5 + (Number['isFinite'](box4['x']) ? box4['x'] : 0x0),
-    value13 = (value7 + value11) * value5 + (Number['isFinite'](box4['y']) ? box4['y'] : 0x0),
+  const value5 = Number['isFinite'](box4['zoom']) ? box4['zoom'] : 1,
+    value6 = Number['isFinite'](box3['x']) ? box3['x'] : 0,
+    value7 = Number['isFinite'](box3['y']) ? box3['y'] : 0,
+    value8 = Number['isFinite'](box3['width']) ? box3['width'] : 0,
+    value9 = Number['isFinite'](box3['height']) ? box3['height'] : 0,
+    value10 = Number['isFinite'](value3) ? value3 : 0,
+    value11 = Number['isFinite'](value4) ? value4 : 0,
+    value12 = (value6 + value10) * value5 + (Number['isFinite'](box4['x']) ? box4['x'] : 0),
+    value13 = (value7 + value11) * value5 + (Number['isFinite'](box4['y']) ? box4['y'] : 0),
     value14 = value8 * value5,
     value15 = value9 * value5;
   return (
@@ -229,12 +229,12 @@ export function collectVirtualKeepAliveNodeIds({
 }
 export function resolveRendererVirtualizationPadding({
   viewport: viewport4,
-  nodeCount: nodeCount = 0x0,
+  nodeCount: nodeCount = 0,
   mountPadding: mountPadding = RENDERER_VIRTUALIZATION_CONFIG['mountPadding'],
   parkPadding: parkPadding = RENDERER_VIRTUALIZATION_CONFIG['parkPadding'],
 } = {}) {
-  const value21 = Number['isFinite'](viewport4?.['zoom']) ? viewport4['zoom'] : 0x1,
-    value22 = Number['isFinite'](nodeCount) ? nodeCount : 0x0;
+  const value21 = Number['isFinite'](viewport4?.['zoom']) ? viewport4['zoom'] : 1,
+    value22 = Number['isFinite'](nodeCount) ? nodeCount : 0;
   if (
     value21 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
     value22 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
@@ -255,12 +255,12 @@ export function resolveRendererVirtualizationPadding({
 }
 export function resolveRendererPreviewPadding({
   viewport: viewport5,
-  nodeCount: nodeCount = 0x0,
+  nodeCount: nodeCount = 0,
   mountPadding: mountPadding = RENDERER_VIRTUALIZATION_CONFIG['mountPadding'],
   previewPadding: previewPadding = mountPadding,
 } = {}) {
-  const value23 = Number['isFinite'](viewport5?.['zoom']) ? viewport5['zoom'] : 0x1,
-    value24 = Number['isFinite'](nodeCount) ? nodeCount : 0x0,
+  const value23 = Number['isFinite'](viewport5?.['zoom']) ? viewport5['zoom'] : 1,
+    value24 = Number['isFinite'](nodeCount) ? nodeCount : 0,
     value25 = Number['isFinite'](Number(previewPadding)) ? Number(previewPadding) : mountPadding;
   if (
     value23 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
@@ -274,9 +274,9 @@ export function resolveRendererPreviewPadding({
     return Math['max'](mountPadding, RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomPreviewPadding']);
   return Math['max'](mountPadding, value25);
 }
-export function resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount = 0x0 } = {}) {
-  const value26 = Number['isFinite'](viewport6?.['zoom']) ? viewport6['zoom'] : 0x1,
-    value27 = Number['isFinite'](nodeCount) ? nodeCount : 0x0;
+export function resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount = 0 } = {}) {
+  const value26 = Number['isFinite'](viewport6?.['zoom']) ? viewport6['zoom'] : 1,
+    value27 = Number['isFinite'](nodeCount) ? nodeCount : 0;
   if (
     value26 <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
     value27 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount']
@@ -287,7 +287,7 @@ export function resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCoun
     value27 >= RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount']
   )
     return RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomMaxMountCandidates'];
-  return 0x0;
+  return 0;
 }
 function limitLowZoomMountCandidates({
   nodes: nodes2,
@@ -298,7 +298,7 @@ function limitLowZoomMountCandidates({
   containerHeight: containerHeight3,
   limit: limit,
 } = {}) {
-  if (!(mountCandidateIds instanceof Set) || !(limit > 0x0)) return mountCandidateIds;
+  if (!(mountCandidateIds instanceof Set) || !(limit > 0)) return mountCandidateIds;
   const value28 = new Set(keepAliveNodeIds || []);
   for (const value29 of mountCandidateIds) {
     const value30 = nodes2?.[value29];
@@ -308,11 +308,11 @@ function limitLowZoomMountCandidates({
   for (const value31 of value28) {
     if (mountCandidateIds['has'](value31)) map2['add'](value31);
   }
-  const count3 = Math['max'](0x0, Math['floor'](limit) - map2['size']);
-  if (count3 <= 0x0) return map2;
+  const count3 = Math['max'](0, Math['floor'](limit) - map2['size']);
+  if (count3 <= 0) return map2;
   const viewportWorldCenter = getViewportWorldCenter(viewport7, containerWidth3, containerHeight3),
     list4 = [];
-  let order = 0x0;
+  let order = 0;
   for (const nodeId of mountCandidateIds) {
     if (map2['has'](nodeId)) continue;
     const enabled5 = nodes2?.[nodeId];
@@ -323,13 +323,13 @@ function limitLowZoomMountCandidates({
       distanceSq: getNodeCenterDistanceSq(enabled5, viewportWorldCenter),
       order: order,
     }),
-      (order += 0x1));
+      (order += 1));
   }
   list4['sort'](
     (value32, value33) =>
       value32['distanceSq'] - value33['distanceSq'] || value32['order'] - value33['order'],
   );
-  for (const value34 of list4['slice'](0x0, count3)) {
+  for (const value34 of list4['slice'](0, count3)) {
     map2['add'](value34['nodeId']);
   }
   return map2;
@@ -347,7 +347,7 @@ function finalizeVirtualizationCandidateSets({
   containerHeight: containerHeight4,
 } = {}) {
   const limit2 = resolveRendererLowZoomMountLimit({ viewport: viewport8, nodeCount: nodeCount2 });
-  if (!(limit2 > 0x0))
+  if (!(limit2 > 0))
     return {
       keepAliveNodeIds: keepAliveNodeIds2,
       mountCandidateIds: mountCandidateIds2,
@@ -569,7 +569,7 @@ export function ensureRendererExactVisiblePreviewCandidates({
             viewport: viewport10,
             containerWidth: containerWidth6,
             containerHeight: containerHeight6,
-            padding: 0x0,
+            padding: 0,
           }),
         )
       : new Set(
@@ -577,7 +577,7 @@ export function ensureRendererExactVisiblePreviewCandidates({
             ['filter'](
               (value48) =>
                 value48?.['id'] &&
-                isNodeInsideViewportPadding(value48, viewport10, containerWidth6, containerHeight6, 0x0),
+                isNodeInsideViewportPadding(value48, viewport10, containerWidth6, containerHeight6, 0),
             )
             ['map']((value49) => value49['id']),
         ),
@@ -586,6 +586,6 @@ export function ensureRendererExactVisiblePreviewCandidates({
       virtualizationResult?.['mountCandidateIds'] ||
       new Set(),
     list6 = Array['from'](value47)['filter']((value50) => !map4['has'](value50));
-  if (list6['length'] === 0x0) return virtualizationResult;
+  if (list6['length'] === 0) return virtualizationResult;
   return { ...virtualizationResult, previewCandidateIds: new Set([...map4, ...list6]) };
 }

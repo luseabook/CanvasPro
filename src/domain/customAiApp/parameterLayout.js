@@ -1,11 +1,11 @@
-export const CUSTOM_APP_FOOTER_LIMIT = 0x4;
+export const CUSTOM_APP_FOOTER_LIMIT = 4;
 export function getParameterEntries(list = [], value = CUSTOM_APP_FOOTER_LIMIT) {
   const list2 = [],
     map = new Map();
   return (
     list['filter']((item) => item['componentKind'] === 'param' && item['previewPlacement'] === 'home')
       ['sort'](
-        (key, index) => (Number(key['homeParamOrder']) || 0x0) - (Number(index['homeParamOrder']) || 0x0),
+        (key, index) => (Number(key['homeParamOrder']) || 0) - (Number(index['homeParamOrder']) || 0),
       )
       ['forEach']((result) => {
         const id = String(result['footerGroupId'] || '')['trim']();
@@ -22,7 +22,7 @@ export function getParameterEntries(list = [], value = CUSTOM_APP_FOOTER_LIMIT) 
         }
         enabled['members']['push'](result);
       }),
-    list2['slice'](0x0, value)
+    list2['slice'](0, value)
   );
 }
 export function clearParameterGroup(data) {
@@ -33,7 +33,7 @@ export function normalizeParameterGroups(list3) {
     (options) => options['componentKind'] !== 'param' || options['previewPlacement'] !== 'home',
   )['forEach'](clearParameterGroup),
     getParameterEntries(list3, Infinity)['forEach']((target) => {
-      if (target['members']['length'] < 0x2) target['members']['forEach'](clearParameterGroup);
+      if (target['members']['length'] < 2) target['members']['forEach'](clearParameterGroup);
     }));
 }
 export function orderParameterEntries(list4) {
@@ -94,7 +94,7 @@ export function getParameterFooterFields(value7) {
           displayOrder: Number['isFinite'](Number(value8['homeParamOrder']))
             ? Number(value8['homeParamOrder'])
             : value8['index'],
-          ...(id2['id'] && id2['members']['length'] > 0x1
+          ...(id2['id'] && id2['members']['length'] > 1
             ? {
                 footerGroup: {
                   id: id2['id'],

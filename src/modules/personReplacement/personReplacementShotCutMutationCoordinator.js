@@ -6,14 +6,14 @@ function cloneJson(item) {
   return JSON['parse'](JSON['stringify'](item));
 }
 export function createPersonReplacementShotCutMutationCoordinator() {
-  let key = 0x0;
+  let key = 0;
   const map = new Map(),
     invalidate = () => {
-      return ((key += 0x1), key);
+      return ((key += 1), key);
     },
     acceptRevision = (index) => {
       const count = Number(index);
-      if (count > 0x0) return ((key = Math['max'](key, count)), count);
+      if (count > 0) return ((key = Math['max'](key, count)), count);
       return invalidate();
     },
     isCurrent = (result) => Number(result) === key,
@@ -100,9 +100,9 @@ export function createPersonReplacementShotReverseOperation({
                 isReversed: isReversed2,
                 materializedIsReversed: materializedIsReversed,
                 materializationStatus: materializationStatus ? 'succeeded' : 'running',
-                materializationProgress: materializationStatus ? 0x64 : 0x0,
+                materializationProgress: materializationStatus ? 100 : 0,
                 ...(entry
-                  ? { replacementImage: { results: [], activeIndex: 0x0 }, replacementImageRef: '' }
+                  ? { replacementImage: { results: [], activeIndex: 0 }, replacementImageRef: '' }
                   : {}),
                 error: '',
               }
@@ -116,7 +116,7 @@ export function createPersonReplacementShotReverseOperation({
                 imageGenerationsByShotId: {},
                 videoGeneration: { status: 'idle', shotId: '', error: '' },
                 videoGenerationsByShotId: {},
-                videoPreparation: { status: 'idle', progress: 0x0, error: '' },
+                videoPreparation: { status: 'idle', progress: 0, error: '' },
               },
             }
           : {}),
@@ -128,7 +128,7 @@ export function createPersonReplacementShotReverseOperation({
         completion: coordinator['trackReverseCompletion']({
           projectId: projectId3,
           shotId: shotId3,
-          completion: Promise['resolve']({ ok: !![], project: cloneJson(project2), changedShotCount: 0x0 }),
+          completion: Promise['resolve']({ ok: !![], project: cloneJson(project2), changedShotCount: 0 }),
         }),
       };
     const ranges = project2['shots']['map']((shotId4) => ({
@@ -161,7 +161,7 @@ export function createPersonReplacementShotReverseOperation({
                       ? {
                           ...args2,
                           materializationStatus: 'failed',
-                          materializationProgress: 0x0,
+                          materializationProgress: 0,
                           error: error2,
                         }
                       : args2,

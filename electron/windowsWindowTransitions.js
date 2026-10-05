@@ -13,15 +13,15 @@ export async function disableWindowsWindowTransitions(
   let windowHandle;
   try {
     const rawHandle = targetWindow?.['getNativeWindowHandle']?.();
-    if (!Buffer['isBuffer'](rawHandle) || ![0x4, 0x8]['includes'](rawHandle['length']))
+    if (!Buffer['isBuffer'](rawHandle) || ![4, 8]['includes'](rawHandle['length']))
       throw new Error('invalid-handle');
     windowHandle =
-      rawHandle['length'] === 0x8 ? rawHandle['readBigUInt64LE']() : BigInt(rawHandle['readUInt32LE']());
+      rawHandle['length'] === 8 ? rawHandle['readBigUInt64LE']() : BigInt(rawHandle['readUInt32LE']());
     if (
       windowHandle <= 0x0n ||
       windowHandle > 0x7fffffffffffffffn ||
       !Number['isSafeInteger'](ownerPid) ||
-      ownerPid <= 0x0
+      ownerPid <= 0
     )
       throw new Error('invalid-handle');
   } catch {
@@ -52,7 +52,7 @@ export async function disableWindowsWindowTransitions(
           '-EncodedCommand',
           Buffer['from'](script, 'utf16le')['toString']('base64'),
         ],
-        { windowsHide: !![], timeout: 0x1388, maxBuffer: 0x4000, encoding: 'utf8' },
+        { windowsHide: !![], timeout: 5000, maxBuffer: 16384, encoding: 'utf8' },
         handleResult,
       );
     } catch (thrown) {

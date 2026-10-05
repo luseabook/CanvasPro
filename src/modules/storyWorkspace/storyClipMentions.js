@@ -29,14 +29,14 @@ function escapeRegExp(key) {
 const STORY_H3_LITERAL_TAG_PATTERN =
   /(?:<|&(?:amp;)*(?:lt;|#0*60;|#x0*3c;)|＜)\s*((?:\/\s*)?d|scenetrans|cutoff|(?:Subject|Picture|Video|Audio)\s+\d+)\s*(?:>|&(?:amp;)*(?:gt;|#0*62;|#x0*3e;)|＞)/giu;
 function normalizeStoryH3LiteralTag(index = '') {
-  const text = normalizeText(index)['replace'](/\s+/gu, '\x20');
+  const text = normalizeText(index)['replace'](/\s+/gu, ' ');
   if (/^\/\s*d$/iu['test'](text)) return '</d>';
   if (/^d$/iu['test'](text)) return '<d>';
   if (/^(scenetrans|cutoff)$/iu['test'](text)) return '<' + text['toLowerCase']() + '>';
   const enabled = text['match'](/^(Subject|Picture|Video|Audio)\s+(\d+)$/iu);
   if (!enabled) return '';
-  const result = '' + enabled[0x1][0x0]['toUpperCase']() + enabled[0x1]['slice'](0x1)['toLowerCase']();
-  return '<' + result + '\x20' + enabled[0x2] + '>';
+  const result = '' + enabled[1][0]['toUpperCase']() + enabled[1]['slice'](1)['toLowerCase']();
+  return '<' + result + ' ' + enabled[2] + '>';
 }
 function protectStoryH3LiteralTags(data = '') {
   const options = [],
@@ -57,10 +57,10 @@ function protectStoryH3LiteralTags(data = '') {
 }
 export function normalizeStoryClipTimeLabel(payload, handle = '3.0s') {
   const state = String(payload ?? '')['match'](/-?\d+(?:\.\d+)?/),
-    count = Number(state?.[0x0]);
-  if (!Number['isFinite'](count) || count <= 0x0) return handle;
-  const config = Math['min'](0x3e7, Math['max'](0.1, count));
-  return config['toFixed'](0x1) + 's';
+    count = Number(state?.[0]);
+  if (!Number['isFinite'](count) || count <= 0) return handle;
+  const config = Math['min'](999, Math['max'](0.1, count));
+  return config['toFixed'](1) + 's';
 }
 function getStoryAssetMentionAppearance(options2 = {}) {
   const scope = Array['isArray'](options2['appearances']) ? options2['appearances'] : [],
@@ -68,7 +68,7 @@ function getStoryAssetMentionAppearance(options2 = {}) {
   return (
     scope['find']((input) => text2 && normalizeText(input?.['id']) === text2) ||
     scope['find']((output) => normalizeText(output?.['name']) === '基础形象') ||
-    scope[0x0] ||
+    scope[0] ||
     null
   );
 }
@@ -146,7 +146,7 @@ function buildStoryClipAssetMentionCandidate({
     menuDirect: !![],
     suppressTooltip: !![],
     assetId: buildStoryAssetMentionId(asset?.['id'], text5),
-    assetIndex: 0x0,
+    assetIndex: 0,
     type: 'image',
     label: text4,
     subtitle: text6,
@@ -176,14 +176,14 @@ export function buildStoryClipMentionCandidates({
   defaultDuration: defaultDuration = '3.0s',
 } = {}) {
   const value17 = new Map([
-      ['character', 0x0],
-      ['scene', 0x1],
-      ['prop', 0x2],
+      ['character', 0],
+      ['scene', 1],
+      ['prop', 2],
     ]),
     args2 = [...getStoryEpisodeMentionAssets(assets, episode)]
       ['sort'](
         (value18, value19) =>
-          (value17['get'](value18?.['kind']) ?? 0x9) - (value17['get'](value19?.['kind']) ?? 0x9),
+          (value17['get'](value18?.['kind']) ?? 9) - (value17['get'](value19?.['kind']) ?? 9),
       )
       ['map']((value20) => {
         const storyAssetMentionAppearances = getStoryAssetMentionAppearances(value20),
@@ -210,9 +210,9 @@ export function buildStoryClipMentionCandidates({
                   normalizeText(value23)['toLowerCase']()['includes'](text8),
                 ),
               )
-            : -0x1,
-          value24 = count2 >= 0x0 ? count2 : 0x0,
-          args3 = list4[value24] || list4[0x0];
+            : -1,
+          value24 = count2 >= 0 ? count2 : 0,
+          args3 = list4[value24] || list4[0];
         return { ...args3, mentionVariants: list4, mentionVariantIndex: value24 };
       }),
     args4 = (Array['isArray'](libraryCandidates) ? libraryCandidates : [])['map']((args5) => ({
@@ -223,7 +223,7 @@ export function buildStoryClipMentionCandidates({
       menuGroup: '全部素材',
       menuSection: '',
       suppressTooltip: !![],
-      assetIndex: Number(args5?.['itemIndex'] || 0x0),
+      assetIndex: Number(args5?.['itemIndex'] || 0),
       label: normalizeText(args5?.['insertLabel'] || args5?.['label'] || args5?.['name']) || '素材库内容',
       assetName: normalizeText(args5?.['assetName']) || '素材库',
       iconType: normalizeText(args5?.['type']),
@@ -235,7 +235,7 @@ export function buildStoryClipMentionCandidates({
             menuDirect: !![],
             suppressTooltip: !![],
             assetId: STORY_TIME_MENTION_ASSET_ID,
-            assetIndex: 0x0,
+            assetIndex: 0,
             type: '',
             label: '添加时间',
             subtitle: '设置当前片段在提示词中的生成时长',
@@ -271,18 +271,18 @@ function renderStoryAssetMentionPill(value26, list5 = []) {
     value32 = value26?.['thumbUrl']
       ? '<img class="ref-pill-thumb" src="' +
         escapeHtml(value26['thumbUrl']) +
-        '\x22\x20alt=\x22\x22\x20draggable=\x22false\x22>'
+        '" alt="" draggable="false">'
       : '';
   return (
-    '<span\x20class=\x22ref-pill' +
+    '<span class="ref-pill' +
     (value27 ? ' ref-pill--unresolved' : '') +
-    '\x22\x20contenteditable=\x22false\x22\x20data-label=\x22' +
+    '" contenteditable="false" data-label="' +
     escapeHtml(storyReplicationCharacterDisplayLabel) +
     '" data-ref-origin="asset" data-asset-id="' +
     escapeHtml(value26['assetId']) +
     '" data-asset-index="0" data-ref-type="image"' +
-    (text10 ? ' data-story-asset-hover-id="' + escapeHtml(text10) + '\x22' : '') +
-    (text11 ? ' data-story-asset-hover-appearance-id="' + escapeHtml(text11) + '\x22' : '') +
+    (text10 ? ' data-story-asset-hover-id="' + escapeHtml(text10) + '"' : '') +
+    (text11 ? ' data-story-asset-hover-appearance-id="' + escapeHtml(text11) + '"' : '') +
     (value27 ? ' data-ref-unresolved="true" data-tooltip="缺少图片素材"' : '') +
     '>' +
     value32 +
@@ -300,7 +300,7 @@ function renderStoryTimeMentionPill(value33) {
     STORY_TIME_MENTION_ASSET_ID +
     '" data-asset-index="0" data-prompt-pill-kind="time"><span class="story-time-pill-icon" aria-hidden="true">' +
     STORY_TIME_ICON_SVG +
-    '</span><span\x20class=\x22ref-pill-label\x22>' +
+    '</span><span class="ref-pill-label">' +
     escapeHtml(storyClipTimeLabel) +
     '</span></span>'
   );
@@ -414,7 +414,7 @@ export function renderStoryClipPromptMentions(
     value46 = episode?.['replication'] ? assets : [];
   for (const value47 of ctx2['pills']) {
     const storyAssetMentionId = parseStoryAssetMentionId(
-        value47['html']['match'](/\bdata-asset-id="([^"]+)"/u)?.[0x1],
+        value47['html']['match'](/\bdata-asset-id="([^"]+)"/u)?.[1],
       ),
       value48 =
         storyAssetMentionId && assets['find']((value49) => value49['id'] === storyAssetMentionId['assetId']),
@@ -433,9 +433,9 @@ export function renderStoryClipPromptMentions(
                 'class="' +
                 value55['split'](/\s+/u)
                   ['filter']((value56) => value56 !== 'ref-pill--unresolved')
-                  ['join']('\x20') +
-                (text15 ? '' : '\x20ref-pill--unresolved') +
-                '\x22',
+                  ['join'](' ') +
+                (text15 ? '' : ' ref-pill--unresolved') +
+                '"',
             );
           if (!text15)
             value53 = value53['replace'](/>$/u, ' data-ref-unresolved="true" data-tooltip="缺少图片素材">');
@@ -451,7 +451,7 @@ export function renderStoryClipPromptMentions(
     value57 &&
       ((value47['html'] = value47['html']['replace'](
         /\bdata-label="[^"]*"/u,
-        'data-label="' + escapeHtml(value57) + '\x22',
+        'data-label="' + escapeHtml(value57) + '"',
       )),
       (value47['html'] = /class="ref-pill-label"/u['test'](value47['html'])
         ? value47['html']['replace'](
@@ -484,19 +484,19 @@ export function renderStoryClipPromptMentions(
     value66 = list6['length'] ? '@(?:' + list6['map'](escapeRegExp)['join']('|') + ')' : '(?!)',
     regExp = new RegExp('(' + value66 + ')|(⏱\\s*-?\\d+(?:\\.\\d+)?\\s*(?:s|秒))', 'gi'),
     handler = (list7, { escapeText: escapeText = !![] } = {}) => {
-      regExp['lastIndex'] = 0x0;
-      let value67 = 0x0,
+      regExp['lastIndex'] = 0;
+      let value67 = 0,
         value68 = '',
         value69 = null;
       const run2 = (value70) => (escapeText ? escapeHtml(value70) : value70);
       while ((value69 = regExp['exec'](list7))) {
         value68 += run2(list7['slice'](value67, value69['index']));
-        if (value69[0x1]) {
-          const value71 = value69[0x1]['slice'](0x1),
+        if (value69[1]) {
+          const value71 = value69[1]['slice'](1),
             value72 = args8['get'](value71);
-          value68 += value72 ? renderStoryAssetMentionPill(value72, value46) : run2(value69[0x0]);
-        } else value68 += renderStoryTimeMentionPill(value69[0x2]);
-        value67 = value69['index'] + value69[0x0]['length'];
+          value68 += value72 ? renderStoryAssetMentionPill(value72, value46) : run2(value69[0]);
+        } else value68 += renderStoryTimeMentionPill(value69[2]);
+        value67 = value69['index'] + value69[0]['length'];
       }
       return ((value68 += run2(list7['slice'](value67))), value68);
     };
@@ -528,11 +528,11 @@ export function resolveStoryClipPromptAssetRefs(
     value75 = /<span\b[^>]*\bclass\s*=\s*(["'])[^"']*\bref-pill\b[^"']*\1[^>]*>/gi,
     handler2 = (value76, value77) => {
       const value78 = value76['match'](
-        new RegExp('\x5cb' + value77 + '\x5cs*=\x5cs*([\x22\x27])(.*?)\x5c1', 'i'),
+        new RegExp('\\b' + value77 + '\\s*=\\s*(["\'])(.*?)\\1', 'i'),
       );
-      return normalizeText(value78?.[0x2])
-        ['replace'](/&quot;/gi, '\x22')
-        ['replace'](/&#39;|&apos;/gi, '\x27')
+      return normalizeText(value78?.[2])
+        ['replace'](/&quot;/gi, '"')
+        ['replace'](/&#39;|&apos;/gi, '\'')
         ['replace'](/&lt;/gi, '<')
         ['replace'](/&gt;/gi, '>')
         ['replace'](/&amp;/gi, '&');
@@ -543,7 +543,7 @@ export function resolveStoryClipPromptAssetRefs(
       voiceAssetIds == null ? null : new Set([...voiceAssetIds]['map'](normalizeText)['filter'](Boolean));
   let value80 = null;
   while ((value80 = value75['exec'](renderStoryClipPromptMentions2))) {
-    const value81 = value80[0x0],
+    const value81 = value80[0],
       enabled5 = handler2(value81, 'data-asset-id');
     if (!enabled5) continue;
     const storyAssetIdFromMentionNodeId = getStoryAssetIdFromMentionNodeId(enabled5),
@@ -643,7 +643,7 @@ export function resolveStoryClipAssetMentionRef(value91, value92 = []) {
     assetId: normalizeText(value91?.['dataset']?.['assetId']),
     storyAssetId: storyAssetMentionId3['assetId'],
     appearanceId: storyAssetMentionId3['appearanceId'],
-    itemIndex: 0x0,
+    itemIndex: 0,
     type: 'image',
     name: normalizeText(error['name']) || '本集素材',
     label: normalizeText(error['name']) || '本集素材',
@@ -701,7 +701,7 @@ export function resolveStoryClipAssetMentionRefs(
   if (!text24['startsWith'](STORY_ASSET_NODE_PREFIX) && typeof resolveExternalAssetRef === 'function')
     return resolveExternalAssetRef({
       assetId: text24,
-      itemIndex: Number(value104?.['dataset']?.['assetIndex'] || 0x0),
+      itemIndex: Number(value104?.['dataset']?.['assetIndex'] || 0),
     });
   const list9 = [],
     storyClipAssetMentionRef = resolveStoryClipAssetMentionRef(value104, value105);
@@ -713,9 +713,9 @@ export function resolveStoryClipAssetMentionRefs(
       origin: 'asset',
       assetId: '' + STORY_CHARACTER_VOICE_NODE_PREFIX + encodeURIComponent(text25),
       storyAssetId: text25,
-      itemIndex: 0x0,
+      itemIndex: 0,
       type: 'audio',
-      name: (normalizeText(response['asset']?.['name']) || '角色') + '\x20·\x20声音参考',
+      name: (normalizeText(response['asset']?.['name']) || '角色') + ' · 声音参考',
       label: normalizeText(response['asset']?.['name']) || '角色声音',
       url: response['url'],
       audioUrl: response['url'],
@@ -728,6 +728,6 @@ export function resolveStoryClipAssetMentionRefs(
       },
     });
   }
-  if (list9['length'] === 0x0) return null;
-  return list9['length'] === 0x1 ? list9[0x0] : list9;
+  if (list9['length'] === 0) return null;
+  return list9['length'] === 1 ? list9[0] : list9;
 }

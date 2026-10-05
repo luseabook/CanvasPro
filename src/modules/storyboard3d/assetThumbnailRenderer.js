@@ -1,9 +1,9 @@
 import * as threeRuntime from '../panoramaSceneNode/threeRuntime.js';
 import { resolveSceneAsset } from '../panoramaSceneNode/sceneAssetCatalog.js';
 import { createSceneAssetVisual } from '../panoramaSceneNode/scene3dProceduralAssetVisual.js';
-const DEFAULT_CACHE_LIMIT = 0x200,
-  DEFAULT_WIDTH = 0xf0,
-  DEFAULT_HEIGHT = 0x96,
+const DEFAULT_CACHE_LIMIT = 512,
+  DEFAULT_WIDTH = 240,
+  DEFAULT_HEIGHT = 150,
   PREVIEW_COLORS = Object['freeze']({
     blue: 0x6ea8ff,
     red: 0xef7777,
@@ -22,7 +22,7 @@ function createCacheKey(response) {
 }
 export function createStoryboard3DAssetThumbnailCache({ limit: limit = DEFAULT_CACHE_LIMIT } = {}) {
   const map = new Map(),
-    item = Math['max'](0x1, Math['floor'](Number(limit) || DEFAULT_CACHE_LIMIT));
+    item = Math['max'](1, Math['floor'](Number(limit) || DEFAULT_CACHE_LIMIT));
   return {
     get(key) {
       const cacheKey = createCacheKey(key);
@@ -69,9 +69,9 @@ function createPreviewScene(entry) {
   ((record['background'] = new threeRuntime['Color'](0x171920)),
     record['add'](new threeRuntime['HemisphereLight'](0xf2f6ff, 0x30343d, 1.7)));
   const payload = new threeRuntime['DirectionalLight'](0xffffff, 2.2);
-  payload['position']['set'](0x4, 0x7, 0x5);
+  payload['position']['set'](4, 7, 5);
   const handle = new threeRuntime['DirectionalLight'](0x8bb8ff, 1.1);
-  return (handle['position']['set'](-0x5, 0x3, -0x4), record['add'](payload, handle, entry), record);
+  return (handle['position']['set'](-5, 3, -4), record['add'](payload, handle, entry), record);
 }
 export function createStoryboard3DAssetThumbnailFraming(
   state,
@@ -84,10 +84,10 @@ export function createStoryboard3DAssetThumbnailFraming(
     config = bounds['getBoundingSphere'](new threeRuntime['Sphere']()),
     radius = Math['max'](0.08, Number(config['radius']) || 0.08),
     camera = new threeRuntime['PerspectiveCamera'](
-      0x20,
-      Math['max'](0.1, Number(aspect) || 0x1),
+      32,
+      Math['max'](0.1, Number(aspect) || 1),
       0.01,
-      radius * 0x1e,
+      radius * 30,
     ),
     scope = new threeRuntime['Vector3'](1.35, 0.85, 1.35)['normalize'](),
     input = threeRuntime['MathUtils']['degToRad'](camera['fov'] * 0.5),
@@ -95,7 +95,7 @@ export function createStoryboard3DAssetThumbnailFraming(
   return (
     camera['position']['copy'](center)['addScaledVector'](scope, distance),
     (camera['near'] = Math['max'](0.01, distance - radius * 2.2)),
-    (camera['far'] = distance + radius * 0x4),
+    (camera['far'] = distance + radius * 4),
     camera['lookAt'](center),
     camera['updateProjectionMatrix'](),
     { bounds: bounds, camera: camera, center: center, distance: distance, radius: radius }
@@ -107,8 +107,8 @@ export function createStoryboard3DAssetThumbnailRenderer({
   width: width = DEFAULT_WIDTH,
   height: height = DEFAULT_HEIGHT,
 } = {}) {
-  const aspect2 = Math['max'](0x60, Math['floor'](Number(width) || DEFAULT_WIDTH)),
-    value2 = Math['max'](0x48, Math['floor'](Number(height) || DEFAULT_HEIGHT));
+  const aspect2 = Math['max'](96, Math['floor'](Number(width) || DEFAULT_WIDTH)),
+    value2 = Math['max'](72, Math['floor'](Number(height) || DEFAULT_HEIGHT));
   let rendererFactory2 = null;
   function run() {
     if (rendererFactory2) return rendererFactory2;
@@ -121,7 +121,7 @@ export function createStoryboard3DAssetThumbnailRenderer({
       preserveDrawingBuffer: !![],
       powerPreference: 'low-power',
     })),
-      rendererFactory2['setPixelRatio']?.(0x1),
+      rendererFactory2['setPixelRatio']?.(1),
       rendererFactory2['setSize']?.(aspect2, value2, ![]));
     if ('outputColorSpace' in rendererFactory2)
       rendererFactory2['outputColorSpace'] = threeRuntime['SRGBColorSpace'];

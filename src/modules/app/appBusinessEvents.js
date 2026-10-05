@@ -234,7 +234,7 @@ export function createAppBusinessEvents({
       setPanoramaSceneEditing({ nodeId: nodeId6, isEditing: true, storeInstance: store }));
   }
   function run9() {
-    const run10 = (config, scope = 0x320) => {
+    const run10 = (config, scope = 800) => {
       const input = store.getState(),
         enabled6 = input?.nodes?.[config];
       if (!enabled6 || enabled6.type !== 'comment-note') return false;
@@ -261,7 +261,7 @@ export function createAppBusinessEvents({
     addShortcutListener((list4) => {
       if (typeof list4 === 'string' && list4.startsWith('comment-note-jump::')) {
         const output = list4.slice('comment-note-jump::'.length);
-        run10(output, 0x320);
+        run10(output, 800);
         return;
       }
       const nodeId7 = run5();
@@ -478,7 +478,7 @@ export function createAppBusinessEvents({
                 ? selectedNodeIds2.filter((item2) => nodes2[item2])
                 : Object.keys(nodes2 || {});
           if (list10.length === 0) break;
-          focusNodes?.(list10, 80, 0x320);
+          focusNodes?.(list10, 80, 800);
           break;
         }
         case 'minimap': {
@@ -653,7 +653,7 @@ export function createAppBusinessEvents({
             const box3 =
               typeof getAIGenerationDefaultSizeByType === 'function'
                 ? getAIGenerationDefaultSizeByType('ai-text')
-                : { width: 0x12c, height: 0x12c };
+                : { width: 300, height: 300 };
             createNodeAtCursor(
               'ai-text',
               box3.width,
@@ -668,7 +668,7 @@ export function createAppBusinessEvents({
             const box4 =
               typeof getAIGenerationDefaultSizeByType === 'function'
                 ? getAIGenerationDefaultSizeByType('ai-image')
-                : { width: 0x120, height: 0x120 };
+                : { width: 288, height: 288 };
             createNodeAtCursor(
               'ai-image',
               box4.width,
@@ -683,7 +683,7 @@ export function createAppBusinessEvents({
             const box5 =
               typeof getAIGenerationDefaultSizeByType === 'function'
                 ? getAIGenerationDefaultSizeByType('ai-video')
-                : { width: 0x120, height: 0x120 };
+                : { width: 288, height: 288 };
             createNodeAtCursor(
               'ai-video',
               box5.width,
@@ -698,7 +698,7 @@ export function createAppBusinessEvents({
             const box6 =
               typeof getAIGenerationDefaultSizeByType === 'function'
                 ? getAIGenerationDefaultSizeByType('ai-audio')
-                : { width: 0x120, height: 0x120 };
+                : { width: 288, height: 288 };
             createNodeAtCursor(
               'ai-audio',
               box6.width,
@@ -711,8 +711,8 @@ export function createAppBusinessEvents({
           if (store.getState().matting?.active) break;
           createNodeAtCursor(
             'scene-detection',
-            0x190,
-            0x1f4,
+            400,
+            500,
             t('appBusinessEvents.nodeDefaults.sceneDetection'),
           );
           break;

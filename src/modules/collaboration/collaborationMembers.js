@@ -5,7 +5,7 @@ const ROLES = { owner: '房主', admin: '管理员', editor: '可编辑', viewer
 export function onlineCollaborationActors(response, value) {
   const item = new Set(
     (response?.['presence'] || [])
-      ['filter']((enabled) => !enabled['expiresAt'] || enabled['expiresAt'] * 0x3e8 > Date['now']())
+      ['filter']((enabled) => !enabled['expiresAt'] || enabled['expiresAt'] * 1000 > Date['now']())
       ['map']((key) => key['actorId']),
   );
   if (response && value && !['offline', 'blocked']['includes'](response['status'])) item['add'](value);
@@ -45,7 +45,7 @@ export function createCollaborationMembers({
         if (error?.['key'] === key2) {
           error['name'] !== person['name'] &&
             ((error['label']['textContent'] = person['name'] + '（你）'),
-            (error['avatar']['textContent'] = person['name']['slice'](0x0, 0x1)),
+            (error['avatar']['textContent'] = person['name']['slice'](0, 1)),
             (error['name'] = person['name']),
             error['nickname']?.['update'](person['name']));
           continue;
@@ -64,7 +64,7 @@ export function createCollaborationMembers({
           online = element('span', 'collaboration-member-online');
         online['setAttribute']('role', 'img');
         const controls = element('div', 'collaboration-member-actions'),
-          avatar = element('span', 'collaboration-avatar', person['name']['slice'](0x0, 0x1));
+          avatar = element('span', 'collaboration-avatar', person['name']['slice'](0, 1));
         row['append'](avatar, label, online, controls);
         const enabled3 =
           !enabled2 &&
@@ -162,7 +162,7 @@ export function createCollaborationMembers({
           error2['follow']['setAttribute']('aria-pressed', String(enabled5)),
           error2['follow']['setAttribute'](
             'aria-label',
-            error2['follow']['textContent'] + '\x20' + error2['name'],
+            error2['follow']['textContent'] + ' ' + error2['name'],
           )),
         (error2['isOnline'] = enabled4),
         (error2['following'] = enabled5));

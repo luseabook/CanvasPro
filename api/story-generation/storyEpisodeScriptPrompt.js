@@ -8,25 +8,25 @@ export const STORY_EPISODE_SCRIPT_SYSTEM_PROMPT = [
   '正文体量由当前分集的剧情内容与自然表演时长决定，不设固定字数目标；不得为了篇幅扩写对白或动作。',
   '不得用重复情节、重复对白、冗长环境描写或同义改写凑篇幅。',
   '小说式环境、心理和背景描述必须影视化转译：保留有叙事价值的内容，并改写为摄像机可见的人物动作、表情、视线、环境变化、光影变化或道具状态；不得只写抽象感受、判断和气氛概括。',
-  '输入\x20scriptMode\x20为\x20narration\x20时，正文以第三人称旁白为主要叙事载体，并用“旁白：”明确标注；只保留推动冲突或情绪转折的关键人物对白。',
+  '输入 scriptMode 为 narration 时，正文以第三人称旁白为主要叙事载体，并用“旁白：”明确标注；只保留推动冲突或情绪转折的关键人物对白。',
   '不得跳集生成，不得提前完成后续分集的核心事件。',
   '正文完成后必须从本集实际内容提取 continuityFacts 和 endingState；不得在状态字段中添加正文没有发生的事实。',
   '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
-]['join']('\x0a');
+]['join']('\n');
 export const STORY_EPISODE_SCRIPT_REPAIR_SYSTEM_PROMPT = [
   '你是短剧分集剧本返回修复助手。',
   '只修复上一次返回，不重新分析或重写整集。',
   '必须完整保留已经返回的场次正文、动作和对白；只补齐缺失结尾、修正字段名称或修复 JSON 语法。',
   '如果上次返回在场次中途截断，从截断位置自然续写到本集既定结尾，不得从头重写。',
   '只返回一个 JSON 对象，不要输出 Markdown、解释、校验报告或原始请求。',
-]['join']('\x0a');
+]['join']('\n');
 export const STORY_EPISODE_SCRIPT_CONTENT_REVISION_SYSTEM_PROMPT = [
   '你是短剧单集正文修订编辑。',
-  '只修复\x20timingReview\x20已定位的重复解释、重复动作、无效描写或改编预算偏离；不得脱离已确认摘要、分集大纲和连续性新增剧情。',
+  '只修复 timingReview 已定位的重复解释、重复动作、无效描写或改编预算偏离；不得脱离已确认摘要、分集大纲和连续性新增剧情。',
   '必须保留本集核心因果、人物选择、冲突结果和指定结尾。',
   '修订后的台词、动作、人物和场景仍必须受 grounding 中的摘要、分集计划与连续性约束。',
-  '只返回与单集剧本相同结构的严格\x20JSON，不要输出说明、对比稿或\x20Markdown。',
-]['join']('\x0a');
+  '只返回与单集剧本相同结构的严格 JSON，不要输出说明、对比稿或 Markdown。',
+]['join']('\n');
 export function createStoryEpisodeScriptPromptApi({
   normalizeText: normalizeText,
   normalizeStringArray: normalizeStringArray,
@@ -39,7 +39,7 @@ export function createStoryEpisodeScriptPromptApi({
   schemaVersion: schemaVersion,
   narrationMode: narrationMode,
 } = {}) {
-  const value = 0x320;
+  const value = 800;
   function storyContract(options = {}) {
     const item = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
     return {
@@ -102,7 +102,7 @@ export function createStoryEpisodeScriptPromptApi({
       list = normalizeText(dom?.['body'] || data),
       body = list['length'] > value ? list['slice'](-value) : list;
     return {
-      number: Number(enabled2?.['number']) || result - 0x1,
+      number: Number(enabled2?.['number']) || result - 1,
       title: normalizeText(enabled2?.['title']),
       synopsis: normalizeText(enabled2?.['synopsis']),
       hook: normalizeText(enabled2?.['hook']),
@@ -127,7 +127,7 @@ export function createStoryEpisodeScriptPromptApi({
   } = {}) {
     const storySummary = run(project),
       scriptMode = normalizeStoryScriptMode(project?.['scriptMode']),
-      number = Math['max'](0x1, Math['trunc'](Number(episode?.['number']) || 0x1)),
+      number = Math['max'](1, Math['trunc'](Number(episode?.['number']) || 1)),
       currentEpisode = {
         ref:
           normalizeText(episode?.['ref'] || episode?.['planningRef'] || episode?.['id']) ||
@@ -151,8 +151,8 @@ export function createStoryEpisodeScriptPromptApi({
         previousEpisode?.['fullScript'] ||
         previousEpisode?.['scriptText'],
     );
-    if (number > 0x1 && !enabled3)
-      throw new Error('必须先完成第 ' + (number - 0x1) + ' 集剧本，才能生成第 ' + number + ' 集。');
+    if (number > 1 && !enabled3)
+      throw new Error('必须先完成第 ' + (number - 1) + ' 集剧本，才能生成第 ' + number + ' 集。');
     return JSON['stringify']({
       task: 'write_story_episode_script',
       schemaVersion: schemaVersion,
@@ -164,7 +164,7 @@ export function createStoryEpisodeScriptPromptApi({
         previousEpisode: previousEpisode2(previousEpisode, number, enabled3),
         nextEpisode: nextEpisode
           ? {
-              number: Number(nextEpisode?.['number']) || number + 0x1,
+              number: Number(nextEpisode?.['number']) || number + 1,
               title: normalizeText(nextEpisode?.['title']),
               synopsis: normalizeText(nextEpisode?.['synopsis']),
               coreBeat: normalizeText(nextEpisode?.['coreBeat']),
@@ -182,14 +182,14 @@ export function createStoryEpisodeScriptPromptApi({
         '仅省略既不能转化为有效画面、也不推动事件、人物选择、关系变化或关键信息的枝节；不得把应当可视化的重要内容直接删掉。',
         '正文体量由本集实际剧情和自然表演需要决定；runtimeGuidance.outlineEstimateSeconds 只作非约束参考。没有固定字数下限，不得为凑篇幅增加重复对白、重复动作或解释性复述，也不得为了贴近预计时长删减必要剧情。',
         '建议拆成 2 至 6 场，每场只写可拍摄的剧情动作和对白。',
-        'body\x20使用标准短剧文本表达，可包含动作描述、角色对白、VO\x20和\x20OS。',
+        'body 使用标准短剧文本表达，可包含动作描述、角色对白、VO 和 OS。',
         '人物对白统一写成“角色名：“完整对白””，完整台词放在中文双引号内；不得写成“角色名：裸台词”。',
-        '不得在\x20body\x20末尾添加“本集完”“全剧终”“待续”等编辑标记；确需观众看见文字时，明确写成“屏幕字幕：“文字””。',
+        '不得在 body 末尾添加“本集完”“全剧终”“待续”等编辑标记；确需观众看见文字时，明确写成“屏幕字幕：“文字””。',
         '人物称呼、关系、目标和世界规则必须与 storySummary 一致。',
         '只生成完整分场剧本，不写分镜编号、景别、运镜、视频参数或绘图提示词。',
         ...(scriptMode === narrationMode
           ? [
-              '以第三人称旁白为主要叙事载体，旁白应占全部可配音文本的\x2080%\x20以上，并统一使用“旁白：”标注。',
+              '以第三人称旁白为主要叙事载体，旁白应占全部可配音文本的 80% 以上，并统一使用“旁白：”标注。',
               '旁白按信息节拍分成短句和短段，每段只推进一个事件、发现、因果或情绪转折，适配单人口播。',
               '保留少量推动冲突、揭示信息或形成情绪爆点的原有关键对白；任务文字、屏幕文字和音效不得改写成人物对白。',
               '动作和环境描述必须可直接画面化，并与旁白表达的事件同步；不要写抽象评价代替可观察行为。',
@@ -205,7 +205,7 @@ export function createStoryEpisodeScriptPromptApi({
         scenes: [
           {
             ref: currentEpisode['ref'] + '-scene-1',
-            heading: '夜\x20内\x20故障电梯',
+            heading: '夜 内 故障电梯',
             characters: ['人物名'],
             body:
               scriptMode === narrationMode
@@ -256,7 +256,7 @@ export function createStoryEpisodeScriptPromptApi({
         '逐项修复 timingReview.findings，不得仅改写措辞后保留同一重复功能。',
         '若时长偏离 grounding.runtimeGuidance.outlineEstimateSeconds，优先合并重复说明、重复动作和无效过场；有叙事价值的环境、心理和背景信息必须改写为简洁、可观察的视觉行为或画面变化，不得直接删除或保留为抽象描述。',
         '不得删除 currentEpisode.coreBeat、endingEvent、关键因果、人物选择和结果。',
-        '不得加入\x20storySummary、currentEpisode\x20和\x20continuity\x20之外的人物、事件、场景或下一集内容。',
+        '不得加入 storySummary、currentEpisode 和 continuity 之外的人物、事件、场景或下一集内容。',
         '返回完整 scenes、continuityFacts 和 endingState，不返回修订说明。',
       ],
     });

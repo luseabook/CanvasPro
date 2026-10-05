@@ -83,7 +83,7 @@ function normalizeAllowedModelIds(list = []) {
 }
 function resolveAllowedModelId(key, list2 = []) {
   const index = String(key || '')['trim']();
-  return list2['length'] && !list2['includes'](index) ? list2[0x0] : index;
+  return list2['length'] && !list2['includes'](index) ? list2[0] : index;
 }
 function resolveRunningHubWorkflowAllowedModelId(result, list3 = []) {
   const data = String(result || '')['trim'](),
@@ -92,19 +92,19 @@ function resolveRunningHubWorkflowAllowedModelId(result, list3 = []) {
     modelManifest?.['provider'] === 'runninghubwf' &&
     modelManifest?.['adapterType'] === 'workflow' &&
     !list3['includes'](data)
-    ? list3[0x0]
+    ? list3[0]
     : data;
 }
 const DEFAULT_VIDEO_FOOTER_PLACEMENT_ORDER = Object['freeze'](['resolution', 'mode']);
 function normalizeReferenceCounts(options = {}) {
   return {
-    imageCount: Math['max'](0x0, Number(options?.['imageCount']) || 0x0),
-    videoCount: Math['max'](0x0, Number(options?.['videoCount']) || 0x0),
-    audioCount: Math['max'](0x0, Number(options?.['audioCount']) || 0x0),
+    imageCount: Math['max'](0, Number(options?.['imageCount']) || 0),
+    videoCount: Math['max'](0, Number(options?.['videoCount']) || 0),
+    audioCount: Math['max'](0, Number(options?.['audioCount']) || 0),
   };
 }
 function wrapSchemaPlacement(target, source) {
-  return source ? '<div class="ui-schema-placement ' + target + '\x22>' + source + '</div>' : '';
+  return source ? '<div class="ui-schema-placement ' + target + '">' + source + '</div>' : '';
 }
 function renderVideoAdvancedControlsMarkup(enabled) {
   if (!enabled) return '';
@@ -116,7 +116,7 @@ function renderVideoAdvancedControlsMarkup(enabled) {
     escapeHtml2 +
     '" aria-expanded="false">' +
     ADVANCED_SETTINGS_TUNE_ICON_MARKUP +
-    '</button></div>\x0a\x20\x20\x20\x20<div\x20class=\x22rh-vram-adv-panel\x22>' +
+    '</button></div>\n    <div class="rh-vram-adv-panel">' +
     enabled +
     '</div>'
   );
@@ -183,12 +183,12 @@ function resolveDreaminaSelectorLayout(entry, record) {
       escapeHtml(dreaminaTaskModelMenuMeta?.['title'] || getDisplayModelName(model)) +
       '</span>\n    </button>\n    <div class="floating-menu dreamina-task-model-menu">' +
       buildDreaminaTaskModelMenuHtml(model, taskType, provider2) +
-      '</div>\x0a\x20\x20</div>',
+      '</div>\n  </div>',
     controlsHtml = [
       payload,
       dreaminaVideoTaskParamVisibility['mode']
         ? wrapSchemaPlacement(
-            'ui-schema-mode-slot\x20dreamina-video-mode-schema',
+            'ui-schema-mode-slot dreamina-video-mode-schema',
             handler([dreaminaParamSchemaFields['mode']]),
           )
         : '',
@@ -343,9 +343,9 @@ export function renderAIGenVideoModelSelectorMarkup({
     },
     model5 = resolveVideoSelectorSchemaLayout(model4, value4, { referenceCounts: referenceCounts });
   return (
-    '<div\x20class=\x22img-model-pills\x20aigen-video-model-selector\x20' +
+    '<div class="img-model-pills aigen-video-model-selector ' +
     escapeHtml(className) +
-    '\x22\x20data-aigen-video-model-selector>\x0a\x20\x20\x20\x20<div\x20class=\x22img-model-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20' +
+    '" data-aigen-video-model-selector>\n    <div class="img-model-wrap">\n      ' +
     renderNodeModelTrigger({
       iconHtml: renderVideoModelTriggerIconHTML({
         model: model5['model'],
@@ -365,10 +365,10 @@ export function renderAIGenVideoModelSelectorMarkup({
     (showSchemaControls
       ? '<div class="aigen-video-schema-controls">' +
         model5['controlsHtml'] +
-        '</div>\x0a\x20\x20\x20\x20' +
+        '</div>\n    ' +
         renderVideoAdvancedControlsMarkup(model5['advanced'])
       : '') +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 function createVideoModelMenuPortal({
@@ -398,11 +398,11 @@ function createSchemaPopupViewportPositioner({
   if (!selector || placement !== 'viewport-auto-up') return { destroy() {} };
   let el = null,
     el2 = null,
-    value5 = 0x0;
-  const value6 = 0x10,
-    value7 = 0x8,
+    value5 = 0;
+  const value6 = 16,
+    value7 = 8,
     value8 = () => {
-      value5 = 0x0;
+      value5 = 0;
       if (!el?.['isConnected'] || !el['classList']?.['contains']?.('show')) return;
       const el3 = el2?.['querySelector']?.('[data-ui-schema-menu-trigger]') || el2,
         box = el3?.['getBoundingClientRect']?.(),
@@ -410,12 +410,12 @@ function createSchemaPopupViewportPositioner({
         count =
           Number(windowObject3?.['innerWidth']) ||
           Number(documentObject3?.['documentElement']?.['clientWidth']) ||
-          0x0,
+          0,
         count2 =
           Number(windowObject3?.['innerHeight']) ||
           Number(documentObject3?.['documentElement']?.['clientHeight']) ||
-          0x0;
-      if (!box || !box2 || count <= 0x0 || count2 <= 0x0) return;
+          0;
+      if (!box || !box2 || count <= 0 || count2 <= 0) return;
       const value9 = Math['max'](value6, count - value6 - box2['width']),
         value10 = Math['min'](Math['max'](box['right'] - box2['width'], value6), value9),
         value11 = Math['max'](value6, count2 - value6 - box2['height']),
@@ -435,7 +435,7 @@ function createSchemaPopupViewportPositioner({
       value5 && windowObject3?.['cancelAnimationFrame']?.(value5);
       const run3 =
         windowObject3?.['requestAnimationFrame']?.['bind']?.(windowObject3) ||
-        ((value15) => windowObject3?.['setTimeout']?.(value15, 0x0));
+        ((value15) => windowObject3?.['setTimeout']?.(value15, 0));
       value5 = run3(value8);
     },
     value16 = (enabled2) => {
@@ -454,7 +454,7 @@ function createSchemaPopupViewportPositioner({
     windowObject3?.['addEventListener']?.('resize', handler2),
     {
       destroy() {
-        (value5 && (windowObject3?.['cancelAnimationFrame']?.(value5), (value5 = 0x0)),
+        (value5 && (windowObject3?.['cancelAnimationFrame']?.(value5), (value5 = 0)),
           selector['removeEventListener']?.('ui-schema-menu-before-open', value16),
           documentObject3?.['removeEventListener']?.('scroll', handler2, !![]),
           windowObject3?.['removeEventListener']?.('resize', handler2),

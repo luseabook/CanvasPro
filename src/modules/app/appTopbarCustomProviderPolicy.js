@@ -19,14 +19,14 @@ export function applyCustomProviderModelSelectionState(
 export function scrollCustomProviderModelListFromWheel(el, event = {}) {
   if (!el) return ![];
   const count = Number(event?.['deltaY']);
-  if (!Number['isFinite'](count) || count === 0x0) return ![];
-  const key = Math['max'](0x0, Number(el['clientHeight']) || 0x0),
-    index = Math['max'](key, Number(el['scrollHeight']) || 0x0),
-    result = Math['max'](0x0, index - key),
-    data = Math['min'](result, Math['max'](0x0, Number(el['scrollTop']) || 0x0)),
-    count2 = Number(event?.['deltaMode']) || 0x0,
-    target = count2 === 0x1 ? 0x10 : count2 === 0x2 ? Math['max'](key, 0x1) : 0x1,
-    source = Math['min'](result, Math['max'](0x0, data + count * target));
+  if (!Number['isFinite'](count) || count === 0) return ![];
+  const key = Math['max'](0, Number(el['clientHeight']) || 0),
+    index = Math['max'](key, Number(el['scrollHeight']) || 0),
+    result = Math['max'](0, index - key),
+    data = Math['min'](result, Math['max'](0, Number(el['scrollTop']) || 0)),
+    count2 = Number(event?.['deltaMode']) || 0,
+    target = count2 === 1 ? 16 : count2 === 2 ? Math['max'](key, 1) : 1,
+    source = Math['min'](result, Math['max'](0, data + count * target));
   if (source === data) return ![];
   return ((el['scrollTop'] = source), !![]);
 }
@@ -41,29 +41,29 @@ export function handleCustomProviderResultWheel(event2, enabled2) {
 export function captureCustomProviderModelSelectionScroll(el3) {
   const current = el3?.['querySelector']?.('.custom-provider-model-options');
   return {
-    resultScrollTop: Math['max'](0x0, Number(el3?.['scrollTop']) || 0x0),
-    modelListScrollTop: Math['max'](0x0, Number(current?.['scrollTop']) || 0x0),
+    resultScrollTop: Math['max'](0, Number(el3?.['scrollTop']) || 0),
+    modelListScrollTop: Math['max'](0, Number(current?.['scrollTop']) || 0),
   };
 }
 export function restoreCustomProviderModelSelectionScroll(el4, entry = {}) {
   if (!el4) return ![];
   const enabled3 = el4['querySelector']?.('.custom-provider-model-options');
   return (
-    (el4['scrollTop'] = Math['max'](0x0, Number(entry['resultScrollTop']) || 0x0)),
-    enabled3 && (enabled3['scrollTop'] = Math['max'](0x0, Number(entry['modelListScrollTop']) || 0x0)),
+    (el4['scrollTop'] = Math['max'](0, Number(entry['resultScrollTop']) || 0)),
+    enabled3 && (enabled3['scrollTop'] = Math['max'](0, Number(entry['modelListScrollTop']) || 0)),
     !!enabled3
   );
 }
 const CUSTOM_PROVIDER_EDITOR_STABLE_HEIGHT_PROPERTY = '--custom-provider-editor-stable-height';
 export function stabilizeCustomProviderEditorListHeight(el5) {
-  if (!el5) return 0x0;
+  if (!el5) return 0;
   const record = Number(el5['getBoundingClientRect']?.()['height']),
     payload = Number['isFinite'](record)
-      ? Math['max'](0x0, record)
-      : Math['max'](0x0, Number(el5['offsetHeight']) || 0x0),
-    handle = Math['max'](0x0, Number(el5['dataset']?.['customProviderStableHeight']) || 0x0),
+      ? Math['max'](0, record)
+      : Math['max'](0, Number(el5['offsetHeight']) || 0),
+    handle = Math['max'](0, Number(el5['dataset']?.['customProviderStableHeight']) || 0),
     enabled4 = Math['ceil'](Math['max'](payload, handle));
-  if (!enabled4) return 0x0;
+  if (!enabled4) return 0;
   return (
     el5['dataset'] && (el5['dataset']['customProviderStableHeight'] = String(enabled4)),
     el5['style']?.['setProperty']?.(CUSTOM_PROVIDER_EDITOR_STABLE_HEIGHT_PROPERTY, enabled4 + 'px'),
@@ -96,14 +96,14 @@ export function getCustomProviderModelsNeedingVerification(list = []) {
 }
 export function getCustomProviderModelsBlockingSave(list2 = []) {
   const list3 = Array['isArray'](list2) ? list2 : [];
-  if (list3['length'] > 0x0 && list3['every']((input) => input?.['kind'] === 'text')) return [];
+  if (list3['length'] > 0 && list3['every']((input) => input?.['kind'] === 'text')) return [];
   return getCustomProviderModelsNeedingVerification(list3);
 }
 export function getCustomProviderSaveStatus(list4 = []) {
   const count3 = Array['isArray'](list4) ? list4 : [],
     key2 = getCustomProviderModelsNeedingVerification(count3)['length'];
   return {
-    key: key2 > 0x0 ? 'savedWithUnverified' : 'saved',
+    key: key2 > 0 ? 'savedWithUnverified' : 'saved',
     count: count3['length'],
     unverified: key2,
   };
@@ -112,15 +112,15 @@ export function getCustomProviderModelActionState({
   hasDiscovery: hasDiscovery = ![],
   hasSavedBundle: hasSavedBundle = ![],
   isAddingModels: isAddingModels = ![],
-  selectedCount: selectedCount = 0x0,
+  selectedCount: selectedCount = 0,
   unverifiedCount: unverifiedCount = selectedCount,
   busy: busy = ![],
 } = {}) {
   return {
     saveHidden: !hasDiscovery,
-    saveDisabled: busy || selectedCount <= 0x0 || unverifiedCount > 0x0,
+    saveDisabled: busy || selectedCount <= 0 || unverifiedCount > 0,
     verifyHidden: !hasDiscovery && !hasSavedBundle,
-    verifyDisabled: busy || selectedCount <= 0x0,
+    verifyDisabled: busy || selectedCount <= 0,
     actionsHidden: !hasDiscovery && !hasSavedBundle,
     saveLabelKey: 'saveModels',
   };

@@ -18,9 +18,9 @@ const FONT_SIZE_MAP = { small: '16px', medium: '21px', large: '26px' },
   PROMPT_ACTION_SURFACES = new Set(['transparent', 'themed']),
   LEFT_SIDEBAR_KEYBOARD_FOCUS_CLASS = 'left-sidebar-keyboard-focus',
   LEFT_SIDEBAR_REVEAL_GUARD_CLASS = 'left-sidebar-auto-hide-revealing',
-  LEFT_SIDEBAR_REVEAL_GUARD_MS = 0x168;
+  LEFT_SIDEBAR_REVEAL_GUARD_MS = 360;
 let leftSidebarAutoHideFocusModeDocument = null,
-  leftSidebarRevealGuardTimer = 0x0;
+  leftSidebarRevealGuardTimer = 0;
 const CURSOR_ROLE_MAP = {
     '--pointer-cursor': { file: 'pointer', fallback: 'default' },
     '--link-cursor': { file: 'link', fallback: 'pointer' },
@@ -112,14 +112,14 @@ function applyCursorStyle({ size: size, preset: preset } = {}) {
           "url('" + cursorAssetRoot + '/' + cursorThemeForPreset + '/' + source['file'] + '-' + current + ".cur')",
       );
     if (target === '--pointer-cursor')
-      el['style']['setProperty']('--pointer-cursor-image', next[0x0]);
+      el['style']['setProperty']('--pointer-cursor-image', next[0]);
     el['style']['setProperty'](
       target,
       [
-        next[0x0],
-        ...(next[0x1] ? ['var(--viewport-edge-cursor, ' + next[0x1] + ')'] : []),
+        next[0],
+        ...(next[1] ? ['var(--viewport-edge-cursor, ' + next[1] + ')'] : []),
         source['fallback'],
-      ]['join'](',\x20'),
+      ]['join'](', '),
     );
   }),
     Object['entries'](CURSOR_ANIMATED_ROLE_MAP)['forEach'](([entry, record]) => {
@@ -299,7 +299,7 @@ function clearLeftSidebarRevealGuard() {
     leftSidebarRevealGuardTimer &&
       typeof window?.['clearTimeout'] === 'function' &&
       window['clearTimeout'](leftSidebarRevealGuardTimer),
-    (leftSidebarRevealGuardTimer = 0x0));
+    (leftSidebarRevealGuardTimer = 0));
 }
 function startLeftSidebarRevealGuard() {
   const el16 = document['getElementById']('v2-wrap');
@@ -310,9 +310,9 @@ function startLeftSidebarRevealGuard() {
     window['clearTimeout'](leftSidebarRevealGuardTimer);
   const value16 = window['setTimeout']?.(() => {
     (el16['classList']['remove'](LEFT_SIDEBAR_REVEAL_GUARD_CLASS),
-      leftSidebarRevealGuardTimer === value16 && (leftSidebarRevealGuardTimer = 0x0));
+      leftSidebarRevealGuardTimer === value16 && (leftSidebarRevealGuardTimer = 0));
   }, LEFT_SIDEBAR_REVEAL_GUARD_MS);
-  leftSidebarRevealGuardTimer = value16 || 0x0;
+  leftSidebarRevealGuardTimer = value16 || 0;
 }
 function initLeftSidebarAutoHideFocusMode() {
   if (leftSidebarAutoHideFocusModeDocument === document) return;
@@ -333,7 +333,7 @@ function initLeftSidebarAutoHideFocusMode() {
     document['querySelector']?.('.sidebar-floating')?.['addEventListener']?.('focusout', () => {
       window['setTimeout']?.(() => {
         !document['querySelector']?.('.sidebar-floating')?.['matches']?.(':focus-within') && run2();
-      }, 0x0);
+      }, 0);
     }));
   const el17 = document['querySelector']?.('.left-sidebar-hover-zone');
   (el17?.['addEventListener']?.('pointerenter', startLeftSidebarRevealGuard),
@@ -502,7 +502,7 @@ function initAutoHideChromeSettings({ uiStore: uiStore3 } = {}) {
       ((bottomLeftBarAutoHidePref = value37 === !![]), setBottomLeftBarAutoHidePref(bottomLeftBarAutoHidePref, uiStore3));
     },
     handler6 = (event3) => {
-      if (Number(event3?.['detail']) > 0x0) event3['currentTarget']?.['blur']?.();
+      if (Number(event3?.['detail']) > 0) event3['currentTarget']?.['blur']?.();
     };
   (run5(leftSidebarAutoHidePref),
     handler3(bottomLeftBarAutoHidePref),

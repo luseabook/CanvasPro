@@ -44,7 +44,7 @@ export function drawCollaborationMediaStatus({
       el['lastChild']['setAttribute']('aria-label', '重试 ' + (box['name'] || '素材')),
       (el['title'] =
         error['failed'] && !error['retry'] ? '请添加此素材的成员重试' : el['firstChild']['textContent']),
-      (el['style']['transform'] = 'translate(' + box2['x'] + 'px,\x20' + box2['y'] + 'px)'),
+      (el['style']['transform'] = 'translate(' + box2['x'] + 'px, ' + box2['y'] + 'px)'),
       (el['style']['maxWidth'] = value + 'px'));
   }
 }

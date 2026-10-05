@@ -4,8 +4,8 @@ export function hasObviouslyInvalidAsyncVideoResult(options = {}) {
   const value = String(
     options?.['videoUrl'] ||
       options?.['localPath'] ||
-      options?.['videos']?.[0x0]?.['videoUrl'] ||
-      options?.['videos']?.[0x0]?.['sourceUrl'] ||
+      options?.['videos']?.[0]?.['videoUrl'] ||
+      options?.['videos']?.[0]?.['sourceUrl'] ||
       '',
   )['trim']();
   return /\.(?:avif|gif|jpe?g|png|webp)(?:[?#]|$)/i['test'](value);

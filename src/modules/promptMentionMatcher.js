@@ -1,6 +1,6 @@
 function candidateKey(value) {
   return value['origin'] === 'asset'
-    ? 'asset:' + value['assetId'] + ':' + (value['assetIndex'] ?? 0x0)
+    ? 'asset:' + value['assetId'] + ':' + (value['assetIndex'] ?? 0)
     : 'node:' + value['nodeId'];
 }
 const WORD = /[\p{L}\p{N}_-]/u;
@@ -22,12 +22,12 @@ export function matchPromptMentions(name, item = []) {
     }
   }
   const list = [];
-  for (let start = 0x0; start < name['length']; start += 0x1) {
+  for (let start = 0; start < name['length']; start += 1) {
     if (!/[@＠]/['test'](name[start])) continue;
-    if (start && /[a-z0-9_@＠.]/i['test'](name[start - 0x1])) continue;
+    if (start && /[a-z0-9_@＠.]/i['test'](name[start - 1])) continue;
     let el2 = key,
       options = null;
-    for (let end = start + 0x1; end < name['length'];) {
+    for (let end = start + 1; end < name['length'];) {
       const list2 = String['fromCodePoint'](name['codePointAt'](end));
       el2 = el2['children']['get'](list2['toLowerCase']());
       if (!el2) break;
@@ -42,17 +42,17 @@ export function matchPromptMentions(name, item = []) {
         (options = {
           start: start,
           end: end,
-          name: name['slice'](start + 0x1, end),
+          name: name['slice'](start + 1, end),
           candidates: [...el2['candidates']['values']()],
         });
     }
-    if (options) (list['push'](options), (start = options['end'] - 0x1));
+    if (options) (list['push'](options), (start = options['end'] - 1));
     else {
-      const name2 = name['slice'](start + 0x1)['match'](/^[\p{L}\p{N}_-]+/u)?.[0x0];
+      const name2 = name['slice'](start + 1)['match'](/^[\p{L}\p{N}_-]+/u)?.[0];
       name2 &&
         (list['push']({
           start: start,
-          end: start + 0x1 + name2['length'],
+          end: start + 1 + name2['length'],
           name: name2,
           candidates: [],
         }),

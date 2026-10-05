@@ -12,9 +12,9 @@ import { DirectorNumericDrag } from './directorNumericDrag.js';
 const selectOptions = (list, value) =>
   list['map'](
     ([item, key]) =>
-      '<option\x20value=\x22' +
+      '<option value="' +
       item +
-      '\x22\x20' +
+      '" ' +
       (item === value ? 'selected' : '') +
       '>' +
       key +
@@ -25,7 +25,7 @@ export class DirectorTimelineEditing {
     ((this['timeline'] = index),
       (this['selected'] = new Set()),
       (this['clipboard'] = []),
-      (this['zoom'] = 0x1),
+      (this['zoom'] = 1),
       (this['unit'] = 'seconds'),
       (this['snap'] = !![]),
       (this['numeric'] = new DirectorNumericDrag(index)),
@@ -38,8 +38,8 @@ export class DirectorTimelineEditing {
           (event['clientX'] - enabled['getBoundingClientRect']()['left'] + enabled['scrollLeft']) /
           this['zoom'];
         ((this['zoom'] = Math['max'](
-          0x1,
-          Math['min'](0x20, this['zoom'] * (event['deltaY'] > 0x0 ? 0.8 : 1.25)),
+          1,
+          Math['min'](32, this['zoom'] * (event['deltaY'] > 0 ? 0.8 : 1.25)),
         )),
           this['applyZoom'](),
           (enabled['scrollLeft'] =
@@ -50,11 +50,11 @@ export class DirectorTimelineEditing {
     return this['timeline']['_context']();
   }
   ['render']() {
-    const options = this['timeline']['playbackRate'] || 0x1;
+    const options = this['timeline']['playbackRate'] || 1;
     return (
       '<div class="storyboard-3d-director-fields storyboard-3d-timeline-editing" data-timeline-editing>\n      <label>倍速<select data-timeline-rate>' +
       selectOptions(
-        [0.25, 0.5, 0x1, 1.5, 0x2, 0x4]['map']((target) => [target, target + '×']),
+        [0.25, 0.5, 1, 1.5, 2, 4]['map']((target) => [target, target + '×']),
         options,
       ) +
       '</select></label>\n      <label>单位<select data-timeline-unit>' +
@@ -79,14 +79,14 @@ export class DirectorTimelineEditing {
           (next, current) =>
             '<option value="' +
             current +
-            '\x22>' +
+            '">' +
             String(next['name'])['replaceAll']('&', '&amp;')['replaceAll']('<', '&lt;') +
             '</option>',
         )
         ['join']('') || '') +
       '</select></label>\n      <output data-timeline-selected-count>' +
       this['selected']['size'] +
-      '\x20项选中</output></div>'
+      ' 项选中</output></div>'
     );
   }
   ['identity'](el) {
@@ -126,21 +126,21 @@ export class DirectorTimelineEditing {
     if (!shot) return !![];
     const storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(shot['animation']),
       config = this['timeline']['_timeForShot'](shot);
-    switch (enabled2['slice'](0xe)) {
+    switch (enabled2['slice'](14)) {
       case 'prev':
-        this['timeline']['_sampleAt'](config - 0x1 / storyboard3DShotAnimation['fps']);
+        this['timeline']['_sampleAt'](config - 1 / storyboard3DShotAnimation['fps']);
         break;
       case 'next':
-        this['timeline']['_sampleAt'](config + 0x1 / storyboard3DShotAnimation['fps']);
+        this['timeline']['_sampleAt'](config + 1 / storyboard3DShotAnimation['fps']);
         break;
       case 'zoom-in':
-        this['zoom'] = Math['min'](0x20, this['zoom'] * 1.5);
+        this['zoom'] = Math['min'](32, this['zoom'] * 1.5);
         break;
       case 'zoom-out':
-        this['zoom'] = Math['max'](0x1, this['zoom'] / 1.5);
+        this['zoom'] = Math['max'](1, this['zoom'] / 1.5);
         break;
       case 'fit':
-        this['zoom'] = 0x1;
+        this['zoom'] = 1;
         break;
       case 'select-all':
         this['selected'] = new Set(
@@ -161,7 +161,7 @@ export class DirectorTimelineEditing {
   }
   ['handleChange'](output) {
     const el2 = output['target'];
-    if (el2['matches']?.('[data-director-camera-key],\x20[data-director-camera-key-easing]')) {
+    if (el2['matches']?.('[data-director-camera-key], [data-director-camera-key-easing]')) {
       const value2 = this['timeline']['selectedKeyframe'];
       if (value2?.['type'] !== 'camera') return !![];
       return (
@@ -177,7 +177,7 @@ export class DirectorTimelineEditing {
               value7 = Number(el2['value']);
             if (!Number['isFinite'](value7)) return value3;
             if (value6 != null) enabled3['camera'][value5][Number(value6)] = value7;
-            else enabled3['camera'][value5] = value5 === 'roll' ? (value7 * Math['PI']) / 0xb4 : value7;
+            else enabled3['camera'][value5] = value5 === 'roll' ? (value7 * Math['PI']) / 180 : value7;
             if (value5 === 'focalLength') delete enabled3['camera']['fov'];
           }
           return value3;
@@ -212,7 +212,7 @@ export class DirectorTimelineEditing {
               if (!this['selected']['has'](directorKeyIdentity(value12))) return;
               if (value12['type'] === 'camera')
                 value12['key']['camera']['target'] = value9['transform']['position']['map'](
-                  (value13, count) => value13 + (count === 0x1 ? 1.2 : 0x0),
+                  (value13, count) => value13 + (count === 1 ? 1.2 : 0),
                 );
               else {
                 if (value12['property'] === 'rotation') {
@@ -220,9 +220,9 @@ export class DirectorTimelineEditing {
                     (value15) => value15['id'] === value12['objectId'],
                   );
                   if (value14)
-                    value12['key']['value'][0x1] = Math['atan2'](
-                      value9['transform']['position'][0x0] - value14['transform']['position'][0x0],
-                      value9['transform']['position'][0x2] - value14['transform']['position'][0x2],
+                    value12['key']['value'][1] = Math['atan2'](
+                      value9['transform']['position'][0] - value14['transform']['position'][0],
+                      value9['transform']['position'][2] - value14['transform']['position'][2],
                     );
                 }
               }
@@ -286,7 +286,7 @@ export class DirectorTimelineEditing {
           value18 = this['timeline']['_timeForShot'](shot2),
           list2 = [
             ...new Set([
-              0x0,
+              0,
               args['duration'],
               ...collectDirectorKeys(args)['map'](({ key: key2 }) => key2['time']),
               ...args['actionClips']['flatMap']((value19) => [value19['start'], value19['end']]),
@@ -294,15 +294,15 @@ export class DirectorTimelineEditing {
           ]['sort']((value20, value21) => value20 - value21),
           value22 =
             value16 === 'home'
-              ? 0x0
+              ? 0
               : value16 === 'end'
                 ? args['duration']
                 : value16 === 'arrowup'
-                  ? (list2['filter']((value23) => value23 < value18 - 0.00001)['at'](-0x1) ?? 0x0)
+                  ? (list2['filter']((value23) => value23 < value18 - 0.00001)['at'](-1) ?? 0)
                   : value16 === 'arrowdown'
                     ? (list2['find']((value24) => value24 > value18 + 0.00001) ?? args['duration'])
                     : value18 +
-                      ((value16 === 'arrowleft' ? -0x1 : 0x1) * (event2['shiftKey'] ? 0xa : 0x1)) /
+                      ((value16 === 'arrowleft' ? -1 : 1) * (event2['shiftKey'] ? 10 : 1)) /
                         args['fps'];
         (this['timeline']['stopPlayback']({ render: ![] }), this['timeline']['_sampleAt'](value22));
       } else {
@@ -321,7 +321,7 @@ export class DirectorTimelineEditing {
     return directorSnapTime(
       value25,
       value26,
-      this['snap'] && !enabled4 ? (value26['duration'] / value27) * 0x8 : 0x0,
+      this['snap'] && !enabled4 ? (value26['duration'] / value27) * 8 : 0,
       value28,
     );
   }
@@ -353,16 +353,16 @@ export class DirectorTimelineEditing {
     const value33 = enabled5['querySelector']('[data-timeline-selected-count]');
     if (value33) value33['textContent'] = this['selected']['size'] + ' 项选中';
     (this['applyZoom'](),
-      enabled5['querySelectorAll']('.storyboard-3d-timeline-ruler\x20>\x20span')['forEach']((el3) => {
+      enabled5['querySelectorAll']('.storyboard-3d-timeline-ruler > span')['forEach']((el3) => {
         const value34 =
-          (parseFloat(el3['style']['getPropertyValue']('--storyboard-3d-tick-position')) / 0x64) *
+          (parseFloat(el3['style']['getPropertyValue']('--storyboard-3d-tick-position')) / 100) *
           shot3['animation']['duration'];
         el3['querySelector']('strong')['textContent'] =
           this['unit'] === 'frames'
             ? Math['round'](value34 * shot3['animation']['fps']) + 'f'
             : this['unit'] === 'milliseconds'
-              ? Math['round'](value34 * 0x3e8) + 'ms'
-              : Number(value34['toFixed'](0x2)) + 's';
+              ? Math['round'](value34 * 1000) + 'ms'
+              : Number(value34['toFixed'](2)) + 's';
       }));
   }
   ['pointerDown'](event3) {
@@ -370,7 +370,7 @@ export class DirectorTimelineEditing {
     if (
       !enabled6 ||
       event3['target']['closest']('button,.storyboard-3d-motion-clip') ||
-      event3['button'] !== 0x0
+      event3['button'] !== 0
     )
       return;
     (event3['preventDefault'](), event3['stopImmediatePropagation']());

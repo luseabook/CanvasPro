@@ -6,7 +6,7 @@ function getMediaNodeRevision(options = {}) {
   return (
     normalizeText(options['id']) +
     ':' +
-    (Number(options['_bizRev']) || 0x0) +
+    (Number(options['_bizRev']) || 0) +
     ':' +
     normalizeText(options['type'])
   );
@@ -59,7 +59,7 @@ export function subscribeStoryCanvasMediaNodeChanges({
       }
     },
     handler = (options2 = {}) =>
-      normalizeText(getActiveCanvasId2?.()) + ':' + (Number(options2['_persistRev']) || 0x0);
+      normalizeText(getActiveCanvasId2?.()) + ':' + (Number(options2['_persistRev']) || 0);
   if (typeof graphStore2['subscribeSelector'] === 'function')
     return graphStore2['subscribeSelector'](handler, () =>
       run(graphStore2['getStateRaw']?.() || graphStore2['getState']?.() || {}),

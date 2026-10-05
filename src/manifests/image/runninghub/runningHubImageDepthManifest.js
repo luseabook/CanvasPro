@@ -19,11 +19,11 @@ export const rhImageDepthModelManifest = Object['freeze']({
     providerProfiles: ['runninghub', 'runninghub-international'],
     imageMenu: { group: 'runninghubWorkflow' },
   },
-  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 0x1 },
+  capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 1 },
   inputSlots: {
     allowedKinds: ['image'],
-    minByKind: { image: 0x1 },
-    maxByKind: { text: 0x0, image: 0x1, video: 0x0, audio: 0x0 },
+    minByKind: { image: 1 },
+    maxByKind: { text: 0, image: 1, video: 0, audio: 0 },
   },
   uiSchema: {
     fields: [
@@ -47,12 +47,12 @@ export const rhImageDepthModelManifest = Object['freeze']({
         placement: 'resolution',
         label: '分辨率',
         menuTitle: '分辨率',
-        defaultValue: 0x400,
+        defaultValue: 1024,
         tooltip: '图片最长边的分辨率',
         options: [
-          { value: 0x300, label: '768', selectedLabel: '分辨率768' },
-          { value: 0x400, label: '1024', selectedLabel: '分辨率1024' },
-          { value: 0x500, label: '1280', selectedLabel: '分辨率1280' },
+          { value: 768, label: '768', selectedLabel: '分辨率768' },
+          { value: 1024, label: '1024', selectedLabel: '分辨率1024' },
+          { value: 1280, label: '1280', selectedLabel: '分辨率1280' },
         ],
       },
       RH_IMAGE_INSTANCE_FIELD,
@@ -79,7 +79,7 @@ export const rhImageDepthExecutionManifest = Object['freeze']({
     allowedValues: RUNNINGHUB_INSTANCE_TYPE_ALLOWED_VALUES,
   },
   mapping: {
-    maxInputImages: 0x1,
+    maxInputImages: 1,
     imageNodes: [{ nodeId: '38', fieldName: 'image', description: '上传图片' }],
     valueNodes: [
       {
@@ -89,9 +89,9 @@ export const rhImageDepthExecutionManifest = Object['freeze']({
         defaultValue: '0',
         description: '选择模式（范围0~1）',
       },
-      { nodeId: '24', fieldName: 'value', field: 'rhResolution', defaultValue: 0x400, description: '分辨率' },
+      { nodeId: '24', fieldName: 'value', field: 'rhResolution', defaultValue: 1024, description: '分辨率' },
     ],
   },
   result: { taskIdPath: 'taskId', urlFields: ['url', 'imageUrl'] },
-  validation: { minInputImages: 0x1, missingInputMessage: '请提供待转换的源图片' },
+  validation: { minInputImages: 1, missingInputMessage: '请提供待转换的源图片' },
 });

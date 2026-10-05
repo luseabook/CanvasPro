@@ -34,8 +34,8 @@ export function captureStoryReplicationAssetSources(key) {
         data['kind'] === 'character' &&
         data['replicationSource']?.['subjectKeys']?.['includes'](event['key']),
     );
-    if (list['length'] === 0x1) {
-      index[event['key']] = list[0x0]['id'];
+    if (list['length'] === 1) {
+      index[event['key']] = list[0]['id'];
       continue;
     }
     const list2 = key['assets']['filter'](
@@ -47,7 +47,7 @@ export function captureStoryReplicationAssetSources(key) {
         (!enabled['sourceChapterIds']?.['length'] ||
           enabled['sourceChapterIds']['includes'](event['episodeId'])),
     );
-    if (list2['length'] === 0x1) index[event['key']] = list2[0x0]['id'];
+    if (list2['length'] === 1) index[event['key']] = list2[0]['id'];
   }
 }
 export function getStoryReplicationBindingError(enabled2) {

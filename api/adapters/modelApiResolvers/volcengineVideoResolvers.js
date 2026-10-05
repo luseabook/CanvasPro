@@ -28,24 +28,24 @@ function getVolcengineSeedance2Mode(options = {}, key = {}) {
 }
 function resolveVolcengineSeedance2TaskType({
   routeMode: routeMode = '',
-  frameImageCount: frameImageCount = 0x0,
-  referenceImageCount: referenceImageCount = 0x0,
-  videoCount: videoCount = 0x0,
-  audioCount: audioCount = 0x0,
+  frameImageCount: frameImageCount = 0,
+  referenceImageCount: referenceImageCount = 0,
+  videoCount: videoCount = 0,
+  audioCount: audioCount = 0,
 } = {}) {
   const seedanceRouteMode = normalizeSeedanceRouteMode(routeMode),
-    positiveInteger = normalizePositiveInteger(frameImageCount, 0x0),
-    positiveInteger2 = normalizePositiveInteger(referenceImageCount, 0x0),
-    positiveInteger3 = normalizePositiveInteger(videoCount, 0x0),
-    positiveInteger4 = normalizePositiveInteger(audioCount, 0x0);
+    positiveInteger = normalizePositiveInteger(frameImageCount, 0),
+    positiveInteger2 = normalizePositiveInteger(referenceImageCount, 0),
+    positiveInteger3 = normalizePositiveInteger(videoCount, 0),
+    positiveInteger4 = normalizePositiveInteger(audioCount, 0);
   if (seedanceRouteMode === 'frames2video') {
-    if (positiveInteger >= 0x2) return 'frames2video';
-    if (positiveInteger === 0x1) return 'image2video';
+    if (positiveInteger >= 2) return 'frames2video';
+    if (positiveInteger === 1) return 'image2video';
     return 'text2video';
   }
   if (seedanceRouteMode === 'image2video') return 'image2video';
   if (seedanceRouteMode === 'text2video') return 'text2video';
-  if (positiveInteger2 > 0x0 || positiveInteger3 > 0x0 || positiveInteger4 > 0x0) return 'multimodal2video';
+  if (positiveInteger2 > 0 || positiveInteger3 > 0 || positiveInteger4 > 0) return 'multimodal2video';
   return 'text2video';
 }
 function getVolcengineSeedance2ModelTier(index = '') {
@@ -67,7 +67,7 @@ function normalizeVolcengineSeedance2Resolution(result, data = {}, target = '') 
           )
           ['filter'](Boolean)
       : [];
-  if (list2['length'] > 0x0)
+  if (list2['length'] > 0)
     return list2['includes'](source)
       ? source
       : list2['includes'](
@@ -76,7 +76,7 @@ function normalizeVolcengineSeedance2Resolution(result, data = {}, target = '') 
               ['toLowerCase'](),
           )
         ? String(data['defaultResolution'])['trim']()['toLowerCase']()
-        : list2[0x0];
+        : list2[0];
   const volcengineSeedance2ModelTier = getVolcengineSeedance2ModelTier(target);
   if (source === '4k' && volcengineSeedance2ModelTier === 'standard') return '4k';
   if (source === '1080p' && volcengineSeedance2ModelTier === 'standard') return '1080p';
@@ -94,16 +94,16 @@ function normalizeVolcengineSeedance2Ratio(current, entry = {}) {
 }
 function normalizeVolcengineSeedance2Duration(record, handle = {}) {
   const state = Number(record);
-  if (state === -0x1 && handle['allowAutoDuration'] !== ![]) return -0x1;
-  const positiveInteger5 = normalizePositiveInteger(handle['minDuration'], 0x4),
-    positiveInteger6 = normalizePositiveInteger(handle['maxDuration'], 0xf);
+  if (state === -1 && handle['allowAutoDuration'] !== ![]) return -1;
+  const positiveInteger5 = normalizePositiveInteger(handle['minDuration'], 4),
+    positiveInteger6 = normalizePositiveInteger(handle['maxDuration'], 15);
   if (!Number['isFinite'](state)) {
     const config = Number(handle['defaultDuration']);
-    return config === -0x1 && handle['allowAutoDuration'] !== ![]
-      ? -0x1
+    return config === -1 && handle['allowAutoDuration'] !== ![]
+      ? -1
       : Number['isFinite'](config)
         ? Math['max'](positiveInteger5, Math['min'](positiveInteger6, Math['trunc'](config)))
-        : 0x5;
+        : 5;
   }
   return Math['max'](positiveInteger5, Math['min'](positiveInteger6, Math['trunc'](state)));
 }
@@ -119,9 +119,9 @@ function normalizeVolcengineBoolean(scope, input = ![]) {
 }
 function normalizeVolcengineSeedance2Priority(value2) {
   if (value2 === undefined || value2 === null || String(value2)['trim']() === '') return null;
-  const value3 = Number['parseInt'](String(value2)['trim'](), 0xa);
+  const value3 = Number['parseInt'](String(value2)['trim'](), 10);
   if (!Number['isFinite'](value3)) return null;
-  return Math['max'](0x0, Math['min'](0x9, value3));
+  return Math['max'](0, Math['min'](9, value3));
 }
 function normalizeVolcengineSeedance2OutputFormat(value4) {
   const value5 = String(value4 || 'mp4')
@@ -223,37 +223,37 @@ export function volcengineSeedance2Video({
   if (text) content['push']({ type: 'text', text: text });
   if (volcengineSeedance2TaskType === 'text2video') {
     if (!text) throw new Error('Volcengine Seedance prompt is required');
-    if (frameImageCount2['length'] > 0x0 || videoCount2['length'] > 0x0 || audioCount2['length'] > 0x0)
+    if (frameImageCount2['length'] > 0 || videoCount2['length'] > 0 || audioCount2['length'] > 0)
       throw new Error('Volcengine Seedance text mode does not accept media input');
   } else {
     if (volcengineSeedance2TaskType === 'image2video') {
-      if (videoCount2['length'] > 0x0 || audioCount2['length'] > 0x0)
+      if (videoCount2['length'] > 0 || audioCount2['length'] > 0)
         throw new Error('Volcengine Seedance image mode does not accept video or audio input');
-      if (frameImageCount2['length'] < 0x1)
-        throw new Error('Volcengine\x20Seedance\x20image\x20mode\x20requires\x201\x20image\x20input');
-      pushVolcengineContentItem(content, 'image_url', frameImageCount2[0x0], 'first_frame');
+      if (frameImageCount2['length'] < 1)
+        throw new Error('Volcengine Seedance image mode requires 1 image input');
+      pushVolcengineContentItem(content, 'image_url', frameImageCount2[0], 'first_frame');
     } else {
       if (volcengineSeedance2TaskType === 'frames2video') {
-        if (videoCount2['length'] > 0x0 || audioCount2['length'] > 0x0)
+        if (videoCount2['length'] > 0 || audioCount2['length'] > 0)
           throw new Error('Volcengine Seedance first-last-frame mode only accepts images');
-        if (frameImageCount2['length'] < 0x2)
+        if (frameImageCount2['length'] < 2)
           throw new Error('Volcengine Seedance first-last-frame mode requires 2 image inputs');
-        (pushVolcengineContentItem(content, 'image_url', frameImageCount2[0x0], 'first_frame'),
-          pushVolcengineContentItem(content, 'image_url', frameImageCount2[0x1], 'last_frame'));
+        (pushVolcengineContentItem(content, 'image_url', frameImageCount2[0], 'first_frame'),
+          pushVolcengineContentItem(content, 'image_url', frameImageCount2[1], 'last_frame'));
       } else {
-        const positiveInteger7 = normalizePositiveInteger(volcengineSeedance2Policy['maxImageCount'], 0x9),
+        const positiveInteger7 = normalizePositiveInteger(volcengineSeedance2Policy['maxImageCount'], 9),
           positiveInteger8 = normalizePositiveInteger(
             volcengineSeedance2Policy['maxVideoReferenceCount'],
-            0x3,
+            3,
           ),
           positiveInteger9 = normalizePositiveInteger(
             volcengineSeedance2Policy['maxAudioReferenceCount'],
-            0x3,
+            3,
           ),
           value19 = volcengineSeedance2Policy['allowAudioOnlyReferences'] === !![];
         if (
-          referenceImageCount2['length'] + videoCount2['length'] <= 0x0 &&
-          !(value19 && audioCount2['length'] > 0x0)
+          referenceImageCount2['length'] + videoCount2['length'] <= 0 &&
+          !(value19 && audioCount2['length'] > 0)
         )
           throw new Error('Volcengine Seedance multimodal mode requires image or video input');
         if (referenceImageCount2['length'] > positiveInteger7)
@@ -262,31 +262,31 @@ export function volcengineSeedance2Video({
           );
         if (videoCount2['length'] > positiveInteger8)
           throw new Error(
-            'Volcengine\x20Seedance\x20multimodal\x20mode\x20supports\x20at\x20most\x20' +
+            'Volcengine Seedance multimodal mode supports at most ' +
               positiveInteger8 +
               ' video inputs',
           );
         if (audioCount2['length'] > positiveInteger9)
           throw new Error(
-            'Volcengine\x20Seedance\x20multimodal\x20mode\x20supports\x20at\x20most\x20' +
+            'Volcengine Seedance multimodal mode supports at most ' +
               positiveInteger9 +
               ' audio inputs',
           );
-        (referenceImageCount2['slice'](0x0, positiveInteger7)['forEach']((value20) =>
+        (referenceImageCount2['slice'](0, positiveInteger7)['forEach']((value20) =>
           pushVolcengineContentItem(content, 'image_url', value20, 'reference_image'),
         ),
-          videoCount2['slice'](0x0, positiveInteger8)['forEach']((value21) =>
+          videoCount2['slice'](0, positiveInteger8)['forEach']((value21) =>
             pushVolcengineContentItem(content, 'video_url', value21, 'reference_video'),
           ),
-          audioCount2['slice'](0x0, positiveInteger9)['forEach']((value22) =>
+          audioCount2['slice'](0, positiveInteger9)['forEach']((value22) =>
             pushVolcengineContentItem(content, 'audio_url', value22, 'reference_audio'),
           ));
       }
     }
   }
-  if (content['length'] === 0x0) throw new Error('Volcengine Seedance request content is empty');
-  if (volcengineOmniReferenceTaskType === 'edit' && videoCount2['length'] < 0x1)
-    throw new Error('Volcengine\x20Seedance\x20edit\x20mode\x20requires\x20a\x20reference\x20video');
+  if (content['length'] === 0) throw new Error('Volcengine Seedance request content is empty');
+  if (volcengineOmniReferenceTaskType === 'edit' && videoCount2['length'] < 1)
+    throw new Error('Volcengine Seedance edit mode requires a reference video');
   const model = modelToken || value18['model'] || stripPrefix(payload['model'], 'volcengine/'),
     value23 =
       volcengineSeedance2Policy['roleImagesRequireAdaptiveRatio'] === !![] &&
@@ -304,7 +304,7 @@ export function volcengineSeedance2Video({
       ),
       ratio: ratio ? 'adaptive' : value23,
       duration: ratio
-        ? -0x1
+        ? -1
         : normalizeVolcengineSeedance2Duration(value18['duration'], volcengineSeedance2Policy),
       generate_audio: normalizeVolcengineBoolean(value18['generate_audio'], !![]),
       watermark: normalizeVolcengineBoolean(value18['watermark'], ![]),
@@ -313,11 +313,11 @@ export function volcengineSeedance2Video({
     (value24['output_format'] = normalizeVolcengineSeedance2OutputFormat(value18['output_format']));
   normalizeVolcengineBoolean(value18['webSearch'], ![]) && (value24['tools'] = [{ type: 'web_search' }]);
   const volcengineSeedance2Priority = normalizeVolcengineSeedance2Priority(value18['priority']);
-  if (volcengineSeedance2Priority !== null && volcengineSeedance2Priority > 0x0)
+  if (volcengineSeedance2Priority !== null && volcengineSeedance2Priority > 0)
     value24['priority'] = volcengineSeedance2Priority;
   if (volcengineSeedance2Policy['supportsSeedParam'] === !![]) {
     const optionalIntegerInRange = normalizeOptionalIntegerInRange(value18['seed'], {
-      min: -0x1,
+      min: -1,
       max: 0x7fffffff,
     });
     if (optionalIntegerInRange !== null) value24['seed'] = optionalIntegerInRange;

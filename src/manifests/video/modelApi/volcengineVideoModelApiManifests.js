@@ -268,7 +268,7 @@ import {
 const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     VOLCENGINE_SEEDANCE_2_MODE_FIELD,
     VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
-    createFooterDurationField({ defaultValue: 0x5, min: 0x4, max: 0xf }),
+    createFooterDurationField({ defaultValue: 5, min: 4, max: 15 }),
     VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD,
     VIDEO_WATERMARK_CN_FIELD,
     VOLCENGINE_SEEDANCE_2_WEB_SEARCH_FIELD,
@@ -281,14 +281,14 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     maxTotalDurationSecondsByKind: SEEDANCE2_MAX_TOTAL_DURATION_SECONDS_BY_KIND,
   }),
   VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
-    -0x1,
-    ...Array['from']({ length: 0x1b }, (value, item) => item + 0x4),
+    -1,
+    ...Array['from']({ length: 27 }, (value, item) => item + 4),
   ]),
   VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE = Object['freeze']({
-    min: 0x4,
-    max: 0x1e,
-    step: 0x1,
-    defaultValue: -0x1,
+    min: 4,
+    max: 30,
+    step: 1,
+    defaultValue: -1,
     values: VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES,
     optionLabels: Object['freeze']({ '-1': '自动' }),
   }),
@@ -316,7 +316,7 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
     createFooterDurationSliderOptionsField({
       values: VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES,
-      defaultValue: -0x1,
+      defaultValue: -1,
       optionOverridesByValue: Object['freeze']({
         '-1': Object['freeze']({ label: '自动', displayLabel: '自动' }),
       }),
@@ -329,10 +329,10 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     ...VIDEO_SEED_FIELDS,
   ]),
   VOLCENGINE_SEEDANCE_2_5_INPUT_SLOTS = createVideoInputSlots({
-    image: 0x1e,
-    video: 0xa,
-    audio: 0xa,
-    maxTotalDurationSecondsByKind: Object['freeze']({ video: 0x1e, audio: 0x1e }),
+    image: 30,
+    video: 10,
+    audio: 10,
+    maxTotalDurationSecondsByKind: Object['freeze']({ video: 30, audio: 30 }),
     mediaConstraintsByKind: Object['freeze']({
       image: Object['freeze']({
         allowedExtensions: Object['freeze']([
@@ -347,25 +347,25 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
           'heic',
           'heif',
         ]),
-        maxBytes: 0x1e * 0x400 * 0x400,
+        maxBytes: 30 * 1024 * 1024,
       }),
       video: Object['freeze']({
         allowedExtensions: Object['freeze'](['mp4', 'mov']),
-        minDurationSeconds: 0x2,
-        maxDurationSeconds: 0x1e,
-        maxBytes: 0xc8 * 0x400 * 0x400,
+        minDurationSeconds: 2,
+        maxDurationSeconds: 30,
+        maxBytes: 200 * 1024 * 1024,
       }),
       audio: Object['freeze']({
         allowedExtensions: Object['freeze'](['wav', 'mp3']),
-        minDurationSeconds: 0x2,
-        maxDurationSeconds: 0x1e,
-        maxBytes: 0xf * 0x400 * 0x400,
+        minDurationSeconds: 2,
+        maxDurationSeconds: 30,
+        maxBytes: 15 * 1024 * 1024,
       }),
     }),
   }),
   VOLCENGINE_SEEDANCE_2_5_BODY_MAPPING = freezeBodyMapping([
     ...VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING['map']((args) =>
-      args['path'] === 'duration' ? Object['freeze']({ ...args, defaultValue: -0x1 }) : args,
+      args['path'] === 'duration' ? Object['freeze']({ ...args, defaultValue: -1 }) : args,
     ),
     Object['freeze']({
       path: 'output_format',
@@ -404,13 +404,13 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     defaultRatio: 'adaptive',
     defaultResolution: '720p',
     allowedResolutions: Object['freeze'](['480p', '720p']),
-    defaultDuration: -0x1,
-    minDuration: 0x4,
-    maxDuration: 0x1e,
+    defaultDuration: -1,
+    minDuration: 4,
+    maxDuration: 30,
     allowAutoDuration: !![],
-    maxImageCount: 0x1e,
-    maxVideoReferenceCount: 0xa,
-    maxAudioReferenceCount: 0xa,
+    maxImageCount: 30,
+    maxVideoReferenceCount: 10,
+    maxAudioReferenceCount: 10,
     allowAudioOnlyReferences: !![],
     roleImagesRequireAdaptiveRatio: !![],
     supportsOutputFormatParam: !![],
@@ -418,9 +418,9 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
   }),
   VOLCENGINE_SEEDANCE_2_5_HELP_TOOLTIP = [
     '火山方舟 Seedance 2.5',
-    '支持文生、图生、首尾帧和多模态参考，最长\x2030\x20秒。',
+    '支持文生、图生、首尾帧和多模态参考，最长 30 秒。',
     '多模态最多支持 30 张图片、10 个视频和 10 个音频，可仅使用音频参考。',
-  ]['join']('\x0a');
+  ]['join']('\n');
 export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
   Object['freeze']({
     provider: 'volcengine',
@@ -428,7 +428,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     executionId: 'volcengine.model-api.video.seedance-2-5.v1',
     displayName: 'Seedance 2.5',
     icon: 'images/volcengine.svg',
-    description: '火山方舟\x20Seedance\x202.5\x20model\x20API',
+    description: '火山方舟 Seedance 2.5 model API',
     model: 'doubao-seedance-2-5-260628',
     endpoint: '/contents/generations/tasks',
     endpointMode: 'content-generation-task',
@@ -469,13 +469,13 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
         supported: !![],
         parameterPolicy: Object['freeze']({
           mode: Object['freeze']({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
-          duration: Object['freeze']({ fieldId: 'duration', value: -0x1 }),
+          duration: Object['freeze']({ fieldId: 'duration', value: -1 }),
         }),
       }),
       dreaminaStyleVideo: Object['freeze']({
-        order: 0x5,
+        order: 5,
         title: 'Seedance 2.5',
-        subtitle: '火山方舟\x202.5，支持最长\x2030\x20秒和多模态参考素材',
+        subtitle: '火山方舟 2.5，支持最长 30 秒和多模态参考素材',
         counterpartKey: 'seedance2-5',
         taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
         resolutionOptionsByTaskType: APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,
@@ -501,7 +501,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     fields: Object['freeze']([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
       createVolcengineSeedance2ResolutionField({ include1080p: ![] }),
-      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](0x1),
+      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
     bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
@@ -536,14 +536,14 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     extensions: Object['freeze']({
       videoMenu: Object['freeze']({
         role: 'volcengineOfficial',
-        order: 0xa,
+        order: 10,
         label: '火山方舟',
         subtitle: 'Seedance 2.0 官方 API',
         iconAlt: 'volcengine',
       }),
       dreaminaStyleVideo: Object['freeze']({
-        order: 0xa,
-        title: 'Seedance\x202.0\x20Fast',
+        order: 10,
+        title: 'Seedance 2.0 Fast',
         subtitle: '火山方舟快速版，480p / 720p',
         counterpartKey: 'seedance2-fast',
         taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
@@ -557,10 +557,10 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     provider: 'volcengine',
     modelId: 'volcengine/seedance-2.0',
     executionId: 'volcengine.model-api.video.seedance-2.v1',
-    displayName: 'Seedance\x202.0',
+    displayName: 'Seedance 2.0',
     aliases: Object['freeze'](['volcengine/doubao-seedance-2-0', 'volcengine/doubao-seedance-2-0-260128']),
     icon: 'images/volcengine.svg',
-    description: '火山方舟\x20Seedance\x202.0\x20model\x20API',
+    description: '火山方舟 Seedance 2.0 model API',
     model: 'doubao-seedance-2-0-260128',
     endpoint: '/contents/generations/tasks',
     endpointMode: 'content-generation-task',
@@ -568,7 +568,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     fields: Object['freeze']([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
       createVolcengineSeedance2ResolutionField({ include1080p: !![], include4k: !![] }),
-      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](0x1),
+      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
     bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
@@ -602,9 +602,9 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
     extensions: Object['freeze']({
       dreaminaStyleVideo: Object['freeze']({
-        order: 0x14,
+        order: 20,
         title: 'Seedance 2.0',
-        subtitle: '火山方舟标准版，支持\x201080p\x20/\x204k',
+        subtitle: '火山方舟标准版，支持 1080p / 4k',
         counterpartKey: 'seedance2-standard',
         taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
         resolutionOptionsByTaskType: APIMART_SEEDANCE_2_0_RESOLUTION_BY_TASK,
@@ -618,7 +618,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     executionId: 'volcengine.model-api.video.seedance-2-mini.v1',
     displayName: 'Seedance 2.0 Mini',
     icon: 'images/volcengine.svg',
-    description: '火山方舟\x20Seedance\x202.0\x20Mini\x20model\x20API',
+    description: '火山方舟 Seedance 2.0 Mini model API',
     model: 'doubao-seedance-2-0-mini-260615',
     endpoint: '/contents/generations/tasks',
     endpointMode: 'content-generation-task',
@@ -626,7 +626,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     fields: Object['freeze']([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
       createVolcengineSeedance2ResolutionField({ include1080p: ![] }),
-      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](0x1),
+      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
     bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
@@ -660,9 +660,9 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
     extensions: Object['freeze']({
       dreaminaStyleVideo: Object['freeze']({
-        order: 0x1e,
-        title: 'Seedance\x202.0\x20Mini',
-        subtitle: '火山方舟\x20Mini\x20版，参数同\x20Seedance\x202.0',
+        order: 30,
+        title: 'Seedance 2.0 Mini',
+        subtitle: '火山方舟 Mini 版，参数同 Seedance 2.0',
         counterpartKey: 'seedance2-mini',
         taskTypes: APIMART_SEEDANCE_DEFAULT_TASK_TYPES,
         resolutionOptionsByTaskType: APIMART_SEEDANCE_FAST_RESOLUTION_BY_TASK,

@@ -64,7 +64,7 @@ async function withMockFetch(key, handler) {
         if (source.startsWith('/api/v2/proxy/upload?')) {
           assert.equal(dom2.headers?.Authorization, 'Bearer k');
           const uploadMarker2 = await readUploadMarker(dom2.body);
-          if (uploadMarker2 === 'b') return makeJsonResponse({ code: 0x1f4, message: 'upload failed' });
+          if (uploadMarker2 === 'b') return makeJsonResponse({ code: 500, message: 'upload failed' });
           return makeJsonResponse({
             code: 0,
             data: { download_url: 'https://www.runninghub.cn/' + uploadMarker2 + '.mp4' },

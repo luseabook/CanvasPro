@@ -58,7 +58,7 @@ export function createCollaborationEditing({
     refresh(target) {
       for (const source of map['values']()) {
         const next = target?.[source['id']];
-        if (next?.['editId'] === editId) source['expiresAt'] = next['expiresAt'] * 0x3e8;
+        if (next?.['editId'] === editId) source['expiresAt'] = next['expiresAt'] * 1000;
       }
     },
     begin(entry) {
@@ -102,7 +102,7 @@ export function createCollaborationEditing({
         ((!enabled8 ||
           enabled8['failed'] ||
           (enabled8['acquired'] && enabled8['expiresAt'] <= Date['now']())) &&
-          ((enabled8 = { id: id, refs: 0x0, acquired: ![], failed: ![], wait: null }),
+          ((enabled8 = { id: id, refs: 0, acquired: ![], failed: ![], wait: null }),
           map['set'](id, enabled8),
           nodeIds2['push'](enabled8)),
           enabled8['refs']++,

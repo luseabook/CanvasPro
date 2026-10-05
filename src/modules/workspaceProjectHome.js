@@ -6,15 +6,15 @@ function escapeHtml(item) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#039;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#039;');
 }
 export function getWorkspaceProjectTaskPresentation({
-  activeCount: activeCount = 0x0,
-  failedCount: failedCount = 0x0,
+  activeCount: activeCount = 0,
+  failedCount: failedCount = 0,
 } = {}) {
-  const activeCount2 = Math['max'](0x0, Math['trunc'](Number(activeCount) || 0x0)),
-    failedCount2 = Math['max'](0x0, Math['trunc'](Number(failedCount) || 0x0));
+  const activeCount2 = Math['max'](0, Math['trunc'](Number(activeCount) || 0)),
+    failedCount2 = Math['max'](0, Math['trunc'](Number(failedCount) || 0));
   return {
     activeCount: activeCount2,
     failedCount: failedCount2,
@@ -36,11 +36,11 @@ export function normalizeWorkspaceProjectSortOrder(key) {
   return WORKSPACE_PROJECT_SORT_ORDERS['includes'](text) ? text : 'updated-desc';
 }
 function getWorkspaceProjectCreatedAt(options = {}) {
-  const count = Number(options?.['createdAt'] || options?.['data']?.['project']?.['createdAt'] || 0x0);
-  if (Number['isFinite'](count) && count > 0x0) return count;
-  const count2 = Number(normalizeText(options?.['id'])['match'](/\d{10,}/)?.[0x0] || 0x0);
-  if (Number['isFinite'](count2) && count2 > 0x0) return count2;
-  return Math['max'](0x0, Number(options?.['updatedAt'] || 0x0));
+  const count = Number(options?.['createdAt'] || options?.['data']?.['project']?.['createdAt'] || 0);
+  if (Number['isFinite'](count) && count > 0) return count;
+  const count2 = Number(normalizeText(options?.['id'])['match'](/\d{10,}/)?.[0] || 0);
+  if (Number['isFinite'](count2) && count2 > 0) return count2;
+  return Math['max'](0, Number(options?.['updatedAt'] || 0));
 }
 export function getWorkspaceProjectHomeEntries(
   list = [],
@@ -49,7 +49,7 @@ export function getWorkspaceProjectHomeEntries(
   const text2 = normalizeText(query)['toLocaleLowerCase']('zh-CN'),
     workspaceProjectSortOrder = normalizeWorkspaceProjectSortOrder(sortOrder);
   return (Array['isArray'](list) ? list : [])
-    ['filter']((index) => Boolean(Number(index?.['archivedAt'] || 0x0)) === Boolean(showArchived))
+    ['filter']((index) => Boolean(Number(index?.['archivedAt'] || 0)) === Boolean(showArchived))
     ['filter']((result) => {
       if (!text2) return !![];
       const list2 = normalizeText(result?.['title'] || result?.['data']?.['project']?.['title'])[
@@ -74,7 +74,7 @@ export function getWorkspaceProjectHomeEntries(
           data['index'] - target['index']
         );
       return (
-        Number(target['entry']?.['updatedAt'] || 0x0) - Number(data['entry']?.['updatedAt'] || 0x0) ||
+        Number(target['entry']?.['updatedAt'] || 0) - Number(data['entry']?.['updatedAt'] || 0) ||
         data['index'] - target['index']
       );
     })
@@ -91,27 +91,27 @@ export function refreshWorkspaceProjectResultsInPlace({
   el2['innerHTML'] = String(renderResults() || '')['trim']();
   const enabled = el['querySelector']?.('.story-project-grid, .story-project-empty'),
     enabled2 = el2['content']?.['firstElementChild'];
-  if (!enabled || !enabled2?.['matches']?.('.story-project-grid,\x20.story-project-empty')) return ![];
+  if (!enabled || !enabled2?.['matches']?.('.story-project-grid, .story-project-empty')) return ![];
   return (enabled['replaceWith'](enabled2), !![]);
 }
 export function renderWorkspaceProjectSortControl(source = 'updated-desc') {
   const workspaceProjectSortOrder2 = normalizeWorkspaceProjectSortOrder(source),
     next =
       WORKSPACE_PROJECT_SORT_OPTIONS['find']((el3) => el3['value'] === workspaceProjectSortOrder2) ||
-      WORKSPACE_PROJECT_SORT_OPTIONS[0x0];
+      WORKSPACE_PROJECT_SORT_OPTIONS[0];
   return (
-    '<div\x20class=\x22story-project-sort\x22\x20data-workspace-project-sort-wrap\x20data-story-project-sort-wrap>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-project-sort-trigger\x20story-menu-trigger\x22\x20data-workspace-action=\x22toggle-project-sort-menu\x22\x20data-story-action=\x22toggle-project-sort-menu\x22\x20aria-haspopup=\x22menu\x22\x20aria-expanded=\x22false\x22>\x0a\x20\x20\x20\x20\x20\x20<span>' +
+    '<div class="story-project-sort" data-workspace-project-sort-wrap data-story-project-sort-wrap>\n    <button type="button" class="story-project-sort-trigger story-menu-trigger" data-workspace-action="toggle-project-sort-menu" data-story-action="toggle-project-sort-menu" aria-haspopup="menu" aria-expanded="false">\n      <span>' +
     next['label'] +
     '</span><span class="story-project-sort-chevron" aria-hidden="true"></span>\n    </button>\n    <div class="story-project-sort-menu" data-workspace-project-sort-menu data-story-project-sort-menu role="menu" aria-label="项目排序" aria-hidden="true">\n      ' +
     WORKSPACE_PROJECT_SORT_OPTIONS['map'](
       (el4) =>
         '<button type="button" class="story-project-sort-option' +
         (el4['value'] === workspaceProjectSortOrder2 ? ' is-selected' : '') +
-        '\x22\x20data-workspace-action=\x22select-project-sort\x22\x20data-story-action=\x22select-project-sort\x22\x20data-workspace-project-sort-option=\x22' +
+        '" data-workspace-action="select-project-sort" data-story-action="select-project-sort" data-workspace-project-sort-option="' +
         el4['value'] +
         '" data-story-project-sort-option="' +
         el4['value'] +
-        '\x22\x20role=\x22menuitemradio\x22\x20aria-checked=\x22' +
+        '" role="menuitemradio" aria-checked="' +
         (el4['value'] === workspaceProjectSortOrder2) +
         '">\n        <span>' +
         el4['label'] +
@@ -132,15 +132,15 @@ function renderWorkspaceProjectCover(
     list4 = (Array['isArray'](list3) ? list3 : [])
       ['map'](normalizeText)
       ['filter']((current, record, list5) => current && list5['indexOf'](current) === record)
-      ['slice'](0x0, 0x3);
+      ['slice'](0, 3);
   if (!list4['length'])
     return (
       '<div class="story-project-cover story-media-empty" data-workspace-project-cover role="img" aria-label="' +
       escapeHtml(emptyLabel) +
-      '\x22>' +
+      '">' +
       (text5
         ? ''
-        : '<span\x20class=\x22story-project-empty-label\x22>' + escapeHtml(emptyLabel) + '</span>') +
+        : '<span class="story-project-empty-label">' + escapeHtml(emptyLabel) + '</span>') +
       '</div>'
     );
   return (
@@ -153,11 +153,11 @@ function renderWorkspaceProjectCover(
         escapeHtml(payload) +
         '" alt="' +
         escapeHtml(altPrefix) +
-        '\x20' +
-        (handle + 0x1) +
+        ' ' +
+        (handle + 1) +
         '" loading="lazy" decoding="async" draggable="false">',
     )['join']('') +
-    '\x0a\x20\x20</div>'
+    '\n  </div>'
   );
 }
 export function renderWorkspaceProjectCard(
@@ -166,7 +166,7 @@ export function renderWorkspaceProjectCard(
     isDeleteConfirming: isDeleteConfirming = ![],
     isMenuOpen: isMenuOpen = ![],
     fallbackTitle: fallbackTitle = '未命名项目',
-    itemCount: itemCount = 0x0,
+    itemCount: itemCount = 0,
     itemLabel: itemLabel = '项',
     coverImageUrls: coverImageUrls = [],
     emptyCoverLabel: emptyCoverLabel = '项目',
@@ -177,11 +177,11 @@ export function renderWorkspaceProjectCard(
 ) {
   const config = state?.['data']?.['project'] || {},
     text6 = normalizeText(state?.['id'] || config['id']) || 'current',
-    scope = Number(state?.['archivedAt'] || 0x0) > 0x0,
-    input = Number['isFinite'](Number(itemCount)) ? Math['max'](0x0, Math['trunc'](Number(itemCount))) : 0x0,
+    scope = Number(state?.['archivedAt'] || 0) > 0,
+    input = Number['isFinite'](Number(itemCount)) ? Math['max'](0, Math['trunc'](Number(itemCount))) : 0,
     text7 =
       normalizeText(config['title'] || state?.['title']) || normalizeText(fallbackTitle) || '未命名项目',
-    output = Number(state?.['updatedAt'] || 0x0),
+    output = Number(state?.['updatedAt'] || 0),
     activeCount3 = taskSummary && typeof taskSummary === 'object' ? taskSummary : {},
     workspaceProjectTaskPresentation = getWorkspaceProjectTaskPresentation({
       activeCount: activeCount3['activeCount'],
@@ -217,9 +217,9 @@ export function renderWorkspaceProjectCard(
         '</span>'
       : '';
   return (
-    '<article\x20class=\x22story-project-card\x20' +
+    '<article class="story-project-card ' +
     (isDeleteConfirming ? 'is-delete-confirming' : '') +
-    (scope ? '\x20is-archived' : '') +
+    (scope ? ' is-archived' : '') +
     (isMenuOpen ? ' is-menu-open' : '') +
     value2 +
     value3 +
@@ -235,7 +235,7 @@ export function renderWorkspaceProjectCard(
     }) +
     '\n    ' +
     value5 +
-    '\x0a\x20\x20\x20\x20<div\x20class=\x22story-project-menu-wrap\x22\x20data-workspace-project-menu-wrap\x20data-story-project-menu-wrap>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-project-menu-trigger\x22\x20data-workspace-action=\x22toggle-project-menu\x22\x20data-story-action=\x22toggle-project-menu\x22\x20data-workspace-project-id=\x22' +
+    '\n    <div class="story-project-menu-wrap" data-workspace-project-menu-wrap data-story-project-menu-wrap>\n      <button type="button" class="story-project-menu-trigger" data-workspace-action="toggle-project-menu" data-story-action="toggle-project-menu" data-workspace-project-id="' +
     escapeHtml(text6) +
     '" data-story-project-id="' +
     escapeHtml(text6) +
@@ -243,11 +243,11 @@ export function renderWorkspaceProjectCard(
     escapeHtml(text7) +
     ' 项目操作" aria-haspopup="menu" aria-expanded="' +
     isMenuOpen +
-    '\x22\x20' +
+    '" ' +
     (isDeleteConfirming ? 'hidden' : '') +
     '>•••</button>\n      <div class="story-project-menu" data-workspace-project-menu data-story-project-menu role="menu" aria-hidden="' +
     !(isMenuOpen && !isDeleteConfirming) +
-    '\x22\x20' +
+    '" ' +
     (isMenuOpen && !isDeleteConfirming ? '' : 'hidden') +
     '>\n        <button type="button" data-workspace-action="rename-project" data-story-action="rename-project" data-workspace-project-id="' +
     escapeHtml(text6) +
@@ -269,9 +269,9 @@ export function renderWorkspaceProjectCard(
     escapeHtml(text6) +
     '" data-story-project-id="' +
     escapeHtml(text6) +
-    '\x22\x20role=\x22menuitem\x22>' +
+    '" role="menuitem">' +
     (scope ? '取消归档' : '归档项目') +
-    '</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22is-danger\x22\x20data-workspace-action=\x22request-delete-project\x22\x20data-story-action=\x22request-delete-project\x22\x20data-workspace-project-id=\x22' +
+    '</button>\n        <button type="button" class="is-danger" data-workspace-action="request-delete-project" data-story-action="request-delete-project" data-workspace-project-id="' +
     escapeHtml(text6) +
     '" data-story-project-id="' +
     escapeHtml(text6) +
@@ -279,7 +279,7 @@ export function renderWorkspaceProjectCard(
     (isDeleteConfirming ? '' : 'hidden') +
     ' aria-label="确认删除 ' +
     escapeHtml(text7) +
-    '\x22>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22confirm-btn\x20confirm-cancel\x22\x20data-workspace-action=\x22cancel-delete-project\x22\x20data-story-action=\x22cancel-delete-project\x22\x20data-workspace-project-id=\x22' +
+    '">\n      <button type="button" class="confirm-btn confirm-cancel" data-workspace-action="cancel-delete-project" data-story-action="cancel-delete-project" data-workspace-project-id="' +
     escapeHtml(text6) +
     '" data-story-project-id="' +
     escapeHtml(text6) +
@@ -301,10 +301,10 @@ export function renderWorkspaceProjectCard(
     (output ? '已自动保存' : '刚刚更新') +
     ' · ' +
     input +
-    '\x20' +
+    ' ' +
     escapeHtml(itemLabel) +
     '</small>' +
     value6 +
-    '</div>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20</article>'
+    '</div>\n    </div>\n  </article>'
   );
 }

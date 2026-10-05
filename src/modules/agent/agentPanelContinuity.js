@@ -3,7 +3,7 @@ export function createAgentPanelContinuity({
   getHistory: getHistory,
   getMessageCount: getMessageCount,
 }) {
-  let epoch = 0x0,
+  let epoch = 0,
     enabled = ![],
     value = null;
   function identity() {
@@ -17,7 +17,7 @@ export function createAgentPanelContinuity({
     return !enabled && key?.['epoch'] === epoch && key['identity'] === identity();
   }
   function invalidate() {
-    ((epoch += 0x1), (value = null));
+    ((epoch += 1), (value = null));
   }
   return {
     capture: capture,

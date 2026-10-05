@@ -179,5 +179,5 @@ export function storyEpisodeCsv(workspace, episode) {
     if (/^[\s\uFEFF]*[=+@-]/.test(safe)) safe = "'" + safe;
     return '"' + safe.replace(/"/g, '""') + '"';
   }
-  return '\uFEFF' + [columns, ...rows.map(row => columns.map(key => row[key]))].map(row => row.map(escape).join(',')).join('\r\n');
+  return '\ufeff' + [columns, ...rows.map(row => columns.map(key => row[key]))].map(row => row.map(escape).join(',')).join('\r\n');
 }

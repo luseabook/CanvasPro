@@ -1,7 +1,7 @@
-export const WORKSPACE_MARQUEE_DRAG_THRESHOLD = 0x5;
+export const WORKSPACE_MARQUEE_DRAG_THRESHOLD = 5;
 function normalizeCoordinate(value) {
   const item = Number(value);
-  return Number['isFinite'](item) ? item : 0x0;
+  return Number['isFinite'](item) ? item : 0;
 }
 function normalizeSelector(key) {
   return String(key || '')['trim']();
@@ -18,7 +18,7 @@ export function hasWorkspaceMarqueeDrag(
 ) {
   const coordinate = normalizeCoordinate(source) - normalizeCoordinate(options),
     coordinate2 = normalizeCoordinate(next) - normalizeCoordinate(target);
-  return Math['hypot'](coordinate, coordinate2) >= Math['max'](0x0, normalizeCoordinate(current));
+  return Math['hypot'](coordinate, coordinate2) >= Math['max'](0, normalizeCoordinate(current));
 }
 export function createWorkspaceMarqueeRect(entry, record, payload, handle, box = null) {
   let coordinate3 = normalizeCoordinate(entry),
@@ -132,7 +132,7 @@ export function createWorkspaceMarqueeSelectionController({
           (event2['overlay'] = documentObject['createElement']('div')),
           (event2['overlay']['className'] = [event2['baseOverlayClassName'], event2['overlayClassName']]
             ['filter'](Boolean)
-            ['join']('\x20')),
+            ['join'](' ')),
           event2['overlay']['setAttribute']('aria-hidden', 'true'),
           root['appendChild'](event2['overlay']));
         if (event2['rootClassName']) root['classList']['add'](event2['rootClassName']);
@@ -192,7 +192,7 @@ export function createWorkspaceMarqueeSelectionController({
         (enabled2 = !![]),
         windowObject['setTimeout'](() => {
           enabled2 = ![];
-        }, 0x0),
+        }, 0),
         additive2['commit'](value6),
         onCommit?.(value6),
         !![]
@@ -218,7 +218,7 @@ export function createWorkspaceMarqueeSelectionController({
     {
       begin(pointerId) {
         if (
-          pointerId['button'] !== 0x0 ||
+          pointerId['button'] !== 0 ||
           pointerId['isPrimary'] === ![] ||
           (pointerId['pointerType'] && pointerId['pointerType'] !== 'mouse')
         )
@@ -243,8 +243,8 @@ export function createWorkspaceMarqueeSelectionController({
           cancel(),
           (value2 = {
             pointerId: pointerId['pointerId'],
-            startX: Number(pointerId['clientX']) || 0x0,
-            startY: Number(pointerId['clientY']) || 0x0,
+            startX: Number(pointerId['clientX']) || 0,
+            startY: Number(pointerId['clientY']) || 0,
             additive:
               typeof commit['additive'] === 'boolean'
                 ? commit['additive']
@@ -261,7 +261,7 @@ export function createWorkspaceMarqueeSelectionController({
             hitClassName: normalizeSelector(commit['hitClassName'] ?? selector4),
             rootClassName: normalizeSelector(commit['rootClassName'] ?? selector5),
             getItemId: getItemId2,
-            dragThreshold: Math['max'](0x0, normalizeCoordinate(commit['dragThreshold'] ?? dragThreshold)),
+            dragThreshold: Math['max'](0, normalizeCoordinate(commit['dragThreshold'] ?? dragThreshold)),
             surface: surface,
             commit: commit['commit'],
           }),

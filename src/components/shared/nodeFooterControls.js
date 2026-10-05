@@ -47,13 +47,13 @@ export function positionNodeAdvancedPanel(el8) {
   ((el8['style']['top'] = ''), (el8['style']['bottom'] = ''), (el8['style']['maxHeight'] = ''));
   const box = el9['getBoundingClientRect'](),
     box2 = el8['getBoundingClientRect'](),
-    index = box['height'] / el9['offsetHeight'] || 0x1,
-    result = Math['max'](0x0, window['innerHeight'] - box['bottom'] - 0x10),
-    data = Math['max'](0x0, box['top'] - 0x10),
-    options = box2['bottom'] > window['innerHeight'] - 0xc && data > result;
-  options && ((el8['style']['top'] = 'auto'), (el8['style']['bottom'] = 'calc(100%\x20+\x208px)'));
+    index = box['height'] / el9['offsetHeight'] || 1,
+    result = Math['max'](0, window['innerHeight'] - box['bottom'] - 16),
+    data = Math['max'](0, box['top'] - 16),
+    options = box2['bottom'] > window['innerHeight'] - 12 && data > result;
+  options && ((el8['style']['top'] = 'auto'), (el8['style']['bottom'] = 'calc(100% + 8px)'));
   const target = parseFloat(getComputedStyle(el8)['maxHeight']) || Infinity;
-  el8['style']['maxHeight'] = Math['max'](0x0, Math['min'](target, (options ? data : result) / index)) + 'px';
+  el8['style']['maxHeight'] = Math['max'](0, Math['min'](target, (options ? data : result) / index)) + 'px';
 }
 export function closeNodeFooterMenus(el10, source = null, next = {}) {
   if (!el10) return;
@@ -83,38 +83,38 @@ export function positionNodeSubmenu(el12, el13) {
     (el13['style']['overflowY'] = ''));
   const el14 = el12['closest']('.node-model-menu, .img-model-menu');
   if (!el14) return;
-  const payload = el12['offsetTop'] || 0x0,
+  const payload = el12['offsetTop'] || 0,
     handle =
       Number(globalThis['window']?.['innerHeight']) ||
       Number(globalThis['document']?.['documentElement']?.['clientHeight']) ||
-      0x0,
-    state = 0xc,
+      0,
+    state = 12,
     count =
-      el13['offsetHeight'] || el13['getBoundingClientRect']?.()['height'] || el13['scrollHeight'] || 0x0,
-    box3 = el14['getBoundingClientRect']?.() || { top: 0x0 },
+      el13['offsetHeight'] || el13['getBoundingClientRect']?.()['height'] || el13['scrollHeight'] || 0,
+    box3 = el14['getBoundingClientRect']?.() || { top: 0 },
     box4 = el12['getBoundingClientRect']?.() || null,
-    config = el14['clientHeight'] || box3['height'] || el13['parentElement']?.['clientHeight'] || 0x0,
-    count2 = handle > state * 0x2 && count > 0x0 ? Math['min'](count, handle - state * 0x2) : count,
+    config = el14['clientHeight'] || box3['height'] || el13['parentElement']?.['clientHeight'] || 0,
+    count2 = handle > state * 2 && count > 0 ? Math['min'](count, handle - state * 2) : count,
     scope = el13['dataset']?.['nodeSubmenuPlacement'];
   if (scope === 'viewport-left' || scope === 'viewport-auto' || scope === 'viewport-auto-up') {
-    const input = el13['offsetWidth'] || el13['getBoundingClientRect']?.()['width'] || box3['width'] || 0xf0,
+    const input = el13['offsetWidth'] || el13['getBoundingClientRect']?.()['width'] || box3['width'] || 240,
       output =
         Number(globalThis['window']?.['innerWidth']) ||
         Number(globalThis['document']?.['documentElement']?.['clientWidth']) ||
-        0x0,
+        0,
       value2 = Math['max'](state, handle - state - count2),
-      value3 = Number(box3['top']) || 0x0,
+      value3 = Number(box3['top']) || 0,
       value4 = Number(box3['bottom']) || value3 + config,
       value5 = scope === 'viewport-auto-up' ? value4 - count2 : Number(box4?.['top']) || value3 + payload,
       value6 = Math['min'](Math['max'](value5, state), value2),
       value7 = Math['max'](state, output - state - input),
-      value8 = Number(box3['left']) || 0x0,
-      value9 = Number(box3['width']) || 0x0,
+      value8 = Number(box3['left']) || 0,
+      value9 = Number(box3['width']) || 0,
       value10 = Number(box3['right']) || value8 + value9,
       value11 =
-        Number['parseFloat'](globalThis['window']?.['getComputedStyle']?.(el14)?.['borderRightWidth']) || 0x0,
-      value12 = value8 - input - 0x6,
-      value13 = value10 - value11 + 0x6;
+        Number['parseFloat'](globalThis['window']?.['getComputedStyle']?.(el14)?.['borderRightWidth']) || 0,
+      value12 = value8 - input - 6,
+      value13 = value10 - value11 + 6;
     let value14 = value12;
     if (scope === 'viewport-auto' || scope === 'viewport-auto-up') {
       const value15 = value13 + input <= output - state,
@@ -130,9 +130,9 @@ export function positionNodeSubmenu(el12, el13) {
       ((el13['style']['maxHeight'] = Math['floor'](count2) + 'px'), (el13['style']['overflowY'] = 'auto'));
     return;
   }
-  const value16 = Math['max'](0x0, config - count2);
+  const value16 = Math['max'](0, config - count2);
   let value17 = Math['min'](payload, value16);
-  if (handle > state * 0x2 && count2 > 0x0) {
+  if (handle > state * 2 && count2 > 0) {
     const value18 = handle - state - count2,
       value19 = Math['min'](Math['max'](box3['top'] + value17, state), value18);
     ((value17 = value19 - box3['top']),
@@ -215,24 +215,24 @@ export function createFloatingModelMenuPortal({
       const right2 =
           Number(windowObject?.['innerWidth']) ||
           Number(documentObject?.['documentElement']?.['clientWidth']) ||
-          0x0,
+          0,
         bottom2 =
           Number(windowObject?.['innerHeight']) ||
           Number(documentObject?.['documentElement']?.['clientHeight']) ||
-          0x0,
+          0,
         box7 = host['getBoundingClientRect']?.() || {
-          top: 0x0,
-          left: 0x0,
+          top: 0,
+          left: 0,
           right: right2,
           bottom: bottom2,
         },
-        value27 = 0xc,
-        value28 = 0xc,
-        value29 = Math['max'](value27, (Number(box7['left']) || 0x0) + value27),
-        value30 = Math['max'](value27, (Number(box7['top']) || 0x0) + value27),
+        value27 = 12,
+        value28 = 12,
+        value29 = Math['max'](value27, (Number(box7['left']) || 0) + value27),
+        value30 = Math['max'](value27, (Number(box7['top']) || 0) + value27),
         value31 = Math['min'](right2 - value27, Number(box7['right']) || right2 - value27),
         value32 = Math['min'](bottom2 - value27, Number(box7['bottom']) || bottom2 - value27),
-        value33 = Math['max'](0x0, value32 - value30),
+        value33 = Math['max'](0, value32 - value30),
         value34 = Math['min'](box6['height'], value33);
       box6['height'] > value33 &&
         (menu['style']?.['setProperty']?.('max-height', Math['floor'](value33) + 'px'),
@@ -327,38 +327,38 @@ export function createFloatingUiSchemaPopupPortal({
       'overflow-y',
     ],
     list4 = ['click', 'mousedown', 'input', 'change'],
-    value43 = 0xc,
-    value44 = 0x8;
+    value43 = 12,
+    value44 = 8;
   let fieldEl = null,
-    enabled4 = 0x0;
+    enabled4 = 0;
   const run = () => {
       if (!enabled4) return;
-      (windowObject?.['cancelAnimationFrame']?.(enabled4), (enabled4 = 0x0));
+      (windowObject?.['cancelAnimationFrame']?.(enabled4), (enabled4 = 0));
     },
     handler6 = () => {
       const right3 =
           Number(windowObject?.['innerWidth']) ||
           Number(documentObject?.['documentElement']?.['clientWidth']) ||
-          0x0,
+          0,
         bottom3 =
           Number(windowObject?.['innerHeight']) ||
           Number(documentObject?.['documentElement']?.['clientHeight']) ||
-          0x0,
+          0,
         box8 = host2['getBoundingClientRect']?.() || {
-          top: 0x0,
-          left: 0x0,
+          top: 0,
+          left: 0,
           right: right3,
           bottom: bottom3,
         };
       return {
-        left: Math['max'](value43, (Number(box8['left']) || 0x0) + value43),
-        top: Math['max'](value43, (Number(box8['top']) || 0x0) + value43),
+        left: Math['max'](value43, (Number(box8['left']) || 0) + value43),
+        top: Math['max'](value43, (Number(box8['top']) || 0) + value43),
         right: Math['min'](right3 - value43, Number(box8['right']) || right3 - value43),
         bottom: Math['min'](bottom3 - value43, Number(box8['bottom']) || bottom3 - value43),
       };
     },
     handler7 = () => {
-      enabled4 = 0x0;
+      enabled4 = 0;
       const el19 = fieldEl?.['popup'],
         el20 = fieldEl?.['trigger'] || fieldEl?.['fieldEl'];
       if (!el19?.['isConnected'] || !el20?.['isConnected']) return;
@@ -367,18 +367,18 @@ export function createFloatingUiSchemaPopupPortal({
       const box10 = handler6(),
         count3 =
           Number(box9['width']) ||
-          Math['max'](0x0, (Number(box9['right']) || 0x0) - (Number(box9['left']) || 0x0));
-      if (fieldEl?.['preservesAnchorWidth'] && count3 > 0x0) {
-        const value45 = Math['max'](0x0, box10['right'] - box10['left']),
+          Math['max'](0, (Number(box9['right']) || 0) - (Number(box9['left']) || 0));
+      if (fieldEl?.['preservesAnchorWidth'] && count3 > 0) {
+        const value45 = Math['max'](0, box10['right'] - box10['left']),
           count4 = Math['min'](Math['ceil'](count3), Math['floor'](value45));
-        count4 > 0x0 && el19['style']?.['setProperty']?.('min-width', count4 + 'px');
+        count4 > 0 && el19['style']?.['setProperty']?.('min-width', count4 + 'px');
       }
       const box11 = el19['getBoundingClientRect']?.();
-      if (!box11 || box11['width'] <= 0x0) return;
-      const value46 = Math['max'](0x50, box10['bottom'] - box10['top']),
+      if (!box11 || box11['width'] <= 0) return;
+      const value46 = Math['max'](80, box10['bottom'] - box10['top']),
         value47 = Math['min'](box11['height'] || el19['scrollHeight'] || value46, value46),
         value48 = fieldEl?.['ownerProxy']?.['classList']?.['contains']?.('ui-schema-pill-menu')
-          ? 0xc
+          ? 12
           : value44,
         value49 = Math['max'](box10['left'], box10['right'] - box11['width']),
         value50 =
@@ -386,7 +386,7 @@ export function createFloatingUiSchemaPopupPortal({
             ? box9['left']
             : horizontalAlign === 'end'
               ? box9['right'] - box11['width']
-              : box9['left'] + (count3 - box11['width']) / 0x2,
+              : box9['left'] + (count3 - box11['width']) / 2,
         value51 = Math['min'](Math['max'](value50, box10['left']), value49),
         value52 = Math['max'](box10['top'], box10['bottom'] - value47),
         value53 = box9['top'] - value48 - value47,
@@ -410,7 +410,7 @@ export function createFloatingUiSchemaPopupPortal({
       run();
       const run2 =
         windowObject?.['requestAnimationFrame']?.['bind']?.(windowObject) ||
-        ((value56) => windowObject?.['setTimeout']?.(value56, 0x0));
+        ((value56) => windowObject?.['setTimeout']?.(value56, 0));
       enabled4 = run2(handler7);
     },
     value57 = (nativeEvent) => {
@@ -482,7 +482,7 @@ export function createFloatingUiSchemaPopupPortal({
           contextClass,
         ]
           ['filter'](Boolean)
-          ['join']('\x20')),
+          ['join'](' ')),
         (fieldEl = {
           popup: popup2,
           fieldEl: fieldEl3,
@@ -597,7 +597,7 @@ export function bindNodeModelMenuPrewarm({
     schedule = () => {
       if (value72 || value73 !== null || value74 !== null) return null;
       return (
-        run4 ? (value73 = run4(value78, { timeout: 0x64 })) : (value74 = value76?.(value78, 0x0) ?? null),
+        run4 ? (value73 = run4(value78, { timeout: 100 })) : (value74 = value76?.(value78, 0) ?? null),
         null
       );
     },
@@ -623,7 +623,7 @@ export function bindNodeModelMenuPrewarm({
     }
   );
 }
-export function bindNodeSubmenus(el24, { delay: delay = 0x78 } = {}) {
+export function bindNodeSubmenus(el24, { delay: delay = 120 } = {}) {
   if (!el24) return () => {};
   const list6 = [],
     map3 = new Map(),

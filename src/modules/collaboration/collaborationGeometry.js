@@ -25,7 +25,7 @@ export function createCollaborationGeometry({
         const data = enabled['locks']?.[result];
         return data?.['clientId'] === enabled['clientId'] &&
           data['actorId'] === enabled['actorId'] &&
-          data['expiresAt'] * 0x3e8 > index
+          data['expiresAt'] * 1000 > index
           ? data
           : null;
       },
@@ -49,7 +49,7 @@ export function createCollaborationGeometry({
     entry !== value && ((value = entry), key['setPresence']({ geometry: geometry }));
     const map3 = new Map();
     for (const clientId of enabled['presence'] || []) {
-      if (clientId['clientId'] === enabled['clientId'] || clientId['expiresAt'] * 0x3e8 <= index) continue;
+      if (clientId['clientId'] === enabled['clientId'] || clientId['expiresAt'] * 1000 <= index) continue;
       for (const [record, payload] of Object['entries'](clientId['geometry'] || {})) {
         const handle = enabled['locks']?.[record];
         if (
@@ -58,7 +58,7 @@ export function createCollaborationGeometry({
           handle?.['clientId'] !== clientId['clientId'] ||
           handle['actorId'] !== clientId['actorId'] ||
           handle['editId'] !== payload['editId'] ||
-          handle['expiresAt'] * 0x3e8 <= index
+          handle['expiresAt'] * 1000 <= index
         )
           continue;
         const patch = Object['fromEntries'](
@@ -106,5 +106,5 @@ export function createCollaborationGeometry({
       (geometry = {}),
       (value = ''));
   }
-  return { update: update, clear: clear, active: () => map['size'] > 0x0 };
+  return { update: update, clear: clear, active: () => map['size'] > 0 };
 }

@@ -40,19 +40,19 @@ export function createRecordingTranscribeTaskHandler(deps) {
           '96k',
           audioPath,
         ],
-        { timeoutMs: 0x2bf20 },
+        { timeoutMs: 180000 },
       ),
         queue.throwIfCancelled(task));
       const bytes = await readFile(audioPath),
         controller = new AbortController(),
-        timeoutTimer = setTimeout(() => controller.abort(), 0x2bf20),
+        timeoutTimer = setTimeout(() => controller.abort(), 180000),
         cancelWatcher = setInterval(() => {
           try {
             queue.throwIfCancelled(task);
           } catch {
             controller.abort();
           }
-        }, 0xfa);
+        }, 250);
       try {
         const result = await asrProvider.run({
           bytes: bytes,

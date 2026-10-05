@@ -23,7 +23,7 @@ const STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE =
   STORY_EPISODE_SEEDANCE_2_5_PERFORMANCE_GUIDANCE =
     '每个人物表演镜头都写出当前画面真正需要的可见表演信息：面部变化、视线、身体姿态、手部动作、动作节奏和对白情绪；不要只写抽象情绪。保持人物位置、朝向、左右手持物、服装、道具状态和场景方向连续，换位与状态变化必须通过可观察动作完成。',
   STORY_EPISODE_OPENING_POSITION_GUIDANCE =
-    '每个\x20clip\x20的首镜画面描述必须以“人物站位：”开头，并用第一个完整句子写清本片段开场所有可见人物的位置、朝向、视线和持物；若与前一个\x20clip\x20处于同一场景和连续时间，必须承接前一个\x20clip\x20末镜，不得重新安排站位；换场或时间跳跃时才重新建立站位。',
+    '每个 clip 的首镜画面描述必须以“人物站位：”开头，并用第一个完整句子写清本片段开场所有可见人物的位置、朝向、视线和持物；若与前一个 clip 处于同一场景和连续时间，必须承接前一个 clip 末镜，不得重新安排站位；换场或时间跳跃时才重新建立站位。',
   STORY_EPISODE_WAN_3_0_TIMELINE_GUIDANCE =
     '当前 promptMode 为 wan-3.0。每个 clip 是一次独立生成、最长 30 秒的 Wan 3.0 视频片段；为 clip.shots 按顺序返回整数秒时间区间，首镜 startSec 必须为 0，后一镜 startSec 必须等于前一镜 endSec，末镜 endSec 必须等于该 clip 总时长，全程无空档、无重叠。durationSec 必须等于 endSec-startSec。',
   STORY_EPISODE_WAN_3_0_REFERENCE_GUIDANCE =
@@ -31,13 +31,13 @@ const STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE =
   STORY_EPISODE_WAN_3_0_AUDIO_GUIDANCE =
     'Wan 3.0 原生生成声音：dialogue 必须保留唯一且稳定的说话人姓名和对白原文；audio 只写当前镜头可听见的环境声、动作声与必要配乐变化。没有对白、旁白或配乐时保持对应字段为空，不得自动补写。多人对话先写当前说话人的可见动作和情绪，再写该人物对白，避免代词造成说话人混淆。',
   STORY_EPISODE_MINIMAX_H3_DURATION_GUIDANCE =
-    '当前\x20promptMode\x20为\x20minimax-h3。每个\x20clip\x20是一次独立生成的\x20MiniMax\x20H3\x20视频，shots\x20总时长必须为\x204\x20至\x2015\x20秒的整数；优先在\x205\x20至\x206\x20秒内完成一个清晰的连续动作或表演节拍，内容容纳不下时在自然动作、对白轮次或情绪落点处拆成下一个\x20clip。不要返回\x20startSec\x20或\x20endSec。',
+    '当前 promptMode 为 minimax-h3。每个 clip 是一次独立生成的 MiniMax H3 视频，shots 总时长必须为 4 至 15 秒的整数；优先在 5 至 6 秒内完成一个清晰的连续动作或表演节拍，内容容纳不下时在自然动作、对白轮次或情绪落点处拆成下一个 clip。不要返回 startSec 或 endSec。',
   STORY_EPISODE_MINIMAX_H3_REFERENCE_GUIDANCE =
-    '参考素材只通过\x20assetUsages\x20或\x20compact\x20assetRefs\x20绑定真实存在的\x20assetRef\x20与\x20appearanceRef；不要在\x20visual、camera、dialogue、voiceover\x20或\x20audio\x20中输出\x20@、<Subject\x20N>、<Picture\x20N>、<Video\x20N>、<Audio\x20N>、URL\x20或内部素材\x20ID。客户端会按\x20MiniMax\x20官方\x20h3-prompt-writing\x20规则，将人物、场景和道具定义为稳定的\x20<Subject\x20N>，将真实输入顺序映射为\x20<Picture\x20N>/<Video\x20N>/<Audio\x20N>；仅用于定义人物、场景、服装、道具或风格的图片只写进对应\x20Subject\x20定义，不单独作为关键帧条目。',
+    '参考素材只通过 assetUsages 或 compact assetRefs 绑定真实存在的 assetRef 与 appearanceRef；不要在 visual、camera、dialogue、voiceover 或 audio 中输出 @、<Subject N>、<Picture N>、<Video N>、<Audio N>、URL 或内部素材 ID。客户端会按 MiniMax 官方 h3-prompt-writing 规则，将人物、场景和道具定义为稳定的 <Subject N>，将真实输入顺序映射为 <Picture N>/<Video N>/<Audio N>；仅用于定义人物、场景、服装、道具或风格的图片只写进对应 Subject 定义，不单独作为关键帧条目。',
   STORY_EPISODE_MINIMAX_H3_DIRECTING_GUIDANCE =
-    '围绕一个明确的核心故事与关系张力组织分镜；首镜\x20visual\x20必须用简体中文落实项目\x20visualStyle，并写清初始构图，所有\x20visual\x20必须用简体中文写清主体位置、环境与光线、可见动作和状态变化，camera\x20必须用自然、具体的简体中文写清景别、机位、运镜类型、幅度、速度和最终落点。audio\x20只写当前镜头可听见的环境声、物理动作声、非语言人声或用户明确要求的配乐事件本身，不要添加任何字段内前缀；客户端会将非配乐声音统一写为“画面内音效：…”，与\x20dialogue\x20和\x20voiceover\x20明确分离。多镜头只在叙事需要新信息时使用，避免在一个\x205\x20至\x206\x20秒动作内堆叠过度复杂的运镜；在不改变原剧情、不新增事件的前提下，提供足够具体的中文视听细节，不要自动补写输入不存在的对白、旁白、声音或配乐。',
+    '围绕一个明确的核心故事与关系张力组织分镜；首镜 visual 必须用简体中文落实项目 visualStyle，并写清初始构图，所有 visual 必须用简体中文写清主体位置、环境与光线、可见动作和状态变化，camera 必须用自然、具体的简体中文写清景别、机位、运镜类型、幅度、速度和最终落点。audio 只写当前镜头可听见的环境声、物理动作声、非语言人声或用户明确要求的配乐事件本身，不要添加任何字段内前缀；客户端会将非配乐声音统一写为“画面内音效：…”，与 dialogue 和 voiceover 明确分离。多镜头只在叙事需要新信息时使用，避免在一个 5 至 6 秒动作内堆叠过度复杂的运镜；在不改变原剧情、不新增事件的前提下，提供足够具体的中文视听细节，不要自动补写输入不存在的对白、旁白、声音或配乐。',
   STORY_EPISODE_MINIMAX_H3_LANGUAGE_GUIDANCE =
-    '为满足\x20MiniMax\x20官方\x20h3-prompt-writing\x20输出结构，当前模式的\x20creativeIntent、transition、transitionFromPrevious、visual、camera、dialogue、voiceover\x20与\x20audio\x20必须使用自然、具体的简体中文，并保留唯一说话人姓名；不得输出或保留英文对白、画外音、歌词、画面文字或英文叙述。客户端会把有参考素材的\x20clip\x20组装为\x20subject_definitions、summary、retention_analysis、detailed_description、overall_soundscape、non_diegetic_music\x20六段式\x20Ref2VA\x20提示词；无参考素材时组装为\x20T2VA\x20三段式提示词。除字段名、<Subject\x20N>\x20等引用标签、[Shot\x20N]\x20At\x20MM:SS.mmm、[reference\x20generation]、fully_preserved、<d>[Chinese]\x20等官方结构标签外，所有提示词正文只能使用简体中文。';
+    '为满足 MiniMax 官方 h3-prompt-writing 输出结构，当前模式的 creativeIntent、transition、transitionFromPrevious、visual、camera、dialogue、voiceover 与 audio 必须使用自然、具体的简体中文，并保留唯一说话人姓名；不得输出或保留英文对白、画外音、歌词、画面文字或英文叙述。客户端会把有参考素材的 clip 组装为 subject_definitions、summary、retention_analysis、detailed_description、overall_soundscape、non_diegetic_music 六段式 Ref2VA 提示词；无参考素材时组装为 T2VA 三段式提示词。除字段名、<Subject N> 等引用标签、[Shot N] At MM:SS.mmm、[reference generation]、fully_preserved、<d>[Chinese] 等官方结构标签外，所有提示词正文只能使用简体中文。';
 export function getStoryEpisodePromptModePlanningRequirements(item = '') {
   if (isStorySeedance25PromptMode(item))
     return [
@@ -77,15 +77,15 @@ export function appendStoryEpisodePromptModeSystemPrompt(
   const list = getStoryEpisodePromptModePlanningRequirements(result);
   if (!list['length']) return index;
   const isStoryWan30PromptMode2 = isStoryWan30PromptMode(result)
-      ? 'Wan\x203.0'
+      ? 'Wan 3.0'
       : isStoryMinimaxH3PromptMode(result)
-        ? 'MiniMax\x20H3'
+        ? 'MiniMax H3'
         : 'Seedance 2.5',
     isStoryContinuousTimelinePromptMode2 = isStoryContinuousTimelinePromptMode(result);
   return [
     index,
     announceTimelineContract && isStoryContinuousTimelinePromptMode2
-      ? '当前为\x20' +
+      ? '当前为 ' +
         isStoryWan30PromptMode2 +
         ' 提示词模式，以下时间轴契约覆盖上方通用 JSON 示例中的字段限制。'
       : '',
@@ -94,15 +94,15 @@ export function appendStoryEpisodePromptModeSystemPrompt(
     announceTimelineContract && isStoryContinuousTimelinePromptMode2
       ? '每个 shot 除通用字段外必须返回 startSec 与 endSec；只返回用户消息指定的 ' +
         isStoryWan30PromptMode2 +
-        '\x20JSON\x20结构。'
+        ' JSON 结构。'
       : '',
   ]
     ['filter'](Boolean)
-    ['join']('\x0a');
+    ['join']('\n');
 }
 export const getStoryEpisodeTimelinePlanningRequirements = getStoryEpisodePromptModePlanningRequirements;
-export function resolveStoryPromptModeClipMaxSeconds(data = '', options = 0xf) {
-  return isStoryMinimaxH3PromptMode(data) ? 0xf : options;
+export function resolveStoryPromptModeClipMaxSeconds(data = '', options = 15) {
+  return isStoryMinimaxH3PromptMode(data) ? 15 : options;
 }
 export function getStorySpatialContinuityPromptLines({ sourceEvidence: sourceEvidence = ![] } = {}) {
   const target = sourceEvidence ? '原片场景' : '场景参考图',
@@ -124,13 +124,13 @@ export function getStoryClipPromptModeRewriteRequirements(
     return hasAssetRefs
       ? [
           '目标为 MiniMax H3 Ref2VA 提示词。严格按 subject_definitions、summary、retention_analysis、detailed_description、overall_soundscape、non_diegetic_music 六段及该顺序输出。',
-          '用\x20<Subject\x20N>\x20定义可复用人物、场景和道具；每个锁定的\x20@素材引用只在\x20subject_definitions\x20中绑定一次，后续只使用对应\x20<Subject\x20N>，不得留下没有定义的标签。summary\x20必须以\x20[reference\x20generation]\x20开头，retention_analysis\x20使用\x20fully_preserved\x20等官方英文关系标记。',
+          '用 <Subject N> 定义可复用人物、场景和道具；每个锁定的 @素材引用只在 subject_definitions 中绑定一次，后续只使用对应 <Subject N>，不得留下没有定义的标签。summary 必须以 [reference generation] 开头，retention_analysis 使用 fully_preserved 等官方英文关系标记。',
           '六段正文直接输出简体中文，仅字段名和官方结构标签保留英文；返回 candidateText 前自行检查，并把草稿中的英文叙述、对白、歌词或画面文字改写为中文。对白写成 <d>[Chinese] 中文原文</d>，说话人使用全片稳定的 (S1)、(S2)。',
           'detailed_description 第一镜写 [Shot 1] 且不带时间；后续镜头写 [Shot N] At MM:SS.mmm，并写清构图、主体、环境光线、动作状态、运镜、声音和参考生效位置。非对白、非画外音的镜内声音统一写为“画面内音效：…”。不得输出其他声音字段前缀或 ⏱ 时长标签。',
         ]
       : [
           '目标为 MiniMax H3 T2VA 提示词。严格按 integrated_multimodal_description、overall_soundscape、non_diegetic_music 三段及该顺序输出，不得创建 Subject、Picture、Video 或 Audio 引用标签。',
-          '三段正文直接输出简体中文，仅字段名和官方结构标签保留英文；返回\x20candidateText\x20前自行检查，并把草稿中的英文叙述、对白、歌词或画面文字改写为中文。对白写成\x20<d>[Chinese]\x20中文原文</d>，说话人使用全片稳定的\x20(S1)、(S2)。',
+          '三段正文直接输出简体中文，仅字段名和官方结构标签保留英文；返回 candidateText 前自行检查，并把草稿中的英文叙述、对白、歌词或画面文字改写为中文。对白写成 <d>[Chinese] 中文原文</d>，说话人使用全片稳定的 (S1)、(S2)。',
           'integrated_multimodal_description 第一镜写 [Shot 1] 且不带时间；后续镜头写 [Shot N] At MM:SS.mmm。非对白、非画外音的镜内声音统一写为“画面内音效：…”。不得输出其他声音字段前缀或 ⏱ 时长标签。',
         ];
   if (isStoryWan30PromptMode(next))

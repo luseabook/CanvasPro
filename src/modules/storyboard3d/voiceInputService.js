@@ -8,17 +8,17 @@ function collectRecognitionText(key) {
   const finalText = [],
     interimText = [],
     list = key?.['results'] || [],
-    index = Math['max'](0x0, Number(key?.['resultIndex'] || 0x0));
-  for (let result = index; result < list['length']; result += 0x1) {
+    index = Math['max'](0, Number(key?.['resultIndex'] || 0));
+  for (let result = index; result < list['length']; result += 1) {
     const data = list[result],
-      enabled = String(data?.[0x0]?.['transcript'] || '')['trim']();
+      enabled = String(data?.[0]?.['transcript'] || '')['trim']();
     if (!enabled) continue;
     if (data['isFinal']) finalText['push'](enabled);
     else interimText['push'](enabled);
   }
   return {
-    finalText: finalText['join']('\x20')['trim'](),
-    interimText: interimText['join']('\x20')['trim'](),
+    finalText: finalText['join'](' ')['trim'](),
+    interimText: interimText['join'](' ')['trim'](),
   };
 }
 export class Storyboard3DVoiceInputService {
@@ -47,14 +47,14 @@ export class Storyboard3DVoiceInputService {
     return isStoryboard3DVoiceInputSupported(this['window']);
   }
   ['_setState'](state, args = {}) {
-    if (this['state'] === state && Object['keys'](args)['length'] === 0x0) return;
+    if (this['state'] === state && Object['keys'](args)['length'] === 0) return;
     ((this['state'] = state), this['onStateChange']?.({ state: state, ...args }));
   }
   ['_bindRecognition'](options) {
     ((options['lang'] = this['lang']),
       (options['continuous'] = this['continuous']),
       (options['interimResults'] = this['interimResults']),
-      (options['maxAlternatives'] = 0x1),
+      (options['maxAlternatives'] = 1),
       (options['onstart'] = () => {
         ((this['_stopping'] = ![]), this['_setState']('listening'));
       }),
@@ -64,10 +64,10 @@ export class Storyboard3DVoiceInputService {
         finalText2 &&
           (this['finalTranscript'] = [this['finalTranscript'], finalText2]
             ['filter'](Boolean)
-            ['join']('\x20'));
+            ['join'](' '));
         const transcript = [this['finalTranscript'], interimText2]
           ['filter'](Boolean)
-          ['join']('\x20')
+          ['join'](' ')
           ['trim']();
         this['onTranscript']?.({
           transcript: transcript,

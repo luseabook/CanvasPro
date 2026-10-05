@@ -18,7 +18,7 @@ import {
 } from '../src/domain/storyGeneration/videoReplicationAsrEvidence.js';
 export async function analyzeVideoReplicationClip({
   videoRef: videoRef = '',
-  durationSec: durationSec = 0x0,
+  durationSec: durationSec = 0,
   modelId: modelId = VIDEO_REPLICATION_PROMPT_MODEL_ID,
   provider: provider = '',
   providerProfileId: providerProfileId = '',
@@ -72,8 +72,8 @@ export async function analyzeVideoReplicationClip({
         structuredOutput: structuredOutput,
         thinking: { type: 'disabled' },
         temperature: 0.2,
-        maxOutputTokens: 0x4000,
-        timeoutMs: 0x5 * 0x3c * 0x3e8,
+        maxOutputTokens: 16384,
+        timeoutMs: 5 * 60 * 1000,
       },
       handler2 = (requestPayload, attempt) =>
         invokeStoryGenerationRequest({
@@ -82,7 +82,7 @@ export async function analyzeVideoReplicationClip({
           stepId: 'replication-source-analysis',
           attempt: attempt,
         });
-    let response2 = await handler2(args, 0x1);
+    let response2 = await handler2(args, 1);
     if (!isActive()) throw new Error('视频分析所属项目已失效。');
     try {
       sourceAnalysis = handler(response2);
@@ -92,25 +92,25 @@ export async function analyzeVideoReplicationClip({
         (response2 = await handler2(
           {
             ...args,
-            temperature: 0x0,
+            temperature: 0,
             prompt: [
               args['prompt'],
               '上次校验失败：' + error['message'],
-              '重新核对所附原视频；视频总长为\x20' +
+              '重新核对所附原视频；视频总长为 ' +
                 durationSec +
                 ' 秒，时间全部使用绝对秒数，必须满足 0 <= startSec < endSec <= ' +
                 durationSec +
                 '，人物代表帧也必须在视频内。1分52秒是112秒，不是152秒。',
-              '这是唯一一次纠正。保留全部实际观察到的剧情、人物与逐句人声，不通过删除事件或人声来逃避校验；核对并修正无效编号、时间、镜头边界、人声先后及镜头引用和缺失的角色外观提示词，visualPrompt\x20使用简体中文。',
+              '这是唯一一次纠正。保留全部实际观察到的剧情、人物与逐句人声，不通过删除事件或人声来逃避校验；核对并修正无效编号、时间、镜头边界、人声先后及镜头引用和缺失的角色外观提示词，visualPrompt 使用简体中文。',
               speechEvidence
                 ? '回看缺失时段及声音关联疑点，纠正画面、切点、人物归属和 speechAssignments；ASR 原文和时间由程序保留，不转写或纠正台词。分类依据不足时保留 uncertain，不假称听到了视频原声。'
                 : '本次回听并优先核对报错事件的人声接缝、声音类型、speechOrder 和对应切点；上次响应只是待核对记录，不是证据。若通话画面确实只有解说，在 uncertainties 说明，不凭动作强造对白。',
               '<rejected_response>',
               typeof response2 === 'string' ? response2 : String(response2?.['text'] || ''),
               '</rejected_response>',
-            ]['join']('\x0a'),
+            ]['join']('\n'),
           },
-          0x2,
+          2,
         )));
       if (!isActive()) throw new Error('视频分析所属项目已失效。');
       sourceAnalysis = handler(response2);
@@ -118,8 +118,8 @@ export async function analyzeVideoReplicationClip({
     const list = getReplicationSourceSpeechReviewReasons(sourceAnalysis, { durationSec: durationSec });
     (list['length'] &&
       sourceAnalysis['events']['length'] &&
-      (sourceAnalysis['events'][0x0]['uncertainties'] = [
-        ...new Set([...sourceAnalysis['events'][0x0]['uncertainties'], ...list]),
+      (sourceAnalysis['events'][0]['uncertainties'] = [
+        ...new Set([...sourceAnalysis['events'][0]['uncertainties'], ...list]),
       ]),
       await onSourceAnalysis?.(sourceAnalysis));
   }

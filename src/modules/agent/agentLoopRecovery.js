@@ -22,35 +22,35 @@ export function isAgentLoopRecoveryEditMessage(index = '') {
 }
 export function shouldRetryAgentLoopNoop({
   hasActionIntent: hasActionIntent = ![],
-  toolResultCount: toolResultCount = 0x0,
-  retryCount: retryCount = 0x0,
+  toolResultCount: toolResultCount = 0,
+  retryCount: retryCount = 0,
   status: status = '',
 } = {}) {
   return (
     hasActionIntent === !![] &&
-    Number(toolResultCount || 0x0) === 0x0 &&
-    Number(retryCount || 0x0) < 0x1 &&
+    Number(toolResultCount || 0) === 0 &&
+    Number(retryCount || 0) < 1 &&
     String(status || '') !== 'chat'
   );
 }
 export function createAgentLoopActionBudget(options = '') {
-  return { duplicateNodeLimit: extractAgentDuplicateCountHint(options) || 0x0, duplicatedNodeCount: 0x0 };
+  return { duplicateNodeLimit: extractAgentDuplicateCountHint(options) || 0, duplicatedNodeCount: 0 };
 }
 function getPlannedDuplicateNodeCount(options2 = {}) {
-  if (String(options2['type'] || '') !== 'node.duplicate') return 0x0;
+  if (String(options2['type'] || '') !== 'node.duplicate') return 0;
   const target =
-      Array['isArray'](options2['args']?.['ids']) && options2['args']['ids']['length'] > 0x0
+      Array['isArray'](options2['args']?.['ids']) && options2['args']['ids']['length'] > 0
         ? options2['args']['ids']['length']
-        : 0x1,
-    source = Math['max'](0x1, Math['trunc'](Number(options2['args']?.['copies'] || 0x1)));
+        : 1,
+    source = Math['max'](1, Math['trunc'](Number(options2['args']?.['copies'] || 1)));
   return target * source;
 }
 export function validateAgentLoopActionBudget(options3 = {}, next = {}) {
-  const limit = Math['max'](0x0, Math['trunc'](Number(next['duplicateNodeLimit'] || 0x0)));
-  if (String(options3['type'] || '') !== 'node.duplicate' || limit === 0x0) return { ok: !![] };
-  const completed = Math['max'](0x0, Math['trunc'](Number(next['duplicatedNodeCount'] || 0x0))),
+  const limit = Math['max'](0, Math['trunc'](Number(next['duplicateNodeLimit'] || 0)));
+  if (String(options3['type'] || '') !== 'node.duplicate' || limit === 0) return { ok: !![] };
+  const completed = Math['max'](0, Math['trunc'](Number(next['duplicatedNodeCount'] || 0))),
     planned = getPlannedDuplicateNodeCount(options3),
-    remaining = Math['max'](0x0, limit - completed);
+    remaining = Math['max'](0, limit - completed);
   if (planned <= remaining) return { ok: !![], planned: planned, remaining: remaining };
   return {
     ok: ![],
@@ -63,7 +63,7 @@ export function validateAgentLoopActionBudget(options3 = {}, next = {}) {
 }
 export function recordAgentLoopActionBudgetResult(args = {}, current = {}, response = {}) {
   if (String(current['type'] || '') !== 'node.duplicate' || response['ok'] !== !![]) return args;
-  const entry = Array['isArray'](response['results']) ? response['results']['at'](-0x1) : null,
+  const entry = Array['isArray'](response['results']) ? response['results']['at'](-1) : null,
     record = entry?.['result'] || {},
     list = Array['isArray'](record['nodeIds'])
       ? record['nodeIds']
@@ -73,6 +73,6 @@ export function recordAgentLoopActionBudgetResult(args = {}, current = {}, respo
   return {
     ...args,
     duplicatedNodeCount:
-      Math['max'](0x0, Math['trunc'](Number(args['duplicatedNodeCount'] || 0x0))) + list['length'],
+      Math['max'](0, Math['trunc'](Number(args['duplicatedNodeCount'] || 0))) + list['length'],
   };
 }

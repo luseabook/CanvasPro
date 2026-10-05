@@ -4,7 +4,7 @@ export function createContextMenuIcon(
   iconId,
   {
     documentObject: documentObject = globalThis['document'],
-    size: size = 0x12,
+    size: size = 18,
     stroke: stroke = 'currentColor',
   } = {},
 ) {

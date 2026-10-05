@@ -484,7 +484,7 @@ function createButtonEvent(target2) {
             type: 'storyboard',
             cols: 2,
             rows: 2,
-            width: 0x12c,
+            width: 300,
             height: 200,
             gridGap: gridGap.gap,
             cells: [
@@ -501,9 +501,9 @@ function createButtonEvent(target2) {
         storyboardNode2._grid.getBoundingClientRect = () => ({
           left: 0,
           top: 0,
-          right: 0x12c,
+          right: 300,
           bottom: 200,
-          width: 0x12c,
+          width: 300,
           height: 200,
         });
         const value49 = el13.querySelector('.act-split-lines');
@@ -550,7 +550,7 @@ function createButtonEvent(target2) {
           type: 'storyboard',
           cols: 2,
           rows: 2,
-          width: 0x12c,
+          width: 300,
           height: 200,
           gridGap: 80,
           cells: [
@@ -574,9 +574,9 @@ function createButtonEvent(target2) {
       args._grid.getBoundingClientRect = () => ({
         left: 0,
         top: 0,
-        right: 0x12c,
+        right: 300,
         bottom: 200,
-        width: 0x12c,
+        width: 300,
         height: 200,
       });
       const value54 = el15.querySelector('.act-split-lines');
@@ -1270,7 +1270,7 @@ function createButtonEvent(target2) {
           type: 'storyboard',
           cols: 2,
           rows: 2,
-          width: 0x12c,
+          width: 300,
           height: 200,
           gridGap: 20,
           gridLayout: { columns: [1.5, 0.5], rows: [0.5, 1.5] },
@@ -1282,7 +1282,7 @@ function createButtonEvent(target2) {
               id: 'cell-3',
               isEmpty: true,
               residualImageLocalPath: 'output/source.png',
-              residualImageWidth: 0x12c,
+              residualImageWidth: 300,
               residualImageHeight: 200,
               residualImageMode: 'source',
             },
@@ -1322,8 +1322,8 @@ function createButtonEvent(target2) {
           type: 'storyboard',
           cols: 3,
           rows: 3,
-          width: 0x12c,
-          height: 0x12c,
+          width: 300,
+          height: 300,
           gridGap: 80,
           cells: [
             { id: 'cell-0', url: '', isEmpty: true },
@@ -1567,8 +1567,8 @@ function createButtonEvent(target2) {
         id: 'cell-center',
         localPath: 'output/tile-4.png',
         sourceLocalPath: 'output/source.png',
-        sourceWidth: 0x12c,
-        sourceHeight: 0x12c,
+        sourceWidth: 300,
+        sourceHeight: 300,
         isEmpty: false,
       }),
         (storyboardNode17 = new StoryboardNode({
@@ -1576,8 +1576,8 @@ function createButtonEvent(target2) {
           type: 'storyboard',
           cols: 3,
           rows: 3,
-          width: 0x12c,
-          height: 0x12c,
+          width: 300,
+          height: 300,
           cells: cells4,
         })));
       const el56 = storyboardNode17.mount();
@@ -1693,8 +1693,8 @@ function createButtonEvent(target2) {
         id: 'cell-center',
         localPath: 'output/tile-4.png',
         sourceLocalPath: 'output/source.png',
-        sourceWidth: 0x12c,
-        sourceHeight: 0x12c,
+        sourceWidth: 300,
+        sourceHeight: 300,
         isEmpty: false,
       };
       const args6 = new StoryboardNode({
@@ -1702,8 +1702,8 @@ function createButtonEvent(target2) {
           type: 'storyboard',
           cols: 3,
           rows: 3,
-          width: 0x12c,
-          height: 0x12c,
+          width: 300,
+          height: 300,
           gridGap: 80,
           isEditing: false,
           cells: cells6,
@@ -1761,8 +1761,8 @@ function createButtonEvent(target2) {
               capturePreviewUrl: 'data:image/jpeg;base64,current-piece',
               sourceLocalPath: 'output/source.png',
               sourceUrl: '/output/source.png',
-              sourceWidth: 0x12c,
-              sourceHeight: 0x12c,
+              sourceWidth: 300,
+              sourceHeight: 300,
               storyboardSourceCrop: true,
               isEmpty: false,
             },
@@ -1810,8 +1810,8 @@ function createButtonEvent(target2) {
               capturePreviewUrl: 'data:image/jpeg;base64,current-piece',
               sourceLocalPath: 'output/source.png',
               sourceUrl: '/output/source.png',
-              sourceWidth: 0x12c,
-              sourceHeight: 0x12c,
+              sourceWidth: 300,
+              sourceHeight: 300,
               storyboardSourceCrop: true,
               isEmpty: false,
             },

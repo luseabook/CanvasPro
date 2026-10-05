@@ -33,7 +33,7 @@ export function createNodeFieldSubscriptions(handler) {
     },
     subscribe(enabled, handler2) {
       if (typeof enabled !== 'string' || !enabled || typeof handler2 !== 'function')
-        throw new TypeError('Expected\x20a\x20node\x20field\x20and\x20listener');
+        throw new TypeError('Expected a node field and listener');
       let map5 = map['get'](enabled);
       return (
         !map5 &&

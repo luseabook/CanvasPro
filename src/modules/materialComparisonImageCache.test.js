@@ -27,7 +27,7 @@ function createHarness(options = {}) {
   const cancelled = [];
   let current = 1000;
   const cache = createComparisonImageCache({
-    maxBytes: options.maxBytes === undefined ? 0x100 * 0x400 * 0x400 : options.maxBytes,
+    maxBytes: options.maxBytes === undefined ? 256 * 1024 * 1024 : options.maxBytes,
     maxEntries: options.maxEntries === undefined ? 4 : options.maxEntries,
     ttlMs: options.ttlMs === undefined ? 100 : options.ttlMs,
     now: () => current,

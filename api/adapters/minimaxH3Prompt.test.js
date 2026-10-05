@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { translateMinimaxH3EditorAssetMentions } from './minimaxH3Prompt.js';
 
 test('minimaxH3Prompt: translates supported asset mentions', () => {
-  const input = '@\u56fe\u72471 @\u56fe\u50cf2 @\u89c6\u98913 @\u58f0\u97f34 @\u97f3\u98915 plain';
+  const input = '@图片1 @图像2 @视频3 @声音4 @音频5 plain';
 
   assert.equal(
     translateMinimaxH3EditorAssetMentions(input),

@@ -1,5 +1,5 @@
 import { createMentionMenuItem, positionMentionMenu } from './mentionMenu.js';
-let nextMenuId = 0x0;
+let nextMenuId = 0;
 export function bindTextareaMentions({
   input: input,
   trigger: trigger,
@@ -22,15 +22,15 @@ export function bindTextareaMentions({
     el['setAttribute']('aria-hidden', 'true'),
     document['body']['append'](el));
   let value = null,
-    item = 0x0,
+    item = 0,
     key = '',
     list = [],
     list2 = [],
-    index = 0x0,
-    requestAnimationFrame2 = 0x0;
+    index = 0,
+    requestAnimationFrame2 = 0;
   const run = () => !menu['hidden'];
   function run2() {
-    (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = 0x0));
+    (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = 0));
     if (menu['matches'](':popover-open')) menu['hidePopover']();
     ((menu['hidden'] = !![]),
       (menu['style']['display'] = 'none'),
@@ -62,11 +62,11 @@ export function bindTextareaMentions({
     ])
       el['style'][result] = computedStyle[result];
     ((el['style']['width'] = box['width'] + 'px'),
-      (el['textContent'] = input['value']['slice'](0x0, value ?? item)));
+      (el['textContent'] = input['value']['slice'](0, value ?? item)));
     const el2 = document['createElement']('span');
     ((el2['textContent'] = input['value']['slice'](value ?? item) || '​'), el['append'](el2));
     const data = document['createRange']();
-    (data['setStart'](el2['firstChild'], 0x0), data['setEnd'](el2['firstChild'], 0x0));
+    (data['setStart'](el2['firstChild'], 0), data['setEnd'](el2['firstChild'], 0));
     const options = data['getBoundingClientRect'](),
       box2 = el['getBoundingClientRect'](),
       target = Math['max'](
@@ -80,7 +80,7 @@ export function bindTextareaMentions({
     return {
       left: source,
       anchorTop: target,
-      top: target + (options['height'] || parseFloat(computedStyle['lineHeight']) || 0x14) + 0x5,
+      top: target + (options['height'] || parseFloat(computedStyle['lineHeight']) || 20) + 5,
     };
   }
   function run4() {
@@ -89,7 +89,7 @@ export function bindTextareaMentions({
     (positionMentionMenu(menu, run3()), (requestAnimationFrame2 = requestAnimationFrame(run4)));
   }
   function run5(next, current = ![]) {
-    ((index = Math['max'](0x0, Math['min'](next, list2['length'] - 0x1))),
+    ((index = Math['max'](0, Math['min'](next, list2['length'] - 1))),
       list2['forEach']((entry, record) => {
         (entry['classList']['toggle']('active', record === index),
           entry['classList']['toggle']('at-mention-keyboard-active', record === index),
@@ -116,7 +116,7 @@ export function bindTextareaMentions({
         (item2['appendChild'](copyEl),
           (item2['id'] = menu['id'] + '-' + output),
           item2['setAttribute']('role', optionRole),
-          (item2['tabIndex'] = -0x1));
+          (item2['tabIndex'] = -1));
         if (scope['visual']) {
           const el3 = document['createElement']('span');
           ((el3['className'] = 'at-mention-visual'),
@@ -140,7 +140,7 @@ export function bindTextareaMentions({
     ((menu['hidden'] = ![]), (menu['style']['display'] = 'flex'));
     if (!menu['matches'](':popover-open')) menu['showPopover']();
     (trigger['setAttribute']('aria-expanded', 'true'),
-      run5(0x0),
+      run5(0),
       cancelAnimationFrame(requestAnimationFrame2),
       run4());
   }
@@ -150,8 +150,8 @@ export function bindTextareaMentions({
       return;
     }
     item = input['selectionStart'];
-    const value5 = input['value']['slice'](0x0, item)['match'](/[@＠]([^@＠\s]*)$/);
-    if (value5 && item === input['selectionEnd']) ((value = item - value5[0x0]['length']), run7(value5[0x1]));
+    const value5 = input['value']['slice'](0, item)['match'](/[@＠]([^@＠\s]*)$/);
+    if (value5 && item === input['selectionEnd']) ((value = item - value5[0]['length']), run7(value5[1]));
     else run2();
   }
   function run9(event) {
@@ -163,8 +163,8 @@ export function bindTextareaMentions({
         if (event['key'] === 'Enter') run6(index);
         else
           run5(
-            (index + (event['key'] === 'ArrowDown' ? 0x1 : -0x1) + list2['length']) %
-              (list2['length'] || 0x1),
+            (index + (event['key'] === 'ArrowDown' ? 1 : -1) + list2['length']) %
+              (list2['length'] || 1),
             !![],
           );
       }

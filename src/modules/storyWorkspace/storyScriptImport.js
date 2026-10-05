@@ -10,36 +10,36 @@ function normalizeText(value) {
   return String(value || '')['trim']();
 }
 function normalizeFullWidthDigits(item) {
-  return String(item || '')['replace'](/[０-９]/g, (key) => String(key['charCodeAt'](0x0) - 0xff10));
+  return String(item || '')['replace'](/[０-９]/g, (key) => String(key['charCodeAt'](0) - 65296));
 }
 function parseChineseNumber(index) {
   const fullWidthDigits = normalizeFullWidthDigits(index);
   if (/^\d+$/['test'](fullWidthDigits)) return Number(fullWidthDigits);
   const result = {
-      零: 0x0,
-      〇: 0x0,
-      一: 0x1,
-      二: 0x2,
-      两: 0x2,
-      三: 0x3,
-      四: 0x4,
-      五: 0x5,
-      六: 0x6,
-      七: 0x7,
-      八: 0x8,
-      九: 0x9,
+      零: 0,
+      〇: 0,
+      一: 1,
+      二: 2,
+      两: 2,
+      三: 3,
+      四: 4,
+      五: 5,
+      六: 6,
+      七: 7,
+      八: 8,
+      九: 9,
     },
-    data = { 十: 0xa, 百: 0x64, 千: 0x3e8 };
-  let options = 0x0,
-    target = 0x0;
+    data = { 十: 10, 百: 100, 千: 1000 };
+  let options = 0,
+    target = 0;
   for (const source of fullWidthDigits) {
     if (Object['prototype']['hasOwnProperty']['call'](result, source)) {
       target = result[source];
       continue;
     }
     const enabled = data[source];
-    if (!enabled) return 0x0;
-    ((options += (target || 0x1) * enabled), (target = 0x0));
+    if (!enabled) return 0;
+    ((options += (target || 1) * enabled), (target = 0));
   }
   return options + target;
 }
@@ -59,9 +59,9 @@ function findUploadedEpisodeHeadings(current) {
     (list['push']({
       index: index2['index'],
       endIndex: endIndex['lastIndex'],
-      numberToken: index2[0x1] || index2[0x2] || '',
-      title: normalizeText(index2[0x3]),
-      heading: normalizeText(index2[0x0]),
+      numberToken: index2[1] || index2[2] || '',
+      title: normalizeText(index2[3]),
+      heading: normalizeText(index2[0]),
     }),
       (index2 = endIndex['exec'](current)));
   }
@@ -75,14 +75,14 @@ function deriveUploadedStoryTitle(entry, record, payload) {
         ['split'](/\r?\n/u)
         ['map'](normalizeText)
         ['find'](Boolean) || '',
-    handle = payload[0x0];
-  if (args && args !== handle?.['heading'] && [...args]['length'] <= 0x50)
+    handle = payload[0];
+  if (args && args !== handle?.['heading'] && [...args]['length'] <= 80)
     return args['replace'](/^[《〈【】“”"']+|[《〈【】“”"']+$/gu, '')['trim']();
   return handle?.['title'] || '未命名剧本';
 }
 function isUploadedSceneHeading(state) {
   const args2 = normalizeText(state)['replace'](/^#{1,6}\s*/u, '');
-  if (!args2 || [...args2]['length'] > 0x78) return ![];
+  if (!args2 || [...args2]['length'] > 120) return ![];
   return (
     UPLOADED_FOUNTAIN_SCENE_HEADING_PATTERN['test'](args2) ||
     UPLOADED_NUMBERED_SCENE_HEADING_PATTERN['test'](args2) ||
@@ -99,7 +99,7 @@ function extractUploadedSceneCharacters(list2 = []) {
   const list3 = [],
     handler = (scope) => {
       const args3 = normalizeUploadedCharacterCue(scope);
-      if (!args3 || [...args3]['length'] > 0x18) return;
+      if (!args3 || [...args3]['length'] > 24) return;
       if (/^(?:旁白|画外音|VO|V\.O\.?|OS|O\.S\.?)$/iu['test'](args3)) return;
       if (!list3['includes'](args3)) list3['push'](args3);
     };
@@ -110,17 +110,17 @@ function extractUploadedSceneCharacters(list2 = []) {
           /^(?:【)?([\p{Script=Han}A-Za-z][\p{Script=Han}A-Za-z0-9·•._-]{0,23})(?:】)?(?:\s*[（(][^（）()\r\n]{0,40}[）)])?\s*[:：]/u,
         );
       if (output) {
-        handler(output[0x1]);
+        handler(output[1]);
         return;
       }
       const value2 = text2['match'](/^@([^\r\n]{1,40})$/u);
       if (value2) {
-        handler(value2[0x1]);
+        handler(value2[1]);
         return;
       }
       const uploadedCharacterCue = normalizeUploadedCharacterCue(text2),
-        value3 = count === 0x0 || !normalizeText(list2[count - 0x1]),
-        value4 = count + 0x1 < list2['length'] && Boolean(normalizeText(list2[count + 0x1]));
+        value3 = count === 0 || !normalizeText(list2[count - 1]),
+        value4 = count + 1 < list2['length'] && Boolean(normalizeText(list2[count + 1]));
       if (value3 && value4 && /^[A-Z][A-Z0-9 ._'\-]{0,39}$/u['test'](uploadedCharacterCue))
         handler(uploadedCharacterCue);
     }),
@@ -150,20 +150,20 @@ export function parseUploadedStoryEpisodeScenes({
       },
     ];
   return list5['map']((value7, value8) => {
-    const value9 = list5[value8 + 0x1] ?? list4['length'],
-      body2 = list4['slice'](value7 + 0x1, value9);
+    const value9 = list5[value8 + 1] ?? list4['length'],
+      body2 = list4['slice'](value7 + 1, value9);
     return {
-      ref: episodeRef + '-scene-' + (value8 + 0x1),
+      ref: episodeRef + '-scene-' + (value8 + 1),
       heading: normalizeText(list4[value7])['replace'](/^#{1,6}\s*/u, ''),
       characters: extractUploadedSceneCharacters(body2),
-      body: body2['join']('\x0a')['trim'](),
+      body: body2['join']('\n')['trim'](),
       source: 'upload-structured',
     };
   })['filter']((dom) => dom['heading'] && dom['body']);
 }
 function createUploadedEpisode({ fullText: fullText2, number: number, title: title, index: index3 }) {
-  const episodeRef2 = 'episode-' + (index3 + 0x1),
-    fallbackHeading2 = normalizeText(title) || '第\x20' + number + '\x20集',
+  const episodeRef2 = 'episode-' + (index3 + 1),
+    fallbackHeading2 = normalizeText(title) || '第 ' + number + ' 集',
     scenes = parseUploadedStoryEpisodeScenes({
       fullText: fullText2,
       episodeRef: episodeRef2,
@@ -181,17 +181,17 @@ function createUploadedEpisode({ fullText: fullText2, number: number, title: tit
     assetIds: [],
     scriptStatus: 'completed',
     script: {
-      schemaVersion: 0x1,
+      schemaVersion: 1,
       source: 'upload',
       episodeRef: episodeRef2,
       scenes: scenes,
       fullText: fullText2,
     },
     clips: [],
-    clipCount: 0x0,
-    characterCount: 0x0,
-    sceneCount: 0x0,
-    propCount: 0x0,
+    clipCount: 0,
+    characterCount: 0,
+    sceneCount: 0,
+    propCount: 0,
     duration: '--:--',
     status: '待拆分',
   };
@@ -202,21 +202,21 @@ export function parseUploadedStoryScript({ sourceText: sourceText = '', fileName
   const list6 = findUploadedEpisodeHeadings(fullText3),
     list7 = list6['length']
       ? list6['map']((title2, count2) => {
-          const value10 = count2 === 0x0 ? 0x0 : title2['index'],
-            value11 = list6[count2 + 0x1]?.['index'] ?? fullText3['length'];
+          const value10 = count2 === 0 ? 0 : title2['index'],
+            value11 = list6[count2 + 1]?.['index'] ?? fullText3['length'];
           return {
             fullText: fullText3['slice'](value10, value11)['trim'](),
-            number: parseChineseNumber(title2['numberToken']) || count2 + 0x1,
+            number: parseChineseNumber(title2['numberToken']) || count2 + 1,
             title: title2['title'],
           };
         })
-      : [{ fullText: fullText3, number: 0x1, title: '' }],
+      : [{ fullText: fullText3, number: 1, title: '' }],
     title3 = deriveUploadedStoryTitle(fileName, fullText3, list6),
     episodes = list7['filter']((value12) => value12['fullText'])['map']((title4, index4) =>
       createUploadedEpisode({
         ...title4,
         index: index4,
-        title: title4['title'] || (list7['length'] === 0x1 ? title3 : ''),
+        title: title4['title'] || (list7['length'] === 1 ? title3 : ''),
       }),
     );
   if (!episodes['length']) throw new Error('剧本中没有可导入的正文。');
@@ -226,7 +226,7 @@ export function parseUploadedStoryScript({ sourceText: sourceText = '', fileName
     episodes: episodes,
     chapters: episodes['map']((id) => ({
       id: id['id'],
-      title: '第\x20' + id['number'] + ' 集：' + id['title'],
+      title: '第 ' + id['number'] + ' 集：' + id['title'],
       content: id['script']['fullText'],
     })),
   };

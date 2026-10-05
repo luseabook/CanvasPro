@@ -6,14 +6,14 @@ export function readPersonReplacementVideoPromptEditor(el) {
   if (el['matches']?.('[contenteditable="true"]')) {
     if (typeof el['innerText'] === 'string') return el['innerText'];
     return String(el['innerHTML'] || el['textContent'] || '')
-      ['replace'](/<br\b[^>]*\/?>/giu, '\x0a')
-      ['replace'](/<\/(?:div|p|section|article|blockquote|li)>/giu, '\x0a')
+      ['replace'](/<br\b[^>]*\/?>/giu, '\n')
+      ['replace'](/<\/(?:div|p|section|article|blockquote|li)>/giu, '\n')
       ['replace'](/<[^>]+>/gu, '')
-      ['replace'](/&nbsp;/giu, '\x20')
+      ['replace'](/&nbsp;/giu, ' ')
       ['replace'](/&lt;/giu, '<')
       ['replace'](/&gt;/giu, '>')
-      ['replace'](/&quot;/giu, '\x22')
-      ['replace'](/&#39;|&apos;/giu, '\x27')
+      ['replace'](/&quot;/giu, '"')
+      ['replace'](/&#39;|&apos;/giu, '\'')
       ['replace'](/&amp;/giu, '&');
   }
   return String(el['value'] || '');

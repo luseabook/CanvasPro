@@ -565,7 +565,7 @@ const TITLE_DRAG_ACTIVATE_THRESHOLD_PX = 5,
   HEAVY_EDGE_DRAG_MIN_ZOOM = 0.24,
   HEAVY_EDGE_DRAG_MAX_ZOOM = 0.48,
   HEAVY_EDGE_DRAG_MIN_EDGES = 3,
-  HEAVY_EDGE_DRAG_SUPPRESS_LIVE_PAINT_EDGES = 0x190,
+  HEAVY_EDGE_DRAG_SUPPRESS_LIVE_PAINT_EDGES = 400,
   DRAG_SNAP_GUIDE_NODE_LIMIT = 160,
   DRAG_EDGE_SCREEN_EPSILON_PX = 6,
   EDGE_INTERACTION_LITE_CLASS = 'is-edge-interaction-lite',
@@ -713,7 +713,7 @@ function _collectDraggedEdgeUpdates(value79) {
         value85 = value82 ? box9.y + pendingDy : box9.y,
         value86 = value83 ? box10.x + pendingDx : box10.x,
         value87 = value83 ? box10.y + pendingDy : box10.y,
-        value88 = value84 + (box9.width || 0x104),
+        value88 = value84 + (box9.width || 260),
         value89 = value85 + (box9.height || 100) / 2,
         value90 = value86,
         value91 = value87 + (box10.height || 100) / 2;
@@ -984,7 +984,7 @@ function _waitForCollageItemImage(value132, value133, enabled27, handler4) {
     return;
   }
   const value134 = performance.now(),
-    value135 = 0x708,
+    value135 = 1800,
     value136 = () => {
       const value137 = typeof window !== 'undefined' ? window.v2Renderer?.nodeInstances?.get(value132) : null,
         el3 = value137?.el || document,
@@ -1007,7 +1007,7 @@ function _waitForCollageItemImage(value132, value133, enabled27, handler4) {
 }
 function _fadeOutGhost(el5, value140 = 160) {
   if (!el5) return;
-  const value141 = 'opacity ' + value140 / 0x3e8 + 's cubic-bezier(0.4, 0, 0.2, 1)',
+  const value141 = 'opacity ' + value140 / 1000 + 's cubic-bezier(0.4, 0, 0.2, 1)',
     value142 = String(el5.style.transition || '').trim();
   ((el5.style.transition = value142 && value142 !== 'none' ? value142 + ', ' + value141 : value141),
     (el5.style.opacity = '0'),
@@ -1617,7 +1617,7 @@ export function createDragController({
           count8++;
           const value244 = box18.x + (targetSet3.has(item9) ? dragNodeId.pendingDx : 0),
             value245 = box18.y + (targetSet3.has(item9) ? dragNodeId.pendingDy : 0),
-            value246 = box18.width || 0x104,
+            value246 = box18.width || 260,
             value247 = box18.height || 100,
             value248 = box18.type !== 'group' ? value245 - 30 : value245;
           ((value240 = Math.min(value240, value244)),
@@ -1772,7 +1772,7 @@ export function createDragController({
             );
         if (el21 && id4) {
           const value264 = performance.now(),
-            value265 = 0x640,
+            value265 = 1600,
             value266 = () => {
               const el22 = _getNodeWrapperEl(id4),
                 value267 = el22 ? el22.querySelector('img') : null;

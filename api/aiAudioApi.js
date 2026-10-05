@@ -9,8 +9,8 @@ import {
   RH_AUDIO_SEPARATION_MODEL_ID,
   resolveModelExecution,
 } from '../src/manifests/index.js';
-const POLL_MAX_COUNT = 0x1c2,
-  POLL_INTERVAL_MS = 0x7d0;
+const POLL_MAX_COUNT = 450,
+  POLL_INTERVAL_MS = 2000;
 export async function cancelRunningHubAudioTask({ apiKey: apiKey, taskId: taskId } = {}) {
   return cancelRunningHubTask({ apiKey: apiKey, taskId: taskId });
 }
@@ -434,7 +434,7 @@ async function pollRunningHubAudioTask(taskId2, apiKey4, signal = {}) {
         url: '/api/v2/proxy/image',
         method: 'POST',
         provider: 'runninghubwf',
-        timeout: 0x7530,
+        timeout: 30000,
         signal: signal?.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -447,7 +447,7 @@ async function pollRunningHubAudioTask(taskId2, apiKey4, signal = {}) {
       responseData = parseResponseData(requester2),
       count = Number(responseData?.code);
     if (Number.isFinite(count)) {
-      if (count === 0x324 || count === 0x32d) continue;
+      if (count === 804 || count === 813) continue;
       if (count !== 0) throw new Error(getApiErrorMessage(responseData, '音频任务轮询失败'));
     }
     const response10 =
@@ -507,7 +507,7 @@ export async function runAudioSeparation(options2 = {}, signal2 = {}) {
       url: url2.url,
       method: 'POST',
       provider: 'runninghubwf',
-      timeout: 0x1d4c0,
+      timeout: 120000,
       signal: signal2?.signal,
       headers: url2.headers || { 'Content-Type': 'application/json' },
       body: JSON.stringify(url2.body),
@@ -544,7 +544,7 @@ export async function generateAudio(value25, signal3 = {}) {
       url: url3.url,
       method: 'POST',
       provider: 'runninghubwf',
-      timeout: 0x1d4c0,
+      timeout: 120000,
       signal: signal3?.signal,
       headers: url3.headers || { 'Content-Type': 'application/json' },
       body: JSON.stringify(url3.body),

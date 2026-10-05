@@ -36,14 +36,14 @@ export function buildPersonReplacementVideoRequest({
       generationParams: currentProject['settings']['replacementVideoGenerationParams'],
     }),
     generationParams = {
-      rhVideoResolution: 0x400,
-      rhVideoFrames: 0x0,
-      rhScail2PersonCount: rhScail2PersonCount ? 0x1 : Math['max'](0x1, item),
+      rhVideoResolution: 1024,
+      rhVideoFrames: 0,
+      rhScail2PersonCount: rhScail2PersonCount ? 1 : Math['max'](1, item),
       rhScailDetectPrompt: 'person',
       ...buildModelUiSchemaDefaultParams(modelId),
       ...args['generationParams'],
       rhVideoFps: resolvePersonReplacementVideoGenerationFps(currentProject['settings']),
-      ...(rhScail2PersonCount ? { rhScail2PersonCount: 0x1 } : {}),
+      ...(rhScail2PersonCount ? { rhScail2PersonCount: 1 } : {}),
     },
     { payloadPatch: payloadPatch } = buildPersonReplacementVideoSlotPayloadPatch({
       project: currentProject,
@@ -76,8 +76,8 @@ export function buildPersonReplacementVideoRequest({
       modelManifest: resolvedExecution?.['modelManifest'],
       provider: provider,
       model: modelId,
-      sourceWidth: Number(shot['frame']?.['width']) || 0x0,
-      sourceHeight: Number(shot['frame']?.['height']) || 0x0,
+      sourceWidth: Number(shot['frame']?.['width']) || 0,
+      sourceHeight: Number(shot['frame']?.['height']) || 0,
     }),
     index
   );

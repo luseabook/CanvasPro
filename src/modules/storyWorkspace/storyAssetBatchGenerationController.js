@@ -46,7 +46,7 @@ export function createStoryAssetBatchGenerationController({
 } = {}) {
   if (!state || !cancellationRegistry)
     throw new TypeError(
-      'Story\x20asset\x20batch\x20generation\x20requires\x20state\x20and\x20cancellation\x20owners.',
+      'Story asset batch generation requires state and cancellation owners.',
     );
   if (
     typeof createProjectToken !== 'function' ||
@@ -58,7 +58,7 @@ export function createStoryAssetBatchGenerationController({
     typeof requestAppearanceImage !== 'function' ||
     typeof requestVoiceGeneration !== 'function'
   )
-    throw new TypeError('Story\x20asset\x20batch\x20generation\x20requires\x20task\x20adapters.');
+    throw new TypeError('Story asset batch generation requires task adapters.');
   const getActiveTargets = (item, key) => {
       const text = normalizeText(key),
         tasks = getStoryBackgroundTasks(item)['filter'](
@@ -192,7 +192,7 @@ export function createStoryAssetBatchGenerationController({
         ],
         batch = createTaskBatch('asset-generation', {
           total: total['totalTasks'],
-          completed: 0x0,
+          completed: 0,
           pendingAssetIds: pendingAssetIds(),
           pendingAppearanceKeys: [...map3],
           pendingVoiceAssetIds: [...map4],
@@ -209,10 +209,10 @@ export function createStoryAssetBatchGenerationController({
         promptPresetId: state['assetPromptPresetId'],
         scenePromptPresetId: state['sceneAssetPromptPresetId'],
       };
-      let value3 = 0x0,
-        value4 = 0x0,
-        tone = 0x0,
-        completed = 0x0,
+      let value3 = 0,
+        value4 = 0,
+        tone = 0,
+        completed = 0,
         value5 = ![],
         showTaskApiKeyError2 = ![],
         enabled3 = ![],
@@ -226,7 +226,7 @@ export function createStoryAssetBatchGenerationController({
           value7 = pendingAppearanceKeys['length'] + pendingVoiceAssetIds['length'],
           label = cancelRequested
             ? value7
-              ? '已取消后续生成 · 正在完成 ' + value7 + '\x20项'
+              ? '已取消后续生成 · 正在完成 ' + value7 + ' 项'
               : '已取消后续生成'
             : '批量生成 ' + completed + '/' + total['totalTasks'];
         syncTaskBatch(projectToken, batch, {
@@ -252,8 +252,8 @@ export function createStoryAssetBatchGenerationController({
                   appearance3['id'],
                 );
                 if (value5) {
-                  ((tone += 0x1),
-                    (completed += 0x1),
+                  ((tone += 1),
+                    (completed += 1),
                     map3['delete'](storyAssetAppearanceGenerationKey),
                     (appearance3['error'] = '缺少 API Key，已跳过当前形象。'));
                   isProjectTaskCurrent(projectToken) &&
@@ -275,17 +275,17 @@ export function createStoryAssetBatchGenerationController({
                     throw new Error('基础形象尚未生成，已跳过当前形象。');
                   await requestAppearanceImage(asset5, appearance3, value2);
                   if (!isProjectTaskLive(projectToken)) return;
-                  value3 += 0x1;
+                  value3 += 1;
                 } catch (error) {
                   if (!isProjectTaskLive(projectToken)) return;
                   ((failed = !![]),
-                    (tone += 0x1),
+                    (tone += 1),
                     (appearance3['error'] =
                       error?.['getUserMessage']?.() || error?.['message'] || '生成失败'),
                     (value5 = value5 || showAssetGenerationError(error, { showFallbackToast: ![] })),
                     (enabled3 = enabled3 || value5));
                 }
-                ((completed += 0x1), map3['delete'](storyAssetAppearanceGenerationKey));
+                ((completed += 1), map3['delete'](storyAssetAppearanceGenerationKey));
                 if (isProjectTaskCurrent(projectToken)) {
                   ((state['batchGeneratingAppearanceKeys'] = state['batchGeneratingAppearanceKeys']['filter'](
                     (value9) => value9 !== storyAssetAppearanceGenerationKey,
@@ -311,7 +311,7 @@ export function createStoryAssetBatchGenerationController({
               if (!isProjectTaskLive(projectToken)) return;
               if (cancellationRegistry['isRequested'](batch['id'])) break;
               if (showTaskApiKeyError2) {
-                ((tone += 0x1), (completed += 0x1), map4['delete'](normalizeText(asset6['id'])));
+                ((tone += 1), (completed += 1), map4['delete'](normalizeText(asset6['id'])));
                 isProjectTaskCurrent(projectToken) &&
                   (state['batchGeneratingVoiceAssetIds'] = state['batchGeneratingVoiceAssetIds']['filter'](
                     (value10) => normalizeText(value10) !== normalizeText(asset6['id']),
@@ -362,10 +362,10 @@ export function createStoryAssetBatchGenerationController({
                 if (isProjectTaskCurrent(projectToken)) stopVoicePreview();
                 replaceStoryCharacterVoiceReference(asset6, enabled6);
                 if (value11) state['characterVoiceEditor']['error'] = '';
-                value4 += 0x1;
+                value4 += 1;
               } catch (error2) {
                 if (!isProjectTaskLive(projectToken)) return;
-                ((tone += 0x1),
+                ((tone += 1),
                   (showTaskApiKeyError2 = showTaskApiKeyError(error2, {
                     provider: modelId?.['provider'],
                     modelId: modelId?.['key'],
@@ -386,7 +386,7 @@ export function createStoryAssetBatchGenerationController({
                 (state['batchGeneratingVoiceAssetIds'] = state['batchGeneratingVoiceAssetIds']['filter'](
                   (value12) => normalizeText(value12) !== normalizeText(asset6['id']),
                 ));
-              ((completed += 0x1), run());
+              ((completed += 1), run());
               if (value11) render();
               else {
                 if (isProjectTaskCurrent(projectToken)) {
@@ -400,7 +400,7 @@ export function createStoryAssetBatchGenerationController({
           },
         ));
       const value13 = cancellationRegistry['isRequested'](batch['id']),
-        value14 = value13 ? map3['size'] + map4['size'] : 0x0;
+        value14 = value13 ? map3['size'] + map4['size'] : 0;
       value13 &&
         syncTaskBatch(projectToken, batch, {
           completed: completed,
@@ -410,7 +410,7 @@ export function createStoryAssetBatchGenerationController({
           pendingAssetIds: [],
           pendingAppearanceKeys: [],
           pendingVoiceAssetIds: [],
-          label: '已取消后续\x20' + value14 + ' 项生成',
+          label: '已取消后续 ' + value14 + ' 项生成',
         });
       cancellationRegistry['clear'](batch['id']);
       if (!isProjectTaskLive(projectToken)) return ![];
@@ -425,7 +425,7 @@ export function createStoryAssetBatchGenerationController({
         render());
       schedulePersistence({ immediate: !![] });
       const value15 = [
-        total['mode'] !== 'voice' ? '图片\x20' + value3 : '',
+        total['mode'] !== 'voice' ? '图片 ' + value3 : '',
         total['mode'] !== 'image' ? '语音 ' + value4 : '',
       ]
         ['filter'](Boolean)
@@ -438,7 +438,7 @@ export function createStoryAssetBatchGenerationController({
               : '已取消后续 ' + value14 + ' 项生成；' + value15 + '。',
             tone ? 'warn' : 'info',
             projectToken,
-            { step: 0x2, assetId: assetId[0x0]?.['id'] },
+            { step: 2, assetId: assetId[0]?.['id'] },
           ),
           !![]
         );
@@ -446,7 +446,7 @@ export function createStoryAssetBatchGenerationController({
         notifyNavigableGenerationComplete(
           tone ? '批量生成完成：' + value15 + '，失败 ' + tone + '。' : '批量生成完成：' + value15 + '。',
           projectToken,
-          { step: 0x2, assetId: assetId[0x0]?.['id'] },
+          { step: 2, assetId: assetId[0]?.['id'] },
           { tone: tone ? 'warn' : 'success', showResultToast: !enabled3 },
         ),
         !![]

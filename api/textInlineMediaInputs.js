@@ -7,10 +7,10 @@ export async function encodeTextMediaInputs(value, item, handler) {
     }
     const enabled = await handler(key);
     let enabled2 = String(enabled['type'] || '')
-      ['split'](';', 0x1)[0x0]
+      ['split'](';', 1)[0]
       ['toLowerCase']();
     if (!enabled2 || enabled2 === 'application/octet-stream') {
-      const index = String(key)['split'](/[?#]/, 0x1)[0x0]['split']('.')['pop']()['toLowerCase']();
+      const index = String(key)['split'](/[?#]/, 1)[0]['split']('.')['pop']()['toLowerCase']();
       enabled2 =
         {
           png: 'image/png',
@@ -32,12 +32,12 @@ export async function encodeTextMediaInputs(value, item, handler) {
     }
     if (!enabled['size'] || !enabled2['startsWith'](item + '/'))
       throw new Error(
-        'Invalid\x20' + item + '\x20input:\x20missing\x20media\x20content\x20or\x20MIME\x20type',
+        'Invalid ' + item + ' input: missing media content or MIME type',
       );
     const list2 = new Uint8Array(await enabled['arrayBuffer']()),
       list3 = [];
-    for (let result = 0x0; result < list2['length']; result += 0x8000) {
-      list3['push'](String['fromCharCode'](...list2['subarray'](result, result + 0x8000)));
+    for (let result = 0; result < list2['length']; result += 32768) {
+      list3['push'](String['fromCharCode'](...list2['subarray'](result, result + 32768)));
     }
     list['push']('data:' + enabled2 + ';base64,' + btoa(list3['join']('')));
   }

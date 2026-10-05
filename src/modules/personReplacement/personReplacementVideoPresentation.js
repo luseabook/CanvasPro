@@ -56,22 +56,22 @@ function resolveVideoResultPosterRef(item, key) {
     : normalizeText(key?.['replacementImageRef'] || key?.['keyframeRef']);
 }
 function buildVideoStageFrameStyle(options = {}) {
-  const index = Math['max'](0x1, Number(options?.['frame']?.['width']) || 0x10),
-    result = Math['max'](0x1, Number(options?.['frame']?.['height']) || 0x9);
+  const index = Math['max'](1, Number(options?.['frame']?.['width']) || 16),
+    result = Math['max'](1, Number(options?.['frame']?.['height']) || 9);
   return (
     '--frame-aspect:' +
     index +
-    '\x20/\x20' +
+    ' / ' +
     result +
     ';' +
     ('--frame-width:' + index + ';--frame-height:' + result)
   );
 }
 export function syncPersonReplacementVideoStageFrame(el) {
-  const count = Math['max'](0x0, Number(el?.['videoWidth']) || 0x0),
-    count2 = Math['max'](0x0, Number(el?.['videoHeight']) || 0x0),
+  const count = Math['max'](0, Number(el?.['videoWidth']) || 0),
+    count2 = Math['max'](0, Number(el?.['videoHeight']) || 0),
     el2 = el?.['closest']?.('[data-person-replacement-video-playback-stage]');
-  if (!(count > 0x0 && count2 > 0x0) || !el2?.['style']) return ![];
+  if (!(count > 0 && count2 > 0) || !el2?.['style']) return ![];
   return (
     el2['style']['setProperty']('--frame-aspect', count + ' / ' + count2),
     el2['style']['setProperty']('--frame-width', String(count)),
@@ -81,13 +81,13 @@ export function syncPersonReplacementVideoStageFrame(el) {
 }
 function normalizeProgress(data) {
   const target = Number(data);
-  if (!Number['isFinite'](target)) return 0x0;
-  return Math['max'](0x0, Math['min'](0x64, target));
+  if (!Number['isFinite'](target)) return 0;
+  return Math['max'](0, Math['min'](100, target));
 }
 function resolveSelectedShot(options2 = {}, source = '') {
   const list = Array['isArray'](options2?.['shots']) ? options2['shots'] : [],
     text2 = normalizeText(source || options2?.['workspace']?.['selectedShotId']);
-  return list['find']((next) => normalizeText(next?.['id']) === text2) || list[0x0] || null;
+  return list['find']((next) => normalizeText(next?.['id']) === text2) || list[0] || null;
 }
 function buildPreparationPresentation(current, entry, record, enabled) {
   const payload = current?.['workspace']?.['videoPreparation'],
@@ -215,7 +215,7 @@ export function buildPersonReplacementVideoPresentation(options3 = {}, { shotId:
       activeResult: activeResult,
       activeResultRef: resultRef,
       count: results['length'],
-      hasMultipleResults: results['length'] > 0x1,
+      hasMultipleResults: results['length'] > 1,
     },
     media: media,
     eligibility: buildGenerationEligibility({
@@ -233,8 +233,8 @@ function escapeHtml(scope) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeMediaUrl(input) {
   const text3 = normalizeText(input);
@@ -252,15 +252,15 @@ function renderVideoInputModeControl(output) {
       ? '替换首帧：从左侧选择图像替换结果，作为生成视频的参考首帧。点击切换为人物参考图。'
       : '人物参考图：可从左侧选择任一已绑定的人物形象或图像替换结果，作为生成视频的参考图。点击切换为替换首帧。';
   return (
-    '<div\x20class=\x22person-replacement-video-input-mode\x22\x20role=\x22group\x22\x20aria-label=\x22视频替换入参模式\x22>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22story-secondary-button\x20person-replacement-toggle-button\x22\x20data-person-replacement-action=\x22set-video-input-mode\x22\x20data-person-replacement-video-input-mode=\x22' +
+    '<div class="person-replacement-video-input-mode" role="group" aria-label="视频替换入参模式">\n    <button type="button" class="story-secondary-button person-replacement-toggle-button" data-person-replacement-action="set-video-input-mode" data-person-replacement-video-input-mode="' +
     value3 +
-    '\x22\x20aria-pressed=\x22' +
+    '" aria-pressed="' +
     value2 +
-    '\x22\x20data-tooltip=\x22' +
+    '" data-tooltip="' +
     value5 +
-    '\x22>' +
+    '">' +
     value4 +
-    '</button>\x0a\x20\x20</div>'
+    '</button>\n  </div>'
   );
 }
 function renderVideoNodeCenterPlayIndicator() {
@@ -331,7 +331,7 @@ function renderVideoReplacementPlaybackControls(
         !className && value6 === 'source'
           ? '<button type="button" class="video-snap-btn story-video-snap-btn story-video-clip-btn" data-person-replacement-action="trim-current-video" data-shot-id="' +
             escapeHtml(options4['id']) +
-            '\x22\x20aria-label=\x22裁剪当前片段\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+            '" aria-label="裁剪当前片段">\n        ' +
             VIDEO_CLIP_ICON_SVG +
             '\n      </button>'
           : '',
@@ -341,9 +341,9 @@ function renderVideoReplacementPlaybackControls(
 function renderVideoReplacementPreview(value7, value8, value9) {
   const value10 = value8?.['shot'] || null,
     enabled2 = value8?.['media'] || {},
-    value11 = Math['max'](0x0, value7['shots']['indexOf'](value10)),
-    value12 = value10?.['title'] || '片段' + String(value11 + 0x1)['padStart'](0x2, '0'),
-    value13 = value7['shots']['length'] > 0x1,
+    value11 = Math['max'](0, value7['shots']['indexOf'](value10)),
+    value12 = value10?.['title'] || '片段' + String(value11 + 1)['padStart'](2, '0'),
+    value13 = value7['shots']['length'] > 1,
     value14 = value13
       ? '' +
         renderPersonReplacementPreviewArrow('previous', {
@@ -382,25 +382,25 @@ function renderVideoReplacementPreview(value7, value8, value9) {
     escapeHtml(value12 + '原视频片段') +
     '">\n    <div class="story-video-result person-replacement-video-preview"' +
     value15 +
-    '>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22story-video-stage\x20person-replacement-video-stage\x22\x20data-person-replacement-video-stage\x20data-person-replacement-video-playback-stage=\x22source\x22\x20data-person-replacement-video-url=\x22' +
+    '>\n      <div class="story-video-stage person-replacement-video-stage" data-person-replacement-video-stage data-person-replacement-video-playback-stage="source" data-person-replacement-video-url="' +
     escapeHtml(mediaUrl) +
     '" data-person-replacement-video-poster="' +
     escapeHtml(mediaUrl2) +
     '" data-person-replacement-video-reversed="' +
     (value10['materializedIsReversed'] === !![]) +
-    '\x22\x20data-person-replacement-video-center-stage\x20data-shot-id=\x22' +
+    '" data-person-replacement-video-center-stage data-shot-id="' +
     escapeHtml(value10['id']) +
-    '\x22\x20style=\x22' +
+    '" style="' +
     videoStageFrameStyle +
     '">\n        <video data-person-replacement-video-player="source" data-person-replacement-video-center-player data-person-replacement-video-url="' +
     escapeHtml(mediaUrl) +
     '" playsinline preload="metadata" ' +
-    (mediaUrl2 ? 'poster="' + escapeHtml(mediaUrl2) + '\x22' : '') +
+    (mediaUrl2 ? 'poster="' + escapeHtml(mediaUrl2) + '"' : '') +
     ' aria-label="' +
     escapeHtml(value12 + '原视频片段') +
     '"></video>\n        ' +
     renderVideoNodeCenterPlayIndicator() +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n        ' +
     renderVideoReplacementPlaybackControls(value10, { role: 'source' }) +
     '\n      </div>\n      ' +
     value14 +
@@ -411,7 +411,7 @@ function renderVideoReplacementResult(title, { isGenerating: isGenerating = ![] 
   const enabled3 = title?.['shot'] || null,
     value16 = title?.['history'] || {},
     value17 = title?.['media'] || {},
-    value18 = Number(value16['activeIndex']) || 0x0,
+    value18 = Number(value16['activeIndex']) || 0,
     text4 = normalizeText(value17['resultRef']),
     value19 = value16['hasMultipleResults'] === !![],
     value20 = value19
@@ -441,10 +441,10 @@ function renderVideoReplacementResult(title, { isGenerating: isGenerating = ![] 
       : '',
     mediaUrl3 = normalizeMediaUrl(text4),
     mediaUrl4 = normalizeMediaUrl(value17['resultPosterRef']),
-    value23 = Math['max'](Number(value16['count']) || 0x0, text4 ? 0x1 : 0x0),
+    value23 = Math['max'](Number(value16['count']) || 0, text4 ? 1 : 0),
     videoStageFrameStyle2 = buildVideoStageFrameStyle(enabled3),
     value24 = text4
-      ? '<div\x20class=\x22story-video-stage\x20person-replacement-video-stage\x20person-replacement-video-result-stage\x22\x20data-person-replacement-video-playback-stage=\x22result\x22\x20data-person-replacement-video-url=\x22' +
+      ? '<div class="story-video-stage person-replacement-video-stage person-replacement-video-result-stage" data-person-replacement-video-playback-stage="result" data-person-replacement-video-url="' +
         escapeHtml(mediaUrl3) +
         '" data-person-replacement-video-poster="' +
         escapeHtml(mediaUrl4) +
@@ -455,9 +455,9 @@ function renderVideoReplacementResult(title, { isGenerating: isGenerating = ![] 
         '">\n        <video data-person-replacement-video-player="result" data-person-replacement-video-center-player data-person-replacement-video-url="' +
         escapeHtml(mediaUrl3) +
         '" playsinline preload="metadata"' +
-        (mediaUrl4 ? ' poster="' + escapeHtml(mediaUrl4) + '\x22' : '') +
+        (mediaUrl4 ? ' poster="' + escapeHtml(mediaUrl4) + '"' : '') +
         ' aria-label="替换视频生成版本 ' +
-        (value18 + 0x1) +
+        (value18 + 1) +
         '/' +
         value23 +
         '"></video>\n        ' +
@@ -476,13 +476,13 @@ function renderVideoReplacementResult(title, { isGenerating: isGenerating = ![] 
       (!enabled3 || isGenerating ? 'disabled' : '') +
       '>' +
       renderWorkspaceUploadIcon() +
-      '</button>\x0a\x20\x20</div>';
+      '</button>\n  </div>';
   return (
-    '<div\x20class=\x22person-replacement-generation-preview\x20person-replacement-video-result' +
-    (isGenerating ? '\x20img-preview-loading' : '') +
+    '<div class="person-replacement-generation-preview person-replacement-video-result' +
+    (isGenerating ? ' img-preview-loading' : '') +
     '" aria-busy="' +
     isGenerating +
-    '\x22' +
+    '"' +
     value21 +
     '><div class="person-replacement-video-result-slide">' +
     value24 +
@@ -506,7 +506,7 @@ function renderVideoReplacementGenerateButton(
     enabled4 = value26['workspace']['shotSelectionMode'] === !![],
     enabled5 = Array['isArray'](value26['workspace']['selectedShotIds'])
       ? value26['workspace']['selectedShotIds']['length']
-      : 0x0,
+      : 0,
     value28 = Boolean(
       value27?.['id'] &&
       ((presentation['generation']?.['isActive'] &&
@@ -519,7 +519,7 @@ function renderVideoReplacementGenerateButton(
       presentation['generation']?.['isActive'] &&
       normalizeText(presentation['generation']['shotId']) === normalizeText(value27?.['id']),
     ),
-    value29 = enabled5 ? '\x20(' + enabled5 + ')' : '',
+    value29 = enabled5 ? ' (' + enabled5 + ')' : '',
     value30 = enabled4
       ? shotBatchGenerationActive
         ? shotBatchCancelRequested
@@ -535,7 +535,7 @@ function renderVideoReplacementGenerateButton(
       ? !enabled5 || shotBatchCancelRequested
       : !enabled6 && (!presentation['eligibility']?.['canGenerate'] || value28);
   return (
-    '<button\x20type=\x22button\x22\x20class=\x22story-asset-generate-button\x22\x20aria-busy=\x22' +
+    '<button type="button" class="story-asset-generate-button" aria-busy="' +
     shotBatchGenerationActive +
     '" data-person-replacement-action="generate-replacement-video" ' +
     (value31 ? 'disabled' : '') +
@@ -568,7 +568,7 @@ function renderVideoReplacementPage(
       ),
     value35 =
       response3['materializationStatus'] === 'running'
-        ? '正在切片并统一为 ' + (value33['outputFps'] || 0x18) + ' FPS…'
+        ? '正在切片并统一为 ' + (value33['outputFps'] || 24) + ' FPS…'
         : response3['materializationStatus'] === 'failed'
           ? response3['error'] || '镜头切片失败'
           : response3['status'] === 'running'
@@ -581,7 +581,7 @@ function renderVideoReplacementPage(
       value33?.['videoPrompt'] ||
       (modelManifest?.['emptyPolicy'] === 'allow' ? '' : PERSON_REPLACEMENT_DEFAULT_VIDEO_PROMPT),
     text5 = normalizeText(modelManifest?.['placeholder']) || '描述视频人物替换效果',
-    value37 = text5 + '；输入\x20/\x20选择预设',
+    value37 = text5 + '；输入 / 选择预设',
     uiSchemaFieldState = resolvePersonReplacementVideoParameterPolicy({
       modelId: modelId,
       inputMode: inputMode['settings']['replacementVideoInputMode'],
@@ -603,7 +603,7 @@ function renderVideoReplacementPage(
       ('--person-replacement-right-width:' + box['right'] + '%;') +
       ('--person-replacement-center-top:' + box['centerTop'] + '%;');
   return (
-    '<div\x20class=\x22person-replacement-production-page\x22>\x0a\x20\x20\x20\x20<div\x20class=\x22person-replacement-four-panel-layout\x22\x20data-person-replacement-layout\x20style=\x22' +
+    '<div class="person-replacement-production-page">\n    <div class="person-replacement-four-panel-layout" data-person-replacement-layout style="' +
     value39 +
     '">\n      ' +
     value32['referenceRailHtml'] +
@@ -629,16 +629,16 @@ function renderVideoReplacementPage(
     value32['referenceInputsHtml'] +
     '</div>' +
     renderVideoInputModeControl(inputMode) +
-    '</div></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22prompt-input-wrapper\x20is-resizable\x20person-replacement-prompt-input-wrapper\x22><div\x20class=\x22prompt-textarea\x20custom-textarea\x20story-asset-prompt-editor\x20person-replacement-prompt-editor\x22\x20contenteditable=\x22true\x22\x20role=\x22textbox\x22\x20aria-multiline=\x22true\x22\x20aria-label=\x22视频替换提示词\x22\x20spellcheck=\x22false\x22\x20data-placeholder=\x22' +
+    '</div></div>\n            <div class="prompt-input-wrapper is-resizable person-replacement-prompt-input-wrapper"><div class="prompt-textarea custom-textarea story-asset-prompt-editor person-replacement-prompt-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="视频替换提示词" spellcheck="false" data-placeholder="' +
     escapeHtml(value37) +
     '" data-person-replacement-field="video-prompt" data-shot-id="' +
     escapeHtml(value33?.['id'] || '') +
-    '\x22>' +
+    '">' +
     renderPersonReplacementPromptHtml(value36) +
     '</div></div>\n          </div>\n          ' +
     (error['status'] === 'ready'
       ? ''
-      : '<p\x20class=\x22person-replacement-reference-note\x22>' +
+      : '<p class="person-replacement-reference-note">' +
         escapeHtml(value38 + '：' + error['message']) +
         '</p>') +
     '\n          <div class="story-asset-generation-bar prompt-panel-footer">' +
@@ -659,7 +659,7 @@ function renderVideoReplacementPage(
       presentation: referenceCounts,
       ...shotBatchGenerationActive2,
     }) +
-    '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</div>\n          ' +
     (value34['error'] ? '<p class="person-replacement-error">' + escapeHtml(value34['error']) + '</p>' : '') +
     '\n        </div>\n      </aside>\n    </div>' +
     renderFooter2(inputMode, { nextLabel: '进入声音克隆' }) +

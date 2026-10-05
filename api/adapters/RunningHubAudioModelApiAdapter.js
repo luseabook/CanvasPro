@@ -17,7 +17,7 @@ function normalizeRefs(item, key, index) {
   const list = (key['inputSlots']?.['fixedSlots'] || [])['filter']((result) => result['kind'] === index),
     list2 =
       item[index + 'Refs'] ||
-      item['input' + index[0x0]['toUpperCase']() + index['slice'](0x1) + 'Urls'] ||
+      item['input' + index[0]['toUpperCase']() + index['slice'](1) + 'Urls'] ||
       [],
     map = new Set();
   return list2['map']((args) => {
@@ -34,14 +34,14 @@ function normalizeRefs(item, key, index) {
 }
 const TRANSFORMS = Object['freeze']({
   audioSlot: (target, { context: context, spec: spec }) => context['audioBySlot'][spec['slot']],
-  first: (source) => source?.[0x0],
+  first: (source) => source?.[0],
   lines: (next) =>
     String(next || '')
       ['split'](/\r?\n/)
       ['map']((current) => current['trim']())
       ['filter'](Boolean),
-  secondsToMilliseconds: (entry) => Math['round'](Number(entry) * 0x3e8),
-  parenthesisFilter: (record) => (record ? 0x64 : 0x0),
+  secondsToMilliseconds: (entry) => Math['round'](Number(entry) * 1000),
+  parenthesisFilter: (record) => (record ? 100 : 0),
 });
 export async function buildRunningHubCatalogRequest(args2, enabled2, payload, handle = {}) {
   const { modelManifest: modelManifest, executionManifest: executionManifest } = payload,
@@ -183,9 +183,9 @@ function extractPreparationValue(value9, value10) {
       ['map']((response3) => response3['text']['trim']())
       ['filter'](Boolean);
   if (value10 === 'id') {
-    if (list3['length'] !== 0x1 || !/^[A-Za-z0-9_-]{1,64}$/['test'](list3[0x0]))
-      throw new Error('Mureka\x20前处理未返回有效素材\x20ID');
-    return { id: list3[0x0] };
+    if (list3['length'] !== 1 || !/^[A-Za-z0-9_-]{1,64}$/['test'](list3[0]))
+      throw new Error('Mureka 前处理未返回有效素材 ID');
+    return { id: list3[0] };
   }
   for (const value12 of list3) {
     let value13;
@@ -202,7 +202,7 @@ function extractPreparationValue(value9, value10) {
     )
       return value13;
   }
-  throw new Error('翻唱前处理未返回\x20coverFeatureId；请核对厂商返回格式，或关闭先提取原曲特征使用直接翻唱');
+  throw new Error('翻唱前处理未返回 coverFeatureId；请核对厂商返回格式，或关闭先提取原曲特征使用直接翻唱');
 }
 export async function prepareRunningHubCatalogRequest(
   dom,
@@ -228,9 +228,9 @@ export async function prepareRunningHubCatalogRequest(
       enabled8['lyrics'] = String(extractPreparationValue2['lyrics'] || '')['trim']();
     if (
       args6['resultType'] === 'coverFeatures' &&
-      (enabled8['lyrics']['length'] < 0xa || enabled8['lyrics']['length'] > 0x3e8)
+      (enabled8['lyrics']['length'] < 10 || enabled8['lyrics']['length'] > 1000)
     )
-      throw new Error('翻唱前处理后的歌词必须为\x2010–1000\x20字符');
+      throw new Error('翻唱前处理后的歌词必须为 10–1000 字符');
   }
   return { ...dom, body: enabled8, meta: { ...dom['meta'], preparations: [] } };
 }

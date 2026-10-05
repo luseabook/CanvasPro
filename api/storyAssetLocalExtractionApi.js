@@ -1,11 +1,11 @@
 import { post } from './requester.js';
 export const STORY_ASSET_LOCAL_EXTRACTION_PATH = '/api/v2/story-workspace/assets/extract-local';
 export const STORY_ASSET_LOCAL_MODEL = 'paddlenlp/PP-UIE-0.5B';
-export const STORY_ASSET_LOCAL_CHUNK_CHARACTERS = 0x2f8;
-export const STORY_ASSET_LOCAL_CHUNK_OVERLAP = 0x64;
-export const STORY_ASSET_LOCAL_BATCH_SIZE = 0x8;
+export const STORY_ASSET_LOCAL_CHUNK_CHARACTERS = 760;
+export const STORY_ASSET_LOCAL_CHUNK_OVERLAP = 100;
+export const STORY_ASSET_LOCAL_BATCH_SIZE = 8;
 const STORY_ASSET_LOCAL_ENTITY_KINDS = new Set(['character', 'scene', 'prop']),
-  STORY_ASSET_LOCAL_EVIDENCE_MAX_CHARACTERS = 0x384;
+  STORY_ASSET_LOCAL_EVIDENCE_MAX_CHARACTERS = 900;
 function normalizeText(value) {
   return typeof value === 'string' ? value['trim']() : '';
 }
@@ -16,8 +16,8 @@ function normalizeLocalEntityText(key) {
   const args = normalizeText(key)
     ['replace'](/^[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+/u, '')
     ['replace'](/[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+$/u, '')
-    ['replace'](/\s+/gu, '\x20');
-  if (!args || [...args]['length'] > 0x30 || /[\r\n]/u['test'](args)) return '';
+    ['replace'](/\s+/gu, ' ');
+  if (!args || [...args]['length'] > 48 || /[\r\n]/u['test'](args)) return '';
   return args;
 }
 function normalizeLocalEntityTexts(index) {
@@ -34,20 +34,20 @@ export function createStoryAssetLocalExtractionChunks(
     overlapCharacters: overlapCharacters = STORY_ASSET_LOCAL_CHUNK_OVERLAP,
   } = {},
 ) {
-  const result = Math['max'](0x12c, Math['trunc'](Number(maxChunkCharacters) || 0x0)),
-    data = Math['min'](result - 0x1, Math['max'](0x0, Math['trunc'](Number(overlapCharacters) || 0x0))),
-    options = Math['max'](0x1, result - data),
+  const result = Math['max'](300, Math['trunc'](Number(maxChunkCharacters) || 0)),
+    data = Math['min'](result - 1, Math['max'](0, Math['trunc'](Number(overlapCharacters) || 0))),
+    options = Math['max'](1, result - data),
     list2 = [];
   return (
     (Array['isArray'](list) ? list : [])['forEach']((dom, target) => {
       const text = normalizeText(dom?.['body']);
       if (!text) return;
-      let start = 0x0,
-        source = 0x0;
+      let start = 0,
+        source = 0;
       while (start < text['length']) {
         const end = Math['min'](text['length'], start + result);
         list2['push']({
-          id: (normalizeText(dom?.['ref']) || 'scene-' + (target + 0x1)) + '-chunk-' + (source + 0x1),
+          id: (normalizeText(dom?.['ref']) || 'scene-' + (target + 1)) + '-chunk-' + (source + 1),
           sceneRef: normalizeText(dom?.['ref']),
           episodeRef: normalizeText(dom?.['episodeRef']),
           start: start,
@@ -55,7 +55,7 @@ export function createStoryAssetLocalExtractionChunks(
           text: text['slice'](start, end),
         });
         if (end >= text['length']) break;
-        ((start += options), (source += 0x1));
+        ((start += options), (source += 1));
       }
     }),
     list2
@@ -65,9 +65,9 @@ export function createStoryAssetLocalExtractionBatches(
   list3 = [],
   { batchSize: batchSize = STORY_ASSET_LOCAL_BATCH_SIZE } = {},
 ) {
-  const next = Math['max'](0x1, Math['min'](0x10, Math['trunc'](Number(batchSize) || 0x0))),
+  const next = Math['max'](1, Math['min'](16, Math['trunc'](Number(batchSize) || 0))),
     list4 = [];
-  for (let current = 0x0; current < list3['length']; current += next) {
+  for (let current = 0; current < list3['length']; current += next) {
     list4['push'](list3['slice'](current, current + next));
   }
   return list4;
@@ -85,7 +85,7 @@ export async function requestStoryAssetMentionsLocal(chunks, signal = {}) {
     {
       provider: 'local',
       signal: signal['signal'],
-      timeout: Number(signal['timeout']) || 0x927c0,
+      timeout: Number(signal['timeout']) || 600000,
     },
   );
 }
@@ -100,12 +100,12 @@ export async function extractStoryAssetMentionsLocal({
     map = new Map(chunks2['map']((entry) => [entry['id'], entry])),
     list5 = [];
   let args2 = { model: STORY_ASSET_LOCAL_MODEL, device: '', precision: '' };
-  for (let current2 = 0x0; current2 < total['length']; current2 += 0x1) {
+  for (let current2 = 0; current2 < total['length']; current2 += 1) {
     onProgress?.({
       stage: 'local-entity-extraction',
       current: current2,
       total: total['length'],
-      message: 'PP-UIE 正在本地扫描证据（' + (current2 + 0x1) + '/' + total['length'] + '）',
+      message: 'PP-UIE 正在本地扫描证据（' + (current2 + 1) + '/' + total['length'] + '）',
     });
     const localExtract2 = await localExtract(total[current2]);
     args2 = {
@@ -126,11 +126,11 @@ export async function extractStoryAssetMentionsLocal({
             state =
               Number['isFinite'](payload) &&
               Number['isFinite'](handle) &&
-              Math['trunc'](payload) >= 0x0 &&
+              Math['trunc'](payload) >= 0 &&
               Math['trunc'](handle) > Math['trunc'](payload) &&
               sceneRef['text']['slice'](Math['trunc'](payload), Math['trunc'](handle)) === text2,
             count = state ? Math['trunc'](payload) : sceneRef['text']['indexOf'](text2);
-          if (count < 0x0) return;
+          if (count < 0) return;
           list5['push']({
             kind: kind,
             text: text2,
@@ -140,7 +140,7 @@ export async function extractStoryAssetMentionsLocal({
             end: sceneRef['start'] + count + text2['length'],
             ...(Number['isFinite'](Number(response?.['probability']))
               ? {
-                  probability: Math['max'](0x0, Math['min'](0x1, Number(response['probability']))),
+                  probability: Math['max'](0, Math['min'](1, Number(response['probability']))),
                 }
               : {}),
           });
@@ -171,20 +171,20 @@ export async function extractStoryAssetMentionsLocal({
   );
 }
 function mergeEvidenceRanges(list7 = [], scope) {
-  const list8 = list7['map'](([input, output]) => [Math['max'](0x0, input), Math['max'](0x0, output)])[
+  const list8 = list7['map'](([input, output]) => [Math['max'](0, input), Math['max'](0, output)])[
       'sort'
-    ]((value2, value3) => value2[0x0] - value3[0x0]),
+    ]((value2, value3) => value2[0] - value3[0]),
     list9 = [];
   list8['forEach'](([value4, value5]) => {
-    const value6 = list9['at'](-0x1);
-    value6 && value4 <= value6[0x1] + 0x28
-      ? (value6[0x1] = Math['max'](value6[0x1], value5))
+    const value6 = list9['at'](-1);
+    value6 && value4 <= value6[1] + 40
+      ? (value6[1] = Math['max'](value6[1], value5))
       : list9['push']([value4, value5]);
   });
   let count2 = scope;
   return list9['flatMap'](([value7, value8]) => {
-    if (count2 <= 0x0) return [];
-    const value9 = Math['min'](count2, Math['max'](0x0, value8 - value7));
+    if (count2 <= 0) return [];
+    const value9 = Math['min'](count2, Math['max'](0, value8 - value7));
     return ((count2 -= value9), value9 ? [[value7, value7 + value9]] : []);
   });
 }
@@ -201,14 +201,14 @@ export function createStoryAssetLocalEvidenceScenes(list10 = [], value10 = []) {
       const originalBodyCharacters = normalizeText(dom2?.['body']),
         localEntityEvidence = map3['get'](normalizeText(dom2?.['ref'])) || [],
         list12 = localEntityEvidence['map']((value12) => [
-          Math['max'](0x0, Number(value12['start']) - 0x5a),
-          Math['min'](originalBodyCharacters['length'], Number(value12['end']) + 0xa0),
+          Math['max'](0, Number(value12['start']) - 90),
+          Math['min'](originalBodyCharacters['length'], Number(value12['end']) + 160),
         ]);
       if (!list12['length']) {
-        list12['push']([0x0, Math['min'](originalBodyCharacters['length'], 0x118)]);
-        if (originalBodyCharacters['length'] > 0x118)
+        list12['push']([0, Math['min'](originalBodyCharacters['length'], 280)]);
+        if (originalBodyCharacters['length'] > 280)
           list12['push']([
-            Math['max'](0x0, originalBodyCharacters['length'] - 0xb4),
+            Math['max'](0, originalBodyCharacters['length'] - 180),
             originalBodyCharacters['length'],
           ]);
       }

@@ -1,5 +1,5 @@
 import { rendererStartupState } from './rendererStartupState.js';
-export const STARTUP_LOADER_HARD_DEADLINE_MS = 0x2710;
+export const STARTUP_LOADER_HARD_DEADLINE_MS = 10000;
 const STARTUP_LOADER_GUARD_CANCEL_KEY = '__aicCancelStartupLoaderGuard';
 function revealAppShell(el) {
   const el2 = el?.['getElementById']?.('v2-initial-loader');
@@ -61,7 +61,7 @@ export function installStartupLoaderGuard({
           ((item = !![]),
             run2(startup['snapshot']()),
             warn?.(
-              '[startup]\x20Still\x20waiting\x20for\x20' +
+              '[startup] Still waiting for ' +
                 startup['snapshot']()['phase'] +
                 '; app remains locked.',
             ));
@@ -73,10 +73,10 @@ export function installStartupLoaderGuard({
           warn?.(
             '[startup] Initial loader exceeded ' +
               timeoutMs +
-              'ms\x20before\x20startup\x20completed\x20and\x20was\x20dismissed.',
+              'ms before startup completed and was dismissed.',
           ));
       },
-      Math['max'](0x0, Number(timeoutMs) || STARTUP_LOADER_HARD_DEADLINE_MS),
+      Math['max'](0, Number(timeoutMs) || STARTUP_LOADER_HARD_DEADLINE_MS),
     ),
     handler2 = () => {
       if (!enabled) return;

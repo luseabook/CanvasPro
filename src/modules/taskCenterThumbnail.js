@@ -6,7 +6,7 @@ export function resolveTaskCenterThumbnail(enabled, value = '') {
       (key) => Array['isArray'](enabled[key]) && enabled[key]['length'],
     ),
     count = item ? enabled[item] : [enabled],
-    index = count[0x0] || {},
+    index = count[0] || {},
     kind = item
       ? { images: 'image', videos: 'video', audios: 'audio' }[item]
       : /video/['test'](value)

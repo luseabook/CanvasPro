@@ -1,6 +1,6 @@
 import { pickAudioDurationSec } from '../services/audioMetadataService.js';
 import { localPathToUrl, normalizeLocalPath } from '../utils/localMediaPath.js';
-const AUDIO_VOICE_HISTORY_LIMIT = 0x5;
+const AUDIO_VOICE_HISTORY_LIMIT = 5;
 export function firstNonEmptyString(...args) {
   for (const value of args) {
     const item = String(value || '')['trim']();
@@ -18,7 +18,7 @@ function normalizeAudioVoiceHistoryEntry(options = {}) {
       localPath,
     );
   if (!audioUrl && !localPath) return null;
-  const createdAt = Number(options['createdAt'] || 0x0) || Date['now']();
+  const createdAt = Number(options['createdAt'] || 0) || Date['now']();
   return {
     id: String(options['id'] || 'audio-voice-history-' + createdAt)['trim'](),
     createdAt: createdAt,
@@ -40,13 +40,13 @@ export function normalizeAudioVoiceHistory(list = []) {
     (map['add'](data), list2['push'](audioVoiceHistoryEntry));
   }
   return list2['sort'](
-    (target, source) => Number(source['createdAt'] || 0x0) - Number(target['createdAt'] || 0x0),
-  )['slice'](0x0, AUDIO_VOICE_HISTORY_LIMIT);
+    (target, source) => Number(source['createdAt'] || 0) - Number(target['createdAt'] || 0),
+  )['slice'](0, AUDIO_VOICE_HISTORY_LIMIT);
 }
 export function buildAudioVoiceHistoryEntry(localPath2 = {}, id = {}) {
-  const createdAt2 = Number(id['createdAt'] || 0x0) || Date['now']();
+  const createdAt2 = Number(id['createdAt'] || 0) || Date['now']();
   return normalizeAudioVoiceHistoryEntry({
-    id: id['id'] || 'audio-voice-history-' + createdAt2 + '-' + Math['round'](Math['random']() * 0x3e8),
+    id: id['id'] || 'audio-voice-history-' + createdAt2 + '-' + Math['round'](Math['random']() * 1000),
     createdAt: createdAt2,
     modelId: id['modelId'],
     modelLabel: id['modelLabel'],
@@ -82,7 +82,7 @@ function hasAudioVoiceGenerationRecord(response2 = {}, handle = '') {
     String(response2['status'] || '')
       ['trim']()
       ['toLowerCase']() === 'generating' ||
-    Number(response2['generationStartTime'] || response2['rhTaskStartedAt'] || 0x0) > 0x0 ||
+    Number(response2['generationStartTime'] || response2['rhTaskStartedAt'] || 0) > 0 ||
     !!String(response2['rhTaskId'] || '')['trim']() ||
     (Array['isArray'](response2['convertedAudioHistory']) &&
       response2['convertedAudioHistory']['some'](
@@ -128,8 +128,8 @@ export function cloneAudioVoiceSegment(imitateToneEnabled = {}) {
       (value2 ? '' : 'global');
   return {
     id: String(imitateToneEnabled['id'] || 'segment-' + Date['now']()),
-    startMs: Number(imitateToneEnabled['startMs'] || 0x0),
-    endMs: Number(imitateToneEnabled['endMs'] || 0x0),
+    startMs: Number(imitateToneEnabled['startMs'] || 0),
+    endMs: Number(imitateToneEnabled['endMs'] || 0),
     sourceText: String(imitateToneEnabled['sourceText'] || ''),
     targetText: String(imitateToneEnabled['targetText'] || ''),
     ...(String(imitateToneEnabled['speakerId'] || '')['trim']()
@@ -151,12 +151,12 @@ export function cloneAudioVoiceSegment(imitateToneEnabled = {}) {
       imitateToneEnabled['sourceClipBaseAudioLocalPath'],
     ),
     sourceClipBaseStartMs: Math['max'](
-      0x0,
-      Math['round'](Number(imitateToneEnabled['sourceClipBaseStartMs']) || 0x0),
+      0,
+      Math['round'](Number(imitateToneEnabled['sourceClipBaseStartMs']) || 0),
     ),
     sourceClipBaseEndMs: Math['max'](
-      0x0,
-      Math['round'](Number(imitateToneEnabled['sourceClipBaseEndMs']) || 0x0),
+      0,
+      Math['round'](Number(imitateToneEnabled['sourceClipBaseEndMs']) || 0),
     ),
     convertedAudioLocalPath: normalizeLocalPath(imitateToneEnabled['convertedAudioLocalPath'] || ''),
     convertedAudioUrl: resolveSegmentLocalAudioUrl(
@@ -193,27 +193,27 @@ export function cloneAudioVoiceSegment(imitateToneEnabled = {}) {
     rhTaskId: String(imitateToneEnabled['rhTaskId'] || ''),
     rhTaskStatus: String(imitateToneEnabled['rhTaskStatus'] || ''),
     rhStatusMessage: String(imitateToneEnabled['rhStatusMessage'] || ''),
-    rhTaskStartedAt: Number(imitateToneEnabled['rhTaskStartedAt'] || 0x0) || 0x0,
+    rhTaskStartedAt: Number(imitateToneEnabled['rhTaskStartedAt'] || 0) || 0,
     rhTaskUseOpenapiQuery: imitateToneEnabled['rhTaskUseOpenapiQuery'] === !![],
     isGenerating: imitateToneEnabled['isGenerating'] === !![],
     jobStatus: String(imitateToneEnabled['jobStatus'] || ''),
     jobError: imitateToneEnabled['jobError'] == null ? null : String(imitateToneEnabled['jobError'] || ''),
-    generationStartTime: Number(imitateToneEnabled['generationStartTime'] || 0x0) || 0x0,
+    generationStartTime: Number(imitateToneEnabled['generationStartTime'] || 0) || 0,
     generationDuration:
       imitateToneEnabled['generationDuration'] === null ||
       imitateToneEnabled['generationDuration'] === undefined
         ? null
-        : Math['max'](0x0, Number(imitateToneEnabled['generationDuration'] || 0x0) || 0x0),
+        : Math['max'](0, Number(imitateToneEnabled['generationDuration'] || 0) || 0),
     convertedAudioHistory: normalizeAudioVoiceHistory(imitateToneEnabled['convertedAudioHistory']),
   };
 }
 export function createAudioVoiceSegmentAfter(options2 = {}, value3 = null) {
-  const startMs = Number(options2['endMs'] || 0x0),
+  const startMs = Number(options2['endMs'] || 0),
     endMs = value3
-      ? Math['max'](startMs + 0xc8, Math['round']((startMs + Number(value3['startMs'] || startMs)) / 0x2))
-      : startMs + 0x5dc;
+      ? Math['max'](startMs + 200, Math['round']((startMs + Number(value3['startMs'] || startMs)) / 2))
+      : startMs + 1500;
   return {
-    id: 'mock-insert-' + Date['now']() + '-' + Math['round'](Math['random']() * 0x3e8),
+    id: 'mock-insert-' + Date['now']() + '-' + Math['round'](Math['random']() * 1000),
     startMs: startMs,
     endMs: endMs,
     sourceText: '',
@@ -222,7 +222,7 @@ export function createAudioVoiceSegmentAfter(options2 = {}, value3 = null) {
     sourceAudioUrl: '',
     convertedAudioLocalPath: '',
     convertedAudioUrl: '',
-    convertedAudioDuration: 0x0,
+    convertedAudioDuration: 0,
     voiceRefNodeId: '',
     voiceRefAudioLocalPath: '',
     voiceRefAudioUrl: '',

@@ -5,14 +5,14 @@ function normalizeText(value) {
 export function createAudioVoiceGenerationOwnerKey(item, key) {
   return (normalizeText(item) || 'source') + '\x1f' + normalizeText(key);
 }
-export function normalizeAudioVoiceBatchConcurrencyLimit(index, result = 0x1) {
+export function normalizeAudioVoiceBatchConcurrencyLimit(index, result = 1) {
   const count = Number(result),
-    data = Number['isFinite'](count) && count > 0x0 ? Math['max'](0x1, Math['floor'](count)) : 0x1,
+    data = Number['isFinite'](count) && count > 0 ? Math['max'](1, Math['floor'](count)) : 1,
     count2 = Number(index);
-  if (!Number['isFinite'](count2) || count2 <= 0x0) return data;
-  return Math['max'](0x1, Math['floor'](count2));
+  if (!Number['isFinite'](count2) || count2 <= 0) return data;
+  return Math['max'](1, Math['floor'](count2));
 }
-export function resolveAudioVoiceProviderBatchConcurrency(options = {}, target = {}, source = 0x1) {
+export function resolveAudioVoiceProviderBatchConcurrency(options = {}, target = {}, source = 1) {
   const text = normalizeText(target?.['provider'])['toLowerCase'](),
     text2 = normalizeText(target?.['adapterType'])['toLowerCase'](),
     next = text === 'runninghubwf' || (text === 'runninghub' && text2 === 'workflow'),
@@ -101,7 +101,7 @@ export function createAudioVoiceGenerationTaskStoreAdapter({
       const segments = readPersistedSnapshot(text6);
       if (!segments || !Array['isArray'](segments['segments'])) return;
       const count3 = segments['segments']['findIndex']((scope) => normalizeText(scope?.['id']) === text7);
-      if (count3 < 0x0) return;
+      if (count3 < 0) return;
       writePersistedSnapshot(text6, {
         ...segments,
         segments: segments['segments']['map']((args2, input) =>
@@ -114,10 +114,10 @@ export function createAudioVoiceGenerationTaskStoreAdapter({
 }
 export function createAudioVoiceGenerationTaskOrchestration({ createStore: createStore } = {}) {
   if (typeof createStore !== 'function')
-    throw new Error('[audioVoiceGeneration]\x20createStore\x20is\x20required');
+    throw new Error('[audioVoiceGeneration] createStore is required');
   const map = new Map(),
     map2 = new Map();
-  let output = 0x0;
+  let output = 0;
   function run3(options3 = {}) {
     const sourceNodeId2 = normalizeText(options3['sourceNodeId']),
       segmentId2 = normalizeText(options3['segmentId']),

@@ -25,7 +25,7 @@ export function addToolbarPendingResultNodes({ nodes: nodes = [], persist: persi
   const run = () => {
     list2['forEach']((result) => appStore['addNode'](result));
   };
-  typeof appStore['batch'] === 'function' && list2['length'] > 0x1 ? appStore['batch'](run) : run();
+  typeof appStore['batch'] === 'function' && list2['length'] > 1 ? appStore['batch'](run) : run();
   const data = list2['map']((options) => options['id']);
   selectToolbarResultNodes(data);
   if (persist) persistToolbarResultNodes();
@@ -50,5 +50,5 @@ export function updateToolbarResultNodes(list3 = []) {
       updateToolbarResultNode(next['nodeId'] || next['id'], next['patch']);
     });
   };
-  typeof appStore['batch'] === 'function' && list4['length'] > 0x1 ? appStore['batch'](run2) : run2();
+  typeof appStore['batch'] === 'function' && list4['length'] > 1 ? appStore['batch'](run2) : run2();
 }

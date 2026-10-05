@@ -1,21 +1,21 @@
 import { fetchLocalMediaPlaybackBlob } from '../../api/localMediaPlaybackApi.js';
 import { createTrackedMediaObjectUrl, revokeTrackedMediaObjectUrl } from './mediaObjectUrlRegistry.js';
-const LOCAL_VIDEO_PLAYBACK_MAX_BYTES = 0x40 * 0x400 * 0x400,
-  LOCAL_VIDEO_PLAYBACK_TOTAL_BYTES = 0x100 * 0x400 * 0x400,
-  LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_BYTES = 0x80 * 0x400 * 0x400,
-  LOCAL_VIDEO_WARMUP_MAX_BYTES = 0x8 * 0x400 * 0x400,
-  LOCAL_VIDEO_WARMUP_TOTAL_BYTES = 0x18 * 0x400 * 0x400,
-  LOCAL_VIDEO_WARMUP_TTL_MS = 0x3a98,
-  LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS = 0x5dc,
-  LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_TIMEOUT_MS = 0x3a98,
-  LOCAL_VIDEO_PLAYBACK_CONCURRENCY = 0x2,
+const LOCAL_VIDEO_PLAYBACK_MAX_BYTES = 64 * 1024 * 1024,
+  LOCAL_VIDEO_PLAYBACK_TOTAL_BYTES = 256 * 1024 * 1024,
+  LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_BYTES = 128 * 1024 * 1024,
+  LOCAL_VIDEO_WARMUP_MAX_BYTES = 8 * 1024 * 1024,
+  LOCAL_VIDEO_WARMUP_TOTAL_BYTES = 24 * 1024 * 1024,
+  LOCAL_VIDEO_WARMUP_TTL_MS = 15000,
+  LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS = 1500,
+  LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_TIMEOUT_MS = 15000,
+  LOCAL_VIDEO_PLAYBACK_CONCURRENCY = 2,
   LOCAL_VIDEO_PATH_RE = /^\/(?:output|data\/assets|data\/uploads)\//i,
   entriesBySource = new Map(),
   sourceByOwner = new Map(),
   sourcesByWarmupScope = new Map(),
   warmupBypassUntilBySource = new Map();
 let queuedEntries = [],
-  activeFetchCount = 0x0;
+  activeFetchCount = 0;
 function resolveCanonicalLocalSource(value) {
   const enabled = String(value || '')['trim'](),
     item = globalThis['location'] || globalThis['window']?.['location'],
@@ -37,14 +37,14 @@ function resolveCanonicalLocalSource(value) {
   }
 }
 function isWarmupBypassed(key) {
-  const index = Number(warmupBypassUntilBySource['get'](key) || 0x0);
+  const index = Number(warmupBypassUntilBySource['get'](key) || 0);
   if (!(index > Date['now']())) return (warmupBypassUntilBySource['delete'](key), ![]);
   return !![];
 }
 function hasReferences(result) {
   return (
-    result['ownerRefs']['size'] > 0x0 ||
-    result['warmupRefs']['size'] > 0x0 ||
+    result['ownerRefs']['size'] > 0 ||
+    result['warmupRefs']['size'] > 0 ||
     result['handoffRetained'] === !![]
   );
 }
@@ -53,20 +53,20 @@ function clearWarmupExpiry(data) {
   (clearTimeout(data['warmupExpiryTimer']), (data['warmupExpiryTimer'] = null));
 }
 function getWarmupBlobBytes(value2 = null) {
-  let options = 0x0;
+  let options = 0;
   for (const enabled4 of entriesBySource['values']()) {
-    if (enabled4 === value2 || !enabled4['blob'] || enabled4['ownerRefs']['size'] > 0x0) continue;
-    options += Number(enabled4['blob']['size'] || 0x0);
+    if (enabled4 === value2 || !enabled4['blob'] || enabled4['ownerRefs']['size'] > 0) continue;
+    options += Number(enabled4['blob']['size'] || 0);
   }
   return options;
 }
 function expireWarmupEntry(enabled5) {
   clearWarmupExpiry(enabled5);
-  if (!enabled5 || enabled5['ownerRefs']['size'] > 0x0) return;
+  if (!enabled5 || enabled5['ownerRefs']['size'] > 0) return;
   for (const target of enabled5['warmupRefs']) {
     const map = sourcesByWarmupScope['get'](target);
     map?.['delete'](enabled5['sourceUrl']);
-    if (map?.['size'] === 0x0) sourcesByWarmupScope['delete'](target);
+    if (map?.['size'] === 0) sourcesByWarmupScope['delete'](target);
   }
   (enabled5['warmupRefs']['clear'](),
     (enabled5['handoffRetained'] = ![]),
@@ -74,7 +74,7 @@ function expireWarmupEntry(enabled5) {
 }
 function scheduleWarmupExpiry(enabled6) {
   clearWarmupExpiry(enabled6);
-  if (!enabled6 || enabled6['ownerRefs']['size'] > 0x0) return;
+  if (!enabled6 || enabled6['ownerRefs']['size'] > 0) return;
   ((enabled6['warmupExpiryTimer'] = setTimeout(() => expireWarmupEntry(enabled6), LOCAL_VIDEO_WARMUP_TTL_MS)),
     enabled6['warmupExpiryTimer']?.['unref']?.());
 }
@@ -82,13 +82,13 @@ function evictWarmupBlobsForBudget(source, next = null) {
   let warmupBlobBytes = getWarmupBlobBytes(next);
   if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
   const current = Array['from'](entriesBySource['values']())
-    ['filter']((entry) => entry !== next && entry['blob'] && entry['ownerRefs']['size'] === 0x0)
+    ['filter']((entry) => entry !== next && entry['blob'] && entry['ownerRefs']['size'] === 0)
     ['sort'](
-      (record, payload) => Number(record['blobReadyAt'] || 0x0) - Number(payload['blobReadyAt'] || 0x0),
+      (record, payload) => Number(record['blobReadyAt'] || 0) - Number(payload['blobReadyAt'] || 0),
     );
   for (const handle of current) {
-    const state = Number(handle['blob']?.['size'] || 0x0);
-    (expireWarmupEntry(handle), (warmupBlobBytes = Math['max'](0x0, warmupBlobBytes - state)));
+    const state = Number(handle['blob']?.['size'] || 0);
+    (expireWarmupEntry(handle), (warmupBlobBytes = Math['max'](0, warmupBlobBytes - state)));
     if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
   }
   return warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES;
@@ -97,11 +97,11 @@ function settleEntry(config, input = '') {
   if (config['settled']) return;
   ((config['settled'] = !![]), config['resolvePromise'](input));
 }
-function createPlaybackResult(output, value3 = '', value4 = 0x0) {
+function createPlaybackResult(output, value3 = '', value4 = 0) {
   return {
     status: String(output || 'failed'),
     playbackUrl: String(value3 || ''),
-    httpStatus: Number(value4 || 0x0),
+    httpStatus: Number(value4 || 0),
   };
 }
 function disposeEntry(enabled7) {
@@ -117,7 +117,7 @@ function disposeEntry(enabled7) {
 }
 function syncEntryObjectUrl(ownerId) {
   if (!ownerId || ownerId['disposed']) return '';
-  if (ownerId['ownerRefs']['size'] === 0x0) {
+  if (ownerId['ownerRefs']['size'] === 0) {
     ownerId['objectUrl'] && (revokeTrackedMediaObjectUrl(ownerId['objectUrl']), (ownerId['objectUrl'] = ''));
     if (
       ownerId['blob'] &&
@@ -164,10 +164,10 @@ function createEntry(sourceUrl, value5 = '') {
       handoffRetained: ![],
       controller: new AbortController(),
       blob: null,
-      blobReadyAt: 0x0,
+      blobReadyAt: 0,
       objectUrl: '',
       status: 'pending',
-      httpStatus: 0x0,
+      httpStatus: 0,
       promise: promise,
       resolvePromise: resolvePromise,
       settled: ![],
@@ -197,20 +197,20 @@ function removeOwnerReference(value10) {
   );
 }
 async function startEntryFetch(signal2) {
-  ((signal2['active'] = !![]), (activeFetchCount += 0x1));
-  const timeout2 = signal2['ownerRefs']['size'] === 0x0;
+  ((signal2['active'] = !![]), (activeFetchCount += 1));
+  const timeout2 = signal2['ownerRefs']['size'] === 0;
   let value11 = ![];
   const run = () =>
     timeout2 &&
-    signal2['ownerRefs']['size'] > 0x0 &&
+    signal2['ownerRefs']['size'] > 0 &&
     !signal2['disposed'] &&
     !signal2['controller']['signal']['aborted'] &&
     entriesBySource['get'](signal2['sourceUrl']) === signal2;
   try {
     const maxBytes2 = timeout2 ? LOCAL_VIDEO_WARMUP_MAX_BYTES : signal2['playbackMaxBytes'],
       value12 = Array['from'](entriesBySource['values']())['reduce'](
-        (value13, value14) => value13 + Number(value14['blob']?.['size'] || value14['reservedBytes'] || 0x0),
-        0x0,
+        (value13, value14) => value13 + Number(value14['blob']?.['size'] || value14['reservedBytes'] || 0),
+        0,
       );
     if (value12 + maxBytes2 > LOCAL_VIDEO_PLAYBACK_TOTAL_BYTES) {
       ((signal2['status'] = 'budget-exceeded'), settleEntry(signal2, ''));
@@ -225,7 +225,7 @@ async function startEntryFetch(signal2) {
       }),
       enabled12 = response?.['blob'] || null;
     ((signal2['status'] = String(response?.['status'] || (enabled12 ? 'ready' : 'failed'))),
-      (signal2['httpStatus'] = Number(response?.['httpStatus'] || 0x0)));
+      (signal2['httpStatus'] = Number(response?.['httpStatus'] || 0)));
     if (
       !enabled12 ||
       signal2['disposed'] ||
@@ -244,9 +244,9 @@ async function startEntryFetch(signal2) {
       settleEntry(signal2, '');
       return;
     }
-    const value15 = Number(enabled12['size'] || 0x0);
+    const value15 = Number(enabled12['size'] || 0);
     if (
-      signal2['ownerRefs']['size'] === 0x0 &&
+      signal2['ownerRefs']['size'] === 0 &&
       (value15 > LOCAL_VIDEO_WARMUP_MAX_BYTES || !evictWarmupBlobsForBudget(value15, signal2))
     ) {
       settleEntry(signal2, '');
@@ -255,22 +255,22 @@ async function startEntryFetch(signal2) {
     ((signal2['blob'] = enabled12),
       (signal2['blobReadyAt'] = Date['now']()),
       (signal2['status'] = 'ready'),
-      (signal2['httpStatus'] = 0x0));
+      (signal2['httpStatus'] = 0));
     const syncEntryObjectUrl2 = syncEntryObjectUrl(signal2);
     settleEntry(signal2, syncEntryObjectUrl2);
   } catch {
     ((signal2['status'] = signal2['controller']['signal']['aborted'] ? 'aborted' : 'failed'),
-      (signal2['httpStatus'] = 0x0));
+      (signal2['httpStatus'] = 0));
     if (run()) value11 = !![];
     else settleEntry(signal2, '');
   } finally {
-    ((signal2['reservedBytes'] = 0x0),
+    ((signal2['reservedBytes'] = 0),
       (signal2['active'] = ![]),
-      (activeFetchCount = Math['max'](0x0, activeFetchCount - 0x1)));
+      (activeFetchCount = Math['max'](0, activeFetchCount - 1)));
     if (value11)
       ((signal2['controller'] = new AbortController()),
         (signal2['status'] = 'pending'),
-        (signal2['httpStatus'] = 0x0),
+        (signal2['httpStatus'] = 0),
         enqueueEntry(signal2, {
           urgent: !![],
           bypassConcurrencyLimit: signal2['bypassConcurrencyLimitRequested'],
@@ -292,7 +292,7 @@ async function startEntryFetch(signal2) {
   }
 }
 function drainQueue() {
-  while (activeFetchCount < LOCAL_VIDEO_PLAYBACK_CONCURRENCY && queuedEntries['length'] > 0x0) {
+  while (activeFetchCount < LOCAL_VIDEO_PLAYBACK_CONCURRENCY && queuedEntries['length'] > 0) {
     const enabled13 = queuedEntries['shift']();
     if (!enabled13) continue;
     enabled13['queued'] = ![];
@@ -344,7 +344,7 @@ function removeOwnerReferenceForSource(value19, value20) {
 function waitForPlaybackEntry(value21, value22, value23, { signal: signal3, timeout: timeout3 } = {}) {
   if (value21['settled']) return Promise['resolve']('settled');
   const count = Number['isFinite'](Number(timeout3))
-    ? Math['max'](0x0, Number(timeout3))
+    ? Math['max'](0, Number(timeout3))
     : LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS;
   return new Promise((handler) => {
     let value24 = ![],
@@ -363,7 +363,7 @@ function waitForPlaybackEntry(value21, value22, value23, { signal: signal3, time
     }
     (signal3 &&
       ((value25 = () => run2('aborted')), signal3['addEventListener']?.('abort', value25, { once: !![] })),
-      count > 0x0 && ((timer = setTimeout(() => run2('timeout'), count)), timer?.['unref']?.()),
+      count > 0 && ((timer = setTimeout(() => run2('timeout'), count)), timer?.['unref']?.()),
       value21['promise']['then'](
         () => run2('settled'),
         () => run2('settled'),
@@ -398,14 +398,14 @@ export async function acquireLocalVideoPlaybackObjectUrlResult(
     response2['playbackMaxBytes'],
     Math['min'](
       LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_BYTES,
-      Math['max'](LOCAL_VIDEO_PLAYBACK_MAX_BYTES, Math['trunc'](Number(maxBytes) || 0x0)),
+      Math['max'](LOCAL_VIDEO_PLAYBACK_MAX_BYTES, Math['trunc'](Number(maxBytes) || 0)),
     ),
   )),
     (response2['playbackTimeoutMs'] = Math['max'](
       response2['playbackTimeoutMs'],
       Math['min'](
         LOCAL_VIDEO_PLAYBACK_MAX_REQUEST_TIMEOUT_MS,
-        Math['max'](LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS, Math['trunc'](Number(timeout) || 0x0)),
+        Math['max'](LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS, Math['trunc'](Number(timeout) || 0)),
       ),
     )));
   (!response2['firstOwnerId'] || response2['firstOwnerId']['startsWith']('warmup:')) &&
@@ -443,21 +443,21 @@ export function releaseLocalVideoPlaybackObjectUrlOwner(value33) {
 }
 export function releaseLocalVideoPlaybackObjectUrlOwnerScope(value34) {
   const enabled19 = String(value34 || '')['trim']();
-  if (!enabled19) return 0x0;
-  let value35 = 0x0;
+  if (!enabled19) return 0;
+  let value35 = 0;
   for (const value36 of Array['from'](sourceByOwner['keys']())) {
     (value36 === enabled19 || value36['startsWith'](enabled19 + ':')) &&
-      (value35 += removeOwnerReference(value36) ? 0x1 : 0x0);
+      (value35 += removeOwnerReference(value36) ? 1 : 0);
   }
   return value35;
 }
 export function syncLocalVideoPlaybackWarmupSources(
   value37,
-  { scope: scope = 'canvas-low-zoom', maxSources: maxSources = 0x3 } = {},
+  { scope: scope = 'canvas-low-zoom', maxSources: maxSources = 3 } = {},
 ) {
   const enabled20 = String(scope || '')['trim']();
-  if (!enabled20) return { sources: [], scheduledCount: 0x0 };
-  const value38 = Math['max'](0x0, Math['min'](0x3, Math['trunc'](Number(maxSources) || 0x0))),
+  if (!enabled20) return { sources: [], scheduledCount: 0 };
+  const value38 = Math['max'](0, Math['min'](3, Math['trunc'](Number(maxSources) || 0))),
     sources = [],
     map2 = new Set();
   for (const value39 of value37 || []) {
@@ -473,13 +473,13 @@ export function syncLocalVideoPlaybackWarmupSources(
     const value42 = entriesBySource['get'](value41);
     (value42?.['warmupRefs']['delete'](enabled20),
       value42 &&
-      value42['ownerRefs']['size'] === 0x0 &&
-      value42['warmupRefs']['size'] === 0x0 &&
+      value42['ownerRefs']['size'] === 0 &&
+      value42['warmupRefs']['size'] === 0 &&
       (value42['blob'] || value42['active'] || value42['queued'])
         ? ((value42['handoffRetained'] = !![]), scheduleWarmupExpiry(value42))
         : removeEntryIfUnreferenced(value42));
   }
-  if (map3['size'] > 0x0) sourcesByWarmupScope['set'](enabled20, map3);
+  if (map3['size'] > 0) sourcesByWarmupScope['set'](enabled20, map3);
   else sourcesByWarmupScope['delete'](enabled20);
   for (const value43 of sources) {
     if (isWarmupBypassed(value43)) continue;
@@ -493,8 +493,8 @@ export function syncLocalVideoPlaybackWarmupSources(
 }
 export function clearLocalVideoPlaybackWarmupScope(value44 = 'canvas-low-zoom') {
   const scope2 = String(value44 || '')['trim'](),
-    value45 = sourcesByWarmupScope['get'](scope2)?.['size'] || 0x0;
-  return (syncLocalVideoPlaybackWarmupSources([], { scope: scope2, maxSources: 0x0 }), value45);
+    value45 = sourcesByWarmupScope['get'](scope2)?.['size'] || 0;
+  return (syncLocalVideoPlaybackWarmupSources([], { scope: scope2, maxSources: 0 }), value45);
 }
 export const __localVideoPlaybackObjectUrlServiceForTest = {
   clear() {
@@ -504,7 +504,7 @@ export const __localVideoPlaybackObjectUrlServiceForTest = {
       sourcesByWarmupScope['clear'](),
       warmupBypassUntilBySource['clear'](),
       (queuedEntries = []),
-      (activeFetchCount = 0x0));
+      (activeFetchCount = 0));
   },
   snapshot() {
     return {
@@ -514,7 +514,7 @@ export const __localVideoPlaybackObjectUrlServiceForTest = {
       warmupBypassedSources: Array['from'](warmupBypassUntilBySource['keys']()),
       entries: Array['from'](entriesBySource['values']())['map']((sourceUrl2) => ({
         sourceUrl: sourceUrl2['sourceUrl'],
-        blobSize: Number(sourceUrl2['blob']?.['size'] || 0x0),
+        blobSize: Number(sourceUrl2['blob']?.['size'] || 0),
         objectUrl: sourceUrl2['objectUrl'],
         status: sourceUrl2['status'],
         httpStatus: sourceUrl2['httpStatus'],

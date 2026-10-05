@@ -4,9 +4,9 @@ import { localPathToUrl } from '../../utils/localMediaPath.js';
 function normalizePositiveNumber(...args) {
   for (const value of args) {
     const count = Number(value);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 function getVideoDurationFromSource(options = {}, item = null) {
   return normalizePositiveNumber(
@@ -117,7 +117,7 @@ function createMediaAccess(handler) {
     },
     pickAiVideoItem = (result, data) => {
       const list = Array['isArray'](result?.['videos']) ? result['videos'] : [];
-      if (list['length'] <= 0x0) return null;
+      if (list['length'] <= 0) return null;
       const target = String(data?.['sourceMediaKey'] || '')['trim']();
       if (target) {
         const source = list['find']((next) => {
@@ -128,8 +128,8 @@ function createMediaAccess(handler) {
         if (source) return source;
       }
       const entry = Number(result?.['mainVideoIndex']),
-        record = Number['isFinite'](entry) ? Math['max'](0x0, Math['trunc'](entry)) : 0x0;
-      return list[Math['min'](record, list['length'] - 0x1)] || null;
+        record = Number['isFinite'](entry) ? Math['max'](0, Math['trunc'](entry)) : 0;
+      return list[Math['min'](record, list['length'] - 1)] || null;
     },
     getVideoUrl = (response, payload = null) => {
       const handle =
@@ -196,13 +196,13 @@ function appendUniqueVideo(list3, list4, value9, args2 = {}) {
   if (!url) return;
   const count2 = list3['indexOf'](url),
     args3 = { ...args2, url: url };
-  if (count2 < 0x0) {
+  if (count2 < 0) {
     (list3['push'](url), list4['push'](args3));
     return;
   }
   const args4 = list4[count2] || {};
-  !(Number(args4['duration']) > 0x0) &&
-    Number(args3['duration']) > 0x0 &&
+  !(Number(args4['duration']) > 0) &&
+    Number(args3['duration']) > 0 &&
     (list4[count2] = { ...args4, ...args3 });
 }
 function appendUniqueAudio(list5, list6, value10, args5 = {}) {
@@ -210,7 +210,7 @@ function appendUniqueAudio(list5, list6, value10, args5 = {}) {
   if (!url2) return;
   const count3 = list5['indexOf'](url2),
     value11 = { ...args5, url: url2 };
-  if (count3 < 0x0) {
+  if (count3 < 0) {
     (list5['push'](url2), list6['push'](value11));
     return;
   }
@@ -220,7 +220,7 @@ function appendUniqueAudio(list5, list6, value10, args5 = {}) {
     ...Object['fromEntries'](
       Object['entries'](value11)['filter'](([, value12]) => {
         if (value12 === '' || value12 == null) return ![];
-        if (Number(value12) === 0x0) return ![];
+        if (Number(value12) === 0) return ![];
         return !![];
       }),
     ),
@@ -261,7 +261,7 @@ export function resolveVideoSubmitInputMaterials({
     )['forEach']((assetRefSource) => {
       const sizeBytes = getImageSizeBytesFromAssetRef(assetRefSource);
       appendUniqueImage(modelApi['images'], modelApi['imageEntries'], assetRefSource['url'], {
-        ...(sizeBytes > 0x0 ? { sizeBytes: sizeBytes } : {}),
+        ...(sizeBytes > 0 ? { sizeBytes: sizeBytes } : {}),
         assetRefSource: assetRefSource['assetRefSource'] || '',
       });
     }),
@@ -279,7 +279,7 @@ export function resolveVideoSubmitInputMaterials({
         const sizeBytes2 = getVideoSizeBytesFromAssetRef(assetRefSource3);
         (appendUniqueVideo(modelApi['videos'], modelApi['videoEntries'], assetRefSource3['url'], {
           duration: getVideoDurationFromAssetRef(assetRefSource3),
-          ...(sizeBytes2 > 0x0 ? { sizeBytes: sizeBytes2 } : {}),
+          ...(sizeBytes2 > 0 ? { sizeBytes: sizeBytes2 } : {}),
           assetRefSource: assetRefSource3['assetRefSource'] || '',
         }),
           modelApi['videoRefs']['push']({
@@ -317,7 +317,7 @@ export function resolveVideoSubmitInputMaterials({
         )['trim'](),
         sizeBytes3 = getImageSizeBytesFromSource(response13);
       appendUniqueImage(modelApi['images'], modelApi['imageEntries'], url5, {
-        ...(sizeBytes3 > 0x0 ? { sizeBytes: sizeBytes3 } : {}),
+        ...(sizeBytes3 > 0 ? { sizeBytes: sizeBytes3 } : {}),
         edgeId: edgeId?.['id'],
       });
       url5 &&
@@ -347,7 +347,7 @@ export function resolveVideoSubmitInputMaterials({
         sizeBytes4 = getVideoSizeBytesFromSource(response13, value19),
         duration = {
           duration: getVideoDurationFromSource(response13, value19),
-          ...(sizeBytes4 > 0x0 ? { sizeBytes: sizeBytes4 } : {}),
+          ...(sizeBytes4 > 0 ? { sizeBytes: sizeBytes4 } : {}),
           edgeId: edgeId?.['id'],
         };
       appendUniqueVideo(modelApi['videos'], modelApi['videoEntries'], url6, duration);

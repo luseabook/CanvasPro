@@ -13,7 +13,7 @@ import { syncPersonReplacementPromptReferenceInputs } from './personReplacementI
 function selectedShot(value) {
   return (
     value['shots']?.['find']((item) => item['id'] === value['workspace']?.['selectedShotId']) ||
-    value['shots']?.[0x0] ||
+    value['shots']?.[0] ||
     null
   );
 }
@@ -43,7 +43,7 @@ function modePresentation(index) {
     tooltip: label
       ? '测试模式仅限开发者：图1叠加人物框和参考图号，不发送独立定位图。点击切换为全部替换。'
       : positioning === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL
-        ? '手动模式：直接提交原图和参考图，不添加默认提示词、定位图或\x20AI\x20增强。请自行填写完整提示词，可输入\x20@\x20引用素材。点击切换为' +
+        ? '手动模式：直接提交原图和参考图，不添加默认提示词、定位图或 AI 增强。请自行填写完整提示词，可输入 @ 引用素材。点击切换为' +
           (isPersonReplacementTestModeAvailable() ? '测试模式' : '全部替换') +
           '。'
         : result
@@ -68,7 +68,7 @@ export function renderPersonReplacementPromptModeControl(
     label2 +
     '" data-tooltip="仅对当前选中的片段生效。' +
     tooltip +
-    '\x22\x20' +
+    '" ' +
     (isPromptModeLocked(options, pendingShotIds) ? 'disabled' : '') +
     '>' +
     label2 +
@@ -87,7 +87,7 @@ function syncModeButton(el, target) {
   }
 }
 export function syncPersonReplacementPromptModeControl(el2, project, current = []) {
-  const el3 = el2?.['querySelector']?.('[data-person-replacement-action=\x22toggle-prompt-mode\x22]');
+  const el3 = el2?.['querySelector']?.('[data-person-replacement-action="toggle-prompt-mode"]');
   if (!el3) return;
   (syncModeButton(el3, project),
     (el3['disabled'] = isPromptModeLocked(project, current)),

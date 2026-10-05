@@ -61,7 +61,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
     messages: messages = {},
   } = options2;
   if (!String(nodeId || '')['trim']())
-    throw new Error('[audioTaskOrchestration]\x20nodeId\x20is\x20required');
+    throw new Error('[audioTaskOrchestration] nodeId is required');
   if (!store || typeof store['getState'] !== 'function')
     throw new Error('[audioTaskOrchestration] store is required');
   let enabled = ![],
@@ -131,7 +131,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
       audioUrl: '',
       src: '',
       localPath: '',
-      rhStatusMessage: rhStatusMessage('interrupted', 'Audio\x20generation\x20interrupted'),
+      rhStatusMessage: rhStatusMessage('interrupted', 'Audio generation interrupted'),
     }),
     handler3 = (provider) => {
       const provider2 = normalizeProvider(provider['provider']),
@@ -303,13 +303,13 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
           ]()));
       } catch {}
     next = apiKey2;
-    const startedAt2 = Number(node['generationStartTime'] || node['rhTaskStartedAt'] || 0x0),
+    const startedAt2 = Number(node['generationStartTime'] || node['rhTaskStartedAt'] || 0),
       generationDuration =
         node['generationDuration'] != null
           ? node['generationDuration']
-          : startedAt2 > 0x0
-            ? Math['max'](0x0, now() - startedAt2)
-            : 0x0,
+          : startedAt2 > 0
+            ? Math['max'](0, now() - startedAt2)
+            : 0,
       args = createGenerationCancelPlanFromNode({
         kind: 'audio',
         node: node,
@@ -342,9 +342,9 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
               )
             : remoteError
               ? remoteError['message'] || rhStatusMessage('cancelFailed', 'Cancel failed')
-              : count === 0x0
+              : count === 0
                 ? rhStatusMessage('cancelSuccess', 'Cancelled')
-                : count === 0x327
+                : count === 807
                   ? rhStatusMessage('cancelTaskMissing', 'Task no longer exists')
                   : remoteResult?.['msg'] || rhStatusMessage('cancelFailed', 'Cancel failed');
         return {
@@ -353,11 +353,11 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
           localPath: '',
           generationDuration: generationDuration,
           rhStatusMessage: rhStatusMessage3,
-          rhStatusCode: !taskId4 ? 0x32d : Number['isFinite'](count) ? count : null,
+          rhStatusCode: !taskId4 ? 813 : Number['isFinite'](count) ? count : null,
           ...buildRunningHubTaskPatch({
             taskId: taskId4,
             status: 'cancelled',
-            startedAt: Number(startedAt3 || startedAt2 || 0x0),
+            startedAt: Number(startedAt3 || startedAt2 || 0),
             recovering: ![],
             useOpenapiQuery: node['rhTaskUseOpenapiQuery'] === !![],
           }),

@@ -13,11 +13,11 @@ export function createSidePlusGeometryOverlay(value, item) {
 }
 export function createGroupSidePlusCandidateIdCache() {
   let result = null,
-    data = -0x1,
+    data = -1,
     list = [];
   return {
     get(options, target) {
-      const source = Number['isFinite'](target) ? target : -0x1;
+      const source = Number['isFinite'](target) ? target : -1;
       if (options === result && source === data) return list;
       ((result = options || null), (data = source), (list = []));
       for (const [next, current] of Object['entries'](options || {})) {
@@ -30,8 +30,8 @@ export function createGroupSidePlusCandidateIdCache() {
   };
 }
 function getClosestResultDistanceSq(record, payload, handle) {
-  const state = payload - Number(record?.['screenRect']?.['cx'] || 0x0),
-    config = handle - Number(record?.['screenRect']?.['cy'] || 0x0);
+  const state = payload - Number(record?.['screenRect']?.['cx'] || 0),
+    config = handle - Number(record?.['screenRect']?.['cy'] || 0);
   return state * state + config * config;
 }
 function getSpatialNodeOrder(scope, input) {
@@ -53,7 +53,7 @@ export function findClosestNodeWithGeometryOverrides({
           getSpatialNodeOrder(spatialIndex, value2) - getSpatialNodeOrder(spatialIndex, value3),
       )
     : [];
-  if (list2['length'] === 0x0)
+  if (list2['length'] === 0)
     return findClosestNode(screenX, screenY, nodes, viewport, ignoreGroup, {
       spatialIndex: spatialIndex,
     });

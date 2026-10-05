@@ -118,15 +118,15 @@ const OUTPUT_KIND_LABELS = Object['freeze']({ image: '图像', video: '视频', 
     'positive prompt',
     'positive_prompt',
   ]),
-  PREVIEW_DRAG_START_THRESHOLD_PX = 0xa,
-  PREVIEW_RENAME_CLICK_TOLERANCE_PX = 0x3,
-  PREVIEW_MOVE_ANIMATION_MS = 0x104,
-  INPUT_SLOT_LABEL_MAX_WIDTH_UNITS = 0x12,
-  INPUT_SLOT_LABEL_INPUT_MAX_LENGTH = 0x18,
+  PREVIEW_DRAG_START_THRESHOLD_PX = 10,
+  PREVIEW_RENAME_CLICK_TOLERANCE_PX = 3,
+  PREVIEW_MOVE_ANIMATION_MS = 260,
+  INPUT_SLOT_LABEL_MAX_WIDTH_UNITS = 18,
+  INPUT_SLOT_LABEL_INPUT_MAX_LENGTH = 24,
   INPUT_SLOT_LABEL_WIDE_CHAR_RE = /[^\u0000-\u00ff]/u,
   INPUT_SLOT_LABEL_LATIN_RE = /^[\u0000-\u007f]+$/u,
-  SOURCE_PAGE_ANIMATION_MS = 0x118,
-  RH_AI_APP_EXIT_MOTION_MS = 0xb4,
+  SOURCE_PAGE_ANIMATION_MS = 280,
+  RH_AI_APP_EXIT_MOTION_MS = 180,
   DEFAULT_AI_APP_NAME = '未命名 AI应用',
   JSON_FILE_EXTENSION_RE = /\.json$/i,
   RH_AI_APP_VIP_PROVIDER = 'runninghubwf';
@@ -135,8 +135,8 @@ function escapeHtml(value) {
     ['replaceAll']('&', '&amp;')
     ['replaceAll']('<', '&lt;')
     ['replaceAll']('>', '&gt;')
-    ['replaceAll']('\x22', '&quot;')
-    ['replaceAll']('\x27', '&#39;');
+    ['replaceAll']('"', '&quot;')
+    ['replaceAll']('\'', '&#39;');
 }
 function normalizeKind(item) {
   return Object['hasOwn'](OUTPUT_KIND_LABELS, item) ? item : 'image';
@@ -194,17 +194,17 @@ function normalizePromptHelpTooltip(state) {
   return String(state || '')['trim']();
 }
 function getBundleDisplayName(config) {
-  return normalizeAppName(config?.['models']?.[0x0]?.['displayName']);
+  return normalizeAppName(config?.['models']?.[0]?.['displayName']);
 }
 function getCanvasCenterWorld(el = null) {
   const { viewport: viewport } = graphStore['getState'](),
-    scope = window['innerWidth'] / 0x2,
-    input = window['innerHeight'] / 0x2,
-    enabled = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0x0,
-    enabled2 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0x0;
+    scope = window['innerWidth'] / 2,
+    input = window['innerHeight'] / 2,
+    enabled = document['documentElement']?.['clientWidth'] || window['innerWidth'] || 0,
+    enabled2 = document['documentElement']?.['clientHeight'] || window['innerHeight'] || 0;
   if (!enabled || !enabled2) return screenToWorld(scope, input, viewport);
-  let output = 0x0,
-    value2 = 0x0,
+  let output = 0,
+    value2 = 0,
     value3 = enabled,
     value4 = enabled2;
   const value5 = [
@@ -212,7 +212,7 @@ function getCanvasCenterWorld(el = null) {
       document['querySelector']('.sidebar-floating'),
       el?.['classList']?.['contains']('is-open') ? el : null,
     ]['filter'](Boolean),
-    value6 = 0x8;
+    value6 = 8;
   for (const el2 of value5) {
     if (!el2?.['isConnected']) continue;
     const box = el2['getBoundingClientRect'](),
@@ -239,12 +239,12 @@ function getCanvasCenterWorld(el = null) {
   }
   const count = value3 - output,
     count2 = value4 - value2,
-    value11 = count > 0x28 ? output + count / 0x2 : scope,
-    value12 = count2 > 0x28 ? value2 + count2 / 0x2 : input;
+    value11 = count > 40 ? output + count / 2 : scope,
+    value12 = count2 > 40 ? value2 + count2 / 2 : input;
   return screenToWorld(value11, value12, viewport);
 }
 function getGenerationNodeSize(value13) {
-  if (value13 === 'ai-audio') return { width: 0x1a4, height: 0xb4 };
+  if (value13 === 'ai-audio') return { width: 420, height: 180 };
   return getAIGenerationDefaultSizeByType(value13);
 }
 function buildRhAiAppNodeData({
@@ -256,7 +256,7 @@ function buildRhAiAppNodeData({
   const type = NODE_TYPE_BY_KIND[kind2] || 'ai-image',
     model = getCustomAiAppBundleModelId(bundle2),
     name = getBundleDisplayName(bundle2),
-    provider = bundle2?.['models']?.[0x0]?.['provider'] || 'runninghubwf',
+    provider = bundle2?.['models']?.[0]?.['provider'] || 'runninghubwf',
     providerProfileId =
       provider === 'runninghubwf' ? normalizeRunningHubModelApiProfileId(runningHubProfileId) : '',
     width = getGenerationNodeSize(type),
@@ -264,8 +264,8 @@ function buildRhAiAppNodeData({
     value14 = {
       id: generateId(type),
       type: type,
-      x: Math['round'](center['x'] - width['width'] / 0x2),
-      y: Math['round'](center['y'] - width['height'] / 0x2),
+      x: Math['round'](center['x'] - width['width'] / 2),
+      y: Math['round'](center['y'] - width['height'] / 2),
       width: width['width'],
       height: width['height'],
       name: name,
@@ -291,7 +291,7 @@ function renderSummaryHtml(enabled3, value15 = SOURCE_TYPE_META[SOURCE_TYPES['ru
       ? enabled3['slots']
           ['map'](
             (value17) =>
-              '<span\x20class=\x22rh-ai-app-chip\x22>' +
+              '<span class="rh-ai-app-chip">' +
               escapeHtml(OUTPUT_KIND_LABELS[value17['kind']] || value17['kind']) +
               ' · ' +
               escapeHtml(value17['label']) +
@@ -311,7 +311,7 @@ function renderSummaryHtml(enabled3, value15 = SOURCE_TYPE_META[SOURCE_TYPES['ru
     escapeHtml(enabled3['appId']) +
     '</strong>\n      </div>\n      <div class="rh-ai-app-summary-row">\n        <span>节点类型</span>\n        <strong>' +
     escapeHtml(OUTPUT_KIND_LABELS[enabled3['kind']] || enabled3['kind']) +
-    '</strong>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-summary-group\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-summary-label\x22>入参槽</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-chip-row\x22>' +
+    '</strong>\n      </div>\n      <div class="rh-ai-app-summary-group">\n        <div class="rh-ai-app-summary-label">入参槽</div>\n        <div class="rh-ai-app-chip-row">' +
     value16 +
     '</div>\n      </div>\n      <div class="rh-ai-app-summary-group">\n        <div class="rh-ai-app-summary-label">参数</div>\n        <div class="rh-ai-app-chip-row">' +
     value18 +
@@ -323,14 +323,14 @@ function renderOptionsHtml(list2, value20) {
   return list2['map'](([value22, value23]) => {
     const value24 = String(value22) === value21 ? ' selected' : '';
     return (
-      '<option value="' + escapeHtml(value22) + '\x22' + value24 + '>' + escapeHtml(value23) + '</option>'
+      '<option value="' + escapeHtml(value22) + '"' + value24 + '>' + escapeHtml(value23) + '</option>'
     );
   })['join']('');
 }
 function getOptionLabel(list3 = [], value25 = '') {
   const value26 = String(value25 || ''),
     value27 = list3['find'](([value28]) => String(value28) === value26);
-  return String(value27?.[0x1] || value26 || '');
+  return String(value27?.[1] || value26 || '');
 }
 function buildOptionsFromValues(list4 = [], value29 = {}) {
   return (Array['isArray'](list4) ? list4 : [])
@@ -419,14 +419,14 @@ function renderPreviewTypeBarHtml(value53, { canRemove: canRemove = ![] } = {}) 
         value54 +
         '" aria-label="重命名' +
         value56 +
-        '\x20' +
+        ' ' +
         escapeHtml(value57) +
         '">重命名</button>'
       : '',
     value59 = enabled7
       ? '<button type="button" class="rh-ai-app-preview-typebar-action rh-ai-app-preview-typebar-remark" data-action="edit-preview-description" data-preview-component-index="' +
         value54 +
-        '\x22\x20aria-label=\x22修改备注\x20' +
+        '" aria-label="修改备注 ' +
         escapeHtml(value57) +
         '">改备注</button>'
       : '',
@@ -441,7 +441,7 @@ function renderPreviewTypeBarHtml(value53, { canRemove: canRemove = ![] } = {}) 
         escapeHtml(value60) +
         '" aria-pressed="' +
         (value62 ? 'true' : 'false') +
-        '\x22>' +
+        '">' +
         escapeHtml(value61) +
         '</button>'
       );
@@ -459,7 +459,7 @@ function renderPreviewTypeBarHtml(value53, { canRemove: canRemove = ![] } = {}) 
           value54 +
           '" aria-label="删除' +
           value56 +
-          '\x20' +
+          ' ' +
           escapeHtml(value57) +
           '">×</button>'
         : '';
@@ -494,17 +494,17 @@ function renderComponentSelectHtml({
     value69 = options['map'](([value70, value71]) => {
       const value72 = String(value70) === value68;
       return (
-        '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22rh-ai-app-select-option\x20' +
+        '\n        <button type="button" class="rh-ai-app-select-option ' +
         (value72 ? 'active' : '') +
-        '\x22\x20data-action=\x22choose-component-select\x22\x20data-component-prop=\x22' +
+        '" data-action="choose-component-select" data-component-prop="' +
         escapeHtml(prop) +
         '" data-value="' +
         escapeHtml(value70) +
         '" role="option" aria-selected="' +
         (value72 ? 'true' : 'false') +
-        '\x22\x20tabindex=\x22-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>' +
+        '" tabindex="-1">\n          <span>' +
         escapeHtml(value71) +
-        '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</button>'
+        '</span>\n        </button>'
       );
     })['join']('');
   return (
@@ -518,9 +518,9 @@ function renderComponentSelectHtml({
     escapeHtml(ariaLabel) +
     '" aria-haspopup="listbox" aria-expanded="false">\n        <span>' +
     escapeHtml(optionLabel) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20viewBox=\x220\x200\x2016\x2016\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22m4\x206\x204\x204\x204-4\x22></path></svg>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-select-menu\x22\x20role=\x22listbox\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</span>\n        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"></path></svg>\n      </button>\n      <div class="rh-ai-app-select-menu" role="listbox">\n        ' +
     value69 +
-    '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>'
+    '\n      </div>\n    </div>'
   );
 }
 function isMediaComponent(value73) {
@@ -547,7 +547,7 @@ function getPreviewResolutionText(list11 = []) {
   return getPreviewParamText(paramComponents);
 }
 function getPreviewInstanceText(value78) {
-  const list12 = value78?.['models']?.[0x0]?.['uiSchema']?.['fields'] || [],
+  const list12 = value78?.['models']?.[0]?.['uiSchema']?.['fields'] || [],
     enabled11 = list12['find']((value79) => value79?.['id'] === 'rhInstanceType');
   if (!enabled11) return '';
   return getRunningHubInstanceTypeLabel(enabled11?.['defaultValue']);
@@ -575,12 +575,12 @@ function getPreviewInputComponents(list13 = []) {
   );
 }
 function getInputSlotLabelWidthUnits(enabled12) {
-  if (!enabled12) return 0x0;
+  if (!enabled12) return 0;
   if (/\s/u['test'](enabled12)) return 0.5;
-  return INPUT_SLOT_LABEL_WIDE_CHAR_RE['test'](enabled12) ? 0x2 : 0x1;
+  return INPUT_SLOT_LABEL_WIDE_CHAR_RE['test'](enabled12) ? 2 : 1;
 }
 function clampInputSlotLabel(value89, value90 = INPUT_SLOT_LABEL_MAX_WIDTH_UNITS) {
-  let value91 = 0x0,
+  let value91 = 0,
     value92 = '';
   for (const value93 of Array['from'](String(value89 ?? '')['trim']())) {
     const inputSlotLabelWidthUnits = getInputSlotLabelWidthUnits(value93);
@@ -597,7 +597,7 @@ function normalizeInputSlotLabel(value94, value95 = '组件') {
 }
 function getInputSlotLabelClass(value96) {
   return INPUT_SLOT_LABEL_LATIN_RE['test'](String(value96 || ''))
-    ? '\x20rh-ai-app-preview-input-label--latin'
+    ? ' rh-ai-app-preview-input-label--latin'
     : '';
 }
 function getPreviewHomeParamComponents(list14 = []) {
@@ -660,8 +660,8 @@ function isPreviewSystemField(options2 = {}) {
   return value108 === 'rhInstanceType' || value109 === 'batch' || options2?.['comfyUiSystemField'] === !![];
 }
 function getBundleParamFields(value110) {
-  const list18 = Array['isArray'](value110?.['models']?.[0x0]?.['uiSchema']?.['fields'])
-    ? value110['models'][0x0]['uiSchema']['fields']
+  const list18 = Array['isArray'](value110?.['models']?.[0]?.['uiSchema']?.['fields'])
+    ? value110['models'][0]['uiSchema']['fields']
     : [];
   return list18['filter']((value111) => !isPreviewSystemField(value111));
 }
@@ -710,7 +710,7 @@ function getPreviewAdvancedParamFields({ bundle: bundle = null, components: comp
               map5['get'](value119) ?? Number['MAX_SAFE_INTEGER'],
             );
       if (value122 !== value123) return value122 - value123;
-      return (map5['get'](value118) ?? 0x0) - (map5['get'](value119) ?? 0x0);
+      return (map5['get'](value118) ?? 0) - (map5['get'](value119) ?? 0);
     });
 }
 function buildPreviewUiSchemaNodeData(value124 = null) {
@@ -752,11 +752,11 @@ function renderPreviewInputComponentsHtml(
       escapeHtml(value130 || inputSlotLabel) +
       '">\n          ' +
       renderPreviewTypeBarHtml(value128, { canRemove: canRemovePreviewInputs }) +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22rh-ai-app-preview-input-slot-content\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22ref-upload-label\x20rh-ai-app-preview-rename-target' +
+      '\n          <span class="rh-ai-app-preview-input-slot-content">\n            <span class="ref-upload-label rh-ai-app-preview-rename-target' +
       inputSlotLabelClass +
       '" data-preview-component-index="' +
       Number(value128['index']) +
-      '\x22>' +
+      '">' +
       escapeHtml(inputSlotLabel) +
       '</span>\n          </span>\n        </div>'
     );
@@ -770,7 +770,7 @@ function getPreviewComponentDescription(value131, value132 = '参数说明') {
   );
 }
 function getPreviewBundlePromptHelpTooltip(value133 = null) {
-  return String(value133?.['models']?.[0x0]?.['help']?.['tooltip'] || value133?.['help']?.['tooltip'] || '')[
+  return String(value133?.['models']?.[0]?.['help']?.['tooltip'] || value133?.['help']?.['tooltip'] || '')[
     'trim'
   ]();
 }
@@ -783,17 +783,17 @@ function renderPreviewDescriptionTipHtml(
   const previewComponentDescription = getPreviewComponentDescription(value134, fallback),
     value136 = ['rh-tip', 'ui-schema-info-tip', 'rh-ai-app-preview-description-target', className]
       ['filter'](Boolean)
-      ['join']('\x20');
+      ['join'](' ');
   return (
-    '<span\x20role=\x22button\x22\x20tabindex=\x220\x22\x20class=\x22' +
+    '<span role="button" tabindex="0" class="' +
     value136 +
     '" data-preview-component-index="' +
     value135 +
     '" data-tooltip="' +
     escapeHtml(previewComponentDescription) +
-    '\x22\x20title=\x22' +
+    '" title="' +
     escapeHtml(previewComponentDescription) +
-    '\x22\x20aria-label=\x22' +
+    '" aria-label="' +
     escapeHtml(ariaLabel) +
     '">!</span>'
   );
@@ -805,20 +805,20 @@ function renderPreviewPromptHelpTipHtml(value137, { bundle: bundle = null } = {}
       getPreviewBundlePromptHelpTooltip(bundle) || getPreviewComponentDescription(value137, '提示词说明'),
     value140 = ['rh-tip', 'rh-ai-app-preview-description-target', 'rh-ai-app-preview-prompt-help-tip']
       ['filter'](Boolean)
-      ['join']('\x20'),
-    value141 = value139 ? ' data-preview-component-index="' + value138 + '\x22' : '',
-    value142 = '\x20data-preview-description-scope=\x22prompt-help\x22';
+      ['join'](' '),
+    value141 = value139 ? ' data-preview-component-index="' + value138 + '"' : '',
+    value142 = ' data-preview-description-scope="prompt-help"';
   return (
     '<button type="button" class="' +
     value140 +
-    '\x22' +
+    '"' +
     value141 +
     value142 +
-    '\x20data-tooltip=\x22' +
+    ' data-tooltip="' +
     escapeHtml(previewBundlePromptHelpTooltip) +
     '" title="' +
     escapeHtml(previewBundlePromptHelpTooltip) +
-    '\x22\x20aria-label=\x22编辑提示词说明\x22>!</button>'
+    '" aria-label="编辑提示词说明">!</button>'
   );
 }
 function isPreviewToggleOn(value143) {
@@ -865,17 +865,17 @@ function renderPreviewHomeParamsHtml(
       renderPreviewTypeBarHtml(value147, { canRemove: canRemovePreviewParams }) +
       '\n          <span class="rh-ai-app-preview-rename-target rh-ai-app-preview-param-label" data-preview-component-index="' +
       value149 +
-      '\x22>' +
+      '">' +
       escapeHtml(value150) +
       '</span>\n          ' +
       value152 +
-      '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22rh-ai-app-preview-drag-pad\x22\x20aria-hidden=\x22true\x22></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>'
+      '\n          <span class="rh-ai-app-preview-drag-pad" aria-hidden="true"></span>\n        </div>'
     );
   });
 }
 function renderPreviewAdvancedPanelHtml({ components: components = [], bundle: bundle = null } = {}) {
   const list22 = getPreviewAdvancedParamFields({ bundle: bundle, components: components }),
-    enabled13 = list22['length'] > 0x0 || getParamComponents(components)['length'] > 0x0;
+    enabled13 = list22['length'] > 0 || getParamComponents(components)['length'] > 0;
   if (!enabled13) return '';
   const previewUiSchemaNodeData = buildPreviewUiSchemaNodeData(bundle),
     value153 = list22['length'] ? '' : ' is-empty';
@@ -910,17 +910,17 @@ function renderDefaultValueInputHtml(value155, value156) {
   const value158 = value156 === 'stepper' || value156 === 'float' ? 'number' : 'text',
     value159 = value156 === 'stepper' ? ' step="1"' : value156 === 'float' ? ' step="any"' : '';
   return (
-    '<input\x20type=\x22' +
+    '<input type="' +
     value158 +
-    '\x22' +
+    '"' +
     value159 +
-    '\x20class=\x22rh-ai-app-component-default\x22\x20aria-label=\x22默认值\x22\x20data-component-prop=\x22defaultValue\x22\x20value=\x22' +
+    ' class="rh-ai-app-component-default" aria-label="默认值" data-component-prop="defaultValue" value="' +
     escapeHtml(value157) +
-    '\x22>'
+    '">'
   );
 }
 function getNextHomeParamOrder(list23 = []) {
-  return Math['min'](getPreviewHomeParamComponents(list23)['length'], PREVIEW_CUSTOM_COMPONENT_LIMIT - 0x1);
+  return Math['min'](getPreviewHomeParamComponents(list23)['length'], PREVIEW_CUSTOM_COMPONENT_LIMIT - 1);
 }
 function assignSequentialOrder(list24 = [], value160) {
   list24['forEach']((value161, value162) => {
@@ -995,8 +995,8 @@ function moveComponentToOrder(list28 = [], value176, value177, value178) {
   const list29 = sortComponentsByOrder(list28, value177)['filter'](
       (value179) => Number(value179['index']) !== Number(value176),
     ),
-    value180 = Math['max'](0x0, Math['min'](list29['length'], Number(value178) || 0x0));
-  return (list29['splice'](value180, 0x0, componentByIndex), assignSequentialOrder(list29, value177), !![]);
+    value180 = Math['max'](0, Math['min'](list29['length'], Number(value178) || 0));
+  return (list29['splice'](value180, 0, componentByIndex), assignSequentialOrder(list29, value177), !![]);
 }
 function renderSavedAppsMenuHtml({
   savedApps: savedApps = [],
@@ -1004,7 +1004,7 @@ function renderSavedAppsMenuHtml({
   pendingOverwriteSavedAppId: pendingOverwriteSavedAppId = '',
   pendingOverwriteIntent: pendingOverwriteIntent = '',
 } = {}) {
-  if (!savedApps['length']) return '<div\x20class=\x22rh-ai-app-saved-app-empty\x22>暂无已保存子应用</div>';
+  if (!savedApps['length']) return '<div class="rh-ai-app-saved-app-empty">暂无已保存子应用</div>';
   return savedApps['map']((error3) => {
     const value181 = String(error3['id'] || ''),
       appName2 = normalizeAppName(error3['name']);
@@ -1027,7 +1027,7 @@ function renderSavedAppsMenuHtml({
         escapeHtml(appName2) +
         '」，是否覆盖？</div>\n            <div class="rh-ai-app-saved-app-confirm-note">' +
         escapeHtml(value182) +
-        '</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-saved-app-confirm-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20data-action=\x22confirm-overwrite-app\x22\x20data-saved-app-id=\x22' +
+        '</div>\n            <div class="rh-ai-app-saved-app-confirm-actions">\n              <button type="button" data-action="confirm-overwrite-app" data-saved-app-id="' +
         escapeHtml(value181) +
         '">覆盖</button>\n              <button type="button" data-action="cancel-overwrite-app">取消</button>\n            </div>\n          </div>'
       );
@@ -1065,11 +1065,11 @@ function renderSaveConfigOverwriteMenuHtml({ savedApp: savedApp = null, intent: 
     escapeHtml(enabled15) +
     '">\n      <div class="rh-ai-app-saved-app-confirm-text">已存在同名应用「' +
     escapeHtml(appName3) +
-    '」，是否覆盖？</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-saved-app-confirm-note\x22>' +
+    '」，是否覆盖？</div>\n      <div class="rh-ai-app-saved-app-confirm-note">' +
     escapeHtml(value185) +
     '</div>\n      <div class="rh-ai-app-saved-app-confirm-actions">\n        <button type="button" data-action="confirm-overwrite-app" data-saved-app-id="' +
     escapeHtml(enabled15) +
-    '\x22>覆盖</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20data-action=\x22cancel-overwrite-app\x22>取消</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>'
+    '">覆盖</button>\n        <button type="button" data-action="cancel-overwrite-app">取消</button>\n      </div>\n    </div>'
   );
 }
 function getComfyUiCandidateSearchText(options5 = {}) {
@@ -1086,7 +1086,7 @@ function getComfyUiCandidateSearchText(options5 = {}) {
         ['toLowerCase'](),
     )
     ['filter'](Boolean)
-    ['join']('\x20');
+    ['join'](' ');
 }
 function filterComfyUiCandidates(list30 = [], map9 = new Set(), value187 = '') {
   const enabled16 = String(value187 || '')
@@ -1133,7 +1133,7 @@ function renderComfyUiCandidateMenuHtml(list31 = [], map10 = new Set(), value191
       value196 +
       '">\n          <span class="rh-ai-app-candidate-topline">\n            <span class="rh-ai-app-candidate-title">' +
       escapeHtml(comfyUiCandidateDefaultComponentName) +
-      '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+      '</span>\n            ' +
       value197 +
       '\n          </span>\n        </button>'
     );
@@ -1159,7 +1159,7 @@ function renderComfyUiComponentAddPanelHtml({
     (isOpen ? 'is-open' : '') +
     '">\n      <div class="rh-ai-app-comfy-add-panel-head">\n        <button type="button" class="rh-ai-app-secondary rh-ai-app-add-component" data-action="toggle-comfy-candidate-select" aria-expanded="' +
     (isOpen ? 'true' : 'false') +
-    '\x22' +
+    '"' +
     value200 +
     '>' +
     value199 +
@@ -1195,7 +1195,7 @@ function renderPreviewAppMenuHtml({
       pendingOverwriteSavedAppId: pendingOverwriteSavedAppId,
       pendingOverwriteIntent: pendingOverwriteIntent,
     }) +
-    '\x0a\x20\x20\x20\x20</div>'
+    '\n    </div>'
   );
 }
 function renderRhAiAppNodePreviewHtml({
@@ -1208,7 +1208,7 @@ function renderRhAiAppNodePreviewHtml({
   pendingDeleteSavedAppId: pendingDeleteSavedAppId = '',
   pendingOverwriteSavedAppId: pendingOverwriteSavedAppId = '',
   pendingOverwriteIntent: pendingOverwriteIntent = '',
-  sourceLabel: sourceLabel = 'RH\x20AI应用',
+  sourceLabel: sourceLabel = 'RH AI应用',
   runningHubProfileLabel: runningHubProfileLabel = '',
   showComfyAddPanel: showComfyAddPanel = ![],
   canAddComfyComponents: canAddComfyComponents = !![],
@@ -1224,13 +1224,13 @@ function renderRhAiAppNodePreviewHtml({
     previewPromptHelpComponent = getPreviewPromptHelpComponent(components),
     value203 = (value201 || previewPromptHelpComponent)?.['label']
       ? '填写' + (value201 || previewPromptHelpComponent)['label'] + '，按 @ 引用素材，/呼出指令...'
-      : '描述' + (OUTPUT_KIND_LABELS[kind] || '生成') + '内容，按\x20@\x20引用素材，/呼出指令...',
+      : '描述' + (OUTPUT_KIND_LABELS[kind] || '生成') + '内容，按 @ 引用素材，/呼出指令...',
     value204 = Number(value201?.['index']),
-    value205 = Number['isInteger'](value204) ? ' data-preview-component-index="' + value204 + '\x22' : '',
+    value205 = Number['isInteger'](value204) ? ' data-preview-component-index="' + value204 + '"' : '',
     value206 = Number['isInteger'](value204) ? ' rh-ai-app-preview-prompt-target' : '',
     value207 =
       value201 && canPreviewPromptBecomeParam(value201)
-        ? '\x20rh-ai-app-preview-draggable\x20rh-ai-app-preview-prompt-draggable'
+        ? ' rh-ai-app-preview-draggable rh-ai-app-preview-prompt-draggable'
         : '',
     value208 = value201 && canPreviewPromptBecomeParam(value201) ? ' data-preview-drag-kind="prompt"' : '',
     previewInstanceText = getPreviewInstanceText(bundle),
@@ -1238,13 +1238,13 @@ function renderRhAiAppNodePreviewHtml({
     renderComfyUiComponentAddPanelHtml2 = renderComfyUiComponentAddPanelHtml({
       show: showComfyAddPanel,
       canAdd: canAddComfyComponents,
-      hasComponents: components['length'] > 0x0,
+      hasComponents: components['length'] > 0,
       emptyText: comfyCandidateEmptyText,
       isOpen: canAddComfyComponents && comfyCandidatePickerOpen === !![],
       searchText: comfyCandidateSearchText,
     });
   return (
-    '\x0a\x20\x20\x20\x20' +
+    '\n    ' +
     renderComfyUiComponentAddPanelHtml2 +
     '\n    <div class="rh-ai-app-node-preview-card rh-ai-app-preview-node" data-preview-node-kind="' +
     escapeHtml(kind) +
@@ -1260,17 +1260,17 @@ function renderRhAiAppNodePreviewHtml({
     value208 +
     '>\n          ' +
     (value201 ? renderPreviewTypeBarHtml(value201, { canRemove: canRemovePreviewParams }) : '') +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22prompt-textarea\x20rh-ai-app-preview-prompt\x22\x20data-placeholder=\x22' +
+    '\n          <div class="prompt-textarea rh-ai-app-preview-prompt" data-placeholder="' +
     escapeHtml(value203) +
     '"></div>\n        </div>\n        <div class="prompt-panel-footer">\n          <div class="img-model-pills">\n            <div class="img-model-wrap">\n              <button type="button" class="img-pill-btn img-model-btn-trigger rh-ai-app-preview-model-trigger" data-action="toggle-app-menu" title="单击打开 ' +
     escapeHtml(sourceLabel) +
-    '\x20菜单，双击修改名字\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<img\x20class=\x22image-model-trigger-icon\x22\x20src=\x22images/RH.png\x22\x20alt=\x22\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22rh-ai-app-preview-runtime-badge\x22\x20data-role=\x22preview-runninghub-runtime-label\x22' +
+    ' 菜单，双击修改名字">\n                <img class="image-model-trigger-icon" src="images/RH.png" alt="">\n                <span class="rh-ai-app-preview-runtime-badge" data-role="preview-runninghub-runtime-label"' +
     (runningHubProfileLabel ? '' : ' hidden') +
     '>' +
     escapeHtml(runningHubProfileLabel) +
     '</span>\n                <span class="img-model-label">' +
     escapeHtml(normalizeAppName(appName)) +
-    '</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '</span>\n              </button>\n              ' +
     renderPreviewAppMenuHtml({
       appName: appName,
       savedApps: savedApps,
@@ -1280,24 +1280,24 @@ function renderRhAiAppNodePreviewHtml({
       pendingOverwriteIntent: pendingOverwriteIntent,
       sourceLabel: sourceLabel,
     }) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20rh-ai-app-preview-param-zone\x22\x20data-preview-zone=\x22params\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n            </div>\n          </div>\n          <div class="ui-schema-placement rh-ai-app-preview-param-zone" data-preview-zone="params">\n            ' +
     renderPreviewHomeParamsHtml(components, bundle, { canRemovePreviewParams: canRemovePreviewParams }) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22prompt-actions\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22rh-adv-wrap\x20rh-ai-app-preview-adv-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22img-pill-btn\x20rh-adv-btn\x22\x20tabindex=\x22-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22rh-adv-btn-label\x22></span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ui-schema-placement\x20ui-schema-instance-slot\x22' +
+    '\n          </div>\n          <div class="prompt-actions">\n            <div class="rh-adv-wrap rh-ai-app-preview-adv-wrap">\n              <button type="button" class="img-pill-btn rh-adv-btn" tabindex="-1">\n                <span class="rh-adv-btn-label"></span>\n              </button>\n            </div>\n            <div class="ui-schema-placement ui-schema-instance-slot"' +
     (previewInstanceText ? '' : ' hidden') +
-    '>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22img-pill-btn\x20rh-vram-btn\x22\x20tabindex=\x22-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22rh-vram-label\x22>' +
+    '>\n              <button type="button" class="img-pill-btn rh-vram-btn" tabindex="-1">\n                <span class="rh-vram-label">' +
     escapeHtml(previewInstanceText) +
     '</span>\n              </button>\n            </div>\n            <div class="ui-schema-placement ui-schema-batch-slot"' +
     (renderPreviewBatchControlsHtml2 ? '' : ' hidden') +
     '>\n              ' +
     renderPreviewBatchControlsHtml2 +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22prompt-submit\x20img-gen-btn\x22\x20tabindex=\x22-1\x22\x20aria-label=\x22生成\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20aria-hidden=\x22true\x22><line\x20x1=\x2212\x22\x20y1=\x2219\x22\x20x2=\x2212\x22\x20y2=\x225\x22></line><polyline\x20points=\x225\x2012\x2012\x205\x2019\x2012\x22></polyline></svg>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20' +
+    '\n            </div>\n            <button type="button" class="prompt-submit img-gen-btn" tabindex="-1" aria-label="生成">\n              <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>\n            </button>\n          </div>\n        </div>\n        ' +
     renderPreviewAdvancedPanelHtml({ components: components, bundle: bundle }) +
-    '\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20</div>'
+    '\n      </div>\n    </div>'
   );
 }
 function renderAppNameConfigHtml(value209 = DEFAULT_AI_APP_NAME, value210 = '') {
   return (
-    '\x0a\x20\x20\x20\x20<div\x20class=\x22rh-ai-app-component-row\x20rh-ai-app-app-name-row\x22>\x0a\x20\x20\x20\x20\x20\x20<label\x20class=\x22rh-ai-app-meta-field\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22rh-ai-app-component-static-label\x22>AI应用名称</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20class=\x22rh-ai-app-name-input\x22\x20aria-label=\x22AI应用名称\x22\x20data-app-prop=\x22appName\x22\x20value=\x22' +
+    '\n    <div class="rh-ai-app-component-row rh-ai-app-app-name-row">\n      <label class="rh-ai-app-meta-field">\n        <span class="rh-ai-app-component-static-label">AI应用名称</span>\n        <input type="text" class="rh-ai-app-name-input" aria-label="AI应用名称" data-app-prop="appName" value="' +
     escapeHtml(value209) +
     '">\n      </label>\n      <label class="rh-ai-app-meta-field">\n        <span class="rh-ai-app-component-static-label">简介</span>\n        <input type="text" class="rh-ai-app-description-input" aria-label="简介" data-app-prop="appDescription" value="' +
     escapeHtml(value210) +
@@ -1368,11 +1368,11 @@ class RunningHubAiAppManager {
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
-      (this['parseTimer'] = 0x0),
-      (this['saveSuccessTimer'] = 0x0),
-      (this['sourceViewAnimationTimer'] = 0x0),
+      (this['parseTimer'] = 0),
+      (this['saveSuccessTimer'] = 0),
+      (this['sourceViewAnimationTimer'] = 0),
       (this['sourceViewTransitionDirection'] = ''),
-      (this['workflowJsonDragDepth'] = 0x0),
+      (this['workflowJsonDragDepth'] = 0),
       (this['registeredBundleKeys'] = new Set()),
       (this['nodeBundleRegistry'] = createCustomAiAppNodeBundleRegistry({
         registerBundle: (value217, value218) =>
@@ -1517,12 +1517,12 @@ class RunningHubAiAppManager {
     const el4 = document['body'] || document['documentElement'];
     (el4['appendChild'](this['panel']),
       (this['bodyEl'] = this['panel']['querySelector']('.rh-ai-app-body')),
-      (this['sourceSelectEl'] = this['panel']['querySelector']('[data-role=\x27source-select\x27]')),
-      (this['workbenchEl'] = this['panel']['querySelector']('[data-role=\x27workbench\x27]')),
+      (this['sourceSelectEl'] = this['panel']['querySelector']('[data-role=\'source-select\']')),
+      (this['workbenchEl'] = this['panel']['querySelector']('[data-role=\'workbench\']')),
       (this['kindTabsEl'] = this['panel']['querySelector']('.rh-ai-app-kind-tabs')),
       (this['sourceBackBtn'] = this['panel']['querySelector']("[data-action='back-to-source-types']")),
       (this['workflowInputFieldEl'] = this['panel']['querySelector'](
-        '[data-role=\x27workflow-input-field\x27]',
+        '[data-role=\'workflow-input-field\']',
       )),
       (this['workflowInputSummaryEl'] = this['panel']['querySelector'](
         "[data-role='workflow-input-summary']",
@@ -1532,16 +1532,16 @@ class RunningHubAiAppManager {
         "[data-role='runninghub-runtime-toggle']",
       )),
       (this['workflowInputToggleBtn'] = this['panel']['querySelector'](
-        '[data-action=\x27toggle-workflow-input\x27]',
+        '[data-action=\'toggle-workflow-input\']',
       )),
       (this['textarea'] = this['panel']['querySelector']('.rh-ai-app-input')),
       (this['builderEl'] = this['panel']['querySelector']("[data-role='builder']")),
       (this['nodePreviewEl'] = this['panel']['querySelector']("[data-role='node-preview']")),
       (this['componentListEl'] = this['panel']['querySelector']("[data-role='components']")),
       (this['componentPickerEl'] = this['panel']['querySelector']("[data-role='comfyui-candidate-menu']")),
-      (this['summaryEl'] = this['panel']['querySelector']('[data-role=\x27summary\x27]')),
-      (this['errorEl'] = this['panel']['querySelector']('[data-role=\x27error\x27]')),
-      (this['saveBtn'] = this['panel']['querySelector']('[data-action=\x27save-config\x27]')),
+      (this['summaryEl'] = this['panel']['querySelector']('[data-role=\'summary\']')),
+      (this['errorEl'] = this['panel']['querySelector']('[data-role=\'error\']')),
+      (this['saveBtn'] = this['panel']['querySelector']('[data-action=\'save-config\']')),
       (this['saveConfigMenuEl'] = this['panel']['querySelector']("[data-role='save-config-menu']")),
       (this['createConfigMenuEl'] = this['panel']['querySelector']("[data-role='create-config-menu']")),
       (this['createBtn'] = this['panel']['querySelector']("[data-action='create']")),
@@ -1585,7 +1585,7 @@ class RunningHubAiAppManager {
       this['button']['setAttribute']('aria-expanded', 'false'),
       this['button']['addEventListener']('click', (event2) => {
         (event2['preventDefault'](), event2['stopPropagation']());
-        if (Number(event2['detail'] || 0x0) > 0x1) return;
+        if (Number(event2['detail'] || 0) > 1) return;
         this['_toggle']();
       }),
       this['button']['addEventListener']('dblclick', (event3) => {
@@ -1786,7 +1786,7 @@ class RunningHubAiAppManager {
     if (this['createBtn']) this['createBtn']['disabled'] = !enabled19;
   }
   ['_resetSaveSuccessFeedback']() {
-    (window['clearTimeout'](this['saveSuccessTimer']), (this['saveSuccessTimer'] = 0x0));
+    (window['clearTimeout'](this['saveSuccessTimer']), (this['saveSuccessTimer'] = 0));
     if (!this['saveBtn']) return;
     (this['saveBtn']['classList']['remove']('is-save-success'),
       (this['saveBtn']['textContent'] = this['saveBtn']['dataset']['defaultText'] || '保存模型'));
@@ -1799,7 +1799,7 @@ class RunningHubAiAppManager {
       window['clearTimeout'](this['saveSuccessTimer']),
       this['saveBtn']['classList']['add']('is-save-success'),
       (this['saveBtn']['textContent'] = '已保存'),
-      (this['saveSuccessTimer'] = window['setTimeout'](() => this['_resetSaveSuccessFeedback'](), 0x4b0)));
+      (this['saveSuccessTimer'] = window['setTimeout'](() => this['_resetSaveSuccessFeedback'](), 1200)));
   }
   ['_getStateKey'](value268 = this['kind'], value269 = this['sourceType']) {
     return this['configRepository']['getKindStateKey'](value269, value268);
@@ -1851,7 +1851,7 @@ class RunningHubAiAppManager {
   }
   ['_clearSourceViewAnimation']() {
     (window['clearTimeout'](this['sourceViewAnimationTimer']),
-      (this['sourceViewAnimationTimer'] = 0x0),
+      (this['sourceViewAnimationTimer'] = 0),
       this['bodyEl']?.['classList']['remove']('is-view-transitioning'),
       this['sourceSelectEl']?.['classList']['remove'](
         'is-page-enter-left',
@@ -1947,7 +1947,7 @@ class RunningHubAiAppManager {
   }
   ['_syncStickyHeaderShadow']() {
     const value277 =
-      Boolean(normalizeSourceType(this['sourceType'])) && Number(this['bodyEl']?.['scrollTop'] || 0x0) > 0x4;
+      Boolean(normalizeSourceType(this['sourceType'])) && Number(this['bodyEl']?.['scrollTop'] || 0) > 4;
     this['panel']?.['classList']['toggle']('has-sticky-kind-shadow', value277);
   }
   ['_selectSourceType'](value278) {
@@ -2183,7 +2183,7 @@ class RunningHubAiAppManager {
       }
       if (value282 === 'toggle-app-menu') {
         this['_closeComponentSelectMenus']();
-        if (Number(event6['detail'] || 0x0) > 0x1) return;
+        if (Number(event6['detail'] || 0) > 1) return;
         ((this['previewAppMenuOpen'] = !this['previewAppMenuOpen']),
           (this['pendingDeleteSavedAppId'] = ''),
           (this['pendingOverwriteSavedAppId'] = ''),
@@ -2418,7 +2418,7 @@ class RunningHubAiAppManager {
     if (!this['currentBundle'] && this['_getInputText']()['trim']())
       try {
         ((this['currentBundle'] = this['_buildCurrentBundle']({
-          syncComponents: this['componentDrafts']['length'] === 0x0,
+          syncComponents: this['componentDrafts']['length'] === 0,
         })),
           (value297 = ''));
       } catch (error5) {
@@ -2455,14 +2455,14 @@ class RunningHubAiAppManager {
       value300 =
         String(componentByIndex2['label'] || componentByIndex2['fieldName'] || '组件')['trim']() || '组件',
       value301 = el21 && isMediaComponent(componentByIndex2) ? normalizeInputSlotLabel(value300) : value300,
-      value302 = el21 ? ' maxlength="' + INPUT_SLOT_LABEL_INPUT_MAX_LENGTH + '\x22' : '';
+      value302 = el21 ? ' maxlength="' + INPUT_SLOT_LABEL_INPUT_MAX_LENGTH + '"' : '';
     (el21?.['classList']?.['add']('is-inline-editing'), el20['classList']['add']('is-renaming'));
     const value303 =
       '<input type="text" class="rh-ai-app-preview-rename-input" data-role="preview-rename-input" data-preview-component-index="' +
       value299 +
       '" data-original-label="' +
       escapeHtml(value301) +
-      '\x22\x20value=\x22' +
+      '" value="' +
       escapeHtml(value301) +
       '" aria-label="组件名"' +
       value302 +
@@ -2529,7 +2529,7 @@ class RunningHubAiAppManager {
     const enabled37 = el27['classList']['contains']('rh-ai-app-preview-prompt-help-tip');
     if (!Number['isInteger'](value309) && !enabled37) return;
     const value310 = this['nodePreviewEl']?.['querySelector']?.(
-      '[data-role=\x27preview-description-input\x27]',
+      '[data-role=\'preview-description-input\']',
     );
     if (value310) this['_commitPreviewInlineDescriptionEdit'](value310);
     const enabled38 = Number['isInteger'](value309)
@@ -2554,7 +2554,7 @@ class RunningHubAiAppManager {
         value311 ? 'rh-ai-app-preview-description-input--param' : '',
       ]
         ['filter'](Boolean)
-        ['join']('\x20')),
+        ['join'](' ')),
       (el28['dataset']['role'] = 'preview-description-input'));
     Number['isInteger'](value309) && (el28['dataset']['previewComponentIndex'] = String(value309));
     enabled37 && (el28['dataset']['previewDescriptionScope'] = 'prompt-help');
@@ -2597,7 +2597,7 @@ class RunningHubAiAppManager {
   ['_handlePanelKeyDown'](event8) {
     const el30 = event8['target']?.['closest']?.('.rh-ai-app-preview-description-target');
     if (el30 && this['panel']?.['contains'](el30)) {
-      if (event8['key'] === 'Enter' || event8['key'] === '\x20') {
+      if (event8['key'] === 'Enter' || event8['key'] === ' ') {
         const value317 = Number(el30['dataset']['previewComponentIndex']),
           value318 = el30['classList']['contains']('rh-ai-app-preview-prompt-help-tip');
         (Number['isInteger'](value317) || value318) &&
@@ -2640,7 +2640,7 @@ class RunningHubAiAppManager {
       this['_commitPreviewInlineDescriptionEdit'](value320);
       return;
     }
-    const enabled42 = event9['target']?.['closest']?.('[data-role=\x27preview-rename-input\x27]');
+    const enabled42 = event9['target']?.['closest']?.('[data-role=\'preview-rename-input\']');
     if (!enabled42 || !this['panel']?.['contains'](enabled42)) return;
     const value321 = event9['relatedTarget']?.['closest']?.("[data-action='confirm-preview-rename']");
     if (value321 && this['panel']?.['contains'](value321)) return;
@@ -2671,7 +2671,7 @@ class RunningHubAiAppManager {
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''));
-    const el34 = this['panel']?.['querySelector']?.('[data-role=\x27saved-app-menu\x27]');
+    const el34 = this['panel']?.['querySelector']?.('[data-role=\'saved-app-menu\']');
     if (el34) el34['hidden'] = !![];
   }
   ['_toggleComponentSelect'](el35) {
@@ -2755,8 +2755,8 @@ class RunningHubAiAppManager {
     if (!enabled47?.['modelId']) return '';
     const value329 = this['_getSourceMeta']()?.['label'] || '工作流',
       value330 = OUTPUT_KIND_LABELS[enabled47['kind']] || enabled47['kind'],
-      value331 = Number(enabled47['slotCount'] ?? enabled47['slots']?.['length'] ?? 0x0),
-      value332 = Number(enabled47['paramCount'] ?? enabled47['params']?.['length'] ?? 0x0);
+      value331 = Number(enabled47['slotCount'] ?? enabled47['slots']?.['length'] ?? 0),
+      value332 = Number(enabled47['paramCount'] ?? enabled47['params']?.['length'] ?? 0);
     return value329 + ' · ' + value330 + ' · ' + value331 + ' 个入参 · ' + value332 + ' 个参数';
   }
   ['_syncWorkflowInputCollapsed']() {
@@ -2809,7 +2809,7 @@ class RunningHubAiAppManager {
     return '';
   }
   ['_setWorkflowJsonDropActive'](enabled50) {
-    if (!enabled50) this['workflowJsonDragDepth'] = 0x0;
+    if (!enabled50) this['workflowJsonDragDepth'] = 0;
     this['workflowInputFieldEl']?.['classList']?.['toggle']('is-json-drag-over', enabled50 === !![]);
   }
   ['_canAcceptWorkflowJsonDrop'](value335) {
@@ -2819,7 +2819,7 @@ class RunningHubAiAppManager {
     if (!this['_canAcceptWorkflowJsonDrop'](event10)) return;
     (event10['preventDefault'](),
       event10['stopPropagation'](),
-      (this['workflowJsonDragDepth'] += 0x1),
+      (this['workflowJsonDragDepth'] += 1),
       this['_setWorkflowJsonDropActive'](!![]));
     if (event10['dataTransfer']) event10['dataTransfer']['dropEffect'] = 'copy';
   }
@@ -2832,8 +2832,8 @@ class RunningHubAiAppManager {
     if (!this['_canAcceptWorkflowJsonDrop'](event12)) return;
     (event12['preventDefault'](),
       event12['stopPropagation'](),
-      (this['workflowJsonDragDepth'] = Math['max'](0x0, this['workflowJsonDragDepth'] - 0x1)));
-    if (this['workflowJsonDragDepth'] === 0x0) this['_setWorkflowJsonDropActive'](![]);
+      (this['workflowJsonDragDepth'] = Math['max'](0, this['workflowJsonDragDepth'] - 1)));
+    if (this['workflowJsonDragDepth'] === 0) this['_setWorkflowJsonDropActive'](![]);
   }
   async ['_handleWorkflowJsonFileDrop'](event13) {
     if (!this['_canAcceptWorkflowJsonDrop'](event13)) return;
@@ -2874,7 +2874,7 @@ class RunningHubAiAppManager {
       ? COMFYUI_WORKFLOW_STATE_SCOPE
       : String(this['sourceType'] || '')['trim']();
     return (
-      isComfyUiSource4 + '\x0a' + String(value341 || '')['trim']() + '\x0a' + String(value340 || '')['trim']()
+      isComfyUiSource4 + '\n' + String(value341 || '')['trim']() + '\n' + String(value340 || '')['trim']()
     );
   }
   ['_syncComponentDrafts']({ force: force = ![] } = {}) {
@@ -2947,11 +2947,11 @@ class RunningHubAiAppManager {
       this['componentPickerEl']['setAttribute']('aria-hidden', open === !![] ? 'false' : 'true'));
     const el40 = this['componentPickerEl']['closest']?.('.rh-ai-app-comfy-add-panel');
     el40?.['classList']?.['toggle']('is-open', open === !![]);
-    const el41 = el40?.['querySelector']?.('[data-action=\x27toggle-comfy-candidate-select\x27]');
+    const el41 = el40?.['querySelector']?.('[data-action=\'toggle-comfy-candidate-select\']');
     el41?.['setAttribute']('aria-expanded', open === !![] ? 'true' : 'false');
     if (el41) el41['textContent'] = open === !![] ? '收起组件' : '点击添加组件';
     if (open && preserveSearchFocus) {
-      const el42 = el40?.['querySelector']('[data-role=\x27comfyui-candidate-search\x27]'),
+      const el42 = el40?.['querySelector']('[data-role=\'comfyui-candidate-search\']'),
         value347 = String(this['comfyCandidateSearchText'] || '')['length'];
       (el42?.['focus']?.(), el42?.['setSelectionRange']?.(value347, value347));
     }
@@ -2974,8 +2974,8 @@ class RunningHubAiAppManager {
   ['_captureComfyCandidateScrollState'](el43 = null) {
     const value348 = el43?.['closest']?.('.rh-ai-app-candidate-options');
     return {
-      panelScrollTop: Number(this['bodyEl']?.['scrollTop'] || 0x0),
-      candidateScrollTop: Number(value348?.['scrollTop'] || 0x0),
+      panelScrollTop: Number(this['bodyEl']?.['scrollTop'] || 0),
+      candidateScrollTop: Number(value348?.['scrollTop'] || 0),
     };
   }
   ['_restoreComfyCandidateScrollState'](options7 = {}) {
@@ -3149,7 +3149,7 @@ class RunningHubAiAppManager {
         value367 === !![] || String(value367)['toLowerCase']() === 'true' ? 'true' : 'false';
     else {
       if (controlType8 === 'stepper')
-        enabled54['defaultValue'] = String(Math['trunc'](Number(value367) || 0x0));
+        enabled54['defaultValue'] = String(Math['trunc'](Number(value367) || 0));
       else {
         if (controlType8 === 'float') {
           const value369 = Number(value367);
@@ -3179,7 +3179,7 @@ class RunningHubAiAppManager {
         '.rh-ai-app-preview-param-zone button:not(.rh-ai-app-preview-draggable), ' +
         ".rh-ai-app-preview-param-zone [contenteditable='true'], " +
         '.rh-ai-app-preview-param-zone [data-ui-schema-input], ' +
-        '.rh-ai-app-preview-param-zone\x20[data-ui-schema-value],\x20' +
+        '.rh-ai-app-preview-param-zone [data-ui-schema-value], ' +
         '.rh-ai-app-preview-param-zone [data-ui-schema-menu-trigger], ' +
         '.rh-ai-app-preview-param-zone .rh-stepper-value, ' +
         '.rh-ai-app-preview-param-zone .rh-stepper-input, ' +
@@ -3195,14 +3195,14 @@ class RunningHubAiAppManager {
         '.rh-ai-app-preview-advanced-panel .rh-stepper-value, ' +
         '.rh-ai-app-preview-advanced-panel .rh-stepper-input, ' +
         '.rh-ai-app-preview-advanced-panel .ui-schema-option, ' +
-        '.rh-ai-app-preview-advanced-panel\x20.rh-tip,\x20' +
-        '.rh-ai-app-preview-advanced-panel\x20.ui-schema-info-tip,\x20' +
-        '.rh-ai-app-preview-typebar-action,\x20' +
+        '.rh-ai-app-preview-advanced-panel .rh-tip, ' +
+        '.rh-ai-app-preview-advanced-panel .ui-schema-info-tip, ' +
+        '.rh-ai-app-preview-typebar-action, ' +
         '.rh-ai-app-preview-typebar-option',
     );
   }
   ['_handleComponentInput'](event14) {
-    const el47 = event14['target']?.['closest']?.('[data-role=\x27preview-rename-input\x27]');
+    const el47 = event14['target']?.['closest']?.('[data-role=\'preview-rename-input\']');
     if (el47 && this['panel']?.['contains'](el47)) {
       const value372 = Number(el47['dataset']['previewComponentIndex']),
         componentByIndex6 = getComponentByIndex(this['componentDrafts'], value372);
@@ -3212,7 +3212,7 @@ class RunningHubAiAppManager {
       }
       return;
     }
-    const el48 = event14['target']?.['closest']?.('[data-role=\x27comfyui-candidate-search\x27]');
+    const el48 = event14['target']?.['closest']?.('[data-role=\'comfyui-candidate-search\']');
     if (el48 && this['panel']?.['contains'](el48)) {
       if (this['comfyCandidateSearchText'] === String(el48['value'] || '')) return;
       ((this['comfyCandidateSearchText'] = String(el48['value'] || '')),
@@ -3276,7 +3276,7 @@ class RunningHubAiAppManager {
       if (componentKind4 === 'prompt') enabled56['controlType'] = 'prompt';
       if (componentKind4 === 'param' && normalizeControlType(enabled56['controlType']) === 'prompt') {
         const list37 = getControlTypeOptions(enabled56, normalizeControlType(enabled56['controlType']));
-        enabled56['controlType'] = list37['find'](([value380]) => value380 !== 'prompt')?.[0x0] || 'text';
+        enabled56['controlType'] = list37['find'](([value380]) => value380 !== 'prompt')?.[0] || 'text';
       }
       if (!isMediaComponent(enabled56)) delete enabled56['inputOrder'];
       !isParamComponent(enabled56) &&
@@ -3337,7 +3337,7 @@ class RunningHubAiAppManager {
         '.rh-ai-app-preview-input-slot, .rh-ai-app-preview-param-chip, .rh-ai-app-preview-advanced-param, .rh-ai-app-preview-prompt-target',
       ),
       value383 = el53?.['querySelector']?.(
-        '.rh-ai-app-preview-rename-target[data-preview-component-index="' + value382 + '\x22]',
+        '.rh-ai-app-preview-rename-target[data-preview-component-index="' + value382 + '"]',
       );
     if (value383) this['_startPreviewInlineRename'](value383, value382);
   }
@@ -3349,14 +3349,14 @@ class RunningHubAiAppManager {
     );
     let el56 =
       el55?.['querySelector']?.(
-        '.rh-ai-app-preview-description-target[data-preview-component-index=\x22' + value384 + '\x22]',
+        '.rh-ai-app-preview-description-target[data-preview-component-index="' + value384 + '"]',
       ) ||
       this['nodePreviewEl']?.['querySelector']?.(
-        '.rh-ai-app-preview-description-target[data-preview-component-index="' + value384 + '\x22]',
+        '.rh-ai-app-preview-description-target[data-preview-component-index="' + value384 + '"]',
       );
     if (!el56 && el55?.['classList']?.['contains']('rh-ai-app-preview-param-chip')) {
       const value385 = el55['querySelector']?.(
-        '.rh-ai-app-preview-param-label[data-preview-component-index=\x22' + value384 + '\x22]',
+        '.rh-ai-app-preview-param-label[data-preview-component-index="' + value384 + '"]',
       );
       if (value385) {
         const componentByIndex8 = getComponentByIndex(this['componentDrafts'], value384),
@@ -3437,7 +3437,7 @@ class RunningHubAiAppManager {
       return;
     }
     (this['_saveKindState'](),
-      (this['parseTimer'] = window['setTimeout'](() => this['_parseNow']({ silent: !![] }), 0xb4)));
+      (this['parseTimer'] = window['setTimeout'](() => this['_parseNow']({ silent: !![] }), 180)));
   }
   ['_parseNow']({ silent: silent = ![] } = {}) {
     window['clearTimeout'](this['parseTimer']);

@@ -2,9 +2,9 @@ export function normalizeCanvasProjectAccess(canSave) {
   if (!canSave || typeof canSave !== 'object') return null;
   return {
     badge: ['shared', 'shared-host']['includes'](canSave['badge']) ? canSave['badge'] : '',
-    label: String(canSave['label'] || '')['slice'](0x0, 0x50),
+    label: String(canSave['label'] || '')['slice'](0, 80),
     canSave: canSave['canSave'] !== ![],
-    saveMessage: String(canSave['saveMessage'] || '')['slice'](0x0, 0xb4),
+    saveMessage: String(canSave['saveMessage'] || '')['slice'](0, 180),
   };
 }
 export function assertCanvasProjectSaveAllowed(value, item = globalThis['window']?.['CanvasTabManager']) {

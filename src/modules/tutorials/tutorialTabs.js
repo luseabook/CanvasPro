@@ -28,11 +28,11 @@ export function createTutorialTabs(el) {
               el['append'](el3));
           }
           value = key;
-          if (index) el['querySelector']('[data-tab=\x22' + item + '\x22]')?.['focus']();
+          if (index) el['querySelector']('[data-tab="' + item + '"]')?.['focus']();
         }
         for (const el4 of el['children']) {
           const data = el4['dataset']['tab'] === item;
-          (el4['setAttribute']('aria-selected', String(data)), (el4['tabIndex'] = data ? 0x0 : -0x1));
+          (el4['setAttribute']('aria-selected', String(data)), (el4['tabIndex'] = data ? 0 : -1));
         }
         run();
       },

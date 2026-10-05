@@ -4,7 +4,7 @@ export function calculateStoryboardDimsByAspect(box, value) {
       .map(Number),
     key = item[0],
     index = item[1],
-    w = box?.width || 0x320;
+    w = box?.width || 800;
   return { w: w, h: Math.round(w * (index / key)) };
 }
 export function buildStoryboardCollapsePatch(box2, enabled) {
@@ -18,8 +18,8 @@ export function buildStoryboardCollapsePatch(box2, enabled) {
     let source, next;
     return (
       count >= 1
-        ? ((next = 0x12c), (source = Math.round(next * count)))
-        : ((source = 0x12c), (next = Math.round(source / count))),
+        ? ((next = 300), (source = Math.round(next * count)))
+        : ((source = 300), (next = Math.round(source / count))),
       (box3._originalWidth = box2?.width),
       (box3._originalHeight = box2?.height),
       (box3.width = source),

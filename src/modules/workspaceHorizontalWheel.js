@@ -1,17 +1,17 @@
 function getDominantWheelDelta(wheelEvent) {
-  const deltaX = Number(wheelEvent?.['deltaX']) || 0x0,
-    deltaY = Number(wheelEvent?.['deltaY']) || 0x0;
+  const deltaX = Number(wheelEvent?.['deltaX']) || 0,
+    deltaY = Number(wheelEvent?.['deltaY']) || 0;
   return Math['abs'](deltaX) > Math['abs'](deltaY) ? deltaX : deltaY;
 }
 function getWheelDeltaMultiplier(deltaMode, viewportWidth) {
-  if (Number(deltaMode) === 0x1) return 0x10;
-  if (Number(deltaMode) === 0x2) return Math['max'](0x1, Number(viewportWidth) || 0x1);
-  return 0x1;
+  if (Number(deltaMode) === 1) return 16;
+  if (Number(deltaMode) === 2) return Math['max'](1, Number(viewportWidth) || 1);
+  return 1;
 }
 const SCROLLABLE_OVERFLOW_VALUES = new Set(['auto', 'scroll', 'overlay']);
 function canConsumeWheelDelta(element, event, computedStyle = {}) {
-  const rawDeltaX = Number(event?.['deltaX']) || 0x0,
-    rawDeltaY = Number(event?.['deltaY']) || 0x0,
+  const rawDeltaX = Number(event?.['deltaX']) || 0,
+    rawDeltaY = Number(event?.['deltaY']) || 0,
     consumesAxis = ({
       delta: delta,
       overflow: overflow,
@@ -20,10 +20,10 @@ function canConsumeWheelDelta(element, event, computedStyle = {}) {
       clientSize: clientSize,
     }) => {
       if (!delta || !SCROLLABLE_OVERFLOW_VALUES['has'](String(overflow || ''))) return ![];
-      const scrollRange = Math['max'](0x0, (Number(scrollSize) || 0x0) - (Number(clientSize) || 0x0));
-      if (!(scrollRange > 0x0)) return ![];
-      const currentOffset = Math['max'](0x0, Math['min'](scrollRange, Number(scrollPosition) || 0x0));
-      return delta > 0x0 ? currentOffset < scrollRange : currentOffset > 0x0;
+      const scrollRange = Math['max'](0, (Number(scrollSize) || 0) - (Number(clientSize) || 0));
+      if (!(scrollRange > 0)) return ![];
+      const currentOffset = Math['max'](0, Math['min'](scrollRange, Number(scrollPosition) || 0));
+      return delta > 0 ? currentOffset < scrollRange : currentOffset > 0;
     };
   return (
     consumesAxis({
@@ -62,14 +62,14 @@ export function scrollElementHorizontallyWithWheel(
   { stopPropagation: stopPropagation = ![] } = {},
 ) {
   if (!scrollElement) return ![];
-  const viewportWidth = Math['max'](0x0, Number(scrollElement['clientWidth']) || 0x0),
-    maxScrollLeft = Math['max'](0x0, (Number(scrollElement['scrollWidth']) || 0x0) - viewportWidth);
+  const viewportWidth = Math['max'](0, Number(scrollElement['clientWidth']) || 0),
+    maxScrollLeft = Math['max'](0, (Number(scrollElement['scrollWidth']) || 0) - viewportWidth);
   if (!maxScrollLeft) return ![];
   const dominantDelta = getDominantWheelDelta(wheelEvent);
   if (!dominantDelta) return ![];
   const scrollDelta = dominantDelta * getWheelDeltaMultiplier(wheelEvent?.['deltaMode'], viewportWidth),
-    startOffset = Math['max'](0x0, Math['min'](maxScrollLeft, Number(scrollElement['scrollLeft']) || 0x0)),
-    nextOffset = Math['max'](0x0, Math['min'](maxScrollLeft, startOffset + scrollDelta));
+    startOffset = Math['max'](0, Math['min'](maxScrollLeft, Number(scrollElement['scrollLeft']) || 0)),
+    nextOffset = Math['max'](0, Math['min'](maxScrollLeft, startOffset + scrollDelta));
   if (nextOffset === startOffset) return ![];
   ((scrollElement['scrollLeft'] = nextOffset), wheelEvent?.['preventDefault']?.());
   if (stopPropagation) wheelEvent?.['stopPropagation']?.();

@@ -4,7 +4,7 @@ import { EventEmitter } from 'node:events';
 import { Buffer } from 'node:buffer';
 import { attachChromeShellStartupDiagnostics } from './chromeShellStartupDiagnostics.js';
 
-const MAX_STDERR_BYTES = 0x708;
+const MAX_STDERR_BYTES = 1800;
 
 function createStderrDouble() {
   const stderr = new EventEmitter();
@@ -14,7 +14,7 @@ function createStderrDouble() {
 function emptySnapshot(overrides = {}) {
   return {
     stderrAvailable: true,
-    stderrBytes: 0x0,
+    stderrBytes: 0,
     stderrTruncated: false,
     stderrReadError: '',
     stderrTail: '',
@@ -26,8 +26,8 @@ test('attachChromeShellStartupDiagnostics reports an empty snapshot before any s
   const stderr = createStderrDouble();
   const diagnostics = attachChromeShellStartupDiagnostics({ stderr: stderr });
   assert.deepEqual(diagnostics.snapshot(), emptySnapshot());
-  assert.equal(stderr.listenerCount('data'), 0x1);
-  assert.equal(stderr.listenerCount('error'), 0x1);
+  assert.equal(stderr.listenerCount('data'), 1);
+  assert.equal(stderr.listenerCount('error'), 1);
 });
 
 test('attachChromeShellStartupDiagnostics tolerates a child process without stderr', () => {
@@ -46,7 +46,7 @@ test('attachChromeShellStartupDiagnostics accumulates Buffer chunks into the sna
   stderr.emit('data', Buffer.from('second line\n', 'utf8'));
   assert.deepEqual(
     diagnostics.snapshot(),
-    emptySnapshot({ stderrBytes: 0x17, stderrTail: 'first line\nsecond line\n' }),
+    emptySnapshot({ stderrBytes: 23, stderrTail: 'first line\nsecond line\n' }),
   );
 });
 
@@ -54,27 +54,27 @@ test('attachChromeShellStartupDiagnostics encodes string chunks as utf8', () => 
   const stderr = createStderrDouble();
   const diagnostics = attachChromeShellStartupDiagnostics({ stderr: stderr });
   stderr.emit('data', '中文');
-  assert.deepEqual(diagnostics.snapshot(), emptySnapshot({ stderrBytes: 0x6, stderrTail: '中文' }));
+  assert.deepEqual(diagnostics.snapshot(), emptySnapshot({ stderrBytes: 6, stderrTail: '中文' }));
 });
 
 test('attachChromeShellStartupDiagnostics keeps only the trailing stderr window but counts every byte', () => {
   const stderr = createStderrDouble();
   const diagnostics = attachChromeShellStartupDiagnostics({ stderr: stderr });
-  stderr.emit('data', Buffer.from('a'.repeat(0x3e8), 'utf8'));
-  stderr.emit('data', Buffer.from('b'.repeat(0x3e8), 'utf8'));
+  stderr.emit('data', Buffer.from('a'.repeat(1000), 'utf8'));
+  stderr.emit('data', Buffer.from('b'.repeat(1000), 'utf8'));
   const snapshot = diagnostics.snapshot();
-  assert.equal(snapshot.stderrBytes, 0x7d0);
+  assert.equal(snapshot.stderrBytes, 2000);
   assert.equal(snapshot.stderrTruncated, true);
   assert.equal(snapshot.stderrTail.length, MAX_STDERR_BYTES);
-  assert.equal(snapshot.stderrTail, 'a'.repeat(0x320) + 'b'.repeat(0x3e8));
+  assert.equal(snapshot.stderrTail, 'a'.repeat(800) + 'b'.repeat(1000));
 });
 
 test('attachChromeShellStartupDiagnostics flags truncation once a single chunk exceeds the window', () => {
   const stderr = createStderrDouble();
   const diagnostics = attachChromeShellStartupDiagnostics({ stderr: stderr });
-  stderr.emit('data', Buffer.from('x'.repeat(MAX_STDERR_BYTES + 0x1), 'utf8'));
+  stderr.emit('data', Buffer.from('x'.repeat(MAX_STDERR_BYTES + 1), 'utf8'));
   const snapshot = diagnostics.snapshot();
-  assert.equal(snapshot.stderrBytes, MAX_STDERR_BYTES + 0x1);
+  assert.equal(snapshot.stderrBytes, MAX_STDERR_BYTES + 1);
   assert.equal(snapshot.stderrTruncated, true);
   assert.equal(snapshot.stderrTail, 'x'.repeat(MAX_STDERR_BYTES));
 });
@@ -99,10 +99,10 @@ test('attachChromeShellStartupDiagnostics ignores stderr traffic after stop and 
   stderr.emit('data', Buffer.from('kept', 'utf8'));
   assert.equal(diagnostics.snapshot().stderrTail, 'kept');
   diagnostics.stop();
-  assert.deepEqual(diagnostics.snapshot(), emptySnapshot({ stderrBytes: 0x4 }));
+  assert.deepEqual(diagnostics.snapshot(), emptySnapshot({ stderrBytes: 4 }));
   stderr.emit('data', Buffer.from('dropped', 'utf8'));
   stderr.emit('error', { code: 'EIO' });
-  assert.deepEqual(diagnostics.snapshot(), emptySnapshot({ stderrBytes: 0x4 }));
+  assert.deepEqual(diagnostics.snapshot(), emptySnapshot({ stderrBytes: 4 }));
 });
 
 test('attachChromeShellStartupDiagnostics returns independent snapshots across calls', () => {

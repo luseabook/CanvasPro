@@ -6,7 +6,7 @@ import {
 } from './personReplacementShotCutModel.js';
 import { hasSplittablePersonReplacementShotCut } from './personReplacementShotCutRendering.js';
 import { togglePersonReplacementShotReverseAtTimelineSec } from './personReplacementShotReverse.js';
-const PREVIEW_READY_TIMEOUT_MS = 0x7530;
+const PREVIEW_READY_TIMEOUT_MS = 30000;
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
@@ -34,7 +34,7 @@ export function createPersonReplacementShotCutEditorController({
   scrollShotCardIntoView: scrollShotCardIntoView = () => {},
 } = {}) {
   if (!session?.['workspaceState'] || !session?.['playback'])
-    throw new TypeError('Shot\x20cut\x20editor\x20requires\x20a\x20session.');
+    throw new TypeError('Shot cut editor requires a session.');
   if (!previewController || !mediaController || !viewportController)
     throw new TypeError('Shot cut editor requires preview, media, and viewport owners.');
   const timelineSec = session['workspaceState'],
@@ -164,19 +164,19 @@ export function createPersonReplacementShotCutEditorController({
           [
             "[data-person-replacement-action='capture-shot-keyframe']",
             "[data-person-replacement-action='split-shot-cut']",
-            '[data-person-replacement-action=\x27toggle-shot-cut-reverse\x27]',
-            '[data-person-replacement-action=\x27merge-shot-cuts\x27]',
+            '[data-person-replacement-action=\'toggle-shot-cut-reverse\']',
+            '[data-person-replacement-action=\'merge-shot-cuts\']',
             "[data-person-replacement-action='undo-shot-cut']",
-            '[data-person-replacement-action=\x27reset-shot-cuts\x27]',
+            '[data-person-replacement-action=\'reset-shot-cuts\']',
             "[data-person-replacement-action='cancel-shot-cuts']",
             "[data-person-replacement-action='confirm-shot-cuts']",
-          ]['join'](',\x20'),
+          ]['join'](', '),
         ) || [];
       list['forEach']((el2) => el2['setAttribute']('disabled', ''));
-      const el3 = el?.['querySelector']?.('[data-person-replacement-action=\x27capture-shot-keyframe\x27]');
+      const el3 = el?.['querySelector']?.('[data-person-replacement-action=\'capture-shot-keyframe\']');
       (el3?.['setAttribute']?.('aria-busy', 'true'), el3?.['classList']?.['add']?.('is-loading'));
       try {
-        const waitForVideoFrame2 = await waitForVideoFrame(video, { timeoutMs: 0x2710 });
+        const waitForVideoFrame2 = await waitForVideoFrame(video, { timeoutMs: 10000 });
         if (!waitForVideoFrame2) throw new Error('当前视频画面尚未加载完成');
         const type = await captureVideoFrameSnapshot(video, {
             type: 'image/png',
@@ -255,10 +255,10 @@ export function createPersonReplacementShotCutEditorController({
       (handler2(),
         (timelineSec['motionTimer'] =
           windowObject?.['setTimeout']?.(() => {
-            timelineSec['motionTimer'] = 0x0;
+            timelineSec['motionTimer'] = 0;
             if (timelineSec['motion'] !== payload) return;
             handler5();
-          }, 0x230) || 0x0));
+          }, 560) || 0));
     },
     handler6 = (list2) => {
       reset();
@@ -270,7 +270,7 @@ export function createPersonReplacementShotCutEditorController({
         (timelineSec['draft'] = list2),
         (timelineSec['initialDraft'] = clone(list2)),
         (timelineSec['previewShotId'] =
-          project3['workspace']['selectedShotId'] || list2[0x0]?.['shotId'] || ''),
+          project3['workspace']['selectedShotId'] || list2[0]?.['shotId'] || ''),
         requestRender(),
         previewController['preview'](
           timelineSec['previewShotId'],
@@ -289,7 +289,7 @@ export function createPersonReplacementShotCutEditorController({
                 timelineSec['draft'],
                 timelineSec['playheadSec'],
               );
-            personReplacementShotCutPositionAtTimelineSec2['shotIndex'] >= 0x0 &&
+            personReplacementShotCutPositionAtTimelineSec2['shotIndex'] >= 0 &&
               previewController['preview'](
                 personReplacementShotCutPositionAtTimelineSec2['shotId'],
                 personReplacementShotCutPositionAtTimelineSec2['sourceTimeSec'],
@@ -307,7 +307,7 @@ export function createPersonReplacementShotCutEditorController({
         enabled4 &&
         !enabled4['error'] &&
         enabled4['seeking'] !== !![] &&
-        Number(enabled4['readyState']) >= 0x2 &&
+        Number(enabled4['readyState']) >= 2 &&
         normalizeText(enabled4['currentSrc'] || enabled4['getAttribute']?.('src') || enabled4['src']),
       ),
     open = () => {
@@ -334,9 +334,9 @@ export function createPersonReplacementShotCutEditorController({
       const el6 = timelineSec['bufferedVideo'];
       if (!el6) return ![];
       const list4 = ['loadeddata', 'canplay', 'canplaythrough', 'seeked', 'progress'];
-      let state = 0x0;
+      let state = 0;
       const run = () => {
-          (state && (windowObject?.['clearTimeout']?.(state), (state = 0x0)),
+          (state && (windowObject?.['clearTimeout']?.(state), (state = 0)),
             list4['forEach']((config) => {
               el6['removeEventListener']?.(config, handler8);
             }),
@@ -367,7 +367,7 @@ export function createPersonReplacementShotCutEditorController({
         }),
         el6['addEventListener']?.('error', scope),
         el6['addEventListener']?.('abort', scope),
-        (state = windowObject?.['setTimeout']?.(scope, PREVIEW_READY_TIMEOUT_MS) || 0x0),
+        (state = windowObject?.['setTimeout']?.(scope, PREVIEW_READY_TIMEOUT_MS) || 0),
         (timelineSec['openingCleanup'] = run),
         handler8(),
         !![]

@@ -72,7 +72,7 @@ function baseSpec(args4 = {}) {
             return (list.push(['poll', taskId]), { text: 'ok' });
           },
         }),
-        { store: store, now: () => 0x3e8 },
+        { store: store, now: () => 1000 },
       ),
       key = store.state.nodes['target-1'];
     (assert.equal(response.ok, true),
@@ -109,7 +109,7 @@ function baseSpec(args4 = {}) {
       })));
     const response2 = await submitTask(baseSpec({ submit: async () => ({ result: { text: 'ok' } }) }), {
       store: store2,
-      now: () => 0x3e8,
+      now: () => 1000,
     });
     (assert.equal(response2.status, 'success'),
       await Promise.resolve(),
@@ -150,7 +150,7 @@ function baseSpec(args4 = {}) {
           return (assert.equal(taskId2, 'rh-dupe-1'), handler(), await options, { text: 'foreground' });
         },
       }),
-      { store: store3, now: () => 0x3e8 },
+      { store: store3, now: () => 1000 },
     );
     await source;
     let payload = 0;
@@ -161,7 +161,7 @@ function baseSpec(args4 = {}) {
           return ((payload += 1), { text: 'recovery' });
         },
       }),
-      { store: store3, now: () => 0x44c },
+      { store: store3, now: () => 1100 },
     );
     (assert.equal(response3.ok, true),
       assert.equal(response3.status, 'running'),
@@ -203,7 +203,7 @@ function baseSpec(args4 = {}) {
       })),
       await submitTask(
         baseSpec({ submit: async () => ({ taskId: 'rh-pending' }), poll: async () => ({ pending: true }) }),
-        { store: store4, now: () => 0x3e8 },
+        { store: store4, now: () => 1000 },
       ),
       await submitTask(
         baseSpec({
@@ -212,7 +212,7 @@ function baseSpec(args4 = {}) {
             throw new Error('boom');
           },
         }),
-        { store: store4, now: () => 0x7d0 },
+        { store: store4, now: () => 2000 },
       ),
       await Promise.resolve(),
       await Promise.resolve(),
@@ -248,7 +248,7 @@ function baseSpec(args4 = {}) {
           );
         },
       }),
-      { store: store5, now: () => 0x834 },
+      { store: store5, now: () => 2100 },
     );
     const value3 = store5.state.nodes['target-1'];
     (assert.deepEqual(list8, [
@@ -273,7 +273,7 @@ function baseSpec(args4 = {}) {
         }),
         submit: async () => ({ result: { text: 'created' } }),
       }),
-      { store: store6, now: () => 0x7d0 },
+      { store: store6, now: () => 2000 },
     );
     const value4 = store6.state.nodes['created-1'];
     (assert.equal(value4.id, 'created-1'),
@@ -292,9 +292,9 @@ function baseSpec(args4 = {}) {
             value5 = taskId3;
           },
         }),
-        { store: store7, now: () => 0xbb8 },
+        { store: store7, now: () => 3000 },
       ),
-      response6 = await cancelTask('target-1', { store: store7, now: () => 0x1388 }),
+      response6 = await cancelTask('target-1', { store: store7, now: () => 5000 }),
       value6 = store7.state.nodes['target-1'];
     (assert.equal(response5.status, 'submitted'),
       assert.equal(response6.ok, true),
@@ -318,10 +318,10 @@ function baseSpec(args4 = {}) {
           value7 = taskId4;
         },
       }),
-      { store: store8, now: () => 0xbb8 },
+      { store: store8, now: () => 3000 },
     );
     await new Promise((value8) => setTimeout(value8, 0));
-    const response7 = await cancelTask('target-1', { store: store8, now: () => 0xdac });
+    const response7 = await cancelTask('target-1', { store: store8, now: () => 3500 });
     run2();
     const response8 = await submitTask3,
       value9 = store8.state.nodes['target-1'];
@@ -341,12 +341,12 @@ function baseSpec(args4 = {}) {
           poll: async () => ({ text: 'late result' }),
           resultBuilder: async () => {
             return (
-              await cancelTask('target-1', { store: store9, now: () => 0xdac }),
+              await cancelTask('target-1', { store: store9, now: () => 3500 }),
               { outputText: 'late result' }
             );
           },
         }),
-        { store: store9, now: () => 0xbb8 },
+        { store: store9, now: () => 3000 },
       ),
       value10 = store9.state.nodes['target-1'];
     (assert.equal(response9.status, 'cancelled'),
@@ -368,7 +368,7 @@ function baseSpec(args4 = {}) {
         waitForResult: false,
         submit: async () => ({ taskId: 'remote-but-not-cancellable' }),
       }),
-      { store: store10, now: () => 0x1b58 },
+      { store: store10, now: () => 7000 },
     );
     const cancelTask2 = await cancelTask('target-1', { store: store10 });
     (assert.deepEqual(cancelTask2, { ok: false, reason: 'not-cancellable', targetNodeId: 'target-1' }),
@@ -381,7 +381,7 @@ function baseSpec(args4 = {}) {
           submit: async () => ({ taskId: 'rh-pending-1' }),
           poll: async () => ({ pending: true, message: '仍在生成' }),
         }),
-        { store: store11, now: () => 0x1f40 },
+        { store: store11, now: () => 8000 },
       ),
       value11 = store11.state.nodes['target-1'];
     (assert.equal(response10.ok, true),
@@ -401,7 +401,7 @@ function baseSpec(args4 = {}) {
           submit: async () => ({ taskId: 'rh-pending-resume-1' }),
           poll: async () => ({ pending: true, message: 'background' }),
         }),
-        { store: store12, now: () => 0x1f40 },
+        { store: store12, now: () => 8000 },
       );
     assert.equal(response11.status, 'pending');
     const response12 = await resumeTask(
@@ -409,7 +409,7 @@ function baseSpec(args4 = {}) {
           taskId: 'rh-pending-resume-1',
           poll: async ({ taskId: taskId5 }) => ({ text: 'resumed:' + taskId5 }),
         }),
-        { store: store12, now: () => 0x2328 },
+        { store: store12, now: () => 9000 },
       ),
       value12 = store12.state.nodes['target-1'];
     (assert.equal(response12.status, 'success'),
@@ -430,7 +430,7 @@ function baseSpec(args4 = {}) {
         },
         failureBuilder: (error) => ({ name: '结果失败', outputText: '失败: ' + error.message }),
       }),
-      { store: store13, now: () => 0x2328 },
+      { store: store13, now: () => 9000 },
     ),
       await submitTask(
         baseSpec({
@@ -440,7 +440,7 @@ function baseSpec(args4 = {}) {
           },
           cancelledBuilder: () => ({ name: '结果已取消', outputText: '状态: 已取消' }),
         }),
-        { store: store13, now: () => 0x2710 },
+        { store: store13, now: () => 10000 },
       ),
       assert.equal(store13.state.nodes['target-1'].jobStatus, 'error'),
       assert.equal(store13.state.nodes['target-1'].name, '结果失败'),
@@ -451,7 +451,7 @@ function baseSpec(args4 = {}) {
   }),
   test('generationTaskRuntime: async model API writes async status and resumes', async () => {
     const store14 = createMockStore({
-        'target-1': { id: 'target-1', type: 'ai-image', asyncTaskId: 'async-1', generationStartTime: 0x2328 },
+        'target-1': { id: 'target-1', type: 'ai-image', asyncTaskId: 'async-1', generationStartTime: 9000 },
       }),
       response13 = await resumeTask(
         baseSpec({
@@ -465,7 +465,7 @@ function baseSpec(args4 = {}) {
           taskId: 'async-1',
           poll: async ({ taskId: taskId6 }) => ({ text: 'done:' + taskId6 }),
         }),
-        { store: store14, now: () => 0x2ee0 },
+        { store: store14, now: () => 12000 },
       ),
       value13 = store14.state.nodes['target-1'];
     (assert.equal(response13.ok, true),
@@ -482,7 +482,7 @@ function baseSpec(args4 = {}) {
           id: 'target-1',
           type: 'source-audio',
           rhTaskId: 'rh-resume-1',
-          generationStartTime: 0x2710,
+          generationStartTime: 10000,
         },
       }),
       list9 = [];
@@ -504,7 +504,7 @@ function baseSpec(args4 = {}) {
           },
           cancelledBuilder: () => ({ audioUrl: '', outputText: '已取消恢复' }),
         }),
-        { store: store15, now: () => 0x32c8 },
+        { store: store15, now: () => 13000 },
       ),
       value17 = store15.state.nodes['target-1'];
     (assert.equal(response14.status, 'pending'),
@@ -519,7 +519,7 @@ function baseSpec(args4 = {}) {
       assert.equal(value17.rhTaskRecovering, false),
       assert.equal(value17.audioWorkflowKey, 'voice-clone'),
       assert.equal(value17.rhStatusMessage, '仍在生成'));
-    const response15 = await cancelTask('target-1', { store: store15, now: () => 0x36b0 }),
+    const response15 = await cancelTask('target-1', { store: store15, now: () => 14000 }),
       value18 = store15.state.nodes['target-1'];
     (assert.equal(response15.status, 'cancelled'),
       assert.equal(value14, 'rh-resume-1'),
@@ -533,7 +533,7 @@ function baseSpec(args4 = {}) {
           id: 'target-1',
           type: 'source-audio',
           rhTaskId: 'rh-abort-1',
-          generationStartTime: 0x3a98,
+          generationStartTime: 15000,
         },
       }),
       response16 = await resumeTask(
@@ -546,7 +546,7 @@ function baseSpec(args4 = {}) {
           },
           cancelledBuilder: () => ({ outputText: '恢复已中断' }),
         }),
-        { store: store16, now: () => 0x3e80 },
+        { store: store16, now: () => 16000 },
       ),
       value19 = store16.state.nodes['target-1'];
     (assert.equal(response16.ok, false),
@@ -562,7 +562,7 @@ function baseSpec(args4 = {}) {
           id: 'target-1',
           type: 'source-audio',
           rhTaskId: 'rh-pause-1',
-          generationStartTime: 0x3a98,
+          generationStartTime: 15000,
           generationDuration: null,
         },
       }),
@@ -577,14 +577,14 @@ function baseSpec(args4 = {}) {
           },
           pauseBuilder: () => ({ outputText: '恢复暂停' }),
         }),
-        { store: store17, now: () => 0x3e80 },
+        { store: store17, now: () => 16000 },
       ),
       value20 = store17.state.nodes['target-1'];
     (assert.equal(response17.ok, false),
       assert.equal(response17.status, 'paused'),
       assert.equal(value20.isGenerating, true),
       assert.equal(value20.jobStatus, 'running'),
-      assert.equal(value20.generationStartTime, 0x3a98),
+      assert.equal(value20.generationStartTime, 15000),
       assert.equal(value20.generationDuration, null),
       assert.equal(value20.rhTaskStatus, 'running'),
       assert.equal(value20.rhTaskRecovering, false),
@@ -596,13 +596,13 @@ function baseSpec(args4 = {}) {
         id: 'target-1',
         type: 'source-image',
         rhTaskId: 'rh-cancel-result-1',
-        generationStartTime: 0x4268,
+        generationStartTime: 17000,
       },
       'target-2': {
         id: 'target-2',
         type: 'source-image',
         rhTaskId: 'rh-cancel-error-1',
-        generationStartTime: 0x4268,
+        generationStartTime: 17000,
       },
     });
     (await submitTask(
@@ -613,9 +613,9 @@ function baseSpec(args4 = {}) {
         cancel: async () => ({ code: 0, msg: 'remote ok' }),
         cancelledBuilder: ({ remoteResult: remoteResult }) => ({ outputText: remoteResult?.msg || '' }),
       }),
-      { store: store18, now: () => 0x4268 },
+      { store: store18, now: () => 17000 },
     ),
-      await cancelTask('target-1', { store: store18, now: () => 0x445c }),
+      await cancelTask('target-1', { store: store18, now: () => 17500 }),
       await submitTask(
         baseSpec({
           targetNodeId: 'target-2',
@@ -626,9 +626,9 @@ function baseSpec(args4 = {}) {
           },
           cancelledBuilder: ({ remoteError: remoteError }) => ({ outputText: remoteError?.message || '' }),
         }),
-        { store: store18, now: () => 0x4650 },
+        { store: store18, now: () => 18000 },
       ),
-      await cancelTask('target-2', { store: store18, now: () => 0x4844 }),
+      await cancelTask('target-2', { store: store18, now: () => 18500 }),
       assert.equal(store18.state.nodes['target-1'].outputText, 'remote ok'),
       assert.equal(store18.state.nodes['target-2'].outputText, 'remote failed'),
       assert.equal(store18.state.nodes['target-1'].jobStatus, 'cancelled'),
@@ -636,7 +636,7 @@ function baseSpec(args4 = {}) {
   }),
   test('generationTaskRuntime: local abort does not overwrite explicit cancel patch', async () => {
     const store19 = createMockStore({
-      'target-1': { id: 'target-1', type: 'source-image', generationStartTime: 0x4a38 },
+      'target-1': { id: 'target-1', type: 'source-image', generationStartTime: 19000 },
     });
     let run3;
     const submitTask4 = submitTask(
@@ -649,12 +649,12 @@ function baseSpec(args4 = {}) {
         cancel: async () => ({ code: 0, msg: 'remote ok' }),
         cancelledBuilder: () => ({ outputText: 'late cancelled patch' }),
       }),
-      { store: store19, now: () => 0x4a38 },
+      { store: store19, now: () => 19000 },
     );
     (await new Promise((value23) => setTimeout(value23, 0)),
       await cancelTask('target-1', {
         store: store19,
-        now: () => 0x4c2c,
+        now: () => 19500,
         cancelledBuilder: () => ({ outputText: 'remote cancel patch' }),
       }));
     const error4 = new Error('CANCELLED');
@@ -670,7 +670,7 @@ function baseSpec(args4 = {}) {
         'target-1': {
           id: 'target-1',
           type: 'source-image',
-          generationStartTime: 0x4e20,
+          generationStartTime: 20000,
           generationDuration: null,
         },
       }),
@@ -685,7 +685,7 @@ function baseSpec(args4 = {}) {
             run4 = value26;
           }),
       }),
-      { store: store20, now: () => 0x4e20, abortController: abortController },
+      { store: store20, now: () => 20000, abortController: abortController },
     );
     (await new Promise((value27) => setTimeout(value27, 0)), abortController.abort());
     const error5 = new Error('CANCELLED');
@@ -703,7 +703,7 @@ function baseSpec(args4 = {}) {
         'target-1': {
           id: 'target-1',
           type: 'source-video',
-          generationStartTime: 0x5208,
+          generationStartTime: 21000,
           generationDuration: null,
         },
       }),
@@ -719,7 +719,7 @@ function baseSpec(args4 = {}) {
             throw error6;
           },
         }),
-        { store: store21, now: () => 0x5208 },
+        { store: store21, now: () => 21000 },
       ),
       value29 = store21.state.nodes['target-1'];
     (assert.equal(response20.status, 'paused'),
@@ -732,7 +732,7 @@ function baseSpec(args4 = {}) {
   }),
   test('generationTaskRuntime: submit abort before task id is not paused', async () => {
     const store22 = createMockStore({
-        'target-1': { id: 'target-1', type: 'source-video', generationStartTime: 0x55f0 },
+        'target-1': { id: 'target-1', type: 'source-video', generationStartTime: 22000 },
       }),
       response21 = await submitTask(
         baseSpec({
@@ -745,7 +745,7 @@ function baseSpec(args4 = {}) {
             throw error7;
           },
         }),
-        { store: store22, now: () => 0x55f0 },
+        { store: store22, now: () => 22000 },
       ),
       value30 = store22.state.nodes['target-1'];
     (assert.equal(response21.status, 'cancelled'),
@@ -763,7 +763,7 @@ function baseSpec(args4 = {}) {
             throw new Error('boom');
           },
         }),
-        { store: store23, now: () => 0x3a98 },
+        { store: store23, now: () => 15000 },
       ),
       value31 = store23.state.nodes['target-1'];
     (assert.equal(response22.ok, false),
@@ -781,7 +781,7 @@ function baseSpec(args4 = {}) {
           throw { message: 'raw provider error', getUserMessage: () => '用户可读错误' };
         },
       }),
-      { store: store24, now: () => 0x4268 },
+      { store: store24, now: () => 17000 },
     ),
       assert.equal(store24.state.nodes['target-1'].jobError, '用户可读错误'));
   }));

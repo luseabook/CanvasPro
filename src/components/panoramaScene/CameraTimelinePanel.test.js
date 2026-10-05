@@ -186,7 +186,7 @@ test('CameraTimelinePanel: render clamps display time and marks the active keyfr
   assert.equal(markers.length, 2);
   assert.equal(markers[1].dataset.keyframeId, 'active');
   assert.equal(markers[1].classList.contains('is-current'), true);
-  assert.equal(panel.querySelector('.panorama-camera-timeline__play').textContent, '\u2161');
+  assert.equal(panel.querySelector('.panorama-camera-timeline__play').textContent, 'Ⅱ');
 });
 
 test('CameraTimelinePanel: set display time updates the slider and output', () => {

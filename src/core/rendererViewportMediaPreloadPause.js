@@ -1,11 +1,11 @@
 import { setCanvasMediaSchedulerPaused } from '../modules/canvasMediaScheduler.js';
-const DEFAULT_RENDERER_VIEWPORT_MEDIA_PRELOAD_AUTO_RESUME_MS = 0x384,
-  ACTIVE_VIEWPORT_RECHECK_MS = 0xb4;
+const DEFAULT_RENDERER_VIEWPORT_MEDIA_PRELOAD_AUTO_RESUME_MS = 900,
+  ACTIVE_VIEWPORT_RECHECK_MS = 180;
 let rendererViewportMediaPreloadsPaused = ![],
-  rendererViewportMediaPreloadResumeTimer = 0x0;
+  rendererViewportMediaPreloadResumeTimer = 0;
 function clearRendererViewportMediaPreloadResumeTimer() {
   if (!rendererViewportMediaPreloadResumeTimer) return;
-  (clearTimeout(rendererViewportMediaPreloadResumeTimer), (rendererViewportMediaPreloadResumeTimer = 0x0));
+  (clearTimeout(rendererViewportMediaPreloadResumeTimer), (rendererViewportMediaPreloadResumeTimer = 0));
 }
 function isViewportBodyBusy() {
   const value = typeof document !== 'undefined' ? document?.['body']?.['classList'] : null;
@@ -18,10 +18,10 @@ function isViewportBodyBusy() {
 function scheduleRendererViewportMediaPreloadResume(item) {
   clearRendererViewportMediaPreloadResumeTimer();
   const key = Number['isFinite'](Number(item))
-    ? Math['max'](0x0, Number(item))
+    ? Math['max'](0, Number(item))
     : DEFAULT_RENDERER_VIEWPORT_MEDIA_PRELOAD_AUTO_RESUME_MS;
   rendererViewportMediaPreloadResumeTimer = setTimeout(() => {
-    rendererViewportMediaPreloadResumeTimer = 0x0;
+    rendererViewportMediaPreloadResumeTimer = 0;
     if (isViewportBodyBusy()) {
       scheduleRendererViewportMediaPreloadResume(ACTIVE_VIEWPORT_RECHECK_MS);
       return;
@@ -36,7 +36,7 @@ export function syncRendererViewportMediaPreloadPause(index, result = {}) {
     : clearRendererViewportMediaPreloadResumeTimer();
   if (rendererViewportMediaPreloadsPaused === data) return;
   ((rendererViewportMediaPreloadsPaused = data),
-    setCanvasMediaSchedulerPaused(data, { bypassPriority: 0x3e8, source: 'renderer-viewport' }));
+    setCanvasMediaSchedulerPaused(data, { bypassPriority: 1000, source: 'renderer-viewport' }));
 }
 export function clearRendererViewportMediaPreloadPause() {
   (clearRendererViewportMediaPreloadResumeTimer(), syncRendererViewportMediaPreloadPause(![]));

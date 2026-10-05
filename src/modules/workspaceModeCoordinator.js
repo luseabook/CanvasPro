@@ -46,11 +46,11 @@ export function isStoryboard3DWorkspaceAvailable(key = globalThis['window']) {
 }
 function renderWorkspaceModeIcon(index) {
   if (index === REPLICATION_MODE_ID)
-    return '<span\x20class=\x22workspace-mode-icon\x20workspace-mode-icon--replication\x22\x20aria-hidden=\x22true\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22><rect\x20x=\x223\x22\x20y=\x225\x22\x20width=\x2213\x22\x20height=\x2214\x22\x20rx=\x222\x22/><path\x20d=\x22m16\x209\x205-3v12l-5-3M7\x209l5\x203-5\x203z\x22/></svg></span>';
+    return '<span class="workspace-mode-icon workspace-mode-icon--replication" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 9 5-3v12l-5-3M7 9l5 3-5 3z"/></svg></span>';
   if (index === REPLACEMENT_STUDIO_MODE_ID)
     return '<span class="workspace-mode-icon workspace-mode-icon--person-replacement" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7.5 10.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z"/><path d="M2.75 18.75v-1.5a4.75 4.75 0 0 1 4.75-4.75h1.25"/><path d="M16.5 13.75a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M12.25 20.25v-1.5A3.75 3.75 0 0 1 16 15h1a4.25 4.25 0 0 1 4.25 4.25v1"/><path d="m10.5 8.25 2-2 2 2M12.5 6.25v5"/></svg></span>';
   if (index === STORYBOARD_3D_MODE_ID)
-    return '<span\x20class=\x22workspace-mode-icon\x20workspace-mode-icon--storyboard3d\x22\x20aria-hidden=\x22true\x22><svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22><path\x20d=\x22m12\x203\x208\x204.5v9L12\x2021l-8-4.5v-9z\x22/><path\x20d=\x22m4\x207.5\x208\x204.5\x208-4.5M12\x2012v9\x22/><circle\x20cx=\x2212\x22\x20cy=\x228\x22\x20r=\x221.5\x22/></svg></span>';
+    return '<span class="workspace-mode-icon workspace-mode-icon--storyboard3d" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/><circle cx="12" cy="8" r="1.5"/></svg></span>';
   if (index === STORY_MODE_ID)
     return '<span class="workspace-mode-icon workspace-mode-icon--story" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3.75h8.5L19 7.25v13H7z"/><path d="M15.5 3.75v3.5H19M10 11h6M10 14.5h6M10 18h4"/></svg></span>';
   return '<span class="workspace-mode-icon workspace-mode-icon--canvas" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3.75" y="3.75" width="6.5" height="6.5" rx="1.25"/><rect x="13.75" y="3.75" width="6.5" height="6.5" rx="1.25"/><rect x="3.75" y="13.75" width="6.5" height="6.5" rx="1.25"/><path d="M14 17h6M17 14v6"/></svg></span>';
@@ -76,11 +76,11 @@ export function renderWorkspaceModeSwitcher(
               : '画布模式',
     options = storyboard3DAvailable ? '' : 'disabled aria-disabled="true"',
     target = replicationAvailable ? '' : 'disabled aria-disabled="true"',
-    source = ['workspace-mode-switcher', menuOpen ? 'is-open' : '']['filter'](Boolean)['join']('\x20');
+    source = ['workspace-mode-switcher', menuOpen ? 'is-open' : '']['filter'](Boolean)['join'](' ');
   return (
     '<div class="' +
     source +
-    '\x22\x20data-story-mode-switcher>\x0a\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22workspace-mode-current\x22\x20aria-haspopup=\x22menu\x22\x20aria-controls=\x22workspaceModeMenu\x22\x20aria-expanded=\x22' +
+    '" data-story-mode-switcher>\n    <button type="button" class="workspace-mode-current" aria-haspopup="menu" aria-controls="workspaceModeMenu" aria-expanded="' +
     menuOpen +
     '">\n      ' +
     renderWorkspaceModeIcon(workspaceMode) +
@@ -94,19 +94,19 @@ export function renderWorkspaceModeSwitcher(
     CANVAS_MODE_ID +
     '" role="menuitem">\n        ' +
     renderWorkspaceModeIcon(CANVAS_MODE_ID) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22workspace-mode-option-copy\x22><span\x20class=\x22workspace-mode-option-title\x22><strong>画布模式</strong></span><small>节点创作与生成</small></span>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22workspace-mode-option\x20workspace-mode-option--story\x20' +
+    '\n        <span class="workspace-mode-option-copy"><span class="workspace-mode-option-title"><strong>画布模式</strong></span><small>节点创作与生成</small></span>\n      </button>\n      <button type="button" class="workspace-mode-option workspace-mode-option--story ' +
     (workspaceMode === STORY_MODE_ID ? 'is-active' : '') +
-    '\x22\x20data-story-workspace-mode=\x22' +
+    '" data-story-workspace-mode="' +
     STORY_MODE_ID +
     '" role="menuitem">\n        ' +
     renderWorkspaceModeIcon(STORY_MODE_ID) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22workspace-mode-option-copy\x22><span\x20class=\x22workspace-mode-option-title\x22><strong>剧本工作室</strong><span\x20class=\x22workspace-mode-beta-badge\x22>beta\x20限免</span></span><small>剧本、素材与分集</small></span>\x0a\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22workspace-mode-option\x20workspace-mode-option--person-replacement\x20' +
+    '\n        <span class="workspace-mode-option-copy"><span class="workspace-mode-option-title"><strong>剧本工作室</strong><span class="workspace-mode-beta-badge">beta 限免</span></span><small>剧本、素材与分集</small></span>\n      </button>\n      <button type="button" class="workspace-mode-option workspace-mode-option--person-replacement ' +
     (workspaceMode === REPLACEMENT_STUDIO_MODE_ID ? 'is-active' : '') +
     '" data-story-workspace-mode="' +
     REPLACEMENT_STUDIO_MODE_ID +
     '" role="menuitem">\n        ' +
     renderWorkspaceModeIcon(REPLACEMENT_STUDIO_MODE_ID) +
-    '\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22workspace-mode-option-copy\x22><span\x20class=\x22workspace-mode-option-title\x22><strong>' +
+    '\n        <span class="workspace-mode-option-copy"><span class="workspace-mode-option-title"><strong>' +
     REPLACEMENT_STUDIO_NAME +
     '</strong><span class="workspace-mode-beta-badge">beta</span><span class="workspace-mode-vip-badge">VIP</span></span><small>角色、镜头与声音替换</small></span>\n      </button>\n      <button type="button" class="workspace-mode-option workspace-mode-option--storyboard3d ' +
     (workspaceMode === STORYBOARD_3D_MODE_ID ? 'is-active' : '') +
@@ -178,7 +178,7 @@ export function createWorkspaceModeCoordinator({
       replicationAvailable: mode(REPLICATION_MODE_ID),
     };
   let handle = ![],
-    state = 0x0,
+    state = 0,
     config = storyboard3DAvailable2['mode'],
     enabled = ![],
     enabled2 = ![],
@@ -224,7 +224,7 @@ export function createWorkspaceModeCoordinator({
       const input = Array['from'](el6?.['querySelectorAll']('.workspace-mode-option:not(:disabled)') || [])[
           'filter'
         ]((output) => output['getAttribute']('aria-disabled') !== 'true'),
-        el7 = focus === 'last' ? input['at'](-0x1) : input[0x0],
+        el7 = focus === 'last' ? input['at'](-1) : input[0],
         handler3 = () => {
           if (!menuOpen2 || !el3['contains'](el7)) return;
           el7?.['focus']?.();
@@ -301,7 +301,7 @@ export function createWorkspaceModeCoordinator({
     },
     setMode = (value7, value8 = {}) => {
       const workspaceMode3 = normalizeWorkspaceMode(value7);
-      return ((config = workspaceMode3), (state += 0x1), handler5(workspaceMode3, value8, state));
+      return ((config = workspaceMode3), (state += 1), handler5(workspaceMode3, value8, state));
     },
     resumePendingMode = (value9) => {
       const workspaceMode4 = normalizeWorkspaceMode(value9);
@@ -360,13 +360,13 @@ export function createWorkspaceModeCoordinator({
         ),
         value18 = list['indexOf'](enabled9);
       let value19 = value18;
-      if (focus2['key'] === 'ArrowDown') value19 = (value18 + 0x1) % list['length'];
+      if (focus2['key'] === 'ArrowDown') value19 = (value18 + 1) % list['length'];
       else {
-        if (focus2['key'] === 'ArrowUp') value19 = (value18 - 0x1 + list['length']) % list['length'];
+        if (focus2['key'] === 'ArrowUp') value19 = (value18 - 1 + list['length']) % list['length'];
         else {
-          if (focus2['key'] === 'Home') value19 = 0x0;
+          if (focus2['key'] === 'Home') value19 = 0;
           else {
-            if (focus2['key'] === 'End') value19 = list['length'] - 0x1;
+            if (focus2['key'] === 'End') value19 = list['length'] - 1;
             else return;
           }
         }
@@ -415,7 +415,7 @@ export function createWorkspaceModeCoordinator({
         documentObject: documentObject,
         windowObject: windowObject,
         rootClassName: 'workspace-mode-reveal-transitioning',
-        duration: 0x2f8,
+        duration: 760,
       });
     },
     value22 = Object['freeze']({

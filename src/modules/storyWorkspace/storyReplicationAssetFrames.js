@@ -32,7 +32,7 @@ export async function collectStoryReplicationAssetFrames({
         '正在提取' +
           (key['kind'] === 'scene' ? '场景' : '道具') +
           '原片截图 ' +
-          (item + 0x1) +
+          (item + 1) +
           '/' +
           list['length'],
       ));

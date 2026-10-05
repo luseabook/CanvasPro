@@ -52,14 +52,14 @@ export function createPersonReplacementVideoPreparationRunner({
     if (!list['length'])
       return (
         (shots['workspace']['videoPreparation']?.['status'] !== 'succeeded' ||
-          Number(shots['workspace']['videoPreparation']?.['progress']) !== 0x64 ||
+          Number(shots['workspace']['videoPreparation']?.['progress']) !== 100 ||
           normalizeText(shots['workspace']['videoPreparation']?.['error'])) &&
           (shots = handler2(
             {
               ...shots,
               workspace: {
                 ...shots['workspace'],
-                videoPreparation: { status: 'succeeded', progress: 0x64, error: '' },
+                videoPreparation: { status: 'succeeded', progress: 100, error: '' },
               },
             },
             { renderWorkspace: renderWorkspace },
@@ -71,14 +71,14 @@ export function createPersonReplacementVideoPreparationRunner({
         ...shots,
         workspace: {
           ...shots['workspace'],
-          videoPreparation: { status: 'running', progress: 0x0, error: '' },
+          videoPreparation: { status: 'running', progress: 0, error: '' },
         },
         shots: shots['shots']['map']((error) =>
           list['some']((result) => result['id'] === error['id'])
             ? {
                 ...error,
                 materializationStatus: 'running',
-                materializationProgress: 0x0,
+                materializationProgress: 0,
                 error: error['analysisStatus'] === 'failed' ? error['error'] : '',
               }
             : error,
@@ -87,23 +87,23 @@ export function createPersonReplacementVideoPreparationRunner({
       { renderWorkspace: renderWorkspace },
     );
     const failures = [];
-    for (let data = 0x0; data < list['length']; data += 0x1) {
+    for (let data = 0; data < list['length']; data += 1) {
       const shotId = list[data]['id'],
         shotId2 = shots['shots']['find']((options) => options['id'] === shotId),
         target = shots['sources']['find']((source) => source['id'] === shotId2?.['sourceId']),
         sourceVideoRef = shotId2?.['sourceVideoRef'] || target?.['videoRef'] || '';
       try {
         if (!shotId2 || !sourceVideoRef) throw new Error('镜头缺少原始视频地址');
-        let endSec = Number(shotId2['endTimeSec']) || 0x0;
+        let endSec = Number(shotId2['endTimeSec']) || 0;
         if (!(endSec > shotId2['startTimeSec'])) {
           if (typeof fetchVideoMeta !== 'function') throw new Error('无法读取镜头结束时间');
           const next = resolveDurationSec(await fetchVideoMeta(sourceVideoRef));
           if (!(next > shotId2['startTimeSec'])) throw new Error('无法读取原视频时长');
           endSec = next;
         }
-        const outputFps = [0x10, 0x18, 0x1e]['includes'](Math['round'](Number(shotId2['outputFps'])))
+        const outputFps = [16, 24, 30]['includes'](Math['round'](Number(shotId2['outputFps'])))
             ? Math['round'](Number(shotId2['outputFps']))
-            : 0x18,
+            : 24,
           range = {
             shotId: shotId2['id'],
             sourceId: shotId2['sourceId'],
@@ -130,7 +130,7 @@ export function createPersonReplacementVideoPreparationRunner({
           shots = shots2;
           continue;
         }
-        const progress = Math['round'](((data + 0x1) / list['length']) * 0x64);
+        const progress = Math['round'](((data + 1) / list['length']) * 100);
         shots = handler2(
           {
             ...shots2,
@@ -140,13 +140,13 @@ export function createPersonReplacementVideoPreparationRunner({
                     ...error2,
                     sourceVideoRef: sourceVideoRef,
                     endTimeSec: endSec,
-                    durationSec: Math['max'](0x0, endSec - error2['startTimeSec']),
+                    durationSec: Math['max'](0, endSec - error2['startTimeSec']),
                     videoRef: videoRef,
                     videoRefIsCropped: videoRefIsCropped,
                     outputFps: outputFps,
                     materializedIsReversed: shotId2['isReversed'] === !![],
                     materializationStatus: 'succeeded',
-                    materializationProgress: 0x64,
+                    materializationProgress: 100,
                     error: error2['analysisStatus'] === 'failed' ? error2['error'] : '',
                   }
                 : error2,
@@ -170,7 +170,7 @@ export function createPersonReplacementVideoPreparationRunner({
                 ? {
                     ...error4,
                     materializationStatus: 'failed',
-                    materializationProgress: 0x0,
+                    materializationProgress: 0,
                     error:
                       error4['analysisStatus'] === 'failed'
                         ? [error4['error'], message]['filter'](Boolean)['join']('；')
@@ -182,7 +182,7 @@ export function createPersonReplacementVideoPreparationRunner({
               ...shots3['workspace'],
               videoPreparation: {
                 status: 'running',
-                progress: Math['round'](((data + 0x1) / list['length']) * 0x64),
+                progress: Math['round'](((data + 1) / list['length']) * 100),
                 error: message,
               },
             },
@@ -199,15 +199,15 @@ export function createPersonReplacementVideoPreparationRunner({
         ...args,
         workspace: {
           ...args['workspace'],
-          videoPreparation: { status: status, progress: 0x64, error: error5 },
+          videoPreparation: { status: status, progress: 100, error: error5 },
         },
       },
       { renderWorkspace: renderWorkspace },
     );
     if (notify) {
       if (failures['length']) showToast(error5 || '部分镜头切片失败。', 'error');
-      else showToast('已准备\x20' + list['length'] + ' 个固定帧率镜头。', 'success');
+      else showToast('已准备 ' + list['length'] + ' 个固定帧率镜头。', 'success');
     }
-    return { ok: failures['length'] === 0x0, failures: failures, project: shots };
+    return { ok: failures['length'] === 0, failures: failures, project: shots };
   };
 }

@@ -84,7 +84,7 @@ export function createStoryEpisodeSplitWorkspaceController({
       persistNow: persistence['persistNow'],
       schedule: persistence['schedule'],
     }),
-    requireFunctions('Story\x20episode\x20split\x20presentation', {
+    requireFunctions('Story episode split presentation', {
       getGenerationControl: presentation['getGenerationControl'],
       notifyComplete: presentation['notifyComplete'],
       notifyGenerationResult: presentation['notifyGenerationResult'],
@@ -95,7 +95,7 @@ export function createStoryEpisodeSplitWorkspaceController({
       showToast: presentation['showToast'],
     }));
   if (typeof getPlanningContext !== 'function')
-    throw new TypeError('Story\x20episode\x20split\x20requires\x20getPlanningContext.');
+    throw new TypeError('Story episode split requires getPlanningContext.');
   const isCancellationRequested = createStoryTaskBatchCancellationRegistry();
   function run() {
     return projectTasks['createProjectToken'](state);
@@ -211,8 +211,8 @@ export function createStoryEpisodeSplitWorkspaceController({
     return {
       project: context3['project'],
       episode: episode3,
-      previousEpisode: previousEpisode > 0x0 ? args2['episodes'][previousEpisode - 0x1] : null,
-      nextEpisode: previousEpisode >= 0x0 ? args2['episodes'][previousEpisode + 0x1] || null : null,
+      previousEpisode: previousEpisode > 0 ? args2['episodes'][previousEpisode - 1] : null,
+      nextEpisode: previousEpisode >= 0 ? args2['episodes'][previousEpisode + 1] || null : null,
       assets: buildVideoReplicationGenerationAssets(args2['assets'], context3['project']),
       constraints: context3['project']['planning'],
       model: splitRun2['execution']['modelId'],
@@ -225,7 +225,7 @@ export function createStoryEpisodeSplitWorkspaceController({
       onCheckpoint: async (record) => {
         if (!projectTasks['isLive'](projectToken3)) return;
         const count = args2['episodes']['findIndex']((payload) => payload['id'] === episode3['id']);
-        if (count < 0x0) return;
+        if (count < 0) return;
         ((args2['episodes'][count] = {
           ...args2['episodes'][count],
           experimentalSplitDraft: cloneData(record),
@@ -270,7 +270,7 @@ export function createStoryEpisodeSplitWorkspaceController({
       type: type,
       scope: { episodeId: episodeId['id'] },
       label: experimentalLabel
-        ? '实验分批拆分第 ' + (episodeId['number'] || '') + '\x20集'
+        ? '实验分批拆分第 ' + (episodeId['number'] || '') + ' 集'
         : '拆分第 ' + (episodeId['number'] || '') + ' 集分镜',
       message: experimental ? '正在规划整集分镜蓝图' : '正在生成分镜脚本',
       batch: batch,
@@ -356,7 +356,7 @@ export function createStoryEpisodeSplitWorkspaceController({
       if (projectTasks['isLive'](projectToken4)) {
         if (storyEpisodeScriptGuard['isCurrent']() && experimental && splitDraft?.['experimentalDraft']) {
           const count2 = projectData['episodes']['findIndex']((handle) => handle['id'] === episodeId['id']);
-          count2 >= 0x0 &&
+          count2 >= 0 &&
             ((projectData['episodes'][count2] = {
               ...projectData['episodes'][count2],
               experimentalSplitDraft: cloneData(splitDraft['experimentalDraft']),
@@ -366,7 +366,7 @@ export function createStoryEpisodeSplitWorkspaceController({
         } else {
           if (storyEpisodeScriptGuard['isCurrent']() && !experimental && splitDraft?.['partialResult']) {
             const count3 = projectData['episodes']['findIndex']((config) => config['id'] === episodeId['id']);
-            count3 >= 0x0 &&
+            count3 >= 0 &&
               ((projectData['episodes'][count3] = {
                 ...projectData['episodes'][count3],
                 splitDraft: splitDraft['partialResult'],
@@ -382,10 +382,10 @@ export function createStoryEpisodeSplitWorkspaceController({
         projectTasks['finishBackgroundTask'](projectToken4, backgroundTaskId2, {
           status: 'failed',
           message: experimentalLabel
-            ? '第\x20' + (episodeId['number'] || '') + ' 集实验分批拆分失败'
+            ? '第 ' + (episodeId['number'] || '') + ' 集实验分批拆分失败'
             : splitDraft?.['partialResult']
-              ? '第\x20' + (episodeId['number'] || '') + '\x20集本次返回未完全通过，已保存原始结果'
-              : '第\x20' + (episodeId['number'] || '') + ' 集分镜拆分失败',
+              ? '第 ' + (episodeId['number'] || '') + ' 集本次返回未完全通过，已保存原始结果'
+              : '第 ' + (episodeId['number'] || '') + ' 集分镜拆分失败',
           error: error,
           resumable: !![],
           resumePayload: modelId2['payload'](),
@@ -411,7 +411,7 @@ export function createStoryEpisodeSplitWorkspaceController({
         promptsStale: ![],
       };
     const count4 = projectData['episodes']['findIndex']((scope) => scope['id'] === episodeId['id']);
-    if (count4 >= 0x0) projectData['episodes'][count4] = args3;
+    if (count4 >= 0) projectData['episodes'][count4] = args3;
     return (
       await modelId2['succeeded'](),
       projectTasks['finishBackgroundTask'](projectToken4, backgroundTaskId2, {
@@ -429,7 +429,7 @@ export function createStoryEpisodeSplitWorkspaceController({
     const output = run(),
       assets = output['data'],
       count5 = assets['episodes']['findIndex']((value2) => value2['id'] === input);
-    if (count5 < 0x0) return ![];
+    if (count5 < 0) return ![];
     const episode5 = assets['episodes'][count5];
     if (!episode5?.['splitDraft'])
       return (presentation['showToast']('当前分集没有已保存的返回可供恢复。', 'info'), ![]);
@@ -455,9 +455,9 @@ export function createStoryEpisodeSplitWorkspaceController({
         persistence['schedule']({ immediate: !![] }),
         presentation['render'](),
         presentation['showToast'](
-          '第\x20' +
+          '第 ' +
             (value4['number'] || '') +
-            '\x20集已在本地恢复为\x20' +
+            ' 集已在本地恢复为 ' +
             value4['clips']['length'] +
             ' 个片段；未调用模型。',
           'success',
@@ -513,30 +513,30 @@ export function createStoryEpisodeSplitWorkspaceController({
         persistence['schedule']({ immediate: !![] }),
         explicitExperimental
           ? presentation['notifyComplete'](
-              '第\x20' +
+              '第 ' +
                 episodeId2['number'] +
                 ' 集实验分批拆分：' +
                 getStoryEpisodeSplitDeliveryMessage(episodeId2),
               value8,
-              { episodeId: episodeId2['id'], clipId: episodeId2['clips'][0x0]?.['id'] },
+              { episodeId: episodeId2['id'], clipId: episodeId2['clips'][0]?.['id'] },
               {
                 notificationMessage:
-                  '第\x20' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
+                  '第 ' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
               },
             )
           : presentation['notifyComplete'](
-              '第\x20' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
+              '第 ' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
               value8,
-              { episodeId: episodeId2['id'], clipId: episodeId2['clips'][0x0]?.['id'] },
+              { episodeId: episodeId2['id'], clipId: episodeId2['clips'][0]?.['id'] },
               {
                 notificationMessage:
-                  '第\x20' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
+                  '第 ' + episodeId2['number'] + ' 集：' + getStoryEpisodeSplitDeliveryMessage(episodeId2),
               },
             ),
         openAfter &&
           projectTasks['isCurrent'](value8) &&
           (setStoryEpisodeSplitRunning(state, enabled3['id'], ![]),
-          await presentation['openEpisode'](episodeId2['id'], episodeId2['clips'][0x0]?.['id'])),
+          await presentation['openEpisode'](episodeId2['id'], episodeId2['clips'][0]?.['id'])),
         !![]
       );
     } catch (error3) {
@@ -588,7 +588,7 @@ export function createStoryEpisodeSplitWorkspaceController({
       batchId = projectTasks['createTaskBatch']('episode-splits', {
         operation: operation,
         total: total['length'],
-        completed: 0x0,
+        completed: 0,
         targetEpisodeIds: targetEpisodeIds,
         pendingEpisodeIds: targetEpisodeIds,
         cancelRequested: ![],
@@ -606,7 +606,7 @@ export function createStoryEpisodeSplitWorkspaceController({
             (value16) => normalizeText(value16?.['id']) === normalizeText(value15?.['id']),
           ),
         createMissingTargetError: (value17) =>
-          new Error('第\x20' + (value17?.['number'] || '') + ' 集不存在，无法拆分。'),
+          new Error('第 ' + (value17?.['number'] || '') + ' 集不存在，无法拆分。'),
         runTarget: (value18) => run7(value18, projectToken5, { batch: batchId, experimental: experimental }),
         onTargetSettled: ({
           target: target2,
@@ -615,7 +615,7 @@ export function createStoryEpisodeSplitWorkspaceController({
           pendingTargets: pendingTargets2,
         }) => {
           const text = normalizeText(target2?.['id']),
-            label = value11 + '\x20' + (index2 + 0x1) + '/' + total['length'];
+            label = value11 + ' ' + (index2 + 1) + '/' + total['length'];
           projectTasks['syncTaskBatch'](projectToken5, batchId, {
             completed: completed,
             pendingEpisodeIds: pendingTargets2['map']((value19) => normalizeText(value19?.['id']))['filter'](
@@ -650,9 +650,9 @@ export function createStoryEpisodeSplitWorkspaceController({
             ? resolveStoryEpisodeExperimentalErrorMessage(error4, { retryActionLabel: '批量拆分' })
             : normalizeText(error4?.['message']) || '分镜拆分失败。',
         notifyFailure: (value22, value23) =>
-          presentation['notifyGenerationResult'](value22, projectToken5, { step: 0x3 }, value23),
+          presentation['notifyGenerationResult'](value22, projectToken5, { step: 3 }, value23),
         notifySuccess: (value24, value25) =>
-          presentation['notifyComplete'](value24, projectToken5, { step: 0x3 }, value25),
+          presentation['notifyComplete'](value24, projectToken5, { step: 3 }, value25),
       });
     } finally {
       (isCancellationRequested['clear'](batchId['id']),

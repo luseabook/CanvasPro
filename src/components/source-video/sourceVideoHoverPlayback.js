@@ -74,10 +74,10 @@ export function releaseIdleSourceVideoHoverPlaybackMedia(enabled3) {
   )
     return ![];
   const index = String(enabled3['_currentSrc'] || '')['trim'](),
-    result = Number(enabled4['currentTime'] || 0x0);
+    result = Number(enabled4['currentTime'] || 0);
   return (
     enabled3['_replacePendingPlaybackResume'](index, result),
-    (enabled3['_playbackSourceToken'] = Number(enabled3['_playbackSourceToken'] || 0x0) + 0x1),
+    (enabled3['_playbackSourceToken'] = Number(enabled3['_playbackSourceToken'] || 0) + 1),
     (enabled3['_playbackSourcePromise'] = null),
     (enabled3['_playbackSourcePromiseSource'] = ''),
     (enabled4['preload'] = 'none'),

@@ -10,12 +10,12 @@ import { validateStoryboard3DBackgroundImageFile } from './backgroundImageContro
 const escape = (value) =>
   String(value ?? '')
     ['replaceAll']('&', '&amp;')
-    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('"', '&quot;')
     ['replaceAll']('<', '&lt;');
 export class DirectorScenePanel {
   constructor(item) {
     ((this['panel'] = item),
-      (this['transform'] = { x: 0x0, y: 0x0, z: 0x0, yaw: 0x0, scale: 0x1 }),
+      (this['transform'] = { x: 0, y: 0, z: 0, yaw: 0, scale: 1 }),
       (this['loading'] = ![]),
       (this['disposed'] = ![]));
   }
@@ -24,14 +24,14 @@ export class DirectorScenePanel {
     if (!scene) return '';
     const directorSceneSettings = normalizeDirectorSceneSettings(scene['directorSettings']);
     return (
-      '<fieldset\x20data-director-scene\x20aria-busy=\x22' +
+      '<fieldset data-director-scene aria-busy="' +
       this['loading'] +
       '"><legend>场景与全景</legend><div class="storyboard-3d-director-fields">\n      ' +
       DIRECTOR_AXIS_VIEWS['map'](
         ([key, index]) =>
           '<button data-storyboard-3d-action="timeline-scene-view" data-view="' +
           key +
-          '\x22>' +
+          '">' +
           index +
           '视图</button>',
       )['join']('') +
@@ -45,7 +45,7 @@ export class DirectorScenePanel {
           ([result, data]) =>
             '<option value="' +
             result +
-            '\x22\x20' +
+            '" ' +
             (directorSceneSettings['displayMode'] === result ? 'selected' : '') +
             '>' +
             data +
@@ -66,13 +66,13 @@ export class DirectorScenePanel {
           ([options, target]) =>
             '<label>' +
             (options === 'yaw'
-              ? '旋转\x20/\x20度'
+              ? '旋转 / 度'
               : options === 'scale'
                 ? '缩放'
                 : '平移 ' + options['toUpperCase']() + ' / 米') +
             '<input type="number" step="0.1" data-director-scene-transform="' +
             options +
-            '\x22\x20value=\x22' +
+            '" value="' +
             target +
             '"></label>',
         )
@@ -81,7 +81,7 @@ export class DirectorScenePanel {
       (directorSceneSettings['panorama']['enabled'] ? 'checked' : '') +
       '>球面全景</label>\n      <label>' +
       (this['loading'] ? '正在导入全景…' : '导入全景图片') +
-      '<input\x20type=\x22file\x22\x20accept=\x22image/*\x22\x20data-director-panorama-file\x20' +
+      '<input type="file" accept="image/*" data-director-panorama-file ' +
       (this['loading'] ? 'disabled' : '') +
       '></label>\n      <label>历史<select data-director-panorama="assetId"><option value="">选择全景</option>' +
       directorSceneSettings['panorama']['history']
@@ -89,7 +89,7 @@ export class DirectorScenePanel {
           (source) =>
             '<option value="' +
             escape(source['assetId']) +
-            '\x22\x20' +
+            '" ' +
             (directorSceneSettings['panorama']['assetId'] === source['assetId'] ? 'selected' : '') +
             '>' +
             escape(source['name']) +
@@ -105,7 +105,7 @@ export class DirectorScenePanel {
             '<label>' +
             ['俯仰', '方位', '倾斜'][current] +
             ' / 度<input type="number" step="1" value="' +
-            (next * 0xb4) / Math['PI'] +
+            (next * 180) / Math['PI'] +
             '" data-director-panorama="rotation-' +
             current +
             '"></label>',
@@ -140,7 +140,7 @@ export class DirectorScenePanel {
   ['change'](event) {
     const el = event['target'];
     if (el['matches']?.('[data-director-panorama-file]')) {
-      const config = el['files']?.[0x0];
+      const config = el['files']?.[0];
       el['value'] = '';
       if (config) void this['importPanorama'](config);
       return !![];
@@ -165,7 +165,7 @@ export class DirectorScenePanel {
           const [output, value2] = el['dataset']['directorPanorama']['split']('-');
           if (value2 != null)
             input['directorSettings']['panorama']['rotation'][Number(value2)] =
-              (Number(el['value']) * Math['PI']) / 0xb4;
+              (Number(el['value']) * Math['PI']) / 180;
           else
             input['directorSettings']['panorama'][output] =
               el['type'] === 'checkbox'
@@ -189,7 +189,7 @@ export class DirectorScenePanel {
       value4 &&
         args &&
         (enabled2['setViewProjection']('orthographic'),
-        enabled2['commitSceneView']({ ...args, orbitYaw: value4[0x2], orbitPitch: value4[0x3] }));
+        enabled2['commitSceneView']({ ...args, orbitYaw: value4[2], orbitPitch: value4[3] }));
     }
     if (enabled === 'timeline-scene-perspective') enabled2['setViewProjection']('perspective');
     if (enabled === 'timeline-scene-quad') this['panel']['timeline']['multiView']?.['toggle']();
@@ -199,13 +199,13 @@ export class DirectorScenePanel {
       );
     if (enabled === 'timeline-scene-ground' && object && !object['locked']) {
       const value7 = enabled2['directorScene']['surfaceHeight'](
-          object['transform']['position'][0x0],
-          object['transform']['position'][0x2],
+          object['transform']['position'][0],
+          object['transform']['position'][2],
           [object['id']],
         ),
-        value8 = enabled2['resolveObjectGroundPosition'](object['id']) || 0x0;
+        value8 = enabled2['resolveObjectGroundPosition'](object['id']) || 0;
       this['mutate']('贴合模型表面', (value9) => {
-        value9['objects']['find']((value10) => value10['id'] === object['id'])['transform']['position'][0x1] =
+        value9['objects']['find']((value10) => value10['id'] === object['id'])['transform']['position'][1] =
           value7 + value8;
       });
     }
@@ -213,7 +213,7 @@ export class DirectorScenePanel {
       const value11 = this['panel']['timeline']['cameraPath'],
         value12 = value11['points']()['map']((value13) => value13['camera']['position']),
         enabled3 = scene3['objects']['find']((value14) => value14['id'] === value11['objectId']);
-      if (!enabled3 || enabled3['locked'] || value12['length'] < 0x2)
+      if (!enabled3 || enabled3['locked'] || value12['length'] < 2)
         return (
           this['panel']['timeline']['setMessage']?.('请先选择已解锁物体的路线，至少设置两个控制点。'),
           !![]
@@ -222,12 +222,12 @@ export class DirectorScenePanel {
         const value15 =
             enabled === 'timeline-scene-avoid'
               ? findDirectorObstacleRoute(
-                  value12[0x0],
-                  value12['at'](-0x1),
+                  value12[0],
+                  value12['at'](-1),
                   enabled2['directorScene']['obstacles']([enabled3['id']]),
                 )
               : value12,
-          value16 = enabled2['resolveObjectGroundPosition'](enabled3['id']) || 0x0,
+          value16 = enabled2['resolveObjectGroundPosition'](enabled3['id']) || 0,
           sampleDirectorGroundRoute2 = sampleDirectorGroundRoute(
             value15,
             (value17, value18) =>
@@ -239,8 +239,8 @@ export class DirectorScenePanel {
           authorDirectorPath(value20, {
             object: enabled3,
             points: sampleDirectorGroundRoute2,
-            start: value19[0x0]['time'],
-            duration: value19['at'](-0x1)['time'] - value19[0x0]['time'],
+            start: value19[0]['time'],
+            duration: value19['at'](-1)['time'] - value19[0]['time'],
             smooth: ![],
           }),
         );
@@ -254,7 +254,7 @@ export class DirectorScenePanel {
     if (this['loading']) return;
     const response = validateStoryboard3DBackgroundImageFile(error);
     if (!response['ok']) {
-      this['panel']['timeline']['setMessage']?.(response['errors'][0x0]['message']);
+      this['panel']['timeline']['setMessage']?.(response['errors'][0]['message']);
       return;
     }
     const { project: project2, scene: scene4 } = this['panel']['context'](),

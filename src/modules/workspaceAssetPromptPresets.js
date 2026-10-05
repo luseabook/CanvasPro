@@ -50,7 +50,7 @@ export function getWorkspaceCharacterAssetPromptPreset(index = '') {
   return (
     WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS['find'](
       (result) => result['id'] === String(index || '')['trim'](),
-    ) || WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS[0x0]
+    ) || WORKSPACE_CHARACTER_ASSET_PROMPT_PRESETS[0]
   );
 }
 export function applyWorkspaceCharacterAssetPromptPreset(data = '', options = '', target = {}) {
@@ -65,7 +65,7 @@ export function getWorkspaceSceneAssetPromptPreset(next = '') {
   return (
     WORKSPACE_SCENE_ASSET_PROMPT_PRESETS['find'](
       (current) => current['id'] === String(next || '')['trim'](),
-    ) || WORKSPACE_SCENE_ASSET_PROMPT_PRESETS[0x0]
+    ) || WORKSPACE_SCENE_ASSET_PROMPT_PRESETS[0]
   );
 }
 export function applyWorkspaceSceneAssetPromptPreset(entry = '', record = '') {

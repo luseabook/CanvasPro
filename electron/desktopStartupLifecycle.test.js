@@ -91,7 +91,7 @@ test('onShellClosed schedules a quit when unsaved changes exist', () => {
   const { lifecycle, timers, calls } = createHarness();
   assert.equal(lifecycle.onShellClosed({ hasUnsavedChanges: true }), false);
   assert.equal(timers.length, 1);
-  assert.equal(timers[0].delayMs, 0x4b0);
+  assert.equal(timers[0].delayMs, 1200);
   assert.deepEqual(calls, []);
   runTimers(timers);
   assert.deepEqual(calls, [['quit']]);

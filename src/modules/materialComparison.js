@@ -96,12 +96,12 @@ export function openMaterialComparison(list = [], value2 = {}) {
       leftIndex: leftIndex['leftIndex'],
       rightIndex: leftIndex['rightIndex'],
       nextSlot: SLOT_LEFT,
-      dividerPercent: 0x32,
-      zoom: 0x1,
-      leftAspectRatio: leftAspectRatio[leftIndex['leftIndex']]['aspectRatio'] || 0x1,
-      rightAspectRatio: leftAspectRatio[leftIndex['rightIndex']]['aspectRatio'] || 0x1,
-      stageWidth: 0x1,
-      stageHeight: 0x1,
+      dividerPercent: 50,
+      zoom: 1,
+      leftAspectRatio: leftAspectRatio[leftIndex['leftIndex']]['aspectRatio'] || 1,
+      rightAspectRatio: leftAspectRatio[leftIndex['rightIndex']]['aspectRatio'] || 1,
+      stageWidth: 1,
+      stageHeight: 1,
     },
     revokeUrlOnClose = new Set();
   let enabled = ![],
@@ -141,7 +141,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     el6['setAttribute']('aria-label', translate('canvasInteraction.materialComparison.modeGroupLabel')));
   const el7 = createButton(
     documentObject,
-    'v2-material-comparison-mode-button\x20is-active',
+    'v2-material-comparison-mode-button is-active',
     translate('canvasInteraction.materialComparison.slideMode'),
   );
   ((el7['dataset']['comparisonMode'] = MODE_SLIDE), el7['setAttribute']('aria-pressed', 'true'));
@@ -162,7 +162,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
   (el4['appendChild'](el5), el4['appendChild'](el6), el4['appendChild'](el9));
   const viewport = createElement(documentObject, 'div', 'v2-material-comparison-viewport'),
     main = createElement(documentObject, 'main', 'v2-material-comparison-main');
-  main['tabIndex'] = 0x0;
+  main['tabIndex'] = 0;
   const stageShell = createElement(documentObject, 'div', 'v2-material-comparison-stage-shell'),
     stage = createElement(documentObject, 'div', 'v2-material-comparison-stage');
   ((stage['dataset']['comparisonMode'] = MODE_SLIDE),
@@ -204,7 +204,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
           video: video,
           badge: badge,
           slot: slot,
-          attachToken: 0x0,
+          attachToken: 0,
           sourceUrl: '',
           entryKind: entryKind ? value7['kind'] : '',
           playbackReady: ![],
@@ -289,7 +289,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
         'v2-material-comparison-thumbnail-card',
         '',
         translate('canvasInteraction.materialComparison.thumbnailLabel', {
-          index: index2 + 0x1,
+          index: index2 + 1,
           name: name['label'],
         }),
       );
@@ -318,7 +318,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
         leftBadge = createTextElement(
           documentObject,
           'span',
-          'v2-material-comparison-thumbnail-badge\x20is-left',
+          'v2-material-comparison-thumbnail-badge is-left',
           translate('canvasInteraction.materialComparison.left'),
         ),
         rightBadge = createTextElement(
@@ -346,7 +346,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     return value9 === SLOT_LEFT ? leftPanel : rightPanel;
   }
   function run6(value10, value11) {
-    const value12 = Number['isFinite'](Number(value11)) && Number(value11) > 0x0 ? Number(value11) : 0x1;
+    const value12 = Number['isFinite'](Number(value11)) && Number(value11) > 0 ? Number(value11) : 1;
     if (value10 === SLOT_LEFT) state2['leftAspectRatio'] = value12;
     else state2['rightAspectRatio'] = value12;
     run5(value10)['panel']['style']['setProperty']('--material-comparison-source-aspect', String(value12));
@@ -367,7 +367,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     (slot2['entryKind'] === MATERIAL_COMPARISON_KIND_VIDEO &&
       materialComparisonPlaybackController['clearPanelSource'](slot2),
       (slot2['entryKind'] = value14['kind']),
-      (slot2['attachToken'] += 0x1),
+      (slot2['attachToken'] += 1),
       (image2['hidden'] = !![]),
       panel2['setAttribute']('aria-busy', 'true'),
       panel2['classList']['add']('is-loading'),
@@ -380,7 +380,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     (value17['entryKind'] === MATERIAL_COMPARISON_KIND_VIDEO &&
       materialComparisonPlaybackController['clearPanelSource'](value17),
       (value17['entryKind'] = value18['kind']),
-      (value17['attachToken'] += 0x1),
+      (value17['attachToken'] += 1),
       (image3['alt'] = value18['label']),
       (image3['hidden'] = !![]),
       image3['removeAttribute']?.('src'),
@@ -389,7 +389,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
       panel3['setAttribute']('aria-busy', 'true'));
   }
   function run9(slot3) {
-    ((slot3['attachToken'] += 0x1),
+    ((slot3['attachToken'] += 1),
       (slot3['image']['hidden'] = !![]),
       (slot3['video']['hidden'] = !![]),
       slot3['panel']['classList']['remove']('is-loading'),
@@ -412,9 +412,9 @@ export function openMaterialComparison(list = [], value2 = {}) {
       ));
   }
   function onMediaAspect(value20, value21, value22 = value21['image']) {
-    const count = Number(value22?.['naturalWidth'] || value22?.['videoWidth'] || 0x0),
-      count2 = Number(value22?.['naturalHeight'] || value22?.['videoHeight'] || 0x0);
-    if (count <= 0x0 || count2 <= 0x0) return;
+    const count = Number(value22?.['naturalWidth'] || value22?.['videoWidth'] || 0),
+      count2 = Number(value22?.['naturalHeight'] || value22?.['videoHeight'] || 0);
+    if (count <= 0 || count2 <= 0) return;
     const value23 = count / count2,
       value24 = value20 === SLOT_LEFT ? state2['leftIndex'] : state2['rightIndex'];
     if (leftAspectRatio[value24]) leftAspectRatio[value24]['aspectRatio'] = value23;
@@ -465,7 +465,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     const enabled8 = value25 === SLOT_LEFT ? leftPanel : rightPanel;
     ((enabled8['badge']['textContent'] =
       getEntryNodeName(enabled7) || translate('canvasInteraction.materialComparison.' + value25)),
-      run6(value25, enabled7['aspectRatio'] || 0x1),
+      run6(value25, enabled7['aspectRatio'] || 1),
       onGeometryChange());
     if (enabled7['kind'] === MATERIAL_COMPARISON_KIND_VIDEO) {
       materialComparisonPlaybackController['setPanelSource'](value25, enabled8, enabled7);
@@ -486,7 +486,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
   }
   function run13(value29) {
     const enabled9 = leftAspectRatio[value29];
-    if (!enabled9 || (map['get'](enabled9['kind']) || 0x0) < 0x2) return !![];
+    if (!enabled9 || (map['get'](enabled9['kind']) || 0) < 2) return !![];
     if (state2['nextSlot'] !== SLOT_RIGHT) return ![];
     return enabled9['kind'] !== getActiveEntry(SLOT_LEFT)?.['kind'];
   }
@@ -519,7 +519,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
         const count3 = leftAspectRatio['findIndex'](
           (value36, value37) => value37 !== value33 && value36['kind'] === leftAspectRatio[value33]['kind'],
         );
-        count3 >= 0x0 && ((state2['rightIndex'] = count3), run12(SLOT_RIGHT, count3));
+        count3 >= 0 && ((state2['rightIndex'] = count3), run12(SLOT_RIGHT, count3));
       }
       state2['nextSlot'] = SLOT_RIGHT;
     } else ((state2['rightIndex'] = value33), (state2['nextSlot'] = SLOT_LEFT));
@@ -540,16 +540,16 @@ export function openMaterialComparison(list = [], value2 = {}) {
       onGeometryChange());
   }
   function run19(value40) {
-    ((state2['dividerPercent'] = Math['round'](clamp(value40, 0x0, 0x64) * 0x64) / 0x64),
+    ((state2['dividerPercent'] = Math['round'](clamp(value40, 0, 100) * 100) / 100),
       handler(),
       el10['setAttribute']('aria-valuenow', String(Math['round'](state2['dividerPercent']))));
   }
   function run20(event2) {
     const box = main['getBoundingClientRect']?.(),
-      count4 = Number(main['clientWidth'] || box?.['width']) || 0x0;
-    if (count4 <= 0x0) return;
-    const value41 = Number(box?.['left']) || 0x0;
-    run19(((Number(event2?.['clientX']) - value41) / count4) * 0x64);
+      count4 = Number(main['clientWidth'] || box?.['width']) || 0;
+    if (count4 <= 0) return;
+    const value41 = Number(box?.['left']) || 0;
+    run19(((Number(event2?.['clientX']) - value41) / count4) * 100);
   }
   function run21(event3) {
     if (value6 === null) return;
@@ -570,11 +570,11 @@ export function openMaterialComparison(list = [], value2 = {}) {
   function run23(event5) {
     if (state2['mode'] !== MODE_SLIDE) return;
     if (enabled2) return;
-    if (event5?.['button'] != null && event5['button'] !== 0x0) return;
+    if (event5?.['button'] != null && event5['button'] !== 0) return;
     (event5?.['preventDefault']?.(),
       event5?.['stopPropagation']?.(),
       run21(),
-      (value6 = event5?.['pointerId'] ?? 0x0),
+      (value6 = event5?.['pointerId'] ?? 0),
       stage['classList']['add']('is-dragging-divider'),
       run20(event5),
       windowObject?.['addEventListener']?.('pointermove', run22, !![]),
@@ -586,7 +586,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     if (event6['key'] !== 'ArrowLeft' && event6['key'] !== 'ArrowRight') return;
     (event6['preventDefault']?.(),
       event6['stopPropagation']?.(),
-      run19(state2['dividerPercent'] + (event6['key'] === 'ArrowRight' ? 0x2 : -0x2)));
+      run19(state2['dividerPercent'] + (event6['key'] === 'ArrowRight' ? 2 : -2)));
   }
   function run25() {
     (windowObject?.['removeEventListener']?.('pointermove', run26, !![]),
@@ -601,18 +601,18 @@ export function openMaterialComparison(list = [], value2 = {}) {
   }
   function run29(pointerId) {
     const count5 = Number(pointerId?.['button']),
-      usesSpaceHand = enabled2 && count5 === 0x0;
-    if (count5 !== 0x1 && !usesSpaceHand) return;
+      usesSpaceHand = enabled2 && count5 === 0;
+    if (count5 !== 1 && !usesSpaceHand) return;
     (pointerId['preventDefault']?.(),
       pointerId['stopPropagation']?.(),
       run21(),
       run28(),
       (event = {
         pointerId: pointerId?.['pointerId'],
-        startX: Number(pointerId?.['clientX'] || 0x0),
-        startY: Number(pointerId?.['clientY'] || 0x0),
-        scrollLeft: Number(main['scrollLeft'] || 0x0),
-        scrollTop: Number(main['scrollTop'] || 0x0),
+        startX: Number(pointerId?.['clientX'] || 0),
+        startY: Number(pointerId?.['clientY'] || 0),
+        scrollLeft: Number(main['scrollLeft'] || 0),
+        scrollTop: Number(main['scrollTop'] || 0),
         captureTarget: main,
         usesSpaceHand: usesSpaceHand,
         moved: ![],
@@ -633,10 +633,10 @@ export function openMaterialComparison(list = [], value2 = {}) {
     )
       return;
     (event7['preventDefault']?.(), event7['stopPropagation']?.());
-    const value42 = Number(event7?.['clientX'] || 0x0) - event['startX'],
-      value43 = Number(event7?.['clientY'] || 0x0) - event['startY'];
+    const value42 = Number(event7?.['clientX'] || 0) - event['startX'],
+      value43 = Number(event7?.['clientY'] || 0) - event['startY'];
     (!event['moved'] &&
-      Math['hypot'](value42, value43) >= 0x2 &&
+      Math['hypot'](value42, value43) >= 2 &&
       ((event['moved'] = !![]), (enabled4 = !![])),
       (main['scrollLeft'] = event['scrollLeft'] - value42),
       (main['scrollTop'] = event['scrollTop'] - value43),
@@ -657,7 +657,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     run28();
   }
   function run30(event9) {
-    return event9?.['code'] === 'Space' || event9?.['key'] === '\x20' || event9?.['key'] === 'Space';
+    return event9?.['code'] === 'Space' || event9?.['key'] === ' ' || event9?.['key'] === 'Space';
   }
   function run31(el16) {
     if (!el16) return ![];
@@ -691,7 +691,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
       (enabled4 = ![]));
   }
   function run34(event11) {
-    if (Number(event11?.['button']) !== 0x1) return;
+    if (Number(event11?.['button']) !== 1) return;
     (event11['preventDefault']?.(), event11['stopPropagation']?.());
   }
   const onClose = () => {
@@ -776,14 +776,14 @@ export function openMaterialComparison(list = [], value2 = {}) {
       'wheel',
       (event13) => {
         const count6 = Math['max'](
-          0x0,
-          Number(el14['scrollWidth'] || 0x0) - Number(el14['clientWidth'] || 0x0),
+          0,
+          Number(el14['scrollWidth'] || 0) - Number(el14['clientWidth'] || 0),
         );
-        if (count6 <= 0x0) return;
-        const enabled12 = Number(event13['deltaY'] || event13['deltaX'] || 0x0);
+        if (count6 <= 0) return;
+        const enabled12 = Number(event13['deltaY'] || event13['deltaX'] || 0);
         if (!enabled12) return;
-        const value53 = Number(el14['scrollLeft'] || 0x0),
-          clamp2 = clamp(value53 + enabled12, 0x0, count6);
+        const value53 = Number(el14['scrollLeft'] || 0),
+          clamp2 = clamp(value53 + enabled12, 0, count6);
         if (clamp2 !== value53) el14['scrollLeft'] = clamp2;
         (event13['preventDefault']?.(), event13['stopPropagation']?.());
       },

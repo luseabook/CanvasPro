@@ -1,5 +1,5 @@
-const DEFAULT_KEEPALIVE_INTERVAL_MS = 0x3a98,
-  DEFAULT_KEEPALIVE_TIMEOUT_MS = 0x3e8,
+const DEFAULT_KEEPALIVE_INTERVAL_MS = 15000,
+  DEFAULT_KEEPALIVE_TIMEOUT_MS = 1000,
   DEFAULT_RUNTIME_INFO_PATH = '/api/v2/runtime/info',
   DEFAULT_BLOCKER_REASON = 'local-runtime-keepalive';
 function isWindowWarmable(enabled) {

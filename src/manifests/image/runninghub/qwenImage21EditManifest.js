@@ -7,24 +7,24 @@ export const QWEN_IMAGE_21_EDIT_MODEL_ID = 'runninghub/2102016235713159169';
 export const QWEN_IMAGE_21_EDIT_EXECUTION_ID = 'runninghub.workflow.qwen-image-21-edit.v1';
 const QWEN_IMAGE_21_EDIT_IMAGE_NODES = Object['freeze'](
     ['490', '487', '541', '544', '543', '545', '548', '547', '546']['map']((nodeId, value) =>
-      Object['freeze']({ nodeId: nodeId, fieldName: 'image', description: '图像' + (value + 0x1) }),
+      Object['freeze']({ nodeId: nodeId, fieldName: 'image', description: '图像' + (value + 1) }),
     ),
   ),
   QWEN_IMAGE_21_EDIT_CONDITIONING_FIELDS = Object['freeze'](
-    Array['from']({ length: 0x9 }, (item, key) =>
+    Array['from']({ length: 9 }, (item, key) =>
       Object['freeze']({
         nodeId: '518',
-        fieldName: 'images.image_' + (key + 0x1),
-        description: '图像' + (key + 0x1) + '输入',
+        fieldName: 'images.image_' + (key + 1),
+        description: '图像' + (key + 1) + '输入',
       }),
     ),
   );
 export const QWEN_IMAGE_21_EDIT_HELP_TOOLTIP = [
-  'Qwen\x20Image\x202.1\x20图像编辑用法',
+  'Qwen Image 2.1 图像编辑用法',
   '不接参考图时按提示词生成图片。',
   '接入 1-9 张参考图时，按连接顺序作为图像1至图像9进行编辑。',
   '高级设置可控制是否开启提示词增强。',
-]['join']('\x0a');
+]['join']('\n');
 export const qwenImage21EditModelManifest = Object['freeze']({
   schemaVersion: '1.0',
   modelId: QWEN_IMAGE_21_EDIT_MODEL_ID,
@@ -34,25 +34,25 @@ export const qwenImage21EditModelManifest = Object['freeze']({
   executionId: QWEN_IMAGE_21_EDIT_EXECUTION_ID,
   displayName: 'Qwen Image 2.1 图像编辑',
   icon: 'images/RH.png',
-  description: '支持文生图和最多\x209\x20张参考图的\x20Qwen\x20Image\x202.1\x20编辑工作流',
+  description: '支持文生图和最多 9 张参考图的 Qwen Image 2.1 编辑工作流',
   help: Object['freeze']({ tooltip: QWEN_IMAGE_21_EDIT_HELP_TOOLTIP }),
   prompt: Object['freeze']({ placeholder: '描述要生成的画面，或说明图像1至图像9的编辑要求' }),
   extensions: Object['freeze']({
     personReplacement: Object['freeze']({ imageMentionFormat: 'at-image' }),
     providerProfiles: Object['freeze'](['runninghub', 'runninghub-international']),
-    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 0x2d }),
+    imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 45 }),
     ratioPolicy: Object['freeze']({ capability: 'dimensions' }),
   }),
   capabilities: Object['freeze']({
     inputKinds: Object['freeze'](['text', 'image']),
     outputType: 'image',
-    maxImages: 0x9,
+    maxImages: 9,
   }),
   inputSlots: Object['freeze']({
     allowedKinds: Object['freeze'](['text', 'image']),
-    minByKind: Object['freeze']({ image: 0x0 }),
-    maxByKind: Object['freeze']({ text: 0x1, image: 0x9, video: 0x0, audio: 0x0 }),
-    displayAspectRatioSource: Object['freeze']({ kind: 'image', fallbackIndex: 0x0 }),
+    minByKind: Object['freeze']({ image: 0 }),
+    maxByKind: Object['freeze']({ text: 1, image: 9, video: 0, audio: 0 }),
+    displayAspectRatioSource: Object['freeze']({ kind: 'image', fallbackIndex: 0 }),
   }),
   uiSchema: Object['freeze']({
     fields: Object['freeze']([
@@ -98,7 +98,7 @@ export const qwenImage21EditExecutionManifest = Object['freeze']({
       'runninghub-international': Object['freeze']({ workflowId: '2102082936647565314' }),
     }),
     payloadResolver: 'runninghubQwenImage21Edit',
-    taskCreate: Object['freeze']({ retainSeconds: 0x3c }),
+    taskCreate: Object['freeze']({ retainSeconds: 60 }),
   }),
   instanceType: Object['freeze']({
     field: 'rhInstanceType',
@@ -106,16 +106,16 @@ export const qwenImage21EditExecutionManifest = Object['freeze']({
     allowedValues: RUNNINGHUB_INSTANCE_TYPE_ALLOWED_VALUES,
   }),
   mapping: Object['freeze']({
-    maxInputImages: 0x9,
+    maxInputImages: 9,
     imageLoaderNodes: QWEN_IMAGE_21_EDIT_IMAGE_NODES,
     conditioningImageNodes: QWEN_IMAGE_21_EDIT_CONDITIONING_FIELDS,
     promptNode: Object['freeze']({ nodeId: '489', fieldName: 'value', description: '提示词' }),
     dimensionsNode: Object['freeze']({
       defaultImageSize: '1K',
       defaultAspectRatio: '1:1',
-      longSideByImageSize: Object['freeze']({ '1K': 0x400, '1.5K': 0x600, '2K': 0x780 }),
-      align: 0x20,
-      minDimension: 0x200,
+      longSideByImageSize: Object['freeze']({ '1K': 1024, '1.5K': 1536, '2K': 1920 }),
+      align: 32,
+      minDimension: 512,
       widthNode: Object['freeze']({ nodeId: '481', fieldName: 'width', description: '宽度' }),
       heightNode: Object['freeze']({ nodeId: '481', fieldName: 'height', description: '高度' }),
     }),

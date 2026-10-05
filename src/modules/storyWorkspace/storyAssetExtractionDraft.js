@@ -67,7 +67,7 @@ export function getStoryAssetModelChangeRerunKinds(options3 = {}) {
     const data = index[result] || {};
     return (
       normalizeStoryAssetPaidRerunBlockStatus(data) === 'blocked-paid-response' &&
-      Math['max'](0x0, Math['trunc'](Number(data['repairCount']) || 0x0)) > 0x0
+      Math['max'](0, Math['trunc'](Number(data['repairCount']) || 0)) > 0
     );
   });
 }
@@ -111,7 +111,7 @@ export function getStoryAssetPaidRerunBlockedBatches(options4 = {}) {
             ? [...new Set(response3['kinds']['map'](normalizeText)['filter'](Boolean))]
             : [],
           status: status2,
-          label: getStoryAssetBatchStageLabel(stage) + '\x20' + batchId,
+          label: getStoryAssetBatchStageLabel(stage) + ' ' + batchId,
           reason:
             normalizeText(response3?.['status']) === 'response-received'
               ? STORY_ASSET_EMPTY_PAID_RESPONSE_REASON
@@ -156,14 +156,14 @@ export function createStoryAssetPaidRerunChoiceDescriptor(
       ['filter']((value7) => value7 !== '：')
       ['join']('；'),
     value8 = list4['length'] + title['length'],
-    value9 = title['length'] ? value8 + '\x20项' : list4['length'] + '\x20路';
+    value9 = title['length'] ? value8 + ' 项' : list4['length'] + ' 路';
   return {
     title: title['length'] ? '处理已阻断的素材批次' : '处理已阻断的素材线路',
     message: [
       value2,
       value5,
-      allowLocalRevalidate ? '免费本地重校验不会调用\x20API' : '以上阻断项没有可安全复验的完整本地结果',
-      '确认重跑将仅重新调用以上\x20' +
+      allowLocalRevalidate ? '免费本地重校验不会调用 API' : '以上阻断项没有可安全复验的完整本地结果',
+      '确认重跑将仅重新调用以上 ' +
         value9 +
         ' API，可能再次计费；' +
         (title['length'] ? '成功线路和批次' : '成功线路') +
@@ -258,8 +258,8 @@ export function createStoryAssetPaidRerunChoiceGate() {
 }
 function getStoryAssetEvidenceProgress(options5 = {}) {
   const text3 = normalizeText(options5?.['progress']?.['stage'] || options5?.['phase']),
-    value13 = Math['max'](0x0, Math['trunc'](Number(options5?.['progress']?.['current']) || 0x0)),
-    value14 = Math['max'](0x0, Math['trunc'](Number(options5?.['progress']?.['total']) || 0x0)),
+    value13 = Math['max'](0, Math['trunc'](Number(options5?.['progress']?.['current']) || 0)),
+    value14 = Math['max'](0, Math['trunc'](Number(options5?.['progress']?.['total']) || 0)),
     list5 = Array['isArray'](options5?.['inventory']?.['assets']) ? options5['inventory']['assets'] : [],
     list6 = Array['isArray'](options5?.['completedAssets']) ? options5['completedAssets'] : [],
     stage2 = ['inventory', 'repair']['includes'](text3),
@@ -269,7 +269,7 @@ function getStoryAssetEvidenceProgress(options5 = {}) {
     stage: stage2 ? 'inventory' : 'detail',
     completed: completed,
     total: total,
-    remaining: Math['max'](0x0, total - completed),
+    remaining: Math['max'](0, total - completed),
   };
 }
 export function isStoryAssetPlannedContinuationDraft(response6 = {}) {
@@ -281,7 +281,7 @@ export function isStoryAssetPlannedContinuationDraft(response6 = {}) {
     getStoryAssetPaidRerunBlockedBatches(response6)['length']
   )
     return ![];
-  return getStoryAssetEvidenceProgress(response6)['remaining'] > 0x0;
+  return getStoryAssetEvidenceProgress(response6)['remaining'] > 0;
 }
 function getStoryAssetExtractionErrorLabel(value15 = '') {
   if (value15 === 'auth') return '认证失败';
@@ -298,12 +298,12 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
   if (response7?.['strategy'] === 'local-pp-uie-v1') {
     const failureCount = Array['isArray'](response7?.['failures']) ? response7['failures'] : [],
       text4 = normalizeText(response7?.['progress']?.['message']),
-      value16 = failureCount['slice'](0x0, 0x3)
+      value16 = failureCount['slice'](0, 3)
         ['map']((value17) => {
           const text5 = normalizeText(value17?.['batchId']);
           return (
             '本地扫描' +
-            (text5 ? '\x20' + text5 : '') +
+            (text5 ? ' ' + text5 : '') +
             '：' +
             getStoryAssetExtractionErrorLabel(normalizeText(value17?.['errorType']))
           );
@@ -314,7 +314,7 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
     return {
       hasProgress: hasProgress,
       failureCount: failureCount['length'],
-      retryCount: retryCount === 'completed' ? 0x0 : 0x1,
+      retryCount: retryCount === 'completed' ? 0 : 1,
       summary: [text4, value16]['filter'](Boolean)['join'](' · '),
       actionLabel: retryCount === 'completed' ? '开发测试' : '继续开发测试',
     };
@@ -327,14 +327,14 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
         ),
       ),
       text6 = normalizeText(response7?.['progress']?.['message']),
-      summary = list7['slice'](0x0, 0x3)
+      summary = list7['slice'](0, 3)
         ['map']((value20) => {
           const value21 = value20?.['stage'] === 'repair' ? '归并校验' : '清单',
             text7 = normalizeText(value20?.['batchLabel'] || value20?.['batchId']);
           return (
             '' +
             value21 +
-            (text7 ? '\x20' + text7 : '') +
+            (text7 ? ' ' + text7 : '') +
             '：' +
             getStoryAssetExtractionErrorLabel(normalizeText(value20?.['errorType']))
           );
@@ -346,7 +346,7 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
     return {
       hasProgress: hasProgress2,
       failureCount: failureCount2,
-      retryCount: failureCount2 || (text8 === 'completed' ? 0x0 : 0x1),
+      retryCount: failureCount2 || (text8 === 'completed' ? 0 : 1),
       summary: summary || text6,
       actionLabel: failureCount2
         ? '重试未完成窗口（' + failureCount2 + '）'
@@ -366,7 +366,7 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
       retryCount2 =
         getStoryAssetPaidRerunBlockedLanes(response7)['length'] +
         getStoryAssetPaidRerunBlockedBatches(response7)['length'],
-      value22 = failureCount3[0x0],
+      value22 = failureCount3[0],
       text9 =
         normalizeText(value22?.['errorType']) === 'incomplete-output' ||
         /资产细化结果必须与当前批次资产数量完全一致|缺少\s*\d+\s*个资产结果/u['test'](
@@ -376,14 +376,14 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
       text10 = normalizeText(response7?.['progress']?.['message']),
       summary2 = total2
         ? (stage3 === 'inventory' ? '清单：已覆盖' : '素材：已完成') +
-          '\x20' +
+          ' ' +
           completed2 +
           '/' +
           total2 +
-          '\x20' +
+          ' ' +
           (stage3 === 'inventory' ? '场' : '个') +
           (remaining
-            ? ' · 剩余 ' + remaining + '\x20' + (stage3 === 'inventory' ? '场' : '个') + '待继续'
+            ? ' · 剩余 ' + remaining + ' ' + (stage3 === 'inventory' ? '场' : '个') + '待继续'
             : '') +
           (text9
             ? ' · 上批输出不完整，未自动重试'
@@ -401,7 +401,7 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
       actionLabel: retryCount2
         ? '处理已阻断（' + retryCount2 + '）'
         : remaining
-          ? '继续剩余 ' + remaining + '\x20' + (stage3 === 'inventory' ? '场' : '个')
+          ? '继续剩余 ' + remaining + ' ' + (stage3 === 'inventory' ? '场' : '个')
           : normalizeText(response7?.['status']) === 'completed'
             ? '提取角色、场景与道具'
             : '继续素材提取',
@@ -420,7 +420,7 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
         return {
           kind: kind2,
           status: status3,
-          text: label + '：成功\x20' + Math['max'](0x0, Number(response8['assetCount']) || 0x0) + '\x20个',
+          text: label + '：成功 ' + Math['max'](0, Number(response8['assetCount']) || 0) + ' 个',
         };
       if (status3 === 'failed')
         return {
@@ -439,7 +439,7 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
     )['length'],
     value26 = list8['length'],
     modelChangeKinds = getStoryAssetModelChangeRerunKinds(response7),
-    actionLabel = modelChangeKinds['length'] > 0x0,
+    actionLabel = modelChangeKinds['length'] > 0,
     value27 = STORY_ASSET_KIND_DISPLAY['filter'](({ kind: kind3 }) => modelChangeKinds['includes'](kind3))
       ['map'](({ label: label2 }) => label2)
       ['join']('、'),

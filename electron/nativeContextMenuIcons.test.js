@@ -58,14 +58,14 @@ test('renders an 18px stroked svg data url from the catalog definition', () => {
   const definition = resolveContextMenuIconDefinition('copy');
   assert.equal(definition.id, 'copy');
   assert.equal(svg.includes('<rect x="8" y="8" width="12" height="12" rx="2"/>'), true);
-  assert.deepEqual(calls.resizes, [{ width: 0x10, height: 0x10, quality: 'best' }]);
-  assert.deepEqual(icon.resizedWith, { width: 0x10, height: 0x10, quality: 'best' });
+  assert.deepEqual(calls.resizes, [{ width: 16, height: 16, quality: 'best' }]);
+  assert.deepEqual(icon.resizedWith, { width: 16, height: 16, quality: 'best' });
 });
 
 test('honours the requested size and stroke colour', () => {
   const { calls, api } = createNativeImageApi();
-  createNativeContextMenuIconFactory(api, { size: 0x18, stroke: 'red' })('archive');
-  assert.deepEqual(calls.resizes, [{ width: 0x18, height: 0x18, quality: 'best' }]);
+  createNativeContextMenuIconFactory(api, { size: 24, stroke: 'red' })('archive');
+  assert.deepEqual(calls.resizes, [{ width: 24, height: 24, quality: 'best' }]);
   const svg = decodeSvg(calls.dataUrls[0]);
   assert.equal(svg.includes('stroke="red"'), true);
 });

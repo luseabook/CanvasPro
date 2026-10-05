@@ -46,9 +46,9 @@ const IMAGE_MEDIA_TYPES = new Set(['source-image', 'image', 'ai-image']);
 function getFirstPositiveDimension(...args) {
   for (const target of args) {
     const count = Number(target);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 
 export function prepareAssetNodeForRestore(source, box3) {
@@ -71,13 +71,13 @@ export function prepareAssetNodeForRestore(source, box3) {
       box3['height'],
       box3['h'],
     );
-  if (!(firstPositiveDimension > 0x0 && firstPositiveDimension2 > 0x0)) return box3;
+  if (!(firstPositiveDimension > 0 && firstPositiveDimension2 > 0)) return box3;
   const box4 = getAutoMediaSizeByShortSide(firstPositiveDimension, firstPositiveDimension2);
   if (getNodeWidth(box3) === box4['width'] && getNodeHeight(box3) === box4['height']) return box3;
   return { ...box3, width: box4['width'], height: box4['height'] };
 }
 
-export function prepareAssetNodesForRestore(next, current = 0x18) {
+export function prepareAssetNodesForRestore(next, current = 24) {
   const entry = Array['isArray'](next?.['nodes']) ? next['nodes'] : [],
     record = entry['map']((payload) => prepareAssetNodeForRestore(next, payload));
   return shouldTopAlignRestoredAsset(record, next?.['edges'])

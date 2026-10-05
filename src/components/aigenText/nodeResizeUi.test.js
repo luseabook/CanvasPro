@@ -94,10 +94,10 @@ test('createNodeResizeHandle: honors custom minimum size', () => {
   withFakeBrowser(({ listeners: listeners2, flushRaf: flushRaf2, previewEl: previewEl2 }) => {
     const _data = {
         id: 'node-1',
-        width: 0x4b0,
-        height: 0x2bc,
-        resizeMinWidth: 0x400,
-        resizeMinHeight: 0x240,
+        width: 1200,
+        height: 700,
+        resizeMinWidth: 1024,
+        resizeMinHeight: 576,
       },
       list5 = [];
     let state = 0;
@@ -125,12 +125,12 @@ test('createNodeResizeHandle: honors custom minimum size', () => {
       preventDefault() {},
       stopPropagation() {},
     }),
-      listeners2.pointermove({ clientX: -0x1f4, clientY: -0x1f4 }),
+      listeners2.pointermove({ clientX: -500, clientY: -500 }),
       flushRaf2(),
       listeners2.pointerup(),
       assert.equal(previewEl2.style.width, '1024px'),
       assert.equal(previewEl2.style.height, '576px'),
-      assert.deepEqual(list5, [{ id: 'node-1', patch: { width: 0x400, height: 0x240 } }]),
+      assert.deepEqual(list5, [{ id: 'node-1', patch: { width: 1024, height: 576 } }]),
       assert.equal(state, 1));
   });
 });

@@ -9,13 +9,13 @@ import { projectGraph } from './collaborationDocument.js';
 import { createCollaborationPreviews } from './collaborationPreviews.js';
 function toBase64(list) {
   let value = '';
-  for (let item = 0x0; item < list['length']; item += 0x2000)
-    value += String['fromCharCode'](...list['subarray'](item, item + 0x2000));
+  for (let item = 0; item < list['length']; item += 8192)
+    value += String['fromCharCode'](...list['subarray'](item, item + 8192));
   return btoa(value);
 }
 async function hashBytes(key) {
   return [...new Uint8Array(await crypto['subtle']['digest']('SHA-256', key))]
-    ['map']((index) => index['toString'](0x10)['padStart'](0x2, '0'))
+    ['map']((index) => index['toString'](16)['padStart'](2, '0'))
     ['join']('');
 }
 export function createCollaborationMedia({
@@ -52,11 +52,11 @@ export function createCollaborationMedia({
       for (const source of list2) {
         if (
           !Array['isArray'](source) ||
-          typeof source[0x0] !== 'string' ||
-          !/^aic-asset:[a-f0-9]{64}$/['test'](source[0x1])
+          typeof source[0] !== 'string' ||
+          !/^aic-asset:[a-f0-9]{64}$/['test'](source[1])
         )
           continue;
-        map['set'](normalizeCollaborationMediaSource(source[0x0]), source[0x1]);
+        map['set'](normalizeCollaborationMediaSource(source[0]), source[1]);
       }
     },
     project: (next) => projectGraph(next, resolveSource),
@@ -68,7 +68,7 @@ export function createCollaborationMedia({
         if (!map['has'](collaborationMediaSource)) entry['add'](collaborationMediaSource);
         return record;
       });
-      let payload = 0x0;
+      let payload = 0;
       for (const handle of entry) {
         (handler2(), onProgress('正在准备素材地址 ' + ++payload + '/' + entry['size']));
         const registerMedia2 = await registerMedia(handle);
@@ -79,17 +79,17 @@ export function createCollaborationMedia({
           (map['set'](handle, state), map2['set'](state, handle));
           continue;
         }
-        onProgress('正在传送素材给房主\x20' + payload + '/' + entry['size']);
+        onProgress('正在传送素材给房主 ' + payload + '/' + entry['size']);
         const mime = await readMedia(handle, signal);
         if (!mime['size'])
           throw Object['assign'](new Error('素材文件为空，请等待文件写入完成后重试'), {
             code: 'ASSET_EMPTY',
           });
         if (mime['size'] > COLLABORATION_MAX_ASSET_BYTES)
-          throw Object['assign'](new Error('临时或远程协作素材单文件不能超过\x20256\x20MiB'), {
+          throw Object['assign'](new Error('临时或远程协作素材单文件不能超过 256 MiB'), {
             code: 'ASSET_LIMIT',
           });
-        if (!isCollaborationMediaType(mime['type']['split'](';')[0x0]))
+        if (!isCollaborationMediaType(mime['type']['split'](';')[0]))
           throw Object['assign'](new Error('无法识别协作素材类型，请使用支持的图片、视频或音频'), {
             code: 'ASSET_TYPE',
           });
@@ -104,14 +104,14 @@ export function createCollaborationMedia({
         const size = new Uint8Array(await mime['arrayBuffer']()),
           hash = await hashBytes(size),
           input = 'aic-asset:' + hash;
-        let offset = 0x0;
+        let offset = 0;
         while (!map2['has'](input) && offset < size['length']) {
           handler2();
           const output = await rpc({
             action: 'assetPut',
             hash: hash,
             size: size['length'],
-            mime: mime['type']['split'](';')[0x0],
+            mime: mime['type']['split'](';')[0],
             offset: offset,
             data: toBase64(size['subarray'](offset, offset + COLLABORATION_CHUNK_BYTES)),
           });
@@ -129,7 +129,7 @@ export function createCollaborationMedia({
                 '/' +
                 entry['size'] +
                 ' · ' +
-                Math['round']((offset / size['length']) * 0x64) +
+                Math['round']((offset / size['length']) * 100) +
                 '%',
             ));
         }
@@ -153,16 +153,16 @@ export function createCollaborationMedia({
       }
       (handler2(), run(value2, ![]));
       const list4 = [...args];
-      for (let value7 = 0x0; value7 < list4['length']; value7 += 0x3e8) {
-        const list5 = list4['slice'](value7, value7 + 0x3e8),
-          value8 = await bindMedia(list5['map']((list6) => list6['slice'](0xa)));
+      for (let value7 = 0; value7 < list4['length']; value7 += 1000) {
+        const list5 = list4['slice'](value7, value7 + 1000),
+          value8 = await bindMedia(list5['map']((list6) => list6['slice'](10)));
         handler2();
         for (const list7 of list5) {
-          const value9 = value8?.[list7['slice'](0xa)];
+          const value9 = value8?.[list7['slice'](10)];
           if (
             typeof value9 !== 'string' ||
             !new RegExp(
-              '^data/assets/(?:_deferred/[\\w-]+|_hosted)/[\\w-]+/' + list7['slice'](0xa) + '\\.[a-z0-9]+$',
+              '^data/assets/(?:_deferred/[\\w-]+|_hosted)/[\\w-]+/' + list7['slice'](10) + '\\.[a-z0-9]+$',
             )['test'](value9)
           )
             throw new Error('共享素材地址无效');

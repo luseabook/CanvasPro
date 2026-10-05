@@ -75,7 +75,7 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
         ...cloneJson(enabled2),
         id: createId('person-replacement'),
         title: (normalizeText(enabled2['title']) || '未命名人物替换项目') + ' 副本',
-        archivedAt: 0x0,
+        archivedAt: 0,
         createdAt: createdAt,
         updatedAt: createdAt,
         output: { ...(enabled2['output'] || {}), canvasBinding: {} },
@@ -151,7 +151,7 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
     );
   }
   const archiveProject = ({ projectId: projectId5, archived: archived } = {}) =>
-    run(projectId5, (args3) => ({ ...args3, archivedAt: archived ? Date['now']() : 0x0 }));
+    run(projectId5, (args3) => ({ ...args3, archivedAt: archived ? Date['now']() : 0 }));
   function deleteProject({ projectId: projectId6 } = {}) {
     const text = normalizeText(projectId6),
       enabled3 = getLibrary();

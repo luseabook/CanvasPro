@@ -11,8 +11,8 @@ const TEXT = Object['freeze']({
     created: '已创建 Skill「{title}」（${id}）。现在可以直接说“用 ${id} …”来使用。',
     duplicate: 'Skill「${id}」已经存在，我没有覆盖它。可以换一个名称，或在 Skill 管理中编辑现有版本。',
     unavailable: '当前无法保存 Skill，请确认正在桌面版中运行并重试。',
-    refreshFailed: 'Skill\x20已保存，但列表刷新失败。请打开\x20Skill\x20管理器点击刷新。',
-    failed: 'Skill\x20创建失败，请重试。',
+    refreshFailed: 'Skill 已保存，但列表刷新失败。请打开 Skill 管理器点击刷新。',
+    failed: 'Skill 创建失败，请重试。',
     stopped: 'Skill 创建已停止。',
   }),
   'en-US': Object['freeze']({
@@ -46,10 +46,10 @@ function compactExistingSkills(options) {
       id: String(options2['id'] || '')['trim'](),
       title: String(options2['title'] || options2['id'] || '')
         ['trim']()
-        ['slice'](0x0, 0x78),
+        ['slice'](0, 120),
     }))
     ['filter']((target) => target['id'])
-    ['slice'](0x0, 0x64);
+    ['slice'](0, 100);
 }
 export function createAgentSkillAuthoringRuntime({
   sessionStore: sessionStore,

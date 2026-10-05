@@ -67,7 +67,7 @@ import { setLocale } from '../../i18n/index.js';
   test('video generation result renderer: failure helper can preserve media fields', () => {
     const videoGenerationFailurePatch2 = buildVideoGenerationFailurePatch({
       error: 'resume failed',
-      duration: 0x4b0,
+      duration: 1200,
       clearMediaFields: false,
     });
     (assert.equal(videoGenerationFailurePatch2.jobStatus, 'error'),

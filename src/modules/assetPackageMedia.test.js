@@ -113,7 +113,7 @@ test('assetPackageMedia: 新条目按 4 列网格排布，第五个换行', () =
   assert.equal(pkg.items.length, 5);
   assert.deepEqual(
     [pkg.nodes[0].x, pkg.nodes[0].y, pkg.nodes[3].x, pkg.nodes[3].y, pkg.nodes[4].x, pkg.nodes[4].y],
-    [0, 0, 3 * 0x228, 0, 0, 0x148],
+    [0, 0, 3 * 552, 0, 0, 328],
   );
 });
 
@@ -130,8 +130,8 @@ test('assetPackageMedia: 有 audio 时走音频节点分支', () => {
   assert.equal(node.id, 'source-audio-fixed');
   assert.equal(node.audioUrl, 'http://cdn/a.mp3');
   assert.equal(node.src, 'http://cdn/a.mp3');
-  assert.equal(node.width, 0x140);
-  assert.equal(node.height, 0x8c);
+  assert.equal(node.width, 320);
+  assert.equal(node.height, 140);
 });
 
 test('assetPackageMedia: 音频没有可用地址时抛错', () => {

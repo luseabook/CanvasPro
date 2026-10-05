@@ -111,7 +111,7 @@ export function createCustomProviderOnboardingController({
   }
   const enabled = {
     activeEditorId: 'custom-provider-editor-1',
-    editorSequence: 0x1,
+    editorSequence: 1,
     editorStates: new Map(),
   };
   function run3() {
@@ -131,7 +131,7 @@ export function createCustomProviderOnboardingController({
         cardEl['getElementById']('customProviderDocumentationUrl'),
       documentationFileEl:
         baseUrlEl?.['querySelector']?.('[data-custom-provider-documentation-file]') ||
-        cardEl['querySelector']('#customProviderDiscoveryCard\x20[data-custom-provider-documentation-file]'),
+        cardEl['querySelector']('#customProviderDiscoveryCard [data-custom-provider-documentation-file]'),
     };
   }
   function run5(el3) {
@@ -211,7 +211,7 @@ export function createCustomProviderOnboardingController({
       handle = list['find'](
         (el6) => String(el6['dataset']['customProviderEditorId'] || '') === enabled['activeEditorId'],
       );
-    return handle || list['find']((el7) => el7['classList']['contains']('is-active')) || list[0x0] || null;
+    return handle || list['find']((el7) => el7['classList']['contains']('is-active')) || list[0] || null;
   }
   function run12() {
     return run4(run11());
@@ -239,12 +239,12 @@ export function createCustomProviderOnboardingController({
   function run18(value6) {
     return String(value6 || '')
       ['trim']()
-      ['replace'](/\s+/g, '\x20');
+      ['replace'](/\s+/g, ' ');
   }
   function run19(value7) {
     const list2 = run3(),
-      index2 = Math['max'](0x0, list2['indexOf'](value7));
-    return trCustomProvider('providerDraftTitle', { index: index2 + 0x1 });
+      index2 = Math['max'](0, list2['indexOf'](value7));
+    return trCustomProvider('providerDraftTitle', { index: index2 + 1 });
   }
   function run20(value8) {
     const value9 = run6(value8);
@@ -332,15 +332,15 @@ export function createCustomProviderOnboardingController({
     const list3 = run3();
     list3['forEach']((value25) => {
       const { deleteBtnEl: deleteBtnEl2 } = run7(value25);
-      if (deleteBtnEl2) deleteBtnEl2['hidden'] = list3['length'] <= 0x1 && !run17(value25);
+      if (deleteBtnEl2) deleteBtnEl2['hidden'] = list3['length'] <= 1 && !run17(value25);
     });
   }
   function run31(el13) {
     const list4 = run3();
-    if (!el13 || list4['length'] <= 0x1) return;
+    if (!el13 || list4['length'] <= 1) return;
     const value26 = run5(el13),
       value27 = list4['indexOf'](el13),
-      value28 = list4[value27 + 0x1] || list4[value27 - 0x1] || null;
+      value28 = list4[value27 + 1] || list4[value27 - 1] || null;
     (enabled['editorStates']['delete'](value26),
       el13['remove'](),
       run22(),
@@ -408,7 +408,7 @@ export function createCustomProviderOnboardingController({
     try {
       value35 && (await run33(value36));
       const list6 = run3();
-      list6['length'] <= 0x1
+      list6['length'] <= 1
         ? (run34(enabled14), run22(), run30(), run9(enabled14, { clearStatus: !![] }))
         : run31(enabled14);
       if (value36) {
@@ -426,14 +426,14 @@ export function createCustomProviderOnboardingController({
         error: error2?.['message'] || trApiInput('diagnostics.unknownError'),
       });
       (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider3),
-        source['showToast']?.(trCustomProvider3, 'error', 0x2328));
+        source['showToast']?.(trCustomProvider3, 'error', 9000));
     } finally {
       if (el15) el15['disabled'] = ![];
     }
   }
   function run37() {
-    const editorId = 'custom-provider-editor-' + (enabled['editorSequence'] + 0x1);
-    enabled['editorSequence'] += 0x1;
+    const editorId = 'custom-provider-editor-' + (enabled['editorSequence'] + 1);
+    enabled['editorSequence'] += 1;
     const customProviderEditorShell = createCustomProviderEditorShell({
         documentObject: cardEl,
         editorId: editorId,
@@ -510,7 +510,7 @@ export function createCustomProviderOnboardingController({
     ((el25['type'] = 'button'),
       (el25['className'] = 'settings-save-btn settings-btn-ghost settings-api-test-btn'),
       (el25['dataset']['customProviderVerifyParams'] = ''));
-    const value45 = cardEl['querySelector']('[data-provider-test]\x20.settings-btn-icon')?.['cloneNode'](
+    const value45 = cardEl['querySelector']('[data-provider-test] .settings-btn-icon')?.['cloneNode'](
       !![],
     );
     if (value45) el25['append'](value45);
@@ -540,12 +540,12 @@ export function createCustomProviderOnboardingController({
     const list7 = run3();
     (list7['forEach']((el28, value46) => {
       !el28['dataset']['customProviderEditorId'] &&
-        (el28['dataset']['customProviderEditorId'] = 'custom-provider-editor-' + (value46 + 0x1));
+        (el28['dataset']['customProviderEditorId'] = 'custom-provider-editor-' + (value46 + 1));
       const value47 = String(el28['dataset']['customProviderEditorId'] || '')['match'](/(\d+)$/);
       value47 &&
-        (enabled['editorSequence'] = Math['max'](enabled['editorSequence'], Number(value47[0x1]) || 0x1));
+        (enabled['editorSequence'] = Math['max'](enabled['editorSequence'], Number(value47[1]) || 1));
     }),
-      run9(run11() || list7[0x0]),
+      run9(run11() || list7[0]),
       run22(),
       run30(),
       run8(run11()));
@@ -565,7 +565,7 @@ export function createCustomProviderOnboardingController({
       return String(value49 || '')
         ['trim']()
         ['replace'](/^[a-z][a-z0-9+.-]*:\/\//i, '')
-        ['split'](/[/?#]/)[0x0]
+        ['split'](/[/?#]/)[0]
         ['replace'](/^www\./i, '');
     }
   }
@@ -598,7 +598,7 @@ export function createCustomProviderOnboardingController({
       { baseUrlEl: baseUrlEl3 } = run4(value62);
     return (
       run10('danger', trApiInput('diagnostics.failed'), trCustomProvider4),
-      source['showToast']?.(trCustomProvider4, 'warn', 0x1b58),
+      source['showToast']?.(trCustomProvider4, 'warn', 7000),
       baseUrlEl3?.['focus']?.(),
       !![]
     );
@@ -676,7 +676,7 @@ export function createCustomProviderOnboardingController({
       ['trim']()
       ['toLowerCase']()
       ['match'](/(\.[^.]+)$/);
-    return value77?.[0x1] || '';
+    return value77?.[1] || '';
   }
   function run53(value78) {
     const value79 = run6(value78);
@@ -685,7 +685,7 @@ export function createCustomProviderOnboardingController({
     if (documentationFileEl2) documentationFileEl2['value'] = '';
   }
   async function run54(enabled19, value80) {
-    const name = value80?.['files']?.[0x0];
+    const name = value80?.['files']?.[0];
     if (!enabled19 || !name) return;
     const value81 = run6(enabled19);
     ((value81['parameterDraft'] = null), (value81['recognitionInvalidated'] = !![]), run55(enabled19));
@@ -694,7 +694,7 @@ export function createCustomProviderOnboardingController({
       (run53(enabled19), source['showToast']?.(trCustomProvider('localDocumentationUnsupported'), 'warn'));
       return;
     }
-    if (Number(name['size'] || 0x0) > CUSTOM_PROVIDER_DOCUMENTATION_MAX_BYTES) {
+    if (Number(name['size'] || 0) > CUSTOM_PROVIDER_DOCUMENTATION_MAX_BYTES) {
       (run53(enabled19), source['showToast']?.(trCustomProvider('localDocumentationTooLarge'), 'warn'));
       return;
     }
@@ -744,7 +744,7 @@ export function createCustomProviderOnboardingController({
     };
   }
   function syncDefaults(options2 = {}) {
-    const { baseUrlEl: baseUrlEl5, apiKeyEl: apiKeyEl3 } = run4(run3()[0x0]),
+    const { baseUrlEl: baseUrlEl5, apiKeyEl: apiKeyEl3 } = run4(run3()[0]),
       value86 = options2?.['openai'] || {};
     (baseUrlEl5 &&
       !String(baseUrlEl5['value'] || '')['trim']() &&
@@ -824,7 +824,7 @@ export function createCustomProviderOnboardingController({
     const map3 = new Map(
       CUSTOM_PROVIDER_FILTER_KINDS['filter']((value106) => value106 !== 'all')['map']((value107) => [
         value107,
-        0x0,
+        0,
       ]),
     );
     return (
@@ -832,7 +832,7 @@ export function createCustomProviderOnboardingController({
         const value109 = String(value108?.['kind'] || 'unknown')
           ['trim']()
           ['toLowerCase']();
-        map3['set'](value109, (map3['get'](value109) || 0x0) + 0x1);
+        map3['set'](value109, (map3['get'](value109) || 0) + 1);
       }),
       map3
     );
@@ -882,7 +882,7 @@ export function createCustomProviderOnboardingController({
         isAddingModels: isAddingModels['isAddingModels'] === !![],
         selectedCount: selectedCount,
         unverifiedCount: getCustomProviderModelsBlockingSave(run64(el33))['length'],
-        busy: isAddingModels['verifyingModelKeys']['size'] > 0x0 || isAddingModels['saving'] === !![],
+        busy: isAddingModels['verifyingModelKeys']['size'] > 0 || isAddingModels['saving'] === !![],
       });
     ((saveSelectedBtnEl['disabled'] = customProviderModelActionState['saveDisabled']),
       (saveSelectedBtnEl['hidden'] = customProviderModelActionState['saveHidden']),
@@ -900,7 +900,7 @@ export function createCustomProviderOnboardingController({
       el34['setAttribute']('aria-hidden', 'true'),
       source['setTimeout']?.(() => {
         if (!el34['classList']['contains']('is-open')) el34['hidden'] = !![];
-      }, 0x104));
+      }, 260));
   }
   function run66(el35) {
     if (!el35) return;
@@ -949,7 +949,7 @@ export function createCustomProviderOnboardingController({
       ['trim']()
       ['toLowerCase']();
     el36['dataset']['customProviderCapabilityStatus'] = value129;
-    if (value125 === 'unknown') el36['tabIndex'] = 0x0;
+    if (value125 === 'unknown') el36['tabIndex'] = 0;
     (el36['classList']['toggle']('is-selected', value127),
       el36['classList']['toggle']('is-verifying', value128));
     if (value128) el36['setAttribute']('aria-busy', 'true');
@@ -1007,15 +1007,15 @@ export function createCustomProviderOnboardingController({
     return (
       (value134['className'] = 'custom-provider-kind-filter-row'),
       CUSTOM_PROVIDER_FILTER_KINDS['forEach']((value135) => {
-        if (value135 === 'unknown' && !(map5['get']('unknown') > 0x0)) return;
+        if (value135 === 'unknown' && !(map5['get']('unknown') > 0)) return;
         const el43 = cardEl['createElement']('button');
         ((el43['type'] = 'button'),
           (el43['className'] = 'custom-provider-kind-filter'),
           (el43['dataset']['customProviderKindFilter'] = value135),
           el43['classList']['toggle']('is-active', value135 === value133['activeKindFilter']),
           el43['setAttribute']('aria-pressed', value135 === value133['activeKindFilter'] ? 'true' : 'false'));
-        const value136 = value135 === 'all' ? list12['length'] : map5['get'](value135) || 0x0;
-        ((el43['textContent'] = run48(value135) + '\x20' + value136), value134['append'](el43));
+        const value136 = value135 === 'all' ? list12['length'] : map5['get'](value135) || 0;
+        ((el43['textContent'] = run48(value135) + ' ' + value136), value134['append'](el43));
       }),
       value134
     );
@@ -1082,11 +1082,11 @@ export function createCustomProviderOnboardingController({
         ),
       ),
       list14['forEach']((value149) => el47['append'](run67(value146, value149))));
-    if (list14['length'] > 0x0) value147['append'](el47);
-    if (list13['length'] === 0x0)
+    if (list14['length'] > 0) value147['append'](el47);
+    if (list13['length'] === 0)
       value147['append'](run38('custom-provider-bundle-empty', trCustomProvider('noModelsDiscovered')));
     else
-      list14['length'] === 0x0 &&
+      list14['length'] === 0 &&
         value147['append'](run38('custom-provider-bundle-empty', trCustomProvider('noModelsInFilter')));
     return value147;
   }
@@ -1251,7 +1251,7 @@ export function createCustomProviderOnboardingController({
       (enabled26['provider'] = error5),
       (enabled26['discovery'] = value170),
       (enabled26['isAddingModels'] = ![]));
-    const value173 = value170['unknown']['length'] > 0x0;
+    const value173 = value170['unknown']['length'] > 0;
     ((enabled26['activeKindFilter'] =
       CUSTOM_PROVIDER_FILTER_KINDS['includes'](enabled26['activeKindFilter']) &&
       (enabled26['activeKindFilter'] !== 'unknown' || value173)
@@ -1264,7 +1264,7 @@ export function createCustomProviderOnboardingController({
   }
   function run86(enabled29) {
     if (!enabled29) return;
-    if (run3()['length'] <= 0x1) {
+    if (run3()['length'] <= 1) {
       (run34(enabled29), run9(enabled29, { clearStatus: !![] }));
       return;
     }
@@ -1289,7 +1289,7 @@ export function createCustomProviderOnboardingController({
           !map6['has'](value179) &&
           run86(el50);
       }),
-      run3()['length'] === 0x0 && run83(),
+      run3()['length'] === 0 && run83(),
       run22(),
       run30(),
       run8(run11()));
@@ -1517,9 +1517,9 @@ export function createCustomProviderOnboardingController({
       (run73(el53, baseUrl3, value207), run30());
       const count2 = run57(baseUrl3),
         supported2 = run58(el53, count2)['length'];
-      if (supported2 === 0x0) {
+      if (supported2 === 0) {
         const trCustomProvider6 = trCustomProvider('configSavedNoSupportedModels');
-        (run10('partial', trCustomProvider6), source['showToast']?.(trCustomProvider6, 'warn', 0x2328));
+        (run10('partial', trCustomProvider6), source['showToast']?.(trCustomProvider6, 'warn', 9000));
         return;
       }
       run10(
@@ -1527,7 +1527,7 @@ export function createCustomProviderOnboardingController({
         trCustomProvider('resultSummary', {
           count: count2['length'],
           supported: supported2,
-          unknown: Array['isArray'](baseUrl3['unknown']) ? baseUrl3['unknown']['length'] : 0x0,
+          unknown: Array['isArray'](baseUrl3['unknown']) ? baseUrl3['unknown']['length'] : 0,
         }),
         baseUrl3['warnings']?.['length'] ? trCustomProvider('sourceIncomplete') : '',
       );
@@ -1536,7 +1536,7 @@ export function createCustomProviderOnboardingController({
         error: error10?.['message'] || trApiInput('diagnostics.unknownError'),
       });
       (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider7),
-        source['showToast']?.(trCustomProvider7, 'error', 0x2328));
+        source['showToast']?.(trCustomProvider7, 'error', 9000));
     } finally {
       run95();
     }
@@ -1564,7 +1564,7 @@ export function createCustomProviderOnboardingController({
       return;
     }
     const models3 = run62(value209);
-    if (models3['length'] === 0x0) {
+    if (models3['length'] === 0) {
       source['showToast']?.(trCustomProvider('noModelsSelected'), 'warn');
       return;
     }
@@ -1593,15 +1593,15 @@ export function createCustomProviderOnboardingController({
         ),
         count3 = Array['isArray'](customProviderRecognizedProfiles?.['models'])
           ? customProviderRecognizedProfiles['models']['length']
-          : 0x0;
-      if (count3 === 0x0) throw new Error(trCustomProvider('noSupportedModels'));
+          : 0;
+      if (count3 === 0) throw new Error(trCustomProvider('noSupportedModels'));
       if (getCustomProviderModelsBlockingSave(customProviderRecognizedProfiles['models'])['length'])
         throw new Error(trCustomProvider('recognizeBeforeSave'));
       const response2 = await validateCustomProviderManifestDraft(customProviderRecognizedProfiles);
       if (!response2?.['ok'])
         throw new Error(
           Array['isArray'](response2?.['errors']) && response2['errors']['length']
-            ? response2['errors']['join'](';\x20')
+            ? response2['errors']['join']('; ')
             : trApiInput('diagnostics.failed'),
         );
       const value215 = response2['bundle'] || customProviderRecognizedProfiles;
@@ -1618,7 +1618,7 @@ export function createCustomProviderOnboardingController({
         error: error11?.['message'] || trApiInput('diagnostics.unknownError'),
       });
       (run10('danger', trApiInput('diagnostics.failed'), trCustomProvider9),
-        source['showToast']?.(trCustomProvider9, 'error', 0x2328));
+        source['showToast']?.(trCustomProvider9, 'error', 9000));
     } finally {
       (run97(), (value211['saving'] = ![]), run55(value209));
     }
@@ -1638,7 +1638,7 @@ export function createCustomProviderOnboardingController({
     let enabled40 = ![];
     try {
       typeof source['showToast'] === 'function' &&
-        (source['showToast'](trCustomProvider10, 'error', 0x2328), (enabled40 = !![]));
+        (source['showToast'](trCustomProvider10, 'error', 9000), (enabled40 = !![]));
     } catch (value219) {
       console['error']('[Custom Provider] 无法显示参数验证提示:', value219);
     }
@@ -1677,7 +1677,7 @@ export function createCustomProviderOnboardingController({
     }
     const providerId5 = run16(value224),
       models4 = run62(value224);
-    if (models4['length'] === 0x0) {
+    if (models4['length'] === 0) {
       const trCustomProvider11 = trCustomProvider('noModelsSelected');
       (run10('partial', trCustomProvider11), source['showToast']?.(trCustomProvider11, 'warn'));
       return;
@@ -1714,8 +1714,8 @@ export function createCustomProviderOnboardingController({
       });
       if (enabled41?.['agentUnavailable']) throw new Error(trCustomProvider('documentationAgentUnavailable'));
       if (!enabled41?.['bundle']) throw new Error(trCustomProvider('documentationNoMatchingProfile'));
-      const count4 = Number(enabled41?.['analysis']?.['documentedModels'] || 0x0);
-      if (count4 <= 0x0)
+      const count4 = Number(enabled41?.['analysis']?.['documentedModels'] || 0);
+      if (count4 <= 0)
         throw new Error(
           trCustomProvider(resolveCustomProviderDocumentationFailureKey(enabled41?.['analysis'])),
         );
@@ -1728,17 +1728,17 @@ export function createCustomProviderOnboardingController({
       if (!response3?.['ok'])
         throw new Error(
           Array['isArray'](response3?.['errors']) && response3['errors']['length']
-            ? response3['errors']['join'](';\x20')
+            ? response3['errors']['join']('; ')
             : trApiInput('diagnostics.failed'),
         );
       if (context !== run63(value224)) throw new Error(trCustomProvider('recognizeBeforeSave'));
       const bundle2 = response3['bundle'] || customProviderRecognizedProfiles2;
       value226['parameterDraft'] = { context: context, bundle: bundle2 };
-      const count5 = Array['isArray'](bundle2?.['models']) ? bundle2['models']['length'] : 0x0,
+      const count5 = Array['isArray'](bundle2?.['models']) ? bundle2['models']['length'] : 0,
         documented = (Array['isArray'](bundle2?.['models']) ? bundle2['models'] : [])['filter'](
           isCustomProviderModelCapabilityRecognized,
         )['length'],
-        value228 = Number(enabled41?.['analysis']?.['agentRepairAttempts'] || 0x0) > 0x0,
+        value228 = Number(enabled41?.['analysis']?.['agentRepairAttempts'] || 0) > 0,
         value229 =
           documented < count5
             ? value228
@@ -1752,7 +1752,7 @@ export function createCustomProviderOnboardingController({
         source['showToast']?.(
           trCustomProvider12,
           documented < count5 ? 'warn' : 'success',
-          documented < count5 ? 0x2328 : undefined,
+          documented < count5 ? 9000 : undefined,
         ));
     } finally {
       ((value226['verifyingModelKeys'] = new Set()),

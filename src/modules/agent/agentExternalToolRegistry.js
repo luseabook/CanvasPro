@@ -11,15 +11,15 @@ function normalizeToolDefinition(inputSchema = {}) {
   if (!TOOL_ID_PATTERN['test'](id))
     throw new TypeError('Invalid Agent external tool id: ' + (id || '<empty>'));
   if (typeof inputSchema['execute'] !== 'function')
-    throw new TypeError('Agent\x20external\x20tool\x20' + id + '\x20must\x20provide\x20execute()');
+    throw new TypeError('Agent external tool ' + id + ' must provide execute()');
   return Object['freeze']({
     id: id,
     title: String(inputSchema['title'] || id)
       ['trim']()
-      ['slice'](0x0, 0x78),
+      ['slice'](0, 120),
     description: String(inputSchema['description'] || '')
       ['trim']()
-      ['slice'](0x0, 0x1f4),
+      ['slice'](0, 500),
     inputSchema:
       inputSchema['inputSchema'] && typeof inputSchema['inputSchema'] === 'object'
         ? structuredClone(inputSchema['inputSchema'])
@@ -113,7 +113,7 @@ export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
           status: 'cancelled',
           toolId: toolId2['id'],
           errorCode: 'EXTERNAL_TOOL_ABORTED',
-          message: 'External\x20tool\x20request\x20was\x20cancelled.',
+          message: 'External tool request was cancelled.',
         };
       try {
         const error3 = toolId2['validate']?.(args);
@@ -123,7 +123,7 @@ export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
             status: 'failed',
             toolId: toolId2['id'],
             errorCode: String(error3?.['errorCode'] || 'INVALID_EXTERNAL_TOOL_INPUT'),
-            message: String(error3?.['message'] || 'External\x20tool\x20input\x20is\x20invalid.'),
+            message: String(error3?.['message'] || 'External tool input is invalid.'),
           };
         const result2 = await executeWithSignal(toolId2['execute'], args, signal);
         if (result2?.['success'] === ![] || result2?.['ok'] === ![])
@@ -183,7 +183,7 @@ export function createDefaultAgentExternalToolRegistry({
         id: AGENT_EXTERNAL_DOCUMENT_TOOL_ID,
         title: 'Read document',
         description:
-          'Extract\x20bounded\x20text\x20from\x20one\x20attached\x20TXT,\x20DOCX,\x20or\x20text-based\x20PDF\x20file.',
+          'Extract bounded text from one attached TXT, DOCX, or text-based PDF file.',
         trust: 'untrusted_external',
         inputSchema: {
           type: 'object',

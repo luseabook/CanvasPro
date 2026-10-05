@@ -29,7 +29,7 @@ export function createAgentExternalInformationRuntime({
     });
     if (!sourceCount) return null;
     const toolIds = [...new Set(sourceCount['requests']['map']((value) => value['toolId']))],
-      toolId = toolIds['length'] === 0x1 ? toolIds[0x0] : 'external-information.batch';
+      toolId = toolIds['length'] === 1 ? toolIds[0] : 'external-information.batch';
     run({
       type: 'external_tool.selected',
       status: 'running',
@@ -75,7 +75,7 @@ export function createAgentExternalInformationRuntime({
           args = result['source'] || result;
         return {
           ...args,
-          sourceId: sourceCount['requests'][index]['sourceKind'] + '-' + (index + 0x1),
+          sourceId: sourceCount['requests'][index]['sourceKind'] + '-' + (index + 1),
           toolId: sourceCount['requests'][index]['toolId'],
           ...(sourceCount['requests'][index]['sourceKind'] === 'url'
             ? { requestedUrl: sourceCount['requests'][index]['args']['url'] }

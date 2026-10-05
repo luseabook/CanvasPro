@@ -30,11 +30,11 @@ const PROFILE_DIR = 'C:\\Profiles\\chrome-shell-profile';
 const APP_URL = 'http://127.0.0.1:8777/';
 const APP_URL_SHELL = 'http://127.0.0.1:8777/?aicRuntime=chrome-shell';
 const SPAWN_ERROR_CODE = 'CHROME_SHELL_SPAWN_ERROR';
-const WINDOWS_ACTIVATION_TIMEOUT_MS = 0x1770;
+const WINDOWS_ACTIVATION_TIMEOUT_MS = 6000;
 
 function createChildDouble({ pid = undefined, exitCode = null, signalCode = null } = {}) {
   const handlers = new Map();
-  const state = { unrefed: 0x0, killed: 0x0, offed: 0x0 };
+  const state = { unrefed: 0, killed: 0, offed: 0 };
   const child = {
     pid: pid,
     exitCode: exitCode,
@@ -48,7 +48,7 @@ function createChildDouble({ pid = undefined, exitCode = null, signalCode = null
       return child;
     },
     off(event, handler) {
-      state.offed += 0x1;
+      state.offed += 1;
       const list = handlers.get(event) || [];
       handlers.set(
         event,
@@ -60,10 +60,10 @@ function createChildDouble({ pid = undefined, exitCode = null, signalCode = null
       for (const handler of [...(handlers.get(event) || [])]) handler(...args);
     },
     unref() {
-      state.unrefed += 0x1;
+      state.unrefed += 1;
     },
     kill() {
-      state.killed += 0x1;
+      state.killed += 1;
       child.killed = true;
     },
   };
@@ -95,7 +95,7 @@ function createTimerDouble() {
     clearTimeoutFn(timer) {
       if (timer) timer.cancelled = true;
     },
-    fire(index = 0x0) {
+    fire(index = 0) {
       const timer = timers[index];
       if (timer && !timer.cancelled) timer.fn();
     },
@@ -469,7 +469,7 @@ test('prepareChromeShellTaskbarIdentity forwards the resolved browser and profil
   });
   assert.equal(typeof readyHandler, 'function');
   assert.ok(result === null || typeof result === 'object');
-  assert.equal(seen.length, 0x1);
+  assert.equal(seen.length, 1);
   assert.equal(seen[0].file, 'powershell.exe');
   assert.ok(seen[0].args.includes('-Command'));
   const script = String(seen[0].args[seen[0].args.length - 1]);
@@ -488,7 +488,7 @@ test('writeChromeShellPreferences creates the profile and neutralizes first-run 
   });
   assert.deepEqual(created, [{ target: path.join(PROFILE_DIR, 'Default'), options: { recursive: true } }]);
   assert.equal(result.preferencesPath, path.join(PROFILE_DIR, 'Default', 'Preferences'));
-  assert.equal(written.length, 0x1);
+  assert.equal(written.length, 1);
   assert.equal(written[0].encoding, 'utf8');
   assert.ok(written[0].contents.endsWith('\n'));
   assert.equal(result.preferences.credentials_enable_service, false);
@@ -530,13 +530,13 @@ test('writeChromeShellPreferences disables devtools with availability 2 when pac
     readFile: createReadFileDouble(),
     writeFile: () => undefined,
   });
-  assert.deepEqual(result.preferences.devtools, { availability: 0x2 });
+  assert.deepEqual(result.preferences.devtools, { availability: 2 });
 });
 
 test('normalizeChromeShellSpawnError wraps a raw failure with a stable shape', () => {
   const raw = new Error('spawn chrome EACCES');
   raw.code = 'EACCES';
-  raw.errno = -0x1005;
+  raw.errno = -4101;
   raw.syscall = 'spawn chrome.exe';
   raw.path = BROWSER_PATH;
   const normalized = normalizeChromeShellSpawnError(raw);
@@ -546,7 +546,7 @@ test('normalizeChromeShellSpawnError wraps a raw failure with a stable shape', (
   assert.equal(normalized.cause, raw);
   assert.deepEqual(normalized.details, {
     originalCode: 'EACCES',
-    errno: -0x1005,
+    errno: -4101,
     syscall: 'spawn chrome.exe',
     path: BROWSER_PATH,
   });
@@ -571,27 +571,27 @@ test('activateChromeShellWindowSoon stays inert off the desktop platforms', () =
   const spawn = createSpawnDouble();
   assert.equal(
     activateChromeShellWindowSoon({
-      child: createChildDouble({ pid: 0x10e1 }),
+      child: createChildDouble({ pid: 4321 }),
       platform: 'linux',
       spawnProcess: spawn.spawnProcess,
     }),
     null,
   );
-  assert.equal(spawn.calls.length, 0x0);
+  assert.equal(spawn.calls.length, 0);
 });
 
 test('activateChromeShellWindowSoon respects the opt-out flag and unusable pids', () => {
   const spawn = createSpawnDouble();
   assert.equal(
     activateChromeShellWindowSoon({
-      child: createChildDouble({ pid: 0x10e1 }),
+      child: createChildDouble({ pid: 4321 }),
       env: { AIC_CHROME_SHELL_ACTIVATE_WINDOW: '0' },
       platform: 'win32',
       spawnProcess: spawn.spawnProcess,
     }),
     null,
   );
-  for (const pid of [undefined, 0x0, -0x1, Number.NaN, 'nope']) {
+  for (const pid of [undefined, 0, -1, Number.NaN, 'nope']) {
     assert.equal(
       activateChromeShellWindowSoon({
         child: createChildDouble({ pid: pid }),
@@ -601,19 +601,19 @@ test('activateChromeShellWindowSoon respects the opt-out flag and unusable pids'
       null,
     );
   }
-  assert.equal(spawn.calls.length, 0x0);
+  assert.equal(spawn.calls.length, 0);
 });
 
 test('activateChromeShellWindowSoon spawns the windows activator with the decoded pid', () => {
   const spawn = createSpawnDouble();
   const helper = activateChromeShellWindowSoon({
-    child: createChildDouble({ pid: 0x1234 }),
+    child: createChildDouble({ pid: 4660 }),
     platform: 'win32',
     spawnProcess: spawn.spawnProcess,
   });
-  assert.equal(spawn.calls.length, 0x1);
+  assert.equal(spawn.calls.length, 1);
   assert.equal(spawn.calls[0].file, 'powershell.exe');
-  assert.deepEqual(spawn.calls[0].args.slice(0x0, 0x5), [
+  assert.deepEqual(spawn.calls[0].args.slice(0, 5), [
     '-NoLogo',
     '-NoProfile',
     '-ExecutionPolicy',
@@ -621,39 +621,39 @@ test('activateChromeShellWindowSoon spawns the windows activator with the decode
     '-Command',
   ]);
   assert.deepEqual(spawn.calls[0].options, { stdio: 'ignore', windowsHide: true, detached: true });
-  const script = spawn.calls[0].args[0x5];
+  const script = spawn.calls[0].args[5];
   assert.ok(script.startsWith('$targetPid = 4660\n$deadline = [DateTime]::UtcNow.AddMilliseconds(6000)'));
   assert.ok(script.includes('AicChromeShellWindowActivator'));
   assert.ok(script.includes("-like '*updream canvas*'"));
   assert.ok(script.includes("-like '*AI CanvasPro*'"));
   assert.ok(!script.includes('SHUO'));
   assert.ok(script.endsWith('exit 0'));
-  assert.equal(helper.state.unrefed, 0x1);
+  assert.equal(helper.state.unrefed, 1);
 });
 
 test('activateChromeShellWindowSoon spawns osascript on darwin', () => {
   const spawn = createSpawnDouble();
   const helper = activateChromeShellWindowSoon({
-    child: createChildDouble({ pid: 0x1234 }),
+    child: createChildDouble({ pid: 4660 }),
     platform: 'darwin',
     spawnProcess: spawn.spawnProcess,
   });
   assert.equal(spawn.calls[0].file, 'osascript');
-  assert.deepEqual(spawn.calls[0].args.slice(0x0, 0x2), ['-l', 'JavaScript']);
-  assert.equal(spawn.calls[0].args[0x2], '-e');
-  const script = spawn.calls[0].args[0x3];
+  assert.deepEqual(spawn.calls[0].args.slice(0, 2), ['-l', 'JavaScript']);
+  assert.equal(spawn.calls[0].args[2], '-e');
+  const script = spawn.calls[0].args[3];
   assert.ok(script.startsWith('ObjC.import("AppKit");'));
   assert.ok(script.includes('runningApplicationWithProcessIdentifier(4660)'));
   assert.ok(script.includes('NSApplicationActivateIgnoringOtherApps'));
   assert.equal(spawn.calls[0].options.detached, true);
-  assert.equal(helper.state.unrefed, 0x1);
+  assert.equal(helper.state.unrefed, 1);
 });
 
 test('activateChromeShellWindowSoon swallows spawn failures', () => {
   const spawn = createSpawnDouble({ throwError: new Error('osascript missing') });
   assert.equal(
     activateChromeShellWindowSoon({
-      child: createChildDouble({ pid: 0x1234 }),
+      child: createChildDouble({ pid: 4660 }),
       platform: 'win32',
       spawnProcess: spawn.spawnProcess,
     }),
@@ -695,7 +695,7 @@ test('controlChromeShellLaunchWindow refuses an unresolvable target', async () =
   const spawn = createSpawnDouble();
   assert.equal(
     await controlChromeShellLaunchWindow({
-      launch: { detached: false, process: { pid: 0x0 } },
+      launch: { detached: false, process: { pid: 0 } },
       platform: 'win32',
       spawnProcess: spawn.spawnProcess,
     }),
@@ -727,14 +727,14 @@ test('controlChromeShellLaunchWindow refuses an unresolvable target', async () =
     }),
     false,
   );
-  assert.equal(spawn.calls.length, 0x0);
+  assert.equal(spawn.calls.length, 0);
 });
 
 test('controlChromeShellLaunchWindow spawns an encoded focus helper carrying the launch identity', async () => {
   const spawn = createSpawnDouble();
   const timers = createTimerDouble();
   const promise = controlChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1, exitCode: null, signalCode: null, killed: false } },
+    launch: { detached: false, process: { pid: 4321, exitCode: null, signalCode: null, killed: false } },
     action: 'focus',
     env: { KEEP: 'yes' },
     platform: 'win32',
@@ -742,9 +742,9 @@ test('controlChromeShellLaunchWindow spawns an encoded focus helper carrying the
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
   });
-  assert.equal(spawn.calls.length, 0x1);
+  assert.equal(spawn.calls.length, 1);
   assert.equal(spawn.calls[0].file, 'powershell.exe');
-  assert.deepEqual(spawn.calls[0].args.slice(0x0, 0x6), [
+  assert.deepEqual(spawn.calls[0].args.slice(0, 6), [
     '-NoLogo',
     '-NoProfile',
     '-NonInteractive',
@@ -752,7 +752,7 @@ test('controlChromeShellLaunchWindow spawns an encoded focus helper carrying the
     'Bypass',
     '-EncodedCommand',
   ]);
-  const script = decodeUtf16Base64(spawn.calls[0].args[0x6]);
+  const script = decodeUtf16Base64(spawn.calls[0].args[6]);
   assert.ok(script.includes('GetEnvironmentVariable("AIC_CHROME_SHELL_FOCUS_MODE")'));
   assert.ok(script.includes('AicChromeShellFocus'));
   assert.ok(
@@ -770,7 +770,7 @@ test('controlChromeShellLaunchWindow spawns an encoded focus helper carrying the
   );
   assert.equal(spawn.calls[0].options.env.AIC_CHROME_SHELL_EXPECTED_BROWSER_PATH, '');
   assert.equal(spawn.calls[0].options.env.KEEP, 'yes');
-  spawn.children[0x0].emit('exit', 0x0);
+  spawn.children[0].emit('exit', 0);
   assert.equal(await promise, true);
 });
 
@@ -778,31 +778,31 @@ test('controlChromeShellLaunchWindow resolves false on error and non-zero exits'
   const timers = createTimerDouble();
   const errorSpawn = createSpawnDouble();
   const onError = controlChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1 } },
+    launch: { detached: false, process: { pid: 4321 } },
     platform: 'win32',
     spawnProcess: errorSpawn.spawnProcess,
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
   });
-  errorSpawn.children[0x0].emit('error', new Error('spawn failed'));
+  errorSpawn.children[0].emit('error', new Error('spawn failed'));
   assert.equal(await onError, false);
 
   const badExitSpawn = createSpawnDouble();
   const onBadExit = controlChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1 } },
+    launch: { detached: false, process: { pid: 4321 } },
     platform: 'win32',
     spawnProcess: badExitSpawn.spawnProcess,
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
   });
-  badExitSpawn.children[0x0].emit('exit', 0x3);
+  badExitSpawn.children[0].emit('exit', 3);
   assert.equal(await onBadExit, false);
 });
 
 test('controlChromeShellLaunchWindow reports false when the helper has no once handler', async () => {
   assert.equal(
     await controlChromeShellLaunchWindow({
-      launch: { detached: false, process: { pid: 0x10e1 } },
+      launch: { detached: false, process: { pid: 4321 } },
       platform: 'win32',
       spawnProcess: () => ({}),
     }),
@@ -810,7 +810,7 @@ test('controlChromeShellLaunchWindow reports false when the helper has no once h
   );
   assert.equal(
     await controlChromeShellLaunchWindow({
-      launch: { detached: false, process: { pid: 0x10e1 } },
+      launch: { detached: false, process: { pid: 4321 } },
       platform: 'win32',
       spawnProcess: () => {
         throw new Error('EPERM');
@@ -824,31 +824,31 @@ test('controlChromeShellLaunchWindow clamps the timeout and kills the helper on 
   const timers = createTimerDouble();
   const spawn = createSpawnDouble();
   const promise = controlChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1 } },
+    launch: { detached: false, process: { pid: 4321 } },
     platform: 'win32',
     timeoutMs: 999999,
     spawnProcess: spawn.spawnProcess,
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
   });
-  assert.equal(spawn.calls[0x0].options.env.AIC_CHROME_SHELL_FOCUS_TIMEOUT_MS, '10000');
-  assert.equal(timers.timers[0x0].ms, 10000 + 0x3e8);
-  timers.fire(0x0);
+  assert.equal(spawn.calls[0].options.env.AIC_CHROME_SHELL_FOCUS_TIMEOUT_MS, '10000');
+  assert.equal(timers.timers[0].ms, 10000 + 1000);
+  timers.fire(0);
   assert.equal(await promise, false);
-  assert.equal(spawn.children[0x0].state.killed, 0x1);
+  assert.equal(spawn.children[0].state.killed, 1);
 
   const lowTimers = createTimerDouble();
   const lowSpawn = createSpawnDouble();
   const lowPromise = controlChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1 } },
+    launch: { detached: false, process: { pid: 4321 } },
     platform: 'win32',
-    timeoutMs: 0x1,
+    timeoutMs: 1,
     spawnProcess: lowSpawn.spawnProcess,
     setTimeoutFn: lowTimers.setTimeoutFn,
     clearTimeoutFn: lowTimers.clearTimeoutFn,
   });
-  assert.equal(lowSpawn.calls[0x0].options.env.AIC_CHROME_SHELL_FOCUS_TIMEOUT_MS, '100');
-  lowTimers.fire(0x0);
+  assert.equal(lowSpawn.calls[0].options.env.AIC_CHROME_SHELL_FOCUS_TIMEOUT_MS, '100');
+  lowTimers.fire(0);
   assert.equal(await lowPromise, false);
 });
 
@@ -856,26 +856,26 @@ test('controlChromeShellLaunchWindow clears the timer once the helper exits firs
   const timers = createTimerDouble();
   const spawn = createSpawnDouble();
   const promise = controlChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1 } },
+    launch: { detached: false, process: { pid: 4321 } },
     platform: 'win32',
     spawnProcess: spawn.spawnProcess,
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
   });
-  spawn.children[0x0].emit('exit', 0x0);
+  spawn.children[0].emit('exit', 0);
   assert.equal(await promise, true);
-  assert.equal(timers.timers[0x0].cancelled, true);
+  assert.equal(timers.timers[0].cancelled, true);
 });
 
 test('focusChromeShellLaunchWindow delegates to the focus action', async () => {
   const spawn = createSpawnDouble();
   const promise = focusChromeShellLaunchWindow({
-    launch: { detached: false, process: { pid: 0x10e1 } },
+    launch: { detached: false, process: { pid: 4321 } },
     platform: 'win32',
     spawnProcess: spawn.spawnProcess,
   });
-  assert.equal(spawn.calls[0x0].options.env.AIC_CHROME_SHELL_WINDOW_ACTION, 'focus');
-  spawn.children[0x0].emit('exit', 0x0);
+  assert.equal(spawn.calls[0].options.env.AIC_CHROME_SHELL_WINDOW_ACTION, 'focus');
+  spawn.children[0].emit('exit', 0);
   assert.equal(await promise, true);
 });
 
@@ -891,14 +891,14 @@ test('closeChromeShellLaunchForUpdate short-circuits and delegates detached clos
     },
   });
   assert.equal(delegated, 'closed');
-  assert.equal(seen.length, 0x1);
-  assert.equal(seen[0x0].action, 'close');
+  assert.equal(seen.length, 1);
+  assert.equal(seen[0].action, 'close');
 });
 
 test('closeChromeShellLaunchForUpdate reports success for an already finished process', async () => {
   assert.equal(
     await closeChromeShellLaunchForUpdate({
-      launch: { detached: false, process: { exitCode: 0x0, signalCode: null } },
+      launch: { detached: false, process: { exitCode: 0, signalCode: null } },
     }),
     true,
   );
@@ -908,17 +908,17 @@ test('closeChromeShellLaunchForUpdate reports success for an already finished pr
 test('closeChromeShellLaunchForUpdate escalates windows taskkill from graceful to forced', async () => {
   const spawn = createSpawnDouble();
   const timers = createTimerDouble();
-  const child = createChildDouble({ pid: 0x10e1 });
+  const child = createChildDouble({ pid: 4321 });
   const promise = closeChromeShellLaunchForUpdate({
     launch: { detached: false, process: child },
     platform: 'win32',
     spawnProcess: spawn.spawnProcess,
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
-    gracefulTimeoutMs: 0x5dc,
-    forceTimeoutMs: 0x9c4,
+    gracefulTimeoutMs: 1500,
+    forceTimeoutMs: 2500,
   });
-  for (let index = 0x0; index < 0xc; index += 0x1) {
+  for (let index = 0; index < 12; index += 1) {
     await new Promise((resolve) => setImmediate(resolve));
     timers.fireNext();
   }
@@ -927,15 +927,15 @@ test('closeChromeShellLaunchForUpdate escalates windows taskkill from graceful t
     spawn.calls.map((call) => call.file),
     ['taskkill.exe', 'taskkill.exe'],
   );
-  assert.deepEqual(spawn.calls[0x0].args, ['/PID', '4321', '/T']);
-  assert.deepEqual(spawn.calls[0x1].args, ['/PID', '4321', '/T', '/F']);
-  assert.ok(timers.timers.length >= 0x2);
+  assert.deepEqual(spawn.calls[0].args, ['/PID', '4321', '/T']);
+  assert.deepEqual(spawn.calls[1].args, ['/PID', '4321', '/T', '/F']);
+  assert.ok(timers.timers.length >= 2);
 });
 
 test('closeChromeShellLaunchForUpdate uses a plain kill off windows and waits for exit', async () => {
   const spawn = createSpawnDouble();
   const timers = createTimerDouble();
-  const child = createChildDouble({ pid: 0x10e1 });
+  const child = createChildDouble({ pid: 4321 });
   const promise = closeChromeShellLaunchForUpdate({
     launch: { detached: false, process: child },
     platform: 'linux',
@@ -943,15 +943,15 @@ test('closeChromeShellLaunchForUpdate uses a plain kill off windows and waits fo
     setTimeoutFn: timers.setTimeoutFn,
     clearTimeoutFn: timers.clearTimeoutFn,
   });
-  assert.equal(child.state.killed, 0x1);
-  child.emit('exit', 0x0, null);
+  assert.equal(child.state.killed, 1);
+  child.emit('exit', 0, null);
   assert.equal(await promise, true);
-  assert.equal(spawn.calls.length, 0x0);
-  assert.equal(child.state.offed, 0x1);
+  assert.equal(spawn.calls.length, 0);
+  assert.equal(child.state.offed, 1);
 });
 
 test('closeChromeShellLaunchForUpdate reports the exit state when kill throws', async () => {
-  const child = createChildDouble({ pid: 0x10e1 });
+  const child = createChildDouble({ pid: 4321 });
   child.kill = () => {
     throw new Error('ESRCH');
   };
@@ -969,7 +969,7 @@ test('closeChromeShellLaunchForUpdate reports the exit state when kill throws', 
       launch: {
         detached: false,
         process: {
-          exitCode: 0x0,
+          exitCode: 0,
           signalCode: null,
           kill: () => {
             throw new Error('ESRCH');
@@ -990,8 +990,8 @@ test('resolveChromeShellWindowStartupArgs picks the largest stored placement', (
       [preferencesPath]: JSON.stringify({
         browser: {
           app_window_placement: {
-            small: { left: 0x0, top: 0x0, right: 0x3e8, bottom: 0x258 },
-            large: { left: 0xa, top: 0xa, right: 0x50a, bottom: 0x2c2 },
+            small: { left: 0, top: 0, right: 1000, bottom: 600 },
+            large: { left: 10, top: 10, right: 1290, bottom: 706 },
           },
         },
       }),
@@ -1035,7 +1035,7 @@ test('resolveChromeShellWindowStartupArgs falls back to the legacy window-state 
   const profileDir = path.join(legacyDir, 'chrome-shell-profile');
   const args = resolveChromeShellWindowStartupArgs({
     profileDir: profileDir,
-    readFile: createReadFileDouble({ [legacyPath]: JSON.stringify({ width: 0x384, height: 0x258 }) }),
+    readFile: createReadFileDouble({ [legacyPath]: JSON.stringify({ width: 900, height: 600 }) }),
   });
   assert.deepEqual(args, ['--window-size=900,600']);
 });
@@ -1051,7 +1051,7 @@ test('resolveChromeShellWindowStartupArgs returns no arguments when there is not
       profileDir: PROFILE_DIR,
       readFile: createReadFileDouble({
         [path.join(PROFILE_DIR, 'Default', 'Preferences')]: JSON.stringify({
-          browser: { app_window_placement: { tiny: { left: 0x1 } } },
+          browser: { app_window_placement: { tiny: { left: 1 } } },
         }),
       }),
     }),
@@ -1063,11 +1063,11 @@ test('resolveChromeShellWindowStartupArgs re-centers an off-screen window on the
   const preferencesPath = path.join(PROFILE_DIR, 'Default', 'Preferences');
   const args = resolveChromeShellWindowStartupArgs({
     profileDir: PROFILE_DIR,
-    displayWorkAreas: [{ workArea: { x: 0x0, y: 0x0, width: 0x780, height: 0x438 } }],
+    displayWorkAreas: [{ workArea: { x: 0, y: 0, width: 1920, height: 1080 } }],
     readFile: createReadFileDouble({
       [preferencesPath]: JSON.stringify({
         browser: {
-          app_window_placement: { off: { left: 0x1388, top: 0x1388, width: 0x320, height: 0x258 } },
+          app_window_placement: { off: { left: 5000, top: 5000, width: 800, height: 600 } },
         },
       }),
     }),
@@ -1083,7 +1083,7 @@ test('resolveChromeShellWindowStartupArgs drops the position when no display wor
     readFile: createReadFileDouble({
       [preferencesPath]: JSON.stringify({
         browser: {
-          app_window_placement: { off: { left: 0x1388, top: 0x1388, width: 0x320, height: 0x258 } },
+          app_window_placement: { off: { left: 5000, top: 5000, width: 800, height: 600 } },
         },
       }),
     }),
@@ -1113,12 +1113,12 @@ test('launchChromeShell builds the full argv in order and records the launch sta
       spawnProcess: spawn.spawnProcess,
       mkdir: (target, options) => created.push({ target: target, options: options }),
       writeFile: (target, contents) => written.push({ target: target, contents: contents }),
-      now: () => 0x3e8,
+      now: () => 1000,
     }),
   );
-  assert.equal(spawn.calls.length, 0x1);
-  assert.equal(spawn.calls[0x0].file, BROWSER_PATH);
-  assert.deepEqual(spawn.calls[0x0].args, [
+  assert.equal(spawn.calls.length, 1);
+  assert.equal(spawn.calls[0].file, BROWSER_PATH);
+  assert.deepEqual(spawn.calls[0].args, [
     '--user-data-dir=' + PROFILE_DIR,
     '--no-first-run',
     '--no-default-browser-check',
@@ -1130,20 +1130,20 @@ test('launchChromeShell builds the full argv in order and records the launch sta
     '--disable-backgrounding-occluded-windows',
     '--app=' + APP_URL_SHELL,
   ]);
-  assert.deepEqual(spawn.calls[0x0].options, { stdio: ['ignore', 'ignore', 'pipe'], windowsHide: false });
+  assert.deepEqual(spawn.calls[0].options, { stdio: ['ignore', 'ignore', 'pipe'], windowsHide: false });
   assert.deepEqual(created, [
     { target: PROFILE_DIR, options: { recursive: true } },
     { target: path.join(PROFILE_DIR, 'Default'), options: { recursive: true } },
   ]);
-  assert.equal(written.length, 0x1);
+  assert.equal(written.length, 1);
   assert.equal(launch.browserPath, BROWSER_PATH);
   assert.equal(launch.profileDir, PROFILE_DIR);
   assert.equal(launch.appUrl, APP_URL_SHELL);
   assert.equal(launch.detached, false);
   assert.equal(launch.spawnError, null);
-  assert.equal(launch.spawnedAt, 0x3e8);
+  assert.equal(launch.spawnedAt, 1000);
   assert.equal(typeof launch.startupDiagnostics.snapshot, 'function');
-  assert.equal(launch.process, spawn.children[0x0]);
+  assert.equal(launch.process, spawn.children[0]);
 });
 
 test('launchChromeShell honours the packaged flag, the debug port and the background opt-outs', async () => {
@@ -1162,7 +1162,7 @@ test('launchChromeShell honours the packaged flag, the debug port and the backgr
       spawnProcess: spawn.spawnProcess,
     }),
   );
-  const args = spawn.calls[0x0].args;
+  const args = spawn.calls[0].args;
   assert.ok(args.includes('--remote-debugging-port=9222'));
   assert.ok(args.includes('--app=' + APP_URL_SHELL + '&aicPackaged=1'));
   assert.ok(!args.includes('--disable-background-mode'));
@@ -1176,13 +1176,13 @@ test('launchChromeShell attaches an injected taskbar identity helper to the chil
   const spawn = createSpawnDouble();
   const prepared = {
     attached: [],
-    cancelled: 0x0,
+    cancelled: 0,
     attach(child) {
       prepared.attached.push(child);
       return true;
     },
     cancel() {
-      prepared.cancelled += 0x1;
+      prepared.cancelled += 1;
     },
   };
   const launch = await launchChromeShell(
@@ -1191,16 +1191,16 @@ test('launchChromeShell attaches an injected taskbar identity helper to the chil
       windowsTaskbarIdentityPreparation: Promise.resolve(prepared),
     }),
   );
-  assert.deepEqual(prepared.attached, [spawn.children[0x0]]);
-  assert.equal(prepared.cancelled, 0x0);
-  assert.equal(launch.process, spawn.children[0x0]);
+  assert.deepEqual(prepared.attached, [spawn.children[0]]);
+  assert.equal(prepared.cancelled, 0);
+  assert.equal(launch.process, spawn.children[0]);
 });
 
 test('launchChromeShell cancels the identity helper and rethrows a normalized spawn error', async () => {
   const prepared = {
-    cancelled: 0x0,
+    cancelled: 0,
     cancel() {
-      prepared.cancelled += 0x1;
+      prepared.cancelled += 1;
     },
   };
   const raw = new Error('spawn EPERM');
@@ -1220,7 +1220,7 @@ test('launchChromeShell cancels the identity helper and rethrows a normalized sp
       return true;
     },
   );
-  assert.equal(prepared.cancelled, 0x1);
+  assert.equal(prepared.cancelled, 1);
 });
 
 test('launchChromeShell wires the process error and exit callbacks', async () => {
@@ -1230,25 +1230,25 @@ test('launchChromeShell wires the process error and exit callbacks', async () =>
   const launch = await launchChromeShell(
     launchInput({
       spawnProcess: spawn.spawnProcess,
-      now: () => 0x64,
+      now: () => 100,
       onExit: (event) => exits.push(event),
       onError: (error) => errors.push(error),
     }),
   );
-  const child = spawn.children[0x0];
+  const child = spawn.children[0];
   child.emit('error', new Error('crashed'));
-  assert.equal(errors.length, 0x1);
-  assert.equal(errors[0x0].code, SPAWN_ERROR_CODE);
-  assert.equal(launch.spawnError, errors[0x0]);
-  child.emit('exit', 0x3, 'SIGTERM');
-  assert.deepEqual(exits, [{ code: 0x3, signal: 'SIGTERM', spawnedAt: 0x64 }]);
+  assert.equal(errors.length, 1);
+  assert.equal(errors[0].code, SPAWN_ERROR_CODE);
+  assert.equal(launch.spawnError, errors[0]);
+  child.emit('exit', 3, 'SIGTERM');
+  assert.deepEqual(exits, [{ code: 3, signal: 'SIGTERM', spawnedAt: 100 }]);
 });
 
 test('launchChromeShell skips the exit hook when no callback is supplied', async () => {
   const spawn = createSpawnDouble();
   const launch = await launchChromeShell(launchInput({ spawnProcess: spawn.spawnProcess }));
-  assert.equal(launch.process, spawn.children[0x0]);
-  spawn.children[0x0].emit('exit', 0x0, null);
+  assert.equal(launch.process, spawn.children[0]);
+  spawn.children[0].emit('exit', 0, null);
 });
 
 test('launchChromeShellWithLifecycle logs the launch and returns the launch record', async () => {
@@ -1257,10 +1257,10 @@ test('launchChromeShellWithLifecycle logs the launch and returns the launch reco
   const launch = await launchChromeShellWithLifecycle(
     launchInput({ spawnProcess: spawn.spawnProcess, logEvent: log.logEvent }),
   );
-  assert.equal(launch.process, spawn.children[0x0]);
-  assert.equal(log.events.length, 0x1);
-  assert.equal(log.events[0x0].type, 'chrome_shell.launched');
-  assert.deepEqual(log.events[0x0].context, {
+  assert.equal(launch.process, spawn.children[0]);
+  assert.equal(log.events.length, 1);
+  assert.equal(log.events[0].type, 'chrome_shell.launched');
+  assert.deepEqual(log.events[0].context, {
     browserPath: BROWSER_PATH,
     profileDir: PROFILE_DIR,
     appUrl: APP_URL_SHELL,
@@ -1271,7 +1271,7 @@ test('launchChromeShellWithLifecycle treats a fast clean exit as a detached shel
   const spawn = createSpawnDouble();
   const log = createLogDouble();
   const closed = [];
-  let clock = 0x3e8;
+  let clock = 1000;
   const app = createAppDouble({ paths: { sessionData: 'C:\\Session' } });
   const launch = await launchChromeShellWithLifecycle(
     launchInput({
@@ -1282,22 +1282,22 @@ test('launchChromeShellWithLifecycle treats a fast clean exit as a detached shel
       now: () => clock,
     }),
   );
-  clock += 0x1f4;
-  spawn.children[0x0].emit('exit', 0x0, null);
+  clock += 500;
+  spawn.children[0].emit('exit', 0, null);
   assert.equal(launch.detached, true);
-  assert.equal(log.events[0x1].type, 'chrome_shell.early_exit_ignored');
-  assert.equal(log.events[0x1].level, 'warn');
-  assert.equal(log.events[0x1].context.runtimeMs, 0x1f4);
-  assert.equal(log.events[0x1].context.graceMs, 0x1388);
-  assert.deepEqual(closed, [{ code: 0x0, signal: null, runtimeMs: 0x1f4, detached: true }]);
-  assert.equal(app.quitCalls.length, 0x0);
+  assert.equal(log.events[1].type, 'chrome_shell.early_exit_ignored');
+  assert.equal(log.events[1].level, 'warn');
+  assert.equal(log.events[1].context.runtimeMs, 500);
+  assert.equal(log.events[1].context.graceMs, 5000);
+  assert.deepEqual(closed, [{ code: 0, signal: null, runtimeMs: 500, detached: true }]);
+  assert.equal(app.quitCalls.length, 0);
 });
 
 test('launchChromeShellWithLifecycle quits after a real exit unless the launcher is kept', async () => {
   const spawn = createSpawnDouble();
   const log = createLogDouble();
   const closed = [];
-  let clock = 0x0;
+  let clock = 0;
   const app = createAppDouble({ paths: { sessionData: 'C:\\Session' } });
   await launchChromeShellWithLifecycle(
     launchInput({
@@ -1311,18 +1311,18 @@ test('launchChromeShellWithLifecycle quits after a real exit unless the launcher
       now: () => clock,
     }),
   );
-  clock = 0x3e8 + 0x1388;
-  spawn.children[0x0].emit('exit', 0x0, null);
-  assert.equal(log.events[0x1].type, 'chrome_shell.exited');
-  assert.equal(log.events[0x1].level, 'info');
-  assert.deepEqual(closed, [{ code: 0x0, signal: null, runtimeMs: 0x1770, detached: false }]);
-  assert.equal(app.quitCalls.length, 0x1);
+  clock = 1000 + 5000;
+  spawn.children[0].emit('exit', 0, null);
+  assert.equal(log.events[1].type, 'chrome_shell.exited');
+  assert.equal(log.events[1].level, 'info');
+  assert.deepEqual(closed, [{ code: 0, signal: null, runtimeMs: 6000, detached: false }]);
+  assert.equal(app.quitCalls.length, 1);
 });
 
 test('launchChromeShellWithLifecycle keeps the app when onClosed asks to or the flag is set', async () => {
   const keepSpawn = createSpawnDouble();
   const keepApp = createAppDouble({ paths: { sessionData: 'C:\\Session' } });
-  let keepClock = 0x0;
+  let keepClock = 0;
   await launchChromeShellWithLifecycle(
     launchInput({
       app: keepApp,
@@ -1332,13 +1332,13 @@ test('launchChromeShellWithLifecycle keeps the app when onClosed asks to or the 
       now: () => keepClock,
     }),
   );
-  keepClock = 0x1770;
-  keepSpawn.children[0x0].emit('exit', 0x0, null);
-  assert.equal(keepApp.quitCalls.length, 0x0);
+  keepClock = 6000;
+  keepSpawn.children[0].emit('exit', 0, null);
+  assert.equal(keepApp.quitCalls.length, 0);
 
   const flagSpawn = createSpawnDouble();
   const flagApp = createAppDouble({ paths: { sessionData: 'C:\\Session' } });
-  let flagClock = 0x0;
+  let flagClock = 0;
   await launchChromeShellWithLifecycle(
     launchInput({
       app: flagApp,
@@ -1352,9 +1352,9 @@ test('launchChromeShellWithLifecycle keeps the app when onClosed asks to or the 
       now: () => flagClock,
     }),
   );
-  flagClock = 0x1770;
-  flagSpawn.children[0x0].emit('exit', 0x0, null);
-  assert.equal(flagApp.quitCalls.length, 0x0);
+  flagClock = 6000;
+  flagSpawn.children[0].emit('exit', 0, null);
+  assert.equal(flagApp.quitCalls.length, 0);
 });
 
 test('launchChromeShellWithLifecycle normalizes and reports spawn errors', async () => {
@@ -1370,12 +1370,12 @@ test('launchChromeShellWithLifecycle normalizes and reports spawn errors', async
       onLaunchError: (error) => launchErrors.push(error),
     }),
   );
-  spawn.children[0x0].emit('error', raw);
-  assert.equal(launchErrors.length, 0x1);
-  assert.equal(launchErrors[0x0].code, SPAWN_ERROR_CODE);
+  spawn.children[0].emit('error', raw);
+  assert.equal(launchErrors.length, 1);
+  assert.equal(launchErrors[0].code, SPAWN_ERROR_CODE);
   const spawnErrorEvent = log.events.find((event) => event.type === 'chrome_shell.spawn_error');
   assert.equal(spawnErrorEvent.level, 'error');
   assert.equal(spawnErrorEvent.source, 'main');
   assert.equal(spawnErrorEvent.message, 'Chrome shell process failed');
-  assert.equal(spawnErrorEvent.error, launchErrors[0x0]);
+  assert.equal(spawnErrorEvent.error, launchErrors[0]);
 });

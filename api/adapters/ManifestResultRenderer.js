@@ -86,7 +86,7 @@ export function buildManifestResultPatch(
     outputUrl = resolveManifestResultValues(current, {
       modelManifest: modelManifest,
       executionManifest: executionManifest,
-    })[0x0];
+    })[0];
   if (!outputUrl) return {};
   if (outputType2 === 'image')
     return { outputUrl: outputUrl, imageUrl: outputUrl, sourceUrl: outputUrl, thumbUrl: outputUrl };

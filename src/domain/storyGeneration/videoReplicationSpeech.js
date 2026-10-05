@@ -30,6 +30,6 @@ export function formatReplicationVoiceover(response, list2 = []) {
     item +
     '：' +
     response['text'] +
-    (response['uncertain'] ? '\x20[待核对]' : '')
+    (response['uncertain'] ? ' [待核对]' : '')
   );
 }

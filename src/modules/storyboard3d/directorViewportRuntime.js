@@ -33,9 +33,9 @@ export class DirectorViewportRuntime {
       ),
       source = target['getBoundingSphere'](new threeRuntime['Sphere']()),
       next = Math['max'](
-        0x3,
+        3,
         (source['radius'] /
-          Math['sin']((Math['min'](0x23, 0x23 * this['bridge']['camera']['aspect']) * Math['PI']) / 0x168)) *
+          Math['sin']((Math['min'](35, 35 * this['bridge']['camera']['aspect']) * Math['PI']) / 360)) *
           1.2,
       ),
       forward = this['bridge']['camera']['getWorldDirection'](new threeRuntime['Vector3']()),
@@ -57,12 +57,12 @@ export class DirectorViewportRuntime {
       (this['monitor']['shadowMap']['enabled'] = this['bridge']['renderer']['shadowMap']['enabled']),
       (this['monitor']['shadowMap']['type'] = this['bridge']['renderer']['shadowMap']['type']),
       (this['monitorCamera'] = new threeRuntime['PerspectiveCamera']()));
-    const current = Math['max'](0x1, Math['round'](canvas['clientWidth'])),
+    const current = Math['max'](1, Math['round'](canvas['clientWidth'])),
       entry = String(near['aspectRatio'] || '16:9')
         ['split'](':')
         ['map'](Number),
-      aspect = entry[0x0] > 0x0 && entry[0x1] > 0x0 ? entry[0x0] / entry[0x1] : 0x10 / 0x9,
-      record = Math['max'](0x1, Math['round'](current / aspect));
+      aspect = entry[0] > 0 && entry[1] > 0 ? entry[0] / entry[1] : 16 / 9,
+      record = Math['max'](1, Math['round'](current / aspect));
     if (canvas['width'] !== current || canvas['height'] !== record)
       this['monitor']['setSize'](current, record, ![]);
     const payload = this['monitorCamera'];
@@ -70,13 +70,13 @@ export class DirectorViewportRuntime {
       Object['assign'](payload, {
         aspect: aspect,
         near: near['near'] || 0.1,
-        far: near['far'] || 0x3e8,
+        far: near['far'] || 1000,
         fov: near['fov'] ?? focalLengthToFov(near['focalLength']),
       }),
       payload['position']['fromArray'](near['position']),
-      payload['up']['set'](0x0, 0x1, 0x0),
+      payload['up']['set'](0, 1, 0),
       payload['lookAt'](new threeRuntime['Vector3'](...near['target'])),
-      payload['rotateZ'](near['roll'] || 0x0),
+      payload['rotateZ'](near['roll'] || 0),
       payload['updateProjectionMatrix'](),
       this['bridge']['_withCleanCaptureFrame'](() =>
         this['monitor']['render'](this['bridge']['scene'], payload),

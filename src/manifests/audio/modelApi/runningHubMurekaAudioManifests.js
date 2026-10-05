@@ -10,17 +10,17 @@ import {
   constantMapping,
   RH_AUDIO_HELPER_IDS,
 } from './runningHubAudioCatalogShared.js';
-const COUNT = audioSelect('count', '生成数量', [0x1, 0x2, 0x3], 0x2, {
+const COUNT = audioSelect('count', '生成数量', [1, 2, 3], 2, {
     placement: 'batch',
     description: '一次请求生成 1–3 首，按生成数量计费。',
     showInfoTip: !![],
   }),
   STYLE = audioTextarea('stylePrompt', '音乐风格', '描述曲风、情绪、乐器和人声，最多 1024 字符。', {
-    maxLength: 0x400,
+    maxLength: 1024,
   }),
   idField = (value, item) =>
     audioText(value, item, '可选。已有 Mureka 素材 ID 可直接复用；连接对应参考音频时自动处理。', {
-      maxLength: 0x40,
+      maxLength: 64,
     }),
   prepare = (slot, targetField, purpose, executionId = ![]) => ({
     executionId: executionId ? RH_AUDIO_HELPER_IDS['murekaClone'] : RH_AUDIO_HELPER_IDS['murekaUpload'],
@@ -30,7 +30,7 @@ const COUNT = audioSelect('count', '生成数量', [0x1, 0x2, 0x3], 0x2, {
     ...(purpose ? { purpose: purpose } : {}),
     resultType: 'id',
   }),
-  fileRules = { audioExtensions: ['mp3', 'm4a'], maxAudioBytes: 0xa * 0x400 * 0x400 };
+  fileRules = { audioExtensions: ['mp3', 'm4a'], maxAudioBytes: 10 * 1024 * 1024 };
 export const runningHubMurekaAudioEntries = Object['freeze']([
   ...[
     ['v7.6', 0x1d7ef044],
@@ -42,10 +42,10 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
       name: 'Mureka ' + key + ' 伴奏生成',
       endpoint: '/openapi/v2/mureka-ai/mureka-' + key + '/generate-bgm',
       docId: docId,
-      order: 0xf0 + index,
+      order: 240 + index,
       promptField: 'prompt',
       promptRequired: ![],
-      promptMaxLength: 0x400,
+      promptMaxLength: 1024,
       promptPlaceholder: '描述伴奏风格，或连接一段参考伴奏（二选一）',
       slots: [audioSlot('instrumental', '参考伴奏')],
       fields: [COUNT, idField('instrumentalId', '伴奏素材 ID')],
@@ -63,12 +63,12 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
     const supportsVoice = result !== 'o2';
     return createRunningHubAudioCatalogEntry({
       id: 'mureka-' + result + '-song',
-      name: 'Mureka\x20' + result + ' 歌曲生成',
+      name: 'Mureka ' + result + ' 歌曲生成',
       endpoint: '/openapi/v2/mureka-ai/mureka-' + result + '/generate-song',
       docId: docId2,
-      order: 0xfa + data,
+      order: 250 + data,
       promptField: 'lyrics',
-      promptMaxLength: 0xbb8,
+      promptMaxLength: 3000,
       promptPlaceholder: '输入歌词，支持 [Verse]、[Chorus] 等段落标记，最多 3000 字符',
       slots: [
         audioSlot('reference', '参考歌曲'),
@@ -78,7 +78,7 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
         COUNT,
         STYLE,
         idField('referenceId', '歌曲素材 ID'),
-        ...(supportsVoice ? [idField('vocalId', '人声音色\x20ID'), idField('melodyId', '旋律素材 ID')] : []),
+        ...(supportsVoice ? [idField('vocalId', '人声音色 ID'), idField('melodyId', '旋律素材 ID')] : []),
       ],
       mapping: [
         paramMapping('n', 'count'),
@@ -109,13 +109,13 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
       name: 'Mureka ' + options + ' 短歌延长',
       endpoint: '/openapi/v2/mureka-ai/mureka-' + options + '/extend-song',
       docId: docId3,
-      order: 0x104 + target,
+      order: 260 + target,
       promptField: 'lyrics',
-      promptMaxLength: 0xbb8,
+      promptMaxLength: 3000,
       promptPlaceholder: '输入延长部分的歌词，最多 3000 字符',
       slots: [audioSlot('sourceAudio', '待延长歌曲', !![])],
       fields: [
-        audioSlider('extendAt', '延长起点（秒）', 0x8, 0x1a4, 0x8, 0.001),
+        audioSlider('extendAt', '延长起点（秒）', 8, 420, 8, 0.001),
         ...(options === 'v8'
           ? [
               audioSelect(

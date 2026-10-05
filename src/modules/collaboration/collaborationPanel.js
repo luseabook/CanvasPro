@@ -6,11 +6,11 @@ import { createCollaborationActivity } from './collaborationActivity.js';
 import { createContextMenuIcon } from '../../components/contextMenuIcon.js';
 import { ADVANCED_SETTINGS_TUNE_ICON_MARKUP } from '../../components/sharedIconMarkup.js';
 const ROLE_NAMES = { owner: '房主', admin: '管理员', editor: '可编辑', viewer: '只读' },
-  QUIET_SYNC_MESSAGES = new Set(['已同步', '正在同步修改', '房主已接收修改\x20·\x20项目文件由房主保存']);
+  QUIET_SYNC_MESSAGES = new Set(['已同步', '正在同步修改', '房主已接收修改 · 项目文件由房主保存']);
 function element(value, item = '', key = '') {
   const el = document['createElement'](value);
   ((el['className'] = item), (el['textContent'] = key));
-  if (value === 'summary') el['tabIndex'] = 0x0;
+  if (value === 'summary') el['tabIndex'] = 0;
   return el;
 }
 export function createCollaborationPanel({
@@ -135,7 +135,7 @@ export function createCollaborationPanel({
     root3 = run3('active');
   collaborationLobby['mountSession'](root3);
   const element7 = element('div', 'collaboration-room-header');
-  (root3['append'](element7), element7['append'](createContextMenuIcon('source', { size: 0x1c })));
+  (root3['append'](element7), element7['append'](createContextMenuIcon('source', { size: 28 })));
   const element8 = element('div', 'collaboration-room-info');
   element7['append'](element8);
   const el8 = element('h3'),
@@ -225,7 +225,7 @@ export function createCollaborationPanel({
   root3['append'](element10);
   const el17 = element('h4');
   element10['append'](el17);
-  const root5 = element('div', 'collaboration-list\x20collaboration-members');
+  const root5 = element('div', 'collaboration-list collaboration-members');
   (root5['setAttribute']('aria-label', '协作成员'), root3['append'](root5));
   const el18 = button('召集成员到我的视角', () => actions['summon'](), root3);
   (el18['classList']['add']('collaboration-text-action', 'collaboration-summon'),
@@ -324,7 +324,7 @@ export function createCollaborationPanel({
       el26['querySelector']('button')['focus']());
   }
   (root['append'](head, element3), document['body']['append'](root));
-  let requestAnimationFrame2 = 0x0,
+  let requestAnimationFrame2 = 0,
     value3 = '';
   function run5(restoreFocus = !![]) {
     (cancelAnimationFrame(requestAnimationFrame2),
@@ -363,12 +363,12 @@ export function createCollaborationPanel({
   document['addEventListener']('pointerdown', value4, !![]);
   function run8() {
     const box = anchor?.['getBoundingClientRect'](),
-      value5 = Math['min'](box?.['bottom'] || 0x30, window['innerHeight'] / 0x3) + 0xa,
+      value5 = Math['min'](box?.['bottom'] || 48, window['innerHeight'] / 3) + 10,
       value6 = Math['max'](
-        0xc,
+        12,
         Math['min'](
-          window['innerWidth'] - (box?.['right'] || window['innerWidth'] - 0x10),
-          window['innerWidth'] - root['offsetWidth'] - 0xc,
+          window['innerWidth'] - (box?.['right'] || window['innerWidth'] - 16),
+          window['innerWidth'] - root['offsetWidth'] - 12,
         ),
       ),
       value7 = value5 + ':' + value6;
@@ -421,7 +421,7 @@ export function createCollaborationPanel({
         (el10['textContent'] =
           (enabled8['session']['hosting'] ? '本机开房' : '已加入房间') + ' · ' + value9 + ' 人在线'),
         (el10['dataset']['status'] = enabled8['session']['status'] || 'connecting'),
-        (el17['textContent'] = '成员\x20·\x20' + (enabled8['session']['members']?.['length'] || 0x0)),
+        (el17['textContent'] = '成员 · ' + (enabled8['session']['members']?.['length'] || 0)),
         (el18['hidden'] = enabled8['session']['role'] !== 'owner'),
         (el23['hidden'] = !enabled8['session']['conflicts']?.['length']),
         (el24['textContent'] =
@@ -484,7 +484,7 @@ export function createCollaborationPanel({
         value17 = collaborationMembers['render'](value16);
       if (value16['session']) {
         const value18 =
-          (value16['session']['hosting'] ? '本机开房' : '已加入房间') + '\x20·\x20' + value17 + '\x20人在线';
+          (value16['session']['hosting'] ? '本机开房' : '已加入房间') + ' · ' + value17 + ' 人在线';
         if (el10['textContent'] !== value18) el10['textContent'] = value18;
       }
     },

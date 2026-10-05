@@ -88,7 +88,7 @@ import {
   shouldUseImageWorkflowBusyButton,
 } from './imageNodeManifestPolicies.js';
 import { t } from '../../i18n/index.js';
-const DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 0x3e8,
+const DREAMINA_STALE_ACTIVE_RESUME_MS = 15 * 1000,
   DREAMINA_NON_RECOVERABLE_STATUSES = new Set([
     'cancelled',
     'canceled',
@@ -1906,13 +1906,13 @@ export function createAIGenerateNodeTaskOrchestrationModule(value10) {
                 ? remoteError.message || t('aigenImage.task.cancelFailed')
                 : count3 === 0
                   ? value119 || t('aigenImage.task.cancelSuccess')
-                  : count3 === 0x327
+                  : count3 === 807
                     ? value119 || t('aigenImage.task.taskNotFound')
                     : value119 || t('aigenImage.task.cancelFailed'));
           return this._buildRunningHubCancelResultPatch({
             latest: latest3,
             message: message2,
-            code: code2 ? 0x32d : count3,
+            code: code2 ? 813 : count3,
             duration: duration3,
           });
         };

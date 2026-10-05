@@ -305,7 +305,7 @@ test('BMP letters, numbers and underscore prevent a partial-name match on the ri
 
 test('right boundaries check one UTF-16 code unit, permitting marks and astral letters or numbers', (t) => {
   installDocument(t);
-  for (const suffix of [' ', '!', '.', ',', '/', '@', '🙂', '\n', '\u0301', '\u{10400}', '\u{1D7CE}', '']) {
+  for (const suffix of [' ', '!', '.', ',', '/', '@', '🙂', '\n', '́', '𐐀', '𝟎', '']) {
     const host = hostElement();
     const text = `@Ann${suffix}`;
     appendMentionText(host, text, [ann], ['ann']);
@@ -442,7 +442,7 @@ test('reviewAvatar uses a Unicode code point rather than a UTF-16 code unit', (t
 test('reviewAvatar does not trim names or combine a whole grapheme cluster', (t) => {
   installDocument(t);
   assert.equal(reviewAvatar({ name: ' Ann' }).textContent, ' ');
-  assert.equal(reviewAvatar({ name: 'e\u0301mile' }).textContent, 'e');
+  assert.equal(reviewAvatar({ name: 'émile' }).textContent, 'e');
   assert.equal(reviewAvatar({ name: '👩‍💻Coder' }).textContent, '👩');
 });
 

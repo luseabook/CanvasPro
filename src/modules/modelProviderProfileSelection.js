@@ -23,7 +23,7 @@ export function getModelProviderProfileIds(index) {
       ? manifest2['extensions']['providerProfiles']
       : [],
     list2 =
-      list['length'] > 0x0
+      list['length'] > 0
         ? list
         : manifest2?.['provider'] === 'runninghubwf' && manifest2?.['adapterType'] === 'workflow'
           ? RUNNINGHUB_SITE_PROFILE_IDS
@@ -40,7 +40,7 @@ export function normalizeModelProviderProfileId(data, options) {
     const source = String(getProviderConfig('runninghubwf')?.['providerProfileId'] || '')['trim']();
     if (list3['includes'](source)) return source;
   }
-  return list3[0x0];
+  return list3[0];
 }
 export function resolveModelGenerationProviderProfileId(next, current, entry) {
   const manifest4 = resolveManifest(next),
@@ -133,8 +133,8 @@ export function buildModelProviderProfileSelectionPatch(options3 = {}, value8 = 
 }
 export function getNextModelProviderProfileId(options4 = {}) {
   const list6 = getModelProviderProfileIds(options4?.['model']);
-  if (list6['length'] < 0x2) return list6[0x0] || '';
+  if (list6['length'] < 2) return list6[0] || '';
   const modelProviderProfileId3 = resolveModelProviderProfileId(options4),
     value11 = list6['indexOf'](modelProviderProfileId3);
-  return list6[(value11 + 0x1 + list6['length']) % list6['length']];
+  return list6[(value11 + 1 + list6['length']) % list6['length']];
 }

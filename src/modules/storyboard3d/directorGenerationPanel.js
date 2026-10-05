@@ -4,7 +4,7 @@ import { bindWorkspacePrices } from '../../components/shared/workspacePriceBindi
 const escape = (value) =>
   String(value ?? '')
     ['replaceAll']('&', '&amp;')
-    ['replaceAll']('\x22', '&quot;')
+    ['replaceAll']('"', '&quot;')
     ['replaceAll']('<', '&lt;');
 export class DirectorGenerationPanel {
   constructor(item) {
@@ -32,12 +32,12 @@ export class DirectorGenerationPanel {
                     '360-degree equirectangular panorama, seamless horizontal wrap, 2:1 projection, continuous horizon, no text. ' +
                     this['prompt'],
                   generationParams: { aspectRatio: '2:1' },
-                  hasReferences: this['files']['length'] > 0x0,
+                  hasReferences: this['files']['length'] > 0,
                 }
               : {
                   ...this['panel']['timeline']['getGenerationContext']?.(),
                   prompt: this['prompt'],
-                  hasReferences: this['files']['length'] > 0x0,
+                  hasReferences: this['files']['length'] > 0,
                 },
         },
       ]))),
@@ -50,10 +50,10 @@ export class DirectorGenerationPanel {
     const { project: project, scene: scene } = this['panel']['context'](),
       list = getDirectorPanoramaModels();
     if (!list['some']((key) => key['modelId'] === this['model']))
-      this['model'] = list[0x0]?.['modelId'] || '';
+      this['model'] = list[0]?.['modelId'] || '';
     const list2 = (project['generationJobs'] || [])
         ['filter']((index) => index['sceneId'] === scene['id'])
-        ['slice'](-0x8)
+        ['slice'](-8)
         ['reverse'](),
       result = list2['some']((response) => response['status'] === 'running');
     return (
@@ -61,29 +61,29 @@ export class DirectorGenerationPanel {
       (this['kind'] === 'layer' ? 'selected' : '') +
       '>可编辑场景层</option><option value="panorama" ' +
       (this['kind'] === 'panorama' ? 'selected' : '') +
-      '>球面全景图片</option></select></label>\x0a\x20\x20\x20\x20\x20\x20' +
+      '>球面全景图片</option></select></label>\n      ' +
       (this['kind'] === 'panorama'
         ? '<label>图像模型<select data-director-generation="model">' +
           list['map'](
             (data) =>
               '<option value="' +
               escape(data['modelId']) +
-              '\x22\x20' +
+              '" ' +
               (this['model'] === data['modelId'] ? 'selected' : '') +
               '>' +
               escape(data['providerLabel']) +
-              '\x20·\x20' +
+              ' · ' +
               escape(data['label']) +
               '</option>',
           )['join']('') +
           '</select></label>'
-        : '<label>结果位置<select\x20data-director-generation=\x22layerId\x22><option\x20value=\x22\x22>插入新生成层</option>' +
+        : '<label>结果位置<select data-director-generation="layerId"><option value="">插入新生成层</option>' +
           (scene['generatedLayers'] || [])
             ['map'](
               (error) =>
-                '<option\x20value=\x22' +
+                '<option value="' +
                 escape(error['id']) +
-                '\x22\x20' +
+                '" ' +
                 (error['id'] === this['layerId'] ? 'selected' : '') +
                 '>替换 ' +
                 escape(error['name']) +
@@ -106,7 +106,7 @@ export class DirectorGenerationPanel {
         (error3) =>
           '<p role="status">' + escape(error3['message']) + ' · ' + escape(error3['model']) + '</p>',
       )['join']('') +
-      '\x0a\x20\x20\x20\x20' +
+      '\n    ' +
       (scene['generatedLayers'] || [])
         ['map'](
           (error4) =>
@@ -122,9 +122,9 @@ export class DirectorGenerationPanel {
                 (error5) =>
                   '<button data-storyboard-3d-action="timeline-generation-restore" data-layer-id="' +
                   escape(error4['id']) +
-                  '\x22\x20data-version-id=\x22' +
+                  '" data-version-id="' +
                   escape(error5['id']) +
-                  '\x22>恢复\x20' +
+                  '">恢复 ' +
                   escape(error5['name']) +
                   '</button>',
               )
@@ -141,9 +141,9 @@ export class DirectorGenerationPanel {
       const list3 = Array['from'](el['files'] || []);
       el['value'] = '';
       if (
-        list3['length'] > 0x6 ||
+        list3['length'] > 6 ||
         list3['some'](
-          (enabled2) => !enabled2['type']['startsWith']('image/') || enabled2['size'] > 0x20 * 0x400 * 0x400,
+          (enabled2) => !enabled2['type']['startsWith']('image/') || enabled2['size'] > 32 * 1024 * 1024,
         )
       )
         this['panel']['timeline']['setMessage']?.('最多选择 6 张图片，每张不超过 32 MB。');

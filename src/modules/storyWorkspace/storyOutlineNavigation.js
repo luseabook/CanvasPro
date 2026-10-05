@@ -27,14 +27,14 @@ export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = g
     dom = el3['ownerDocument'];
   let enabled = ![],
     index = ![],
-    result = 0x0,
-    enabled2 = 0x0;
+    result = 0,
+    enabled2 = 0;
   const run2 = (data) => {
       el5?.['setAttribute']('aria-expanded', String(data));
     },
     handler = () => {
       if (!enabled2) return;
-      (windowObject['clearTimeout'](enabled2), (enabled2 = 0x0));
+      (windowObject['clearTimeout'](enabled2), (enabled2 = 0));
     },
     handler2 = (options) => {
       ((index = Boolean(options)),
@@ -56,15 +56,15 @@ export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = g
       handler();
       if (enabled) return;
       enabled2 = windowObject['setTimeout'](() => {
-        ((enabled2 = 0x0), handler2(![]));
-      }, 0xb4);
+        ((enabled2 = 0), handler2(![]));
+      }, 180);
     },
     entry = () => run2(!![]),
     record = () => {
       if (result) windowObject['clearTimeout'](result);
       result = windowObject['setTimeout'](() => {
-        ((result = 0x0), run2(enabled || el4['contains'](dom['activeElement'])));
-      }, 0x0);
+        ((result = 0), run2(enabled || el4['contains'](dom['activeElement'])));
+      }, 0);
     },
     payload = (event2) => {
       const el6 = event2['target']['closest']?.('[data-story-outline-nav-target]');

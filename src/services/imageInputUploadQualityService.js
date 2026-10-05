@@ -32,7 +32,7 @@ export function getImageInputUploadQualityOptions(index) {
     return {
       imageInputUploadQualityMode: imageInputUploadQualityMode2,
       compress: true,
-      maxDim: 0x1000,
+      maxDim: 4096,
       quality: 0.95,
       fallbackCompressOnError: false,
     };
@@ -43,13 +43,13 @@ export function getImageInputUploadQualityOptions(index) {
       maxDim: 0,
       quality: 1,
       fallbackCompressOnError: true,
-      fallbackMaxDim: 0x800,
+      fallbackMaxDim: 2048,
       fallbackQuality: 0.9,
     };
   return {
     imageInputUploadQualityMode: IMAGE_INPUT_UPLOAD_QUALITY_MODES.STANDARD,
     compress: true,
-    maxDim: 0x800,
+    maxDim: 2048,
     quality: 0.9,
     fallbackCompressOnError: false,
   };

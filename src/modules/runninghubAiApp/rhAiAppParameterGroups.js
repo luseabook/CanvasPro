@@ -11,14 +11,14 @@ import { renderUiSchemaFields } from '../../components/aigenImage/uiSchemaRender
 import { positionAnchoredSubmenu } from '../../utils/submenuPosition.js';
 import { animatePreviewOrder, showGroupPanel } from './rhAiAppMotion.js';
 export function renderGroupedPreviewParams(value, item, handler) {
-  const key = item?.['models']?.[0x0]?.['uiSchema']?.['fields'] || [],
+  const key = item?.['models']?.[0]?.['uiSchema']?.['fields'] || [],
     index = {
       generationParams: Object['fromEntries'](key['map']((result) => [result['id'], result['defaultValue']])),
     };
   return getParameterEntries(value)
     ['map']((enabled, data) => {
-      if (!enabled['id'] || enabled['members']['length'] < 0x2) return handler(enabled['members'][0x0], data);
-      const options = enabled['members'][0x0]['index'],
+      if (!enabled['id'] || enabled['members']['length'] < 2) return handler(enabled['members'][0], data);
+      const options = enabled['members'][0]['index'],
         escapeHtmlAttr2 = escapeHtmlAttr(enabled['id']),
         target = enabled['members']
           ['map']((source) => {
@@ -27,14 +27,14 @@ export function renderGroupedPreviewParams(value, item, handler) {
             return (
               '<div class="rh-ai-app-group-member" data-group-member="' +
               source['index'] +
-              '\x22>' +
+              '">' +
               renderUiSchemaFields([{ ...args, variant: 'groupRow' }], index, { unwrap: !![] }) +
               '</div>'
             );
           })
           ['join']('');
       return (
-        '<div\x20class=\x22rh-ai-app-preview-component\x20rh-ai-app-preview-draggable\x20rh-ai-app-preview-param-chip\x20rh-ai-app-preview-group\x22\x20data-preview-drag-kind=\x22param\x22\x20data-preview-component-index=\x22' +
+        '<div class="rh-ai-app-preview-component rh-ai-app-preview-draggable rh-ai-app-preview-param-chip rh-ai-app-preview-group" data-preview-drag-kind="param" data-preview-component-index="' +
         options +
         '" data-param-group="' +
         escapeHtmlAttr2 +
@@ -44,9 +44,9 @@ export function renderGroupedPreviewParams(value, item, handler) {
         escapeHtmlAttr(enabled['label']) +
         '</button><span class="rh-ai-app-preview-drag-pad" aria-hidden="true"></span>\n      <div class="rh-ai-app-group-panel" hidden role="dialog" aria-label="编辑参数组">\n        <div class="rh-ai-app-group-heading"><input aria-label="参数组名称" data-param-group-name="' +
         escapeHtmlAttr2 +
-        '\x22\x20value=\x22' +
+        '" value="' +
         escapeHtmlAttr(enabled['label']) +
-        '\x22\x20maxlength=\x2224\x22><span\x20role=\x22button\x22\x20tabindex=\x220\x22\x20class=\x22rh-tip\x20ui-schema-info-tip\x22\x20data-param-group-action=\x22description\x22\x20data-tooltip=\x22' +
+        '" maxlength="24"><span role="button" tabindex="0" class="rh-tip ui-schema-info-tip" data-param-group-action="description" data-tooltip="' +
         escapeHtmlAttr(enabled['description'] || '编辑参数组说明') +
         '" aria-label="编辑参数组说明">!</span></div>\n        <textarea class="rh-ai-app-group-description" data-param-group-description="' +
         escapeHtmlAttr2 +
@@ -80,7 +80,7 @@ export function createParameterGroupInteraction(current) {
       state['style']['bottom'] = 'auto';
       const config = el['getBoundingClientRect'](),
         el2 = current['panel'],
-        scope = el2['querySelector']('.rh-ai-app-kind-field')?.['getBoundingClientRect']()['bottom'] || 0x0,
+        scope = el2['querySelector']('.rh-ai-app-kind-field')?.['getBoundingClientRect']()['bottom'] || 0,
         input =
           el2['querySelector']('.rh-ai-app-footer')?.['getBoundingClientRect']()['top'] ||
           window['innerHeight'];
@@ -90,10 +90,10 @@ export function createParameterGroupInteraction(current) {
         containerRect: config,
         horizontalPlacement: 'center',
         verticalPlacement: 'above',
-        verticalGap: 0xa,
+        verticalGap: 10,
         viewportTop: scope,
         viewportHeight: input,
-        viewportWidth: el2['getBoundingClientRect']()['right'] - 0x8,
+        viewportWidth: el2['getBoundingClientRect']()['right'] - 8,
       });
     },
     handler6 = (list, output, value2) => {
@@ -106,7 +106,7 @@ export function createParameterGroupInteraction(current) {
         const value4 = handler2()['filter'](
           (enabled3) => !enabled3['members']['some']((value5) => list['includes'](value5)),
         );
-        (value4['splice'](value2, 0x0, ...list['map']((value6) => ({ members: [value6] }))),
+        (value4['splice'](value2, 0, ...list['map']((value6) => ({ members: [value6] }))),
           orderParameterEntries(value4));
       } else {
         const value7 = run()
@@ -121,7 +121,7 @@ export function createParameterGroupInteraction(current) {
               (value9['advancedParamOrder'] ?? value9['index']) -
               (value10['advancedParamOrder'] ?? value10['index']),
           );
-        (value7['splice'](value2, 0x0, ...list),
+        (value7['splice'](value2, 0, ...list),
           value7['forEach']((value11, value12) => {
             value11['advancedParamOrder'] = value12;
           }));
@@ -139,7 +139,7 @@ export function createParameterGroupInteraction(current) {
       if (!enabled5) return;
       const value14 = enabled5['querySelector']('.rh-ai-app-group-panel');
       ((value14['hidden'] = ![]),
-        enabled5['querySelector']('[data-param-group-action=\x22open\x22]')['setAttribute'](
+        enabled5['querySelector']('[data-param-group-action="open"]')['setAttribute'](
           'aria-expanded',
           'true',
         ),
@@ -175,9 +175,9 @@ export function createParameterGroupInteraction(current) {
           value20 = el3['getBoundingClientRect']()['top'] + el3['clientTop'] - el3['scrollTop'],
           value21 = value18['filter'](
             (value22) =>
-              value15['currentClientY'] > value20 + value22['offsetTop'] + value22['offsetHeight'] / 0x2,
+              value15['currentClientY'] > value20 + value22['offsetTop'] + value22['offsetHeight'] / 2,
           )['length'],
-          value23 = value18[value21] || value18['at'](-0x1);
+          value23 = value18[value21] || value18['at'](-1);
         (value23?.['setAttribute']('data-group-insert', value21 < value18['length'] ? 'before' : 'after'),
           (entry = {
             element: value23,
@@ -185,7 +185,7 @@ export function createParameterGroupInteraction(current) {
             id: enabled6['footerGroupId'],
             scrollTop: el3['scrollTop'],
           }));
-        const value24 = el3['querySelector']('[data-group-member="' + enabled6['index'] + '\x22]'),
+        const value24 = el3['querySelector']('[data-group-member="' + enabled6['index'] + '"]'),
           value25 = Array['from'](el3['querySelectorAll']('[data-group-member]'));
         if (value25['indexOf'](value24) !== value21) {
           const value26 = el3['scrollTop'];
@@ -228,7 +228,7 @@ export function createParameterGroupInteraction(current) {
               (el5['dataset']['groupDropLabel'] = el5['dataset']['paramGroup']
                 ? '松开加入分组'
                 : '松开创建分组'));
-          }, 0x1c2))));
+          }, 450))));
       const enabled8 = handler2()['some']((value29) => value29['id']);
       if (!enabled2 && value16 === 'advanced') current['_reorderPreviewAdvancedParamsDuringDrag'](value15);
       else current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: !![] });
@@ -251,7 +251,7 @@ export function createParameterGroupInteraction(current) {
             args2 = value27['filter']((value36) => value36 !== value34),
             value37 = args2['filter']((value38) => {
               const value39 = value38['getBoundingClientRect']();
-              return value15['currentClientX'] > value39['left'] + value39['width'] / 0x2;
+              return value15['currentClientX'] > value39['left'] + value39['width'] / 2;
             })['length'];
           value34 &&
             Array['from'](value34['parentElement']['children'])['indexOf'](value34) !== value37 &&
@@ -294,7 +294,7 @@ export function createParameterGroupInteraction(current) {
         const value45 = handler2(),
           value46 = value45['find']((value47) => value47['id'] === enabled11['id']);
         ((value46['members'] = value46['members']['filter']((value48) => value48 !== enabled10)),
-          value46['members']['splice'](entry['order'], 0x0, enabled10),
+          value46['members']['splice'](entry['order'], 0, enabled10),
           orderParameterEntries(value45));
       } else {
         if (enabled2?.['ready'] && value41 === 'params')
@@ -304,20 +304,20 @@ export function createParameterGroupInteraction(current) {
             const value49 = handler2()['filter'](
                 (enabled13) => !enabled12 || !enabled13['members']['includes'](enabled10),
               ),
-              value50 = enabled11 && (enabled12 || enabled11['members']['length'] === 0x1);
+              value50 = enabled11 && (enabled12 || enabled11['members']['length'] === 1);
             if (value50 || value49['length'] < CUSTOM_APP_FOOTER_LIMIT) {
               const value51 = Array['from'](current['_getPreviewZoneElement']('params')?.['children'] || [])[
                   'filter'
                 ](
                   (value52) =>
                     Number(value52['dataset']['previewComponentIndex']) !==
-                    (enabled11?.['members'][0x0]?.['index'] ?? enabled10['index']),
+                    (enabled11?.['members'][0]?.['index'] ?? enabled10['index']),
                 ),
                 value53 = value51['filter']((value54) => {
                   const value55 = value54['getBoundingClientRect']();
-                  return enabled9['currentClientX'] > value55['left'] + value55['width'] / 0x2;
+                  return enabled9['currentClientX'] > value55['left'] + value55['width'] / 2;
                 })['length'];
-              if (enabled12) (value49['splice'](value53, 0x0, enabled11), orderParameterEntries(value49));
+              if (enabled12) (value49['splice'](value53, 0, enabled11), orderParameterEntries(value49));
               else handler6(value44, 'home', value53);
             }
           } else {
@@ -357,7 +357,7 @@ export function createParameterGroupInteraction(current) {
             (el7['querySelectorAll']('.rh-ai-app-group-panel')['forEach']((enabled16) => {
               if (enabled16 !== value62 && !enabled16['hidden']) showGroupPanel(enabled16, ![]);
             }),
-              el7['querySelectorAll']('[data-param-group-action=\x22open\x22]')['forEach']((value64) =>
+              el7['querySelectorAll']('[data-param-group-action="open"]')['forEach']((value64) =>
                 value64['setAttribute']('aria-expanded', 'false'),
               ),
               showGroupPanel(value62, value63),
@@ -420,8 +420,8 @@ export function createParameterGroupInteraction(current) {
           );
         },
         value78 = (event4) => {
-          (event4['key'] === 'Enter' || event4['key'] === '\x20') &&
-            event4['target']['matches']('[data-param-group-action=\x22description\x22]') &&
+          (event4['key'] === 'Enter' || event4['key'] === ' ') &&
+            event4['target']['matches']('[data-param-group-action="description"]') &&
             (event4['preventDefault'](), event4['target']['click']());
         };
       return (

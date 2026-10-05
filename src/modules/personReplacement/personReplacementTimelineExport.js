@@ -32,21 +32,21 @@ export function buildPersonReplacementTimelineRequest(name = {}, format) {
       const localPath = normalizeLocalPath(enabled);
       if (!localPath) throw new Error(name2 + '尚未保存到本地，请先完成素材下载');
       if (!map['has'](localPath)) {
-        const id = 'media-' + (media['length'] + 0x1);
+        const id = 'media-' + (media['length'] + 1);
         (map['set'](localPath, id), media['push']({ id: id, localPath: localPath, name: name2 }));
       }
       return map['get'](localPath);
     },
-    muted = name['audio']?.['previewTrack'] === 'original' ? 0x0 : 0x1,
+    muted = name['audio']?.['previewTrack'] === 'original' ? 0 : 1,
     tracks = [
       { type: 'video', name: '原视频片段', muted: ![], clips: [] },
       { type: 'video', name: '替换视频片段', muted: ![], clips: [] },
-      { type: 'audio', name: '原视频音频片段', muted: muted !== 0x0, clips: [] },
-      { type: 'audio', name: '替换视频音频片段', muted: muted !== 0x1, clips: [] },
+      { type: 'audio', name: '原视频音频片段', muted: muted !== 0, clips: [] },
+      { type: 'audio', name: '替换视频音频片段', muted: muted !== 1, clips: [] },
     ],
     map2 = new Map((name['sources'] || [])['map']((key) => [key['id'], key])),
     slots = list['map']((enabled2, slot) => {
-      const name3 = '镜头' + String(slot + 0x1)['padStart'](0x2, '0'),
+      const name3 = '镜头' + String(slot + 1)['padStart'](2, '0'),
         index = enabled2['sourceVideoRef'] || map2['get'](enabled2['sourceId'])?.['videoRef'] || '',
         result = enabled2['videoRef'] || index;
       if (result && enabled2['isReversed'] && !enabled2['materializedIsReversed'])
@@ -55,13 +55,13 @@ export function buildPersonReplacementTimelineRequest(name = {}, format) {
         mediaId2 = handler(enabled2['resultVideoRef'], name3 + '-替换视频'),
         sourceStartSec =
           !enabled2['videoRef'] || enabled2['videoRef'] === index
-            ? Math['max'](0x0, Number(enabled2['startTimeSec']) || 0x0)
-            : 0x0,
+            ? Math['max'](0, Number(enabled2['startTimeSec']) || 0)
+            : 0,
         sourceDurationSec = Math['max'](
-          0x0,
+          0,
           Number(enabled2['durationSec']) ||
             Number(enabled2['endTimeSec']) - Number(enabled2['startTimeSec']) ||
-            0x0,
+            0,
         );
       if (mediaId) {
         const args = {
@@ -69,19 +69,19 @@ export function buildPersonReplacementTimelineRequest(name = {}, format) {
           mediaId: mediaId,
           name: name3,
           sourceStartSec: sourceStartSec,
-          ...(sourceDurationSec > 0x0 ? { sourceDurationSec: sourceDurationSec } : {}),
+          ...(sourceDurationSec > 0 ? { sourceDurationSec: sourceDurationSec } : {}),
         };
-        (tracks[0x0]['clips']['push'](args), tracks[0x2]['clips']['push']({ ...args }));
+        (tracks[0]['clips']['push'](args), tracks[2]['clips']['push']({ ...args }));
       }
       if (mediaId2) {
-        const args2 = { slot: slot, mediaId: mediaId2, name: name3, sourceStartSec: 0x0 };
-        (tracks[0x1]['clips']['push'](args2), tracks[0x3]['clips']['push']({ ...args2 }));
+        const args2 = { slot: slot, mediaId: mediaId2, name: name3, sourceStartSec: 0 };
+        (tracks[1]['clips']['push'](args2), tracks[3]['clips']['push']({ ...args2 }));
       }
       return mediaId
         ? {
             durationMediaId: mediaId,
             sourceStartSec: sourceStartSec,
-            ...(sourceDurationSec > 0x0 ? { durationSec: sourceDurationSec } : {}),
+            ...(sourceDurationSec > 0 ? { durationSec: sourceDurationSec } : {}),
           }
         : mediaId2
           ? { durationMediaId: mediaId2 }

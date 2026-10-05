@@ -3,7 +3,7 @@ function codePath(value, item) {
     const uRL = new URL(value, item);
     if (uRL['origin'] !== new URL(item)['origin']) return '';
     return /^\/(?:main\.js|(?:src|api|vendor)\/[A-Za-z0-9_./-]+\.m?js)$/['test'](uRL['pathname'])
-      ? uRL['pathname']['slice'](0x0, 0xf0)
+      ? uRL['pathname']['slice'](0, 240)
       : '';
   } catch {
     return '';
@@ -15,7 +15,7 @@ export function collectRendererStartupEvidence(error, dom) {
     index = String(error?.['message'] || ''),
     result = String(error?.['error']?.['name'] || ''),
     source = codePath(enabled ? error['target']['src'] : error?.['filename'], key),
-    line = (count) => (Number['isSafeInteger'](count) && count > 0x0 ? count : 0x0);
+    line = (count) => (Number['isSafeInteger'](count) && count > 0 ? count : 0);
   let category = enabled ? 'script-load' : 'runtime-error';
   if (!enabled) {
     if (/Failed to fetch dynamically imported module|Importing a module script failed/i['test'](index))
@@ -44,8 +44,8 @@ export function collectRendererStartupEvidence(error, dom) {
   };
   try {
     data['failedScriptRequests'] = (dom['performance']?.['getEntriesByType']?.('resource') || [])
-      ['filter']((error2) => error2['responseStatus'] >= 0x190 && codePath(error2['name'], key))
-      ['slice'](-0x8)
+      ['filter']((error2) => error2['responseStatus'] >= 400 && codePath(error2['name'], key))
+      ['slice'](-8)
       ['map']((status) => ({
         source: codePath(status['name'], key),
         status: status['responseStatus'],

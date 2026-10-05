@@ -30,7 +30,7 @@ export const audioSelect = (id2, label2, options, defaultValue, args3 = {}) => (
   ),
   ...args3,
 });
-export const audioSlider = (id3, label3, min, max, defaultValue2, step = 0x1, args4 = {}) => ({
+export const audioSlider = (id3, label3, min, max, defaultValue2, step = 1, args4 = {}) => ({
   id: id3,
   label: label3,
   type: 'slider',
@@ -100,7 +100,7 @@ export function createRunningHubAudioCatalogEntry({
   mapping: mapping = [],
   rules: rules = {},
   preparations: preparations = [],
-  order: order = 0xc8,
+  order: order = 200,
   description: description = '',
 }) {
   const modelId = 'runninghub/' + id6,
@@ -124,12 +124,12 @@ export function createRunningHubAudioCatalogEntry({
       inputSlots: {
         allowedKinds: ['text', ...new Set(slots['map']((result) => result['kind']))],
         minByKind: {
-          text: promptRequired ? 0x1 : 0x0,
+          text: promptRequired ? 1 : 0,
           audio: slots['filter']((data) => data['kind'] === 'audio' && data['required'])['length'],
         },
         maxByKind: {
           image: slots['filter']((target) => target['kind'] === 'image')['length'],
-          video: 0x0,
+          video: 0,
           audio: slots['filter']((source) => source['kind'] === 'audio')['length'],
         },
         fixedSlots: slots,
@@ -142,7 +142,7 @@ export function createRunningHubAudioCatalogEntry({
           ...slots['map']((next) => next['label'] + '：' + (next['required'] ? '必填' : '可选')),
         ]
           ['filter'](Boolean)
-          ['join']('\x0a'),
+          ['join']('\n'),
       },
       extensions: {
         audioMenu: { group: 'runninghubModel', order: order },

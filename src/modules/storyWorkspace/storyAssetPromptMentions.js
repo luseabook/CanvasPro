@@ -43,11 +43,11 @@ export function renderStoryAssetPromptMentions(index = '', result = {}) {
       STORY_ASSET_STYLE_REFERENCE_NODE_ID +
       '" data-ref-label="' +
       STORY_ASSET_STYLE_REFERENCE_MENTION +
-      '\x22\x20data-prompt-pill-kind=\x22' +
+      '" data-prompt-pill-kind="' +
       STORY_ASSET_STYLE_REFERENCE_PILL_KIND +
-      '\x22>' +
+      '">' +
       (text2
-        ? '<img\x20class=\x22ref-pill-thumb\x22\x20src=\x22' +
+        ? '<img class="ref-pill-thumb" src="' +
           escapeHtml(text2) +
           '" alt="" draggable="false">'
         : '') +
@@ -64,11 +64,11 @@ export function readStoryAssetPromptText(enabled2 = null) {
     },
     handler2 = (el, { root: root = ![] } = {}) => {
       const count = Number(el?.['nodeType']);
-      if (count === 0x3) {
+      if (count === 3) {
         handler(el['textContent'] || '');
         return;
       }
-      if (count !== 0x1 && !root) return;
+      if (count !== 1 && !root) return;
       if (
         !root &&
         normalizeText(el?.['dataset']?.['promptPillKind']) === STORY_ASSET_STYLE_REFERENCE_PILL_KIND
@@ -78,19 +78,19 @@ export function readStoryAssetPromptText(enabled2 = null) {
       }
       const source = String(el?.['tagName'] || '')['toUpperCase']();
       if (source === 'BR') {
-        handler('\x0a');
+        handler('\n');
         return;
       }
       const next = !root && ['DIV', 'P']['includes'](source);
-      if (next && list['length'] && !list['at'](-0x1)['endsWith']('\x0a')) handler('\x0a');
+      if (next && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
       Array['from'](el?.['childNodes'] || [])['forEach']((current) => handler2(current));
-      if (next && list['length'] && !list['at'](-0x1)['endsWith']('\x0a')) handler('\x0a');
+      if (next && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
     };
   return (
     handler2(enabled2, { root: !![] }),
     list['join']('')
-      ['replace'](/\u00a0/g, '\x20')
-      ['replace'](/\n{3,}/g, '\x0a\x0a')
+      ['replace'](/\u00a0/g, ' ')
+      ['replace'](/\n{3,}/g, '\n\n')
       ['replace'](/\n$/g, '')
   );
 }

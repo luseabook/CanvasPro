@@ -108,7 +108,7 @@ test('normalizeRuntimeAgentSkill：字符串数组去重、逐条截断、上限
   assert.equal(s.triggers[2], '123');
   assert.equal(s.triggers.length, 40);
   assert.equal(new Set(s.triggers).size, 40);
-  // resourceNames 上限来自第二个入参 0x18。
+  // resourceNames 上限来自第二个入参 24。
   assert.equal(s.resourceNames.length, 24);
   assert.deepEqual(normalizeRuntimeAgentSkill({ triggers: 'not-an-array' }).triggers, []);
 });

@@ -38,7 +38,7 @@ function releaseSegmentRetakeParameterLocks(args, options) {
     if (!enabled3) continue;
     const el3 = { ...el2 };
     (delete el3['disabled'], delete el3['lockedValue'], delete el3['segmentRetakeLocked']);
-    if (Object['keys'](el3)['length'] > 0x0) uiSchemaFieldState[source] = el3;
+    if (Object['keys'](el3)['length'] > 0) uiSchemaFieldState[source] = el3;
     else delete uiSchemaFieldState[source];
     target = !![];
   }
@@ -76,7 +76,7 @@ export function decorateSegmentRetakeParameterSchemaFields(options2 = {}, entry 
     Object['entries'](entry)['map'](([payload, args5]) => {
       const defaultValue = map['get'](args5?.['id']);
       if (!defaultValue) return [payload, args5];
-      const handle = defaultValue['value'] === -0x1 || defaultValue['value'] === 'auto';
+      const handle = defaultValue['value'] === -1 || defaultValue['value'] === 'auto';
       return [
         payload,
         {

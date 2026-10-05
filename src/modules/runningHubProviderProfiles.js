@@ -54,7 +54,7 @@ export const RUNNINGHUB_MODEL_API_PROFILES = Object['freeze']({
     id: RUNNINGHUB_INTERNATIONAL_PROFILE_ID,
     label: 'RunningHUB（国际）',
     shortLabel: '国际',
-    switchLabel: 'RunningHUB\x20国际版',
+    switchLabel: 'RunningHUB 国际版',
     credentialLabel: '模型 API Key',
     apiUrl: 'https://www.runninghub.ai',
   }),
@@ -84,7 +84,7 @@ export function resolveRunningHubSiteProfileIdFromUrl(index) {
   const enabled = String(index || '')['match'](/https?:\/\/[^\s'"`\\]+/i);
   if (!enabled) return '';
   try {
-    const uRL = new URL(enabled[0x0])['hostname']['toLowerCase']();
+    const uRL = new URL(enabled[0])['hostname']['toLowerCase']();
     if (/(^|\.)runninghub\.ai$/['test'](uRL)) return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
     if (/(^|\.)runninghub\.cn$/['test'](uRL)) return RUNNINGHUB_DOMESTIC_PROFILE_ID;
   } catch {
@@ -119,7 +119,7 @@ export function getRunningHubModelApiProfileIds(target) {
 export function resolveRunningHubModelApiProfileId(source, next) {
   const list = getRunningHubModelApiProfileIds(source),
     runningHubModelApiProfileId = normalizeRunningHubModelApiProfileId(next);
-  return list['includes'](runningHubModelApiProfileId) ? runningHubModelApiProfileId : list[0x0];
+  return list['includes'](runningHubModelApiProfileId) ? runningHubModelApiProfileId : list[0];
 }
 export function getRunningHubModelApiProfile(current) {
   return RUNNINGHUB_MODEL_API_PROFILES[normalizeRunningHubModelApiProfileId(current)];

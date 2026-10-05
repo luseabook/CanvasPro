@@ -28,7 +28,7 @@ export function createAgentContextDigestRuntime({
       ...(recentMessageLimit == null ? {} : { recentMessageLimit: recentMessageLimit }),
       ...(minBatchMessages == null ? {} : { minBatchMessages: minBatchMessages }),
     });
-    if (messageCount['messages']['length'] === 0x0) return contextDigest;
+    if (messageCount['messages']['length'] === 0) return contextDigest;
     const key = [
         conversationId,
         messageCount['coveredThrough']?.['itemId'] ||
@@ -71,7 +71,7 @@ export function createAgentContextDigestRuntime({
           onTrace?.({
             type: 'agent_context_digest_failed',
             conversationId: conversationId,
-            reason: String(error?.['message'] || error || 'context digest failed')['slice'](0x0, 0xf0),
+            reason: String(error?.['message'] || error || 'context digest failed')['slice'](0, 240),
           }),
           contextDigest
         );

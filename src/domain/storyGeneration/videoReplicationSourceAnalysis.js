@@ -63,20 +63,20 @@ export function getVideoReplicationDialogueSummary(key) {
     label: data['length']
       ? '对白 ' +
         list['length'] +
-        '\x20句\x20·\x20解说／独白\x20' +
+        ' 句 · 解说／独白 ' +
         data['length'] +
-        '\x20句' +
-        (target ? ' · ' + target + '\x20句待核对' : '')
+        ' 句' +
+        (target ? ' · ' + target + ' 句待核对' : '')
       : list['length']
-        ? '对白 ' + list['length'] + '\x20句' + (target ? ' · ' + target + ' 句待核对' : '')
+        ? '对白 ' + list['length'] + ' 句' + (target ? ' · ' + target + ' 句待核对' : '')
         : '本次分析未返回可用人声文案',
   };
 }
-export function createVideoReplicationSourceOutput({ durationSec: durationSec = 0x0 } = {}) {
+export function createVideoReplicationSourceOutput({ durationSec: durationSec = 0 } = {}) {
   const next = {
     type: 'number',
-    minimum: 0x0,
-    ...(Number(durationSec) > 0x0 ? { maximum: Number(durationSec) } : {}),
+    minimum: 0,
+    ...(Number(durationSec) > 0 ? { maximum: Number(durationSec) } : {}),
     description: '视频起点后的绝对秒数；1分05秒为65，不是105。',
   };
   return {
@@ -97,7 +97,7 @@ export function createVideoReplicationSourceOutput({ durationSec: durationSec = 
           id: string,
           name: string,
           description: string,
-          visualPrompt: { type: 'string', minLength: 0x1 },
+          visualPrompt: { type: 'string', minLength: 1 },
           identityNotes: string,
           role: { type: 'string', enum: Object['keys'](REPLICATION_CHARACTER_ROLES) },
           subjectType: { type: 'string', enum: Object['keys'](REPLICATION_SUBJECT_TYPES) },
@@ -107,7 +107,7 @@ export function createVideoReplicationSourceOutput({ durationSec: durationSec = 
       },
       events: {
         type: 'array',
-        minItems: 0x1,
+        minItems: 1,
         items: object({
           id: string,
           startSec: next,
@@ -132,7 +132,7 @@ export function createVideoReplicationSourceOutput({ durationSec: durationSec = 
           speechOrder: strings,
           shots: {
             type: 'array',
-            minItems: 0x1,
+            minItems: 1,
             items: object({
               id: string,
               startSec: next,
@@ -149,13 +149,13 @@ export function createVideoReplicationSourceOutput({ durationSec: durationSec = 
     }),
   };
 }
-export function buildVideoReplicationSourcePrompt({ durationSec: durationSec = 0x0 } = {}) {
+export function buildVideoReplicationSourcePrompt({ durationSec: durationSec = 0 } = {}) {
   return [
-    '必须实际读取所附视频的画面后才能设置\x20videoObserved=true。未收到视频、链接无法读取或接口不支持视频时，设置\x20videoObserved=false，并在\x20observationError\x20说明原因；禁止把无法读取视频当成无人场景或成功分析。',
+    '必须实际读取所附视频的画面后才能设置 videoObserved=true。未收到视频、链接无法读取或接口不支持视频时，设置 videoObserved=false，并在 observationError 说明原因；禁止把无法读取视频当成无人场景或成功分析。',
     '先理解整段原视频，再按时间顺序整理完整故事、可区分的主体、动作、镜头和对白。只记录原片事实，不翻译、不本地化、不换人物、不编写视频生成提示词；characters.visualPrompt 仅整理原片可观察的角色外观，供独立人设图使用。',
-    '原片时长\x20' +
-      (Number(durationSec) || 0x0) +
-      '\x20秒。events\x20按剧情顺序记录关键动作、镜头和完整对白，时间用原片绝对秒数的大致范围，不按固定15秒截断。时间只用于定位和核对，不要求逐秒对齐或首尾精确衔接，允许事件间有空隙或时间范围重叠。',
+    '原片时长 ' +
+      (Number(durationSec) || 0) +
+      ' 秒。events 按剧情顺序记录关键动作、镜头和完整对白，时间用原片绝对秒数的大致范围，不按固定15秒截断。时间只用于定位和核对，不要求逐秒对齐或首尾精确衔接，允许事件间有空隙或时间范围重叠。',
     '完整观看原片，覆盖人物、产品、场景、动作与所有可见元素，包括无人声时段、停顿与片尾文字；不要为填满时长虚构事件或拉长时间。未看清、听不清或无法确认的内容写入疑点供用户核对。',
     REPLICATION_CONTENT_ROUTING_RULE,
     REPLICATION_VISUAL_ELEMENTS_RULE,
@@ -169,23 +169,23 @@ export function buildVideoReplicationSourcePrompt({ durationSec: durationSec = 0
     '确认事件没有人声时 dialogue 与 voiceover 都返回空数组；听不清时仅在未知局部写[听不清]并标 uncertain。不能确定声音类型或说话人时，保留已识别原话并标 uncertain，不用[听不清]替换听清的文字，不得用空数组冒充无人声。',
     'voiceover.text 逐句保留实际原话，不用‘画外音自述’等摘要替代。独立解说员 speakerId 为空是合法情况，不因此标记听不清；只有证据确认角色本人在叙述时才绑定角色。同一事件允许对白与解说交替，用 speechOrder 保持顺序，同一句只记录在一个声音通道。',
     '所有事件时间必须处于视频实际时长' +
-      (Number(durationSec) > 0x0 ? '（0 到 ' + Number(durationSec) + ' 秒）' : '') +
+      (Number(durationSec) > 0 ? '（0 到 ' + Number(durationSec) + ' 秒）' : '') +
       '以内，禁止把分秒格式写成十进制秒（如 1分20秒应写80秒，不是120秒）。返回前逐段核对开头、中段、结尾的人声是否遗漏；听不清的解说保留[听不清]并标记 uncertain。',
     'characters 记录画面中可区分的人物或动物，使用稳定 id（如 person-1）。不认识姓名可用红衣人物等可观察称呼；不得猜测真实身份或无依据的亲属关系。',
     '同一主体跨镜头沿用 id。服装变化不等于新人，衣服相同不证明同一人；无法确认的保持分开，在 identityNotes 和相关事件 uncertainties 写清疑点。',
-    '先通看全片建立角色名单，再逐镜头核对是否漏人或把同一角色重复计数。characters\x20是全片去重后的可区分角色，不是单帧人数；背景人群无法逐个辨认时在\x20uncertainties\x20说明，不虚构个人。镜子、照片和屏幕中的同一主体不重复计数。',
+    '先通看全片建立角色名单，再逐镜头核对是否漏人或把同一角色重复计数。characters 是全片去重后的可区分角色，不是单帧人数；背景人群无法逐个辨认时在 uncertainties 说明，不虚构个人。镜子、照片和屏幕中的同一主体不重复计数。',
     'role 根据全片故事功能标为 main（主角，可有多位）、supporting（配角）、background（背景人物）或 uncertain（待确认）；roleEvidence 写明推动哪些事件或承担什么叙事作用，不能仅按出场时间或画面中心判断。subjectType 区分 person、animal、uncertain。',
     '主角和配角需逐个写清可观察的外观差异、画面位置及跨镜头连续性依据。若存在遮挡、背影、换装或相似人物，保留身份疑点；不要把无法确认的人强行合并。返回前逐项核对人物名单、每个事件出场角色和对白说话人。',
     '每个角色 representativeTimeSec 选择其实际出现且尽量清晰的画面时刻，description 明确外观及在该帧中的位置，便于自动截图后核对。不要虚构边框坐标。',
-    'characters.visualPrompt\x20与核对用的\x20description\x20分开，必须使用简体中文：只写独立角色的正向视觉描述，开头写原片实际可观察的视觉风格（如真人写实摄影、二维动画、三维动画），不要写‘保留原视频的视觉风格、场景和道具’等指令。',
+    'characters.visualPrompt 与核对用的 description 分开，必须使用简体中文：只写独立角色的正向视觉描述，开头写原片实际可观察的视觉风格（如真人写实摄影、二维动画、三维动画），不要写‘保留原视频的视觉风格、场景和道具’等指令。',
     '人物 visualPrompt 必须逐项核对外观性别呈现、视觉年龄段（如约二十多岁、中年，不猜真实年龄）、脸型与可见五官、肤色、发型发色、身材体态、服装款式层次与材质、可见鞋履和穿戴细节。不得仅凭长发或服装颜色判断性别；不要用‘面容姣好’等泛词代替可观察特征。动物改写物种、体型、毛色与特征，不套用人物年龄和性别要求。',
     'visualPrompt 以代表帧的外观为准，采用自然站立、水平正视全身立绘、纯灰色背景；只写有视觉依据的外观，不补造被遮挡的服装或鞋履，不混合不同镜头的换装。无法判断的性别、年龄或其他特征写入 identityNotes 供核对，不在 visualPrompt 中猜测或堆砌‘未知’。画面位置、剧情动作、环境、家具、道具、其他人物及身份疑点只留在核对描述或事件中，不写入 visualPrompt。',
     'events.characterIds 只列当前画面实际可见主体；dialogue.speakerId 记录有证据的说话人，无法确认用空字符串并标记 uncertain。画外音不能默认归给画面中的人。',
     '保持全部关键动作、事件因果、道具变化、对白顺序与结局。逐镜 visual 记录可见主体位置、朝向、人物与道具关系，按发生顺序写清主要动作过程及结束状态，保留可见视线、表情和背景变化，不压缩成剧情摘要。camera 写实际景别、机位、构图及运镜；过肩镜头明确前景是谁、主要看谁，运动写方向及跟随对象。静物镜头可简短，不设最低字数；未知信息不从台词推演或为了细化而编造。',
     '只返回指定 JSON。没有人物或对白时返回空数组，不能为了填字段编造。',
-  ]['join']('\x0a');
+  ]['join']('\n');
 }
-export function parseVideoReplicationSourceResult(current, { durationSec: durationSec = 0x0 } = {}) {
+export function parseVideoReplicationSourceResult(current, { durationSec: durationSec = 0 } = {}) {
   const text2 = text(current?.['text'] ?? current)['replace'](/^```(?:json)?\s*|\s*```$/gu, '');
   let entry;
   try {
@@ -205,15 +205,15 @@ export function parseVideoReplicationSourceResult(current, { durationSec: durati
     );
   return normalizeVideoReplicationSource(entry, { durationSec: durationSec });
 }
-export function normalizeVideoReplicationSource(enabled2, { durationSec: durationSec = 0x0 } = {}) {
+export function normalizeVideoReplicationSource(enabled2, { durationSec: durationSec = 0 } = {}) {
   if (!enabled2 || !Array['isArray'](enabled2['events']) || !enabled2['events']['length'])
     throw new Error('原视频分析缺少事件时间轴。');
-  const count = Number(durationSec) > 0x0 ? Number(durationSec) : Infinity,
+  const count = Number(durationSec) > 0 ? Number(durationSec) : Infinity,
     enabled3 = new Set(),
     payload = (Array['isArray'](enabled2['characters']) ? enabled2['characters'] : [])['map']((error) => {
       const text3 = text(error['id']),
         count2 = Number(error['representativeTimeSec']);
-      if (!text3 || enabled3['has'](text3) || !Number['isFinite'](count2) || count2 < 0x0 || count2 >= count)
+      if (!text3 || enabled3['has'](text3) || !Number['isFinite'](count2) || count2 < 0 || count2 >= count)
         throw Object['assign'](new Error('原视频人物编号或代表帧时间无效。'), {
           code: 'SOURCE_ANALYSIS_REPAIRABLE',
         });
@@ -248,7 +248,7 @@ export function normalizeVideoReplicationSource(enabled2, { durationSec: duratio
         map['has'](text6) ||
         !Number['isFinite'](count3) ||
         !Number['isFinite'](args) ||
-        count3 < 0x0 ||
+        count3 < 0 ||
         state <= count3
       )
         throw Object['assign'](new Error('原视频事件编号或时间范围无效，请重试分析。'), {
@@ -318,10 +318,10 @@ export function normalizeVideoReplicationSource(enabled2, { durationSec: duratio
     ) &&
       (value2['identityNotes'] = [value2['identityNotes'], '代表帧时间与事件标注未对齐，请核对人物截图。']
         ['filter'](Boolean)
-        ['join']('\x0a'));
+        ['join']('\n'));
   }
   return {
-    schemaVersion: 0x1,
+    schemaVersion: 1,
     title: text(enabled2['title']),
     synopsis: text(enabled2['synopsis']),
     contentType: normalizeReplicationContentType(enabled2['contentType']),
@@ -329,7 +329,7 @@ export function normalizeVideoReplicationSource(enabled2, { durationSec: duratio
     sourceLanguage: text(enabled2['sourceLanguage']),
     characters: payload,
     events: list2,
-    revision: 0x1,
+    revision: 1,
   };
 }
 export function buildVideoReplicationSourceTranscript(args4) {
@@ -348,7 +348,7 @@ export function buildVideoReplicationSourceTranscript(args4) {
         ])['map']((args8) => {
           if (args8['kind'] === 'voiceover')
             return formatReplicationVoiceover(
-              { ...args8, kind: args5['voiceover'][Number(args8['key']['split'](':')[0x1])]['kind'] },
+              { ...args8, kind: args5['voiceover'][Number(args8['key']['split'](':')[1])]['kind'] },
               args4['characters'],
             );
           const value5 = args4['characters']['find']((value6) => value6['id'] === args8['speakerId']);
@@ -359,20 +359,20 @@ export function buildVideoReplicationSourceTranscript(args4) {
             (args8['uncertain'] ? ' [待核对]' : '')
           );
         }),
-      ]['join']('\x0a'),
+      ]['join']('\n'),
     ),
   ]
     ['filter'](Boolean)
-    ['join']('\x0a\x0a');
+    ['join']('\n\n');
 }
 export function buildVideoReplicationTimingGuidance(enabled4 = {}) {
   if (enabled4['replication']?.['segmentPlan']?.['length'])
     return getReplicationSegmentPlanGuidance(enabled4);
   const count4 = Number(enabled4['sourceVideo']?.['durationSec']);
-  if (!enabled4['replication']?.['sourceAnalysis'] || !Number['isFinite'](count4) || count4 <= 0x0) return '';
+  if (!enabled4['replication']?.['sourceAnalysis'] || !Number['isFinite'](count4) || count4 <= 0) return '';
   return (
     '原片时长为 ' +
-    Number(count4['toFixed'](0x3)) +
+    Number(count4['toFixed'](3)) +
     ' 秒。保留原片节奏、动作、反应、停顿和人声；译后对白不能按中文字数等速估算。' +
     REPLICATION_TIMELINE_RULE
   );
@@ -382,7 +382,7 @@ export function buildVideoReplicationSourceEvidence(args9 = {}, args10 = {}, val
   if (!enabled5) return null;
   const count5 = Number(args9['sourceVideo']?.['durationSec']);
   return {
-    ...(Number['isFinite'](count5) && count5 > 0x0
+    ...(Number['isFinite'](count5) && count5 > 0
       ? { sourceDurationSec: count5, timingGuidance: buildVideoReplicationTimingGuidance(args9) }
       : {}),
     sourceLanguage: enabled5['sourceLanguage'],
@@ -469,7 +469,7 @@ export function buildVideoReplicationSourceEvidence(args9 = {}, args10 = {}, val
         }
       : {}),
     instructions:
-      '直接依据\x20events\x20的原片时间线编排，正文仅辅助理解；按\x20characterBindings\x20替换人物，并处理对白语言。保留人物关系、事件顺序、关键动作、场景、道具、冲突和结局，不确定项不得猜测为事实。targetLocale\x20为\x20source\x20时保留原语言和原对白；其他语言逐句翻译，保持原意、信息量、语气、顺序和说话人对应。每句人声放在开始发声的镜头，跨镜保留一次及声音时间，后镜无需延续标记。按已确定的\x20segmentPlan\x20保留片段范围和时长，不重新规划。' +
+      '直接依据 events 的原片时间线编排，正文仅辅助理解；按 characterBindings 替换人物，并处理对白语言。保留人物关系、事件顺序、关键动作、场景、道具、冲突和结局，不确定项不得猜测为事实。targetLocale 为 source 时保留原语言和原对白；其他语言逐句翻译，保持原意、信息量、语气、顺序和说话人对应。每句人声放在开始发声的镜头，跨镜保留一次及声音时间，后镜无需延续标记。按已确定的 segmentPlan 保留片段范围和时长，不重新规划。' +
       REPLICATION_VISUAL_ELEMENTS_RULE +
       REPLICATION_VISUAL_STATE_RULE +
       REPLICATION_IMAGE_APPEARANCE_GUIDANCE,

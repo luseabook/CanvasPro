@@ -12,7 +12,7 @@ export function createRendererRasterPaintSurface(
     context = ctx;
   if (ctx)
     try {
-      const el = createBackingCanvas(Math['max'](0x1, box['width']), Math['max'](0x1, box['height'])),
+      const el = createBackingCanvas(Math['max'](1, box['width']), Math['max'](1, box['height'])),
         key = el?.['getContext']?.('2d', { alpha: !![] });
       key && ((box2 = el), (context = key));
     } catch {}
@@ -30,10 +30,10 @@ export function createRendererRasterPaintSurface(
       if (!box2) return;
       ((ctx['globalCompositeOperation'] = 'copy'),
         (ctx['imageSmoothingEnabled'] = ![]),
-        ctx['drawImage'](box2, 0x0, 0x0));
+        ctx['drawImage'](box2, 0, 0));
     },
     release() {
-      box2 && ((box2['width'] = 0x1), (box2['height'] = 0x1));
+      box2 && ((box2['width'] = 1), (box2['height'] = 1));
     },
   };
 }

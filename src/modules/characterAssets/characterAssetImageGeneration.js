@@ -6,7 +6,7 @@ export function normalizeCharacterAssetImageGenerationParams(item, key = {}) {
   const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(item, key, { includeDefaults: !![] });
   return (
     Object['prototype']['hasOwnProperty']['call'](sanitizeModelUiSchemaParams2, 'batchSize') &&
-      (sanitizeModelUiSchemaParams2['batchSize'] = 0x1),
+      (sanitizeModelUiSchemaParams2['batchSize'] = 1),
     sanitizeModelUiSchemaParams2
   );
 }
@@ -35,6 +35,6 @@ export function buildCharacterAssetImageGenerationPayload({
     generationParams: generationParams2,
     aspectRatio: generationParams2['aspectRatio'] || '1:1',
     imageSize: generationParams2['imageSize'] || '2K',
-    batchSize: 0x1,
+    batchSize: 1,
   };
 }

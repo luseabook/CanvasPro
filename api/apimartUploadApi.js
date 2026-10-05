@@ -83,7 +83,7 @@ export async function uploadBlobToApimart(enabled, timeout = {}) {
     formData.append('apiUrl', normalizeApimartBaseUrl(timeout.apiUrl)));
   const response = await post('/api/v2/proxy/apimart-upload', formData, {
       provider: 'apimart',
-      timeout: timeout.uploadTimeout || 5 * 60 * 0x3e8,
+      timeout: timeout.uploadTimeout || 5 * 60 * 1000,
     }),
     enabled3 = response?.cdnUrl || response?.url || '';
   if (!enabled3) throw new Error('APIMART 上传返回 URL 为空');

@@ -61,17 +61,17 @@ const FUNASR_DEFAULT_MODEL = Object.freeze({
   SORTFORMER_DEFAULT_MODEL_URL =
     'https://huggingface.co/nvidia/diar_streaming_sortformer_4spk-v2.1/resolve/main/diar_streaming_sortformer_4spk-v2.1.nemo',
   FUNASR_TRANSCRIPT_MERGE_DEFAULTS = Object.freeze({
-    maxGapMs: 0x320,
-    maxDurationMs: 0x2710,
-    maxTextChars: 0x64,
+    maxGapMs: 800,
+    maxDurationMs: 10000,
+    maxTextChars: 100,
   }),
-  DIARIZATION_SPEAKER_RECONCILE_DEFAULTS = Object.freeze({ maxBridgeGapMs: 0x78 }),
+  DIARIZATION_SPEAKER_RECONCILE_DEFAULTS = Object.freeze({ maxBridgeGapMs: 120 }),
   DEFAULT_FUNASR_GPU_TORCH_INDEX_URL = 'https://download.pytorch.org/whl/cu128',
   DEFAULT_FUNASR_GPU_TORCH_PACKAGES = Object.freeze([
     'torch==2.11.0+cu128',
     'torchaudio==2.11.0+cu128',
   ]);
-function toNumber(value, fallback = 0x0) {
+function toNumber(value, fallback = 0) {
   const numeric = Number(value);
   return Number.isFinite(numeric) ? numeric : fallback;
 }
@@ -80,12 +80,12 @@ function clamp(value, min, max) {
 }
 function normalizePositiveSeconds(value, fallback) {
   const numeric = toNumber(value, fallback);
-  return numeric > 0x0 ? numeric : fallback;
+  return numeric > 0 ? numeric : fallback;
 }
 function normalizeSilenceOptions(options = {}) {
-  const noiseDb = Math.round(toNumber(options.noiseDb, -0x23)),
+  const noiseDb = Math.round(toNumber(options.noiseDb, -35)),
     minSilenceSec = normalizePositiveSeconds(options.minSilenceSec, 0.35),
-    paddingMs = Math.max(0x0, Math.round(toNumber(options.paddingMs, 0x50)));
+    paddingMs = Math.max(0, Math.round(toNumber(options.paddingMs, 80)));
   return { noiseDb: noiseDb, minSilenceSec: minSilenceSec, paddingMs: paddingMs };
 }
 function normalizeAsrProvider(options = {}) {
@@ -112,16 +112,16 @@ export function normalizeFunasrEngine(engine) {
     ? 'gpu'
     : 'cpu';
 }
-export function parseSilenceDetectRanges(output = '', durationSec = 0x0) {
+export function parseSilenceDetectRanges(output = '', durationSec = 0) {
   const text = String(output || ''),
-    maxSec = Math.max(0x0, toNumber(durationSec, 0x0)),
+    maxSec = Math.max(0, toNumber(durationSec, 0)),
     pattern = /silence_(start|end):\s*([0-9]+(?:\.[0-9]+)?)/g,
     ranges = [];
   let pendingStart = null,
     match = null;
   while ((match = pattern.exec(text))) {
-    const marker = match[0x1],
-      seconds = clamp(toNumber(match[0x2], 0x0), 0x0, maxSec || Number.MAX_SAFE_INTEGER);
+    const marker = match[1],
+      seconds = clamp(toNumber(match[2], 0), 0, maxSec || Number.MAX_SAFE_INTEGER);
     if (marker === 'start') {
       pendingStart = seconds;
       continue;
@@ -141,26 +141,26 @@ function mergeShortSpeechSegments(segments, minSpeechSec) {
   const merged = [];
   for (const segment of segments) {
     const durationSec = segment.endSec - segment.startSec;
-    if (durationSec >= minSpeechSec || merged.length === 0x0) {
+    if (durationSec >= minSpeechSec || merged.length === 0) {
       merged.push({ ...segment });
       continue;
     }
-    merged[merged.length - 0x1].endSec = segment.endSec;
+    merged[merged.length - 1].endSec = segment.endSec;
   }
   return merged.filter((segment) => segment.endSec - segment.startSec > 0.05);
 }
 export function buildAudioVoiceSpeechSegments({
   silenceRanges: silenceRanges = [],
-  durationSec: durationSec = 0x0,
-  paddingMs: paddingMs = 0x50,
+  durationSec: durationSec = 0,
+  paddingMs: paddingMs = 80,
   minSpeechSec: minSpeechSec = 0.25,
 } = {}) {
-  const totalSec = Math.max(0x0, toNumber(durationSec, 0x0));
-  if (totalSec <= 0x0) return [];
+  const totalSec = Math.max(0, toNumber(durationSec, 0));
+  if (totalSec <= 0) return [];
   const speechRanges = [];
-  let cursorSec = 0x0;
+  let cursorSec = 0;
   for (const range of silenceRanges) {
-    const startSec = clamp(toNumber(range.startSec, 0x0), 0x0, totalSec),
+    const startSec = clamp(toNumber(range.startSec, 0), 0, totalSec),
       endSec = clamp(toNumber(range.endSec, startSec), startSec, totalSec);
     if (startSec > cursorSec) speechRanges.push({ startSec: cursorSec, endSec: startSec });
     cursorSec = Math.max(cursorSec, endSec);
@@ -168,24 +168,24 @@ export function buildAudioVoiceSpeechSegments({
   if (cursorSec < totalSec) speechRanges.push({ startSec: cursorSec, endSec: totalSec });
   const normalizedRanges = speechRanges.length
       ? mergeShortSpeechSegments(speechRanges, Math.max(0.05, toNumber(minSpeechSec, 0.25)))
-      : [{ startSec: 0x0, endSec: totalSec }],
-    paddingSec = Math.max(0x0, toNumber(paddingMs, 0x0)) / 0x3e8,
+      : [{ startSec: 0, endSec: totalSec }],
+    paddingSec = Math.max(0, toNumber(paddingMs, 0)) / 1000,
     segments = [];
-  let previousEndSec = 0x0;
+  let previousEndSec = 0;
   for (const range of normalizedRanges) {
     const startSec = clamp(range.startSec - paddingSec, previousEndSec, totalSec),
       endSec = clamp(range.endSec + paddingSec, startSec, totalSec);
     if (endSec - startSec <= 0.05) continue;
     (segments.push({
-      startMs: Math.round(startSec * 0x3e8),
-      endMs: Math.round(endSec * 0x3e8),
+      startMs: Math.round(startSec * 1000),
+      endMs: Math.round(endSec * 1000),
     }),
       (previousEndSec = endSec));
   }
-  return segments.length ? segments : [{ startMs: 0x0, endMs: Math.round(totalSec * 0x3e8) }];
+  return segments.length ? segments : [{ startMs: 0, endMs: Math.round(totalSec * 1000) }];
 }
 function formatSec(milliseconds) {
-  return (Math.max(0x0, Number(milliseconds) || 0x0) / 0x3e8).toFixed(0x3);
+  return (Math.max(0, Number(milliseconds) || 0) / 1000).toFixed(3);
 }
 export function buildAudioVoiceSegmentCutArgs({
   sourceAudioAbs: sourceAudioAbs,
@@ -193,7 +193,7 @@ export function buildAudioVoiceSegmentCutArgs({
   startMs: startMs,
   endMs: endMs,
 } = {}) {
-  const durationMs = Math.max(0x1, Math.round(Number(endMs || 0x0) - Number(startMs || 0x0)));
+  const durationMs = Math.max(1, Math.round(Number(endMs || 0) - Number(startMs || 0)));
   return [
     '-y',
     '-ss',
@@ -210,8 +210,8 @@ export function buildAudioVoiceSegmentCutArgs({
     outAbs,
   ];
 }
-export function normalizeFunasrTranscriptSegments(result = {}, durationSec = 0x0) {
-  const maxMs = Math.max(0x0, Math.round(Number(durationSec || 0x0) * 0x3e8)),
+export function normalizeFunasrTranscriptSegments(result = {}, durationSec = 0) {
+  const maxMs = Math.max(0, Math.round(Number(durationSec || 0) * 1000)),
     rawSegments = Array.isArray(result?.segments)
       ? result.segments
       : Array.isArray(result)
@@ -220,12 +220,12 @@ export function normalizeFunasrTranscriptSegments(result = {}, durationSec = 0x0
     segments = [];
   for (const rawSegment of rawSegments) {
     const startMs = clamp(
-        Math.round(Number(rawSegment?.startMs || 0x0)),
-        0x0,
+        Math.round(Number(rawSegment?.startMs || 0)),
+        0,
         maxMs || Number.MAX_SAFE_INTEGER,
       ),
       endMs = clamp(
-        Math.round(Number(rawSegment?.endMs || 0x0)),
+        Math.round(Number(rawSegment?.endMs || 0)),
         startMs,
         maxMs || Number.MAX_SAFE_INTEGER,
       );
@@ -243,8 +243,8 @@ export function normalizeFunasrTranscriptSegments(result = {}, durationSec = 0x0
   }
   return segments.sort((left, right) => left.startMs - right.startMs);
 }
-export function normalizeDiarizationSegments(result = {}, durationSec = 0x0) {
-  const maxMs = Math.max(0x0, Math.round(Number(durationSec || 0x0) * 0x3e8)),
+export function normalizeDiarizationSegments(result = {}, durationSec = 0) {
+  const maxMs = Math.max(0, Math.round(Number(durationSec || 0) * 1000)),
     rawSegments = Array.isArray(result?.segments)
       ? result.segments
       : Array.isArray(result)
@@ -253,12 +253,12 @@ export function normalizeDiarizationSegments(result = {}, durationSec = 0x0) {
     segments = [];
   for (const rawSegment of rawSegments) {
     const startMs = clamp(
-        Math.round(Number(rawSegment?.startMs || 0x0)),
-        0x0,
+        Math.round(Number(rawSegment?.startMs || 0)),
+        0,
         maxMs || Number.MAX_SAFE_INTEGER,
       ),
       endMs = clamp(
-        Math.round(Number(rawSegment?.endMs || 0x0)),
+        Math.round(Number(rawSegment?.endMs || 0)),
         startMs,
         maxMs || Number.MAX_SAFE_INTEGER,
       );
@@ -283,8 +283,8 @@ function joinTranscriptText(left = '', right = '') {
     rightText = String(right || '').trim();
   if (!leftText) return rightText;
   if (!rightText) return leftText;
-  const lastChar = leftText.slice(-0x1),
-    firstChar = rightText.slice(0x0, 0x1),
+  const lastChar = leftText.slice(-1),
+    firstChar = rightText.slice(0, 1),
     needsSpace = /[A-Za-z0-9,.;:!?)]/.test(lastChar) && /[A-Za-z0-9(]/.test(firstChar);
   return '' + leftText + (needsSpace ? ' ' : '') + rightText;
 }
@@ -299,21 +299,21 @@ function hasStrongTranscriptBoundary(text = '') {
 function canMergeFunasrTranscriptSegments(previous = {}, next = {}, options = {}) {
   if (!mergeSpeakerLabel(previous.speaker, next.speaker)) return false;
   const maxGapMs = Math.max(
-      0x0,
+      0,
       Math.round(toNumber(options.maxGapMs, FUNASR_TRANSCRIPT_MERGE_DEFAULTS.maxGapMs)),
     ),
     maxDurationMs = Math.max(
-      0x1,
+      1,
       Math.round(toNumber(options.maxDurationMs, FUNASR_TRANSCRIPT_MERGE_DEFAULTS.maxDurationMs)),
     ),
     maxTextChars = Math.max(
-      0x1,
+      1,
       Math.round(toNumber(options.maxTextChars, FUNASR_TRANSCRIPT_MERGE_DEFAULTS.maxTextChars)),
     ),
-    gapMs = Math.round(Number(next.startMs || 0x0) - Number(previous.endMs || 0x0));
+    gapMs = Math.round(Number(next.startMs || 0) - Number(previous.endMs || 0));
   if (gapMs > maxGapMs) return false;
-  const startMs = Math.min(Number(previous.startMs || 0x0), Number(next.startMs || 0x0)),
-    endMs = Math.max(Number(previous.endMs || 0x0), Number(next.endMs || 0x0));
+  const startMs = Math.min(Number(previous.startMs || 0), Number(next.startMs || 0)),
+    endMs = Math.max(Number(previous.endMs || 0), Number(next.endMs || 0));
   if (endMs - startMs > maxDurationMs) return false;
   const mergedText = joinTranscriptText(previous.sourceText, next.sourceText);
   return transcriptTextLength(mergedText) <= maxTextChars;
@@ -333,11 +333,11 @@ function shouldBridgeDiarizationSpeakerChange(
     nextLabel = normalizeSpeakerLabel(nextDiarization?.speaker);
   if (!previousLabel || !nextLabel || previousLabel === nextLabel) return false;
   const gapMs = Math.max(
-      0x0,
-      Math.round(Number(nextDiarization?.startMs || 0x0) - Number(previousDiarization?.endMs || 0x0)),
+      0,
+      Math.round(Number(nextDiarization?.startMs || 0) - Number(previousDiarization?.endMs || 0)),
     ),
     maxBridgeGapMs = Math.max(
-      0x0,
+      0,
       Math.round(DIARIZATION_SPEAKER_RECONCILE_DEFAULTS.maxBridgeGapMs),
     );
   if (gapMs > maxBridgeGapMs) return false;
@@ -357,11 +357,11 @@ function reconcileDiarizationSpeakerChanges(transcriptSegments = [], diarization
     diarizations = (Array.isArray(diarizationSegments) ? diarizationSegments : []).map((segment) => ({
       ...segment,
     }));
-  for (let index = 0x1; index < diarizations.length; index += 0x1) {
-    const previous = diarizations[index - 0x1],
+  for (let index = 1; index < diarizations.length; index += 1) {
+    const previous = diarizations[index - 1],
       current = diarizations[index];
     shouldBridgeDiarizationSpeakerChange(
-      transcripts[index - 0x1],
+      transcripts[index - 1],
       transcripts[index],
       previous,
       current,
@@ -372,8 +372,8 @@ function reconcileDiarizationSpeakerChanges(transcriptSegments = [], diarization
 export function mergeFunasrTranscriptSegments(segments = [], options = {}) {
   const merged = [];
   for (const rawSegment of Array.isArray(segments) ? segments : []) {
-    const startMs = Math.max(0x0, Math.round(Number(rawSegment?.startMs || 0x0))),
-      endMs = Math.max(startMs, Math.round(Number(rawSegment?.endMs || 0x0)));
+    const startMs = Math.max(0, Math.round(Number(rawSegment?.startMs || 0))),
+      endMs = Math.max(startMs, Math.round(Number(rawSegment?.endMs || 0)));
     if (endMs - startMs <= 0.05) continue;
     const speaker = normalizeSpeakerLabel(
         rawSegment?.speaker ?? rawSegment?.spk ?? rawSegment?.speakerId,
@@ -384,7 +384,7 @@ export function mergeFunasrTranscriptSegments(segments = [], options = {}) {
         sourceText: String(rawSegment?.sourceText || rawSegment?.text || '').trim(),
       };
     if (speaker) segment.speaker = speaker;
-    const previous = merged[merged.length - 0x1];
+    const previous = merged[merged.length - 1];
     if (previous && canMergeFunasrTranscriptSegments(previous, segment, options)) {
       ((previous.endMs = Math.max(previous.endMs, segment.endMs)),
         (previous.sourceText = joinTranscriptText(previous.sourceText, segment.sourceText)));
@@ -399,16 +399,16 @@ export function mergeFunasrTranscriptSegments(segments = [], options = {}) {
 function stripTranscriptSpeakerLabels(segments = []) {
   return (Array.isArray(segments) ? segments : [])
     .map((segment) => ({
-      startMs: Math.max(0x0, Math.round(Number(segment?.startMs || 0x0))),
-      endMs: Math.max(0x0, Math.round(Number(segment?.endMs || 0x0))),
+      startMs: Math.max(0, Math.round(Number(segment?.startMs || 0))),
+      endMs: Math.max(0, Math.round(Number(segment?.endMs || 0))),
       sourceText: String(segment?.sourceText || segment?.text || '').trim(),
     }))
     .filter((segment) => segment.endMs > segment.startMs);
 }
 function overlapMs(left = {}, right = {}) {
-  const startMs = Math.max(Number(left.startMs || 0x0), Number(right.startMs || 0x0)),
-    endMs = Math.min(Number(left.endMs || 0x0), Number(right.endMs || 0x0));
-  return Math.max(0x0, Math.round(endMs - startMs));
+  const startMs = Math.max(Number(left.startMs || 0), Number(right.startMs || 0)),
+    endMs = Math.min(Number(left.endMs || 0), Number(right.endMs || 0));
+  return Math.max(0, Math.round(endMs - startMs));
 }
 export function assignDiarizationSpeakersToTranscriptSegments(
   transcriptSegments = [],
@@ -420,13 +420,13 @@ export function assignDiarizationSpeakersToTranscriptSegments(
       const speakerMs = new Map();
       for (const diarization of normalizedDiarization) {
         const overlap = overlapMs(segment, diarization);
-        if (overlap <= 0x0) continue;
+        if (overlap <= 0) continue;
         const speaker = normalizeSpeakerLabel(diarization.speaker);
         if (!speaker) continue;
-        speakerMs.set(speaker, (speakerMs.get(speaker) || 0x0) + overlap);
+        speakerMs.set(speaker, (speakerMs.get(speaker) || 0) + overlap);
       }
       let bestSpeaker = '',
-        bestMs = 0x0;
+        bestMs = 0;
       for (const [speaker, totalMs] of speakerMs.entries()) {
         totalMs > bestMs && ((bestSpeaker = speaker), (bestMs = totalMs));
       }
@@ -440,8 +440,8 @@ export function hasRecognizedTranscriptText(segments = []) {
 export function mapFunasrProgressToOverall(stage, progress) {
   const normalizedStage = String(stage || '').trim(),
     range = FUNASR_STAGE_RANGES[normalizedStage] || FUNASR_STAGE_RANGES.transcribe,
-    normalizedProgress = clamp(Number(progress || 0x0), 0x0, 0x1);
-  return range[0x0] + (range[0x1] - range[0x0]) * normalizedProgress;
+    normalizedProgress = clamp(Number(progress || 0), 0, 1);
+  return range[0] + (range[1] - range[0]) * normalizedProgress;
 }
 export function buildFunasrTranscriptionArgs({
   audioAbs: audioAbs,
@@ -462,7 +462,7 @@ export function buildFunasrTranscriptionArgs({
       '--model-root',
       modelRoot,
       '--duration-ms',
-      String(Math.max(0x0, Math.round(Number(durationSec || 0x0) * 0x3e8))),
+      String(Math.max(0, Math.round(Number(durationSec || 0) * 1000))),
       '--model',
       model,
       '--vad-model',
@@ -476,7 +476,7 @@ export function buildFunasrTranscriptionArgs({
   if (normalizedSpkModel) args.push('--spk-model', normalizedSpkModel);
   if (checkRuntimeOnly) args.push('--check-runtime-only');
   else
-    prepareOnly ? args.push('--prepare-only') : args.splice(0x2, 0x0, '--audio', audioAbs);
+    prepareOnly ? args.push('--prepare-only') : args.splice(2, 0, '--audio', audioAbs);
   if (downloadModelIfMissing) args.push('--download-model-if-missing');
   return args;
 }
@@ -497,7 +497,7 @@ export function buildSortformerDiarizationArgs({
     '--model-root',
     modelRoot,
     '--duration-ms',
-    String(Math.max(0x0, Math.round(Number(durationSec || 0x0) * 0x3e8))),
+    String(Math.max(0, Math.round(Number(durationSec || 0) * 1000))),
     '--model-url',
     String(modelUrl || SORTFORMER_DEFAULT_MODEL_URL),
     '--model-file',
@@ -507,7 +507,7 @@ export function buildSortformerDiarizationArgs({
   ];
   if (checkRuntimeOnly) args.push('--check-runtime-only');
   else
-    prepareOnly ? args.push('--prepare-only') : args.splice(0x2, 0x0, '--audio', audioAbs);
+    prepareOnly ? args.push('--prepare-only') : args.splice(2, 0, '--audio', audioAbs);
   if (downloadModelIfMissing) args.push('--download-model-if-missing');
   return args;
 }
@@ -658,7 +658,7 @@ export function runPipInstallProcess({
           return;
         }
         bumpProgress();
-      }, 0x7d0),
+      }, 2000),
       settle = (callback, value) => {
         clearInterval(progressTimer);
         if (task.child === child) task.child = null;
@@ -675,14 +675,14 @@ export function runPipInstallProcess({
         (stderrChunks.push(Buffer.from(chunk)), handleOutput(chunk));
       }),
       child.once('error', (error) =>
-        settle(reject, createProcessStartError(pythonCommand, pipArgs, { cwd: appRoot }, error, 0x1)),
+        settle(reject, createProcessStartError(pythonCommand, pipArgs, { cwd: appRoot }, error, 1)),
       ),
       child.once('exit', (code, signal) => {
         if (queue?.isCancelled?.(task)) {
           settle(reject, new MediaTaskCancelledError());
           return;
         }
-        if (code === 0x0) {
+        if (code === 0) {
           settle(resolve, {
             stdout: Buffer.concat(stdoutChunks),
             stderr: Buffer.concat(stderrChunks),
@@ -712,7 +712,7 @@ export function runFunasrTranscriptionProcess({
   appRoot: appRoot = DEFAULT_APP_ROOT,
   audioAbs: audioAbs,
   downloadModelIfMissing: downloadModelIfMissing = true,
-  durationSec: durationSec = 0x0,
+  durationSec: durationSec = 0,
   engine: engine = 'cpu',
   modelRoot: modelRoot,
   prepareOnly: prepareOnly = false,
@@ -750,7 +750,7 @@ export function runFunasrTranscriptionProcess({
         stdoutBuffer = '',
         stderrBuffer = '',
         stage = AUDIO_VOICE_ASR_STAGE.MODEL_DOWNLOAD,
-        overallProgress = mapFunasrProgressToOverall(stage, 0x0);
+        overallProgress = mapFunasrProgressToOverall(stage, 0);
       const emitStageProgress = (nextStage, fraction, message = '') => {
           ((stage = String(nextStage || stage)),
             (overallProgress = Math.max(overallProgress, mapFunasrProgressToOverall(stage, fraction))),
@@ -766,13 +766,13 @@ export function runFunasrTranscriptionProcess({
             return;
           }
           const range = FUNASR_STAGE_RANGES[stage] || FUNASR_STAGE_RANGES.transcribe,
-            nextProgress = Math.min(range[0x1] - 0.01, overallProgress + 0.006);
+            nextProgress = Math.min(range[1] - 0.01, overallProgress + 0.006);
           nextProgress > overallProgress &&
             ((overallProgress = nextProgress),
             queue?.emitProgress?.(task, nextProgress, resolveAsrProgressMessage(stage), {
               stage: stage,
             }));
-        }, 0x5dc),
+        }, 1500),
         settle = (callback, value) => {
           clearInterval(progressTimer);
           if (task.child === child) task.child = null;
@@ -799,7 +799,7 @@ export function runFunasrTranscriptionProcess({
         child.once('error', (error) =>
           settle(
             reject,
-            createProcessStartError(pythonCommand, args, { cwd: appRoot }, error, 0x1),
+            createProcessStartError(pythonCommand, args, { cwd: appRoot }, error, 1),
           ),
         ),
         child.once('exit', (code, signal) => {
@@ -808,7 +808,7 @@ export function runFunasrTranscriptionProcess({
             settle(reject, new MediaTaskCancelledError());
             return;
           }
-          if (code === 0x0 && resultMessage) {
+          if (code === 0 && resultMessage) {
             settle(resolve, resultMessage);
             return;
           }
@@ -825,7 +825,7 @@ export function runSortformerDiarizationProcess({
   appRoot: appRoot = DEFAULT_APP_ROOT,
   audioAbs: audioAbs,
   downloadModelIfMissing: downloadModelIfMissing = true,
-  durationSec: durationSec = 0x0,
+  durationSec: durationSec = 0,
   engine: engine = 'cpu',
   modelRoot: modelRoot,
   pythonCommand: pythonCommand,
@@ -874,7 +874,7 @@ export function runSortformerDiarizationProcess({
             queue?.emitProgress?.(task, progress, 'Preparing speaker separation', {
               stage: AUDIO_VOICE_ASR_STAGE.DIARIZATION_MODEL_PREPARE,
             }));
-        }, 0x7d0),
+        }, 2000),
         settle = (callback, value) => {
           clearInterval(progressTimer);
           if (task.child === child) task.child = null;
@@ -908,7 +908,7 @@ export function runSortformerDiarizationProcess({
         child.once('error', (error) =>
           settle(
             reject,
-            createProcessStartError(pythonCommand, args, { cwd: appRoot }, error, 0x1),
+            createProcessStartError(pythonCommand, args, { cwd: appRoot }, error, 1),
           ),
         ),
         child.once('exit', (code, signal) => {
@@ -917,7 +917,7 @@ export function runSortformerDiarizationProcess({
             settle(reject, new MediaTaskCancelledError());
             return;
           }
-          if (code === 0x0 && resultMessage) {
+          if (code === 0 && resultMessage) {
             settle(resolve, resultMessage);
             return;
           }
@@ -953,8 +953,8 @@ async function detectSpeechSegmentsWithSilence({
       '-',
     ]),
     output = Buffer.concat([
-      result.stdout || Buffer.alloc(0x0),
-      result.stderr || Buffer.alloc(0x0),
+      result.stdout || Buffer.alloc(0),
+      result.stderr || Buffer.alloc(0),
     ]).toString('utf8');
   return buildAudioVoiceSpeechSegments({
     silenceRanges: parseSilenceDetectRanges(output, durationSec),
@@ -1052,8 +1052,8 @@ export function createAudioVoiceAnalyzeMediaTaskHandler({
       if (!hasVideoStream) throw new Error('Source media has no audio stream');
       throw new Error('Source video has no audio stream');
     }
-    const durationSec = Math.max(0x0, Number(videoMeta.duration || 0x0));
-    if (!(durationSec > 0x0)) throw new Error('Source media duration is unavailable');
+    const durationSec = Math.max(0, Number(videoMeta.duration || 0));
+    if (!(durationSec > 0)) throw new Error('Source media duration is unavailable');
     const analyzeDir = path.join(getOutputDir(), 'AudioVoiceAnalyze'),
       segmentsDir = path.join(getOutputDir(), 'AudioVoiceSegments');
     (mkdirSync(analyzeDir, { recursive: true }), mkdirSync(segmentsDir, { recursive: true }));
@@ -1177,14 +1177,14 @@ export function createAudioVoiceAnalyzeMediaTaskHandler({
         sourceAudioAbs,
       ]));
     const segments = [];
-    for (let index = 0x0; index < transcriptSegments.length; index += 0x1) {
+    for (let index = 0; index < transcriptSegments.length; index += 1) {
       const segment = transcriptSegments[index],
-        segmentFilename = createOutputFilename('segment_' + (index + 0x1), 'mp3'),
+        segmentFilename = createOutputFilename('segment_' + (index + 1), 'mp3'),
         segmentAbs = path.join(segmentsDir, segmentFilename),
         segmentLocalPath = toOutputLocalPath('AudioVoiceSegments', segmentFilename);
       (queue.emitProgress(
         task,
-        Math.min(0.95, 0.62 + (index / Math.max(0x1, transcriptSegments.length)) * 0.33),
+        Math.min(0.95, 0.62 + (index / Math.max(1, transcriptSegments.length)) * 0.33),
         'Cutting sentence audio',
         { stage: AUDIO_VOICE_ASR_STAGE.SLICE },
       ),
@@ -1199,7 +1199,7 @@ export function createAudioVoiceAnalyzeMediaTaskHandler({
           }),
         ),
         segments.push({
-          id: 'audio-voice-segment-' + (index + 0x1),
+          id: 'audio-voice-segment-' + (index + 1),
           startMs: segment.startMs,
           endMs: segment.endMs,
           sourceText: String(segment.sourceText || ''),
@@ -1309,7 +1309,7 @@ export function createAudioVoiceModelPrepareMediaTaskHandler({
       task: task,
     });
     return (
-      queue?.emitProgress?.(task, 0x1, 'Audio voice models are ready', {
+      queue?.emitProgress?.(task, 1, 'Audio voice models are ready', {
         stage: AUDIO_VOICE_ASR_STAGE.DIARIZE,
       }),
       {

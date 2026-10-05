@@ -29,10 +29,10 @@ export function getStorySceneIdentityKey(index) {
 }
 function getIdentityBigrams(result) {
   const length = getStorySceneIdentityKey(result);
-  if (length['length'] < 0x2) return length ? new Set([length]) : new Set();
+  if (length['length'] < 2) return length ? new Set([length]) : new Set();
   return new Set(
-    Array['from']({ length: length['length'] - 0x1 }, (data, options) =>
-      length['slice'](options, options + 0x2),
+    Array['from']({ length: length['length'] - 1 }, (data, options) =>
+      length['slice'](options, options + 2),
     ),
   );
 }

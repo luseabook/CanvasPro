@@ -35,7 +35,7 @@ export function syncTextResultImages(nodeId) {
     ((el7['type'] = 'button'),
       (el7['className'] = 'aigen-text-image-preview'),
       (el7['title'] = t('aigenText.result.imagePreview')),
-      el7['setAttribute']('aria-label', el7['title'] + ':\x20' + alt['title']));
+      el7['setAttribute']('aria-label', el7['title'] + ': ' + alt['title']));
     const el8 = el3['createElement']('img');
     ((el8['alt'] = alt['title']),
       (el8['loading'] = 'lazy'),
@@ -99,8 +99,8 @@ export function syncTextResultImages(nodeId) {
       text === null
         ? t('aigenText.result.toolUsageUnavailable')
         : t('aigenText.result.imageToolUsage', {
-            text: text['web_search_image']?.['count'] || 0x0,
-            image: text['image_search']?.['count'] || 0x0,
+            text: text['web_search_image']?.['count'] || 0,
+            image: text['image_search']?.['count'] || 0,
           })),
       el4['appendChild'](el14));
     if (!list['length']) {

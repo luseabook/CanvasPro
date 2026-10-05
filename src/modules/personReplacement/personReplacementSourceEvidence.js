@@ -21,16 +21,16 @@ export async function buildSourceEvidence(value, { signal: signal } = {}) {
     const { x: x, y: y, width: width, height: height } = bbox || {};
     if (
       ![x, y, width, height]['every'](Number['isFinite']) ||
-      x < 0x0 ||
-      y < 0x0 ||
-      width <= 0x0 ||
-      height <= 0x0 ||
+      x < 0 ||
+      y < 0 ||
+      width <= 0 ||
+      height <= 0 ||
       x + width > 1.001 ||
       y + height > 1.001
     )
       throw new Error('人物' + markerLabel + '选框无效，请重新框选');
     const box = document['createElement']('canvas');
-    ((box['width'] = 0x640), (box['height'] = 0x320));
+    ((box['width'] = 1600), (box['height'] = 800));
     try {
       const ctx = box['getContext']('2d');
       if (
@@ -40,34 +40,34 @@ export async function buildSourceEvidence(value, { signal: signal } = {}) {
       )
         throw new Error('无法绘制原人物识别图');
       ((ctx['fillStyle'] = index),
-        ctx['fillRect'](0x0, 0x0, box['width'], box['height']),
+        ctx['fillRect'](0, 0, box['width'], box['height']),
         (ctx['fillStyle'] = result),
         (ctx['font'] = 'bold 32px Arial'),
-        ctx['fillText'](markerLabel + ' | FULL FRAME', 0x14, 0x2d),
-        ctx['fillText'](markerLabel + ' | BOX CROP', 0x438, 0x2d));
+        ctx['fillText'](markerLabel + ' | FULL FRAME', 20, 45),
+        ctx['fillText'](markerLabel + ' | BOX CROP', 1080, 45));
       const data = Math['min'](
-          0x410 / personReplacementGuideImage['naturalWidth'],
-          0x2bc / personReplacementGuideImage['naturalHeight'],
+          1040 / personReplacementGuideImage['naturalWidth'],
+          700 / personReplacementGuideImage['naturalHeight'],
         ),
         options = personReplacementGuideImage['naturalWidth'] * data,
         target = personReplacementGuideImage['naturalHeight'] * data,
-        source = 0x14,
-        next = 0x50 + (0x2bc - target) / 0x2;
+        source = 20,
+        next = 80 + (700 - target) / 2;
       (ctx['drawImage'](personReplacementGuideImage, source, next, options, target),
         (ctx['strokeStyle'] = result),
-        (ctx['lineWidth'] = 0x4),
+        (ctx['lineWidth'] = 4),
         ctx['strokeRect'](source + x * options, next + y * target, width * options, height * target));
-      const current = Math['min'](width, 0x1 - x) * personReplacementGuideImage['naturalWidth'],
-        entry = Math['min'](height, 0x1 - y) * personReplacementGuideImage['naturalHeight'],
-        record = Math['min'](0x1f4 / current, 0x2bc / entry);
+      const current = Math['min'](width, 1 - x) * personReplacementGuideImage['naturalWidth'],
+        entry = Math['min'](height, 1 - y) * personReplacementGuideImage['naturalHeight'],
+        record = Math['min'](500 / current, 700 / entry);
       ctx['drawImage'](
         personReplacementGuideImage,
         x * personReplacementGuideImage['naturalWidth'],
         y * personReplacementGuideImage['naturalHeight'],
         current,
         entry,
-        0x438 + (0x1f4 - current * record) / 0x2,
-        0x50 + (0x2bc - entry * record) / 0x2,
+        1080 + (500 - current * record) / 2,
+        80 + (700 - entry * record) / 2,
         current * record,
         entry * record,
       );
@@ -75,7 +75,7 @@ export async function buildSourceEvidence(value, { signal: signal } = {}) {
       if (!enabled3['startsWith']('data:image/png;base64,')) throw new Error('原人物识别图导出失败');
       list['push'](enabled3);
     } finally {
-      ((box['width'] = 0x0), (box['height'] = 0x0));
+      ((box['width'] = 0), (box['height'] = 0));
     }
   }
   return list;

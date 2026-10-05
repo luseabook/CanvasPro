@@ -69,7 +69,7 @@ function _decodeAudioData(key, index) {
 function _buildMinMaxBarsPath(list, { width: width2, height: height2, samples: samples2 }) {
   const options = Number(width2) || 200,
     target = Number(height2) || 80,
-    source = Math.max(40, Math.min(0x190, Math.round(Number(samples2) || 180))),
+    source = Math.max(40, Math.min(400, Math.round(Number(samples2) || 180))),
     next = target / 2,
     current = Math.max(1, Math.round(target * 0.08)),
     entry = Math.max(1, next - current),
@@ -229,24 +229,24 @@ export async function getWaveformBarsPathFromUrl(
 
 const _decodeQueue = [];
 
-let _activeDecodes = 0x0;
+let _activeDecodes = 0;
 
-const MAX_CONCURRENT_AUDIO_DECODES = 0x2,
-  MAX_WAVEFORM_PATHS = 0x100;
+const MAX_CONCURRENT_AUDIO_DECODES = 2,
+  MAX_WAVEFORM_PATHS = 256;
 
-function _cachePath(value37, enabled10, count2 = 0x0) {
+function _cachePath(value37, enabled10, count2 = 0) {
   if (!enabled10) return;
   (_cache['delete'](value37),
     _cache['set'](value37, {
       path: enabled10,
-      duration: Number['isFinite'](count2) && count2 > 0x0 ? count2 : 0x0,
+      duration: Number['isFinite'](count2) && count2 > 0 ? count2 : 0,
     }));
   while (_cache['size'] > MAX_WAVEFORM_PATHS) _cache['delete'](_cache['keys']()['next']()['value']);
 }
 
 function _readWaveformResult(value38, value39) {
   const count3 = Number(value38?.['duration']);
-  if (Number['isFinite'](count3) && count3 > 0x0) value39?.(count3);
+  if (Number['isFinite'](count3) && count3 > 0) value39?.(count3);
   return value38?.['path'] || '';
 }
 
@@ -254,16 +254,16 @@ function _queueAudioDecode(handler3, value40) {
   return new Promise((handler4) => {
     const value41 = () => {
         const count4 = _decodeQueue['indexOf'](handler5);
-        count4 >= 0x0 && (_decodeQueue['splice'](count4, 0x1), handler4(null));
+        count4 >= 0 && (_decodeQueue['splice'](count4, 1), handler4(null));
       },
       handler5 = async () => {
-        (value40?.['removeEventListener']('abort', value41), (_activeDecodes += 0x1));
+        (value40?.['removeEventListener']('abort', value41), (_activeDecodes += 1));
         try {
           handler4(value40?.['aborted'] ? null : await handler3());
         } catch {
           handler4(null);
         } finally {
-          _activeDecodes -= 0x1;
+          _activeDecodes -= 1;
           while (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES && _decodeQueue['length']) {
             void _decodeQueue['shift']()();
           }
@@ -277,7 +277,7 @@ function _queueAudioDecode(handler3, value40) {
 
 function _createDecodedAudioBufferJob(value42, value43) {
   const value44 = typeof AbortController === 'function' ? new AbortController() : null,
-    value45 = { consumers: 0x0, controller: value44, settled: ![], promise: null };
+    value45 = { consumers: 0, controller: value44, settled: ![], promise: null };
   return (
     (value45['promise'] = _queueAudioDecode(async () => {
       let enabled11;
@@ -305,7 +305,7 @@ function _createDecodedAudioBufferJob(value42, value43) {
 
 async function _waitForDecodedAudioBufferJob(enabled12, value46) {
   if (!enabled12 || value46?.['aborted']) return null;
-  enabled12['consumers'] += 0x1;
+  enabled12['consumers'] += 1;
   let value47 = ![],
     value48 = null;
   const value49 = value46
@@ -320,10 +320,10 @@ async function _waitForDecodedAudioBufferJob(enabled12, value46) {
     return await (value49 ? Promise['race']([enabled12['promise'], value49]) : enabled12['promise']);
   } finally {
     if (value46 && value48) value46['removeEventListener']('abort', value48);
-    ((enabled12['consumers'] = Math['max'](0x0, enabled12['consumers'] - 0x1)),
+    ((enabled12['consumers'] = Math['max'](0, enabled12['consumers'] - 1)),
       value47 &&
         !enabled12['settled'] &&
-        enabled12['consumers'] === 0x0 &&
+        enabled12['consumers'] === 0 &&
         enabled12['controller']?.['abort']());
   }
 }
@@ -339,11 +339,11 @@ export async function getAudioNodeWaveformPath(value50, value51, args = {}) {
       args['samples'],
     ]),
     value53 = _cache['get'](value52);
-  if (value53 && (value53['duration'] > 0x0 || !args['onDuration']))
+  if (value53 && (value53['duration'] > 0 || !args['onDuration']))
     return _readWaveformResult(value53, args['onDuration']);
   const value54 = value51 ? await getWaveformBarsPathFromPersistedUrl(value51, args) : '';
   if (args['signal']?.['aborted']) return '';
-  let audioDurationFromUrl = 0x0;
+  let audioDurationFromUrl = 0;
   if (value54) {
     args['onDuration'] &&
       (audioDurationFromUrl = await getAudioDurationFromUrl(value50, {

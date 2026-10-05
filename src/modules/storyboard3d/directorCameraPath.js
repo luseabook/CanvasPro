@@ -11,13 +11,13 @@ export function readDirectorCameraPath(index) {
 export function addDirectorCameraPathPoint(args, data) {
   const list = readDirectorCameraPath(args),
     time = list['length']
-      ? list['at'](-0x1)['time'] + 0x1
-      : Math['max'](0x0, ...args['cameraKeyframes']['map']((options) => options['time'])) + 0x1;
-  if (time > 0xe10) throw new Error('轨道已达到镜头时长上限。');
-  if (list['length'] >= 0x64) throw new Error('每条轨道最多 100 个控制点。');
+      ? list['at'](-1)['time'] + 1
+      : Math['max'](0, ...args['cameraKeyframes']['map']((options) => options['time'])) + 1;
+  if (time > 3600) throw new Error('轨道已达到镜头时长上限。');
+  if (list['length'] >= 100) throw new Error('每条轨道最多 100 个控制点。');
   const structuredClone2 = structuredClone(args);
   if (!list['length'])
-    structuredClone2['cameraPath'] = { pointIds: [structuredClone2['cameraKeyframes']['at'](-0x1)['id']] };
+    structuredClone2['cameraPath'] = { pointIds: [structuredClone2['cameraKeyframes']['at'](-1)['id']] };
   const target = {
     id: 'camera-path-' + globalThis['crypto']['randomUUID'](),
     time: time,
@@ -37,8 +37,8 @@ export function updateDirectorCameraPathPoint(source, next, args2) {
   if (!enabled) return structuredClone3;
   if (args2['time'] != null) {
     const count = Math['round'](Number(args2['time']) * structuredClone3['fps']) / structuredClone3['fps'];
-    if (!Number['isFinite'](count) || count < 0x0 || count > 0xe10)
-      throw new Error('控制点时间必须在\x200–3600\x20秒之间。');
+    if (!Number['isFinite'](count) || count < 0 || count > 3600)
+      throw new Error('控制点时间必须在 0–3600 秒之间。');
     if (
       structuredClone3['cameraKeyframes']['some'](
         (entry) => entry['id'] !== next && Math['abs'](entry['time'] - count) < 0.5 / structuredClone3['fps'],
@@ -67,7 +67,7 @@ export function updateDirectorCameraPathPoint(source, next, args2) {
   );
 }
 export function removeDirectorCameraPathPoint(state, config) {
-  if (state['cameraKeyframes']['length'] <= 0x1) throw new Error('至少保留一个摄像机控制点。');
+  if (state['cameraKeyframes']['length'] <= 1) throw new Error('至少保留一个摄像机控制点。');
   const structuredClone4 = structuredClone(state);
   return (
     (structuredClone4['cameraKeyframes'] = structuredClone4['cameraKeyframes']['filter'](

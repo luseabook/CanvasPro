@@ -31,7 +31,7 @@ export function createCollaborationMediaQueue({
     map3 = new Set();
   let enabled = ![],
     setTimeout2 = null,
-    result = 0x0,
+    result = 0,
     value2 = null,
     value3 = null,
     args3 = null,
@@ -86,7 +86,7 @@ export function createCollaborationMediaQueue({
   function resolveWire(output) {
     return walk(output, (value5) => {
       const value6 = value5['match'](PENDING),
-        value7 = value6 && map2['get'](value6[0x2]);
+        value7 = value6 && map2['get'](value6[2]);
       return value7
         ? value7['ref'] ||
             'aic-' + (value7['phase'] === 'failed' ? 'failed' : 'pending') + ':' + value7['token']
@@ -118,7 +118,7 @@ export function createCollaborationMediaQueue({
     return (run4(), project(state2));
   }
   function run4() {
-    while (handler2() && map3['size'] < 0x1 && list2['length']) {
+    while (handler2() && map3['size'] < 1 && list2['length']) {
       const enabled2 = list2['shift']();
       (map3['add'](enabled2),
         void (async () => {
@@ -167,7 +167,7 @@ export function createCollaborationMediaQueue({
               if (list2['length'] && !setTimeout2)
                 setTimeout2 = setTimeout(() => {
                   ((setTimeout2 = null), run4());
-                }, 0x0);
+                }, 0);
             }
           }
         })());
@@ -183,14 +183,14 @@ export function createCollaborationMediaQueue({
     afterEdit({ name: name, args: args7 }, state4, handler3) {
       const value22 =
         name === 'updateNodeData'
-          ? { [args7[0x0]]: args7[0x1] }
+          ? { [args7[0]]: args7[1] }
           : name === 'updateNodesData'
-            ? args7[0x0]
+            ? args7[0]
             : {};
       for (const [value23, enabled4] of Object['entries'](value22 || {})) {
         const list4 = state4['nodes'][value23]?.['_collaborationPendingMedia'];
         if (!list4 || !enabled4 || enabled4['_collaborationPendingMedia']) continue;
-        const list5 = list4['filter']((value24) => !Object['hasOwn'](enabled4, value24['path'][0x0]));
+        const list5 = list4['filter']((value24) => !Object['hasOwn'](enabled4, value24['path'][0]));
         if (list5['length'] !== list4['length']) handler3(value23, list5);
       }
     },
@@ -202,7 +202,7 @@ export function createCollaborationMediaQueue({
           walk2 = walk(value26, (value27, path) => {
             const enabled5 = value27['match'](PENDING);
             if (!enabled5) return value27;
-            const value28 = map2['get'](enabled5[0x2]);
+            const value28 = map2['get'](enabled5[2]);
             return (list6['push']({ path: path, value: value27 }), value28?.['source'] || '');
           });
         Object['assign'](value26, walk2);
@@ -224,10 +224,10 @@ export function createCollaborationMediaQueue({
           const value34 = value33['match'](PENDING);
           if (value34) {
             ((value32 = !![]),
-              (failed ||= value34[0x1] === 'failed'),
-              (owned ||= map2['has'](value34[0x2])),
-              (retry2 ||= map2['has'](value34[0x2]) && value34[0x1] === 'failed'));
-            if (value34[0x1] === 'failed') message ||= map2['get'](value34[0x2])?.['message'] || '';
+              (failed ||= value34[1] === 'failed'),
+              (owned ||= map2['has'](value34[2])),
+              (retry2 ||= map2['has'](value34[2]) && value34[1] === 'failed'));
+            if (value34[1] === 'failed') message ||= map2['get'](value34[2])?.['message'] || '';
           }
           return value33;
         });
@@ -269,7 +269,7 @@ export function createCollaborationMediaQueue({
     dispose() {
       ((enabled = !![]),
         clearTimeout(setTimeout2),
-        (list2['length'] = 0x0),
+        (list2['length'] = 0),
         (args3 = null),
         (args4 = []),
         collaborationMedia['dispose'](),

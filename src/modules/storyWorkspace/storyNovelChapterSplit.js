@@ -13,13 +13,13 @@ const SPECIAL_HEADING_PATTERN = /^[\s\u3000]*(序章|序言|楔子|引子|前言
 const LATIN_HEADING_PATTERN = /^[\s\u3000]*(?:chapter|part)[\s\u3000]*[0-9]+\b(.*)$/iu;
 
 // Used only when the text has no recognisable headings at all.
-export const FALLBACK_CHAPTER_CHARACTERS = 0xbb8; // 3000
+export const FALLBACK_CHAPTER_CHARACTERS = 3000; // 3000
 
 // A heading line must be short. Without this the pattern also matches body text that happens to
 // start with 第N章 (a paragraph beginning "第1章正文。…" was treated as a heading, which left
 // every chapter with an empty body and produced zero chapters overall). Real chapter headings
 // are a handful of characters; body paragraphs are not.
-export const NOVEL_HEADING_MAX_CHARACTERS = 0x28; // 40
+export const NOVEL_HEADING_MAX_CHARACTERS = 40; // 40
 
 function normalizeText(value) {
   return String(value ?? '').trim();
@@ -41,7 +41,7 @@ function headingTitle(line, maxCharacters = NOVEL_HEADING_MAX_CHARACTERS) {
 function pushChapter(chapters, title, lines) {
   const content = lines.join('\n').trim();
   if (!content) return;
-  chapters.push({ title: normalizeText(title) || '第 ' + (chapters.length + 0x1) + ' 节', content: content });
+  chapters.push({ title: normalizeText(title) || '第 ' + (chapters.length + 1) + ' 节', content: content });
 }
 
 /**
@@ -55,14 +55,14 @@ function splitByParagraphGroups(text, limit = FALLBACK_CHAPTER_CHARACTERS) {
     .filter(Boolean);
   const chapters = [];
   let buffer = [];
-  let size = 0x0;
+  let size = 0;
   for (const paragraph of paragraphs) {
     const pieces = paragraph.length > limit ? [paragraph] : [paragraph];
     for (const piece of pieces) {
       if (buffer.length && size + piece.length > limit) {
         pushChapter(chapters, '', buffer);
         buffer = [];
-        size = 0x0;
+        size = 0;
       }
       buffer.push(piece);
       size += piece.length;
@@ -96,11 +96,11 @@ export function splitNovelChapters(
     for (const chapter of splitByParagraphGroups(source, fallbackCharacters)) chapters.push(chapter);
   } else {
     // Text before the first heading becomes its own opening chapter.
-    const preamble = lines.slice(0x0, headings[0x0].index).join('\n').trim();
+    const preamble = lines.slice(0, headings[0].index).join('\n').trim();
     if (preamble) pushChapter(chapters, '正文开头', preamble.split('\n'));
     headings.forEach((heading, position) => {
-      const end = position + 0x1 < headings.length ? headings[position + 0x1].index : lines.length;
-      pushChapter(chapters, heading.title, lines.slice(heading.index + 0x1, end));
+      const end = position + 1 < headings.length ? headings[position + 1].index : lines.length;
+      pushChapter(chapters, heading.title, lines.slice(heading.index + 1, end));
     });
   }
 

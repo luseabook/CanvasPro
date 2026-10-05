@@ -1,15 +1,15 @@
 export const WHITEBOARD_NODE_TYPE = 'whiteboard';
-export const WHITEBOARD_DATA_VERSION = 0x2;
-export const WHITEBOARD_DEFAULT_SIZE = Object['freeze']({ width: 0x2d0, height: 0x1e0 });
+export const WHITEBOARD_DATA_VERSION = 2;
+export const WHITEBOARD_DEFAULT_SIZE = Object['freeze']({ width: 720, height: 480 });
 export const WHITEBOARD_DEFAULT_TOOL = 'brush';
 export const WHITEBOARD_DEFAULT_COLOR = 'black';
-export const WHITEBOARD_DEFAULT_BRUSH_SIZE_PX = 0x14;
+export const WHITEBOARD_DEFAULT_BRUSH_SIZE_PX = 20;
 export const WHITEBOARD_DEFAULT_SHAPE_TYPE = 'rectangle';
-export const WHITEBOARD_DEFAULT_VIEW = Object['freeze']({ x: 0x0, y: 0x0, zoom: 0.5 });
+export const WHITEBOARD_DEFAULT_VIEW = Object['freeze']({ x: 0, y: 0, zoom: 0.5 });
 export const WHITEBOARD_DEFAULT_STYLE = Object['freeze']({
   color: WHITEBOARD_DEFAULT_COLOR,
   size: WHITEBOARD_DEFAULT_BRUSH_SIZE_PX,
-  opacity: 0x1,
+  opacity: 1,
   fill: 'none',
   dash: 'solid',
   font: 'sans',
@@ -78,11 +78,11 @@ const WHITEBOARD_TOOL_SET = new Set([
     'inverted',
     'bar',
   ]),
-  WHITEBOARD_COMMAND_LIMIT = 0x7d0,
-  WHITEBOARD_POINT_LIMIT = 0x1388,
+  WHITEBOARD_COMMAND_LIMIT = 2000,
+  WHITEBOARD_POINT_LIMIT = 5000,
   WHITEBOARD_MIN_ZOOM = 0.1,
-  WHITEBOARD_MAX_ZOOM = 0x8,
-  finiteNumberOr = (value, item = 0x0) => {
+  WHITEBOARD_MAX_ZOOM = 8,
+  finiteNumberOr = (value, item = 0) => {
     const key = Number(value);
     return Number['isFinite'](key) ? key : item;
   },
@@ -100,11 +100,11 @@ const WHITEBOARD_TOOL_SET = new Set([
   },
   normalizeBrushSize = (record, payload = WHITEBOARD_DEFAULT_BRUSH_SIZE_PX) => {
     const finiteNumberOr2 = finiteNumberOr(record, payload);
-    return Math['max'](0x1, Math['min'](0x78, finiteNumberOr2));
+    return Math['max'](1, Math['min'](120, finiteNumberOr2));
   },
   normalizeOpacity = (handle, state = WHITEBOARD_DEFAULT_STYLE['opacity']) => {
     const finiteNumberOr3 = finiteNumberOr(handle, state);
-    return Math['max'](0.1, Math['min'](0x1, finiteNumberOr3));
+    return Math['max'](0.1, Math['min'](1, finiteNumberOr3));
   },
   normalizeEnum = (config, map, scope) => {
     const input = String(config || '')['trim']();
@@ -203,7 +203,7 @@ const WHITEBOARD_TOOL_SET = new Set([
   },
   normalizePointList = (value6) =>
     (Array['isArray'](value6) ? value6 : [])
-      ['slice'](0x0, WHITEBOARD_POINT_LIMIT)
+      ['slice'](0, WHITEBOARD_POINT_LIMIT)
       ['map']((box2) => {
         const x2 = Number(box2?.['x']),
           y2 = Number(box2?.['y']);
@@ -219,7 +219,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
       {
         type: type,
         color: String(arrowEnd['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 1)),
         points: normalizePointList(arrowEnd['points']),
       },
       arrowEnd,
@@ -228,7 +228,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
     return applyCommandStyle(
       {
         type: type,
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 1)),
         points: normalizePointList(arrowEnd['points']),
       },
       arrowEnd,
@@ -238,7 +238,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
       {
         type: type,
         color: String(arrowEnd['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 1)),
         x1: finiteNumberOr(arrowEnd['x1']),
         y1: finiteNumberOr(arrowEnd['y1']),
         x2: finiteNumberOr(arrowEnd['x2']),
@@ -253,7 +253,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
       {
         type: type,
         color: String(arrowEnd['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 1)),
         x1: finiteNumberOr(arrowEnd['x1']),
         y1: finiteNumberOr(arrowEnd['y1']),
         x2: finiteNumberOr(arrowEnd['x2']),
@@ -263,7 +263,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
         arrowKind: normalizeEnum(
           arrowEnd['arrowKind'],
           WHITEBOARD_ARROW_KIND_SET,
-          Math['abs'](bend) > 0x0 ? 'arc' : WHITEBOARD_DEFAULT_STYLE['arrowKind'],
+          Math['abs'](bend) > 0 ? 'arc' : WHITEBOARD_DEFAULT_STYLE['arrowKind'],
         ),
         arrowEnd: arrowEnd['arrowEnd'] ?? WHITEBOARD_DEFAULT_STYLE['arrowEnd'],
       },
@@ -276,7 +276,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
         type: type,
         shapeType: normalizeShapeType(arrowEnd['shapeType']),
         color: String(arrowEnd['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x1)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 1)),
         x1: finiteNumberOr(arrowEnd['x1']),
         y1: finiteNumberOr(arrowEnd['y1']),
         x2: finiteNumberOr(arrowEnd['x2']),
@@ -299,14 +299,14 @@ export function normalizeWhiteboardCommand(arrowEnd) {
     return applyCommandStyle(
       {
         type: type,
-        text: String(arrowEnd['text'] || '')['slice'](0x0, 0xc8),
+        text: String(arrowEnd['text'] || '')['slice'](0, 200),
         color: String(arrowEnd['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x10)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 16)),
         x: finiteNumberOr(arrowEnd['x']),
         y: finiteNumberOr(arrowEnd['y']),
-        scale: finiteNumberOr(arrowEnd['scale'], 0x1),
-        scaleX: finiteNumberOr(arrowEnd['scaleX'], 0x1),
-        scaleY: finiteNumberOr(arrowEnd['scaleY'], 0x1),
+        scale: finiteNumberOr(arrowEnd['scale'], 1),
+        scaleX: finiteNumberOr(arrowEnd['scaleX'], 1),
+        scaleY: finiteNumberOr(arrowEnd['scaleY'], 1),
         rotation: finiteNumberOr(arrowEnd['rotation']),
       },
       arrowEnd,
@@ -315,9 +315,9 @@ export function normalizeWhiteboardCommand(arrowEnd) {
     return applyCommandStyle(
       {
         type: type,
-        number: Math['max'](0x1, Math['floor'](finiteNumberOr(arrowEnd['number'], 0x1))),
+        number: Math['max'](1, Math['floor'](finiteNumberOr(arrowEnd['number'], 1))),
         color: String(arrowEnd['color'] || ''),
-        sizeWorld: Math['max'](0x1, finiteNumberOr(arrowEnd['sizeWorld'], 0x12)),
+        sizeWorld: Math['max'](1, finiteNumberOr(arrowEnd['sizeWorld'], 18)),
         x: finiteNumberOr(arrowEnd['x']),
         y: finiteNumberOr(arrowEnd['y']),
       },
@@ -327,7 +327,7 @@ export function normalizeWhiteboardCommand(arrowEnd) {
 }
 export function normalizeWhiteboardCommands(value7) {
   return (Array['isArray'](value7) ? value7 : [])
-    ['slice'](0x0, WHITEBOARD_COMMAND_LIMIT)
+    ['slice'](0, WHITEBOARD_COMMAND_LIMIT)
     ['map'](normalizeWhiteboardCommand)
     ['filter'](Boolean);
 }
@@ -342,7 +342,7 @@ export function createDefaultWhiteboardState(el = {}) {
     style: style,
     color: style['color'],
     brushSizePx: style['size'],
-    updatedAt: Number['isFinite'](Number(el['updatedAt'])) ? Number(el['updatedAt']) : 0x0,
+    updatedAt: Number['isFinite'](Number(el['updatedAt'])) ? Number(el['updatedAt']) : 0,
   };
 }
 export function normalizeWhiteboardState(enabled) {
@@ -364,8 +364,8 @@ export function getRelevantWhiteboardStyleControls(value8, value9 = null) {
 }
 export function createWhiteboardNodeData({
   id: id,
-  x: x = 0x0,
-  y: y = 0x0,
+  x: x = 0,
+  y: y = 0,
   width: width = WHITEBOARD_DEFAULT_SIZE['width'],
   height: height = WHITEBOARD_DEFAULT_SIZE['height'],
   name: name = '白板',

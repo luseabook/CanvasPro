@@ -26,7 +26,7 @@ export function bindImageExpandAction(item) {
     }),
     button.addEventListener('click', (event) => {
       (event.stopPropagation(),
-        window.v2FocusOnNode && window.v2FocusOnNode(nodeId, 0x104, 0x4b0),
+        window.v2FocusOnNode && window.v2FocusOnNode(nodeId, 260, 1200),
         ImageExpandController.init(nodeId));
     }));
 }

@@ -366,7 +366,7 @@ function normalizeLayout(value15) {
       target3.primaryZone.dispatchEvent({
         type: 'dragover',
         target: target3.expandBtn,
-        clientX: 0x3e7,
+        clientX: 999,
         preventDefault() {},
       }),
       assert.deepEqual(target3.primaryZone.children, [target3.expandBtn, target3.mattingBtn]),

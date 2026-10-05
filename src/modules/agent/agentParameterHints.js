@@ -20,13 +20,13 @@ const COMMON_ASPECT_RATIO_VALUES = Object['freeze']([
     'max_images',
   ]);
 function gcd(value, item) {
-  let key = Math['abs'](Math['round'](Number(value) || 0x0)),
-    index = Math['abs'](Math['round'](Number(item) || 0x0));
+  let key = Math['abs'](Math['round'](Number(value) || 0)),
+    index = Math['abs'](Math['round'](Number(item) || 0));
   while (index) {
     const result = key % index;
     ((key = index), (index = result));
   }
-  return key || 0x1;
+  return key || 1;
 }
 function normalizeOptionText(data) {
   return String(data ?? '')
@@ -48,7 +48,7 @@ function getOptionLabel(options) {
 }
 function findFieldOptionValue(options2 = {}, target) {
   const list = Array['isArray'](options2['options']) ? options2['options'] : [];
-  if (list['length'] === 0x0) return target;
+  if (list['length'] === 0) return target;
   const optionText = normalizeOptionText(target),
     source = list['find']((next) => {
       const optionValue = getOptionValue(next),
@@ -62,7 +62,7 @@ function findFieldOptionValue(options2 = {}, target) {
 function normalizeRatio(current, entry) {
   const count = Number(current),
     count2 = Number(entry);
-  if (!Number['isFinite'](count) || !Number['isFinite'](count2) || count <= 0x0 || count2 <= 0x0) return '';
+  if (!Number['isFinite'](count) || !Number['isFinite'](count2) || count <= 0 || count2 <= 0) return '';
   const gcd2 = gcd(count, count2);
   return Math['round'](count / gcd2) + ':' + Math['round'](count2 / gcd2);
 }
@@ -70,16 +70,16 @@ function normalizeResolutionLabel(record) {
   const enabled = String(record || '')['trim']();
   if (!enabled) return '';
   const payload = /^(\d{3,4})\s*p$/i['exec'](enabled);
-  if (payload) return payload[0x1] + 'p';
+  if (payload) return payload[1] + 'p';
   if (/^([1248])\s*k$/i['test'](enabled)) return enabled['replace'](/\s+/g, '')['toUpperCase']();
   return enabled;
 }
 function readDimensionHint(handle) {
   const enabled2 = String(handle || '')['match'](/(\d{3,5})\s*(?:x|×|\*)\s*(\d{3,5})/i);
   if (!enabled2) return null;
-  const count3 = Number(enabled2[0x1]),
-    count4 = Number(enabled2[0x2]);
-  if (!Number['isFinite'](count3) || !Number['isFinite'](count4) || count3 <= 0x0 || count4 <= 0x0)
+  const count3 = Number(enabled2[1]),
+    count4 = Number(enabled2[2]);
+  if (!Number['isFinite'](count3) || !Number['isFinite'](count4) || count3 <= 0 || count4 <= 0)
     return null;
   return {
     width: Math['round'](count3),
@@ -92,7 +92,7 @@ function readAspectRatioHint(state, config = null) {
   const scope = String(state || ''),
     input = scope['match'](/(\d{1,2})\s*(?::|：|比)\s*(\d{1,2})/);
   if (input) {
-    const ratio = normalizeRatio(input[0x1], input[0x2]);
+    const ratio = normalizeRatio(input[1], input[2]);
     if (COMMON_ASPECT_RATIO_VALUES['includes'](ratio)) return ratio;
   }
   if (/横版|横屏|宽屏|\blandscape\b/i['test'](scope)) return '16:9';
@@ -103,15 +103,15 @@ function readAspectRatioHint(state, config = null) {
 function readResolutionHint(output, value2 = null) {
   const value3 = String(output || ''),
     value4 = value3['match'](/\b(720p|1080p|2160p|4k|2k|1k)\b/i);
-  if (value4) return normalizeResolutionLabel(value4[0x1]);
+  if (value4) return normalizeResolutionLabel(value4[1]);
   if (/高清|高分辨率|高画质/['test'](value3)) return '1080p';
   return value2?.['resolution'] || '';
 }
 function readDurationHint(value5) {
   const enabled3 = String(value5 || '')['match'](/(\d+(?:\.\d+)?)\s*(?:秒|seconds?|secs?|s)/i);
   if (!enabled3) return undefined;
-  const count5 = Number(enabled3[0x1]);
-  return Number['isFinite'](count5) && count5 > 0x0 ? count5 : undefined;
+  const count5 = Number(enabled3[1]);
+  return Number['isFinite'](count5) && count5 > 0 ? count5 : undefined;
 }
 function readBatchSizeHint(value6) {
   const value7 = String(value6 || ''),
@@ -119,21 +119,21 @@ function readBatchSizeHint(value6) {
       value7['match'](/(?:批量|一次|生成|出)\s*(\d{1,2})\s*(?:张|幅|个图|images?)/i) ||
       value7['match'](/(\d{1,2})\s*(?:张|幅)\s*(?:图|图片|照片|海报|封面)/);
   if (!enabled4) return undefined;
-  const count6 = Number(enabled4[0x1]);
-  return Number['isInteger'](count6) && count6 > 0x0 ? count6 : undefined;
+  const count6 = Number(enabled4[1]);
+  return Number['isInteger'](count6) && count6 > 0 ? count6 : undefined;
 }
 const SMALL_CHINESE_NUMBERS = Object['freeze']({
-  一: 0x1,
-  二: 0x2,
-  两: 0x2,
-  三: 0x3,
-  四: 0x4,
-  五: 0x5,
-  六: 0x6,
-  七: 0x7,
-  八: 0x8,
-  九: 0x9,
-  十: 0xa,
+  一: 1,
+  二: 2,
+  两: 2,
+  三: 3,
+  四: 4,
+  五: 5,
+  六: 6,
+  七: 7,
+  八: 8,
+  九: 9,
+  十: 10,
 });
 function parseSmallPositiveInteger(value8) {
   const value9 = String(value8 || '')['trim']();
@@ -142,7 +142,7 @@ function parseSmallPositiveInteger(value8) {
     return SMALL_CHINESE_NUMBERS[value9];
   const enabled5 = /^([一二三四五六七八九])?十([一二三四五六七八九])?$/['exec'](value9);
   if (!enabled5) return undefined;
-  return (SMALL_CHINESE_NUMBERS[enabled5[0x1]] || 0x1) * 0xa + (SMALL_CHINESE_NUMBERS[enabled5[0x2]] || 0x0);
+  return (SMALL_CHINESE_NUMBERS[enabled5[1]] || 1) * 10 + (SMALL_CHINESE_NUMBERS[enabled5[2]] || 0);
 }
 export function extractAgentDuplicateCountHint(value10 = '') {
   const value11 = String(value10 || ''),
@@ -150,10 +150,10 @@ export function extractAgentDuplicateCountHint(value10 = '') {
       value11['match'](/(?:复制|克隆|拷贝).{0,12}?([0-9一二两三四五六七八九十]{1,3})\s*(?:份|次|个|张)/i) ||
       value11['match'](/([0-9一二两三四五六七八九十]{1,3})\s*(?:份|个|张)?\s*(?:副本|拷贝)/i) ||
       value11['match'](/\b(?:duplicate|copy|clone|make)\b.{0,20}?\b(\d{1,2})\s*(?:copies|times)\b/i),
-    smallPositiveInteger = parseSmallPositiveInteger(value12?.[0x1]);
+    smallPositiveInteger = parseSmallPositiveInteger(value12?.[1]);
   return Number['isInteger'](smallPositiveInteger) &&
-    smallPositiveInteger >= 0x1 &&
-    smallPositiveInteger <= 0xc
+    smallPositiveInteger >= 1 &&
+    smallPositiveInteger <= 12
     ? smallPositiveInteger
     : undefined;
 }
@@ -178,7 +178,7 @@ export function extractAgentParameterHints(value13 = '') {
     {
       params: params,
       requestedParamIds: Array['from'](value14),
-      hasHints: Object['keys'](params)['length'] > 0x0,
+      hasHints: Object['keys'](params)['length'] > 0,
     }
   );
 }
@@ -228,7 +228,7 @@ export function buildSupportedAgentParamsFromHints(options4 = {}, value23 = {}) 
     const fieldOptionValue2 = findFieldOptionValue(value25, value26);
     if (
       Array['isArray'](value25['options']) &&
-      value25['options']['length'] > 0x0 &&
+      value25['options']['length'] > 0 &&
       fieldOptionValue2 === undefined
     )
       continue;

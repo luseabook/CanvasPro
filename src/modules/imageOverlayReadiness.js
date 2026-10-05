@@ -1,4 +1,4 @@
-const DEFAULT_IMAGE_READY_TIMEOUT_MS = 0x2710;
+const DEFAULT_IMAGE_READY_TIMEOUT_MS = 10000;
 export function waitForImageElementReady({
   image: image,
   onReady: onReady = () => {},
@@ -22,11 +22,11 @@ export function waitForImageElementReady({
     item = () => handler(onReady),
     key = () => handler(onError);
   (image?.['addEventListener']?.('load', item), image?.['addEventListener']?.('error', key));
-  const count = Math['max'](0x0, Number(timeoutMs) || 0x0);
-  count > 0x0 &&
+  const count = Math['max'](0, Number(timeoutMs) || 0);
+  count > 0 &&
     typeof setTimeoutFn === 'function' &&
     (setTimeoutFn2 = setTimeoutFn(() => handler(onTimeout), count));
   if (!image) handler(onError);
-  else image['complete'] && handler(image['naturalWidth'] > 0x0 ? onReady : onError);
+  else image['complete'] && handler(image['naturalWidth'] > 0 ? onReady : onError);
   return run;
 }

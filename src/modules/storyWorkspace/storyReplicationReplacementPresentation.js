@@ -4,7 +4,7 @@ import { getSelectedAppearanceIndex } from './storyAssetSettingsProjection.js';
 const escape = (value) =>
   String(value ?? '')['replace'](
     /[&<>"']/gu,
-    (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '\x22': '&quot;', '\x27': '&#39;' })[item],
+    (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[item],
   );
 export function renderStoryReplicationAssetComparison(key, name2) {
   if (
@@ -32,7 +32,7 @@ export function renderStoryReplicationAssetComparison(key, name2) {
     options = list['map'](({ character: character2 }) => character2['name'])['join']('、') || error['name'],
     target = data || response?.['url'],
     source = { character: '原片形象', scene: '原片场景', prop: '原片道具' }[name2['kind']],
-    next = response?.['url'] ? ' data-tooltip="' + escape(source + '：' + options) + '\x22' : '';
+    next = response?.['url'] ? ' data-tooltip="' + escape(source + '：' + options) + '"' : '';
   return (
     '<span class="story-replacement-comparison story-replacement-gallery">\n    <span class="story-replacement-source"' +
     next +
@@ -44,21 +44,21 @@ export function renderStoryReplicationAssetComparison(key, name2) {
         escape(error['name']) +
         '" loading="lazy" decoding="async">'
       : '<span class="story-replacement-missing">' + escape2 + '</span>') +
-    '<span\x20class=\x22story-replacement-gallery-empty\x22><span\x20class=\x22story-replacement-upload-plus\x22\x20aria-hidden=\x22true\x22>+</span>待设定<br>' +
+    '<span class="story-replacement-gallery-empty"><span class="story-replacement-upload-plus" aria-hidden="true">+</span>待设定<br>' +
     result +
     '</span></span>\n    <span class="story-replacement-portrait">' +
     (target
       ? '<img class="' +
         (data ? 'story-replacement-target-image' : 'story-replacement-reference-image') +
-        '\x22\x20src=\x22' +
+        '" src="' +
         escape(target) +
-        '\x22\x20alt=\x22' +
+        '" alt="' +
         escape((data ? result : '原片参考') + '：' + name2['name']) +
         '" loading="lazy" decoding="async">'
       : '<span class="story-replacement-missing">' + escape2 + '</span>') +
-    '<small\x20class=\x22story-replacement-portrait-label' +
+    '<small class="story-replacement-portrait-label' +
     (data ? ' is-new-appearance' : '') +
-    '\x22>' +
+    '">' +
     (data ? result : '原片参考') +
     '</small></span>\n  </span>'
   );

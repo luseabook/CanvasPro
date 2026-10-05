@@ -815,16 +815,16 @@ function assertPromptConfig(value83) {
     !ALLOWED_PROMPT_EMPTY_POLICIES['has'](String(value83['prompt']['emptyPolicy'] || ''))
   )
     throw new Error(
-      '[manifest]\x20model\x20manifest\x20' +
+      '[manifest] model manifest ' +
         value83['modelId'] +
         ' prompt.emptyPolicy must be one of: ' +
-        Array['from'](ALLOWED_PROMPT_EMPTY_POLICIES)['join'](',\x20'),
+        Array['from'](ALLOWED_PROMPT_EMPTY_POLICIES)['join'](', '),
     );
   if (value83['prompt']['minLength'] !== undefined && value83['prompt']['minLength'] !== null) {
     const count4 = Number(value83['prompt']['minLength']);
-    if (!Number['isInteger'](count4) || count4 < 0x0)
+    if (!Number['isInteger'](count4) || count4 < 0)
       throw new Error(
-        '[manifest]\x20model\x20manifest\x20' +
+        '[manifest] model manifest ' +
           value83['modelId'] +
           ' prompt.minLength must be a non-negative integer',
       );
@@ -833,7 +833,7 @@ function assertPromptConfig(value83) {
 
 function assertInputPolicyCondition(list20, value84) {
   if (Array['isArray'](list20)) {
-    if (list20['length'] === 0x0) throw new Error('[manifest] ' + value84 + '\x20must\x20not\x20be\x20empty');
+    if (list20['length'] === 0) throw new Error('[manifest] ' + value84 + ' must not be empty');
     list20['forEach']((value85, value86) =>
       assertInputPolicyCondition(value85, value84 + '[' + value86 + ']'),
     );
@@ -846,9 +846,9 @@ function assertInputPolicyCondition(list20, value84) {
     return;
   }
   if (!normalizeRegistryKey(list20['field'] ?? list20['param']))
-    throw new Error('[manifest] ' + value84 + '\x20must\x20declare\x20field\x20or\x20param');
+    throw new Error('[manifest] ' + value84 + ' must declare field or param');
   if (list20['value'] === undefined && list20['values'] === undefined)
-    throw new Error('[manifest]\x20' + value84 + ' must declare value or values');
+    throw new Error('[manifest] ' + value84 + ' must declare value or values');
 }
 
 function assertInputPolicyExtensions(value88) {
@@ -862,11 +862,11 @@ function assertInputPolicyExtensions(value88) {
   if (
     list21 !== undefined &&
     (!Array['isArray'](list21) ||
-      list21['length'] === 0x0 ||
+      list21['length'] === 0 ||
       list21['some']((value90) => !String(value90 || '')['trim']()))
   )
     throw new Error(
-      '[manifest]\x20model\x20manifest\x20inputSlots.preserveHiddenInputsByKindFields\x20must\x20be\x20a\x20non-empty\x20string\x20array',
+      '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields must be a non-empty string array',
     );
   if (Array['isArray'](list21) && value89['preserveHiddenInputsByKind'] !== !![])
     throw new Error(
@@ -884,9 +884,9 @@ function assertInputPolicyExtensions(value88) {
       throw new Error('[manifest] ' + value94 + '.maxByKind must be an object');
     Object['entries'](value92['maxByKind'] || {})['forEach'](([value95, value96]) => {
       const count5 = Number(value96);
-      if (!Number['isFinite'](count5) || count5 < 0x0)
+      if (!Number['isFinite'](count5) || count5 < 0)
         throw new Error(
-          '[manifest]\x20' + value94 + '.maxByKind.' + value95 + ' must be a non-negative number',
+          '[manifest] ' + value94 + '.maxByKind.' + value95 + ' must be a non-negative number',
         );
     });
   });
@@ -899,7 +899,7 @@ function assertInputPolicyExtensions(value88) {
       ['minDurationSeconds', 'maxDurationSeconds', 'maxBytes']['forEach']((value101) => {
         if (value99[value101] === undefined) return;
         const count6 = Number(value99[value101]);
-        if (!Number['isFinite'](count6) || count6 <= 0x0)
+        if (!Number['isFinite'](count6) || count6 <= 0)
           throw new Error('[manifest] ' + value100 + '.' + value101 + ' must be positive');
       }));
     if (
@@ -908,7 +908,7 @@ function assertInputPolicyExtensions(value88) {
       Number(value99['minDurationSeconds']) > Number(value99['maxDurationSeconds'])
     )
       throw new Error(
-        '[manifest] ' + value100 + '.minDurationSeconds\x20cannot\x20exceed\x20maxDurationSeconds',
+        '[manifest] ' + value100 + '.minDurationSeconds cannot exceed maxDurationSeconds',
       );
     if (
       value99['allowedExtensions'] !== undefined &&
@@ -933,7 +933,7 @@ function assertManifestBundle(value103) {
     models = value103['models'];
   (executions['forEach'](validateExecutionManifest),
     models['forEach'](validateModelManifest),
-    assertRegistryKeysAvailable(executions, _executions, 'id', 'execution\x20manifest'));
+    assertRegistryKeysAvailable(executions, _executions, 'id', 'execution manifest'));
   const manifestKeyMap2 = buildManifestKeyMap(executions, 'id', 'execution manifest');
   return (
     assertRegistryKeysAvailable(models, _models, 'modelId', 'model manifest'),
@@ -960,7 +960,7 @@ export function unregisterManifestBundle(value110) {
     list23 = Array['isArray'](value110?.['models']) ? value110['models'] : [];
   return (
     list22['forEach']((value111) =>
-      removeManifestFromRegistry(value111, _executions, 'id', 'execution\x20manifest'),
+      removeManifestFromRegistry(value111, _executions, 'id', 'execution manifest'),
     ),
     list23['forEach']((value112) =>
       removeManifestFromRegistry(value112, _models, 'modelId', 'model manifest'),
@@ -977,5 +977,5 @@ function resolveUniqueModelDisplayName(value113, value114 = '') {
     if (normalizeRegistryKey(value115?.['displayName'])['toLowerCase']() !== registryKey13) return ![];
     return !providerId3 || normalizeProviderId(value115?.['provider']) === providerId3;
   });
-  return list24['length'] === 0x1 ? list24[0x0] : null;
+  return list24['length'] === 1 ? list24[0] : null;
 }

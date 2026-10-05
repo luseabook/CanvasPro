@@ -10,20 +10,20 @@ function getSelectedShot(options = {}) {
 }
 function buildShotFilenameBase(key, index, result) {
   const data = Math['max'](
-    0x0,
+    0,
     key['shots']['findIndex']((target) => target['id'] === index['id']),
   );
-  return '镜头片段' + String(data + 0x1)['padStart'](0x2, '0') + '-' + result;
+  return '镜头片段' + String(data + 1)['padStart'](2, '0') + '-' + result;
 }
 function resolveOriginalVideoRef(options2 = {}) {
   const list = Array['isArray'](options2?.['replacementVideo']?.['results'])
       ? options2['replacementVideo']['results']
       : [],
     source = Math['max'](
-      0x0,
+      0,
       Math['min'](
-        list['length'] - 0x1,
-        Math['trunc'](Number(options2?.['replacementVideo']?.['activeIndex']) || 0x0),
+        list['length'] - 1,
+        Math['trunc'](Number(options2?.['replacementVideo']?.['activeIndex']) || 0),
       ),
     ),
     response = list[source] || {};

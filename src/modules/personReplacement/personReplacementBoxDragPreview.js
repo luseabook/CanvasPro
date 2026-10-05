@@ -1,15 +1,15 @@
 export function applyManualBoxPreview(el, box) {
-  (el?.['style']?.['setProperty']?.('--box-x', box['x'] * 0x64 + '%'),
-    el?.['style']?.['setProperty']?.('--box-y', box['y'] * 0x64 + '%'),
-    el?.['style']?.['setProperty']?.('--box-width', box['width'] * 0x64 + '%'),
-    el?.['style']?.['setProperty']?.('--box-height', box['height'] * 0x64 + '%'));
+  (el?.['style']?.['setProperty']?.('--box-x', box['x'] * 100 + '%'),
+    el?.['style']?.['setProperty']?.('--box-y', box['y'] * 100 + '%'),
+    el?.['style']?.['setProperty']?.('--box-width', box['width'] * 100 + '%'),
+    el?.['style']?.['setProperty']?.('--box-height', box['height'] * 100 + '%'));
 }
 export function getPersonReplacementBoxDragDistance(event, value) {
   const item = Number(event?.['clientX']),
     key = Number(event?.['clientY']);
   return Number['isFinite'](item) && Number['isFinite'](key)
     ? Math['hypot'](item - value['startClientX'], key - value['startClientY'])
-    : 0x0;
+    : 0;
 }
 export function createPersonReplacementBoxDragPreview({
   getSession: getSession,
@@ -17,11 +17,11 @@ export function createPersonReplacementBoxDragPreview({
   threshold: threshold,
   windowObject: windowObject,
 }) {
-  let index = 0x0,
+  let index = 0,
     value2 = null,
     value3 = null;
   const run = () => {
-    index = 0x0;
+    index = 0;
     const result = value2,
       data = value3;
     ((value2 = null), (value3 = null));
@@ -40,7 +40,7 @@ export function createPersonReplacementBoxDragPreview({
     },
     cancel() {
       if (index) windowObject?.['cancelAnimationFrame']?.(index);
-      ((index = 0x0), (value2 = null), (value3 = null));
+      ((index = 0), (value2 = null), (value3 = null));
     },
   };
 }

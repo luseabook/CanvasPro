@@ -25,13 +25,13 @@ export function createForegroundDialogPresenterCore({
         workArea = display?.['workArea'] || display?.['bounds'];
       if (workArea)
         return {
-          x: Math['round'](workArea['x'] + Math['max'](0x0, workArea['width'] - 0x2)),
-          y: Math['round'](workArea['y'] + Math['max'](0x0, workArea['height'] - 0x2)),
-          width: 0x1,
-          height: 0x1,
+          x: Math['round'](workArea['x'] + Math['max'](0, workArea['width'] - 2)),
+          y: Math['round'](workArea['y'] + Math['max'](0, workArea['height'] - 2)),
+          width: 1,
+          height: 1,
         };
     } catch {}
-    return { x: -0x7d00, y: -0x7d00, width: 0x1, height: 0x1 };
+    return { x: -32000, y: -32000, width: 1, height: 1 };
   }
   function createOwnerWindow() {
     ((ownerWindow = new BrowserWindowClass({
@@ -39,7 +39,7 @@ export function createForegroundDialogPresenterCore({
       show: ![],
       frame: ![],
       transparent: !![],
-      opacity: 0x0,
+      opacity: 0,
       skipTaskbar: !![],
       alwaysOnTop: !![],
       focusable: !![],
@@ -53,7 +53,7 @@ export function createForegroundDialogPresenterCore({
         ownerWindow = null;
       }));
     try {
-      ownerWindow['setOpacity'](0x0);
+      ownerWindow['setOpacity'](0);
     } catch {}
     return ownerWindow;
   }
@@ -70,7 +70,7 @@ export function createForegroundDialogPresenterCore({
       candidateWindow['setBounds'](getOffscreenBounds());
     } catch {}
     try {
-      candidateWindow['setOpacity'](0x0);
+      candidateWindow['setOpacity'](0);
     } catch {}
     try {
       candidateWindow['setAlwaysOnTop'](!![], 'screen-saver');

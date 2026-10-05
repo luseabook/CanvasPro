@@ -81,7 +81,7 @@ test('动作预算：从消息取副本数提示，取不到即 0 且初始已�
     duplicateNodeLimit: 5,
     duplicatedNodeCount: 0,
   });
-  // 无提示 ⇒ undefined 经 `|| 0x0` 回落 0
+  // 无提示 ⇒ undefined 经 `|| 0` 回落 0
   for (const message of ['', null, undefined, '画一只猫', '复制 15 份']) {
     assert.deepEqual(
       createAgentLoopActionBudget(message),

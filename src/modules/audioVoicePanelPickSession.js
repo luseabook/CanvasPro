@@ -2,7 +2,7 @@ import { createLinkCursor, getCursorSize } from './cursorUtils.js';
 const VIDEO_NODE_TYPES = new Set(['source-video', 'ai-video', 'video']),
   AUDIO_NODE_TYPES = new Set(['source-audio', 'ai-audio', 'audio']),
   SOURCE_NODE_TYPES = new Set([...VIDEO_NODE_TYPES, ...AUDIO_NODE_TYPES]),
-  CANVAS_NODE_SELECTOR = '.v2-node,\x20.v2-fast-preview-node';
+  CANVAS_NODE_SELECTOR = '.v2-node, .v2-fast-preview-node';
 export const AUDIO_VOICE_BATCH_AUDIO_PICK_ID = '__audioVoiceSelectedSegments__';
 export function isAudioVoiceVideoNode(options = {}) {
   return VIDEO_NODE_TYPES['has'](String(options?.['type'] || '')['trim']());
@@ -25,7 +25,7 @@ export function resolveAudioVoiceSelectionTargetIds(value = '', item = [], key =
     map2 = item instanceof Set ? item : new Set(Array['isArray'](item) ? item : []),
     list = [...map]['filter']((target) => map2['has'](target));
   if (enabled === result) return list;
-  if (map2['has'](enabled) && list['length'] > 0x1) return list;
+  if (map2['has'](enabled) && list['length'] > 1) return list;
   return map['has'](enabled) ? [enabled] : [];
 }
 function getStateSnapshot(store2) {
@@ -149,7 +149,7 @@ export function createAudioVoicePanelPickSession({
       return;
     }
     if (typeof windowObject?.['setTimeout'] === 'function') {
-      windowObject['setTimeout'](run18, 0x0);
+      windowObject['setTimeout'](run18, 0);
       return;
     }
     run18();
@@ -296,7 +296,7 @@ export function createAudioVoicePanelPickSession({
         (response) => response?.['status'] !== 'removed',
       ),
       targetIds = resolveAudioVoiceSelectionTargetIds(input, getSelectedSegmentIds(), list3);
-    if (targetIds['length'] <= 0x0) return { eligible: ![], reason: 'no-target', targetIds: targetIds };
+    if (targetIds['length'] <= 0) return { eligible: ![], reason: 'no-target', targetIds: targetIds };
     const reason = targetIds['some']((output) => {
       const value3 = list3['find']((value4) => value4?.['id'] === output);
       return value3 && !doesSegmentSupportAudioReference(value3);
@@ -375,7 +375,7 @@ export function createAudioVoicePanelPickSession({
     return (
       run32(),
       run5(
-        reason2['appliedIds']['length'] > 0x1
+        reason2['appliedIds']['length'] > 1
           ? text('toasts.audioPickBatchSelected', { count: reason2['appliedIds']['length'] })
           : text('toasts.audioPickSelected'),
         'success',

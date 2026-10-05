@@ -64,7 +64,7 @@ import {
       jobStatus: 'running',
       rhTaskStatus: 'pending',
       mediaTaskStatus: 'complete',
-      generationStartTime: 0x3e8,
+      generationStartTime: 1000,
       generationDuration: null,
     };
     (assert.equal(resolveGenerationUiState(key), 'running'),

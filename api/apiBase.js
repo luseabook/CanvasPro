@@ -1,4 +1,4 @@
-const DEFAULT_TIMEOUT = 0x7530;
+const DEFAULT_TIMEOUT = 30000;
 export function getApiBase() {
   try {
     if (typeof location !== 'undefined' && location.protocol === 'file:') return 'http://127.0.0.1:8777';
@@ -76,7 +76,7 @@ export async function request(source, next = {}, current = DEFAULT_TIMEOUT) {
   const entry = source.startsWith('http') ? source : buildApiUrl(source);
   try {
     const status = await fetchWithTimeout(entry, next, current);
-    if (status.status === 0x194) return { success: true, data: null, status: 0x194 };
+    if (status.status === 404) return { success: true, data: null, status: 404 };
     if (!status.ok) {
       const errorBody = await parseErrorBody(status);
       return {

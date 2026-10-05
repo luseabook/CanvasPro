@@ -11,43 +11,43 @@ export const GLOBAL_CAPTURE_ACTION_IDS = Object['freeze']([
 ]);
 const AI_ACTION_IDS = new Set(['ai-text', 'ai-image', 'ai-video']),
   CAPTURE_PHASES = new Set(['capturing', 'ready', 'error']),
-  DEFAULT_WINDOW_SIZE = Object['freeze']({ width: 0x190, height: 0x34 }),
-  EXPANDED_HEIGHT = 0x104,
-  NATIVE_TRANSPARENT_BACKGROUND = '#' + '0'['repeat'](0x8);
+  DEFAULT_WINDOW_SIZE = Object['freeze']({ width: 400, height: 52 }),
+  EXPANDED_HEIGHT = 260,
+  NATIVE_TRANSPARENT_BACKGROUND = '#' + '0'['repeat'](8);
 function clamp(value, min, max) {
   if (max < min) return min;
   return Math['min'](max, Math['max'](min, value));
 }
 function normalizeScreenArea(area = {}) {
   return {
-    x: Math['round'](Number(area?.['x']) || 0x0),
-    y: Math['round'](Number(area?.['y']) || 0x0),
-    width: Math['max'](0x1, Math['round'](Number(area?.['width']) || 0x1)),
-    height: Math['max'](0x1, Math['round'](Number(area?.['height']) || 0x1)),
+    x: Math['round'](Number(area?.['x']) || 0),
+    y: Math['round'](Number(area?.['y']) || 0),
+    width: Math['max'](1, Math['round'](Number(area?.['width']) || 1)),
+    height: Math['max'](1, Math['round'](Number(area?.['height']) || 1)),
   };
 }
 export function resolveGlobalCaptureWindowBounds({
-  cursor: cursor = { x: 0x0, y: 0x0 },
-  workArea: workArea = { x: 0x0, y: 0x0, width: 0x500, height: 0x2d0 },
+  cursor: cursor = { x: 0, y: 0 },
+  workArea: workArea = { x: 0, y: 0, width: 1280, height: 720 },
   size: size = DEFAULT_WINDOW_SIZE,
-  margin: margin = 0xc,
-  offset: offset = 0xe,
+  margin: margin = 12,
+  offset: offset = 14,
 } = {}) {
   const safeWorkArea = normalizeScreenArea(workArea),
-    safeMargin = Math['max'](0x0, Math['round'](Number(margin) || 0x0)),
-    maxWidth = Math['max'](0x1, safeWorkArea['width'] - safeMargin * 0x2),
-    maxHeight = Math['max'](0x1, safeWorkArea['height'] - safeMargin * 0x2),
+    safeMargin = Math['max'](0, Math['round'](Number(margin) || 0)),
+    maxWidth = Math['max'](1, safeWorkArea['width'] - safeMargin * 2),
+    maxHeight = Math['max'](1, safeWorkArea['height'] - safeMargin * 2),
     width = Math['min'](
       maxWidth,
-      Math['max'](0x1, Math['round'](Number(size?.['width']) || DEFAULT_WINDOW_SIZE['width'])),
+      Math['max'](1, Math['round'](Number(size?.['width']) || DEFAULT_WINDOW_SIZE['width'])),
     ),
     height = Math['min'](
       maxHeight,
-      Math['max'](0x1, Math['round'](Number(size?.['height']) || DEFAULT_WINDOW_SIZE['height'])),
+      Math['max'](1, Math['round'](Number(size?.['height']) || DEFAULT_WINDOW_SIZE['height'])),
     ),
     cursorX = Math['round'](Number(cursor?.['x']) || safeWorkArea['x']),
     cursorY = Math['round'](Number(cursor?.['y']) || safeWorkArea['y']),
-    safeOffset = Math['max'](0x0, Math['round'](Number(offset) || 0x0)),
+    safeOffset = Math['max'](0, Math['round'](Number(offset) || 0)),
     minX = safeWorkArea['x'] + safeMargin,
     minY = safeWorkArea['y'] + safeMargin,
     maxX = safeWorkArea['x'] + safeWorkArea['width'] - safeMargin - width,
@@ -75,8 +75,8 @@ export function createGlobalCaptureWindowController({
   logDiagnosticEvent: logDiagnosticEvent = () => {},
   prepareWindow: prepareWindow = disableWindowsWindowTransitions,
   windowSize: windowSize = DEFAULT_WINDOW_SIZE,
-  focusRetryDelayMs: focusRetryDelayMs = 0x18,
-  pendingShowDelayMs: pendingShowDelayMs = 0x78,
+  focusRetryDelayMs: focusRetryDelayMs = 24,
+  pendingShowDelayMs: pendingShowDelayMs = 120,
   setTimeoutFn: setTimeoutFn = setTimeout,
   clearTimeoutFn: clearTimeoutFn = clearTimeout,
 } = {}) {
@@ -88,8 +88,8 @@ export function createGlobalCaptureWindowController({
     userFocused = ![],
     focusRetryTimer = null,
     pendingShowTimer = null,
-    presentationSeq = 0x0,
-    dispatchSeq = 0x0,
+    presentationSeq = 0,
+    dispatchSeq = 0,
     runImmediately = ![],
     activeActionId = 'source-text',
     destroyed = ![];
@@ -197,7 +197,7 @@ export function createGlobalCaptureWindowController({
               type: 'global_capture.window_transitions_disabled',
               level: 'info',
               source: 'main',
-              message: 'Native\x20popup\x20transitions\x20disabled\x20before\x20presentation',
+              message: 'Native popup transitions disabled before presentation',
             });
         })
         ['catch']((preparationError) => {
@@ -205,7 +205,7 @@ export function createGlobalCaptureWindowController({
             type: 'global_capture.window_transitions_unavailable',
             level: 'warn',
             source: 'main',
-            message: 'Native\x20popup\x20transitions\x20could\x20not\x20be\x20disabled',
+            message: 'Native popup transitions could not be disabled',
             error: preparationError,
           });
         });
@@ -256,12 +256,12 @@ export function createGlobalCaptureWindowController({
       const reusablePresentation = presentation?.['captureId'] === captureId ? presentation : null;
       if (!reusablePresentation) presentation?.['dispatchAbort']?.['abort']();
       const cursor = reusablePresentation?.['cursor'] ||
-          screenApi['getCursorScreenPoint']?.() || { x: 0x0, y: 0x0 },
+          screenApi['getCursorScreenPoint']?.() || { x: 0, y: 0 },
         display = screenApi['getDisplayNearestPoint']?.(cursor) || {},
         workArea =
           reusablePresentation?.['workArea'] ||
           normalizeScreenArea(
-            display['workArea'] || display['bounds'] || { x: 0x0, y: 0x0, width: 0x500, height: 0x2d0 },
+            display['workArea'] || display['bounds'] || { x: 0, y: 0, width: 1280, height: 720 },
           ),
         bounds = resolveGlobalCaptureWindowBounds({
           cursor: cursor,
@@ -309,7 +309,7 @@ export function createGlobalCaptureWindowController({
           type: 'global_capture.window_show_failed',
           level: 'error',
           source: 'main',
-          message: 'Global\x20capture\x20window\x20failed\x20to\x20show',
+          message: 'Global capture window failed to show',
           error: showError,
         }),
         { ok: ![], reason: 'window-show-failed' }
@@ -374,15 +374,15 @@ export function createGlobalCaptureWindowController({
     const { bounds: baseBounds, workArea: expandWorkArea } = presentation,
       expanded = expandPayload?.['expanded'] === !![],
       expandedHeight = expanded
-        ? Math['min'](EXPANDED_HEIGHT, Math['max'](0x1, expandWorkArea['height'] - 0x18))
+        ? Math['min'](EXPANDED_HEIGHT, Math['max'](1, expandWorkArea['height'] - 24))
         : baseBounds['height'],
       opensUp =
-        expanded && baseBounds['y'] + expandedHeight > expandWorkArea['y'] + expandWorkArea['height'] - 0xc,
+        expanded && baseBounds['y'] + expandedHeight > expandWorkArea['y'] + expandWorkArea['height'] - 12,
       nextBounds = {
         ...baseBounds,
         height: expandedHeight,
         y: opensUp
-          ? Math['max'](expandWorkArea['y'] + 0xc, baseBounds['y'] + baseBounds['height'] - expandedHeight)
+          ? Math['max'](expandWorkArea['y'] + 12, baseBounds['y'] + baseBounds['height'] - expandedHeight)
           : baseBounds['y'],
       };
     return (

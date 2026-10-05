@@ -158,8 +158,8 @@ export function bindPreviewUploadEntry({
 }
 
 const OPTIMISTIC_IMAGE_PREVIEW_SELECTOR = '.preview-upload-optimistic-media';
-const DEFAULT_OPTIMISTIC_PREVIEW_FINALIZE_DELAY_MS = 0x15e;
-const DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS = 0x7530;
+const DEFAULT_OPTIMISTIC_PREVIEW_FINALIZE_DELAY_MS = 350;
+const DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS = 30000;
 
 function shouldReadPreviewUploadNaturalSize(options2 = {}) {
   return options2['kind'] === 'image';
@@ -228,7 +228,7 @@ function getMountedPreviewElement(entry) {
 function clearExistingOptimisticImagePreview(enabled6) {
   if (!enabled6) return;
   if (typeof enabled6['_previewUploadOptimisticCleanup'] === 'function') {
-    enabled6['_previewUploadOptimisticCleanup']({ delayMs: 0x0, force: !![] });
+    enabled6['_previewUploadOptimisticCleanup']({ delayMs: 0, force: !![] });
     return;
   }
   enabled6['querySelectorAll']?.(OPTIMISTIC_IMAGE_PREVIEW_SELECTOR)?.['forEach']((config) =>
@@ -266,7 +266,7 @@ function normalizeUrlPathForCompare(value5 = '') {
   try {
     return new URL(enabled7, 'http://aic.local')['pathname']['replace'](/\/+/g, '/');
   } catch {
-    return enabled7['split']('?')[0x0]['split']('#')[0x0]['replace'](/\\/g, '/');
+    return enabled7['split']('?')[0]['split']('#')[0]['replace'](/\\/g, '/');
   }
 }
 
@@ -274,7 +274,7 @@ function imageSrcMatchesExpected(value6 = '', value7 = []) {
   const urlPathForCompare = normalizeUrlPathForCompare(value6);
   if (!urlPathForCompare) return ![];
   const list3 = value7['map']((value8) => normalizeUrlPathForCompare(value8))['filter'](Boolean);
-  if (list3['length'] === 0x0) return !![];
+  if (list3['length'] === 0) return !![];
   return list3['some']((value9) => urlPathForCompare === value9 || urlPathForCompare['endsWith'](value9));
 }
 
@@ -333,7 +333,7 @@ function waitForUploadedPreviewImageCommit({
         value14 = !![];
         if (setTimeout2 !== null) clearTimeout(setTimeout2);
         if (setTimeout3 !== null) clearTimeout(setTimeout3);
-        for (const run of list4['splice'](0x0)) run();
+        for (const run of list4['splice'](0)) run();
         handler2(value15);
       },
       handler4 = (el6) => {
@@ -378,9 +378,9 @@ function waitForUploadedPreviewImageCommit({
       },
       handler6 = () => {
         if (value14 || handler5()) return;
-        setTimeout2 = setTimeout(handler6, 0x50);
+        setTimeout2 = setTimeout(handler6, 80);
       };
-    ((setTimeout3 = setTimeout(() => handler3(![]), Math['max'](0x0, Number(timeoutMs) || 0x0))), handler6());
+    ((setTimeout3 = setTimeout(() => handler3(![]), Math['max'](0, Number(timeoutMs) || 0))), handler6());
   });
 }
 
@@ -424,14 +424,14 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
         value22?.['_previewUploadOptimisticCleanup'] === run3 &&
           delete value22['_previewUploadOptimisticCleanup']);
     };
-  function run3({ delayMs: delayMs = 0x0, force: force = ![] } = {}) {
+  function run3({ delayMs: delayMs = 0, force: force = ![] } = {}) {
     if (value21) return;
     setTimeout4 !== null && (clearTimeout(setTimeout4), (setTimeout4 = null));
     const run4 = () => {
         handler7();
       },
-      count = Math['max'](0x0, Number(delayMs) || 0x0);
-    !force && count > 0x0 && typeof setTimeout === 'function'
+      count = Math['max'](0, Number(delayMs) || 0);
+    !force && count > 0 && typeof setTimeout === 'function'
       ? (setTimeout4 = setTimeout(run4, count))
       : run4();
   }
@@ -479,7 +479,7 @@ export function bindPreviewUploadToolbarAction({
       ((el10['accept'] = response['accept']), (el10['value'] = ''), el10['click']?.());
     },
     async3 = async () => {
-      const enabled11 = el10['files']?.[0x0];
+      const enabled11 = el10['files']?.[0];
       if (!enabled11) return;
       setToolbarUploadButtonBusy(button3, !![]);
       try {

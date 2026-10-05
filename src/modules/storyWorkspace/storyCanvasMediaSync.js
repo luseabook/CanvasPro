@@ -18,8 +18,8 @@ function normalizeText(item) {
 }
 function normalizeIndex(key, count) {
   const index = Math['trunc'](Number(key));
-  if (!Number['isFinite'](index) || count <= 0x0) return 0x0;
-  return Math['max'](0x0, Math['min'](count - 0x1, index));
+  if (!Number['isFinite'](index) || count <= 0) return 0;
+  return Math['max'](0, Math['min'](count - 1, index));
 }
 function firstText(...list) {
   return list['map'](normalizeText)['find'](Boolean) || '';
@@ -27,9 +27,9 @@ function firstText(...list) {
 function hashText(result) {
   let data = 0x811c9dc5;
   for (const options of String(result || '')) {
-    ((data ^= options['charCodeAt'](0x0)), (data = Math['imul'](data, 0x1000193)));
+    ((data ^= options['charCodeAt'](0)), (data = Math['imul'](data, 0x1000193)));
   }
-  return (data >>> 0x0)['toString'](0x24);
+  return (data >>> 0)['toString'](36);
 }
 function withoutNodeType(target) {
   const source = { ...asObject(target) };
@@ -68,9 +68,9 @@ function findEpisodeContext(
         Array['isArray'](input?.['clips']) &&
         input['clips']['some']((output) => normalizeText(output?.['id']) === text),
     ));
-  episode ||= list4[0x0] || null;
+  episode ||= list4[0] || null;
   const list5 = Array['isArray'](episode?.['clips']) ? episode['clips'] : [],
-    clip = list5['find']((value2) => normalizeText(value2?.['id']) === text) || list5[0x0] || null;
+    clip = list5['find']((value2) => normalizeText(value2?.['id']) === text) || list5[0] || null;
   return { episode: episode, clip: clip };
 }
 export function isStoryCanvasMediaNode(options2 = {}) {
@@ -113,9 +113,9 @@ export function resolveStoryCanvasNodeMedia(box = {}) {
       displayLocalPath: displayLocalPath,
       thumbLocalPath: thumbLocalPath,
       fileName: firstText(box2['fileName'], box2['filename'], box['fileName'], box['filename']),
-      width: Number(box2['width'] || box2['originalWidth'] || box['originalWidth'] || box['width']) || 0x0,
+      width: Number(box2['width'] || box2['originalWidth'] || box['originalWidth'] || box['width']) || 0,
       height:
-        Number(box2['height'] || box2['originalHeight'] || box['originalHeight'] || box['height']) || 0x0,
+        Number(box2['height'] || box2['originalHeight'] || box['originalHeight'] || box['height']) || 0,
     };
   }
   if (VIDEO_NODE_TYPES['has'](text4)) {
@@ -150,15 +150,15 @@ export function resolveStoryCanvasNodeMedia(box = {}) {
       ),
       posterLocalPath: firstText(box3['posterLocalPath'], box['posterLocalPath']),
       fileName: firstText(box3['fileName'], box3['filename'], box['fileName'], box['filename']),
-      width: Number(box3['videoWidth'] || box3['width'] || box['videoWidth'] || box['width']) || 0x0,
-      height: Number(box3['videoHeight'] || box3['height'] || box['videoHeight'] || box['height']) || 0x0,
+      width: Number(box3['videoWidth'] || box3['width'] || box['videoWidth'] || box['width']) || 0,
+      height: Number(box3['videoHeight'] || box3['height'] || box['videoHeight'] || box['height']) || 0,
       videoDuration: Math['max'](
-        0x0,
-        Number(box3['videoDuration'] || box3['duration'] || box['videoDuration'] || box['duration']) || 0x0,
+        0,
+        Number(box3['videoDuration'] || box3['duration'] || box['videoDuration'] || box['duration']) || 0,
       ),
       videoFps: Math['max'](
-        0x0,
-        Number(box3['videoFps'] || box3['fps'] || box['videoFps'] || box['fps']) || 0x0,
+        0,
+        Number(box3['videoFps'] || box3['fps'] || box['videoFps'] || box['fps']) || 0,
       ),
     };
   }
@@ -192,7 +192,7 @@ export function buildStoryCanvasMediaFrame({
       existingFrame?.['id'],
       buildCanvasMediaFrameId(canvasId2, canvasNodeId),
     ),
-    createdAt = Math['max'](0x0, Number(existingFrame?.['createdAt']) || Number(now?.()) || Date['now']());
+    createdAt = Math['max'](0, Number(existingFrame?.['createdAt']) || Number(now?.()) || Date['now']());
   return normalizeStoryClipFrame({
     ...asObject(existingFrame),
     ...endTimeSec,
@@ -202,8 +202,8 @@ export function buildStoryCanvasMediaFrame({
     episodeTitle: normalizeText(episode2?.['title']),
     clipId: normalizeText(clip2?.['id']),
     clipTitle: firstText(clip2?.['title'], existingFrame?.['clipTitle'], '片段'),
-    currentTimeSec: 0x0,
-    endTimeSec: endTimeSec['mediaType'] === STORY_CLIP_MEDIA_TYPE_VIDEO ? endTimeSec['videoDuration'] : 0x0,
+    currentTimeSec: 0,
+    endTimeSec: endTimeSec['mediaType'] === STORY_CLIP_MEDIA_TYPE_VIDEO ? endTimeSec['videoDuration'] : 0,
     sourceKey: 'canvas-node:' + canvasId2 + ':' + canvasNodeId,
     canvasId: canvasId2,
     canvasNodeId: canvasNodeId,
@@ -291,8 +291,8 @@ export function buildStoryClipFrameCanvasNodeData({ project: project = {}, frame
       thumbUrl: resolveStoryClipFrameImageUrl(error),
       posterUrl: firstText(error['posterUrl'], error['thumbUrl']),
       posterLocalPath: normalizeText(error['posterLocalPath']),
-      videoDuration: Number(error['videoDuration']) || 0x0,
-      videoFps: Number(error['videoFps']) || 0x0,
+      videoDuration: Number(error['videoDuration']) || 0,
+      videoFps: Number(error['videoFps']) || 0,
     };
   return {
     ...args,
@@ -307,7 +307,7 @@ export function createStoryClipFrameCanvasAdapter({
   getGraphState: getGraphState,
   updateNodeData: updateNodeData,
   deleteNodes: deleteNodes2 = null,
-  getNodeSize: getNodeSize = () => ({ width: 0x200, height: 0x120 }),
+  getNodeSize: getNodeSize = () => ({ width: 512, height: 288 }),
   commit: commit = () => {},
 } = {}) {
   if (
@@ -316,7 +316,7 @@ export function createStoryClipFrameCanvasAdapter({
     typeof getGraphState !== 'function' ||
     typeof updateNodeData !== 'function'
   )
-    throw new Error('story\x20clip\x20frame\x20canvas\x20adapter\x20dependencies\x20are\x20incomplete');
+    throw new Error('story clip frame canvas adapter dependencies are incomplete');
   const run = (value7) => asObject(getGraphState()?.['nodes'])[normalizeText(value7)] || null;
   return {
     canvasExists(value8) {
@@ -340,8 +340,8 @@ export function createStoryClipFrameCanvasAdapter({
       const box4 = asObject(getNodeSize(error2['type'], error2)),
         args2 = createNodeAtCursor(
           error2['type'],
-          Number(box4['width']) || 0x200,
-          Number(box4['height']) || 0x120,
+          Number(box4['width']) || 512,
+          Number(box4['height']) || 288,
           error2['name'],
           { placement: 'viewport-center-sequence', sequenceKey: sequenceKey },
         );

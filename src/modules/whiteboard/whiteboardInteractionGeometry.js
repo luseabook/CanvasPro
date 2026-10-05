@@ -1,5 +1,5 @@
 const EPSILON = 0.000001,
-  finiteNumberOr = (value, item = 0x0) => {
+  finiteNumberOr = (value, item = 0) => {
     const key = Number(value);
     return Number['isFinite'](key) ? key : item;
   },
@@ -29,14 +29,14 @@ const EPSILON = 0.000001,
       (Math['abs'](cross5) <= EPSILON && isPointOnSegment(result, data, options))
     );
   };
-export function snapWhiteboardPointToAngle(target, source, next = Math['PI'] / 0xc) {
+export function snapWhiteboardPointToAngle(target, source, next = Math['PI'] / 12) {
   const x = toPoint(target),
     box8 = toPoint(source),
     current = box8['x'] - x['x'],
     entry = box8['y'] - x['y'],
     record = Math['hypot'](current, entry);
   if (record <= EPSILON) return { ...x };
-  const payload = Math['max'](EPSILON, Math['abs'](finiteNumberOr(next, Math['PI'] / 0xc))),
+  const payload = Math['max'](EPSILON, Math['abs'](finiteNumberOr(next, Math['PI'] / 12))),
     handle = Math['round'](Math['atan2'](entry, current) / payload) * payload;
   return {
     x: x['x'] + Math['cos'](handle) * record,
@@ -52,8 +52,8 @@ export function getPointToSegmentDistance(state, config, scope) {
     value2 = input * input + output * output;
   if (value2 <= EPSILON) return Math['hypot'](box9['x'] - box10['x'], box9['y'] - box10['y']);
   const value3 = Math['max'](
-    0x0,
-    Math['min'](0x1, ((box9['x'] - box10['x']) * input + (box9['y'] - box10['y']) * output) / value2),
+    0,
+    Math['min'](1, ((box9['x'] - box10['x']) * input + (box9['y'] - box10['y']) * output) / value2),
   );
   return Math['hypot'](box9['x'] - (box10['x'] + input * value3), box9['y'] - (box10['y'] + output * value3));
 }
@@ -62,7 +62,7 @@ export function getSegmentToSegmentDistance(value4, value5, value6, value7) {
     toPoint3 = toPoint(value5),
     toPoint4 = toPoint(value6),
     toPoint5 = toPoint(value7);
-  if (segmentsIntersect(toPoint2, toPoint3, toPoint4, toPoint5)) return 0x0;
+  if (segmentsIntersect(toPoint2, toPoint3, toPoint4, toPoint5)) return 0;
   return Math['min'](
     getPointToSegmentDistance(toPoint2, toPoint4, toPoint5),
     getPointToSegmentDistance(toPoint3, toPoint4, toPoint5),
@@ -70,18 +70,18 @@ export function getSegmentToSegmentDistance(value4, value5, value6, value7) {
     getPointToSegmentDistance(toPoint5, toPoint2, toPoint3),
   );
 }
-export function doesSegmentHitPolyline(value8, value9, value10, value11 = 0x0) {
+export function doesSegmentHitPolyline(value8, value9, value10, value11 = 0) {
   const list = (Array['isArray'](value10) ? value10 : [])['map'](toPoint);
-  if (list['length'] === 0x0) return ![];
-  const value12 = Math['max'](0x0, finiteNumberOr(value11));
-  if (list['length'] === 0x1) return getPointToSegmentDistance(list[0x0], value8, value9) <= value12;
-  for (let value13 = 0x1; value13 < list['length']; value13 += 0x1) {
-    if (getSegmentToSegmentDistance(value8, value9, list[value13 - 0x1], list[value13]) <= value12)
+  if (list['length'] === 0) return ![];
+  const value12 = Math['max'](0, finiteNumberOr(value11));
+  if (list['length'] === 1) return getPointToSegmentDistance(list[0], value8, value9) <= value12;
+  for (let value13 = 1; value13 < list['length']; value13 += 1) {
+    if (getSegmentToSegmentDistance(value8, value9, list[value13 - 1], list[value13]) <= value12)
       return !![];
   }
   return ![];
 }
-export function getPolylineBounds(value14, value15 = 0x0) {
+export function getPolylineBounds(value14, value15 = 0) {
   let x2 = Infinity,
     y = Infinity,
     width = -Infinity,
@@ -96,12 +96,12 @@ export function getPolylineBounds(value14, value15 = 0x0) {
       (height = Math['max'](height, value17)));
   });
   if (!Number['isFinite'](x2) || !Number['isFinite'](y)) return null;
-  const value18 = Math['max'](0x0, finiteNumberOr(value15));
+  const value18 = Math['max'](0, finiteNumberOr(value15));
   return {
     x: x2 - value18,
     y: y - value18,
-    width: width - x2 + value18 * 0x2,
-    height: height - y + value18 * 0x2,
+    width: width - x2 + value18 * 2,
+    height: height - y + value18 * 2,
   };
 }
 const isPointInBounds = (box13, box14) =>
@@ -109,13 +109,13 @@ const isPointInBounds = (box13, box14) =>
   box13['x'] <= box14['x'] + box14['width'] &&
   box13['y'] >= box14['y'] &&
   box13['y'] <= box14['y'] + box14['height'];
-export function doesSegmentHitBounds(value19, value20, box15, value21 = 0x0) {
-  const value22 = Math['max'](0x0, finiteNumberOr(value21)),
+export function doesSegmentHitBounds(value19, value20, box15, value21 = 0) {
+  const value22 = Math['max'](0, finiteNumberOr(value21)),
     x3 = {
       x: finiteNumberOr(box15?.['x']) - value22,
       y: finiteNumberOr(box15?.['y']) - value22,
-      width: Math['max'](0x0, finiteNumberOr(box15?.['width'])) + value22 * 0x2,
-      height: Math['max'](0x0, finiteNumberOr(box15?.['height'])) + value22 * 0x2,
+      width: Math['max'](0, finiteNumberOr(box15?.['width'])) + value22 * 2,
+      height: Math['max'](0, finiteNumberOr(box15?.['height'])) + value22 * 2,
     },
     toPoint6 = toPoint(value19),
     toPoint7 = toPoint(value20);
@@ -132,11 +132,11 @@ export function doesSegmentHitBounds(value19, value20, box15, value21 = 0x0) {
   ]['some'](([value27, value28]) => segmentsIntersect(toPoint6, toPoint7, value27, value28));
 }
 export function doesSegmentHitCircle(value29, value30, value31, value32) {
-  return getPointToSegmentDistance(value31, value29, value30) <= Math['max'](0x0, finiteNumberOr(value32));
+  return getPointToSegmentDistance(value31, value29, value30) <= Math['max'](0, finiteNumberOr(value32));
 }
 const isPointInPolygon = (box16, list2) => {
   let enabled = ![];
-  for (let value33 = 0x0, value34 = list2['length'] - 0x1; value33 < list2['length']; value34 = value33++) {
+  for (let value33 = 0, value34 = list2['length'] - 1; value33 < list2['length']; value34 = value33++) {
     const box17 = list2[value33],
       box18 = list2[value34],
       value35 =
@@ -148,16 +148,16 @@ const isPointInPolygon = (box16, list2) => {
   }
   return enabled;
 };
-export function doesSegmentHitPolygon(value36, value37, value38, value39 = 0x0) {
+export function doesSegmentHitPolygon(value36, value37, value38, value39 = 0) {
   const list3 = (Array['isArray'](value38) ? value38 : [])['map'](toPoint);
-  if (list3['length'] < 0x2) return ![];
+  if (list3['length'] < 2) return ![];
   const toPoint8 = toPoint(value36),
     toPoint9 = toPoint(value37);
   if (isPointInPolygon(toPoint8, list3) || isPointInPolygon(toPoint9, list3)) return !![];
-  const value40 = Math['max'](0x0, finiteNumberOr(value39));
-  for (let value41 = 0x0; value41 < list3['length']; value41 += 0x1) {
+  const value40 = Math['max'](0, finiteNumberOr(value39));
+  for (let value41 = 0; value41 < list3['length']; value41 += 1) {
     const value42 = list3[value41],
-      value43 = list3[(value41 + 0x1) % list3['length']];
+      value43 = list3[(value41 + 1) % list3['length']];
     if (getSegmentToSegmentDistance(toPoint8, toPoint9, value42, value43) <= value40) return !![];
   }
   return ![];

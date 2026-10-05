@@ -58,28 +58,28 @@ export function resolveCustomAiAppNodeManifest(options2 = {}, entry = {}) {
 }
 function normalizePositiveNumber(config) {
   const count = Number(config);
-  return Number['isFinite'](count) && count > 0x0 ? count : 0x0;
+  return Number['isFinite'](count) && count > 0 ? count : 0;
 }
 function scaleByShortSide(scope, input, output) {
-  const positiveNumber = normalizePositiveNumber(scope) || 0x1,
-    positiveNumber2 = normalizePositiveNumber(input) || 0x1,
-    value2 = Math['max'](0x1, Math['round'](Number(output) || 0x120)),
+  const positiveNumber = normalizePositiveNumber(scope) || 1,
+    positiveNumber2 = normalizePositiveNumber(input) || 1,
+    value2 = Math['max'](1, Math['round'](Number(output) || 288)),
     value3 = value2 / Math['min'](positiveNumber, positiveNumber2);
   return {
-    width: Math['max'](0x1, Math['round'](positiveNumber * value3)),
-    height: Math['max'](0x1, Math['round'](positiveNumber2 * value3)),
+    width: Math['max'](1, Math['round'](positiveNumber * value3)),
+    height: Math['max'](1, Math['round'](positiveNumber2 * value3)),
   };
 }
 export function buildRhAiAppResultDisplayPatch({
   nodeData: nodeData = {},
-  mediaWidth: mediaWidth = 0x0,
-  mediaHeight: mediaHeight = 0x0,
+  mediaWidth: mediaWidth = 0,
+  mediaHeight: mediaHeight = 0,
   mediaKey: mediaKey = '',
-  shortSide: shortSide = 0x120,
+  shortSide: shortSide = 288,
 } = {}) {
   const positiveNumber3 = normalizePositiveNumber(mediaWidth),
     positiveNumber4 = normalizePositiveNumber(mediaHeight);
-  if (!(positiveNumber3 > 0x0 && positiveNumber4 > 0x0)) return {};
+  if (!(positiveNumber3 > 0 && positiveNumber4 > 0)) return {};
   const value4 = [
     String(mediaKey || '')['trim'](),
     Math['round'](positiveNumber3),
@@ -89,14 +89,14 @@ export function buildRhAiAppResultDisplayPatch({
     ['join']('|');
   if (value4 && String(nodeData?.[RH_AI_APP_RESULT_RATIO_KEY] || '') === value4) return {};
   const width = scaleByShortSide(positiveNumber3, positiveNumber4, shortSide),
-    value5 = Math['max'](0x1, Math['round'](Number(nodeData?.['width']) || shortSide)),
-    value6 = Math['max'](0x1, Math['round'](Number(nodeData?.['height']) || shortSide)),
-    value7 = Number['isFinite'](Number(nodeData?.['x'])) ? Number(nodeData['x']) : 0x0,
-    value8 = Number['isFinite'](Number(nodeData?.['y'])) ? Number(nodeData['y']) : 0x0;
+    value5 = Math['max'](1, Math['round'](Number(nodeData?.['width']) || shortSide)),
+    value6 = Math['max'](1, Math['round'](Number(nodeData?.['height']) || shortSide)),
+    value7 = Number['isFinite'](Number(nodeData?.['x'])) ? Number(nodeData['x']) : 0,
+    value8 = Number['isFinite'](Number(nodeData?.['y'])) ? Number(nodeData['y']) : 0;
   return {
     width: width['width'],
     height: width['height'],
-    x: Math['round'](value7 - (width['width'] - value5) / 0x2),
+    x: Math['round'](value7 - (width['width'] - value5) / 2),
     y: Math['round'](value8 - (width['height'] - value6)),
     [RH_AI_APP_RESULT_RATIO_KEY]: value4,
     [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![],

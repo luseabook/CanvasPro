@@ -20,9 +20,9 @@ export const RH_VIDEO_WATERMARK_REMOVAL_V2_HELP_TOOLTIP = [
 ].join('\n');
 const RH_VIDEO_WATERMARK_REMOVAL_V2_RESOLUTION_FIELD = Object.freeze({
     ...RH_VIDEO_RESOLUTION_FIELD,
-    defaultValue: 0x3c0,
+    defaultValue: 960,
     showHighResolutionOptions: true,
-    options: Object.freeze([0x340, 0x3c0, 0x400, 0x500, 0x5a0, 0x640, 0x780]),
+    options: Object.freeze([832, 960, 1024, 1280, 1440, 1600, 1920]),
   }),
   RH_VIDEO_WATERMARK_REMOVAL_V2_FRAMES_FIELD = Object.freeze({
     id: 'rhVideoFrames',
@@ -150,8 +150,8 @@ export const rhVideoWatermarkRemovalV2ExecutionManifest = createRunningHubVideoE
         fieldName: 'value',
         source: 'param',
         field: 'rhVideoResolution',
-        defaultValue: 0x3c0,
-        transform: Object.freeze({ name: 'normalizeRhVideoResolution', fallback: 0x3c0 }),
+        defaultValue: 960,
+        transform: Object.freeze({ name: 'normalizeRhVideoResolution', fallback: 960 }),
         description: '分辨率',
       }),
       Object.freeze({

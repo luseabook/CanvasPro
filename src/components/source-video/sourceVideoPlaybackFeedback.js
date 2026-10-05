@@ -15,7 +15,7 @@ export async function playSourceVideoWithFeedback(card, playbackIntent, shouldCo
   (card['_attachPlaybackRecovery'](playbackIntent), clearSourceVideoPlaybackFeedback(card));
   const item = card['_currentSrc'],
     key = { card: card['_card'] };
-  (!isMediaElementPlaybackSource(enabled2, item) || Number(enabled2['readyState'] || 0x0) < 0x2) &&
+  (!isMediaElementPlaybackSource(enabled2, item) || Number(enabled2['readyState'] || 0) < 2) &&
     (pendingPlayback['set'](card, key),
     key['card']?.['setAttribute']?.('aria-busy', 'true'),
     startLoading(key['card'], { variant: 'indeterminate' }));
@@ -29,9 +29,9 @@ export async function playSourceVideoWithFeedback(card, playbackIntent, shouldCo
           preload: playbackIntent === 'hover' ? 'metadata' : 'auto',
         }),
       minBufferAhead: playbackIntent === 'hover' ? 0.5 : undefined,
-      readyTimeoutMs: playbackIntent === 'hover' ? 0x15e : undefined,
-      recoveryDebounceMs: playbackIntent === 'hover' ? 0x96 : undefined,
-      recoveryCooldownMs: playbackIntent === 'hover' ? 0x1f4 : undefined,
+      readyTimeoutMs: playbackIntent === 'hover' ? 350 : undefined,
+      recoveryDebounceMs: playbackIntent === 'hover' ? 150 : undefined,
+      recoveryCooldownMs: playbackIntent === 'hover' ? 500 : undefined,
       shouldRecover: () =>
         card['_video']?.['isConnected'] !== ![] &&
         (card['_isHovered'] || card['_isManualControl'] || !card['_video']?.['paused']),

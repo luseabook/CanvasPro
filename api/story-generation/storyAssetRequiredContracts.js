@@ -92,7 +92,7 @@ export function createStoryAssetRequiredContractsByKind({
             Array['isArray'](scope?.['fixedTraits'])
               ? scope['fixedTraits']['join']('、')
               : scope?.['fixedTraits'],
-          )['slice'](0x0, 0xa0);
+          )['slice'](0, 160);
         return {
           name: name,
           sourceSceneRefs: sourceSceneRefs,
@@ -124,7 +124,7 @@ export function lockStoryAssetRequiredSourceChapterIds(args = {}, input = {}, ou
           ? list12
           : list11['filter']((error6) => assetNamesMatch(text2, error4?.['name'], error6?.['name'])),
         value2 = new Set(list13['map']((error7) => getStorySceneIdentityKey(error7?.['name']))),
-        list14 = text2 === 'scene' && !list12['length'] && value2['size'] > 0x1 ? [] : list13;
+        list14 = text2 === 'scene' && !list12['length'] && value2['size'] > 1 ? [] : list13;
       if (!list14['length']) return error4;
       const sourceChapterIds2 = normalizeStringArray(
         list14['flatMap']((value3) => value3['sourceChapterIds'] || []),

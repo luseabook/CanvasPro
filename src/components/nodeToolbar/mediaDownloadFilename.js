@@ -39,7 +39,7 @@ function basenameFromSource(key) {
     );
     return safeDecode(uRL['pathname']['split']('/')['filter'](Boolean)['pop']() || '');
   } catch {
-    const index = trimText2['split'](/[?#]/, 0x1)[0x0]['replace'](/\\/g, '/');
+    const index = trimText2['split'](/[?#]/, 1)[0]['replace'](/\\/g, '/');
     return safeDecode(index['split']('/')['filter'](Boolean)['pop']() || '');
   }
 }
@@ -55,19 +55,19 @@ function extensionFromSource(data, options) {
 }
 function extensionFromFilename(target, source) {
   const next = target['match'](/\.([a-z0-9]{1,10})$/i),
-    current = String(next?.[0x1] || '')['toLowerCase']();
+    current = String(next?.[1] || '')['toLowerCase']();
   return MEDIA_EXTENSIONS[source]?.['has'](current) ? current : '';
 }
 function stripKnownMediaExtension(list) {
   const entry = list['match'](/\.([a-z0-9]{1,10})$/i),
-    record = String(entry?.[0x1] || '')['toLowerCase'](),
+    record = String(entry?.[1] || '')['toLowerCase'](),
     payload = Object['values'](MEDIA_EXTENSIONS)['some']((map) => map['has'](record));
-  return payload ? list['slice'](0x0, -entry[0x0]['length']) : list;
+  return payload ? list['slice'](0, -entry[0]['length']) : list;
 }
 function withExtension(handle, list2) {
   const list3 = sanitizeFilenamePart(stripKnownMediaExtension(handle)),
-    state = Math['max'](0x1, 0xa0 - list2['length'] - 0x1),
-    config = list3['slice'](0x0, state)['replace'](/[. ]+$/g, '');
+    state = Math['max'](1, 160 - list2['length'] - 1),
+    config = list3['slice'](0, state)['replace'](/[. ]+$/g, '');
   return (config || 'media') + '.' + list2;
 }
 export function resolveNodeMediaDownloadFilename({

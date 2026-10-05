@@ -18,7 +18,7 @@ export function loadPersonReplacementGuideImage(value, el) {
         else handler(image);
       },
       handler4 = () => handler3(new DOMException('人物定位图制作已取消', 'AbortError')),
-      setTimeout2 = setTimeout(() => handler3(new Error('人物定位示意图加载超时')), 0x7530);
+      setTimeout2 = setTimeout(() => handler3(new Error('人物定位示意图加载超时')), 30000);
     ((image['crossOrigin'] = 'anonymous'),
       (image['onload'] = () => handler3()),
       (image['onerror'] = () => handler3(new Error('无法加载人物定位示意图，未提交人物替换'))),
@@ -46,12 +46,12 @@ export async function buildPersonReplacementLocationGuide({
   try {
     const ctx = box2['getContext']('2d');
     if (!ctx) throw new Error('无法绘制人物定位图');
-    ctx['drawImage'](personReplacementGuideImage, 0x0, 0x0);
+    ctx['drawImage'](personReplacementGuideImage, 0, 0);
     const dataUrl = box2['toDataURL']('image/png');
     if (!dataUrl['startsWith']('data:image/png;base64,')) throw new Error('人物定位图 PNG 导出失败');
     return { ...box, dataUrl: dataUrl };
   } finally {
-    ((box2['width'] = 0x0), (box2['height'] = 0x0));
+    ((box2['width'] = 0), (box2['height'] = 0));
   }
 }
 export function applyPersonReplacementLocationGuide(referenceImages, ref) {

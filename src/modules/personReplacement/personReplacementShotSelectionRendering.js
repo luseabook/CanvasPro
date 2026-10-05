@@ -5,7 +5,7 @@ import {
   restoreWorkspaceScrollPosition,
 } from '../workspaceWheelNavigation.js';
 const VIDEO_REFERENCE_LIST_SELECTOR = '[data-person-replacement-video-reference-list]',
-  RESULT_HISTORY_TOGGLE_SELECTOR = ':scope\x20>\x20[data-person-replacement-result-history-toggle]',
+  RESULT_HISTORY_TOGGLE_SELECTOR = ':scope > [data-person-replacement-result-history-toggle]',
   imageSourceReconcileTokens = new WeakMap();
 function syncElementAttributes(el, enabled, { preserveAttributeNames: preserveAttributeNames = [] } = {}) {
   if (!el || !enabled) return ![];
@@ -25,7 +25,7 @@ function syncElementAttributes(el, enabled, { preserveAttributeNames: preserveAt
 }
 function hasEquivalentNodeShape(enabled2, enabled3, value = '') {
   if (!enabled2 || !enabled3 || enabled2['nodeType'] !== enabled3['nodeType']) return ![];
-  if (enabled2['nodeType'] === 0x1 && enabled2['tagName'] !== enabled3['tagName']) return ![];
+  if (enabled2['nodeType'] === 1 && enabled2['tagName'] !== enabled3['tagName']) return ![];
   if (value && enabled2['matches']?.(value) && enabled3['matches']?.(value)) return !![];
   const list = Array['from'](enabled2['childNodes'] || []),
     list2 = Array['from'](enabled3['childNodes'] || []);
@@ -49,7 +49,7 @@ function reconcileImageNode(el3, el4) {
           ['filter'](Boolean),
       );
       (map3['delete']('is-pending'), map3['add']('is-ready'));
-      const result = [...map3]['join']('\x20');
+      const result = [...map3]['join'](' ');
       if (el3['getAttribute']('class') !== result) el3['setAttribute']('class', result);
     }
     return;
@@ -79,8 +79,8 @@ function syncEquivalentNodeTree(
   if (preserveSelector && options['matches']?.(preserveSelector) && target['matches']?.(preserveSelector))
     return;
   if (
-    options?.['nodeType'] === 0x1 &&
-    target?.['nodeType'] === 0x1 &&
+    options?.['nodeType'] === 1 &&
+    target?.['nodeType'] === 1 &&
     options['tagName'] === 'IMG' &&
     target['tagName'] === 'IMG'
   ) {
@@ -92,7 +92,7 @@ function syncEquivalentNodeTree(
         : syncElementAttributes(options, target);
     return;
   }
-  if (options['nodeType'] === 0x1) syncElementAttributes(options, target);
+  if (options['nodeType'] === 1) syncElementAttributes(options, target);
   else options['nodeValue'] !== target['nodeValue'] && (options['nodeValue'] = target['nodeValue']);
   const list3 = Array['from'](options['childNodes'] || []),
     source = Array['from'](target['childNodes'] || []);
@@ -165,7 +165,7 @@ export function reconcilePersonReplacementShotTimelineCard({
   const enabled10 = String(shotId ?? '')['trim']();
   if (!enabled10) return ![];
   const run2 = (el5) =>
-      Array['from'](el5?.['querySelectorAll']?.('[data-person-replacement-shot-card=\x22true\x22]') || [])[
+      Array['from'](el5?.['querySelectorAll']?.('[data-person-replacement-shot-card="true"]') || [])[
         'find'
       ]((el6) => String(el6['dataset']?.['shotId'] ?? '')['trim']() === enabled10),
     enabled11 = run2(currentScroller),
@@ -332,10 +332,10 @@ function collectVideoShotSelectionElements(currentReferenceRail2, nextReferenceR
     currentScroller: currentScroller2?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
     nextScroller: nextScroller2?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
     currentRightSplitter: currentReferenceRail2?.['querySelector']?.(
-      '[data-person-replacement-layout-splitter=\x22right\x22]',
+      '[data-person-replacement-layout-splitter="right"]',
     ),
     nextRightSplitter: nextReferenceRail2?.['querySelector']?.(
-      '[data-person-replacement-layout-splitter=\x22right\x22]',
+      '[data-person-replacement-layout-splitter="right"]',
     ),
     currentGenerationPanel: currentGenerationPanel,
     nextGenerationPanel: nextGenerationPanel,
@@ -496,10 +496,10 @@ function collectImageShotSelectionElements(el17, el18) {
       '.person-replacement-prompt-reference-inputs',
     ),
     currentPromptEditor: currentPromptField2?.['querySelector']?.(
-      '[data-person-replacement-field=\x22image-prompt\x22]',
+      '[data-person-replacement-field="image-prompt"]',
     ),
     nextPromptEditor: nextPromptField2?.['querySelector']?.(
-      '[data-person-replacement-field=\x22image-prompt\x22]',
+      '[data-person-replacement-field="image-prompt"]',
     ),
     currentFooter: currentFooter2,
     nextFooter: nextFooter2,
@@ -509,7 +509,7 @@ function collectImageShotSelectionElements(el17, el18) {
       '[data-person-replacement-action="generate-replacement-image"]',
     ),
     nextGenerateButton: nextFooter2?.['querySelector']?.(
-      '[data-person-replacement-action=\x22generate-replacement-image\x22]',
+      '[data-person-replacement-action="generate-replacement-image"]',
     ),
   };
 }

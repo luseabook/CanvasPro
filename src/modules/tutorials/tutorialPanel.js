@@ -32,7 +32,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
     root['setAttribute']('role', 'dialog'),
     root['setAttribute']('aria-modal', 'true'),
     root['setAttribute']('aria-labelledby', 'canvasTutorialTitle'),
-    (root['tabIndex'] = -0x1),
+    (root['tabIndex'] = -1),
     (root['innerHTML'] =
       '<header class="tutorial-header"><div><h2 id="canvasTutorialTitle">使用教程</h2><p>教程、玩法与版本动态</p></div><button type="button" aria-label="关闭使用教程" data-action="close">×</button></header>\n    <div class="tutorial-tabs-scroll"><div class="tutorial-tabs" role="tablist" aria-label="教程分类"></div></div><div class="tutorial-content" role="tabpanel" tabindex="0"></div>\n    <footer class="tutorial-status"><span role="status"></span><button type="button" data-action="refresh">刷新内容</button></footer>'),
     el['append'](root),
@@ -67,9 +67,9 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
     el2['replaceChildren']();
   }
   function run4() {
-    (tutorialReleaseNotes['unmount'](), run3(), (el2['scrollTop'] = 0x0));
+    (tutorialReleaseNotes['unmount'](), run3(), (el2['scrollTop'] = 0));
     !enabled['categories']['some']((record) => record['id'] === key) &&
-      ((key = enabled['categories'][0x0]['id']), (enabled3 = null));
+      ((key = enabled['categories'][0]['id']), (enabled3 = null));
     if (index && item !== 'bundled') {
       const payload = enabled['guides']['find']((handle) => handle['id'] === index);
       payload && ((enabled3 = payload), (index = ''));
@@ -79,7 +79,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
       el2['setAttribute']('aria-labelledby', 'tutorial-tab-' + key));
     if (enabled3) {
       (el2['append'](
-        run2('←\x20返回教程列表', () => {
+        run2('← 返回教程列表', () => {
           ((enabled3 = null), run4(), el2['focus']());
         }),
       ),
@@ -127,7 +127,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
       input = run(
         'div',
         enabled['categories']['find']((output) => output['id'] === key)?.['layout'] === 'grid'
-          ? 'tutorial-list\x20tutorial-play-grid'
+          ? 'tutorial-list tutorial-play-grid'
           : 'tutorial-list',
       );
     if (!list2['length'])
@@ -167,7 +167,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
       ((enabled = fetchTutorialContent2), (item = 'server'));
       if (!enabled2) key = null;
       !enabled['categories']['some']((value7) => value7['id'] === key) &&
-        ((key = enabled['categories'][0x0]['id']), (enabled3 = null));
+        ((key = enabled['categories'][0]['id']), (enabled3 = null));
       tutorialTabs['update'](enabled['categories'], key);
       const writeTutorialCache2 = writeTutorialCache(storage, fetchTutorialContent2);
       if (!enabled3 && key !== 'updates') run4();
@@ -208,10 +208,10 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
         value8 = list3['findIndex']((el11) => el11['dataset']['tab'] === key),
         value9 =
           event2['key'] === 'Home'
-            ? 0x0
+            ? 0
             : event2['key'] === 'End'
-              ? list3['length'] - 0x1
-              : (value8 + (event2['key'] === 'ArrowRight' ? 0x1 : list3['length'] - 0x1)) % list3['length'];
+              ? list3['length'] - 1
+              : (value8 + (event2['key'] === 'ArrowRight' ? 1 : list3['length'] - 1)) % list3['length'];
       (list3[value9]['click'](), list3[value9]['focus']());
     }),
     el['addEventListener']('click', (event3) => {

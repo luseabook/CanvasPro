@@ -42,12 +42,12 @@ export {
   STORY_ASSET_EVIDENCE_BODY_MAX_CHARACTERS,
   STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
 };
-export const STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS = 0x7d00;
-const STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION = 0x1,
-  STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS = 0x4b0,
-  STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS = 0x40,
-  STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION = 0x7,
-  STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION = 0x2,
+export const STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS = 32000;
+const STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION = 1,
+  STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS = 1200,
+  STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS = 64,
+  STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION = 7,
+  STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION = 2,
   STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN = 'paid-rerun-required',
   STORY_ASSET_PARALLEL_DRAFT_STRATEGY = 'kind-detailed-parallel-v1',
   STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY = 'evidence-batched-api-v2';
@@ -87,7 +87,7 @@ function createStoryAssetFocusedContractSnapshot(
     kind: kind,
     responseMode: includeClientKeys,
     responseSchemaVersion:
-      includeClientKeys === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 0x1,
+      includeClientKeys === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 1,
     requiredAssets: cloneValue(storyAssetPromptContracts['requiredAssets'] || []),
     candidateAssets: cloneValue(storyAssetPromptContracts['candidateAssets'] || []),
   };
@@ -96,7 +96,7 @@ function compareStoryAssetSceneHeadingContractRows(list4, list5) {
   if (!Array['isArray'](list4) || !Array['isArray'](list5)) return { compatible: ![], changed: ![] };
   if (list4['length'] !== list5['length']) return { compatible: ![], changed: ![] };
   let changed = ![];
-  for (let result = 0x0; result < list4['length']; result += 0x1) {
+  for (let result = 0; result < list4['length']; result += 1) {
     const error = list4[result],
       error2 = list5[result];
     if (JSON['stringify'](error) === JSON['stringify'](error2)) continue;
@@ -159,7 +159,7 @@ function isStoryAssetSceneHeadingContractMigration({
   responseModeByKind: responseModeByKind2,
 } = {}) {
   if (
-    Number(resumeDraft2?.['hybridQualityPolicyVersion']) !== 0x6 ||
+    Number(resumeDraft2?.['hybridQualityPolicyVersion']) !== 6 ||
     resumeDraft2?.['strategy'] !== STORY_ASSET_PARALLEL_DRAFT_STRATEGY ||
     resumeDraft2?.['status'] !== 'completed' ||
     resumeDraft2?.['qualityReview']
@@ -193,7 +193,7 @@ function getStoryAssetPaidDraftKinds(record) {
       record?.['paidResponseReceivedByKind']?.[payload] ||
       Object['hasOwn'](record?.['rawResponsesByKind'] || {}, payload) ||
       (Array['isArray'](record?.['assetsByKind']?.[payload]) && record['assetsByKind'][payload]['length']) ||
-      Math['max'](0x0, Math['trunc'](Number(response?.['requestCount']) || 0x0)) > 0x0 ||
+      Math['max'](0, Math['trunc'](Number(response?.['requestCount']) || 0)) > 0 ||
       [
         'running',
         'succeeded',
@@ -221,7 +221,7 @@ function getStoryAssetProtectedPaidBatchKeys(config) {
     const output = String(response2?.['status'] || '')['trim'](),
       value2 =
         output !== 'rejected-confirmed' &&
-        (Math['max'](0x0, Math['trunc'](Number(response2?.['requestCount']) || 0x0)) > 0x0 ||
+        (Math['max'](0, Math['trunc'](Number(response2?.['requestCount']) || 0)) > 0 ||
           Object['hasOwn'](response2 || {}, 'rawResponse') ||
           [
             'submitted',
@@ -374,7 +374,7 @@ function reportDiagnostics(value13, value14, level = {}) {
 function getStoryProjectChapterCharacters(options2 = {}) {
   return (Array['isArray'](options2?.['chapters']) ? options2['chapters'] : [])['reduce'](
     (value15, value16) => value15 + String(value16?.['content'] || '')['length'],
-    0x0,
+    0,
   );
 }
 function shouldUseDirectStoryAssetApi(options3 = {}, list8 = []) {
@@ -385,8 +385,8 @@ function shouldUseDirectStoryAssetApi(options3 = {}, list8 = []) {
     );
     if (!list10['some']((value19) => !isNarrativeStoryCharacterFragment(value19))) return ![];
   }
-  const count = list8['reduce']((value20, dom) => value20 + String(dom?.['body'] || '')['length'], 0x0);
-  return count > 0x0 && count <= STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS;
+  const count = list8['reduce']((value20, dom) => value20 + String(dom?.['body'] || '')['length'], 0);
+  return count > 0 && count <= STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS;
 }
 function hasCompleteStructuredStorySceneEvidence(list11 = [], value21 = {}) {
   const list12 = Array['isArray'](list11) ? list11 : [];
@@ -492,7 +492,7 @@ function storyPropQualityRequirementMatches(error7 = {}, value45 = '') {
   const args5 = normalizeStoryAssetQualityName(value45);
   if (!args5) return ![];
   if (normalizeStoryAssetQualityName(error7?.['name']) === args5) return !![];
-  if ([...args5]['length'] < 0x3) return ![];
+  if ([...args5]['length'] < 3) return ![];
   const list22 = normalizeStoryAssetQualityName(
     [
       error7?.['scriptFacts'],
@@ -502,7 +502,7 @@ function storyPropQualityRequirementMatches(error7 = {}, value45 = '') {
         : []),
     ]
       ['filter'](Boolean)
-      ['join']('\x20'),
+      ['join'](' '),
   );
   return list22['includes'](args5);
 }
@@ -539,7 +539,7 @@ export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
         (value53) => getStorySceneIdentityKey(value53) === getStorySceneIdentityKey(asset?.['name']),
       ),
       canonicalName =
-        value52 || (list28['length'] === 0x1 ? list28[0x0] : String(asset?.['name'] || '')['trim']()),
+        value52 || (list28['length'] === 1 ? list28[0] : String(asset?.['name'] || '')['trim']()),
       key2 = getStorySceneIdentityKey(canonicalName);
     (!map4['has'](key2) && (map4['set'](key2, []), list27['push']({ type: 'scene', key: key2 })),
       map4['get'](key2)['push']({ asset: asset, canonicalName: canonicalName }));
@@ -551,7 +551,7 @@ export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
         (value54, value55) =>
           getStoryAssetVisualCompletenessScore(value55['asset']) -
           getStoryAssetVisualCompletenessScore(value54['asset']),
-      )[0x0];
+      )[0];
     if (!name) return [];
     const sourceChapterIds = [
         ...new Set(
@@ -567,7 +567,7 @@ export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
         const value56 = String(error8?.['name'] || '')
             ['trim']()
             ['toLowerCase'](),
-          value57 = value56 || 'appearance-' + (list30['length'] + 0x1);
+          value57 = value56 || 'appearance-' + (list30['length'] + 1);
         (!map5['has'](value57) && (map5['set'](value57, []), list30['push'](value57)),
           map5['get'](value57)['push'](error8));
       });
@@ -580,7 +580,7 @@ export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
             String(value60?.['description'] || '')['trim']()['length'] -
             String(value59?.['prompt'] || '')['trim']()['length'] -
             String(value59?.['description'] || '')['trim']()['length'],
-        )[0x0];
+        )[0];
       return {
         ...args7,
         occurrences: mergeStoryAssetCoverageText(list31['map']((value61) => value61?.['occurrences'])),
@@ -617,8 +617,8 @@ function collectLegacyQuotedStoryProps(
       const list34 = String(dom2?.['body'] || '');
       for (const value63 of list34['matchAll'](/《([^》\r\n]{1,24})》/gu)) {
         const value64 = list34['slice'](
-          Math['max'](0x0, (value63['index'] || 0x0) - 0x28),
-          value63['index'] || 0x0,
+          Math['max'](0, (value63['index'] || 0) - 40),
+          value63['index'] || 0,
         );
         if (
           !includeEpisodeTitles &&
@@ -627,7 +627,7 @@ function collectLegacyQuotedStoryProps(
           ](value64)
         )
           continue;
-        const value65 = String(value63[0x1] || '')['trim']();
+        const value65 = String(value63[1] || '')['trim']();
         if (value65 && !list33['includes'](value65)) list33['push'](value65);
       }
     }),
@@ -636,7 +636,7 @@ function collectLegacyQuotedStoryProps(
 }
 function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value66) {
   if (!enabled5) return [];
-  const count2 = Number(enabled5['hybridQualityPolicyVersion']) || 0x0;
+  const count2 = Number(enabled5['hybridQualityPolicyVersion']) || 0;
   if (count2 >= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION) return [];
   const character = collectLegacyRequiredStoryCharacterNames(value66),
     args9 = { ...args8, character: character },
@@ -652,7 +652,7 @@ function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value6
     value68 = JSON['stringify'](args8),
     map6 = new Map();
   return (
-    (count2 >= 0x3 ? [args9] : count2 >= 0x2 ? [args10] : [args10, value67])['forEach']((value69) => {
+    (count2 >= 3 ? [args9] : count2 >= 2 ? [args10] : [args10, value67])['forEach']((value69) => {
       const value70 = JSON['stringify'](value69);
       if (value70 !== value68 && !map6['has'](value70)) map6['set'](value70, value69);
     }),
@@ -666,9 +666,9 @@ function promptCopiesStorySource(value71 = '', list35 = []) {
     const list37 = compactStoryAssetQualityText(dom3?.['body']);
     if (list37['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
     for (
-      let value72 = 0x0;
+      let value72 = 0;
       value72 <= list37['length'] - STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS;
-      value72 += Math['floor'](STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 0x2)
+      value72 += Math['floor'](STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 2)
     ) {
       const value73 = list37['slice'](value72, value72 + STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS);
       if (list36['includes'](value73)) return !![];
@@ -807,7 +807,7 @@ export function assertStoryAssetPublicResultQuality(options6 = {}, value79 = [],
           handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '描述泄露了内部处理规则');
       });
       error16?.['designStatus'] === 'baseline' &&
-        handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少\x20API\x20视觉反推');
+        handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少 API 视觉反推');
       error16?.['kind'] === 'scene' &&
         /[/／|｜]/u['test'](String(error16?.['name'] || '')) &&
         handler('scene', error16['name'] + '仍是复合场景名');
@@ -839,7 +839,7 @@ export function assertStoryAssetPublicResultQuality(options6 = {}, value79 = [],
   if (!problems['length']) return;
   const error18 = new Error(
     'API 视觉反推质量校验未通过：' +
-      problems['slice'](0x0, 0x3)['join']('；') +
+      problems['slice'](0, 3)['join']('；') +
       '。旧资产已保留，未进入下一步。',
   );
   ((error18['type'] = 'ASSET_VISUAL_QUALITY'),
@@ -911,7 +911,7 @@ function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
   if (!response6) return value108;
   let enabled7 = ![];
   response6['qualityReview'] && (delete response6['qualityReview'], (enabled7 = !![]));
-  let enabled8 = 0x0;
+  let enabled8 = 0;
   ['character', 'scene', 'prop']['forEach']((value109) => {
     const response7 = response6?.['kindStates']?.[value109],
       assetCount = response6?.['assetsByKind']?.[value109],
@@ -931,7 +931,7 @@ function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
         errorType: '',
         errorMessage: '',
       }),
-        (enabled8 += 0x1));
+        (enabled8 += 1));
       return;
     }
     if (
@@ -947,7 +947,7 @@ function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
       errorType: '',
       errorMessage: '',
     }),
-      (enabled8 += 0x1));
+      (enabled8 += 1));
   });
   if (!enabled8 && !enabled7) return value108;
   return (
@@ -969,7 +969,7 @@ function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
           (value112) => response6['assetsByKind']?.[value112] || [],
         )),
     (response6['failures'] = []),
-    (response6['status'] = response6['completedKinds']['length'] === 0x3 ? 'completed' : 'partial'),
+    (response6['status'] = response6['completedKinds']['length'] === 3 ? 'completed' : 'partial'),
     response6
   );
 }
@@ -1014,10 +1014,10 @@ function archiveAndResetStoryAssetQualityLane(responseMode2, kind4) {
       ...(responseMode2['kindStates'][kind4] || {}),
       kind: kind4,
       status: 'pending',
-      assetCount: 0x0,
+      assetCount: 0,
       errorType: '',
       errorMessage: '',
-      finishedAt: 0x0,
+      finishedAt: 0,
     }));
 }
 function archiveAndResetStoryAssetQualityBatches(response9, list50) {
@@ -1046,7 +1046,7 @@ function archiveAndResetStoryAssetQualityBatches(response9, list50) {
     (response9['detailBatches'] = []),
     (response9['batchSubmissionRecords'] = {}),
     (response9['failures'] = []),
-    (response9['runRequestCount'] = 0x0),
+    (response9['runRequestCount'] = 0),
     delete response9['kindStates'],
     delete response9['progress']);
 }
@@ -1144,7 +1144,7 @@ export async function extractStoryAssetsHybridExperimental({
     value121 = Boolean(previousSourceFingerprint2 && previousSourceFingerprint2 !== nextSourceFingerprint2),
     enabled11 = Boolean(
       value121 &&
-      Number(resumeDraft?.['hybridQualityPolicyVersion']) >= 0x5 &&
+      Number(resumeDraft?.['hybridQualityPolicyVersion']) >= 5 &&
       Number(resumeDraft?.['hybridQualityPolicyVersion']) <= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
       hasSameStoryAssetAuthoritativeContent(resumeDraft?.['hybridEvidenceScenes'], sourceScenes),
     ),
@@ -1335,7 +1335,7 @@ export async function extractStoryAssetsHybridExperimental({
         status: 'started',
         extractionMode: extractionMode,
         ...(capacityError?.['capacityDetails'] || {}),
-        requestLimit: 0x3,
+        requestLimit: 3,
       });
       const value135 =
         resumeDraft4 && paidKinds2['length']
@@ -1363,7 +1363,7 @@ export async function extractStoryAssetsHybridExperimental({
           hybridExtractionMode: extractionMode,
           hybridCapacityFallback: {
             strategy: 'evidence-batched-api',
-            requestLimit: 0x3,
+            requestLimit: 3,
             capacityDetails: cloneValue(capacityError?.['capacityDetails']),
           },
           hybridEvidenceScenes: cloneValue(sourceScenes2),
@@ -1386,7 +1386,7 @@ export async function extractStoryAssetsHybridExperimental({
           onProgress: onProgress,
           resumeDraft: resumeDraft4 ? null : resumeDraft3,
           allowLocalBaselineFallback: ![],
-          requestLimit: 0x3,
+          requestLimit: 3,
           onCheckpoint: onCheckpoint2,
         });
       } catch (value137) {
@@ -1472,11 +1472,11 @@ export async function extractStoryAssetsHybridExperimental({
                 mentionCount: model['mentions']['length'],
                 originalCharacters: sourceScenes['reduce'](
                   (value140, dom4) => value140 + dom4['body']['length'],
-                  0x0,
+                  0,
                 ),
                 evidenceCharacters: evidenceCharacters['reduce'](
                   (value141, dom5) => value141 + dom5['body']['length'],
-                  0x0,
+                  0,
                 ),
               };
             ((localRuntime2 = createStoryAssetCandidateInventory({
@@ -1542,8 +1542,8 @@ export async function extractStoryAssetsHybridExperimental({
     }),
       onProgress?.({
         stage: 'parallel-api-asset-extraction',
-        current: 0x0,
-        total: 0x3,
+        current: 0,
+        total: 3,
         message:
           '完整剧本共 ' + chapterCharacters + ' 字，正在分别提取角色、场景与道具；三类各调用一次且不自动重试',
       }));
@@ -1554,7 +1554,7 @@ export async function extractStoryAssetsHybridExperimental({
         sourceScenes,
       ),
       resumeSourceAliases =
-        resumeDraft3 && Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0x0) < 0x5
+        resumeDraft3 && Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0) < 5
           ? [{ project: project, requiredAssetNamesByKind: requiredAssetNamesByKind3 }]
           : [],
       isStoryAssetSceneHeadingContractMigration2 = isStoryAssetSceneHeadingContractMigration({
@@ -1602,7 +1602,7 @@ export async function extractStoryAssetsHybridExperimental({
           ((cloneValue6 = cloneValue(value143)), await onCheckpoint?.(value143));
         },
         resumeDraft: resumeDraft5,
-        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0x0),
+        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0),
         onProgress: onProgress,
       }),
       assetCount3 = removeNarrativeUploadFallbackCharacterAssets(
@@ -1670,11 +1670,11 @@ export async function extractStoryAssetsHybridExperimental({
             mentionCount: model2['mentions']['length'],
             originalCharacters: sourceScenes['reduce'](
               (value148, dom6) => value148 + dom6['body']['length'],
-              0x0,
+              0,
             ),
             evidenceCharacters: evidenceCharacters2['reduce'](
               (value149, dom7) => value149 + dom7['body']['length'],
-              0x0,
+              0,
             ),
           }),
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
@@ -1683,8 +1683,8 @@ export async function extractStoryAssetsHybridExperimental({
           }),
           onProgress?.({
             stage: 'local-evidence-ready',
-            current: 0x1,
-            total: 0x1,
+            current: 1,
+            total: 1,
             message:
               'PP-UIE 已把正文压缩为 ' +
               localRuntime4['evidenceCharacters'] +
@@ -1695,7 +1695,7 @@ export async function extractStoryAssetsHybridExperimental({
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
             status: 'stopped',
             errorMessage: String(error24?.['message'] || error24 || ''),
-            apiRequestCount: 0x0,
+            apiRequestCount: 0,
           });
           throw createMissingLocalStoryAssetEvidenceError(error24);
         }
@@ -1708,8 +1708,8 @@ export async function extractStoryAssetsHybridExperimental({
           }),
           onProgress?.({
             stage: 'local-evidence-fallback',
-            current: 0x0,
-            total: 0x1,
+            current: 0,
+            total: 1,
             message: '本地 PP-UIE 不可用，已改用结构化首尾证据；角色、场景、道具各调用一次且不自动重试',
           }));
       }
@@ -1731,23 +1731,23 @@ export async function extractStoryAssetsHybridExperimental({
       project3 = createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
         requirementEvidence: requirementEvidence,
       }),
-      includeAllSceneHeadings = Number(resumeDraft3?.['hybridQualityPolicyVersion']) || 0x0,
+      includeAllSceneHeadings = Number(resumeDraft3?.['hybridQualityPolicyVersion']) || 0,
       resumeSourceAliases2 = resumeRequiredAssetNamesByKindAliases2['map']((requiredAssetNamesByKind4) => ({
         project: createBudgetedStoryAssetEvidenceProject(
           project,
           evidenceCharacters2,
-          includeAllSceneHeadings >= 0x3
+          includeAllSceneHeadings >= 3
             ? { requirementEvidence: requirementEvidence, includeAllSceneCharacters: !![] }
             : { includeAllSceneHeadings: !![], includeAllSceneCharacters: !![] },
         ),
         requiredAssetNamesByKind: requiredAssetNamesByKind4,
       }));
     resumeDraft3 &&
-      includeAllSceneHeadings < 0x5 &&
+      includeAllSceneHeadings < 5 &&
       resumeSourceAliases2['push']({
         project: createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
           requirementEvidence: requirementEvidence,
-          includeAllSceneHeadings: includeAllSceneHeadings < 0x3,
+          includeAllSceneHeadings: includeAllSceneHeadings < 3,
           includeAllSceneCharacters: !![],
           bodyCharacterBudget: Number['MAX_SAFE_INTEGER'],
         }),
@@ -1796,8 +1796,8 @@ export async function extractStoryAssetsHybridExperimental({
       }));
     onProgress?.({
       stage: 'parallel-api-asset-extraction',
-      current: 0x0,
-      total: 0x3,
+      current: 0,
+      total: 3,
       message:
         extractionMode2 === 'local-pp-uie'
           ? '本地证据已准备，正在并行反推角色、场景与道具；三类各调用一次且不自动重试'
@@ -1831,7 +1831,7 @@ export async function extractStoryAssetsHybridExperimental({
         structuredOutputFallback: 'none',
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
         resumeDraft: resumeDraft6,
-        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0x0),
+        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0),
         onProgress: onProgress,
         onCheckpoint: onCheckpoint3,
       }),
@@ -1887,7 +1887,7 @@ export async function extractStoryAssetsHybridExperimental({
       onProgress: onProgress,
       resumeDraft: resumeDraft3,
       allowLocalBaselineFallback: ![],
-      requestLimit: 0x3,
+      requestLimit: 3,
       onCheckpoint: onCheckpoint4,
     }),
     extractionStrategy2 = removeNarrativeUploadFallbackCharacterAssets(

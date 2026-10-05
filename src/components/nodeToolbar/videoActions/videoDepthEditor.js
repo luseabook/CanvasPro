@@ -15,7 +15,7 @@ export function openVideoDepthEditor(args) {
     overlayDataKey: 'videoDepthEditor',
     renderSelector: renderAIGenVideoModelSelectorMarkup,
     bindSelector: bindAIGenVideoModelSelector,
-    selectorOptions: { allowedModelIds: [args['modelId']], referenceCounts: { videoCount: 0x1 } },
+    selectorOptions: { allowedModelIds: [args['modelId']], referenceCounts: { videoCount: 1 } },
     acquireMedia({ target: target, source: source, overlay: overlay }) {
       const nodeVideoElement = resolveNodeVideoElement(target, source['mainVideoIndex']);
       return (

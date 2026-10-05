@@ -52,7 +52,7 @@ async function withImmediateTimers(handler2) {
 async function withMockCanvasComposition(handler4) {
   const next = globalThis.createImageBitmap,
     current = globalThis.OffscreenCanvas;
-  ((globalThis.createImageBitmap = async () => ({ width: 0x280, height: 0x1e0, close() {} })),
+  ((globalThis.createImageBitmap = async () => ({ width: 640, height: 480, close() {} })),
     (globalThis.OffscreenCanvas = class entry {
       constructor(record, payload) {
         ((this.width = record),
@@ -878,7 +878,7 @@ const RUNNINGHUB_FLASH_MODEL = 'runninghub-model/rhart-text-g-3-flash-preview-cv
         if (value58.startsWith('/api/v2/proxy/upload?'))
           return (
             assert.equal(response6.headers?.Authorization, 'Bearer k_runninghub_model'),
-            jsonResponse({ code: 0x191, errorMessage: 'invalid model api key' })
+            jsonResponse({ code: 401, errorMessage: 'invalid model api key' })
           );
         throw new Error('unexpected fetch url: ' + value58);
       },

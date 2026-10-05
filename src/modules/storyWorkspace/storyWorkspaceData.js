@@ -3,7 +3,7 @@ const STORY_SUMMARY =
   PLOT_SCRIPT =
     '《重生者的诡异任务》\n\n夜晚九点，教室灯火通明，窗外却像被墨汁吞没。\n\n陈木猛地睁开双眼。讲台上的倒计时只剩四十分钟，他认出这是诡异末世降临前的第五年——也是一切尚未发生的一个月前。\n\n班主任照常批改试卷，同桌正偷偷刷手机。陈木压住呼吸，确认口袋里那枚前世从未拿到的冥府银行凭证仍然存在。\n\n午夜十二点的钟声提前响起，一张带着血迹的任务书落在每个人桌上：前往午夜食堂，完成值夜任务。\n\n同学们惊慌失措，陈木却第一个站起身。他知道，真正的危险不是食堂里的诡异，而是队伍中那个会在第三条规则出现后背叛所有人的人。',
   NARRATION_SCRIPT =
-    '夜晚九点，陈木在熟悉的教室里醒来。\x0a\x0a他很快意识到，自己回到了诡异末世降临前的一个月。上一世的遗憾、背叛和死亡仍然清晰，而这一世，他终于有机会提前改变命运。\x0a\x0a当午夜钟声响起，血红色任务书出现在每个人桌上。教室不再安全，所有人都必须前往午夜食堂。\x0a\x0a别人只看见未知的恐惧，陈木却知道那里藏着第一笔足以改变未来的诡异冥币。',
+    '夜晚九点，陈木在熟悉的教室里醒来。\n\n他很快意识到，自己回到了诡异末世降临前的一个月。上一世的遗憾、背叛和死亡仍然清晰，而这一世，他终于有机会提前改变命运。\n\n当午夜钟声响起，血红色任务书出现在每个人桌上。教室不再安全，所有人都必须前往午夜食堂。\n\n别人只看见未知的恐惧，陈木却知道那里藏着第一笔足以改变未来的诡异冥币。',
   DEMO_ASSETS = Object['freeze']([
     {
       id: 'character-chen-mu',
@@ -61,7 +61,7 @@ const STORY_SUMMARY =
       kind: 'character',
       name: '食堂经理',
       role: '对立角色',
-      occurrences: '第\x202、3\x20集',
+      occurrences: '第 2、3 集',
       description: '午夜食堂的管理者，礼貌、克制，却始终保持不自然的微笑。',
       prompt: '三十五岁东亚女性，暗红色制服，盘发，苍白皮肤，礼貌但令人不安的微笑，全身角色设定照，电影写实',
       imageUrl: '',
@@ -93,7 +93,7 @@ const STORY_SUMMARY =
       kind: 'scene',
       name: '冥府银行',
       role: '伏笔场景',
-      occurrences: '第\x203\x20集',
+      occurrences: '第 3 集',
       description: '隐藏在旧城区地下的诡异银行，铜制柜台和墨绿色灯光带有上世纪质感。',
       prompt:
         '地下诡异银行大厅，旧铜柜台，墨绿色台灯，墙上密集保险柜，复古东方恐怖，电影写实，广角镜头，16:9',
@@ -103,18 +103,18 @@ const STORY_SUMMARY =
   EPISODES = Object['freeze']([
     {
       id: 'episode-1',
-      number: 0x1,
+      number: 1,
       title: '重生者的诡异任务',
       status: '待生成',
-      characterCount: 0x3,
-      sceneCount: 0x1,
-      clipCount: 0x6,
+      characterCount: 3,
+      sceneCount: 1,
+      clipCount: 6,
       duration: '00:28',
       coverUrl: '',
       clips: [
         {
           id: 'episode-1-clip-1',
-          number: 0x1,
+          number: 1,
           duration: '4.0s',
           title: '异常醒来',
           prompt:
@@ -122,7 +122,7 @@ const STORY_SUMMARY =
         },
         {
           id: 'episode-1-clip-2',
-          number: 0x2,
+          number: 2,
           duration: '4.0s',
           title: '确认时间',
           prompt:
@@ -130,7 +130,7 @@ const STORY_SUMMARY =
         },
         {
           id: 'episode-1-clip-3',
-          number: 0x3,
+          number: 3,
           duration: '5.0s',
           title: '观察同学',
           prompt:
@@ -138,7 +138,7 @@ const STORY_SUMMARY =
         },
         {
           id: 'episode-1-clip-4',
-          number: 0x4,
+          number: 4,
           duration: '5.0s',
           title: '凭证出现',
           prompt:
@@ -146,7 +146,7 @@ const STORY_SUMMARY =
         },
         {
           id: 'episode-1-clip-5',
-          number: 0x5,
+          number: 5,
           duration: '5.0s',
           title: '钟声提前',
           prompt:
@@ -154,7 +154,7 @@ const STORY_SUMMARY =
         },
         {
           id: 'episode-1-clip-6',
-          number: 0x6,
+          number: 6,
           duration: '5.0s',
           title: '血色任务书',
           prompt:
@@ -164,24 +164,24 @@ const STORY_SUMMARY =
     },
     {
       id: 'episode-2',
-      number: 0x2,
+      number: 2,
       title: '午夜食堂任务开启',
       status: '待拆分',
-      characterCount: 0x4,
-      sceneCount: 0x2,
-      clipCount: 0x0,
+      characterCount: 4,
+      sceneCount: 2,
+      clipCount: 0,
       duration: '--:--',
       coverUrl: '',
       clips: [],
     },
     {
       id: 'episode-3',
-      number: 0x3,
+      number: 3,
       title: '食堂诡异任务惊魂',
       status: '待拆分',
-      characterCount: 0x4,
-      sceneCount: 0x3,
-      clipCount: 0x0,
+      characterCount: 4,
+      sceneCount: 3,
+      clipCount: 0,
       duration: '--:--',
       coverUrl: '',
       clips: [],
@@ -191,11 +191,11 @@ export const DEMO_STORY_PROJECTS = Object['freeze']([
   {
     id: 'story-demo-main',
     title: '重生者的诡异任务',
-    updatedAt: '今天\x2010:32',
-    episodeCount: 0x3,
+    updatedAt: '今天 10:32',
+    episodeCount: 3,
     status: '制作中',
   },
-  { id: 'story-demo-empty', title: '未命名故事', updatedAt: '今天 09:57', episodeCount: 0x1, status: '草稿' },
+  { id: 'story-demo-empty', title: '未命名故事', updatedAt: '今天 09:57', episodeCount: 1, status: '草稿' },
 ]);
 export function createDemoStoryWorkspaceData() {
   return {
@@ -209,14 +209,14 @@ export function createDemoStoryWorkspaceData() {
       customVideoStylePrompt: '真人写实 · 电影感 · 冷色调',
       videoStyle: '真人写实 · 电影感 · 冷色调',
       aspectRatio: '16:9',
-      planning: { episodeCount: 0x3, sceneMaxSeconds: 0xf, promptMode: 'seedance-2.0' },
+      planning: { episodeCount: 3, sceneMaxSeconds: 15, promptMode: 'seedance-2.0' },
       sourceDocument: null,
       summary: STORY_SUMMARY,
       background: '诡异末世降临前一个月的现代高中校园，日常秩序正被无法解释的规则逐步侵蚀。',
       setting: '午夜后血色任务书会强制发布生存任务；完成任务可获得诡异冥币，违背规则将付出生命代价。',
       logline: '重生回末世前的高中生，必须利用前世记忆抢先完成午夜任务并改写所有人的命运。',
       sourceChapters: [{ id: 'chapter-1', title: '第一章 重生晚自习', content: PLOT_SCRIPT }],
-      chapters: [{ id: 'chapter-1', title: '第一章\x20重生晚自习', content: PLOT_SCRIPT }],
+      chapters: [{ id: 'chapter-1', title: '第一章 重生晚自习', content: PLOT_SCRIPT }],
       plotScript: PLOT_SCRIPT,
       narrationScript: NARRATION_SCRIPT,
     },

@@ -13,7 +13,7 @@ export async function fetchSubscriptionStatus(key, index = '') {
     url: '' + SUBSCRIPTION_STATUS_PATH + data,
     method: 'GET',
     provider: 'local',
-    timeout: 0x3a98,
+    timeout: 15000,
     headers: buildDeviceIdHeaders(index),
   });
 }
@@ -25,7 +25,7 @@ export async function activateCdkey(options) {
     url: SUBSCRIPTION_ACTIVATE_PATH,
     method: 'POST',
     provider: 'local',
-    timeout: 0x4e20,
+    timeout: 20000,
     headers: { 'Content-Type': 'application/json', ...buildDeviceIdHeaders(deviceId) },
     body: JSON.stringify({
       installId: installId,
@@ -41,7 +41,7 @@ export async function clearSubscriptionAuthorization(options2 = {}) {
     url: SUBSCRIPTION_CLEAR_AUTHORIZATION_PATH,
     method: 'POST',
     provider: 'local',
-    timeout: 0x3a98,
+    timeout: 15000,
     headers: { 'Content-Type': 'application/json', ...buildDeviceIdHeaders(deviceId2) },
     body: JSON.stringify({
       ...(installId2 ? { installId: installId2 } : {}),

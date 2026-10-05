@@ -9,11 +9,11 @@ export function isModelCatalogProviderVisible(response = {}, item = '') {
     providerId = normalizeProviderId(response?.['provider']),
     count = Number(response?.['modelCount']);
   return (
-    list['length'] > 0x0 &&
+    list['length'] > 0 &&
     providerId === list &&
     response?.['status'] === 'ready' &&
     Number['isFinite'](count) &&
-    count > 0x0
+    count > 0
   );
 }
 export function bindModelCatalogProviderCardVisibility({

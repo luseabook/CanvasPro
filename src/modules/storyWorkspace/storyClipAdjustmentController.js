@@ -106,10 +106,10 @@ export function createStoryClipAdjustmentController({
       (source, next) =>
         source +
         normalizeDurationSeconds(next?.['durationSec'] || next?.['durationSeconds'] || next?.['duration']),
-      0x0,
+      0,
     );
     return (
-      (enabled['durationSec'] = Number(target['toFixed'](0x1))),
+      (enabled['durationSec'] = Number(target['toFixed'](1))),
       (enabled['duration'] = formatStoryClockDuration(enabled['durationSec'])),
       !![]
     );
@@ -184,7 +184,7 @@ export function createStoryClipAdjustmentController({
         sourceMode['data']['project']?.['planning']?.['sceneMaxSeconds'],
       ),
       maxDurationSeconds = isStoryMinimaxH3PromptMode(targetPromptMode)
-        ? Math['min'](0xf, storySceneMaxSeconds)
+        ? Math['min'](15, storySceneMaxSeconds)
         : storySceneMaxSeconds;
     (map2['add'](storyClipAdjustmentGenerationKey), (state['clipAdjustmentGeneratingIds'] = [...map2]));
     handler2(sourceMode) &&
@@ -347,12 +347,12 @@ export function createStoryClipAdjustmentController({
       (state['clipAdjustmentGeneratingIds'] = [...map4]),
       (state['clipAdjustmentOpen'] = ![]),
       render());
-    let scope = 0x0;
+    let scope = 0;
     const list2 = [];
     try {
       return (
         await Promise['all'](
-          Array['from']({ length: Math['min'](0x3, reopenOnError2['length']) }, async () => {
+          Array['from']({ length: Math['min'](3, reopenOnError2['length']) }, async () => {
             while (scope < reopenOnError2['length']) {
               const args3 = reopenOnError2[scope++];
               if (!handler(projectTokenOverride2)) break;
@@ -367,7 +367,7 @@ export function createStoryClipAdjustmentController({
                   reserved: !![],
                   reservation: reservation2,
                   projectTokenOverride: projectTokenOverride2,
-                  reopenOnError: reopenOnError2['length'] === 0x1 && args['reopenOnError'] !== ![],
+                  reopenOnError: reopenOnError2['length'] === 1 && args['reopenOnError'] !== ![],
                 }),
               );
             }

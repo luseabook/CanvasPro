@@ -5,10 +5,10 @@ export function bindImageCropAction(value) {
     el.addEventListener('click', (event) => {
       (event.stopPropagation(),
         window.v2FocusOnNode
-          ? (window.v2FocusOnNode(nodeId, 120, 0x320),
+          ? (window.v2FocusOnNode(nodeId, 120, 800),
             setTimeout(() => {
               ImageCropController.init(nodeId);
-            }, 0x258))
+            }, 600))
           : ImageCropController.init(nodeId));
     });
 }

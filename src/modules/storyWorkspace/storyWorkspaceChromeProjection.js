@@ -21,13 +21,13 @@ export function getStoryEpisodeToolbarOptions(list2 = [], result = '') {
     (data) =>
       normalizeText(data?.['id']) !== text &&
       Array['isArray'](data?.['clips']) &&
-      data['clips']['length'] > 0x0,
+      data['clips']['length'] > 0,
   );
 }
 export function getStoryProjectCanvasEpisodes(list3 = [], options = '') {
   const list4 = getStoryVideoEpisodes(list3),
     text2 = normalizeText(options),
-    target = list4['find']((source) => normalizeText(source?.['id']) === text2) || list4[0x0];
+    target = list4['find']((source) => normalizeText(source?.['id']) === text2) || list4[0];
   return target ? [target] : [];
 }
 function projectEpisodeSwitcher(next, current, isCurrentPage) {
@@ -47,24 +47,24 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
     const record = entry['data']?.['project']?.['sourceMode'],
       args =
         record === 'upload-original'
-          ? steps['map']((args2) => (args2['id'] === 0x1 ? { ...args2, label: '原始剧本' } : args2))
+          ? steps['map']((args2) => (args2['id'] === 1 ? { ...args2, label: '原始剧本' } : args2))
           : record === 'video-replication'
             ? steps['map']((args3) => ({
                 ...args3,
-                label: { 0x1: '原片分析', 0x2: '素材设定', 0x3: '视频列表' }[args3['id']] || args3['label'],
+                label: { 1: '原片分析', 2: '素材设定', 3: '视频列表' }[args3['id']] || args3['label'],
               }))
             : steps;
     return {
       activeStep: activeStep,
-      items: (isStoryCollaborationProject(entry['data']) ? [{ id: 0x0, label: '故事构思' }, ...args] : args)[
+      items: (isStoryCollaborationProject(entry['data']) ? [{ id: 0, label: '故事构思' }, ...args] : args)[
         'map'
       ]((id2, number) => ({
         id: id2['id'],
-        number: number + 0x1,
+        number: number + 1,
         label: id2['label'],
         active: activeStep === id2['id'],
         disabled:
-          (id2['id'] === 0x0 && entry['developerModeAvailable'] !== !![]) ||
+          (id2['id'] === 0 && entry['developerModeAvailable'] !== !![]) ||
           isStoryWorkspaceStepNavigationDisabled(entry['data'], id2['id']),
       })),
     };
@@ -87,7 +87,7 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
         list5['find'](
           (state) => normalizeText(state?.['id']) === normalizeText(projectLabel['selectedEpisodeId']),
         ) ||
-        list5[0x0] ||
+        list5[0] ||
         null;
     return {
       kind: 'project',
@@ -117,12 +117,12 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
         nextAction ||
         (isLast
           ? 'finish-story-workbench'
-          : showPrevious['step'] === 0x1
+          : showPrevious['step'] === 1
             ? 'extract-assets'
             : 'open-episode-stage'),
       config =
         showPrevious['data']?.['project']?.['sourceMode'] === 'video-replication' &&
-        showPrevious['splittingEpisodeIds']?.['length'] > 0x0,
+        showPrevious['splittingEpisodeIds']?.['length'] > 0,
       nextLabel2 = Boolean(showPrevious['storyPlanningOperation'] || config),
       scope = config ? '正在生成分段提示词' : showPrevious['storyPlanningStatus'] || nextLabel || '处理中',
       input =
@@ -131,7 +131,7 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
           ? '剧本摘要已完成'
           : nextAction === 'extract-assets'
             ? '完整分集剧本已全部完成'
-            : showPrevious['step'] === 0x2
+            : showPrevious['step'] === 2
               ? '角色、场景和道具设定已应用'
               : '分集结构已建立'),
       output =
@@ -151,8 +151,8 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
       showPrevious:
         showPrevious['step'] >
         (showPrevious['developerModeAvailable'] === !![] && isStoryCollaborationProject(showPrevious['data'])
-          ? 0x0
-          : 0x1),
+          ? 0
+          : 1),
       nextAction: nextAction2,
       nextLabel: nextLabel2 ? scope : nextLabel || '下一步',
       busy: nextLabel2,

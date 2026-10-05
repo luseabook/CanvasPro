@@ -82,8 +82,8 @@ export function adjustAdjacentStoryboardGridTracks(args2, count2, handle) {
     config = Math.min(0.2, state / 2),
     scope = Math.min(Math.max(list3[count2] + handle, config), state - config);
   return (
-    (list3[count2] = Math.round(scope * 0x2710) / 0x2710),
-    (list3[count2 + 1] = Math.round((state - scope) * 0x2710) / 0x2710),
+    (list3[count2] = Math.round(scope * 10000) / 10000),
+    (list3[count2 + 1] = Math.round((state - scope) * 10000) / 10000),
     list3
   );
 }

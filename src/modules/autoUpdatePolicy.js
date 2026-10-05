@@ -34,6 +34,6 @@ export async function ensureDesktopUpdateAvailable(value) {
     key?.['state'] !== 'downloaded' &&
     !(key?.['state'] === 'error' && key?.['latestInfo'])
   )
-    throw new Error('desktop\x20update\x20not\x20available');
+    throw new Error('desktop update not available');
   return key;
 }

@@ -1,14 +1,14 @@
-export const DEFAULT_STORYBOARD_3D_TEXTURE_MAX_DIMENSION = 0x1000;
-export const DEFAULT_STORYBOARD_3D_TEXTURE_MAX_PIXELS = 0x1000 * 0x1000;
-export const DEFAULT_STORYBOARD_3D_IMAGE_MAX_BYTES = 0x40 * 0x400 * 0x400;
+export const DEFAULT_STORYBOARD_3D_TEXTURE_MAX_DIMENSION = 4096;
+export const DEFAULT_STORYBOARD_3D_TEXTURE_MAX_PIXELS = 4096 * 4096;
+export const DEFAULT_STORYBOARD_3D_IMAGE_MAX_BYTES = 64 * 1024 * 1024;
 const ownedTextureResources = new WeakMap();
-function finitePositiveInteger(value, item = 0x0) {
+function finitePositiveInteger(value, item = 0) {
   const count = Math['floor'](Number(value));
-  return Number['isFinite'](count) && count > 0x0 ? count : item;
+  return Number['isFinite'](count) && count > 0 ? count : item;
 }
-function createAbortError(error = 'Texture\x20processing\x20was\x20cancelled') {
+function createAbortError(error = 'Texture processing was cancelled') {
   const error2 = new Error(
-    String(error?.['message'] || error || 'Texture\x20processing\x20was\x20cancelled'),
+    String(error?.['message'] || error || 'Texture processing was cancelled'),
   );
   return ((error2['name'] = 'AbortError'), (error2['code'] = 'ABORT_ERR'), error2);
 }
@@ -33,8 +33,8 @@ function imageDimensions(box) {
 function materialTextures(data) {
   const options = new Set(),
     map = new WeakSet(),
-    handler = (list, count2 = 0x0) => {
-      if (!list || count2 > 0x4) return;
+    handler = (list, count2 = 0) => {
+      if (!list || count2 > 4) return;
       if (list['isTexture']) {
         options['add'](list);
         return;
@@ -43,20 +43,20 @@ function materialTextures(data) {
       if (typeof list !== 'object' || map['has'](list)) return;
       map['add'](list);
       if (Array['isArray'](list)) {
-        list['forEach']((target) => handler(target, count2 + 0x1));
+        list['forEach']((target) => handler(target, count2 + 1));
         return;
       }
-      Object['values'](list)['forEach']((source) => handler(source, count2 + 0x1));
+      Object['values'](list)['forEach']((source) => handler(source, count2 + 1));
     };
   return (handler(data), options);
 }
 function computeTargetSize(next, current, entry) {
-  const record = Math['min'](0x1, entry['maxDimension'] / next, entry['maxDimension'] / current),
-    payload = Math['min'](0x1, Math['sqrt'](entry['maxPixels'] / (next * current))),
+  const record = Math['min'](1, entry['maxDimension'] / next, entry['maxDimension'] / current),
+    payload = Math['min'](1, Math['sqrt'](entry['maxPixels'] / (next * current))),
     scale = Math['min'](record, payload);
   return {
-    width: Math['max'](0x1, Math['floor'](next * scale)),
-    height: Math['max'](0x1, Math['floor'](current * scale)),
+    width: Math['max'](1, Math['floor'](next * scale)),
+    height: Math['max'](1, Math['floor'](current * scale)),
     scale: scale,
   };
 }
@@ -222,7 +222,7 @@ async function createDownsampledSource(
     ((source3['width'] = resizeWidth), (source3['height'] = resizeHeight));
     const ctx = source3['getContext']?.('2d', { alpha: !![] });
     if (!ctx?.['drawImage']) throw new Error('A drawable 2D canvas context is unavailable');
-    (ctx['drawImage'](value7, 0x0, 0x0, resizeWidth, resizeHeight), throwIfAborted(signal));
+    (ctx['drawImage'](value7, 0, 0, resizeWidth, resizeHeight), throwIfAborted(signal));
     if (typeof source3['transferToImageBitmap'] === 'function') {
       const source4 = source3['transferToImageBitmap']();
       if (signal?.['aborted']) {
@@ -252,7 +252,7 @@ export async function downsampleStoryboard3DTexture(
     colorSpace['isCompressedTexture'] ||
     colorSpace['isDataTexture']
   ) {
-    const error7 = new Error('Texture\x20source\x20is\x20not\x20a\x20drawable\x202D\x20image.');
+    const error7 = new Error('Texture source is not a drawable 2D image.');
     error7['code'] = 'TEXTURE_DOWNSAMPLE_UNAVAILABLE';
     throw error7;
   }
@@ -297,14 +297,14 @@ export async function applyStoryboard3DTexturePolicy(
     warnings = inspection['textures']
       ['filter']((value11) => value11['action'] === 'warning')
       ['map']((code) => ({
-        code: code['reasons'][0x0],
+        code: code['reasons'][0],
         texture: code['texture'],
         references: code['references'],
         message:
-          'Texture\x20dimensions\x20could\x20not\x20be\x20determined;\x20the\x20texture\x20was\x20kept\x20unchanged.',
+          'Texture dimensions could not be determined; the texture was kept unchanged.',
       })),
     total = inspection['textures']['filter']((value12) => value12['action'] === 'downsample');
-  for (let completed = 0x0; completed < total['length']; completed += 0x1) {
+  for (let completed = 0; completed < total['length']; completed += 1) {
     throwIfAborted(signal3);
     const width5 = total[completed];
     try {
@@ -335,9 +335,9 @@ export async function applyStoryboard3DTexturePolicy(
       });
     }
     onProgress?.({
-      completed: completed + 0x1,
+      completed: completed + 1,
       total: total['length'],
-      progress: total['length'] ? (completed + 0x1) / total['length'] : 0x1,
+      progress: total['length'] ? (completed + 1) / total['length'] : 1,
     });
   }
   return {
@@ -361,20 +361,20 @@ export function validateStoryboard3DImageFile(
   if (!String(error8?.['name'] || '')['trim']())
     ok['push']({
       code: 'IMAGE_FILE_NAME_REQUIRED',
-      message: 'Image\x20file\x20name\x20is\x20required.',
+      message: 'Image file name is required.',
     });
   if (!enabled3['startsWith']('image/'))
     ok['push']({ code: 'IMAGE_FILE_TYPE_INVALID', message: 'The selected file is not an image.' });
-  if (!Number['isFinite'](count3) || count3 <= 0x0)
+  if (!Number['isFinite'](count3) || count3 <= 0)
     ok['push']({ code: 'IMAGE_FILE_EMPTY', message: 'The image file is empty.' });
   return (
     Number['isFinite'](count3) &&
       count3 > maxBytes &&
       ok['push']({
         code: 'IMAGE_FILE_TOO_LARGE',
-        message: 'The image file exceeds ' + Math['round'](maxBytes / 0x400 / 0x400) + ' MB.',
+        message: 'The image file exceeds ' + Math['round'](maxBytes / 1024 / 1024) + ' MB.',
       }),
-    { ok: ok['length'] === 0x0, errors: ok }
+    { ok: ok['length'] === 0, errors: ok }
   );
 }
 async function defaultDecodeImageDimensions(
@@ -382,7 +382,7 @@ async function defaultDecodeImageDimensions(
   { createImageBitmapFn: createImageBitmapFn = globalThis['createImageBitmap'], signal: signal4 } = {},
 ) {
   if (typeof createImageBitmapFn !== 'function') {
-    const error9 = new Error('Image\x20dimension\x20decoding\x20is\x20unavailable.');
+    const error9 = new Error('Image dimension decoding is unavailable.');
     error9['code'] = 'IMAGE_DIMENSION_DECODER_UNAVAILABLE';
     throw error9;
   }
@@ -447,7 +447,7 @@ export async function preflightStoryboard3DImageFile(
                 width6 +
                 'x' +
                 height4 +
-                '\x20should\x20be\x20downsampled\x20to\x20' +
+                ' should be downsampled to ' +
                 targetWidth2['width'] +
                 'x' +
                 targetWidth2['height'] +

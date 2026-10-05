@@ -162,7 +162,19 @@ vendored 的 three.js 本身是混淆发布版（11 个文件 / 54859 处）。�
 
 注：vendor 自带的 `*.test.js` 不在 `src|electron|api` 的 glob 内，**不会被全量回归跑到**，须单独执行。
 
-### 本战役中工具自身被修掉的 4 个缺陷
+**去转义/去十六进制时 vendor 必须排除（2026-10-05 实测）**：上游代码里的十六进制是**作者刻意写法**，
+不是混淆残留。例如 `vendor/three/examples/jsm/loaders/FBXLoader.js:3553` 的
+`( … + 160 + 16 ) & ~ 0xf` 是真半字节掩码。按单半字节规则干跑，全仓 46 件非 `src/api/electron`
+文件里唯一命中的正是这一处 —— 说明规则本身没问题，**是扫描范围必须限定在移植件**。
+凡是"上游 vendored 代码 + 我们工具"共存时，规则再宽也只作用于前者之外的部分。
+
+**受保护件可在授权后清理（2026-10-05，第 160 批）**：`src`/`api`/`electron` 的 10 个受保护装配件在
+158b/159 两批被隔离，但它们同样带混淆残留（6 件、406 处）。**去混淆 ≠ 升代**——它只重写字面量拼写
+（`mountPadding: 0x258` → `600`、`Math['min'](0xc8, …)` → `200`），标识符、对象键、导出面**一个都不动**，
+所以不会改变装配行为。经用户单独授权后清完，举证方式 = 逐件 `deobf-unescape-verify.mjs --numbers`
+**6/6 PASS** + 全量回归零回归。**判据**：改的是「值」还是「装配实现」——前者授权后可清，后者必须真机验证。
+
+### 本战役中工具自身被修掉的 5 个缺陷
 
 | 缺陷 | 症状 | 修法 |
 |------|------|------|
@@ -170,6 +182,12 @@ vendored 的 three.js 本身是混淆发布版（11 个文件 / 54859 处）。�
 | 名字分配器非单射 | 后缀搜索在 200 处截断，回落 `base + '_'` 且不登记 → `Identifier 'value_' has already been declared` | 搜索上限提到百万并**保证登记**；闸门把"非单射"从 REVIEW 升级为硬失败 |
 | 空映射破坏文件 | `keys=[]` 时正则变成 `\b()\b`，每个词边界被替换成字符串 `undefined`，文件开头成 `undefinedimportundefined {` | 空映射直接拒写 |
 | 遮蔽既有名 | `const isPlainObject = isPlainObject(item) ? ... : {}` | 用文件既有绑定名预填名字池 + 闸门硬拒 |
+| 嵌套模板吞掉文件后半 | `` `a-${x || `${y}-${z}`}` `` 里 `skipExpression` 用**绝对**层级判闭合，内层 `${…}` 只在 2→1 收尾、永不归零 → 扫描一路吃到文件末尾，其后所有 `\x` 与十六进制都被当成"模板正文"跳过 | `skipExpression` 改为**相对**计数（恒从 1 起），嵌套靠递归而非起始层级表达；`tools/deobf-unescape.test.js` 加断言：任何 substitution 区间都不得越过文件尾 |
+
+末条的波及面：全仓 13 件含嵌套模板，其中 2 件（`api/localMediaTaskApi.js`、
+`src/modules/storyWorkspace/storyWorkspaceModel.js`）确实有被漏掉的改写；
+其余 11 件的嵌套模板靠近文件尾部，尾区本就无可改项。**该缺陷只漏改、不会改错**
+（伪造区间只用于排除，且闸门会拒绝任何语义变化），所以 158 批的等价性结论仍然成立。
 
 被测试（而非闸门）抓到的两个**断言脆弱点**：`captureChainWiring.test.js` 硬编码了另一个模块的
 `_0x` 名；`multiResultStackBackplates.test.js` 要求源码里的**尾逗号**（prettier 会按行宽去掉）。

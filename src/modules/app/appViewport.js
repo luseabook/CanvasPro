@@ -111,7 +111,7 @@ export function createAppViewport({
           ' ';
       },
     ));
-  function animateViewport(value12, value13, value14, value15, value16, value17, value18 = 0x320) {
+  function animateViewport(value12, value13, value14, value15, value16, value17, value18 = 800) {
     requestAnimationFrame2 !== null &&
       (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = null));
     const value19 = ++value,
@@ -173,7 +173,7 @@ export function createAppViewport({
       }),
     fitActionEl?.addEventListener('click', () => {
       const value31 = Object.keys(graphStore.getState().nodes || {});
-      viewportFocusController?.focusNodes(value31, 80, 0x320);
+      viewportFocusController?.focusNodes(value31, 80, 800);
     }),
     {
       animateViewport: animateViewport,
@@ -184,11 +184,11 @@ export function createAppViewport({
       clearTrackedFocus: (...args4) => viewportFocusController?.clearTrackedFocus(...args4),
       installWindowBindings(value32 = window) {
         ((value32.v2AnimateViewport = animateViewport),
-          (value32.v2FocusOnNode = (value33, value34 = 120, value35 = 0x5dc, value36) =>
+          (value32.v2FocusOnNode = (value33, value34 = 120, value35 = 1500, value36) =>
             viewportFocusController?.focusNode(value33, value34, value35, value36)),
-          (value32.v2FocusOnNodeAtZoomPercent = (value37, value38 = 60, value39 = 0x320) =>
+          (value32.v2FocusOnNodeAtZoomPercent = (value37, value38 = 60, value39 = 800) =>
             viewportFocusController?.focusNodeAtZoomPercent(value37, value38, value39)),
-          (value32.v2FocusOnNodes = (value40, value41 = 80, value42 = 0x320, value43) =>
+          (value32.v2FocusOnNodes = (value40, value41 = 80, value42 = 800, value43) =>
             viewportFocusController?.focusNodes(value40, value41, value42, value43)));
       },
     }

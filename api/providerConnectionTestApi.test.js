@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 function jsonResponse(value, ok = 200) {
   return {
-    ok: ok >= 200 && ok < 0x12c,
+    ok: ok >= 200 && ok < 300,
     status: ok,
     headers: { get: () => 'application/json' },
     json: async () => value,
@@ -217,7 +217,7 @@ function jsonResponse(value, ok = 200) {
       });
     (assert.equal(value6.displayText, '积分 99,999 · 钱包 999 人民币'),
       assert.equal(value6.workflowCredits, 0x1869f),
-      assert.equal(value6.modelWallet, 0x3e7),
+      assert.equal(value6.modelWallet, 999),
       assert.equal(value6.currencyLabel, '人民币'),
       assert.match(value6.detailText, /工作流积分：99,999/),
       assert.match(value6.detailText, /模型钱包：999 人民币/));
@@ -393,7 +393,7 @@ function jsonResponse(value, ok = 200) {
       }
       if (String(value24).startsWith('/api/v2/proxy/upload?'))
         return jsonResponse({ code: 0, data: { download_url: 'https://www.runninghub.cn/aic-test.png' } });
-      return jsonResponse({ code: 0x324, message: 'task not found' });
+      return jsonResponse({ code: 804, message: 'task not found' });
     }),
       value22.after(() => {
         globalThis.fetch = value23;
@@ -404,7 +404,7 @@ function jsonResponse(value, ok = 200) {
     (assert.equal(response10.ok, true),
       assert.equal(list11.length, 2),
       assert.equal(response10.balance?.displayText, '积分 12,345'),
-      assert.equal(response10.balance?.workflowCredits, 0x3039),
+      assert.equal(response10.balance?.workflowCredits, 12345),
       assert.equal(list11[0].url, '/api/v2/runninghubwf/query'),
       assert.deepEqual(JSON.parse(list11[0].options.body), {
         apiKey: 'rh-workflow-key',
@@ -432,7 +432,7 @@ function jsonResponse(value, ok = 200) {
       }
       if (String(value28).startsWith('/api/v2/proxy/upload?'))
         return jsonResponse({ code: 0, data: { download_url: 'https://www.runninghub.cn/aic-test.png' } });
-      return jsonResponse({ code: 0x324, message: 'task not found' });
+      return jsonResponse({ code: 804, message: 'task not found' });
     }),
       value26.after(() => {
         globalThis.fetch = value27;
@@ -484,7 +484,7 @@ function jsonResponse(value, ok = 200) {
   }),
   test('providerConnectionTestApi: explains auth failures in human language', async (value36) => {
     const value37 = globalThis.fetch;
-    ((globalThis.fetch = async () => jsonResponse({ error: 'invalid api key' }, 0x191)),
+    ((globalThis.fetch = async () => jsonResponse({ error: 'invalid api key' }, 401)),
       value36.after(() => {
         globalThis.fetch = value37;
       }));
@@ -506,7 +506,7 @@ function jsonResponse(value, ok = 200) {
       if (String(value40).includes('/proxy/task?')) return jsonResponse({ data: [{ id: 'demo' }] });
       if (String(value40).endsWith('/api/v2/proxy/completions'))
         return jsonResponse({ choices: [{ message: { content: 'ok' } }] });
-      return jsonResponse({ error: 'upload service unavailable' }, 0x1f4);
+      return jsonResponse({ error: 'upload service unavailable' }, 500);
     }),
       value38.after(() => {
         globalThis.fetch = value39;

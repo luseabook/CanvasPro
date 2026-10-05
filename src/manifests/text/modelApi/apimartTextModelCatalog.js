@@ -1,9 +1,9 @@
 export const apimartAdditionalTextModels = Object['freeze'](
   [
-    { model: 'gpt-6-astra', displayName: 'GPT-6\x20Astra', icon: 'oa', reasoningEffortMode: 'openai' },
+    { model: 'gpt-6-astra', displayName: 'GPT-6 Astra', icon: 'oa', reasoningEffortMode: 'openai' },
     { model: 'claude-fable-5.1', displayName: 'Claude Fable 5.1' },
-    { model: 'claude-opus-5', displayName: 'Claude\x20Opus\x205' },
-    { model: 'gemini-3.8-flash', displayName: 'Gemini\x203.8\x20Flash', icon: 'gemini', videoInput: !![] },
+    { model: 'claude-opus-5', displayName: 'Claude Opus 5' },
+    { model: 'gemini-3.8-flash', displayName: 'Gemini 3.8 Flash', icon: 'gemini', videoInput: !![] },
     { model: 'gemini-3.7-flash', displayName: 'Gemini 3.7 Flash', icon: 'gemini', videoInput: !![] },
     {
       model: 'glm-5.3',
@@ -19,7 +19,7 @@ export const apimartAdditionalTextModels = Object['freeze'](
     },
     {
       model: 'kimi-k3',
-      displayName: 'Kimi\x20K3',
+      displayName: 'Kimi K3',
       icon: 'moonshot',
       mediaPolicy: 'image-video',
       mediaInputEncoding: 'base64',
@@ -45,8 +45,8 @@ export const apimartAdditionalTextModels = Object['freeze'](
       ...args,
       modelId: 'apimart/' + args['model'],
       executionId: 'apimart.model-api.text.' + args['model']['replaceAll']('.', '-') + '.v1',
-      subtitle: 'APIMart\x20chat\x20completion\x20model\x20API',
-      order: 0x5a + value,
+      subtitle: 'APIMart chat completion model API',
+      order: 90 + value,
     }),
   ),
 );

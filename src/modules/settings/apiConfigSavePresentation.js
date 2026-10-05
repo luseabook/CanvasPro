@@ -3,17 +3,17 @@ export function createApiConfigSavePresentation(
   value = globalThis['document'],
   {
     timerHost: timerHost = globalThis['window'] || globalThis,
-    successDuration: successDuration = 0x7d0,
+    successDuration: successDuration = 2000,
   } = {},
 ) {
   const el = value?.['getElementById']('btnApiSave'),
     el2 = value?.['getElementById']('apiConfigSaveStatus');
   let item = 'auto',
     value2 = null,
-    key = 0x0,
+    key = 0,
     index = ![];
   const run = () => {
-      key += 0x1;
+      key += 1;
       if (value2 !== null) timerHost['clearTimeout'](value2);
       value2 = null;
     },

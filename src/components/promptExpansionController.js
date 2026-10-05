@@ -3,7 +3,7 @@ import { hostPromptFloatingSurfaces } from './promptExpansionFloatingSurfaces.js
 import { beginModalInteraction } from '../services/modalInteractionScope.js';
 import { createPromptExpansionMotion } from './promptExpansionMotion.js';
 const EXPAND_ICON =
-    '<svg\x20viewBox=\x220\x200\x2024\x2024\x22\x20fill=\x22none\x22\x20stroke=\x22currentColor\x22\x20stroke-width=\x221.7\x22\x20stroke-linecap=\x22round\x22\x20stroke-linejoin=\x22round\x22\x20aria-hidden=\x22true\x22><path\x20d=\x22M8\x203H3v5m13-5h5v5M3\x2016v5h5m13-5v5h-5\x22/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg>',
   COLLAPSE_ICON =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h5V3m8 0v5h5M8 21v-5H3m18 0h-5v5"/></svg>';
 let activeController = null;
@@ -32,8 +32,8 @@ export function createPromptExpansionController({
     hostPromptFloatingSurfaces2 = null,
     beginModalInteraction2 = null,
     el3 = null,
-    value = 0x0,
-    item = 0x0,
+    value = 0,
+    item = 0,
     el4 = null,
     key = ![],
     index = ![],
@@ -203,7 +203,7 @@ export function createPromptExpansionController({
   function run6(event6) {
     if (!overlay) return;
     event6['stopPropagation']();
-    if (key || event6['isComposing'] || event6['keyCode'] === 0xe5) {
+    if (key || event6['isComposing'] || event6['keyCode'] === 229) {
       if (event6['key'] === 'Escape') event6['preventDefault']();
       return;
     }

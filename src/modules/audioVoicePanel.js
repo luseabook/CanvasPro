@@ -196,9 +196,9 @@ const AUDIO_VOICE_IMITATE_TONE_WORKFLOW_IDS = new Set([
   AUDIO_VOICE_PANEL_WIDTH_STORAGE_KEY = 'aiCanvas.audioVoicePanelWidth.v1',
   AUDIO_VOICE_STUDIO_VIP_PROVIDER = 'aicanvas',
   AUDIO_VOICE_ANALYSIS_STATE_FIELD = 'audioVoiceAnalysis',
-  AUDIO_VOICE_ANALYSIS_SCHEMA_VERSION = 0x1,
-  AUDIO_VOICE_WARM_SEGMENT_LIMIT = 0x4,
-  AUDIO_VOICE_PANEL_WIDTH_LIMITS = Object['freeze']({ min: 0x230, max: 0x35c }),
+  AUDIO_VOICE_ANALYSIS_SCHEMA_VERSION = 1,
+  AUDIO_VOICE_WARM_SEGMENT_LIMIT = 4,
+  AUDIO_VOICE_PANEL_WIDTH_LIMITS = Object['freeze']({ min: 560, max: 860 }),
   AUDIO_VOICE_INLINE_ERROR_CODES = new Set([
     'missingVoiceRefAudio',
     'missingSecondVoiceRefAudio',
@@ -226,9 +226,9 @@ const AUDIO_VOICE_IMITATE_TONE_WORKFLOW_IDS = new Set([
     'select-global-model',
     'select-segment-model',
   ]),
-  ANALYZE_TASK_TIMEOUT_MS = 0x2d * 0x3c * 0x3e8,
+  ANALYZE_TASK_TIMEOUT_MS = 45 * 60 * 1000,
   AUDIO_VOICE_ASR_RUNTIME_PROGRESS_SHARE = 0.35,
-  AUDIO_CUT_TASK_TIMEOUT_MS = 0x2 * 0x3c * 0x3e8,
+  AUDIO_CUT_TASK_TIMEOUT_MS = 2 * 60 * 1000,
   AUDIO_VOICE_ANALYSIS_STAGES = new Set([
     'asr-runtime-check',
     'asr-runtime-manifest',
@@ -284,13 +284,13 @@ export function shouldShowVolcengineSpeechApiKeyHelp(options2 = {}, index = '') 
   return isVolcengineSpeechAsrAuthFailure(
     [index, options2?.['summary'], options2?.['suggestion'], options2?.['detail'], options2?.['error']]
       ['filter'](Boolean)
-      ['join']('\x20'),
+      ['join'](' '),
   );
 }
 function clampProgress01(data) {
   const target = Number(data);
-  if (!Number['isFinite'](target)) return 0x0;
-  return Math['max'](0x0, Math['min'](0x1, target));
+  if (!Number['isFinite'](target)) return 0;
+  return Math['max'](0, Math['min'](1, target));
 }
 function normalizeAnalysisProgressStage(source) {
   const next = String(source || '')['trim']();
@@ -302,7 +302,7 @@ function getStateSnapshot(store) {
 function clampAudioVoicePanelWidth(current, entry = globalThis['window']?.['innerWidth']) {
   const record = Number(current),
     payload = Number['isFinite'](Number(entry))
-      ? Math['max'](0x140, Number(entry) - 0x18)
+      ? Math['max'](320, Number(entry) - 24)
       : AUDIO_VOICE_PANEL_WIDTH_LIMITS['max'],
     handle = Math['min'](AUDIO_VOICE_PANEL_WIDTH_LIMITS['max'], payload),
     state = Math['min'](AUDIO_VOICE_PANEL_WIDTH_LIMITS['min'], handle);
@@ -310,7 +310,7 @@ function clampAudioVoicePanelWidth(current, entry = globalThis['window']?.['inne
 }
 function readStoredPanelWidth(config = globalThis['window']) {
   const count = Number(config?.['localStorage']?.['getItem']?.(AUDIO_VOICE_PANEL_WIDTH_STORAGE_KEY));
-  return Number['isFinite'](count) && count > 0x0 ? count : null;
+  return Number['isFinite'](count) && count > 0 ? count : null;
 }
 function writeStoredPanelWidth(scope, input = globalThis['window']) {
   try {
@@ -328,23 +328,23 @@ function dispatchWebPreviewPanelSync(reason) {
   enabled['dispatchEvent'](output);
 }
 function formatTimecode(value2) {
-  const value3 = Math['max'](0x0, Math['round'](Number(value2) || 0x0)),
-    value4 = Math['floor'](value3 / 0xea60),
-    value5 = Math['floor']((value3 % 0xea60) / 0x3e8),
-    value6 = value3 % 0x3e8;
+  const value3 = Math['max'](0, Math['round'](Number(value2) || 0)),
+    value4 = Math['floor'](value3 / 60000),
+    value5 = Math['floor']((value3 % 60000) / 1000),
+    value6 = value3 % 1000;
   return (
-    String(value4)['padStart'](0x2, '0') +
+    String(value4)['padStart'](2, '0') +
     ':' +
-    String(value5)['padStart'](0x2, '0') +
+    String(value5)['padStart'](2, '0') +
     ':' +
-    String(value6)['padStart'](0x3, '0')
+    String(value6)['padStart'](3, '0')
   );
 }
 export function formatAudioVoiceTimeRange(value7, value8) {
-  const value9 = Math['max'](0x0, Math['round'](Number(value7) || 0x0)),
-    value10 = Math['max'](value9, Math['round'](Number(value8) || 0x0)),
-    value11 = ((value10 - value9) / 0x3e8)['toFixed'](0x1);
-  return formatTimecode(value9) + '\x20-\x20' + formatTimecode(value10) + ' （约 ' + value11 + ' 秒）';
+  const value9 = Math['max'](0, Math['round'](Number(value7) || 0)),
+    value10 = Math['max'](value9, Math['round'](Number(value8) || 0)),
+    value11 = ((value10 - value9) / 1000)['toFixed'](1);
+  return formatTimecode(value9) + ' - ' + formatTimecode(value10) + ' （约 ' + value11 + ' 秒）';
 }
 export function resolveAudioVoicePanelCoverUrl(options3 = {}) {
   return resolveCanvasVideoPosterUrl(options3);
@@ -353,8 +353,8 @@ export function createDefaultAudioVoiceSegments() {
   return [
     {
       id: 'mock-segment-1',
-      startMs: 0x50,
-      endMs: 0x10ae,
+      startMs: 80,
+      endMs: 4270,
       sourceText: '马某人这个县长买来的，嗯，买官就是为了挣钱。',
       targetText: '',
       sourceAudioReady: !![],
@@ -365,8 +365,8 @@ export function createDefaultAudioVoiceSegments() {
     },
     {
       id: 'mock-segment-2',
-      startMs: 0x1525,
-      endMs: 0x2794,
+      startMs: 5413,
+      endMs: 10132,
       sourceText: '今天参加会议的人里面，就有一个人是怪物伪装的。',
       targetText: '',
       sourceAudioReady: !![],
@@ -377,8 +377,8 @@ export function createDefaultAudioVoiceSegments() {
     },
     {
       id: 'mock-segment-3',
-      startMs: 0x2760,
-      endMs: 0x2e49,
+      startMs: 10080,
+      endMs: 11849,
       sourceText: '谁有钱就挣谁的。',
       targetText: '',
       sourceAudioReady: !![],
@@ -389,8 +389,8 @@ export function createDefaultAudioVoiceSegments() {
     },
     {
       id: 'mock-segment-4',
-      startMs: 0x2f1c,
-      endMs: 0x3c14,
+      startMs: 12060,
+      endMs: 15380,
       sourceText: '那你想挣谁的钱呢？',
       targetText: '',
       sourceAudioReady: !![],
@@ -451,7 +451,7 @@ export function getAudioVoicePanelModelGroups() {
         ['map']((value17) => map['get'](String(value17?.['modelId'] || '')['trim']()))
         ['filter'](Boolean),
     }))
-    ['filter']((value18) => value18['items']['length'] > 0x0);
+    ['filter']((value18) => value18['items']['length'] > 0);
 }
 export function getAudioVoiceWorkflowAudioSlots(value19 = '') {
   return getAudioWorkflowSlots(value19)['map']((args2) => ({
@@ -479,13 +479,13 @@ function normalizeAudioVoicePromptForBackend(value23, value24) {
   const value25 = String(value24 || '')['trim']();
   if (value23 !== RH_AUDIO_ADVANCED_VOICE_CLONE_MODEL_ID) return value25;
   return value25['replace'](/(^|\s+)@?音频1\s*[:：]?\s*/g, '$1[speaker_1]: ')
-    ['replace'](/(^|\s+)@?音频2\s*[:：]?\s*/g, '$1[speaker_2]:\x20')
-    ['replace'](/\s+(\[speaker_[12]\]:)/g, '\x0a$1')
+    ['replace'](/(^|\s+)@?音频2\s*[:：]?\s*/g, '$1[speaker_2]: ')
+    ['replace'](/\s+(\[speaker_[12]\]:)/g, '\n$1')
     ['trim']();
 }
-export function resolveAudioVoiceSegmentAudioInput(options7 = {}, value26 = 0x1) {
-  const count2 = Number(value26) === 0x2 ? 0x2 : 0x1;
-  if (count2 === 0x2)
+export function resolveAudioVoiceSegmentAudioInput(options7 = {}, value26 = 1) {
+  const count2 = Number(value26) === 2 ? 2 : 1;
+  if (count2 === 2)
     return {
       nodeId: String(options7['voiceRefNodeId'] || ''),
       localPath: normalizeLocalPath(options7['voiceRefAudioLocalPath'] || ''),
@@ -512,8 +512,8 @@ function getAudioVoicePrimaryAudioSlot(value28 = '') {
   return value28 === RH_AUDIO_ADVANCED_VOICE_CLONE_MODEL_ID ? 'audio1' : 'audioRef';
 }
 function buildAudioVoiceWorkflowAudioRefs(options8 = {}, value29 = '', value30 = []) {
-  const audioVoiceSegmentAudioInput = resolveAudioVoiceSegmentAudioInput(options8, 0x1),
-    audioVoiceSegmentAudioInput2 = resolveAudioVoiceSegmentAudioInput(options8, 0x2);
+  const audioVoiceSegmentAudioInput = resolveAudioVoiceSegmentAudioInput(options8, 1),
+    audioVoiceSegmentAudioInput2 = resolveAudioVoiceSegmentAudioInput(options8, 2);
   if (isAudioVoiceImitateToneWorkflow(value29)) {
     const audioVoicePrimaryAudioSlot = getAudioVoicePrimaryAudioSlot(value29),
       list2 = [];
@@ -535,8 +535,8 @@ function buildAudioVoiceWorkflowAudioRefs(options8 = {}, value29 = '', value30 =
   if (value29 === RH_AUDIO_VOICE_CONVERT_MODEL_ID)
     return normalizeAudioWorkflowRefSlots(
       [
-        createAudioVoiceWorkflowAudioRef(audioVoiceSegmentAudioInput2, value30[0x0]?.['slot'] || ''),
-        createAudioVoiceWorkflowAudioRef(audioVoiceSegmentAudioInput, value30[0x1]?.['slot'] || ''),
+        createAudioVoiceWorkflowAudioRef(audioVoiceSegmentAudioInput2, value30[0]?.['slot'] || ''),
+        createAudioVoiceWorkflowAudioRef(audioVoiceSegmentAudioInput, value30[1]?.['slot'] || ''),
       ]['filter'](Boolean),
       value29,
     );
@@ -572,7 +572,7 @@ export function buildAudioVoiceGeneratePayload(
           value35['slot'] === 'audioRef' ? 'missingVoiceRefAudio' : 'missingSourceAudio',
         );
       throw createAudioVoicePayloadError(
-        count3 === 0x0 ? 'missingSourceAudio' : 'missingSecondVoiceRefAudio',
+        count3 === 0 ? 'missingSourceAudio' : 'missingSecondVoiceRefAudio',
       );
     }
   });
@@ -607,11 +607,11 @@ export async function resolveAudioVoiceGenerateInstallId(value38 = globalThis['w
 }
 function normalizeAudioVoiceLastUsedAt(value42) {
   const count4 = Number(value42);
-  return Number['isFinite'](count4) && count4 > 0x0 ? Math['round'](count4) : 0x0;
+  return Number['isFinite'](count4) && count4 > 0 ? Math['round'](count4) : 0;
 }
 function resolveLatestAudioVoicePersistedSourceNode(options10 = {}) {
   let value43 = null,
-    value44 = 0x0;
+    value44 = 0;
   return (
     Object['values'](options10 || {})['forEach']((value45) => {
       if (!isAudioVoiceSourceNode(value45)) return;
@@ -668,10 +668,10 @@ export function resolveAudioVoiceAnalysisMemoryKey(options12 = {}) {
 }
 function formatDuration(value60) {
   const count5 = Number(value60);
-  if (!Number['isFinite'](count5) || count5 <= 0x0) return '';
+  if (!Number['isFinite'](count5) || count5 <= 0) return '';
   const value61 = Math['round'](count5),
-    value62 = Math['floor'](value61 / 0x3c),
-    value63 = String(value61 % 0x3c)['padStart'](0x2, '0');
+    value62 = Math['floor'](value61 / 60),
+    value63 = String(value61 % 60)['padStart'](2, '0');
   return value62 + ':' + value63;
 }
 function getSourceLabel(options13 = {}) {
@@ -701,7 +701,7 @@ export function buildAudioVoiceVideoAnalysisMemorySnapshot({
   analysisSourceAudioLocalPath: analysisSourceAudioLocalPath = '',
   analysisSourceAudioUrl: analysisSourceAudioUrl = '',
   analysisStatus: analysisStatus = 'ready',
-  lastUsedAt: lastUsedAt = 0x0,
+  lastUsedAt: lastUsedAt = 0,
   completedComposeKey: completedComposeKey = '',
 } = {}) {
   const value64 = sourceNode || {},
@@ -722,7 +722,7 @@ export function buildAudioVoiceVideoAnalysisMemorySnapshot({
       completedComposeKey: String(completedComposeKey || ''),
       segments: (Array['isArray'](segments) ? segments : [])['map'](cloneAudioVoiceSegment),
     };
-  if (audioVoiceLastUsedAt2 > 0x0) value65['lastUsedAt'] = audioVoiceLastUsedAt2;
+  if (audioVoiceLastUsedAt2 > 0) value65['lastUsedAt'] = audioVoiceLastUsedAt2;
   return value65;
 }
 export function resolveAudioVoicePersistedAnalysisSnapshot(sourceNode2 = {}) {
@@ -741,7 +741,7 @@ export function resolveAudioVoicePersistedAnalysisSnapshot(sourceNode2 = {}) {
   if (!event) return null;
   const value66 = String(sourceNodeId2['key'] || '')['trim']();
   if (value66 && value66 !== event['key']) return null;
-  if (event['analysisStatus'] !== 'ready' && event['segments']['length'] <= 0x0) return null;
+  if (event['analysisStatus'] !== 'ready' && event['segments']['length'] <= 0) return null;
   return event;
 }
 function shouldShowConvertedRow(response3 = {}) {
@@ -775,18 +775,18 @@ export function resolveAudioVoiceSegmentActiveAudioLocalPath(options20 = {}) {
     return normalizeLocalPath(options20['convertedAudioLocalPath'] || '');
   return normalizeLocalPath(options20['sourceAudioLocalPath'] || '');
 }
-function resolveAudioVoiceSegmentActiveAudioDurationMs(options21 = {}, value67 = 0x0, value68 = 0x0) {
+function resolveAudioVoiceSegmentActiveAudioDurationMs(options21 = {}, value67 = 0, value68 = 0) {
   const value69 = Math['max'](
-    0x0,
-    Math['round'](Number(value68) || 0x0) - Math['round'](Number(value67) || 0x0),
+    0,
+    Math['round'](Number(value68) || 0) - Math['round'](Number(value67) || 0),
   );
   if (isSegmentUsingConvertedAudio(options21)) {
     const audioDurationSec = pickAudioDurationSec(
       options21['convertedAudioDuration'],
       options21['audioDuration'],
     );
-    if (audioDurationSec > 0x0) return Math['max'](0x1, Math['round'](audioDurationSec * 0x3e8));
-    return 0x0;
+    if (audioDurationSec > 0) return Math['max'](1, Math['round'](audioDurationSec * 1000));
+    return 0;
   }
   return value69;
 }
@@ -847,7 +847,7 @@ export function buildAudioVoiceComposeTimelineClips(list7 = []) {
     ['filter']((response6) => response6?.['status'] !== 'removed')
     ['map']((value74) => {
       const src = resolveAudioVoiceSegmentActiveAudioLocalPath(value74),
-        startMs = Math['max'](0x0, Math['round'](Number(value74['startMs']) || 0x0)),
+        startMs = Math['max'](0, Math['round'](Number(value74['startMs']) || 0)),
         endMs = Math['max'](startMs, Math['round'](Number(value74['endMs']) || startMs));
       if (!src || !(endMs > startMs)) return null;
       const durationMs = resolveAudioVoiceSegmentActiveAudioDurationMs(value74, startMs, endMs);
@@ -856,7 +856,7 @@ export function buildAudioVoiceComposeTimelineClips(list7 = []) {
         src: src,
         startMs: startMs,
         endMs: endMs,
-        ...(durationMs > 0x0 ? { durationMs: durationMs } : {}),
+        ...(durationMs > 0 ? { durationMs: durationMs } : {}),
       };
     })
     ['filter'](Boolean);
@@ -865,20 +865,20 @@ export function resolveAudioVoiceComposeDurationSec(options22 = {}, value75 = []
   const count6 = Number(
     options22?.['videoDuration'] || options22?.['audioDuration'] || options22?.['duration'],
   );
-  if (Number['isFinite'](count6) && count6 > 0x0) return count6;
+  if (Number['isFinite'](count6) && count6 > 0) return count6;
   const count7 = Math['max'](
-    0x0,
+    0,
     ...(Array['isArray'](value75) ? value75 : [])
-      ['map']((value76) => Math['round'](Number(value76?.['endMs']) || 0x0))
-      ['filter']((count8) => Number['isFinite'](count8) && count8 > 0x0),
+      ['map']((value76) => Math['round'](Number(value76?.['endMs']) || 0))
+      ['filter']((count8) => Number['isFinite'](count8) && count8 > 0),
   );
-  return count7 > 0x0 ? count7 / 0x3e8 : 0x0;
+  return count7 > 0 ? count7 / 1000 : 0;
 }
 export function getDefaultAudioVoiceModelId() {
   const list8 = getAudioVoicePanelModelOptions();
   return (
     list8['find']((value77) => value77['id'] === RH_AUDIO_INDEXTTS2_CLONE_MODEL_ID)?.['id'] ||
-    list8[0x0]?.['id'] ||
+    list8[0]?.['id'] ||
     ''
   );
 }
@@ -904,7 +904,7 @@ export function initAudioVoicePanel({
   });
   let sourceNodeId3 = '',
     sourceNode3 = null,
-    lastUsedAt2 = 0x0,
+    lastUsedAt2 = 0,
     analysisSourceAudioLocalPath3 = '',
     analysisSourceAudioUrl2 = '',
     segments3 = [],
@@ -930,7 +930,7 @@ export function initAudioVoicePanel({
   const map8 = new Set();
   let enabled2 = null,
     value85 = null,
-    value86 = 0x0,
+    value86 = 0,
     completedComposeKey2 = '',
     map9 = new Set();
   const cancelInFlight = createAudioVoiceGenerationTaskOrchestration({
@@ -949,7 +949,7 @@ export function initAudioVoicePanel({
             kind: 'audioCompose',
             nodeId: sourceNodeId5,
             srcs: srcs,
-            args: { srcs: srcs, duration: Math['max'](0x0, Number(durationMs2 || 0x0) / 0x3e8) },
+            args: { srcs: srcs, duration: Math['max'](0, Number(durationMs2 || 0) / 1000) },
           },
           { wait: !![], timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
         ),
@@ -968,12 +968,12 @@ export function initAudioVoicePanel({
     panel = createEl('aside', 'audio-voice-panel');
   (panel['classList']['toggle']('is-embedded', embedded === !![]),
     panel['setAttribute']('aria-hidden', 'true'),
-    panel['setAttribute']('aria-label', panelText('title') + '\x20' + panelText('betaBadge')));
+    panel['setAttribute']('aria-label', panelText('title') + ' ' + panelText('betaBadge')));
   const el = createEl('div', 'audio-voice-panel-resize-handle panel-resize-handle');
   (el['setAttribute']('role', 'separator'),
     el['setAttribute']('aria-orientation', 'vertical'),
     el['setAttribute']('aria-label', panelText('resizeLabel')),
-    (el['tabIndex'] = 0x0));
+    (el['tabIndex'] = 0));
   const el2 = createEl('div', 'audio-voice-panel-header'),
     el3 = createEl('div', 'audio-voice-panel-title');
   el3['append'](
@@ -1028,7 +1028,7 @@ export function initAudioVoicePanel({
     audioVoiceConfirmDialog['close'](enabled3);
   }
   function run8() {
-    ((value86 += 0x1), (value85 = null), run7(![]));
+    ((value86 += 1), (value85 = null), run7(![]));
   }
   function confirmAction(options23 = {}) {
     return audioVoiceConfirmDialog['confirm'](options23);
@@ -1288,7 +1288,7 @@ export function initAudioVoicePanel({
       completedComposeKey: completedComposeKey2,
     });
     if (!event3) return;
-    if (event3['analysisStatus'] !== 'ready' && event3['segments']['length'] <= 0x0) return;
+    if (event3['analysisStatus'] !== 'ready' && event3['segments']['length'] <= 0) return;
     (map7['set'](event3['key'], event3), run24(event3));
   }
   function run25(value121) {
@@ -1304,7 +1304,7 @@ export function initAudioVoicePanel({
         (analysisSourceAudioLocalPath3 = ''),
         (analysisSourceAudioUrl2 = ''),
         (analysisStatus2 = 'idle'),
-        (lastUsedAt2 = 0x0),
+        (lastUsedAt2 = 0),
         (completedComposeKey2 = ''),
         ![]
       );
@@ -1318,7 +1318,7 @@ export function initAudioVoicePanel({
         localPathToUrl(analysisSourceAudioLocalPath3),
       )),
       (analysisStatus2 =
-        event4['analysisStatus'] === 'ready' || segments3['length'] > 0x0 ? 'ready' : 'idle'),
+        event4['analysisStatus'] === 'ready' || segments3['length'] > 0 ? 'ready' : 'idle'),
       (lastUsedAt2 = normalizeAudioVoiceLastUsedAt(event4['lastUsedAt'])),
       (completedComposeKey2 = String(event4['completedComposeKey'] || '')));
     const value123 = { ...event4, segments: segments3['map'](cloneAudioVoiceSegment) };
@@ -1347,7 +1347,7 @@ export function initAudioVoicePanel({
       run5(),
       (sourceNode3 = value125 || null),
       (sourceNodeId3 = sourceNode3?.['id'] || ''),
-      (lastUsedAt2 = 0x0),
+      (lastUsedAt2 = 0),
       map10['clear'](),
       run25(sourceNode3));
     if (markLastUsed) run5({ markLastUsed: !![] });
@@ -1355,7 +1355,7 @@ export function initAudioVoicePanel({
   }
   function run23() {
     const visibleAudioVoiceSegments = getVisibleAudioVoiceSegments(segments3)
-      ['slice'](0x0, AUDIO_VOICE_WARM_SEGMENT_LIMIT)
+      ['slice'](0, AUDIO_VOICE_WARM_SEGMENT_LIMIT)
       ['flatMap']((value126) => [
         resolveSegmentLocalAudioUrl(value126['sourceAudioUrl'], value126['sourceAudioLocalPath']),
         value126['convertedAudioReady']
@@ -1363,7 +1363,7 @@ export function initAudioVoicePanel({
           : '',
       ])
       ['filter'](Boolean);
-    void map10['warmMany'](visibleAudioVoiceSegments, { limit: AUDIO_VOICE_WARM_SEGMENT_LIMIT * 0x2 });
+    void map10['warmMany'](visibleAudioVoiceSegments, { limit: AUDIO_VOICE_WARM_SEGMENT_LIMIT * 2 });
   }
   function closeInlineMenus() {
     const list11 = panel['querySelectorAll']?.(
@@ -1388,7 +1388,7 @@ export function initAudioVoicePanel({
         options27['stage'] || audioVoiceInitialAnalysisProgress?.['stage'],
       ),
       progress: clampProgress01(
-        options27['progress'] ?? audioVoiceInitialAnalysisProgress?.['progress'] ?? 0x0,
+        options27['progress'] ?? audioVoiceInitialAnalysisProgress?.['progress'] ?? 0,
       ),
     }),
       run27());
@@ -1407,13 +1407,13 @@ export function initAudioVoicePanel({
       createEl(
         'div',
         'audio-voice-analysis-progress-percent',
-        Math['round'](clampProgress01(audioVoiceInitialAnalysisProgress['progress']) * 0x64) + '%',
+        Math['round'](clampProgress01(audioVoiceInitialAnalysisProgress['progress']) * 100) + '%',
       ),
     );
-    const el9 = createEl('div', 'update-banner-progress-track\x20audio-voice-analysis-progress-track'),
-      el10 = createEl('div', 'update-banner-progress-bar\x20audio-voice-analysis-progress-bar');
+    const el9 = createEl('div', 'update-banner-progress-track audio-voice-analysis-progress-track'),
+      el10 = createEl('div', 'update-banner-progress-bar audio-voice-analysis-progress-bar');
     ((el10['style']['width'] =
-      Math['round'](clampProgress01(audioVoiceInitialAnalysisProgress['progress']) * 0x64) + '%'),
+      Math['round'](clampProgress01(audioVoiceInitialAnalysisProgress['progress']) * 100) + '%'),
       el9['appendChild'](el10));
     const el11 = createEl(
       'div',
@@ -1435,7 +1435,7 @@ export function initAudioVoicePanel({
     if (!alert) return null;
     const el12 = createEl(
       'section',
-      ['audio-voice-asr-config-alert', className]['filter'](Boolean)['join']('\x20'),
+      ['audio-voice-asr-config-alert', className]['filter'](Boolean)['join'](' '),
     );
     el12['setAttribute']('role', 'alert');
     const el13 = createEl('span', 'audio-voice-asr-config-alert-icon');
@@ -1444,7 +1444,7 @@ export function initAudioVoicePanel({
       el15 = createEl('div', 'audio-voice-asr-config-alert-title', alert['title']),
       el16 = createEl('div', 'audio-voice-asr-config-alert-message');
     (el16['appendChild'](document['createTextNode'](alert['message'])),
-      el16['appendChild'](document['createTextNode']('\x20')));
+      el16['appendChild'](document['createTextNode'](' ')));
     const el17 = createEl('button', 'audio-voice-asr-config-alert-link', helpLabel);
     ((el17['type'] = 'button'),
       (el17['dataset']['audioVoiceAction'] = helpAction),
@@ -1490,7 +1490,7 @@ export function initAudioVoicePanel({
   function run33() {
     const list12 = getAudioVoiceAsrProviderOptions();
     audioVoiceAsrProvider = normalizeAudioVoiceAsrProvider(audioVoiceAsrProvider);
-    const value127 = list12['find']((value128) => value128['id'] === audioVoiceAsrProvider) || list12[0x0],
+    const value127 = list12['find']((value128) => value128['id'] === audioVoiceAsrProvider) || list12[0],
       provider2 = value127?.['label'] || '',
       panelText5 = panelText('actions.subtitleRecognitionWithName', { provider: provider2 }),
       el21 = createEl('div', 'audio-voice-asr-settings'),
@@ -1534,7 +1534,7 @@ export function initAudioVoicePanel({
       !list13['some']((value130) => value130['id'] === defaultAudioVoiceModelId)) &&
       (defaultAudioVoiceModelId = getDefaultAudioVoiceModelId());
     const value131 =
-        list13['find']((value132) => value132['id'] === defaultAudioVoiceModelId) || list13[0x0] || null,
+        list13['find']((value132) => value132['id'] === defaultAudioVoiceModelId) || list13[0] || null,
       model = value131?.['label'] || panelText('settings.noModels'),
       panelText6 = panelText('actions.globalModelWithName', { model: model }),
       el26 = createEl('div', 'audio-voice-global-settings'),
@@ -1589,12 +1589,12 @@ export function initAudioVoicePanel({
             (el33['append'](
               createEl(
                 'span',
-                'audio-voice-global-model-name\x20fmi-title',
+                'audio-voice-global-model-name fmi-title',
                 value134['label'] || value134['id'],
               ),
               createEl(
                 'span',
-                'audio-voice-global-model-subtitle\x20fmi-sub',
+                'audio-voice-global-model-subtitle fmi-sub',
                 value134['subtitle'] || value134['id'],
               ),
             ),
@@ -1690,7 +1690,7 @@ export function initAudioVoicePanel({
   function run39() {
     return (
       analysisStatus2 === 'ready' &&
-      run38()['targets']['length'] > 0x0 &&
+      run38()['targets']['length'] > 0 &&
       !run6() &&
       !runAudioVoiceBatchGenerationQueue2 &&
       !enabled2 &&
@@ -1722,7 +1722,7 @@ export function initAudioVoicePanel({
         const value140 = run37(error5['id']),
           el47 = createEl(
             'button',
-            'audio-voice-menu-item\x20audio-voice-translation-language',
+            'audio-voice-menu-item audio-voice-translation-language',
             value140?.['label'] || error5['name'],
           );
         ((el47['type'] = 'button'),
@@ -1762,14 +1762,14 @@ export function initAudioVoicePanel({
   }
   function run42() {
     const list15 = getVisibleAudioVoiceSegments(segments3);
-    return list15['length'] > 0x0 && list15['every']((value146) => map5['has'](value146['id']));
+    return list15['length'] > 0 && list15['every']((value146) => map5['has'](value146['id']));
   }
   function run44() {
     return getVisibleAudioVoiceSegments(segments3)['filter']((value147) => map5['has'](value147['id']));
   }
   function run45() {
     const list16 = run44(),
-      list17 = list16['length'] > 0x0 ? list16 : getVisibleAudioVoiceSegments(segments3);
+      list17 = list16['length'] > 0 ? list16 : getVisibleAudioVoiceSegments(segments3);
     return list17['filter']((response9) => response9['status'] !== 'generating');
   }
   function run46(list18 = []) {
@@ -1786,19 +1786,19 @@ export function initAudioVoicePanel({
         return resolveAudioVoiceProviderBatchConcurrency(
           providerConfig3,
           { provider: provider3, adapterType: adapterType },
-          value151 ? list19['length'] : 0x1,
+          value151 ? list19['length'] : 1,
         );
       }),
-      list21 = list20['filter']((value152) => Number['isFinite'](Number(value152)) && Number(value152) > 0x0);
-    if (list21['length'] <= 0x0) return 0x1;
-    return normalizeAudioVoiceBatchConcurrencyLimit(Math['min'](...list21), 0x1);
+      list21 = list20['filter']((value152) => Number['isFinite'](Number(value152)) && Number(value152) > 0);
+    if (list21['length'] <= 0) return 1;
+    return normalizeAudioVoiceBatchConcurrencyLimit(Math['min'](...list21), 1);
   }
   function run47() {
-    return analysisStatus2 === 'ready' && getVisibleAudioVoiceSegments(segments3)['length'] > 0x0;
+    return analysisStatus2 === 'ready' && getVisibleAudioVoiceSegments(segments3)['length'] > 0;
   }
   function run48(clips = buildAudioVoiceComposeTimelineClips(segments3)) {
     const sourceLocalPath = resolveAudioVoiceSourceLocalPath(sourceNode3 || {});
-    if (!sourceLocalPath || clips['length'] < 0x1) return '';
+    if (!sourceLocalPath || clips['length'] < 1) return '';
     return JSON['stringify']({
       sourceNodeId: sourceNodeId3,
       sourceLocalPath: sourceLocalPath,
@@ -1812,7 +1812,7 @@ export function initAudioVoicePanel({
     );
     if (!run47()) return null;
     const el52 = createEl('div', 'audio-voice-batch-actions'),
-      value153 = run44()['length'] > 0x0,
+      value153 = run44()['length'] > 0,
       value154 = value153 ? panelText('actions.selectedGenerate') : panelText('actions.batchGenerate'),
       value155 = value153
         ? panelText('actions.selectedGenerateTooltip')
@@ -1820,7 +1820,7 @@ export function initAudioVoicePanel({
       enabled5 = Boolean(runAudioVoiceBatchGenerationQueue2),
       value156 = Boolean(value84?.['isRequested']?.()),
       el53 = createButton(
-        'audio-voice-batch-action-btn\x20audio-voice-batch-generate-btn',
+        'audio-voice-batch-action-btn audio-voice-batch-generate-btn',
         enabled5 ? panelText('actions.stopBatchGeneration') : value155,
         enabled5 ? 'loading' : 'generateAction',
         enabled5
@@ -1837,7 +1837,7 @@ export function initAudioVoicePanel({
         (!enabled5 && Boolean(enabled2)) ||
         run6() ||
         audioVoiceSegmentMergeController['hasPending']() ||
-        (!enabled5 && run45()['length'] <= 0x0)));
+        (!enabled5 && run45()['length'] <= 0)));
     const list22 = buildAudioVoiceComposeTimelineClips(segments3),
       enabled6 = Boolean(enabled2),
       value157 = !enabled6 && completedComposeKey2 !== '' && completedComposeKey2 === run48(list22),
@@ -1862,7 +1862,7 @@ export function initAudioVoicePanel({
       el54['classList']['toggle']('is-composed', value157),
       el54['setAttribute']('aria-busy', String(enabled6)),
       (el54['disabled'] =
-        enabled6 || run6() || audioVoiceSegmentMergeController['hasPending']() || list22['length'] < 0x1),
+        enabled6 || run6() || audioVoiceSegmentMergeController['hasPending']() || list22['length'] < 1),
       el52['append'](run34(), run49(), el53, el54),
       el52
     );
@@ -1870,7 +1870,7 @@ export function initAudioVoicePanel({
   function run50() {
     const list23 = getAudioVoicePanelModelOptions(),
       value158 =
-        list23['find']((value159) => value159['id'] === defaultAudioVoiceModelId) || list23[0x0] || null;
+        list23['find']((value159) => value159['id'] === defaultAudioVoiceModelId) || list23[0] || null;
     return [
       run47() ? 'show' : 'hide',
       analysisStatus2,
@@ -1899,7 +1899,7 @@ export function initAudioVoicePanel({
             ':' +
             response10['activeAudio'] +
             ':' +
-            (response10['convertedAudioReady'] ? 0x1 : 0x0),
+            (response10['convertedAudioReady'] ? 1 : 0),
         )
         ['join'](','),
       canSelectAudioReference['getSnapshot']()['audioSegmentId'],
@@ -1908,7 +1908,7 @@ export function initAudioVoicePanel({
   function run51() {
     const list24 = getAudioVoiceAsrProviderOptions(),
       value162 =
-        list24['find']((value163) => value163['id'] === audioVoiceAsrProvider) || list24[0x0] || null;
+        list24['find']((value163) => value163['id'] === audioVoiceAsrProvider) || list24[0] || null;
     return [
       sourceNodeId3,
       sourceNode3 ? getSourceName(sourceNode3) : '',
@@ -1960,13 +1960,13 @@ export function initAudioVoicePanel({
       el5['removeChild'](el5['lastElementChild']);
     }
   }
-  function run56(options28 = {}, value169 = 0x1) {
+  function run56(options28 = {}, value169 = 1) {
     const error6 = resolveAudioVoiceSegmentAudioInput(options28, value169),
       enabled7 = String(error6['name'] || error6['nodeId'] || '')['trim']();
     if (!enabled7) return '+';
     const value170 = enabled7['replace'](/\.[^.\\/:]+$/, '')['trim']();
     return Array['from'](value170 || enabled7)
-      ['slice'](0x0, 0x2)
+      ['slice'](0, 2)
       ['join']('')
       ['toUpperCase']();
   }
@@ -1981,13 +1981,13 @@ export function initAudioVoicePanel({
     );
   }
   function run58(value174) {
-    const value175 = new Date(Number(value174 || 0x0) || Date['now']()),
-      handler2 = (value176) => String(value176)['padStart'](0x2, '0');
+    const value175 = new Date(Number(value174 || 0) || Date['now']()),
+      handler2 = (value176) => String(value176)['padStart'](2, '0');
     return (
-      handler2(value175['getMonth']() + 0x1) +
+      handler2(value175['getMonth']() + 1) +
       '/' +
       handler2(value175['getDate']()) +
-      '\x20' +
+      ' ' +
       handler2(value175['getHours']()) +
       ':' +
       handler2(value175['getMinutes']())
@@ -2001,7 +2001,7 @@ export function initAudioVoicePanel({
   function run60(value177, value178, value179, value180 = 'converted') {
     const el55 = createEl('textarea', 'audio-voice-line-text audio-voice-line-input');
     return (
-      (el55['rows'] = 0x1),
+      (el55['rows'] = 1),
       (el55['value'] = String(value178 || '')),
       (el55['placeholder'] = String(value179 || '')),
       (el55['autocomplete'] = 'off'),
@@ -2018,17 +2018,17 @@ export function initAudioVoicePanel({
     const list27 = normalizeAudioVoiceHistory(value181['convertedAudioHistory']),
       el56 = createEl('div', 'audio-voice-history-wrap'),
       el57 = createButton(
-        'audio-voice-icon-btn\x20audio-voice-history-trigger',
+        'audio-voice-icon-btn audio-voice-history-trigger',
         panelText('actions.history'),
         'history',
       );
     ((el57['dataset']['audioVoiceAction'] = 'toggle-history'),
       (el57['dataset']['segmentId'] = value181['id']),
-      (el57['disabled'] = list27['length'] <= 0x0));
+      (el57['disabled'] = list27['length'] <= 0));
     if (el57['disabled']) el57['setAttribute']('aria-disabled', 'true');
     const el58 = createEl('div', 'audio-voice-history-menu');
     return (
-      list27['length'] <= 0x0
+      list27['length'] <= 0
         ? el58['appendChild'](createEl('div', 'audio-voice-history-empty', panelText('history.empty')))
         : list27['forEach']((value182, index2) => {
             const el59 = createEl('div', 'audio-voice-history-item'),
@@ -2045,7 +2045,7 @@ export function initAudioVoicePanel({
                 createEl(
                   'span',
                   'audio-voice-history-title',
-                  value182['modelLabel'] || panelText('history.itemTitle', { index: index2 + 0x1 }),
+                  value182['modelLabel'] || panelText('history.itemTitle', { index: index2 + 1 }),
                 ),
                 createEl('span', 'audio-voice-history-meta', run58(value182['createdAt'])),
               ),
@@ -2111,8 +2111,8 @@ export function initAudioVoicePanel({
         createButton('audio-voice-icon-btn', panelText('actions.editSourceTooltip'), 'edit'),
         createButton('audio-voice-icon-btn', panelText('actions.alignSourceText'), 'align'),
       ),
-        (el64['children'][0x0]['dataset']['audioVoiceAction'] = 'edit-source'),
-        (el64['children'][0x1]['dataset']['audioVoiceAction'] = 'align-source'));
+        (el64['children'][0]['dataset']['audioVoiceAction'] = 'edit-source'),
+        (el64['children'][1]['dataset']['audioVoiceAction'] = 'align-source'));
     return (
       [...el64['children']]['forEach']((el66) => {
         if (el66['matches']?.('button')) el66['dataset']['segmentId'] = enabled10['id'];
@@ -2171,7 +2171,7 @@ export function initAudioVoicePanel({
     return (el68['append'](el71, renderAudioVoiceSegmentInlineMenu2), el68);
   }
   function run66(value188) {
-    const error7 = resolveAudioVoiceSegmentAudioInput(value188, 0x2),
+    const error7 = resolveAudioVoiceSegmentAudioInput(value188, 2),
       el72 = createEl('div', 'audio-voice-audio-param-wrap'),
       el73 = createEl('button', 'audio-voice-audio-param');
     el73['type'] = 'button';
@@ -2191,7 +2191,7 @@ export function initAudioVoicePanel({
     const el74 = createEl(
       'span',
       value189 ? 'audio-voice-audio-param-avatar' : 'audio-voice-audio-param-plus',
-      error7['imageUrl'] ? '' : run56(value188, 0x2),
+      error7['imageUrl'] ? '' : run56(value188, 2),
     );
     if (error7['imageUrl']) {
       const el75 = createEl('img', 'audio-voice-audio-param-image');
@@ -2244,7 +2244,7 @@ export function initAudioVoicePanel({
     el80?.['querySelectorAll']?.('button, input, textarea, select, [role="button"]')?.['forEach']((el81) => {
       if ('disabled' in el81) el81['disabled'] = !![];
       el81['setAttribute']?.('aria-disabled', 'true');
-      if (el81['hasAttribute']?.('tabindex')) el81['tabIndex'] = -0x1;
+      if (el81['hasAttribute']?.('tabindex')) el81['tabIndex'] = -1;
     });
   }
   function run72(response11, value193, value194) {
@@ -2269,7 +2269,7 @@ export function initAudioVoicePanel({
     ((el83['dataset']['audioVoiceAction'] = 'toggle-select'),
       (el83['dataset']['segmentId'] = response11['id']),
       el83['setAttribute']('role', 'button'),
-      (el83['tabIndex'] = 0x0),
+      (el83['tabIndex'] = 0),
       el83['append'](
         createEl(
           'div',
@@ -2311,12 +2311,12 @@ export function initAudioVoicePanel({
   function run74(value204, value205, list28) {
     const el87 = createEl('div', 'audio-voice-segment-gap-actions');
     el87['dataset']['segmentId'] = value204['id'];
-    if (value205 >= list28['length'] - 0x1) el87['classList']['add']('is-last');
-    if (value205 < list28['length'] - 0x1) {
+    if (value205 >= list28['length'] - 1) el87['classList']['add']('is-last');
+    if (value205 < list28['length'] - 1) {
       const el88 = run73('merge', panelText('actions.merge'), 'merge', value204['id']);
       ((el88['disabled'] =
         audioVoiceSegmentMergeController['isReserved'](value204) ||
-        audioVoiceSegmentMergeController['isReserved'](list28[value205 + 0x1])),
+        audioVoiceSegmentMergeController['isReserved'](list28[value205 + 1])),
         el87['appendChild'](el88));
     }
     const el89 = run73('insert', panelText('actions.insertSegment'), 'insert', value204['id']);
@@ -2363,17 +2363,17 @@ export function initAudioVoicePanel({
     (list30['push'](run54(), run75()), run55(list30), run76(), (value83 = null));
   }
   function run77() {
-    let count11 = 0x0;
+    let count11 = 0;
     return (
       panel['querySelectorAll']('.audio-voice-segment-card[data-segment-id]')['forEach']((el93) => {
         const enabled14 = String(el93['dataset']['segmentId'] || '')['trim']();
         if (!enabled14) return;
-        count11 += 0x1;
+        count11 += 1;
         const value211 = map5['has'](enabled14);
         (el93['classList']['toggle']('is-selected', value211),
           el93['setAttribute']('aria-selected', value211 ? 'true' : 'false'));
       }),
-      count11 > 0x0
+      count11 > 0
     );
   }
   function run78(el94, enabled15) {
@@ -2491,7 +2491,7 @@ export function initAudioVoicePanel({
   function run87(event5) {
     (event5['preventDefault']?.(), event5['stopPropagation']?.());
     const value219 = Number(event5['clientX']),
-      enabled22 = panel['getBoundingClientRect']?.()['width'] || panel['offsetWidth'] || 0x0;
+      enabled22 = panel['getBoundingClientRect']?.()['width'] || panel['offsetWidth'] || 0;
     if (!Number['isFinite'](value219) || !enabled22) return;
     document?.['body']?.['classList']?.['add']?.('audio-voice-panel-resizing');
     const value220 = (event6) => {
@@ -2517,7 +2517,7 @@ export function initAudioVoicePanel({
   }
   function run89(value227, args10) {
     const count12 = run21(value227);
-    if (count12 < 0x0) return null;
+    if (count12 < 0) return null;
     const value228 = { ...segments3[count12], ...args10 };
     return (
       (segments3 = segments3['map']((value229, value230) => (value230 === count12 ? value228 : value229))),
@@ -2745,14 +2745,14 @@ export function initAudioVoicePanel({
   function run65(options34 = {}) {
     return (
       isAudioVoiceImitateToneWorkflow(run4(options34)?.['id']) &&
-      !!resolveAudioVoiceSegmentAudioInput(options34, 0x2)['audioUrl']
+      !!resolveAudioVoiceSegmentAudioInput(options34, 2)['audioUrl']
     );
   }
   function run102(value263) {
     const enabled43 = String(value263 || '')['trim']();
     if (!enabled43) return [];
     const list36 =
-      map5['has'](enabled43) && map5['size'] > 0x1
+      map5['has'](enabled43) && map5['size'] > 1
         ? getVisibleAudioVoiceSegments(segments3)
             ['filter']((value264) => map5['has'](value264['id']))
             ['map']((value265) => value265['id'])
@@ -2764,7 +2764,7 @@ export function initAudioVoicePanel({
   }
   function run103(value268, imitateToneEnabled2) {
     const list37 = run102(value268);
-    if (list37['length'] <= 0x0) return ![];
+    if (list37['length'] <= 0) return ![];
     const map13 = new Set(list37);
     ((segments3 = segments3['map']((args11) =>
       map13['has'](args11['id'])
@@ -2786,7 +2786,7 @@ export function initAudioVoicePanel({
   }
   function updateCurrentSegment(value270, args12) {
     const count13 = run21(value270);
-    if (count13 < 0x0) return;
+    if (count13 < 0) return;
     const args13 = segments3[count13],
       value271 = { ...args13, ...args12 };
     ((segments3 = segments3['map']((value272, value273) => (value273 === count13 ? value271 : value272))),
@@ -2821,7 +2821,7 @@ export function initAudioVoicePanel({
   function run106(value279, el118 = {}) {
     const value280 = String(value279 || '')['trim'](),
       count14 = run21(value280);
-    if (count14 < 0x0) return ![];
+    if (count14 < 0) return ![];
     const args14 = segments3[count14],
       _audioVoiceConvertedRowVisible = run59(args14);
     map6['add'](value280);
@@ -2832,7 +2832,7 @@ export function initAudioVoicePanel({
   function run107(value282) {
     const value283 = String(value282 || '')['trim'](),
       count15 = run21(value283);
-    if (count15 < 0x0 || !map6['has'](value283)) return ![];
+    if (count15 < 0 || !map6['has'](value283)) return ![];
     const args15 = segments3[count15];
     if (shouldShowConvertedRow(args15)) return ![];
     map6['delete'](value283);
@@ -2840,10 +2840,10 @@ export function initAudioVoicePanel({
     if (!run97(value283, value284, args15)) render();
     return !![];
   }
-  function run108(value285, value286 = 0x1) {
+  function run108(value285, value286 = 1) {
     const list39 = getVisibleAudioVoiceSegments(segments3),
       count16 = list39['findIndex']((value287) => value287['id'] === value285);
-    if (count16 < 0x0) return ![];
+    if (count16 < 0) return ![];
     const enabled49 = list39[count16 + value286];
     if (!enabled49) return ![];
     return run106(enabled49['id'], { focus: !![] });
@@ -2862,7 +2862,7 @@ export function initAudioVoicePanel({
         !![]
       );
     if (event8['key'] === 'Tab') {
-      const value288 = event8['shiftKey'] ? -0x1 : 0x1;
+      const value288 = event8['shiftKey'] ? -1 : 1;
       if (!run108(enabled50, value288)) return ![];
       return (event8['preventDefault']?.(), event8['stopPropagation']?.(), !![]);
     }
@@ -2870,7 +2870,7 @@ export function initAudioVoicePanel({
   }
   function run110(value289, value290, value291 = 'converted') {
     const count17 = run21(value289);
-    if (count17 < 0x0) return;
+    if (count17 < 0) return;
     const args16 = segments3[count17],
       _audioVoiceConvertedRowVisible2 = run59(args16),
       value292 = { ...args16, ...buildAudioVoiceTextEditPatch(args16, value290) };
@@ -2894,7 +2894,7 @@ export function initAudioVoicePanel({
     value293 && run76();
   }
   async function run111(options35 = {}, value295 = {}, nodeId2 = sourceNodeId3) {
-    const value296 = Math['max'](0x0, Math['round'](Number(value295['startMs']) || 0x0)),
+    const value296 = Math['max'](0, Math['round'](Number(value295['startMs']) || 0)),
       src2 =
         normalizeLocalPath(value295['localPath'] || '') ||
         String(value295['audioUrl'] || '')['trim']() ||
@@ -2905,8 +2905,8 @@ export function initAudioVoicePanel({
           src: src2,
           nodeId: nodeId2,
           args: {
-            start: Math['max'](0x0, (Number(options35['startMs'] || 0x0) - value296) / 0x3e8),
-            end: Math['max'](0x0, (Number(options35['endMs'] || 0x0) - value296) / 0x3e8),
+            start: Math['max'](0, (Number(options35['startMs'] || 0) - value296) / 1000),
+            end: Math['max'](0, (Number(options35['endMs'] || 0) - value296) / 1000),
           },
         },
         { wait: !![], timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
@@ -2947,9 +2947,9 @@ export function initAudioVoicePanel({
       wrapperEl: wrapperEl,
       sourceLocalPath: sourceLocalPath2['localPath'],
       sourceUrl: sourceLocalPath2['audioUrl'],
-      initialStartSec: 0x0,
+      initialStartSec: 0,
       initialEndSec:
-        Math['max'](AUDIO_VOICE_SOURCE_CLIP_MIN_MS, Number(sourceLocalPath2['durationMs'] || 0x0)) / 0x3e8,
+        Math['max'](AUDIO_VOICE_SOURCE_CLIP_MIN_MS, Number(sourceLocalPath2['durationMs'] || 0)) / 1000,
       allowSplit: !![],
       dimMode: ![],
       onConfirm: async ({ startSec: startSec, endSec: endSec, splitSec: splitSec, ranges: ranges }) => {
@@ -2969,20 +2969,20 @@ export function initAudioVoicePanel({
                   id: String(value300?.['id'] || ''),
                   startMs:
                     sourceLocalPath2['startMs'] +
-                    Math['round'](Math['max'](0x0, Number(value300?.['startSec']) || 0x0) * 0x3e8),
+                    Math['round'](Math['max'](0, Number(value300?.['startSec']) || 0) * 1000),
                   endMs:
                     sourceLocalPath2['startMs'] +
-                    Math['round'](Math['max'](0x0, Number(value300?.['endSec']) || 0x0) * 0x3e8),
+                    Math['round'](Math['max'](0, Number(value300?.['endSec']) || 0) * 1000),
                 }))['sort']((value301, value302) => value301['startMs'] - value302['startMs'])
               : null,
-            rangesMs = Array['isArray'](list41) && list41['length'] >= 0x2,
+            rangesMs = Array['isArray'](list41) && list41['length'] >= 2,
             selectionStartMs = rangesMs
-              ? list41[0x0]['startMs']
+              ? list41[0]['startMs']
               : sourceLocalPath2['startMs'] +
-                Math['round'](Math['max'](0x0, Number(startSec) || 0x0) * 0x3e8),
+                Math['round'](Math['max'](0, Number(startSec) || 0) * 1000),
             selectionEndMs = rangesMs
-              ? list41[list41['length'] - 0x1]['endMs']
-              : sourceLocalPath2['startMs'] + Math['round'](Math['max'](0x0, Number(endSec) || 0x0) * 0x3e8),
+              ? list41[list41['length'] - 1]['endMs']
+              : sourceLocalPath2['startMs'] + Math['round'](Math['max'](0, Number(endSec) || 0) * 1000),
             args17 = await commitAudioVoiceSourceClipEdit(anchorId, {
               selectionStartMs: selectionStartMs,
               selectionEndMs: selectionEndMs,
@@ -2991,7 +2991,7 @@ export function initAudioVoicePanel({
                 rangesMs || splitSec === undefined || splitSec === null
                   ? null
                   : sourceLocalPath2['startMs'] +
-                    Math['round'](Math['max'](0x0, Number(splitSec) || 0x0) * 0x3e8),
+                    Math['round'](Math['max'](0, Number(splitSec) || 0) * 1000),
               newSegmentId: anchorId['id'] + '-split-' + Date['now'](),
               editBase: sourceLocalPath2,
               cutRange: (value303) => run111(value303, sourceLocalPath2, sourceNodeId8),
@@ -3085,7 +3085,7 @@ export function initAudioVoicePanel({
         : {}),
       localPath: localPath3,
       audioUrl: localPathToUrl(localPath3),
-      ...(audioDuration > 0x0 ? { audioDuration: audioDuration } : {}),
+      ...(audioDuration > 0 ? { audioDuration: audioDuration } : {}),
     };
   }
   async function run118(
@@ -3110,8 +3110,8 @@ export function initAudioVoicePanel({
           src: ownerAnalysisSourceAudioLocalPath,
           nodeId: ownerSourceNodeId,
           args: {
-            start: Math['max'](0x0, Number(args19['startMs'] || 0x0) / 0x3e8),
-            end: Math['max'](0x0, Number(args19['endMs'] || 0x0) / 0x3e8),
+            start: Math['max'](0, Number(args19['startMs'] || 0) / 1000),
+            end: Math['max'](0, Number(args19['endMs'] || 0) / 1000),
           },
         },
         { wait: !![], timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
@@ -3129,16 +3129,16 @@ export function initAudioVoicePanel({
   }
   function run119(value311) {
     const count18 = run21(value311);
-    if (count18 < 0x0) return;
+    if (count18 < 0) return;
     const targetText = segments3[count18];
     updateCurrentSegment(value311, {
       targetText:
         targetText['targetText'] ||
         (targetText['sourceText'] || panelText('sentences.sourcePlaceholder')) +
-          '\x20' +
+          ' ' +
           panelText('sentences.convertedSuffix'),
       convertedAudioReady: ![],
-      convertedAudioDuration: 0x0,
+      convertedAudioDuration: 0,
       activeAudio: 'source',
       status: 'edited',
     });
@@ -3150,7 +3150,7 @@ export function initAudioVoicePanel({
       segmentId: segmentId = '',
       modelOption: modelOption = {},
       modelId: modelId = '',
-      startedAt: startedAt = 0x0,
+      startedAt: startedAt = 0,
       fallbackSegment: fallbackSegment = null,
     } = {},
   ) {
@@ -3192,13 +3192,13 @@ export function initAudioVoicePanel({
   }
   function run49(value316 = '') {
     const el121 = document['createElement']('template');
-    el121['innerHTML'] = renderRequestDebugButton('data-audio-voice-action=\x22debug-generation\x22');
+    el121['innerHTML'] = renderRequestDebugButton('data-audio-voice-action="debug-generation"');
     const el122 = el121['content']['firstElementChild'];
     return ((el122['dataset']['segmentId'] = value316), el122);
   }
   function run120(value317) {
     if (windowObject?.['DEV_MODE'] !== !![]) return;
-    const enabled56 = value317 ? segments3[run21(value317)] : run45()[0x0];
+    const enabled56 = value317 ? segments3[run21(value317)] : run45()[0];
     openDebugRequestWindow({
       windowObject: windowObject,
       title: '声音生成请求调试',
@@ -3221,7 +3221,7 @@ export function initAudioVoicePanel({
         'trim'
       ](),
       count19 = run21(segmentId6);
-    if (count19 < 0x0) return { status: 'skipped' };
+    if (count19 < 0) return { status: 'skipped' };
     const response18 = cloneAudioVoiceSegment(segments3[count19]);
     if (response18['status'] === 'generating') return { status: 'skipped' };
     if (cancelInFlight['getRun'](sourceNodeId9, segmentId6)) return { status: 'skipped' };
@@ -3355,7 +3355,7 @@ export function initAudioVoicePanel({
           value319 && windowObject?.['showToast']?.(panelText('toasts.generateComplete'), 'success'),
           value320 &&
             (await notifyAudioVoiceGenerationComplete(
-              { total: 0x1, succeeded: 0x1, incomplete: 0x0 },
+              { total: 1, succeeded: 1, incomplete: 0 },
               { playSound: playCompletion, showNotification: showCompletionNotification },
             )),
           { status: 'success' }
@@ -3444,7 +3444,7 @@ export function initAudioVoicePanel({
       return;
     }
     const list43 = run45();
-    if (list43['length'] <= 0x0) {
+    if (list43['length'] <= 0) {
       windowObject?.['showToast']?.(panelText('toasts.noGenerateTargets'), 'warn');
       return;
     }
@@ -3486,7 +3486,7 @@ export function initAudioVoicePanel({
       return (
         windowObject?.['showToast']?.(
           audioVoiceGenerationCompletionMessage,
-          summarizeAudioVoiceGenerationResults2['incomplete'] > 0x0 ? 'warn' : 'success',
+          summarizeAudioVoiceGenerationResults2['incomplete'] > 0 ? 'warn' : 'success',
         ),
         await notifyAudioVoiceGenerationComplete(summarizeAudioVoiceGenerationResults2, {
           playSound: playCompletion,
@@ -3513,7 +3513,7 @@ export function initAudioVoicePanel({
     const list45 = getVisibleAudioVoiceSegments(segments3),
       value334 = list45['findIndex']((value335) => value335['id'] === value333),
       enabled61 = list45[value334],
-      value336 = list45[value334 + 0x1] || null;
+      value336 = list45[value334 + 1] || null;
     if (!enabled61) return;
     const audioVoiceSegmentAfter = createAudioVoiceSegmentAfter(enabled61, value336);
     run2('insert', [audioVoiceSegmentAfter['id']]);
@@ -3527,7 +3527,7 @@ export function initAudioVoicePanel({
   async function run125(triggerEl = null) {
     if (enabled2) return (run3(panelText('status.composing')), enabled2);
     const clips2 = buildAudioVoiceComposeTimelineClips(segments3);
-    if (clips2['length'] < 0x1) {
+    if (clips2['length'] < 1) {
       windowObject?.['showToast']?.(panelText('toasts.composeNeedsMoreAudio'), 'warn');
       return;
     }
@@ -3577,7 +3577,7 @@ export function initAudioVoicePanel({
         void Promise['resolve']()
           ['then'](() => playCompletion?.('audio-voice-compose'))
           ['catch']((value341) => {
-            console['warn']('[audioVoicePanel]\x20completion\x20sound\x20failed', value341);
+            console['warn']('[audioVoicePanel] completion sound failed', value341);
           }),
         enabled63
       );
@@ -3602,7 +3602,7 @@ export function initAudioVoicePanel({
     if (run6()) return (run3(panelText('status.translating')), null);
     const language2 = run37(value344),
       count20 = run38();
-    if (!language2 || analysisStatus2 !== 'ready' || count20['targets']['length'] <= 0x0)
+    if (!language2 || analysisStatus2 !== 'ready' || count20['targets']['length'] <= 0)
       return (windowObject?.['showToast']?.(panelText('toasts.noTranslationText'), 'warn'), null);
     closeInlineMenus();
     const enabled64 = await run9({
@@ -3613,7 +3613,7 @@ export function initAudioVoicePanel({
     });
     if (!enabled64) return null;
     const value345 = run38();
-    if (value345['targets']['length'] <= 0x0)
+    if (value345['targets']['length'] <= 0)
       return (windowObject?.['showToast']?.(panelText('toasts.noTranslationText'), 'warn'), null);
     const id2 = ++value86,
       value346 = sourceNodeId3,
@@ -3746,9 +3746,9 @@ export function initAudioVoicePanel({
           args: {
             asrProvider: isLocal,
             ...args24,
-            noiseDb: -0x23,
+            noiseDb: -35,
             minSilenceSec: 0.35,
-            paddingMs: 0x50,
+            paddingMs: 80,
           },
         }),
         enabled65 = String(enqueueElectronMediaTask2?.['taskId'] || '')['trim']();
@@ -3759,7 +3759,7 @@ export function initAudioVoicePanel({
         isLocal === AUDIO_VOICE_ASR_PROVIDER_IDS['FUNASR']
           ? {
               progressOffset: AUDIO_VOICE_ASR_RUNTIME_PROGRESS_SHARE,
-              progressScale: 0x1 - AUDIO_VOICE_ASR_RUNTIME_PROGRESS_SHARE,
+              progressScale: 1 - AUDIO_VOICE_ASR_RUNTIME_PROGRESS_SHARE,
             }
           : {},
       );
@@ -4071,7 +4071,7 @@ export function initAudioVoicePanel({
           getVisibleAudioVoiceSegments(segments3),
         ),
         map16 = new Set(audioVoiceSelectionTargetIds);
-      if (map16['size'] <= 0x0) return;
+      if (map16['size'] <= 0) return;
       ((segments3 = segments3['map']((args26) =>
         map16['has'](args26['id'])
           ? {
@@ -4099,7 +4099,7 @@ export function initAudioVoicePanel({
     if (value362 === 'remove') {
       const list47 = getVisibleAudioVoiceSegments(segments3),
         value371 = list47['findIndex']((value372) => value372['id'] === value363),
-        value373 = list47[value371 + 0x1] || list47[value371 - 0x1] || null;
+        value373 = list47[value371 + 1] || list47[value371 - 1] || null;
       (run2('remove-shift', value373 ? [value373['id']] : []),
         commitSegments(segments3['filter']((value374) => value374['id'] !== value363)));
       return;
@@ -4122,8 +4122,8 @@ export function initAudioVoicePanel({
     el['addEventListener']('keydown', (event10) => {
       if (event10['key'] !== 'ArrowLeft' && event10['key'] !== 'ArrowRight') return;
       event10['preventDefault']?.();
-      const value377 = panel['getBoundingClientRect']?.()['width'] || panel['offsetWidth'] || 0x0,
-        value378 = event10['key'] === 'ArrowLeft' ? 0x18 : -0x18;
+      const value377 = panel['getBoundingClientRect']?.()['width'] || panel['offsetWidth'] || 0,
+        value378 = event10['key'] === 'ArrowLeft' ? 24 : -24;
       run86(value377 + value378, { persist: !![] });
     }),
     panel['addEventListener']('pointerdown', (event11) => {
@@ -4151,7 +4151,7 @@ export function initAudioVoicePanel({
         const el131 = document?.['activeElement']?.['closest']?.('[data-audio-voice-text-input]');
         if (el131?.['dataset']['segmentId'] === value381) return;
         run107(value381);
-      }, 0x0);
+      }, 0);
     }),
     panel['addEventListener']('click', (event14) => {
       const el132 = event14['target']?.['closest']?.('[data-audio-voice-action]');
@@ -4181,7 +4181,7 @@ export function initAudioVoicePanel({
     panel['addEventListener']('keydown', (event15) => {
       const value382 = event15['target']?.['closest']?.('[data-audio-voice-text-input]');
       if (value382 && run109(event15, value382)) return;
-      if (event15['key'] !== 'Enter' && event15['key'] !== '\x20') return;
+      if (event15['key'] !== 'Enter' && event15['key'] !== ' ') return;
       const el134 = event15['target']?.['closest']?.('[data-audio-voice-action="toggle-select"]');
       if (!el134) return;
       (event15['preventDefault']?.(), onAction2('toggle-select', el134['dataset']['segmentId'] || '', el134));

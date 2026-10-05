@@ -59,7 +59,7 @@ export function initMinimap(mapW, store) {
   }
   function run6(box) {
     if (box && box.width !== 0) return box;
-    return { minX: -0x3e8, minY: -0x3e8, maxX: 0x3e8, maxY: 0x3e8, width: 0x7d0, height: 0x7d0 };
+    return { minX: -1000, minY: -1000, maxX: 1000, maxY: 1000, width: 2000, height: 2000 };
   }
   function run7(enabled6) {
     const count = Number(enabled6?._nodeCount);
@@ -96,8 +96,8 @@ export function initMinimap(mapW, store) {
   function run11(payload, handle, state = {}) {
     const bounds2 = run6(payload),
       { mapW: mapW3, mapH: mapH2 } = run5(),
-      config = Math.max(bounds2.width, 0x3e8),
-      scope = Math.max(bounds2.height, 0x3e8),
+      config = Math.max(bounds2.width, 1000),
+      scope = Math.max(bounds2.height, 1000),
       scale2 = Math.min(mapW3 / config, mapH2 / scope),
       offsetX2 = (mapW3 - config * scale2) / 2,
       offsetY2 = (mapH2 - scope * scale2) / 2;

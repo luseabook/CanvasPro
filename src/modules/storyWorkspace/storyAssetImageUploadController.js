@@ -95,7 +95,7 @@ export function createStoryAssetImageUploadController({
         if (isProjectTaskCurrent(projectToken2))
           state['assetAppearanceIndexes'] = {
             ...state['assetAppearanceIndexes'],
-            [assetId2]: index['appearances']['length'] - 0x1,
+            [assetId2]: index['appearances']['length'] - 1,
           };
       }
       return (finishTask(projectToken2, id, { status: 'succeeded', message: '本地图片已保存' }), !![]);
@@ -123,7 +123,7 @@ export function bindStoryAssetImageDrop(el, { state: state2, capture: capture2, 
       (el2?.['classList']['remove']('is-image-drop-target'), (el2 = null));
     },
     handler2 = (event) => {
-      if (state2['view'] !== 'project' || state2['step'] !== 0x2 || state2['assetFilter'] === 'library')
+      if (state2['view'] !== 'project' || state2['step'] !== 2 || state2['assetFilter'] === 'library')
         return null;
       const el3 =
         event['target']['closest']?.('[data-story-asset-id]') ||
@@ -151,7 +151,7 @@ export function bindStoryAssetImageDrop(el, { state: state2, capture: capture2, 
       if (!el5 || !event3['dataTransfer']?.['files']?.['length']) return;
       (event3['preventDefault'](), event3['stopPropagation']());
       const entry = capture2(el5['dataset']['storyAssetId'], { appendAppearance: !![] });
-      void upload2(event3['dataTransfer']['files'][0x0], entry);
+      void upload2(event3['dataTransfer']['files'][0], entry);
     };
   return (
     el['addEventListener']('dragover', target, !![]),

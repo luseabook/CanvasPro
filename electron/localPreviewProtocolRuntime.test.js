@@ -19,7 +19,7 @@ class FakeResponse {
 }
 
 function createHarness(overrides = {}) {
-  const state = { files: new Map(), handles: [], warnings: [], nowValue: 0x0, tokenSeq: 0x0 };
+  const state = { files: new Map(), handles: [], warnings: [], nowValue: 0, tokenSeq: 0 };
   const measureStat = (target) => {
     const entry = state.files.get(target);
     if (!entry) throw new Error('ENOENT ' + target);
@@ -33,11 +33,11 @@ function createHarness(overrides = {}) {
     },
     scheme: SCHEME,
     appOrigin: APP_ORIGIN,
-    ttlMs: 0x3e8,
+    ttlMs: 1000,
     resolveLocalVirtualPath: (value) => (value ? path.resolve('/virtual', value) : ''),
     now: () => state.nowValue,
     createToken: () => {
-      state.tokenSeq += 0x1;
+      state.tokenSeq += 1;
       return 'token' + state.tokenSeq;
     },
     resolveRealPath: (value) => value,
@@ -50,18 +50,18 @@ function createHarness(overrides = {}) {
   return { runtime: createLocalPreviewProtocolRuntime({ ...config, ...overrides }), state: state };
 }
 
-function registerFile(state, target, size = 0x40) {
+function registerFile(state, target, size = 64) {
   state.files.set(target, { size: size, isFile: () => true });
   return target;
 }
 
 function registerNonFile(state, target) {
-  state.files.set(target, { size: 0x0, isFile: () => false });
+  state.files.set(target, { size: 0, isFile: () => false });
   return target;
 }
 
 function handleRequest(harness, url, rangeHeader = null) {
-  return harness.state.handles[0x0]['handler']({
+  return harness.state.handles[0]['handler']({
     url: url,
     headers: { get: (name) => (name === 'range' ? rangeHeader : null) },
   });
@@ -105,15 +105,15 @@ test('createLocalPreviewProtocolRuntime requires its injected collaborators', ()
 });
 
 test('parseLocalPreviewRange parses bounded, open-ended and suffix ranges', () => {
-  assert.deepEqual(parseLocalPreviewRange('bytes=0-9', 100), { start: 0x0, end: 0x9 });
-  assert.deepEqual(parseLocalPreviewRange('bytes=10-', 100), { start: 0xa, end: 0x63 });
-  assert.deepEqual(parseLocalPreviewRange('bytes=-10', 100), { start: 0x5a, end: 0x63 });
-  assert.deepEqual(parseLocalPreviewRange('bytes=0-', 1), { start: 0x0, end: 0x0 });
+  assert.deepEqual(parseLocalPreviewRange('bytes=0-9', 100), { start: 0, end: 9 });
+  assert.deepEqual(parseLocalPreviewRange('bytes=10-', 100), { start: 10, end: 99 });
+  assert.deepEqual(parseLocalPreviewRange('bytes=-10', 100), { start: 90, end: 99 });
+  assert.deepEqual(parseLocalPreviewRange('bytes=0-', 1), { start: 0, end: 0 });
 });
 
 test('parseLocalPreviewRange clamps a range that runs past the end', () => {
-  assert.deepEqual(parseLocalPreviewRange('bytes=95-200', 100), { start: 0x5f, end: 0x63 });
-  assert.deepEqual(parseLocalPreviewRange('bytes=-500', 100), { start: 0x0, end: 0x63 });
+  assert.deepEqual(parseLocalPreviewRange('bytes=95-200', 100), { start: 95, end: 99 });
+  assert.deepEqual(parseLocalPreviewRange('bytes=-500', 100), { start: 0, end: 99 });
 });
 
 test('parseLocalPreviewRange rejects malformed or unsatisfiable ranges', () => {
@@ -126,7 +126,7 @@ test('parseLocalPreviewRange rejects malformed or unsatisfiable ranges', () => {
 });
 
 test('parseLocalPreviewRange rejects invalid sizes', () => {
-  assert.equal(parseLocalPreviewRange('bytes=0-9', 0x0), null);
+  assert.equal(parseLocalPreviewRange('bytes=0-9', 0), null);
   assert.equal(parseLocalPreviewRange('bytes=0-9', 'x'), null);
   assert.equal(parseLocalPreviewRange('bytes=0-9', 10.5), null);
   assert.equal(parseLocalPreviewRange('bytes=0-9', Number.MAX_SAFE_INTEGER + 2), null);
@@ -162,11 +162,11 @@ test('getLocalPreviewMimeType maps known extensions case-insensitively', () => {
 
 test('createUrl registers an absolute file and returns a preview url', () => {
   const harness = createHarness();
-  const target = registerFile(harness.state, path.resolve('/assets', 'clip one.mp4'), 0x800);
-  harness.state.nowValue = 0x64;
+  const target = registerFile(harness.state, path.resolve('/assets', 'clip one.mp4'), 2048);
+  harness.state.nowValue = 100;
   const url = harness.runtime['createUrl']({ path: target, type: 'video/mp4' });
   assert.equal(url, SCHEME + '://preview/token1/clip%20one.mp4');
-  assert.equal(harness.state.tokenSeq, 0x1);
+  assert.equal(harness.state.tokenSeq, 1);
 });
 
 test('createUrl resolves a virtual path through the injected resolver', () => {
@@ -220,8 +220,8 @@ test('install registers the scheme once and is idempotent', () => {
   const harness = createHarness();
   assert.equal(harness.runtime['install'](), true);
   assert.equal(harness.runtime['install'](), false);
-  assert.equal(harness.state.handles.length, 0x1);
-  assert.equal(harness.state.handles[0x0]['scheme'], SCHEME);
+  assert.equal(harness.state.handles.length, 1);
+  assert.equal(harness.state.handles[0]['scheme'], SCHEME);
 });
 
 test('clearExpired drops entries exactly at their ttl and keeps earlier ones', () => {
@@ -229,12 +229,12 @@ test('clearExpired drops entries exactly at their ttl and keeps earlier ones', (
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
   harness.runtime['install']();
   const url = harness.runtime['createUrl']({ path: target });
-  harness.state.nowValue = 0x3e7;
+  harness.state.nowValue = 999;
   harness.runtime['clearExpired']();
-  assert.equal(handleRequest(harness, url)['init']['status'], 0xc8);
-  harness.state.nowValue = 0x3e8;
+  assert.equal(handleRequest(harness, url)['init']['status'], 200);
+  harness.state.nowValue = 1000;
   harness.runtime['clearExpired']();
-  assert.equal(handleRequest(harness, url)['init']['status'], 0x194);
+  assert.equal(handleRequest(harness, url)['init']['status'], 404);
 });
 
 test('expired entries are swept when the next url is minted', () => {
@@ -242,19 +242,19 @@ test('expired entries are swept when the next url is minted', () => {
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
   harness.runtime['install']();
   const stale = harness.runtime['createUrl']({ path: target });
-  harness.state.nowValue = 0x3e8;
+  harness.state.nowValue = 1000;
   const fresh = harness.runtime['createUrl']({ path: target });
-  assert.equal(handleRequest(harness, stale)['init']['status'], 0x194);
-  assert.equal(handleRequest(harness, fresh)['init']['status'], 0xc8);
+  assert.equal(handleRequest(harness, stale)['init']['status'], 404);
+  assert.equal(handleRequest(harness, fresh)['init']['status'], 200);
 });
 
 test('the protocol handler streams a full file with cors and cache headers', () => {
   const harness = createHarness();
-  const target = registerFile(harness.state, path.resolve('/assets', 'a.png'), 0x40);
+  const target = registerFile(harness.state, path.resolve('/assets', 'a.png'), 64);
   harness.runtime['install']();
   const url = harness.runtime['createUrl']({ path: target, type: 'image/png' });
   const response = handleRequest(harness, url);
-  assert.equal(response['init']['status'], 0xc8);
+  assert.equal(response['init']['status'], 200);
   assert.deepEqual(response['init']['headers'], {
     'Content-Type': 'image/png',
     'Accept-Ranges': 'bytes',
@@ -268,18 +268,18 @@ test('the protocol handler streams a full file with cors and cache headers', () 
 
 test('the protocol handler answers a byte range with 206 and a partial stream', () => {
   const harness = createHarness();
-  const target = registerFile(harness.state, path.resolve('/assets', 'a.mp4'), 0x40);
+  const target = registerFile(harness.state, path.resolve('/assets', 'a.mp4'), 64);
   harness.runtime['install']();
   const url = harness.runtime['createUrl']({ path: target, type: 'video/mp4' });
   const response = handleRequest(harness, url, 'bytes=8-15');
-  assert.equal(response['init']['status'], 0xce);
+  assert.equal(response['init']['status'], 206);
   assert.equal(response['init']['headers']['Content-Range'], 'bytes 8-15/64');
   assert.equal(response['init']['headers']['Content-Length'], '8');
-  assert.deepEqual(response['body']['stream']['options'], { start: 0x8, end: 0xf });
+  assert.deepEqual(response['body']['stream']['options'], { start: 8, end: 15 });
 });
 
 test('the protocol handler floors the cache max-age from the ttl', () => {
-  const harness = createHarness({ ttlMs: 0x0 });
+  const harness = createHarness({ ttlMs: 0 });
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
   harness.runtime['install']();
   const url = harness.runtime['createUrl']({ path: target });
@@ -291,7 +291,7 @@ test('the protocol handler returns 404 for an unknown preview token', () => {
   const harness = createHarness();
   harness.runtime['install']();
   const response = handleRequest(harness, SCHEME + '://preview/missing/a.png');
-  assert.equal(response['init']['status'], 0x194);
+  assert.equal(response['init']['status'], 404);
   assert.equal(response['body'], 'Preview not found');
 });
 
@@ -301,9 +301,9 @@ test('the protocol handler drops an entry whose target stopped being a file', ()
   harness.runtime['install']();
   const url = harness.runtime['createUrl']({ path: target });
   registerNonFile(harness.state, target);
-  assert.equal(handleRequest(harness, url)['init']['status'], 0x194);
-  assert.equal(handleRequest(harness, url)['init']['status'], 0x194);
-  assert.equal(harness.state.warnings.length, 0x0);
+  assert.equal(handleRequest(harness, url)['init']['status'], 404);
+  assert.equal(handleRequest(harness, url)['init']['status'], 404);
+  assert.equal(harness.state.warnings.length, 0);
 });
 
 test('the protocol handler logs and answers 500 when streaming fails', () => {
@@ -316,9 +316,9 @@ test('the protocol handler logs and answers 500 when streaming fails', () => {
   harness.runtime['install']();
   const url = harness.runtime['createUrl']({ path: target });
   const response = handleRequest(harness, url);
-  assert.equal(response['init']['status'], 0x1f4);
+  assert.equal(response['init']['status'], 500);
   assert.equal(response['body'], 'Preview failed');
-  assert.equal(harness.state.warnings.length, 0x1);
-  assert.equal(harness.state.warnings[0x0][0x0], '[electron] local preview failed:');
-  assert.equal(harness.state.warnings[0x0][0x1]['message'], 'boom');
+  assert.equal(harness.state.warnings.length, 1);
+  assert.equal(harness.state.warnings[0][0], '[electron] local preview failed:');
+  assert.equal(harness.state.warnings[0][1]['message'], 'boom');
 });

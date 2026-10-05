@@ -252,7 +252,7 @@ export function createStorySummaryGenerationWorkspaceController({
             updateBackgroundTask(projectTitleEdited, id, { status: 'running', message: message2 });
             if (isProjectTaskCurrent(projectTitleEdited)) {
               state['generationStatus'] = message2;
-              if (state['view'] === 'project' && state['step'] === 0x1) render();
+              if (state['view'] === 'project' && state['step'] === 1) render();
             }
           },
         }));
@@ -289,7 +289,7 @@ export function createStorySummaryGenerationWorkspaceController({
         }),
         await resumePayload2['succeeded'](),
         notifyTextTaskComplete('剧本摘要生成完成。', projectTitleEdited, {
-          step: 0x1,
+          step: 1,
           outlineSectionId: 'summary',
         }),
         schedulePersistence({ immediate: !![] }));
@@ -356,7 +356,7 @@ export function createStorySummaryGenerationWorkspaceController({
             updateBackgroundTask(projectTitleEdited2, id2, { status: 'running', message: message4 });
             if (isProjectTaskCurrent(projectTitleEdited2)) {
               state['generationStatus'] = message4;
-              if (state['view'] === 'project' && state['step'] === 0x1) render();
+              if (state['view'] === 'project' && state['step'] === 1) render();
             }
           },
         }));
@@ -394,7 +394,7 @@ export function createStorySummaryGenerationWorkspaceController({
         }),
         await resumePayload3['succeeded'](),
         notifyTextTaskComplete('剧本摘要已重新生成。', projectTitleEdited2, {
-          step: 0x1,
+          step: 1,
           outlineSectionId: 'summary',
         }),
         !![]

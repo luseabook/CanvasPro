@@ -5,9 +5,9 @@ export function createCollaborationChatState({
 }) {
   let enabled = null,
     enabled2 = ![],
-    value = 0x0,
+    value = 0,
     enabled3 = ![],
-    item = 0x0,
+    item = 0,
     failed = null;
   const map = new Map(),
     handler = () => ({
@@ -18,10 +18,10 @@ export function createCollaborationChatState({
       loading: ![],
       sending: ![],
       error: '',
-      unread: 0x0,
+      unread: 0,
       mentioned: ![],
       hasMore: ![],
-      revision: -0x1,
+      revision: -1,
     });
   let body2 = handler(),
     enabled4 = ![];
@@ -39,7 +39,7 @@ export function createCollaborationChatState({
           mentions: [...body2['mentions']],
           failed: failed,
         });
-      ((enabled = index), value++, (enabled3 = ![]), (item = 0x0));
+      ((enabled = index), value++, (enabled3 = ![]), (item = 0));
       const body3 = map['get'](handler2(index));
       ((failed = body3?.['failed'] || null),
         (body2 = {
@@ -53,8 +53,8 @@ export function createCollaborationChatState({
         run());
     }
     if (!enabled || enabled2) return;
-    item = Math['max'](item, enabled['state']['review']?.['chatRevision'] || 0x0);
-    if (!enabled3 && (body2['revision'] < item || body2['revision'] < 0x0) && !body2['error']) void refresh();
+    item = Math['max'](item, enabled['state']['review']?.['chatRevision'] || 0);
+    if (!enabled3 && (body2['revision'] < item || body2['revision'] < 0) && !body2['error']) void refresh();
   }
   async function refresh() {
     if (!enabled || enabled3 || enabled2) return;
@@ -64,7 +64,7 @@ export function createCollaborationChatState({
     try {
       let options;
       do {
-        const enabled5 = body2['revision'] < 0x0,
+        const enabled5 = body2['revision'] < 0,
           target = await result['review']['readChat'](enabled5 ? {} : { after: body2['revision'] });
         if (data !== value || enabled2) return;
         const map2 = new Set(body2['messages']['map']((source) => source['id'])),
@@ -81,7 +81,7 @@ export function createCollaborationChatState({
             }
           }
         ((options = !enabled5 && target['hasMore']),
-          (body2['revision'] = options ? target['messages']['at'](-0x1)['seq'] : target['chatRevision']),
+          (body2['revision'] = options ? target['messages']['at'](-1)['seq'] : target['chatRevision']),
           run());
       } while (options || body2['revision'] < item);
     } catch (error) {
@@ -96,7 +96,7 @@ export function createCollaborationChatState({
       handle = value;
     ((enabled3 = !![]), (body2['loading'] = !![]), (body2['error'] = ''), run());
     try {
-      const args2 = await payload['review']['readChat']({ before: body2['messages'][0x0]['seq'] });
+      const args2 = await payload['review']['readChat']({ before: body2['messages'][0]['seq'] });
       if (handle !== value || enabled2) return;
       const map3 = new Set(body2['messages']['map']((state) => state['id']));
       (body2['messages']['unshift'](...args2['messages']['filter']((config) => !map3['has'](config['id']))),
@@ -155,7 +155,7 @@ export function createCollaborationChatState({
     send: send,
     snapshot: () => body2,
     setVisible(value2) {
-      ((enabled4 = value2), value2 && ((body2['unread'] = 0x0), (body2['mentioned'] = ![])), run());
+      ((enabled4 = value2), value2 && ((body2['unread'] = 0), (body2['mentioned'] = ![])), run());
     },
     destroy() {
       ((enabled2 = !![]), value++, map['clear']());

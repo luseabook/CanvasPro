@@ -68,8 +68,8 @@ function computeExpectedViewportBox({
   innerHeight: innerHeight,
 }) {
   const bounds = calcWorldBounds({}, viewport),
-    target = Math.max(bounds.width, 0x3e8),
-    source = Math.max(bounds.height, 0x3e8),
+    target = Math.max(bounds.width, 1000),
+    source = Math.max(bounds.height, 1000),
     scale = Math.min(mapW / target, mapH / source),
     offsetX = (mapW - target * scale) / 2,
     offsetY = (mapH - source * scale) / 2,
@@ -141,7 +141,7 @@ function installMinimapDomStubs() {
       ['v2-wrap', fakeElement],
     ]);
   return (
-    (globalThis.window = { innerWidth: 0x4b0, innerHeight: 0x320, _v2MinimapScale: 0 }),
+    (globalThis.window = { innerWidth: 1200, innerHeight: 800, _v2MinimapScale: 0 }),
     (globalThis.document = {
       createElement() {
         return createFakeElement();
@@ -208,7 +208,7 @@ function installMinimapDomStubs() {
       value3 = Object.prototype.hasOwnProperty.call(globalThis, 'performance'),
       value4 = globalThis.performance,
       list4 = [];
-    let value5 = 0x3e8;
+    let value5 = 1000;
     ((globalThis.setTimeout = (callback2, delay) => {
       const value6 = { callback: callback2, delay: delay, cancelled: false };
       return (list4.push(value6), value6);
@@ -234,15 +234,15 @@ function installMinimapDomStubs() {
       globalThis.window._v2ScheduleMinimapViewportPreview(value8, { force: true });
       const value9 = mapW3.minimapViewport.style.left,
         value10 = mapW3.minimapViewport.style.top;
-      value5 = 0x3fc;
-      const viewport3 = { x: 0x104, y: -90, zoom: 1 };
+      value5 = 1020;
+      const viewport3 = { x: 260, y: -90, zoom: 1 };
       (globalThis.window._v2ScheduleMinimapViewportPreview(viewport3),
         assert.equal(mapW3.minimapViewport.style.left, value9),
         assert.equal(mapW3.minimapViewport.style.top, value10),
         assert.equal(list4.length, 1),
         assert.ok(list4[0].delay > 0),
         assert.ok(list4[0].delay <= 96),
-        (value5 = 0x44c),
+        (value5 = 1100),
         list4[0].callback());
       const box3 = computeExpectedViewportBox({
         viewport: viewport3,

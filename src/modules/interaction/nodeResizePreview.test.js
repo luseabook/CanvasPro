@@ -52,8 +52,8 @@ function withFakeBrowser(handler) {
       location: { href: 'http://127.0.0.1/' },
       document: globalThis.document,
       performance: { getEntriesByType: () => [] },
-      _lastMx: 0x14d,
-      _lastMy: 0x1bc,
+      _lastMx: 333,
+      _lastMy: 444,
       v2Renderer: {
         previewNodeResizeGeometry(target) {
           rendererCalls.push(target);
@@ -145,8 +145,8 @@ function withFakeBrowser(handler) {
         assert.equal(output, 1),
         assert.deepEqual(rendererCalls2, [{ nodeId: 'node-1', width: 230, height: 140 }]),
         assert.equal(sidePlusCalls2.length, 1),
-        assert.equal(sidePlusCalls2[0].x, 0x14d),
-        assert.equal(sidePlusCalls2[0].y, 0x1bc),
+        assert.equal(sidePlusCalls2[0].x, 333),
+        assert.equal(sidePlusCalls2[0].y, 444),
         assert.deepEqual(sidePlusCalls2[0].options.nodeSizeOverrides, {
           'node-1': { width: 230, height: 140 },
         }),

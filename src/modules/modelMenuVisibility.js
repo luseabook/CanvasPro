@@ -59,7 +59,7 @@ export function syncModelMenuVisibility(el2, list2, key = {}) {
     const list3 = list2['filter']((result) => el3['contains'](result)),
       data =
         enabled2 &&
-        (list3['length'] > 0x0
+        (list3['length'] > 0
           ? list3['every']((el4) => el4['dataset']?.['modelMenuHidden'] === 'true')
           : Boolean(provider['dataset']?.['credentialProvider']) &&
             isModelMenuEntryUnconfigured({
@@ -72,14 +72,14 @@ export function syncModelMenuVisibility(el2, list2, key = {}) {
   let el5 = el2['querySelector']?.('[data-model-menu-empty]');
   const enabled3 =
     enabled2 &&
-    list2['length'] > 0x0 &&
+    list2['length'] > 0 &&
     list2['every']((el6) => el6['dataset']?.['modelMenuHidden'] === 'true');
   if (enabled3 && !el5) {
     const el7 = key['documentObject'] || el2['ownerDocument'] || globalThis['document'];
     ((el5 = el7?.['createElement']?.('button')),
       el5 &&
         ((el5['type'] = 'button'),
-        (el5['className'] = 'floating-menu-item\x20model-menu-configuration-empty'),
+        (el5['className'] = 'floating-menu-item model-menu-configuration-empty'),
         (el5['dataset']['modelMenuEmpty'] = 'true'),
         el5['addEventListener']('click', (event) => {
           (event['stopPropagation'](),

@@ -90,7 +90,7 @@ function buildMediaClipAudioMixFilterParts(list3 = [], config = 0, scope = 0, in
     nonNegative2 = normalizeNonNegative(scope, 0),
     list5 = list4.map((item2, value3) => {
       const value4 = config + value3,
-        value5 = Math.max(0, Math.round(item2.timelineStart * 0x3e8));
+        value5 = Math.max(0, Math.round(item2.timelineStart * 1000));
       return (
         '[' +
         value4 +

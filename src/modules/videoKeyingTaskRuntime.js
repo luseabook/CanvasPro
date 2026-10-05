@@ -31,8 +31,8 @@ function getNode(key) {
 }
 function computeGenerationDuration(index) {
   const count = Number(getNode(index)?.['generationStartTime']);
-  if (!Number['isFinite'](count) || count <= 0x0) return 0x0;
-  return Math['max'](0x0, Date['now']() - count);
+  if (!Number['isFinite'](count) || count <= 0) return 0;
+  return Math['max'](0, Date['now']() - count);
 }
 function notifyTaskChange(options = {}) {
   try {
@@ -94,13 +94,13 @@ function findStoredTask(next, current = '') {
       })
       ['sort']((record, payload) => {
         const handle =
-            Number(record['node']['rhTaskStartedAt'] || record['node']['generationStartTime'] || 0x0) || 0x0,
+            Number(record['node']['rhTaskStartedAt'] || record['node']['generationStartTime'] || 0) || 0,
           state =
-            Number(payload['node']['rhTaskStartedAt'] || payload['node']['generationStartTime'] || 0x0) ||
-            0x0;
+            Number(payload['node']['rhTaskStartedAt'] || payload['node']['generationStartTime'] || 0) ||
+            0;
         return state - handle;
       }),
-    sourceNodeId = entry[0x0];
+    sourceNodeId = entry[0];
   if (!sourceNodeId) return null;
   return toPublicTask(
     {
@@ -177,7 +177,7 @@ export async function runVideoKeyingTask({
   if (!sourceNodeId3 || !outId4)
     throw new Error('[videoKeyingTaskRuntime] sourceNodeId and outId are required');
   const apiKey = {
-    id: Date['now']() + '_' + Math['random']()['toString'](0x24)['slice'](0x2),
+    id: Date['now']() + '_' + Math['random']()['toString'](36)['slice'](2),
     running: !![],
     taskId: '',
     sourceNodeId: sourceNodeId3,

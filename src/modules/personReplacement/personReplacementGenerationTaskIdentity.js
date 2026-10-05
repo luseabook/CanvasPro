@@ -19,9 +19,9 @@ function firstText(...args) {
 function firstPositiveNumber(...args2) {
   for (const key of args2) {
     const count = Number(key);
-    if (Number['isFinite'](count) && count > 0x0) return count;
+    if (Number['isFinite'](count) && count > 0) return count;
   }
-  return 0x0;
+  return 0;
 }
 export function isPersonReplacementGenerationTaskActive(response) {
   const index = response && typeof response === 'object' ? response['status'] : response;

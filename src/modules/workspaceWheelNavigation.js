@@ -6,10 +6,10 @@ function normalizeSelector(value) {
 export function hasWorkspaceScrollableOverflow(el, item) {
   const key =
       WORKSPACE_SCROLLABLE_OVERFLOW_VALUES['has'](String(item?.['overflowY'] || '')) &&
-      Number(el?.['scrollHeight'] || 0x0) > Number(el?.['clientHeight'] || 0x0),
+      Number(el?.['scrollHeight'] || 0) > Number(el?.['clientHeight'] || 0),
     index =
       WORKSPACE_SCROLLABLE_OVERFLOW_VALUES['has'](String(item?.['overflowX'] || '')) &&
-      Number(el?.['scrollWidth'] || 0x0) > Number(el?.['clientWidth'] || 0x0);
+      Number(el?.['scrollWidth'] || 0) > Number(el?.['clientWidth'] || 0);
   return key || index;
 }
 export function shouldPreserveWorkspaceNestedWheel(
@@ -40,15 +40,15 @@ export function shouldPreserveWorkspaceNestedWheel(
 export function captureWorkspaceScrollPosition(enabled) {
   if (!enabled) return null;
   return {
-    top: Math['max'](0x0, Number(enabled['scrollTop']) || 0x0),
-    left: Math['max'](0x0, Number(enabled['scrollLeft']) || 0x0),
+    top: Math['max'](0, Number(enabled['scrollTop']) || 0),
+    left: Math['max'](0, Number(enabled['scrollLeft']) || 0),
   };
 }
 export function restoreWorkspaceScrollPosition(enabled2, box) {
   if (!enabled2 || !box) return ![];
   return (
-    (enabled2['scrollTop'] = Math['max'](0x0, Number(box['top']) || 0x0)),
-    (enabled2['scrollLeft'] = Math['max'](0x0, Number(box['left']) || 0x0)),
+    (enabled2['scrollTop'] = Math['max'](0, Number(box['top']) || 0)),
+    (enabled2['scrollLeft'] = Math['max'](0, Number(box['left']) || 0)),
     !![]
   );
 }

@@ -1,5 +1,5 @@
 const STARTUP_LOADER_ID = 'v2-initial-loader',
-  STARTUP_VISUAL_FALLBACK_POLL_MS = 0x64;
+  STARTUP_VISUAL_FALLBACK_POLL_MS = 100;
 function readLoaderPresentation(element, windowObject) {
   if (typeof windowObject?.['getComputedStyle'] === 'function')
     try {

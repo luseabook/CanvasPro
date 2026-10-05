@@ -37,7 +37,7 @@ function createDeferredWebPreviewRuntime({
     webPreviewManager = null,
     ensureRuntimePromise = null,
     disposed = ![];
-  const createIdleSyncResult = () => ({ ok: !![], count: 0x0, visibleCount: 0x0 }),
+  const createIdleSyncResult = () => ({ ok: !![], count: 0, visibleCount: 0 }),
     createDisabledResult = () => ({ ok: ![], error: 'browser-node-disabled' });
   async function ensureRuntime() {
     if (disposed) return null;
@@ -90,14 +90,14 @@ function createDeferredWebPreviewRuntime({
         keptViews = views['filter'](shouldKeepWebPreviewView),
         nextPayload = { ...payload, views: keptViews };
       if (webPreviewManager) return webPreviewManager['syncViews'](nextPayload);
-      if (keptViews['length'] === 0x0) return createIdleSyncResult();
+      if (keptViews['length'] === 0) return createIdleSyncResult();
       const runtime = await ensureRuntime();
       if (!runtime)
         return mode === 'off' ? createDisabledResult() : { ok: ![], error: 'browser-node-unavailable' };
       return runtime['syncViews'](nextPayload);
     },
     async disposeViews(payload = {}) {
-      if (!webPreviewManager) return { ok: !![], disposed: 0x0 };
+      if (!webPreviewManager) return { ok: !![], disposed: 0 };
       return webPreviewManager['disposeViews'](payload);
     },
     async controlView(payload = {}) {
@@ -115,8 +115,8 @@ function createDeferredWebPreviewRuntime({
       if (disposed) return Promise['resolve']([]);
       const requestedWaitMs = Number(payload?.['waitMs']),
         waitMs = Number['isFinite'](requestedWaitMs)
-          ? Math['max'](0x32, Math['min'](0x9c4, requestedWaitMs))
-          : 0x3e8;
+          ? Math['max'](50, Math['min'](2500, requestedWaitMs))
+          : 1000;
       return new Promise((resolve) => setTimeout(resolve, waitMs, []));
     },
     async dispose() {
@@ -218,7 +218,7 @@ export async function startChromeShellRuntime({
             const startupError = new Error('Chrome shell exited before the renderer completed startup');
             return (
               (startupError['code'] =
-                closeContext?.['code'] === 0x0 && !closeContext?.['signal']
+                closeContext?.['code'] === 0 && !closeContext?.['signal']
                   ? 'CHROME_SHELL_STARTUP_CANCELLED'
                   : 'CHROME_SHELL_EXITED_BEFORE_READY'),
               (startupError['details'] = closeContext),
@@ -260,7 +260,7 @@ export async function startChromeShellRuntime({
           context: {
             browserPath: launch['browserPath'],
             profileDir: launch['profileDir'],
-            elapsedMs: Number(readiness?.['elapsedMs'] || 0x0),
+            elapsedMs: Number(readiness?.['elapsedMs'] || 0),
           },
         }));
     }
@@ -321,7 +321,7 @@ export async function startChromeShellRuntime({
         source: 'main',
         message: launchClosed
           ? 'Chrome shell close completed; profile release is not confirmed'
-          : 'Chrome\x20shell\x20process\x20tree\x20could\x20not\x20be\x20confirmed\x20closed\x20after\x20startup\x20failure',
+          : 'Chrome shell process tree could not be confirmed closed after startup failure',
         context: { closed: launchClosed },
       });
     }
@@ -340,7 +340,7 @@ export async function startChromeShellRuntime({
         level: windowClosed ? 'info' : 'warn',
         source: 'main',
         message: windowClosed
-          ? 'Detached\x20Chrome\x20shell\x20window\x20closed\x20after\x20startup\x20failure'
+          ? 'Detached Chrome shell window closed after startup failure'
           : 'Detached Chrome shell window could not be closed after startup failure',
         context: { closed: windowClosed },
       });

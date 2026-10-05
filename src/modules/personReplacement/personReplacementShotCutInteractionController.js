@@ -36,21 +36,21 @@ export function createPersonReplacementShotCutInteractionController({
   updateSmartClipSettings: updateSmartClipSettings = () => {},
 } = {}) {
   if (!session?.['workspaceState'])
-    throw new TypeError('Shot\x20cut\x20interactions\x20require\x20a\x20session.');
+    throw new TypeError('Shot cut interactions require a session.');
   if (!previewController || !viewportController || !editorController)
     throw new TypeError('Shot cut interactions require preview, viewport, and editor owners.');
   const timelineSec = session['workspaceState'],
     getTimelineSecFromPointer = (event, el) => {
       const box = el?.['getBoundingClientRect']?.(),
         count = Number(box?.['width']);
-      if (!(count > 0x0)) return timelineSec['playheadSec'];
+      if (!(count > 0)) return timelineSec['playheadSec'];
       const personReplacementShotCutDisplayDuration = getPersonReplacementShotCutDisplayDuration(
           timelineSec['draft'],
         ),
-        clamp2 = clamp((Number(event?.['clientX']) - Number(box?.['left'] || 0x0)) / count, 0x0, 0x1, 0x0);
+        clamp2 = clamp((Number(event?.['clientX']) - Number(box?.['left'] || 0)) / count, 0, 1, 0);
       return clamp(
         clamp2 * personReplacementShotCutDisplayDuration,
-        0x0,
+        0,
         getPersonReplacementShotCutTotalDuration(timelineSec['draft']),
         timelineSec['playheadSec'],
       );
@@ -63,7 +63,7 @@ export function createPersonReplacementShotCutInteractionController({
       )
         return;
       const entry = () => {
-          timelineSec['hoverPreviewRaf'] = 0x0;
+          timelineSec['hoverPreviewRaf'] = 0;
           if (
             timelineSec['isKeyframeCapturing'] ||
             !timelineSec['hoverPreviewActive'] ||
@@ -75,7 +75,7 @@ export function createPersonReplacementShotCutInteractionController({
           const record = Number(timelineSec['hoverPreviewRequest']);
           if (!Number['isFinite'](record)) return;
           const timelineSec2 = getPersonReplacementShotCutPositionAtTimelineSec(timelineSec['draft'], record);
-          if (timelineSec2['shotIndex'] < 0x0) return;
+          if (timelineSec2['shotIndex'] < 0) return;
           previewController['preview'](timelineSec2['shotId'], timelineSec2['sourceTimeSec'], {
             timelineSec: timelineSec2['timelineSec'],
             hover: !![],
@@ -84,7 +84,7 @@ export function createPersonReplacementShotCutInteractionController({
         handler2 = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
       typeof handler2 === 'function'
         ? (timelineSec['hoverPreviewRaf'] = handler2(entry))
-        : (timelineSec['hoverPreviewRaf'] = windowObject?.['setTimeout']?.(entry, 0x10) || 0x0);
+        : (timelineSec['hoverPreviewRaf'] = windowObject?.['setTimeout']?.(entry, 16) || 0);
     },
     syncHoverPlayhead = (event2) => {
       const el2 = getRoot(),
@@ -107,9 +107,9 @@ export function createPersonReplacementShotCutInteractionController({
       ((el3['hidden'] = ![]),
         el3['style']?.['setProperty']?.(
           'left',
-          (personReplacementShotCutDisplayDuration2 > 0x0
-            ? (payload / personReplacementShotCutDisplayDuration2) * 0x64
-            : 0x0) + '%',
+          (personReplacementShotCutDisplayDuration2 > 0
+            ? (payload / personReplacementShotCutDisplayDuration2) * 100
+            : 0) + '%',
         ),
         el3['classList']?.['add']?.('is-visible'),
         (timelineSec['hoverPreviewActive'] = !![]),
@@ -143,7 +143,7 @@ export function createPersonReplacementShotCutInteractionController({
       if (config && scope?.['paused'] !== ![]) {
         const personReplacementShotCutPositionAtTimelineSec =
           getPersonReplacementShotCutPositionAtTimelineSec(timelineSec['draft'], timelineSec['playheadSec']);
-        personReplacementShotCutPositionAtTimelineSec['shotIndex'] >= 0x0 &&
+        personReplacementShotCutPositionAtTimelineSec['shotIndex'] >= 0 &&
           previewController['preview'](
             personReplacementShotCutPositionAtTimelineSec['shotId'],
             personReplacementShotCutPositionAtTimelineSec['sourceTimeSec'],
@@ -158,28 +158,28 @@ export function createPersonReplacementShotCutInteractionController({
       const el6 = getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-track]');
       if (!el6) return;
       const durationSec = getPersonReplacementShotCutTotalDuration(timelineSec['draft']);
-      let startSec = 0x0;
+      let startSec = 0;
       (timelineSec['draft']['forEach']((input, output) => {
-        const value3 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(input['durationSec']) || 0x0),
+        const value3 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(input['durationSec']) || 0),
           mediaClipTimelineRangeRect = getMediaClipTimelineRangeRect({
             startSec: startSec,
             endSec: startSec + value3,
             durationSec: durationSec,
-            minWidthPct: 0x0,
+            minWidthPct: 0,
           }),
-          el7 = el6['querySelector']?.('[data-person-replacement-cut-shot-index="' + output + '\x22]');
+          el7 = el6['querySelector']?.('[data-person-replacement-cut-shot-index="' + output + '"]');
         (el7?.['style']?.['setProperty']?.('left', mediaClipTimelineRangeRect['leftPct'] + '%'),
           el7?.['style']?.['setProperty']?.('width', mediaClipTimelineRangeRect['widthPct'] + '%'),
           (startSec += value3));
-        const el8 = el7?.['querySelector']?.('[data-person-replacement-cut-duration="' + output + '\x22]');
+        const el8 = el7?.['querySelector']?.('[data-person-replacement-cut-duration="' + output + '"]');
         el8 && (el8['textContent'] = formatDurationLabel(value3));
       }),
         el6['querySelectorAll']?.('[data-person-replacement-cut-boundary-index]')?.['forEach']?.((el9) => {
           const count2 = Math['trunc'](Number(el9['dataset']?.['personReplacementCutBoundaryIndex'])),
             enabled2 = timelineSec['draft'][count2];
-          if (!(count2 > 0x0) || !enabled2) return;
+          if (!(count2 > 0) || !enabled2) return;
           (el9['classList']?.['toggle']?.('is-dragging', count2 === value2),
-            el9['setAttribute']?.('aria-valuenow', enabled2['startSec']['toFixed'](0x4)));
+            el9['setAttribute']?.('aria-valuenow', enabled2['startSec']['toFixed'](4)));
         }),
         viewportController['syncPlayhead']());
     },
@@ -211,29 +211,29 @@ export function createPersonReplacementShotCutInteractionController({
       const value9 = Math['trunc'](Number(value8)),
         box2 = el10?.['getBoundingClientRect']?.(),
         count3 = Number(box2?.['width']);
-      if (!(count3 > 0x0)) return timelineSec['draft'][value9]?.['startSec'];
+      if (!(count3 > 0)) return timelineSec['draft'][value9]?.['startSec'];
       const personReplacementShotCutDisplayDuration3 = getPersonReplacementShotCutDisplayDuration(
         timelineSec['draft'],
       );
-      let count4 = value9 - 0x1;
+      let count4 = value9 - 1;
       while (
-        count4 > 0x0 &&
-        timelineSec['draft'][count4 - 0x1]?.['sourceId'] === timelineSec['draft'][value9]?.['sourceId']
+        count4 > 0 &&
+        timelineSec['draft'][count4 - 1]?.['sourceId'] === timelineSec['draft'][value9]?.['sourceId']
       ) {
-        count4 -= 0x1;
+        count4 -= 1;
       }
       const value10 = timelineSec['draft']
-          ['slice'](0x0, count4)
-          ['reduce']((value11, value12) => value11 + value12['durationSec'], 0x0),
-        value13 = Number(timelineSec['draft'][count4]?.['startSec']) || 0x0,
-        clamp3 = clamp((Number(event4?.['clientX']) - Number(box2['left'] || 0x0)) / count3, 0x0, 0x1, 0x0);
+          ['slice'](0, count4)
+          ['reduce']((value11, value12) => value11 + value12['durationSec'], 0),
+        value13 = Number(timelineSec['draft'][count4]?.['startSec']) || 0,
+        clamp3 = clamp((Number(event4?.['clientX']) - Number(box2['left'] || 0)) / count3, 0, 1, 0);
       return value13 + clamp3 * personReplacementShotCutDisplayDuration3 - value10;
     },
     beginBoundaryDrag = (event5, el11) => {
       if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']() || !el11) return ![];
       const active2 = Math['trunc'](Number(el11['dataset']?.['personReplacementCutBoundaryIndex'])),
         enabled5 = el11['closest']?.('[data-person-replacement-shot-cut-track]');
-      if (!(active2 > 0x0) || !enabled5) return ![];
+      if (!(active2 > 0) || !enabled5) return ![];
       event5['preventDefault']?.();
       try {
         el11['focus']?.({ preventScroll: !![] });
@@ -295,7 +295,7 @@ export function createPersonReplacementShotCutInteractionController({
       const project = getProject();
       return (
         (timelineSec['previewShotId'] =
-          project['workspace']['selectedShotId'] || timelineSec['draft'][0x0]?.['shotId'] || ''),
+          project['workspace']['selectedShotId'] || timelineSec['draft'][0]?.['shotId'] || ''),
         requestRender(),
         previewController['preview'](
           timelineSec['previewShotId'],
@@ -322,9 +322,9 @@ export function createPersonReplacementShotCutInteractionController({
       );
       timelineSec['playheadSec'] = clamp(
         timelineSec['playheadSec'],
-        0x0,
+        0,
         personReplacementShotCutTotalDuration,
-        0x0,
+        0,
       );
       const timelineSec3 = getPersonReplacementShotCutPositionAtTimelineSec(
         timelineSec['draft'],
@@ -332,9 +332,9 @@ export function createPersonReplacementShotCutInteractionController({
       );
       return (
         (timelineSec['previewShotId'] =
-          timelineSec3['shotId'] || timelineSec['draft'][0x0]?.['shotId'] || ''),
+          timelineSec3['shotId'] || timelineSec['draft'][0]?.['shotId'] || ''),
         requestRender(),
-        timelineSec3['shotIndex'] >= 0x0 &&
+        timelineSec3['shotIndex'] >= 0 &&
           previewController['preview'](timelineSec3['shotId'], timelineSec3['sourceTimeSec'], {
             timelineSec: timelineSec3['timelineSec'],
           }),
@@ -379,18 +379,18 @@ export function createPersonReplacementShotCutInteractionController({
               (requestRender(), windowObject?.['showToast']?.('智能检测结果与当前切口一致。', 'info'));
               return;
             }
-            ((timelineSec['playheadSec'] = 0x0),
-              (timelineSec['previewShotId'] = list[0x0]?.['shotId'] || ''),
+            ((timelineSec['playheadSec'] = 0),
+              (timelineSec['previewShotId'] = list[0]?.['shotId'] || ''),
               requestRender(),
               previewController['preview'](
                 timelineSec['previewShotId'],
-                Number(list[0x0]?.['startSec']) || 0x0,
+                Number(list[0]?.['startSec']) || 0,
                 {
-                  timelineSec: 0x0,
+                  timelineSec: 0,
                 },
               ),
               windowObject?.['showToast']?.(
-                '智能检测完成，已覆盖为\x20' + list['length'] + '\x20个片段。',
+                '智能检测完成，已覆盖为 ' + list['length'] + ' 个片段。',
                 'success',
               ));
           })
@@ -489,7 +489,7 @@ export function createPersonReplacementShotCutInteractionController({
       togglePlayback: () => previewController['togglePlayback'](),
       step: ({ target: target4 }) =>
         previewController['stepTimeline'](
-          Number(target4['dataset']['personReplacementStepDirection']) < 0x0 ? -0x1 : 0x1,
+          Number(target4['dataset']['personReplacementStepDirection']) < 0 ? -1 : 1,
         ),
       zoom: ({ target: target5, event: event8 }) =>
         viewportController['applyTimelineZoom'](target5['dataset']['personReplacementZoomDirection'], {
